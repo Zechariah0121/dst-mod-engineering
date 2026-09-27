@@ -11,7 +11,7 @@
 
 | 入口 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | 工作流程、关键约束、15 篇专题的按需导航 |
+| [SKILL.md](SKILL.md) | 工作流程、关键约束、17 篇专题的按需导航 |
 | [references/](references/) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
 | [scripts/dst_zip_tool.py](scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
 | [scripts/check_api.py](scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
@@ -22,16 +22,24 @@
 
 ## 安装技能
 
-克隆到所用 AI 工具的技能目录，保持文件夹名称为 `dst-mod-engineering`。例如使用 `$CODEX_HOME/skills` 的 Codex 配置，在 PowerShell 中运行：
+Claude Code、Cursor、GitHub Copilot 和 Codex 的安装目录、调用方式及首次加载检查见 [跨 Agent 接入指南](references/agent-setup.md)。文档按各产品官方说明核对；格式兼容不等于已经逐个实测所有 Agent。
+
+克隆整个目录，保持文件夹名称为 `dst-mod-engineering`。例如，按 [Codex 当前官方说明](https://learn.chatgpt.com/docs/build-skills) 安装到用户技能目录，在 PowerShell 中运行：
 
 ```powershell
-$skills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }
-git clone https://github.com/zhuchengguang317-eng/dst-mod-engineering.git (Join-Path $skills 'dst-mod-engineering')
+$skills = Join-Path $env:USERPROFILE '.agents/skills'
+$destination = Join-Path $skills 'dst-mod-engineering'
+if (Test-Path -LiteralPath $destination) { throw '目标已存在；请先核对和保存本地修改。' }
+New-Item -ItemType Directory -Path $skills -Force | Out-Null
+git clone https://github.com/zhuchengguang317-eng/dst-mod-engineering.git $destination
+if ($LASTEXITCODE -ne 0) { throw '技能克隆失败，请检查 Git 输出。' }
 ```
 
-如果目标目录已有技能，先比较并保存本地修改，再选择安装位置。其他工具按其技能发现规则放置整个目录。重新打开会话后可明确调用：
+已有旧目录安装时，先确认当前 Agent 实际加载的位置，不自动迁移或同时安装多个同名副本。不支持技能发现机制的 Agent 也可使用完整目录，并明确要求它读取文件：
 
-> 使用 `$dst-mod-engineering` 审查这个 Mod。先核对当前游戏源码，再修复确定故障；玩法取舍先列出选项。分别报告静态检查、专服行为和客户端验收结果。
+> 请读取 `<技能目录>/SKILL.md`，按导航读取相关参考，然后审查这个 Mod。先核对当前游戏源码，再修复确定故障；玩法取舍先列出选项。分别报告静态检查、专服行为和客户端验收结果。
+
+原生技能调用按 Agent 的命令选择；例如 Codex 使用 `$dst-mod-engineering`。只有聊天能力时可阅读和分析，执行脚本需要终端与文件权限，视觉验收还需可访问的客户端或人工反馈。Windows 专服测试器的系统限制与 Agent 品牌无关。
 
 单纯阅读技能无需安装 Python 包。运行 `check_api.py` 和自动测试需要 Python 3.10+ 与 `luaparser`；建议为仓库单独创建虚拟环境：
 
@@ -85,7 +93,9 @@ end)
 
 ## 动画与音频工具
 
-按任务选用 DST Mod Tool、Klei Mod Tools、`ktech`、`krane` 与 FMOD 工具；具体版本、能力和输入输出先在自己的环境核对。本仓库不捆绑这些程序，也不要求执行旧教程附件。
+**本机没有动画工具也有接入流程**：按 [工具安装与首次验证](references/tool-bootstrap.md) 先识别任务，检查现有工具，再选择必需工具的官方或作者发布入口。Agent 应说明缺什么、从哪里获取、装到哪里及如何验证；已有安装授权就继续执行，没有授权时一次提出明确方案。不会因为安装了技能就无条件安装所有程序。
+
+指南覆盖 DST Mod Tool、Klei Don't Starve Mod Tools、`ktech` / `krane`，并说明无 GUI、断网和平台不匹配时的处理。首次验证包括实际的小型转换或编译；仅能显示 `--help` 不算产物验证。本仓库不捆绑这些工具。音频任务的 FMOD 流程另见对应专题。
 
 动画工作流见 [资源与动画](references/assets-animation.md) 和 [DST Mod Tool](references/dst-mod-tool.md)；音效见 [音频与粒子](references/audio-particles.md)。
 

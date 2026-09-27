@@ -20,8 +20,12 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 
 ## 按问题读取
 
+首次接入其他 Agent、技能未识别时，先读 [Agent 接入](references/agent-setup.md)。缺少当前任务必需的动画工具时，先读 [工具安装与首次验证](references/tool-bootstrap.md)：主动查明来源、平台和最小依赖，给出可执行的安装方案；获得相应安装授权后继续下载、配置和产物验证。已有授权不重复询问，也不能只报告“工具不存在”后停下。
+
 | 当前任务 | 参考文件 |
 |---|---|
+| Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
+| 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
 | 首次定位游戏、当前源码、Python、工具版本 | [environment-tools.md](references/environment-tools.md) |
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](references/entities-components.md) |

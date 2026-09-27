@@ -81,7 +81,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/my_item.xml", "my_item.tex")
 
 ## 工具选择与编译
 
-先发现实际安装路径、版本和 help，不用资料夹名当版本。2026-09-27 核验环境快照：DMT 1.1.13；ktech 自报 4.4.0；官方 Mod Tools 有 `scml.exe`、`buildanimation.py`、`image_build.py` 和 Python 2.7。这些是历史快照，不是固定依赖版本；换机器/工具后重新发现，不自动安装或升级。
+先发现实际安装路径、版本和 help，不用资料夹名当版本。2026-09-27 核验环境快照：DMT 1.1.13；ktech 自报 4.4.0；官方 Mod Tools 有 `scml.exe`、`buildanimation.py`、`image_build.py` 和 Python 2.7。这些是历史快照，不是固定依赖版本；换机器/工具后重新发现。缺少必需工具时进入 [工具安装与首次验证](tool-bootstrap.md)，按实际任务和已有授权处理下载安装，不依据旧版本号自行升级。
 
 | 任务 | 合适工具 | 边界 |
 |---|---|---|
