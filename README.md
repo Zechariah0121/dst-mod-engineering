@@ -11,14 +11,34 @@
 
 | 入口 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | 工作流程、关键约束、17 篇专题的按需导航 |
+| [SKILL.md](SKILL.md) | 工作流程、关键约束、18 篇专题的按需导航 |
 | [references/](references/) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
 | [scripts/dst_zip_tool.py](scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
 | [scripts/check_api.py](scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
 | [scripts/dst_modtest.py](scripts/dst_modtest.py) | Windows 离线单分片专服测试，使用唯一副本、明确完成标记和证据清单 |
-| [tests/](tests/) | 使用自造夹具的自动回归，不要求安装游戏 |
+| [scripts/build_web_bundle.py](scripts/build_web_bundle.py) | 自动生成网页资料包，并检查与源文件的一致性 |
+| [tests/](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
 
 技能可独立使用，不需要安装历史 `dst-mod-development` 或 `dst-mod-devkit`。现有旧技能不会被本仓库自动覆盖。
+
+## 网页 AI：下载后使用
+
+无需本地 Agent 或 Python。按当前网页实际支持的功能选择文件，然后照 [网页使用指南](references/web-chat.md) 的启动提示词提供任务与材料：
+
+| 用法 | 下载 |
+|---|---|
+| 平台提供原生“上传技能”入口 | [技能 ZIP](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，内含单一 `dst-mod-engineering/` 根目录；它不是插件安装包 |
+| 普通聊天，先确认材料和能力 | [入门 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
+| 代码审查 / 修复 | [代码审查 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
+| 联机 / 存档 / UI | [联机 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
+| 贴图 / 动画 / 音频工具 | [资源 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
+| 世界生成 / 空间判定 | [世界生成 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
+| 下载全部专题后自行选择 | [网页资料 ZIP](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip)，解压后只上传本次需要的 Markdown |
+| 明确需要全部文档且平台容量允许 | [完整 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+
+通常选择一份专题即可，其中已包含共同入口。ZIP 作为普通附件上传，不代表平台一定会解压或注册技能；无法读取时改传单个 Markdown。若 Markdown 不被接受，可按指南分段粘贴必要文本。
+
+平台的账号、工作区、上传和代码执行能力各不相同。资料包没有游戏源码或动画程序，也不会给予网页 AI 本机访问权限。需要本机编译或游戏测试时使用 [本机验证交接单](templates/local-validation.md)，把真实结果交回网页 AI 复核。各包的源文件指纹和输出哈希见 [bundle-index.json](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/bundle-index.json)。
 
 ## 安装技能
 
@@ -101,11 +121,15 @@ end)
 
 ## 验证与维护
 
+以下命令供维护者在 **GitHub 源码仓库** 根目录运行；网页上传用技能 ZIP 不包含测试目录或 CI 配置。网页资料从同一份文档生成，禁止手工改生成文件：
+
 ```powershell
 & $python -m unittest discover -s tests -v
+& $python scripts/build_web_bundle.py
+& $python scripts/build_web_bundle.py --check
 ```
 
-GitHub Actions 在 Windows / Linux 上执行无需游戏的回归检查。游戏引擎实测由本地合法安装完成，不在 CI 中下载或运行游戏。
+生成器仅需 Python 标准库；它不会下载或安装工具。GitHub Actions 在 Windows / Linux 上执行无需游戏的回归检查，并检查提交的网页包是否与源码一致。修改输入文档或脚本后重新生成 `dist/web/` 再提交，避免上传版与技能正文漂移。游戏引擎实测由本地合法安装完成，不在 CI 中下载或运行游戏。
 
 首轮整理日期为 **2026-09-27**；核验针对当时实际安装的源码快照，不宣称永远对应最新游戏版本。检查范围、源码指纹、已测结果和未测部分见 [验证记录](docs/validation.md)。游戏更新后，应重新核对相关实现与调用链。
 

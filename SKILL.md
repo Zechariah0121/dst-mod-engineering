@@ -22,8 +22,11 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 
 首次接入其他 Agent、技能未识别时，先读 [Agent 接入](references/agent-setup.md)。缺少当前任务必需的动画工具时，先读 [工具安装与首次验证](references/tool-bootstrap.md)：主动查明来源、平台和最小依赖，给出可执行的安装方案；获得相应安装授权后继续下载、配置和产物验证。已有授权不重复询问，也不能只报告“工具不存在”后停下。
 
+网页聊天、上传附件或云端执行环境先读 [网页使用指南](references/web-chat.md)：确认实际可读的材料和执行位置，按任务补充资料；不能把上传成功当作完整读取，也不能把云端脚本运行当成本机 DST 验收。
+
 | 当前任务 | 参考文件 |
 |---|---|
+| 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
 | 首次定位游戏、当前源码、Python、工具版本 | [environment-tools.md](references/environment-tools.md) |
@@ -57,5 +60,6 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 - `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
+- `scripts/build_web_bundle.py`：供维护者从公开仓库生成技能 ZIP 和按专题合并的网页资料；`--check` 只读核对产物是否匹配源文件，不编译 Mod，也不安装第三方工具。
 
 维护技能时，以“实际失败 → 原版/工具契约 → 可复现验证”为新增规则的依据。版本相关结论保留核验日期与源码定位；不可验证的经验保留为待查项，不升级为铁律。

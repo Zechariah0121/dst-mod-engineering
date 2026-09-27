@@ -34,3 +34,5 @@ jobs:
         run: python -m compileall -q scripts tests
       - name: Run unit tests with synthetic fixtures (no DST installation)
         run: python -m unittest discover -s tests -v
+      - name: Verify generated web bundles match source files
+        run: python scripts/build_web_bundle.py --check
