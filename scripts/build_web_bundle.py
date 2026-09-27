@@ -157,7 +157,7 @@ def make_outputs(root):
             text = inputs[name].decode('utf-8')
             sections.extend([f'\n---\n\n## 来源：`{name}`\n\n原始 SHA-256：`{hashes[name]}`\n\n',
                              rewrite_links(text, name), '\n'])
-        outputs[f'web-{profile}.md'] = ''.join(sections).encode('utf-8')
+        outputs[f'web-{profile}.md'] = (''.join(sections).rstrip('\n') + '\n').encode('utf-8')
     reading = {name: data for name, data in outputs.items()}
     reading['local-validation.md'] = inputs['templates/local-validation.md']
     reading['LICENSE'] = inputs['LICENSE']

@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`d96d834548c5e84bf375057cf050e56b6eff31d3c96278b9a5095b6881e55871`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`d0bc539afe166cc689cdfcc0f30e1e18d3c1d412ebdaca1e0c964f7b6c4af450`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -2374,4 +2374,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
