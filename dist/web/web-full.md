@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`51869d02d57f9c98754c0895e77590cf8f44d2dc016cff99cc98ad0a6db3ee34`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -440,7 +440,7 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 
 ## 来源：`README.md`
 
-原始 SHA-256：`5baef55a3061336bce11dd13e88a179d863ae396558516c852fc863442bca4c9`
+原始 SHA-256：`a254b61d68db587e15a5b3b2b49f7e1ddfc436e79f1d32c396373c7e5cc0aca2`
 
 # dst-mod-engineering
 
@@ -567,6 +567,12 @@ end)
 
 ## 验证与维护
 
+### 公开内容与本机资料分开
+
+GitHub 源码、网页 Markdown 和技能 ZIP 只发布通用开发知识、公开来源与自造示例。私人 Mod 的名称、代码、素材、设计数值、交接记录、测试日志、存档、用户名和真实目录留在本机；经验需先抽象成不依赖私人项目的规则，再进入公开版。本机安装目录不是发行源，发布从本仓库的已审查文件生成。
+
+本机专用 Markdown 用独立一行的 `<!-- local-only -->` 标记，位于 YAML frontmatter 之后或普通文档开头。生成器遇到该标记会拒绝打包，`--check` 同样拒绝，且保留已有产物。此检查只防止带标记文件误打包，不会识别所有未标记的私人内容，也不能阻止直接 Git 提交；提交前仍要审查暂存文件、示例和 ZIP 内文，确认没有带入本机资料。
+
 以下命令供维护者在 **GitHub 源码仓库** 根目录运行；网页上传用技能 ZIP 不包含测试目录或 CI 配置。网页资料从同一份文档生成，禁止手工改生成文件：
 
 ```powershell
@@ -592,7 +598,7 @@ end)
 
 ## 来源：`docs/consolidation.md`
 
-原始 SHA-256：`d7ad82df8a7d840d58c4a4a61321df136541bbb32c3176eea98fd27243130743`
+原始 SHA-256：`3cb2d75872eace520c2a25a4a9bf7d03d05f5fbbbb47fc06bac60ebdf2d57cf7`
 
 # 统一技能的内容去向
 
@@ -611,7 +617,7 @@ end)
 
 - 可复用的完整制作流程保留，但公共规则只维护一次；专题通过链接使用网络、生命周期、工具和测试规范。
 - 原版 API 与项目自定义 helper 分开；从当前安装源码确认签名、端别、调用顺序、注册与清理，不根据旧文件的“实锤”“铁律”措辞提高可信度。
-- 旧项目选定的数值、造型、工具路径、文件夹与 Workshop 副本，仅作为历史背景。重新执行需要当前任务的目标与授权；不会自动覆盖用户环境。
+- 私人项目选定的数值、造型、工具路径、文件夹与 Workshop 副本信息只留在本机资料中，公开版仅保留通用方法。重新执行需要当前任务的目标与授权；不会自动覆盖用户环境。
 - 缺少上下文的旧 Lua 模板不直接分发为可用成品；需要实例化时从本项目和当前原版接口裁取，并补全实际生命周期与验证。
 - 个例缓解办法不升级为全局限制。图集大小、帧数、画布、锚点、音频参数等先以有效产物和目标平台证据核对。
 
@@ -630,7 +636,7 @@ end)
 
 ## 来源：`docs/validation.md`
 
-原始 SHA-256：`0a949c36bd86586a17187d070dcc1efd52384856accad984b83f5cf383b32cce`
+原始 SHA-256：`1bf96a45afc9197c2e7e64f5f7bf4f9b08071d597794ca49e6f7fe5fdcb4c376`
 
 # 验证记录与适用范围
 
@@ -664,6 +670,10 @@ end)
 | 音频工具 | 核对现有 Designer 工具和资料；发现的 Studio 模板仅保留为待验证候选，没有新音效编译、运行或听感通过结论 |
 
 整合沿用并重跑 41 个无游戏回归，同时检查技能入口、相对链接、Python/Lua 示例与 PowerShell 文档语法。网页资料重新由源文件生成；代码审查、网络和资源资料包补入对应新专题。以上检查不替代真实客户端的美术、声音与联机验收，也未安装新工具或修改任何实际 Mod。
+
+## 公开分发边界补充
+
+本机定制内容与发行输入分开维护。打包器新增本机专用 Markdown 标记检查：被标记文件混入允许打包的目录时，生成与 `--check` 均在写出前拒绝。新增两个自造输入回归，覆盖首次生成无残留、已有产物保持，以及 BOM/CRLF 文本；总计 43 个回归。标记不是内容脱敏器，仍需检查实际待发布文件与归档内部内容。发布规则见 [README](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/README.md#公开内容与本机资料分开)。
 
 ## 资料与源码快照
 
@@ -1116,7 +1126,7 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 
 ## 来源：`references/audio-particles.md`
 
-原始 SHA-256：`b9ca186fa77181d425cff039f8efacd5045d5f8bb9b891739966f4c148c129f7`
+原始 SHA-256：`a048ef2322416221a87717ede339f3e3fcf19f2e368c4f7a648c53e6d972a2b0`
 
 # 音频与粒子特效
 
@@ -1185,7 +1195,7 @@ if ($LASTEXITCODE -ne 0) { throw '音频转换失败' }
 
 表格中的 `\|` 是 Markdown 转义；传给 FFmpeg 的完整滤镜字符串应使用普通 `|` 并整体加引号。单位与选项依据 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前再看已安装版本帮助。
 
-`peak=-10 dBFS`、固定增益和固定回声层数仅是旧项目取值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
+峰值目标、增益和回声层数按本次素材与游戏混音确定，不继承其他项目的固定值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
 
 ## FDP 工程与 3D 设置
 
@@ -1537,7 +1547,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 
 ## 来源：`references/cooker-dishes.md`
 
-原始 SHA-256：`7c0369f5a58993cfe432473a11c95360aaee32066955815bdfe938f3ce81a475`
+原始 SHA-256：`9e176f8455d6f0f0ba9ff440493ca2ae86f01a004e5e9dcde7b995edd0113cf5`
 
 # 新增与维护锅料理
 
@@ -1549,7 +1559,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 
 先列正例、反例和应保留的竞争配方，分别在普通锅与便携锅判断。`names` 使用 `cooking.lua` 规范化后的食材名，`tags` 是累计值；具体食材个数与标签值不是同一个条件。未出现的字段可能为 nil。`AddIngredientValues` 会替换已有食材标签，不能为了新料理顺手清掉原版属性。
 
-盘点项目实际模块，不要求创建固定的 `recipes.lua`、`atlas.lua`、`strings_cn.lua` 或调味文件。旧项目中的 `AddModCookerRecipe`、`MOD_FOOD_RECIPES`、`MOD_FOODS`、`SHARED_ANIM_DISHES`、`MOD_DISH_QUOTES` 都是项目封装/数据表，**不是原版公共接口**；遇到它们先读定义、调用方和初始化顺序，不能搬名称就假定可用。
+盘点项目实际模块，不要求固定文件名或调味模块布局。项目自定义的配方包装函数、料理数据表、图集分组与台词表**不是原版公共接口**；先读实际定义、调用方和初始化顺序，确认最终如何接入原版 `AddCookerRecipe` 等接口，不能搬名称就假定可用。
 
 尽量以一份已确认的数据定义基础料理，供配方和 prefab 构造读取，再派生调味数据。既有项目必须多表维护时，逐字段核对并记录映射，避免只改配方提示而没有改变实体数值。生成变体时复制所需嵌套表，避免意外修改基础数据。
 
@@ -1571,7 +1581,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 
 原版数据文件最后会补齐 `name`、`weight` 等字段；`AddCookerRecipe` 本身没有替任意 Mod 配方做同样的补齐。当前抽取分支直接使用 `candidate.weight`，省略它可能运行时报错。
 
-腐烂时长按已批准的天数使用当前 `TUNING.TOTAL_DAY_TIME` 或适当的 TUNING 常量，别从旧样例继承 `10 * 480`。当前 `FOODTYPE` 不只有 VEGGIE/MEAT/GOODIES，也没有 FISH；食材 `fish` 标签不等于可食组件枚举。怪物副类型是否保留属于饮食设计，不能为消除某角色限制擅自改掉。
+腐烂时长按已批准的天数使用当前 `TUNING.TOTAL_DAY_TIME` 或适当的 TUNING 常量，不继承其他项目的天数与硬编码日长。当前 `FOODTYPE` 不只有 VEGGIE/MEAT/GOODIES，也没有 FISH；食材 `fish` 标签不等于可食组件枚举。怪物副类型是否保留属于饮食设计，不能为消除某角色限制擅自改掉。
 
 ## 3. 产品实体与资源接线
 
@@ -1584,7 +1594,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 - 复用原版 `cook_pot_food` 的 bank/idle 与换符号路径时，新资源可只提供 build 和图集；不强行制造 `anim.bin`。如果料理确实有独立动作，则检查相应 bank、animation 与完整依赖。
 - 普通锅/便携锅使用 `recipe.overridebuild` 和 `recipe.overridesymbolname or product` 覆盖 `swap_cooked`。用自定义 symbol 名时，这个字段只解决锅的调用；自己 prefab 的 `OverrideSymbol` 仍要对应真实符号。原版食物构造默认使用 `basename or name`，没有自动消费该覆盖字段。
 - 库存图标链条为 TEX/XML Element → `RegisterInventoryItemAtlas(atlas, image_with_tex)` → inventoryitem/replica 查询；XML Texture 文件名不必等于 Element 名。图鉴默认也查询此注册，避免只给实例设置 atlas 而遗漏静态图鉴路径。
-- 64×64 库存源图可作常见起点，200×132 地面图、固定内容范围、固定缩放和颜色倍率都是旧项目美术参数，不是通用标准。保持 alpha，不能直接按白色阈值删除白色主体与高光。
+- 库存与地面源图的画布、内容范围、缩放和颜色倍率按目标资源与美术需求确定，不继承其他项目的固定参数。保持 alpha，不能直接按白色阈值删除白色主体与高光。
 
 图像处理、当前工具发现、DMT 预览和 ZIP 校验沿 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)、[DMT 工作流](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md)、[工具安装](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 执行。没有强制的 ComfyUI 模型、端口或出图后处理流水线。官方编译器报缺少 `animation.xml` 时，应定位输入工程、导出日志与当前工具契约；旧文档“第一次故意失败→手写固定矩阵 XML→再编译”的补丁不作为通用流程。也不要为了改变时间戳或压缩算法无条件重写已有效的 ZIP。
 

@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-code-review
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`51869d02d57f9c98754c0895e77590cf8f44d2dc016cff99cc98ad0a6db3ee34`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -1020,7 +1020,7 @@ end
 
 ## 来源：`references/cooker-dishes.md`
 
-原始 SHA-256：`7c0369f5a58993cfe432473a11c95360aaee32066955815bdfe938f3ce81a475`
+原始 SHA-256：`9e176f8455d6f0f0ba9ff440493ca2ae86f01a004e5e9dcde7b995edd0113cf5`
 
 # 新增与维护锅料理
 
@@ -1032,7 +1032,7 @@ end
 
 先列正例、反例和应保留的竞争配方，分别在普通锅与便携锅判断。`names` 使用 `cooking.lua` 规范化后的食材名，`tags` 是累计值；具体食材个数与标签值不是同一个条件。未出现的字段可能为 nil。`AddIngredientValues` 会替换已有食材标签，不能为了新料理顺手清掉原版属性。
 
-盘点项目实际模块，不要求创建固定的 `recipes.lua`、`atlas.lua`、`strings_cn.lua` 或调味文件。旧项目中的 `AddModCookerRecipe`、`MOD_FOOD_RECIPES`、`MOD_FOODS`、`SHARED_ANIM_DISHES`、`MOD_DISH_QUOTES` 都是项目封装/数据表，**不是原版公共接口**；遇到它们先读定义、调用方和初始化顺序，不能搬名称就假定可用。
+盘点项目实际模块，不要求固定文件名或调味模块布局。项目自定义的配方包装函数、料理数据表、图集分组与台词表**不是原版公共接口**；先读实际定义、调用方和初始化顺序，确认最终如何接入原版 `AddCookerRecipe` 等接口，不能搬名称就假定可用。
 
 尽量以一份已确认的数据定义基础料理，供配方和 prefab 构造读取，再派生调味数据。既有项目必须多表维护时，逐字段核对并记录映射，避免只改配方提示而没有改变实体数值。生成变体时复制所需嵌套表，避免意外修改基础数据。
 
@@ -1054,7 +1054,7 @@ end
 
 原版数据文件最后会补齐 `name`、`weight` 等字段；`AddCookerRecipe` 本身没有替任意 Mod 配方做同样的补齐。当前抽取分支直接使用 `candidate.weight`，省略它可能运行时报错。
 
-腐烂时长按已批准的天数使用当前 `TUNING.TOTAL_DAY_TIME` 或适当的 TUNING 常量，别从旧样例继承 `10 * 480`。当前 `FOODTYPE` 不只有 VEGGIE/MEAT/GOODIES，也没有 FISH；食材 `fish` 标签不等于可食组件枚举。怪物副类型是否保留属于饮食设计，不能为消除某角色限制擅自改掉。
+腐烂时长按已批准的天数使用当前 `TUNING.TOTAL_DAY_TIME` 或适当的 TUNING 常量，不继承其他项目的天数与硬编码日长。当前 `FOODTYPE` 不只有 VEGGIE/MEAT/GOODIES，也没有 FISH；食材 `fish` 标签不等于可食组件枚举。怪物副类型是否保留属于饮食设计，不能为消除某角色限制擅自改掉。
 
 ## 3. 产品实体与资源接线
 
@@ -1067,7 +1067,7 @@ end
 - 复用原版 `cook_pot_food` 的 bank/idle 与换符号路径时，新资源可只提供 build 和图集；不强行制造 `anim.bin`。如果料理确实有独立动作，则检查相应 bank、animation 与完整依赖。
 - 普通锅/便携锅使用 `recipe.overridebuild` 和 `recipe.overridesymbolname or product` 覆盖 `swap_cooked`。用自定义 symbol 名时，这个字段只解决锅的调用；自己 prefab 的 `OverrideSymbol` 仍要对应真实符号。原版食物构造默认使用 `basename or name`，没有自动消费该覆盖字段。
 - 库存图标链条为 TEX/XML Element → `RegisterInventoryItemAtlas(atlas, image_with_tex)` → inventoryitem/replica 查询；XML Texture 文件名不必等于 Element 名。图鉴默认也查询此注册，避免只给实例设置 atlas 而遗漏静态图鉴路径。
-- 64×64 库存源图可作常见起点，200×132 地面图、固定内容范围、固定缩放和颜色倍率都是旧项目美术参数，不是通用标准。保持 alpha，不能直接按白色阈值删除白色主体与高光。
+- 库存与地面源图的画布、内容范围、缩放和颜色倍率按目标资源与美术需求确定，不继承其他项目的固定参数。保持 alpha，不能直接按白色阈值删除白色主体与高光。
 
 图像处理、当前工具发现、DMT 预览和 ZIP 校验沿 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)、[DMT 工作流](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md)、[工具安装](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 执行。没有强制的 ComfyUI 模型、端口或出图后处理流水线。官方编译器报缺少 `animation.xml` 时，应定位输入工程、导出日志与当前工具契约；旧文档“第一次故意失败→手写固定矩阵 XML→再编译”的补丁不作为通用流程。也不要为了改变时间戳或压缩算法无条件重写已有效的 ZIP。
 

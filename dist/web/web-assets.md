@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-assets
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`51869d02d57f9c98754c0895e77590cf8f44d2dc016cff99cc98ad0a6db3ee34`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -817,7 +817,7 @@ tool:select_frame(animation.frames[1])
 
 ## 来源：`references/audio-particles.md`
 
-原始 SHA-256：`b9ca186fa77181d425cff039f8efacd5045d5f8bb9b891739966f4c148c129f7`
+原始 SHA-256：`a048ef2322416221a87717ede339f3e3fcf19f2e368c4f7a648c53e6d972a2b0`
 
 # 音频与粒子特效
 
@@ -886,7 +886,7 @@ if ($LASTEXITCODE -ne 0) { throw '音频转换失败' }
 
 表格中的 `\|` 是 Markdown 转义；传给 FFmpeg 的完整滤镜字符串应使用普通 `|` 并整体加引号。单位与选项依据 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前再看已安装版本帮助。
 
-`peak=-10 dBFS`、固定增益和固定回声层数仅是旧项目取值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
+峰值目标、增益和回声层数按本次素材与游戏混音确定，不继承其他项目的固定值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
 
 ## FDP 工程与 3D 设置
 

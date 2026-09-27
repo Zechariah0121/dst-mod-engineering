@@ -17,6 +17,7 @@ NAME = 'dst-mod-engineering'
 REPOSITORY = 'https://github.com/zhuchengguang317-eng/dst-mod-engineering'
 GENERATOR = 'dst-mod-engineering/web-bundle-v1'
 INDEX = 'bundle-index.json'
+LOCAL_ONLY_MARKER = '<!-- local-only -->'
 ROOT_FILES = ('SKILL.md', 'README.md', 'LICENSE', 'requirements.txt')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'scripts': '.py'}
 COMMON = ('SKILL.md', 'references/web-chat.md', 'references/environment-tools.md',
@@ -76,7 +77,12 @@ def source_files(root):
         path = regular_path(path)
         if not path.is_file():
             raise ValueError(f'Missing source file: {path}')
-        inputs[path.relative_to(root).as_posix()] = path.read_bytes()
+        name = path.relative_to(root).as_posix()
+        data = path.read_bytes()
+        if path.suffix == '.md' and any(
+                line.strip() == LOCAL_ONLY_MARKER for line in data.decode('utf-8-sig').splitlines()):
+            raise ValueError(f'Local-only source cannot be published: {name}')
+        inputs[name] = data
     required = set(COMMON) | {'templates/local-validation.md'}
     required.update(f'references/{name}.md' for names in PROFILE_EXTRA.values() for name in names)
     missing = required - inputs.keys()

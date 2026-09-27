@@ -121,6 +121,22 @@ class WebBundleTests(unittest.TestCase):
         self.assertEqual(self.cli(), 2)
         self.assertFalse(self.output.exists())
 
+    def test_local_only_source_refuses_build_without_creating_output(self):
+        self.put('references/environment-tools.md', '\ufeff  <!-- local-only -->\r\n'
+                 '# Private environment\r\nSynthetic confidential configuration\r\n')
+        self.assertEqual(self.cli(), 2)
+        self.assertFalse(self.output.exists())
+
+    def test_local_only_source_preserves_existing_bundles_in_build_and_check(self):
+        self.assertEqual(self.cli(), 0)
+        before = {p.name: p.read_bytes() for p in self.output.iterdir()}
+        path = self.source / 'SKILL.md'
+        path.write_bytes(path.read_bytes() + b'\n<!-- local-only -->\nPrivate project notes\n')
+        for args in ((), ('--check',)):
+            with self.subTest(args=args):
+                self.assertEqual(self.cli(*args), 2)
+                self.assertEqual({p.name: p.read_bytes() for p in self.output.iterdir()}, before)
+
     def test_rebuild_updates_owned_outputs_and_repairs_missing_owned_file(self):
         self.assertEqual(self.cli(), 0)
         (self.output / 'web-starter.md').unlink()
