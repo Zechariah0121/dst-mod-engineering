@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-starter
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`d0bc539afe166cc689cdfcc0f30e1e18d3c1d412ebdaca1e0c964f7b6c4af450`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -18,16 +18,16 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`c387e1581ac33181e66b67556f1cd586f3aa7faa4fad5006d1095f38ed4ac078`
+原始 SHA-256：`70dc759c800d9216b9c65346404c9eb7f0de69ea6dd687cc6ef92476af2ad020`
 
 ---
 name: dst-mod-engineering
-description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按当前游戏源码处理 Lua、主客机同步、存档生命周期、动作与 UI、物品角色、世界生成及资源工具链；用于新功能、崩溃修复、兼容排查和发布前验证。
+description: 开发、审查与验证《饥荒联机版》DST Mod。按当前源码处理角色、法术、自定义数值、料理、联机与存档，以及角色外观、装备、动画和音效；用于功能开发、崩溃修复、兼容排查与发布检查。
 ---
 
 # DST 模组工程
 
-按当前游戏源码开发、审查与验证 DST Mod。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
+这是 DST 开发、审查、排错与资源制作的统一入口，包含旧通用技能和专项制作流程的核验整合。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
 
 ## 工作顺序
 
@@ -55,13 +55,17 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/entities-components.md) |
 | 角色、Brain、Stategraph、自定义生物 | [characters-brains-stategraphs.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md) |
+| 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md) |
 | netvar、Replica、RPC、客户端与服务端 | [networking-rpc.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/networking-rpc.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md) |
 | HUD、Widget、输入、Action、施法与预测 | [ui-actions-controls.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/ui-actions-controls.md) |
 | 伤害、Buff、容器、冷却、范围查询 | [combat-buffs-containers.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) |
 | 装备、投掷、维修、制作、锅料理、树木种植 | [items-food-plants.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/items-food-plants.md) |
+| 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/cooker-dishes.md) |
 | 地图生成、布局、地皮、空间判定 | [worldgen-spatial.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/worldgen-spatial.md) |
 | TEX/XML、SCML、bank/build/symbol、编译资源 | [assets-animation.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md) |
+| 角色换皮/拆件、手持装备、书籍外观与接入检查 | [character-and-equipment-art.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md) |
+| GIF/WebP 帧序列、旋转法阵、锚点与动画编译 | [animation-recipes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md) |
 | DST Mod Tool 项目/脚本接口/预览 | [dst-mod-tool.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md) |
 | 音效、FMOD 与粒子 | [audio-particles.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md) |
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) |

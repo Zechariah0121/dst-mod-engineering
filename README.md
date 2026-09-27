@@ -11,7 +11,7 @@
 
 | 入口 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | 工作流程、关键约束、18 篇专题的按需导航 |
+| [SKILL.md](SKILL.md) | 工作流程、关键约束、22 篇专题的按需导航 |
 | [references/](references/) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
 | [scripts/dst_zip_tool.py](scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
 | [scripts/check_api.py](scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
@@ -20,6 +20,8 @@
 | [tests/](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
 
 技能可独立使用，不需要安装历史 `dst-mod-development` 或 `dst-mod-devkit`。现有旧技能不会被本仓库自动覆盖。
+
+料理、法术、自定义数值、角色外观、装备手持、GIF 动画和 FMOD 音效的旧专项流程已核验并并入本技能，按入口导航读取即可，无需同时安装旧专项技能。旧项目的配色、数值、绝对路径和固定同步目录不作为通用默认。各旧名称的内容去向见 [整合记录](docs/consolidation.md)。
 
 ## 网页 AI：下载后使用
 

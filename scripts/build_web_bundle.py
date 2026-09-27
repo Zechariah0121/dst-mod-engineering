@@ -23,9 +23,12 @@ COMMON = ('SKILL.md', 'references/web-chat.md', 'references/environment-tools.md
           'references/testing-release.md')
 PROFILE_EXTRA = {
     'starter': ('agent-setup', 'tool-bootstrap'),
-    'code-review': ('core-lua-hooks', 'entities-components', 'lifecycle-save', 'items-food-plants'),
-    'networking': ('core-lua-hooks', 'networking-rpc', 'lifecycle-save', 'ui-actions-controls'),
-    'assets': ('tool-bootstrap', 'assets-animation', 'dst-mod-tool', 'audio-particles'),
+    'code-review': ('core-lua-hooks', 'entities-components', 'lifecycle-save', 'items-food-plants',
+                    'spells-and-custom-stats', 'cooker-dishes'),
+    'networking': ('core-lua-hooks', 'networking-rpc', 'lifecycle-save', 'ui-actions-controls',
+                   'spells-and-custom-stats'),
+    'assets': ('tool-bootstrap', 'assets-animation', 'dst-mod-tool', 'audio-particles',
+               'animation-recipes', 'character-and-equipment-art'),
     'worldgen': ('core-lua-hooks', 'entities-components', 'worldgen-spatial'),
     'full': (),
 }

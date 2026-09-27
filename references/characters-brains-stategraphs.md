@@ -2,6 +2,8 @@
 
 适用于角色创建、动物亲和、定制生物、形态变化与动作状态排错。以 2026-09-27 核验环境的原版脚本为基线，详见 [environment-tools.md](environment-tools.md)。美术、网络变量与客户端界面细节按技能入口中的对应专题展开。
 
+角色外观和选人资源接入见 [角色与装备美术](character-and-equipment-art.md)；魔力/能量条与恢复流程见 [法术与自定义数值](spells-and-custom-stats.md)。
+
 ## 角色工厂与生命周期
 
 注册 `PrefabFiles` 和 `AddModCharacter(name, gender, modes)`，角色 Prefab 使用 `require("prefabs/player_common")` 返回的工厂。性别参数是语法/代词分类；`PLURAL` 是复数类别，不是“双性”，`SECRET` 也不是原版建议的性别枚举。

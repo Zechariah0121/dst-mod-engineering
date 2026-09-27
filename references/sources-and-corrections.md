@@ -2,6 +2,8 @@
 
 本技能于 2026-09-27 完成首轮重建，随后整理为独立可移植版本。资料输入包括两份既有通用技能 `dst-mod-development`、`dst-mod-devkit` 与 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial)。教程包含 2021 年内容和后续补充，并非当前游戏的官方 API 规范；使用本技能不需要安装这两份旧技能或下载教程附件。
 
+同日继续核验七份专项技能：新增料理、法术、自定义数值、角色 build、装备 swap、帧序列动画和 FMOD 音频，包含旧法术模板与装备清单。内容按任务并入本技能，不再要求加载任何旧 DST 技能；逐项去向见 [整合记录](../docs/consolidation.md)。旧项目的私人素材与游戏缓存只留在本地归档，不纳入公开许可和分发包。
+
 旧 devkit 的测试工具注明来源 [zhuchengguang317-eng/dst-modtest](https://github.com/zhuchengguang317-eng/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
 
 技术事实优先核对合法安装的游戏与官方 Mod Tools；本仓库不分发它们的源码、资源或二进制。工具与参数的公开参考包括 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)、[Klei 专服命令行说明](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/) 和 [FFmpeg 滤镜文档](https://ffmpeg.org/ffmpeg-filters.html)。具体调用以当前安装版本的帮助和相关游戏实现为准。
@@ -36,6 +38,15 @@
 | 固定采样率/声道/压缩才兼容、FSB5 一定不能用 | audio-particles.md |
 | 同名 Mod 可直接复用、脚本 return 就可判成功 | testing-release.md、三个 scripts |
 | 离线端口永远10999、用猜测端口配置后杀别的进程 | environment-tools.md |
+| PushEvent 全部下一帧、GetAttacked 传 electric 自动加倍率 | spells-and-custom-stats.md |
+| 每隔 1 世界单位灌溉即每格加一次、睡眠原函数后无条件恢复 | spells-and-custom-stats.md |
+| 自定义属性必须使用 Class setter、构造中从 components 取回自身 | spells-and-custom-stats.md |
+| 项目料理 helper 当原版 API、AddCookerRecipe 自动建实体和调味 | cooker-dishes.md |
+| 17 个台词表等于全部角色、强制三目录或固定图集 | cooker-dishes.md |
+| 手持必须 BUILD_90s_90s、整包搜哈希就证明符号存在 | character-and-equipment-art.md |
+| 固定模板帧数/画布适合所有角色、删除整个 anim 强制编译 | character-and-equipment-art.md |
+| 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
+| 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
 公开的检查范围、工具回归结果及未覆盖内容见 [验证记录](../docs/validation.md)。各专题保留相关源码文件/函数定位、适用条件与验证边界，供读者在自己的合法安装中复核。
 
@@ -43,4 +54,4 @@
 
 ## 后续使用范围
 
-其他专项 DST 技能可以补充专门的制作流程，但不是本技能的必需依赖；其通用规则若与当前源码不符，按当前证据修正，不再反向引入旧口诀。首轮重建只审查两份通用技能及列明的材料，没有覆盖所有社区技能。新的游戏数值和美术决策仍由项目作者决定，不能从旧项目例子自动继承。
+统一入口按需加载内部专题，不再维护旧专项技能的独立规则。核验范围是两份通用技能、七份专项技能及列明材料，没有覆盖所有社区技能，也未证明任意游戏版本都适用。新的游戏数值和美术决策仍由项目作者决定，不能从旧项目例子自动继承。

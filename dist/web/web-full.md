@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`d0bc539afe166cc689cdfcc0f30e1e18d3c1d412ebdaca1e0c964f7b6c4af450`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -10,12 +10,16 @@
 - `references/environment-tools.md`
 - `references/testing-release.md`
 - `README.md`
+- `docs/consolidation.md`
 - `docs/validation.md`
 - `references/agent-setup.md`
+- `references/animation-recipes.md`
 - `references/assets-animation.md`
 - `references/audio-particles.md`
+- `references/character-and-equipment-art.md`
 - `references/characters-brains-stategraphs.md`
 - `references/combat-buffs-containers.md`
+- `references/cooker-dishes.md`
 - `references/core-lua-hooks.md`
 - `references/dst-mod-tool.md`
 - `references/entities-components.md`
@@ -23,6 +27,7 @@
 - `references/lifecycle-save.md`
 - `references/networking-rpc.md`
 - `references/sources-and-corrections.md`
+- `references/spells-and-custom-stats.md`
 - `references/tool-bootstrap.md`
 - `references/ui-actions-controls.md`
 - `references/worldgen-spatial.md`
@@ -34,16 +39,16 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`c387e1581ac33181e66b67556f1cd586f3aa7faa4fad5006d1095f38ed4ac078`
+原始 SHA-256：`70dc759c800d9216b9c65346404c9eb7f0de69ea6dd687cc6ef92476af2ad020`
 
 ---
 name: dst-mod-engineering
-description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按当前游戏源码处理 Lua、主客机同步、存档生命周期、动作与 UI、物品角色、世界生成及资源工具链；用于新功能、崩溃修复、兼容排查和发布前验证。
+description: 开发、审查与验证《饥荒联机版》DST Mod。按当前源码处理角色、法术、自定义数值、料理、联机与存档，以及角色外观、装备、动画和音效；用于功能开发、崩溃修复、兼容排查与发布检查。
 ---
 
 # DST 模组工程
 
-按当前游戏源码开发、审查与验证 DST Mod。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
+这是 DST 开发、审查、排错与资源制作的统一入口，包含旧通用技能和专项制作流程的核验整合。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
 
 ## 工作顺序
 
@@ -71,13 +76,17 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/entities-components.md) |
 | 角色、Brain、Stategraph、自定义生物 | [characters-brains-stategraphs.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md) |
+| 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md) |
 | netvar、Replica、RPC、客户端与服务端 | [networking-rpc.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/networking-rpc.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md) |
 | HUD、Widget、输入、Action、施法与预测 | [ui-actions-controls.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/ui-actions-controls.md) |
 | 伤害、Buff、容器、冷却、范围查询 | [combat-buffs-containers.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) |
 | 装备、投掷、维修、制作、锅料理、树木种植 | [items-food-plants.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/items-food-plants.md) |
+| 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/cooker-dishes.md) |
 | 地图生成、布局、地皮、空间判定 | [worldgen-spatial.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/worldgen-spatial.md) |
 | TEX/XML、SCML、bank/build/symbol、编译资源 | [assets-animation.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md) |
+| 角色换皮/拆件、手持装备、书籍外观与接入检查 | [character-and-equipment-art.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md) |
+| GIF/WebP 帧序列、旋转法阵、锚点与动画编译 | [animation-recipes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md) |
 | DST Mod Tool 项目/脚本接口/预览 | [dst-mod-tool.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md) |
 | 音效、FMOD 与粒子 | [audio-particles.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md) |
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) |
@@ -431,7 +440,7 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 
 ## 来源：`README.md`
 
-原始 SHA-256：`0f17dee811595920d2ba419e690eeecb2535b40ec85987fcc883da2b8dde6387`
+原始 SHA-256：`5baef55a3061336bce11dd13e88a179d863ae396558516c852fc863442bca4c9`
 
 # dst-mod-engineering
 
@@ -446,7 +455,7 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 
 | 入口 | 用途 |
 |---|---|
-| [SKILL.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/SKILL.md) | 工作流程、关键约束、18 篇专题的按需导航 |
+| [SKILL.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/SKILL.md) | 工作流程、关键约束、22 篇专题的按需导航 |
 | [references/](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/references) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
 | [scripts/dst_zip_tool.py](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
 | [scripts/check_api.py](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
@@ -455,6 +464,8 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 | [tests/](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
 
 技能可独立使用，不需要安装历史 `dst-mod-development` 或 `dst-mod-devkit`。现有旧技能不会被本仓库自动覆盖。
+
+料理、法术、自定义数值、角色外观、装备手持、GIF 动画和 FMOD 音效的旧专项流程已核验并并入本技能，按入口导航读取即可，无需同时安装旧专项技能。旧项目的配色、数值、绝对路径和固定同步目录不作为通用默认。各旧名称的内容去向见 [整合记录](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/docs/consolidation.md)。
 
 ## 网页 AI：下载后使用
 
@@ -579,9 +590,47 @@ end)
 
 ---
 
+## 来源：`docs/consolidation.md`
+
+原始 SHA-256：`d7ad82df8a7d840d58c4a4a61321df136541bbb32c3176eea98fd27243130743`
+
+# 统一技能的内容去向
+
+2026-09-27，在两个通用技能完成重建后，继续审查七个专项技能及随附法术模板、装备检查清单。目标是只使用 `dst-mod-engineering` 入口，详细资料按任务加载。归档保留原始经验，不意味着旧结论仍应执行。
+
+| 旧名称 | 当前内容去向 |
+|---|---|
+| `dst-mod-development` / `dst-mod-devkit` | [统一入口](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/SKILL.md)及现有核心专题、三个开发验证脚本 |
+| `dst-add-cooker-dish` | [独立料理流程](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/cooker-dishes.md)、[物品与植物](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/items-food-plants.md) |
+| `dst-add-spell` / `dst-custom-stat` | [法术与数值](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md)、动作、网络和生命周期专题 |
+| `dst-character-build` / `dst-swap-build` | [角色与装备美术](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md)、[资源结构](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)、角色与动作专题 |
+| `gif-to-dst-anim` | [帧序列与法阵制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md)、资源结构与工具专题 |
+| `dst-sound-fmod` | [音频与粒子](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md) |
+
+## 处理原则
+
+- 可复用的完整制作流程保留，但公共规则只维护一次；专题通过链接使用网络、生命周期、工具和测试规范。
+- 原版 API 与项目自定义 helper 分开；从当前安装源码确认签名、端别、调用顺序、注册与清理，不根据旧文件的“实锤”“铁律”措辞提高可信度。
+- 旧项目选定的数值、造型、工具路径、文件夹与 Workshop 副本，仅作为历史背景。重新执行需要当前任务的目标与授权；不会自动覆盖用户环境。
+- 缺少上下文的旧 Lua 模板不直接分发为可用成品；需要实例化时从本项目和当前原版接口裁取，并补全实际生命周期与验证。
+- 个例缓解办法不升级为全局限制。图集大小、帧数、画布、锚点、音频参数等先以有效产物和目标平台证据核对。
+
+## 从旧技能迁移
+
+本仓库只分发一个 `SKILL.md`。若用户选择合并自己的旧安装，先列清所有技能发现目录，逐文件备份并校验哈希；核对新技能包含所需流程后，再将旧目录移到技能发现目录之外，不能只把目录改名留在同一 `skills/` 下。旧项目对技能名的引用改为本页对应入口，不保留需要再次自动加载的兼容技能。
+
+归档中可能含旧机器配置、游戏源码缓存、第三方素材或日志；它是用户的本地备份，不能直接上传为本仓库的 MIT 内容。不删除原项目、素材、游戏安装或存档。本仓库不会在安装或运行打包器时自动扫描、移动、删除用户的其他技能。
+
+## 验证范围
+
+专项整合核对了当前安装的 Lua 源码、官方编译器/工具资料及相关现有资源结构。检查包含参考链接、示例语法、技能入口、分发包一致性与独立情境评估；具体结果见 [验证记录](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/docs/validation.md)。本次技能归并不等于给任何实际 Mod 增加功能，也不替代真实客户端对角色、动画、声音和多人状态的验收。
+
+
+---
+
 ## 来源：`docs/validation.md`
 
-原始 SHA-256：`071a7afc4b3255dc435dddcad8b9d95927d0634a0c888b98eb4eedba8edc4684`
+原始 SHA-256：`0a949c36bd86586a17187d070dcc1efd52384856accad984b83f5cf383b32cce`
 
 # 验证记录与适用范围
 
@@ -595,11 +644,26 @@ end)
 
 ## 网页资料包补充
 
-新增 [网页使用指南](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/web-chat.md)、[本机验证交接模板](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/templates/local-validation.md) 和标准库打包器，现有 18 篇参考文档、3 个开发验证工具与 1 个分发工具。网页专题从现有文档生成，原生技能包保留单一根目录；来源指纹和逐文件哈希可用于追踪资料版本。
+新增 [网页使用指南](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/web-chat.md)、[本机验证交接模板](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/templates/local-validation.md) 和标准库打包器，当次达到 18 篇参考文档、3 个开发验证工具与 1 个分发工具。网页专题从现有文档生成，原生技能包保留单一根目录；来源指纹和逐文件哈希可用于追踪资料版本。
 
 包结构、确定性、资料归属、缺项处理和覆盖保护由自造输入回归检查；CI 另以 `build_web_bundle.py --check` 核对提交产物。它们不验证网页平台是否完整读取附件、是否正确自动触发技能，也不证明目标账户允许上传或执行代码。本次没有登录第三方 AI 平台上传用户项目，平台实际加载与任务效果仍需按网页指南进行验收。
 
 本次新增 14 个资料包回归，合计 41 个测试；覆盖生成失败回滚、用户修改保留、只读过期检测、来源哈希、许可证、嵌套链接和 ZIP 结构。生成物使用固定 ZIP 元数据与无压缩存储，避免不同系统和压缩库造成无意义漂移。
+
+## 专项技能统一整合
+
+同日继续审查七个专项技能及法术模板、装备检查清单，合并到一个入口与 **22 篇参考文档**。新增料理、法术与自定义数值、角色与装备美术、帧序列动画四篇流程，扩充音频专题；旧名称的内容去向见 [迁移说明](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/docs/consolidation.md)。历史项目 helper、固定数值和机器路径不再作为通用 API 或默认部署目标。
+
+逐节记录区分保留、改写、纠错、项目特例和证据不足。查证时将实际使用的解压 Lua 文件与安装版 `scripts.zip` 比较，源码包指纹仍与下文一致。独立情境评估覆盖手持装备、长帧动画、料理调味、声音验收、睡眠回魔与 HUD、伤害与灌溉，6/6 场景能沿新入口形成正确的下一步方案，并补充湿度钳制与图鉴系统区分两项说明。这属于文档使用评估，不是六个已运行的 Mod。
+
+| 本次资源检查 | 实际证据与限制 |
+|---|---|
+| 官方动画编译器 | 使用随工具提供的 Python 2.7，从工具目录外编译自造 32×24 图像、201 个时间线帧的工程；核对 BILD v6、ANIM v4、KTEX 与 ZIP CRC，输入 ZIP 未改变。帧复用同一图像，不代表 201 张大型独立贴图均已验证 |
+| 图集排布 | 函数级输入生成 64×64 与 64×32 两页，引用 sampler 0/1；说明不能把“必须正方形、单图集”当通则，未完成这组产物的客户端渲染验收 |
+| 装备资源 | 解析原版 `swap_spear.zip` 的实际符号记录，确认 build-only 可用作原版换符号资源；不能从这一例推断任意装备均正确 |
+| 音频工具 | 核对现有 Designer 工具和资料；发现的 Studio 模板仅保留为待验证候选，没有新音效编译、运行或听感通过结论 |
+
+整合沿用并重跑 41 个无游戏回归，同时检查技能入口、相对链接、Python/Lua 示例与 PowerShell 文档语法。网页资料重新由源文件生成；代码审查、网络和资源资料包补入对应新专题。以上检查不替代真实客户端的美术、声音与联机验收，也未安装新工具或修改任何实际 Mod。
 
 ## 资料与源码快照
 
@@ -783,13 +847,135 @@ macOS / Linux 的 Bash 或 Zsh 示例同样默认采用 `.agents/skills`；按�
 
 ---
 
+## 来源：`references/animation-recipes.md`
+
+原始 SHA-256：`39a5122b5a3225b7e9fa0078eeb79bcfd83df01637b399f259a088a8ae3515ae`
+
+# 帧序列、锚点与旋转动画
+
+用于 GIF/WebP/PNG 序列转运行时动画，以及静态图制作旋转效果。资源类型、bank/build、库存图和客户端检查先见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)；缺工具按 [工具安装与首次验证](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 推进，已有 SCML 或可编辑 DMT 工程优先保留，不强制改成逐帧烘焙。
+
+## 先确定输入和时间轴
+
+1. 登记源文件哈希、画布、逐帧时长、透明方式、循环次数、目标锚点和用途。已有手改 PNG 时以明确选定的输入为准，不用旧 GIF 再导出覆盖。
+2. 解码 GIF/WebP 时处理帧间合成和 disposal，导出完整 RGBA 帧并保留时长清单；只读取局部更新矩形会丢掉上一帧内容。抽检首尾、透明边缘和帧数。
+3. GIF 的透明索引不能保存连续 alpha；需要柔边时保留 PNG/WebP 母版，GIF 只作预览。预览播放器的时长取整不代表引擎实际帧率。
+4. 本页所核验的 `buildanimation.py` 对 XML `framerate` 调用 `int()`，再写入二进制 float；因此这条管线需要正整数 FPS，不能据此宣称所有 DST 动画只支持整数 FPS。
+
+每帧原时长为 `d_i` 时，总时长是 `T = sum(d_i)`。固定 FPS 输出有 N 个时间轴帧，其时长约为 `N/FPS`。非均匀时长要按累计时间重采样，允许重复引用同一张 PNG；不可仅用第一帧时长推算整个动画。把 33.33 直接截成 33 会改变时长，是否接受、降帧或改节奏属于设计选择。循环时间轴通常避免把首帧作为末帧再停一次；非循环动画保留完整尾部。
+
+## 透明、缩放与视觉锚点
+
+- 已有 alpha 就保留。黑底发光素材可试 `alpha=max(R,G,B)`，并在非零 alpha 上反算颜色以消除黑底污染；这是特定合成假设，不是通用抠图。黑色主体和阴影可能被删掉，先在黑、灰、白背景预览。
+- 白底淡彩图也不能简单反亮度后当成正确 alpha。JPEG 噪声、高光和白色主体都需要检查；固定阈值、gamma、增强倍数只属于具体素材，不写成默认配方。影响观感的“保留淡色/增强颜色”先出对比供用户选择。
+- 保留直通 alpha 的源 PNG，并核对编译器是否做 premultiply；已预乘图像再预乘会使边缘发黑。本页工具的 `textureconverter.Convert` 默认给转换器传 `--premultiply`。
+- 尽量从母版一次缩放，保持长宽比。`AnimState:SetScale` 只能放大已有细节；图像分辨率、几何尺寸、矩阵、实体缩放和镜头一起决定观感，没有“1 格恒等于 200 动画单位”的通用换算。
+
+对宽 W、高 H 的帧，若目标原点在原 PNG 左上角坐标系的 `(cx,cy)`，本页中间 build XML 可设置：
+
+```text
+x = W/2 - cx
+y = H/2 - cy
+顶点左上角 = (x-W/2, y-H/2) = (-cx,-cy)
+```
+
+因此底边中心锚点是 `x=0, y=-H/2`；居中锚点为 `x=0, y=0`。同时缩图和几何时，W/H 与 x/y 同比例变化。先区分“画布中心”“实际落点”“动画矩阵平移”，避免重复补偿。
+
+环形落点的自动定位只是辅助：行宽峰值可避开竖直光柱对整图质心的污染，但非对称环、火花、厚环都可能误判。限定合理区域后检查宽度分布；多行接近峰值时可求加权中心。若各帧内容没有真实位移，采用经确认的常量锚点；只有真实位移才逐帧修正。把所有帧按最终坐标叠到固定原点预览，排除计算造成的抖动，再用 DMT/客户端核对落点。
+
+## 中间 ZIP 与坐标
+
+`buildanimation.py` 输入是中间 XML/PNG ZIP，运行时 ZIP 是另一种内容。完整新动画的最小布局：
+
+```text
+my_fx_stage.zip
+├── build.xml
+├── animation.xml
+└── frame_000.png
+```
+
+```xml
+<Build name="my_fx_build">
+  <Symbol name="my_fx_symbol">
+    <Frame framenum="0" duration="1" w="32" h="24" x="0" y="-12" image="frame_000"/>
+  </Symbol>
+</Build>
+```
+
+```xml
+<animations>
+  <anim name="idle" root="my_fx_bank" framerate="30">
+    <frame x="0" y="-12" w="32" h="24">
+      <element name="my_fx_symbol" frame="0" layername="my_fx_layer" m_a="1" m_b="0" m_c="0" m_d="1" m_tx="0" m_ty="0" z_index="0"/>
+    </frame>
+  </anim>
+</animations>
+```
+
+这是说明字段的单帧样例，32×24 和 30 FPS 不是设计默认。多帧时逐项对应 symbol 帧号和时间轴；`duration` 表示 build symbol 帧覆盖范围，不等于 GIF 毫秒时长。`image` 写 ZIP 内 PNG 路径去掉 `.png`；标签及 `animation.xml` 文件名区分大小写。当前编译器把 build、symbol、图像、动画、root 等名称编码为 ASCII，名称使用 ASCII；这不等于所有工具的外部文件路径都禁止中文。
+
+- `SetBank("my_fx_bank")` 取自动画的 `root`，`SetBuild("my_fx_build")` 取自 Build.name；ZIP 文件名可不同。原版 spear 的 bank/build 也不同。
+- 矩阵排列为 `x'=m_a*x+m_c*y+m_tx`、`y'=m_b*x+m_d*y+m_ty`；不要交换 b/c，或把图片向下的 Y 直接当世界高度。先用单位矩阵和不对称测试图确认方向，再引入旋转/缩放。
+- build 的 x/y 是图像中心偏移。动画 frame 的 x/y/w/h 是包围框信息，不能用其代替 element 平移。旧记录把动画 x/y 固定解释成左上角并归因于裁剪，证据不足：公开官方 SCML 导出代码将包围中心写入 position。本样例采用该约定，复杂变换优先保留当前导出器计算的框，并核对四角变换后的范围，不沿用未经验证的“左上角”修复。
+- 动画名的 `_up`、`_down`、`_side` 等后缀会被本编译器识别为朝向并从动作名中拆掉；无意使用保留后缀会改变查找结果。z_index 决定导出排序，不是世界 Z 高度。
+
+坐标依据：[官方 SCML 导出代码](https://github.com/kleientertainment/ds_mod_tools/blob/master/src/app/scml/main.cpp) 的 `export_element`、`extend_bounding_box`、`export_animation_frame`；再对照实际安装版本的 `buildanimation.py`。公开源代码与已安装二进制不自动视为相同版本。
+
+## 图集预算与编译
+
+预算同时考虑独立图像数量、尺寸、透明占用、mipmap、元素数和并发实例。总像素面积只是下界；当前 `klei/atlas.py` 有面积排序、4 像素对齐和空位搜索，不是可用“每行张数×行数”精确预测的纯货架模型。要知道图集数量就运行实际打包器并检查输出。
+
+当前 `buildanimation.py` 默认最大图集边长 2048、带 alpha 默认 bc3；它允许多个 atlas，并在顶点第六个 float 保存 sampler。`atlas.py` 默认还会在空间允许时缩为非正方形。`--square` 是可选布局开关，不是多图集必需修复；“单 symbol 绝不能跨 atlas”不是已证实的引擎限制。出现某管线色块应保留可复现资产，查图集引用、UV、premultiply、几何和客户端效果。
+
+PowerShell：先把变量设为已确认的绝对路径，输出目录选择本次隔离工作区。这里不需要改全局 PATH，也不需要把原工程迁入工具目录。
+
+```powershell
+$Compiler = Join-Path $ModTools 'tools/scripts/buildanimation.py'
+$Python27 = Join-Path $ModTools 'buildtools/windows/Python27/python.exe'
+& $Python27 -B $Compiler --help
+if ($LASTEXITCODE -ne 0) { throw '编译环境不可用' }
+$CompileArgs = @('-B', $Compiler, $StageZip, '--force', '--outputdir', $OutputRoot)
+& $Python27 @CompileArgs
+if ($LASTEXITCODE -ne 0) { throw '动画编译失败，请检查完整日志' }
+$ResultZip = Join-Path $OutputRoot ('anim/' + [IO.Path]::GetFileNameWithoutExtension($StageZip) + '.zip')
+if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成预期动画 ZIP' }
+```
+
+使用随工具的 Python 2.7 和依赖，不用系统 Python 3 执行这份 Python 2 脚本。该版本绝对路径调用已在工具目录外成功；“cwd 必须 tools/scripts”不是固定要求。相对 `--outputdir` 会按输入路径的上级解析，明确绝对路径能避免找错产物。命令成功还要检查日志及二进制，`--ignoreexceptions` 会改变失败处理，不作为日常成功判据；`sitecustomize` 警告也不能仅凭退出码一概忽略。
+
+遇到路径错误先记录工具版本、原路径和编码；必要时在本次独立 ASCII 路径副本重现，不移动原素材。ktech 应按当前 help 使用位置参数及明确 `.png` 输出，不能把无扩展名文件盲当固定 2048² 裸 RGBA。
+
+## 静态图制作旋转效果
+
+先确认是一整层旋转还是内外层独立运动。若现有动画工程能够用多 symbol 和矩阵表达，优先沿用；只有需要逐帧烘焙或工具限制时，才把各层合成为帧序列，不为旧“单 symbol”推断强行合并。
+
+1. 在母版标明环心，必要时查看径向 alpha 分布选择内外层分界。低 alpha 区可减少接缝，但不保证硬切永远无痕；检查旋转后缝隙。
+2. 画布需覆盖绕锚点旋转的最远可见点，并留滤波边界。百分位去噪可能切掉合法装饰，不能代替人工检查。每一帧从母版旋转，避免上一帧接着旋转造成累积损失。
+3. 按目标时间轴生成角度；不同库正角方向不同，以不对称标记预览确认。双层反向旋转属于设计选择，不自动采用。
+4. 抽检全角度裁边、中心漂移、半透明接缝、循环首尾速度和颜色。图集预算不足时比较分辨率、图层复用、帧率和分段加载的代价；拆 bank/build 还要检查切换时机与资源可用性，不直接改变时长。
+
+## 验收与证据范围
+
+按 [资源交付检查](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md#交付检查) 分层验证：ZIP CRC；BILD/ANIM 版本与名字；symbol/帧号/朝向；顶点区间、UV 和 sampler；所有图集存在且能解码；时长与原点预览；真实客户端和远端观察。KTEX 用工具读取头和 mip 信息，不把固定字节偏移当成所有版本的通用格式。
+
+FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持客户端可见；后续动态变化使用正确的同步或客户端更新路径。`SetPristine()` 不是“所有属性之后永远不能变”的边界。循环动画需明确停止和清理，单次动画用匹配的完成事件/状态回收。泛光 shader 和 Light 照明不同，不能靠泛光掩盖缩放模糊。
+
+2026-09-27 的证据：合成 32×24 PNG 经原装 Python 2.7/compiler 在工具目录外生成 201 时间轴帧的 BILD6/ANIM4/KTEX ZIP，源 ZIP 哈希不变；小图集函数探针产生两个 atlas（64×64、64×32）和 sampler 0/1。原版 `alterguardian_phase1_lunar.zip` 的 `spawn_lunar` 另有 215 帧。这些排除编译器的“60/149 帧硬上限”说法，**不证明任意 201 张大图或跨图集资产已通过客户端渲染**。
+
+本轮未启动游戏、未做真实素材视觉验收；声音制作转到 [音频与粒子](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md)，不在此重复维护第二份 FMOD 流程。
+
+
+---
+
 ## 来源：`references/assets-animation.md`
 
-原始 SHA-256：`92c8187fb6dc63f1c1152cc62b63dbc8eb8079e2dae0b94c06039cf8b9baa27b`
+原始 SHA-256：`a11bae29e483c56d6d692d7754a81e701a1bf159a5ee5d9da2b2b281908ee2bb`
 
 # 图像、图集与动画
 
 适用于库存图标、装备换符号、角色皮肤、SCML 与动画帧序列。先找到同类原版 prefab 的资源声明和调用，再确定要修改的资源层。只改 Lua 行为不必重编美术；改源图后要重建受影响产物。
+
+角色拆件与装备接入流程见 [角色与装备美术](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md)；GIF/WebP、旋转法阵和锚点制作见 [帧序列制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md)。这两篇补充制作步骤，名称、资源职责和验收边界仍以本页为准。
 
 ## 先分清名称与资源职责
 
@@ -930,15 +1116,15 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 
 ## 来源：`references/audio-particles.md`
 
-原始 SHA-256：`022058221ad39717bd88d2ee77639453205038500f55c8e54d828da5ae5c687a`
+原始 SHA-256：`b9ca186fa77181d425cff039f8efacd5045d5f8bb9b891739966f4c148c129f7`
 
 # 音频与粒子特效
 
-本页涵盖声音事件银行和 `VFXEffect` 粒子。动画帧序列见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)。新工具名称不能替代兼容性验证；使用当前项目已验证的管线，并记录输入、工具版本、事件路径和产物。
+本页涵盖声音事件银行和 `VFXEffect` 粒子。动画帧序列见 [帧序列制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md)。使用当前项目已验证的音频管线，记录输入、工具版本、事件路径和产物；缺少工具时按 [工具安装与首次验证](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 检查官方 Mod Tools，不另装一整套无关动画工具。
 
 ## 音频资源与事件
 
-标准 Mod 声音路径是素材 → FMOD 工程 → FEV 事件元数据 + FSB 采样银行 → Asset 声明 → `SoundEmitter` 事件调用。`PlaySound` 接事件路径，不接任意 MP3/WAV 文件路径。
+已验证的 Designer 管线是素材 → FMOD FDP 工程 → FEV 事件元数据 + FSB 采样银行 → Asset 声明 → `SoundEmitter` 事件调用。`PlaySound` 接事件路径，不接任意 MP3/WAV 文件路径。
 
 ```lua
 Assets = {
@@ -967,38 +1153,84 @@ inst.SoundEmitter:KillSound(SOUND_HANDLE)
 
 替换事件可使用 `RemapSoundEvent(old_event, new_event)`，先确认影响范围与撤销策略，不为单个角色的声音无意改掉全世界同类声音。
 
-## 编译和音质检查
+## 选择目标工具
 
-2026-09-27 核验环境中，官方 Mod Tools 的 FMOD Designer CLI 自报 **4.44.7**。目录中同时存在 FMOD Studio，并不能证明任意 Studio 新版产物可直接替换 DST 的已验证银行；先对照目标引擎和官方示例。不自动下载安装旧教程附件或新版本。
+2026-09-27 核验环境中，官方 Mod Tools 的 FMOD Designer CLI 自报 **4.44.7**，随附《FMOD Designer 2010》文档；以下命令针对这一管线。保留已有可工作的 FDP 工程，不因新工具名字就重做工程或升级版本。
 
-先读取当前 CLI help。已安装 Designer 的只读 help 列出 `-pc`、`-b` 输出目录、`-m` 依赖清单、`-l` 银行列表，以及 `-k` / `-K` 禁用工程的构建前/后命令。接手第三方 FDP 先审查其路径、事件和构建命令。
+工具包也确实包含 **FMOD Studio 1.10.10**、`Template/myDSTmod.fspro` 和 `DST_MOD_ConfigureMasterBank.js` / `DST_MOD_BuildBanks.js`。这些官方文件说明存在另一条候选制作路线，但不证明任意现代 Studio `.bank` 可由当前 DST Mod 直接加载。本轮未构建或加载 Studio 银行；选择它之前，要核对目标版本的 Mod 加载接口、示例工程、Master Bank 标识处理和客户端最小事件验证。官方配置脚本会改工程元数据、触发关闭 Studio；模板构建后批处理还包含复制银行，先审查并改为独立输出，不能盲跑到游戏目录。FEV/FSB 与 `.bank` 流程不可混写。
+
+## 素材加工与响度
+
+保留无损母带和加工参数，先读取文件声道、采样率、位深、时长，再决定裁剪、延迟、回声和增益。44.1 kHz / PCM 16-bit 是兼容排查起点，不是强制唯一格式；mono/stereo 选择按定位与素材设计决定，Designer 支持不同采样率、声道及重采样。
+
+PowerShell 中 `$Ffmpeg`、`$Ffprobe`、`$SourceAudio`、`$ProcessedWav` 是已确认的绝对路径；新输出不能覆盖母版。以下转换仅示范已选定 44.1 kHz、16-bit PCM、双声道的情况：
+
+```powershell
+& $Ffprobe -v error -show_entries 'stream=codec_name,sample_rate,channels,bits_per_sample:format=duration' -of json $SourceAudio
+& $Ffmpeg -hide_banner -nostdin -n -i $SourceAudio -ar 44100 -ac 2 -c:a pcm_s16le $ProcessedWav
+if ($LASTEXITCODE -ne 0) { throw '音频转换失败' }
+& $Ffmpeg -hide_banner -nostdin -i $ProcessedWav -af 'astats=metadata=1:reset=0' -f null -
+```
+
+直接调用 Windows 可执行文件时传 Windows 路径，由参数数组/调用运算符保持路径含空格的边界；Git Bash 是否转换 `/d/` 受环境影响，不把一次失败写成所有 Windows FFmpeg 的限制。
+
+| 操作 | 可用参数与需要核对的地方 |
+|---|---|
+| 截取 | `-ss`、`-t` 按秒；切点检查不连续和咔哒声，淡化时长由素材决定，循环接缝不能随意淡空 |
+| 回声 | `aecho=0.8:0.8:450\|900:0.4\|0.2` 的 delay 是毫秒；两段延迟/衰减数量对应。数值只是语法例 |
+| 延迟 | `adelay=150\|150` 表示双声道各 150 ms；按实际声道数量或当前版本的 `all` 参数处理 |
+| 多层混音 | `amix=inputs=2:duration=longest`；`normalize=0` 仅在已设计各路增益时选择，叠加后检查削波 |
+| 响度/峰值 | `loudnorm`、`astats` 用于测量或有目标的处理；短音效不能只以综合响度判断听感 |
+| 限幅 | 查看 `alimiter` 的自动电平设置；当前版本 `level` 默认开启，设置低 limit 后可能被自动补偿，不等于最终输出已经降低 |
+
+表格中的 `\|` 是 Markdown 转义；传给 FFmpeg 的完整滤镜字符串应使用普通 `|` 并整体加引号。单位与选项依据 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前再看已安装版本帮助。
+
+`peak=-10 dBFS`、固定增益和固定回声层数仅是旧项目取值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
+
+## FDP 工程与 3D 设置
+
+优先使用官方示例或有复用许可且已经验证的工程。FDP 是 XML，但复制另一 Mod 的素材或模板仍要有权限；私人临时脚本与 Workshop 项目名不作为本技能依赖。
+
+1. 在独立副本设置命名空间隔离的项目、事件组、事件、银行名，修正所有音频来源和构建输出路径；一个 FEV 可关联多个 FSB，银行名不必等于项目名。
+2. 项目/事件标识符不能无差别逐次 uuid4 替换。需要迁移 GUID 时保持同一旧 ID 到同一新 ID 的映射及内部引用，优先由目标编辑器生成；官方 Studio 的 Master Bank 操作不等同于 Designer 的全 GUID 重写。
+3. 声音事件组与混音分类不同。组不必叫 `sound`；分类需与游戏音量滑块路由匹配。事件路径变化后更新全部调用点。
+4. 一次性事件在实际工程里核对 One-shot、触发条件和声部释放；循环还要检查 Sound Def 实例、事件时间轴、停止方式和代码句柄。`loopmode=1, loopcount2=-1` 只是旧模板片段，不能跳过字段语义检查。
+5. 3D 声音同时需要正确的发声实体位置、事件模式、衰减方式及必要参数；把模板“两处 x_2d 改为 x_3d”不能覆盖所有工程。全局或 world 上的 emitter 不会因此把事件格式改成 2D，但其位置可能不符合预期。2D 同样受事件/分类/游戏增益控制，不代表全图恒定最大音量。
+
+Designer 文档的 Min Distance 是开始距离衰减的位置，具体单位须由目标游戏的坐标和音频尺度确认；`mindistance=3` **不能译成“3 格地皮”**。Inverse 模式的 Max Distance 是停止继续衰减的位置，Linear/Linear Square 通常在最大距离衰减至静音，Custom 可忽略这两个值。按实际曲线做近、中、远距离客户端试听，不能仅填 `3/30` 就宣称有正确空间感。依据随工具文档第 141、376 页；One-shot/循环实例语义见第 144、379 页。
+
+## 编译与交付
+
+先读 CLI help，再检查项目的预/后构建命令。`-m` 列出依赖且不构建银行，`-l` 生成波形银行清单，`-k` / `-K` 禁用工程的预/后构建命令。只有明确需要且已审核的构建动作才另行启用。
 
 ```powershell
 & $FmodDesignerCli -help
-# 实际编译前先创建独立输出目录，确认工程和素材路径。
-& $FmodDesignerCli -pc -k -K -b $OutputDirectory $ProjectFdp
+& $FmodDesignerCli -pc -k -K -m $ProjectFdp
+if ($LASTEXITCODE -ne 0) { throw 'FMOD 工程依赖检查失败' }
+New-Item -ItemType Directory -Path $OutputDirectory -ErrorAction Stop | Out-Null
+& $FmodDesignerCli -pc -k -K -l -b $OutputDirectory $ProjectFdp
+if ($LASTEXITCODE -ne 0) { throw '声音银行构建失败，请检查完整日志' }
+Get-ChildItem -LiteralPath $OutputDirectory -File
 ```
 
-本次技能重建只验证了 CLI 帮助、官方文档和现有原版银行头，**没有重编/试听新的声音银行**。上述编译参数来自当前 help；真实工程仍需按下列步骤验收。
+`$OutputDirectory` 选择本次新的独立目录，`$ProjectFdp` 指向副本；若已有输出，先确认归属，不递归删除整个 sound 目录。实际 FEV 与银行文件名由工程决定，以依赖清单和输出为准，不能假定总是同名一对。修改 WAV 或事件配置后重新构建对应产物，核对其哈希与日志，再同步运行时。
 
-- 保留无损母带。44.1 kHz / PCM 16-bit 是可选工作起点，不是 DST 只能接受的唯一采样率/位深；声道选择取决于空间定位和素材。Designer 官方文档支持多种采样率、mono/stereo/多声道及重采样设置。
-- 压缩格式不是必须 MP3。选择目标工具/平台支持的设置，检查循环接缝和音质。大小不可能对所有压缩方式都接近 WAV PCM 字节数。
-- 声音事件组与混音分类不同：自定义组名可命名空间隔离；分类需要与目标游戏音量滑块路由一致，参照当前官方样例/工程，不能从旧截图推导任意固定名字。
-- 音量取决于素材响度、事件增益、叠加声部、衰减与游戏混音；`peak=-10 dBFS` 是旧项目经验，不能一刀切。记录峰值/响度并在游戏里与同类音效对比。
-- 裁剪避免接缝爆音，淡入淡出应按内容设计；循环素材不能随意把首尾都淡掉。混音是否 `normalize=0` 取决于增益设计，必须检查削波，不把它列为强制参数。
-- ffmpeg 的 `aecho` delay 单位是毫秒；要 450 ms 回声应写 `450`，不能把 `.45` 当 0.45 秒。参见 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前核对已安装版本帮助。
-- 复制 FDP 模板时检查项目/事件/银行唯一性、素材路径和标识符。不要无差别替换所有 GUID 后假定内部引用仍正确。
-- 2D/3D 与距离衰减在实际事件和关联设置中核对；不能保证把模板中“两处 x_2d 改成 x_3d”就适配所有工程。
+```text
+交付目录/
+├── sound/             实际需要的 FEV 与全部 FSB
+├── source/            可编辑 FDP、音频母版及处理后输入
+└── integration.md     事件路径、Asset、循环/3D/混音参数、版本、验证记录
+```
 
-构建检查分层记录：
+每项验收明确证据：
 
-1. 日志、实际输出路径、输入依赖、FEV 中事件名与银行引用、FSB 头和可解析的样本信息。
-2. 极小银行可能提示遗漏采样，但“192 字节就是静默空壳”和“只看文件大小”不是格式规范。
-3. 当前原版 153 个本地 FSB 的头均为 `FSB5`；因此不能仅凭 FSB5 判定不兼容。同为 FSB5 也不能证明编码、FEV 配套和运行时都兼容。
-4. 专服中 `PlaySound` 后出现打印最多证明脚本走到了该处；无声后端可能不完成客户端解码/混音。不能把打印当成银行、事件和听感全部通过。
-5. 客户端实际播放，检查第一次触发、循环/停止、近远距离、多人观察、音量滑块、连续触发和切世界。保留失败日志，避免把所有播放崩溃先归因于 WAV 参数。
+1. **文件与工程**：退出码、完整日志、真实输出路径、输入依赖、FEV 事件及银行引用、FSB 可解析的样本数量/编码/采样信息。`strings` 能找到名字只作线索，不能证明完整事件存在或可播放。
+2. **编码**：压缩后大小不必接近 WAV PCM，头部标识也不说明 PCM。“192 字节必为空壳”“FSB5 必崩”均不可作判据。2026-09-27 再查当前 153 个原版 FSB 均为 FSB5，仅证明该容器存在；相同头不等于采样编码、FEV 配套和目标平台兼容。
+3. **隔离运行**：专服 `nosound` 下打印 `PlaySound` 之后的标记只证明脚本执行到该处，不能声称事件查找、解码、混音和银行加载全部通过。按 [测试与发布](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) 运行行为测试并正常关闭，不复制旧 `os.exit()` / 强杀共享进程的临时 harness。
+4. **声音实测**：用目标工具试听作为中间检查，再到客户端检验第一次触发、循环/停止、近远距离、音量滑块、连续触发、多玩家观察和切世界。没有音频输出/客户端时保留这项待验收，不能用银行大小代替。
+5. **回修**：记录实际事件、主客机、Mod 列表、输入与银行版本和失败日志。Lua 无异常但客户端退出时结合原生崩溃记录排查，不先认定一定是 WAV 参数或 FSB 版本；未经解析的 dump 也不能当成根因。
 
-交付包含：运行时 FEV/FSB、可编辑工程与母带、事件完整路径、分类/3D/循环参数、工具版本、验证记录及未测范围。未经用户要求不调整游戏音量/声音设计。
+本轮核验了 Designer help、官方随附文档、Studio 模板/脚本存在及原版银行头，**没有编译或试听新声音银行，没有验证 Studio Mod 运行时接入**。交付记录应保留这些边界，不把工作流说明写成已完成的声音验收。
 
 ## 粒子系统与网络边界
 
@@ -1030,7 +1262,7 @@ local assets = {
 - `AddRotatingParticle` 的 angle 参数不是 UV 坐标。教程变量叫 `uv_offset` 却传给 angle，是误命名/机制混淆；需要图集帧时参考 `AddRotatingParticleUV`、`SetUVFrameSize` 的配套用法。
 - 粒子数量、寿命、发射频率一起决定负载。原版代码里的每 tick 随机倍率只代表具体效果，不等于严格的每秒目标数；要精确速率时先定义累积/抖动需求。
 - 客户端随机装饰可以各自不同。影响伤害/命中的范围和时刻由服务器判定，不用粒子的位置反推游戏逻辑。
-- `persist=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
+- `persists=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
 - 混合模式、泛光和 shader 需以当前资产及客户端效果验证；专服 PASS 不证明有画面。需要截图/视频验收时明确抽检的实例、时段和机位，不声称看过未播放素材。
 
 核验依据：当前 `prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；核验环境中的 FMOD Designer help；随工具提供的《FMOD Designer 2010》80、142、152-157、205 页；该环境中的 FSB 文件头统计。现代 FMOD Studio 文档可帮助理解概念，不能替代这些 DST 目标版本证据。
@@ -1038,13 +1270,80 @@ local assets = {
 
 ---
 
+## 来源：`references/character-and-equipment-art.md`
+
+原始 SHA-256：`b2c59789d2c0623ec4a9c3b5a84365f5f3f016f70f53cf8b146c47d8d3967b5c`
+
+# 角色外观与装备手持资源
+
+用于角色换皮、全新角色部件、手持装备和施法书外观。资源层级、图集、编译工具和通用验收先见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)；角色注册与生命周期见 [角色机制](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md)。仅更换已有角色的造型通常复用其动作；自定义骨架、特殊形态或新增动作仍需要对应动画，不能概括为“所有角色永远只做 build”。
+
+## 角色外观：从参考到部件
+
+1. 先区分改色、局部重绘、全新造型与改变动作。记录原角色的 bank/build、符号帧、朝向、画布和 pivot，保留可回退的原工程。不要把某个模板的符号数、帧数或画布尺寸当成全角色标准。
+2. 选择当前角色兼容的模板或原有工程。仅改色/换图时保留既有帧编号与锚点可降低风险；改变轮廓或画布时可以调整 pivot 和位置，但必须同步坐标映射并检查完整动作。不能用“画布永远不准改”限制所有新角色。
+3. 三视图是拆件参考，不能直接当成可播放 build。按实际符号拆头、脸、头发、身体、手脚等，核对同一方向的遮挡关系、连接处和动作所需帧。表达式/头部位置取本角色测量值，不继承历史人物的像素偏移。
+4. 调色和重绘从未加工源文件生成，避免重复映射、反复重采样。已有透明图保留 alpha；白底素材有白色衣物/高光时，不能全局删白。检查边缘、半透明发丝与深浅背景下的颜色。
+5. 工具由当前可用能力决定，不固定某个本地生成模型、端口、工作流节点或去背阈值。若使用图像生成工具，仍需逐部件检查轮廓、朝向、设计一致性及原图授权。
+
+[Extended Sample Character 作者仓库](https://github.com/DragonWolfLeo/extendedsamplecharacter-dontstarvetogether)可作为模板来源和工程说明。其默认 SCML 使用方式不等于所有管线的格式限制；先核对所取版本、许可与当前游戏，再选择复用范围。本技能不捆绑模板素材或私人角色工程。
+
+## 编译与预览
+
+- 在独立输出目录编译受影响工程，记录输入与产物清单。仅改 ZIP 文件名不会改内部 build；重命名需沿资源声明、编译源、内部名称与调用方核对。缓存提示异常时先核对依赖和实际输出，不删除整个 `anim/` 强迫重编。
+- 解析实际 build 的符号、帧号、图集引用；需要动作时解析 anim 的 bank/动作/朝向。`krane` 导出与 DST Mod Tool 预览有助于交叉检查，但一个工具能打开不等于全部游戏行为通过。
+- 角色预览应组合真实动作和本角色 build。`BUILD_PLAYER` 等零件陈列动作只适合检查部件存在性，不能替代站立、跑动、受击与装备姿态。
+- 软件预览必须使用本工程的 pivot、矩阵、图层和朝向规则。不要把一份 krane/SCML 转换器的“反序绘制”或 Y 翻转公式无条件套到另一格式。用非对称小样本确认上下左右、旋转方向、锚点及遮挡后再批量渲染。
+- 模板 build 缺少某些原版符号时，检查目标动画是否真的引用、是否应该隐藏或复用；软件渲染器简单跳过缺符号只能作为诊断，不能作为游戏资源验收。
+
+## 新角色 Mod 的资源接入
+
+按实际工程建立映射表：角色 prefab → 注册名称/字符串键 → 皮肤定义/build → 选人、头像、小地图与幽灵资源 → XML Element 名及 TEX 路径。只改文本和目录不能改变二进制内部名称；只改 PNG 也不会自动更新 TEX/ZIP。
+
+`MakePlayerCharacter` 默认设置 `wilson` bank，并为调试生成设置默认 build，随后还有 skinner 路径。测试普通出生、调试生成、换肤和幽灵/复活时都需检查最终 build，不能只在初始化末尾强行 `SetBuild` 掩盖映射问题。
+
+角色专属组件先查工厂和相近角色是否添加。当前 `wes.lua` 在使用 `efficientuser` 前判空添加；`wickerbottom.lua` 自己添加 `reader`。组件不存在时不能直接调方法，也不能为所有角色无条件加同一组件。
+
+名称缺失先对照真实 prefab、`STRINGS.NAMES` 和对应消费者；台词的状态表/角色键另按 [角色机制](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md)核查，不把所有字符串表都写成同一种结构。Lua 字符串可使用合法长字符串或转义换行，不需要一律禁止多行描述。
+
+新角色测试应实际生成角色并检查关键组件和出生路径，单纯启动世界不覆盖 `master_postinit`。使用 [当前测试器](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md)的 `TEST.After` / `TEST.Done` 完成协议；旧共享测试目录、打印标记、强杀占端口进程与私人存档路径不作为默认流程。
+
+## 手持装备：按引用链排错
+
+先分别列出 ZIP 路径、内部 build、源 symbol 和角色的目标 symbol。装备不显示时按以下顺序检查，而不是把所有名字统一后反复改动画名：
+
+1. 资源已加载，build 名与实际产物一致。
+2. `OverrideSymbol(目标, build, 源符号)` 的源符号存在，并有该动作所需的帧/朝向；原版 `sword_lunarplant.lua` 的 build 和源符号名称就不同。
+3. 装备回调确实执行，目标符号和 `ARM_carry` / `ARM_normal` 等显隐与同类原版一致；皮肤分支可能使用 `OverrideItemSkinSymbol`。
+4. 检查源图、pivot、矩阵、缩放、透明区域以及后续皮肤/变身/另一装备的覆盖。手持并不存在统一“必须填满 200 像素画布”的规则。
+5. 卸下或换装备时沿原版恢复路径处理本 Mod 拥有的外观。不能延迟无条件清空 `swap_object`，从而擦掉后来装备的覆盖。
+
+纯换符号可使用 build-only。当前原版 `swap_spear.zip` 无 `anim.bin`；角色不会为了显示手持物去播放该包的 `BUILD_90s_90s`。旧 SCML 模板的编译入口动画可以保留，但不要把它当成引擎显示条件。
+
+符号核验要读取 BILD 对应版本的符号记录及名称表；散扫明文或在整个二进制中搜索某个四字节哈希都可能误判。当前官方 `buildanimation.py` 的符号哈希逐字符转小写，再按 32 位 SDBM 累积；仅匹配字节串不证明它位于符号表、拥有所需帧或没有碰撞。
+
+## 书籍、灯光与验收
+
+使用原版 `book` 状态时，查 `SGwilson` 的 `book2` 和物品定义。当前路径支持 `book.swap_build` 与 `book.swap_prefix`（默认 `book`），用 `<prefix>_open` / `<prefix>_closed` 源符号覆盖角色的 `book_open` / `book_closed`。书本 FX、骑乘与皮肤是另行处理的分支，不要用挂在人物原点的整张大书图替代这些机制。法术与地图动作见 [法术与数值](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md)。
+
+灯光是引擎 `Light` 接口，原版使用 `inst.entity:AddLight()` 及 `inst.Light`；不能从“找不到 RemoveLight”推导应新增一个名为 `light` 的 Lua 组件。需要关闭/回收时沿同类原版的 `Light:Enable` 或独立灯光实体生命周期；发光贴图、Bloom 与照亮环境是不同效果。
+
+交付至少核对：源工程可追踪、内部名称和图集引用、目标动作与朝向预览、装备/卸下/换装、皮肤与形态变化、幽灵/复活、主机和远端观察者。静态检查、软件预览、专服加载和真实客户端视觉分别报告；不以字符数、文件大小或软件截图替代实际客户端结果。
+
+核验基线：2026-09-27 安装源码的 `prefabs/player_common.lua:MakePlayerCharacter`、`prefabs/wes.lua`、`prefabs/wickerbottom.lua`、`prefabs/spear.lua`、`prefabs/sword_lunarplant.lua`、`stategraphs/SGwilson.lua:book2`，实际 `data/anim/swap_spear.zip`，以及安装版 `mod_tools/tools/scripts/buildanimation.py:strhash/ExportBuild`。源码指纹见 [环境与来源](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/environment-tools.md)。
+
+
+---
+
 ## 来源：`references/characters-brains-stategraphs.md`
 
-原始 SHA-256：`c3c88c0b89101486174f501eecedb31c07fbbb4488872651bc0fb9ccf5249847`
+原始 SHA-256：`18ba0f1cbd645885ea1aae4bf9db4ab779e94123e507ee4ec884909b6639775f`
 
 # 角色、Brain 与 StateGraph
 
 适用于角色创建、动物亲和、定制生物、形态变化与动作状态排错。以 2026-09-27 核验环境的原版脚本为基线，详见 [environment-tools.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/environment-tools.md)。美术、网络变量与客户端界面细节按技能入口中的对应专题展开。
+
+角色外观和选人资源接入见 [角色与装备美术](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md)；魔力/能量条与恢复流程见 [法术与自定义数值](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md)。
 
 ## 角色工厂与生命周期
 
@@ -1232,6 +1531,114 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 - `prefabs/moonrockseed.lua`；`components/builder.lua:235-301`；`components/playerprox.lua:44-59,165-180`：科技选择与纯邻近触发。
 
 伤害测试需比较普通/位面/护甲/PvP、主目标不重复、范围边缘和叠加来源；Buff 测重复/到期/移除/死亡/读档；容器测多人打开、转移、召回与磁盘重启。网络展示、真实玩家输入和第三方 Mod 组合另做客户端验收。
+
+
+---
+
+## 来源：`references/cooker-dishes.md`
+
+原始 SHA-256：`7c0369f5a58993cfe432473a11c95360aaee32066955815bdfe938f3ce81a475`
+
+# 新增与维护锅料理
+
+用于完成一道料理从设计、注册、调味、图像到验证的全过程。先读当前 `cooking.lua`、相近配方和 `prefabs/preparedfoods.lua`；料理判定基础见 [物品与料理](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/items-food-plants.md)，实体骨架见 [Prefab 与组件](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/entities-components.md)。本页不规定料理数值、画风、项目目录或角色台词数量。
+
+## 1. 建立料理合同与变更清单
+
+一次确认未决定的项目：内部名称与显示名；允许的锅；原料数量及生/熟/干替代；优先级与同档竞争；三维、食物主/副类型、特殊食用效果；烹饪和腐烂时间；是否支持调味；语言与图像表现。已有明确需求不重复询问。
+
+先列正例、反例和应保留的竞争配方，分别在普通锅与便携锅判断。`names` 使用 `cooking.lua` 规范化后的食材名，`tags` 是累计值；具体食材个数与标签值不是同一个条件。未出现的字段可能为 nil。`AddIngredientValues` 会替换已有食材标签，不能为了新料理顺手清掉原版属性。
+
+盘点项目实际模块，不要求创建固定的 `recipes.lua`、`atlas.lua`、`strings_cn.lua` 或调味文件。旧项目中的 `AddModCookerRecipe`、`MOD_FOOD_RECIPES`、`MOD_FOODS`、`SHARED_ANIM_DISHES`、`MOD_DISH_QUOTES` 都是项目封装/数据表，**不是原版公共接口**；遇到它们先读定义、调用方和初始化顺序，不能搬名称就假定可用。
+
+尽量以一份已确认的数据定义基础料理，供配方和 prefab 构造读取，再派生调味数据。既有项目必须多表维护时，逐字段核对并记录映射，避免只改配方提示而没有改变实体数值。生成变体时复制所需嵌套表，避免意外修改基础数据。
+
+## 2. 配方注册与实际消费者
+
+在 Mod 环境中调用 `AddCookerRecipe(cooker_name, recipe)`。这个包装已传入 mod 标记；不要绕过它，把料理伪装成官方食物。按需求分别注册 `cookpot`、`portablecookpot` 等真实锅名；是否参与 `archive_cookpot` 需明确。注册配方不会替你创建产品 prefab。
+
+| 数据 | 必须核对的行为 |
+|---|---|
+| `name` | 与实际注册的产品 prefab 对应；只有项目 helper 明确处理时，表键才能代替此字段 |
+| `test(cooker, names, tags)` | 返回此配方是否进入候选；读懂原料别名、缺失字段、准确数量和排除条件 |
+| `priority`、`weight` | 先保留最高 priority，再按 weight 抽取；明确给正数 weight，不能靠缺省分支兜底 |
+| `cooktime` | 是 `TUNING.BASE_COOK_TIME` 的倍率，实际还乘锅的 `cooktimemult`，不是直接秒数 |
+| `perishtime` | 配方影响烹饪的新鲜度计算和锅内变质；实体的 perishable 也必须读取相应设计 |
+| `cookpot_perishtime` | 锅中成品变质时间的可选覆盖；不自动改变取出后实体的保鲜时长 |
+| `health`、`hunger`、`sanity`、`foodtype` 等 | 配方与图鉴数据不会自动写入任意自定义 prefab，需由该 prefab 构造实际应用 |
+| `overridebuild`、`overridesymbolname`、`potlevel` | 供锅内成品显示；独立检查拾取后实体的 bank/build/symbol，不能以锅内显示正常代替 |
+| `cookbook_atlas`、`cookbook_tex`、`no_cookbook` | 按实际图鉴需求配置；默认图像名为产品名加 `.tex`，图集可回退库存注册 |
+
+原版数据文件最后会补齐 `name`、`weight` 等字段；`AddCookerRecipe` 本身没有替任意 Mod 配方做同样的补齐。当前抽取分支直接使用 `candidate.weight`，省略它可能运行时报错。
+
+腐烂时长按已批准的天数使用当前 `TUNING.TOTAL_DAY_TIME` 或适当的 TUNING 常量，别从旧样例继承 `10 * 480`。当前 `FOODTYPE` 不只有 VEGGIE/MEAT/GOODIES，也没有 FISH；食材 `fish` 标签不等于可食组件枚举。怪物副类型是否保留属于饮食设计，不能为消除某角色限制擅自改掉。
+
+## 3. 产品实体与资源接线
+
+以当前 `prefabs/preparedfoods.lua` 的构造顺序为参照：公共动画、必要 tag、网络与浮水设置 → `SetPristine()` → 主客端分离 → 权威端的 edible、inventoryitem、stackable、perishable 等。实际用途决定是否保留可燃、交易、诱饵等原版行为。`MakePreparedFood` 是该文件内部局部函数，不能当成可从 Mod 直接调用的导出接口。
+
+`PrefabFiles` 填实际 prefab 模块路径；一个模块也可返回多个 prefab，不必强制每道菜及每种调味各建一个文件。声明并加载新增动画、图集与 TEX；沿引用检查依赖，不机械要求所有资源同时在 `modmain.Assets` 与 prefab 中重复声明。
+
+**独立图集是资源组织选择，不是新增料理的引擎要求。** 保留“不要破坏已发布共享资源”的经验：先识别该资源的使用者，保留可重编源工程；选择扩展共享 build 或新增 build 后，验证受影响的旧菜。只有项目明确冻结共享包时才保留该项目限制。
+
+- 复用原版 `cook_pot_food` 的 bank/idle 与换符号路径时，新资源可只提供 build 和图集；不强行制造 `anim.bin`。如果料理确实有独立动作，则检查相应 bank、animation 与完整依赖。
+- 普通锅/便携锅使用 `recipe.overridebuild` 和 `recipe.overridesymbolname or product` 覆盖 `swap_cooked`。用自定义 symbol 名时，这个字段只解决锅的调用；自己 prefab 的 `OverrideSymbol` 仍要对应真实符号。原版食物构造默认使用 `basename or name`，没有自动消费该覆盖字段。
+- 库存图标链条为 TEX/XML Element → `RegisterInventoryItemAtlas(atlas, image_with_tex)` → inventoryitem/replica 查询；XML Texture 文件名不必等于 Element 名。图鉴默认也查询此注册，避免只给实例设置 atlas 而遗漏静态图鉴路径。
+- 64×64 库存源图可作常见起点，200×132 地面图、固定内容范围、固定缩放和颜色倍率都是旧项目美术参数，不是通用标准。保持 alpha，不能直接按白色阈值删除白色主体与高光。
+
+图像处理、当前工具发现、DMT 预览和 ZIP 校验沿 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)、[DMT 工作流](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md)、[工具安装](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 执行。没有强制的 ComfyUI 模型、端口或出图后处理流水线。官方编译器报缺少 `animation.xml` 时，应定位输入工程、导出日志与当前工具契约；旧文档“第一次故意失败→手写固定矩阵 XML→再编译”的补丁不作为通用流程。也不要为了改变时间戳或压缩算法无条件重写已有效的 ZIP。
+
+## 4. 调味是单独的完整链路
+
+需要支持调味时，同时完成：调味站接受食物 → 变体配方 → 变体 prefab → 食用效果 → 图像和名称。只添加 `preparedfood` tag 不足以完成这条链；当前调味站以该 tag 和非 `spicedfood` 判断基础菜准入。
+
+对照 `spicedfoods.lua` 与 `prefabs/preparedfoods.lua` 的分工：
+
+1. 为所支持的香料派生变体数据，包含独立 `name`、基础菜 `basename`、香料 `spice` 与判定；注册到 `portablespicer`，并确保产品 prefab 已存在。默认原版生成循环仅处理其列出的基础表，不会自动扫描任意 Mod 菜。
+2. 保留基础菜数值、食用回调、依赖和图像引用，再按相应香料语义叠加。蒜/糖/辣椒的 buff、辣椒温度变化及盐的读取链以当前原版为准；不能把所有香料都当成直接乘三维，也不能用香料回调覆盖基础菜效果。
+3. 变体沿原版添加 `spicedfood`，设置 edible 的 `spice`，使用基础菜标识处理检查描述和食谱记录。需要餐桌等显示兼容时同时追踪 `food_basename`、`food_symbol_build` 的消费者。
+4. 图像通常复用基础菜库存图作为 `inv_image_bg`，叠加香料图标；地面表现复用 `plate_food`、`spices` 和基础菜符号。注册基础图集并在两端检查，不能为每个变体盲目复制一份相同 TEX。
+5. 名称沿原版香料名称模板组合基础菜显示名；验证各语言的组合结果和基础菜台词回退。
+
+`GenerateSpicedFoods` 虽在原版模块中定义，但会写入该模块持有的全局调味结果表，且生成过程带官方数据假设；它不是 `modutil` 暴露的独立注册工厂。读清副作用后再决定项目接入方式，不靠改原版表、全局函数或硬编码“料理总数”完成新增。
+
+## 5. 名称、描述与语言
+
+- 显示名使用 `STRINGS.NAMES[upper_prefab]`。
+- 检查台词使用 `STRINGS.CHARACTERS.<角色表>.DESCRIBE[upper_prefab]`，默认回退 `GENERIC`。`STRINGS.DESCRIBE` 不是这条原版检查链的入口；若旧项目通过 helper 转写它，要保留实际转写证据。
+- `STRINGS.RECIPE_DESC` 服务制作配方说明；只有锅料理并不因此必须新增制作菜单描述。本篇“图鉴”指食谱图鉴（Cookbook）；先确认项目所指系统，若还要求 Scrapbook，另查其注册与发现链，不能把食谱图鉴接通当作所有图鉴都已支持。图鉴消费的数据应沿其 UI 查证。
+- 2026-09-27 基线中 `DST_CHARACTERLIST` 有 19 项（含隐藏 `wonkey`），而 `STRINGS.CHARACTERS` 有 17 个基础台词表（GENERIC 加 16 专属）。GENERIC 来自 Wilson 台词，Wes 走哑剧特殊处理；**台词表项数不是角色总数**。
+- 按当前版本的已加载台词表、项目支持范围和实际语言补齐。不要为凑固定数量造不存在的表，不覆盖第三方角色自己的台词；补缺失项时保留已有值。中英双语是支持范围选择，不能仅因旧案例写过就改动项目语言策略。
+
+## 6. 按链路验证并交付
+
+| 层次 | 本次改菜后需要证明的事项 |
+|---|---|
+| 静态 | Lua 可解析；调用与字段真实存在；所有配方产品可注册；基础/调味数据一致；名称、XML、图像、build/symbol 引用完整 |
+| 判定与服务端 | 各锅的正反例、边界食材数量和优先级竞争；同档候选/权重符合设计；真正烹饪、取出、食用、堆叠、腐烂与保存重载 |
+| 调味 | 每种承诺支持的香料都能产出实体；基础效果和香料效果各按原版链结算；调味后不会继续作为未调味食物重复进入 |
+| 客户端 | 主机与真实远端看到锅内成品、地面、库存、图鉴、名称与台词；有相关行为时检查浮水、餐桌和饮食限制 |
+| 发布与同步 | 比较已授权的源码/运行副本，保留用户改动并逐文件核对哈希；版本与变更说明按项目发布策略更新 |
+
+概率判定的测试检查候选与权重本身，单次抽到预期菜不能证明同档竞争正确。语法检查、构造 prefab 成功或无头运行都不能代替客户端画面与远端图鉴验收。完整命令和证据分级见 [测试与交付](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md)。
+
+同步目标由当前项目与用户授权确定；不预设固定三份目录，不默认覆盖 Workshop 下载副本。交付列出料理合同、改动文件、资源、实际同步目标、验证证据和未验边界，审查结论按项目约定写 `.txt`。没有发生实际发布时，不声称已经更新玩家订阅内容。
+
+## 核验依据
+
+以下为 2026-09-27 当前安装版源码定位；相应文件已逐字节核对安装包，基线见 [环境与源码](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/environment-tools.md)。后续版本仍需重查定义与消费者。
+
+| 主题 | 源码入口 |
+|---|---|
+| 配方注册、食材别名、候选 | `modutil.lua:636-653`；`cooking.lua:9-29,46-68,178-228,238-287`；`preparedfoods.lua:1098-1104` |
+| 时间、新鲜度、保存与产出 | `components/stewer.lua:75-99,130-177,203-261,276`；`tuning.lua` 的 `BASE_COOK_TIME` / `TOTAL_DAY_TIME` |
+| prefab 与调味 | `prefabs/preparedfoods.lua:7-179`；`spicedfoods.lua:17-83`；`containers.lua:425-429` |
+| 香料与基础食用效果 | `components/edible.lua:88-142,184-197`；`tuning.lua` 的 `SPICE_MULTIPLIERS`；`prefabs/player_common_extensions.lua:919` |
+| 锅内符号、调味站符号 | `prefabs/cookpot.lua:105-125`；`prefabs/portablecookpot.lua:120-139`；`prefabs/portablespicer.lua:135-156` |
+| 图集与图鉴 | `simutil.lua:658-699`；`modutil.lua:954-957`；`widgets/redux/cookbookpage_crockpot.lua:497-522` |
+| 台词与角色范围 | `strings.lua:15579-15598`；`stringutil.lua:364-413`；`constants.lua:442-463,2022-2043` |
+
+本次整合核实的是文档和源码合同，没有制作新料理、美术编译或实际开服验收。具体新增料理仍按上表执行其真实验证。
 
 
 ---
@@ -1634,11 +2041,13 @@ return Counter
 
 ## 来源：`references/items-food-plants.md`
 
-原始 SHA-256：`740a211f2d9af95f589061a4c5c765b458565757ef57b72af2579fc2d497caf9`
+原始 SHA-256：`52dc5f24f5c5b94d03089837d69094d1e246564e0541053cda32af92262415be`
 
 # 物品、武器、料理与植物
 
 用于修改物品机制、修复菜单、制作配方、锅料理或生长/种植。先读当前相近 prefab，再追组件和调用端。此页片段用于说明接口，不是含资产、数值、网络声明的完整 prefab。
+
+新增独立锅料理的配方、调味变体、图标与台词交付流程见 [料理制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/cooker-dishes.md)。
 
 ## 物品与武器的实施顺序
 
@@ -1935,11 +2344,13 @@ end)
 
 ## 来源：`references/sources-and-corrections.md`
 
-原始 SHA-256：`198f90a4fca6601d6fff23534647cb07ad7781302d26ae6daf40ad825d158d3a`
+原始 SHA-256：`2befdd9320ff25af275fddf370531ef637b900ae1d3ef98e32194f8242410432`
 
 # 来源、可信度与纠错范围
 
 本技能于 2026-09-27 完成首轮重建，随后整理为独立可移植版本。资料输入包括两份既有通用技能 `dst-mod-development`、`dst-mod-devkit` 与 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial)。教程包含 2021 年内容和后续补充，并非当前游戏的官方 API 规范；使用本技能不需要安装这两份旧技能或下载教程附件。
+
+同日继续核验七份专项技能：新增料理、法术、自定义数值、角色 build、装备 swap、帧序列动画和 FMOD 音频，包含旧法术模板与装备清单。内容按任务并入本技能，不再要求加载任何旧 DST 技能；逐项去向见 [整合记录](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/docs/consolidation.md)。旧项目的私人素材与游戏缓存只留在本地归档，不纳入公开许可和分发包。
 
 旧 devkit 的测试工具注明来源 [zhuchengguang317-eng/dst-modtest](https://github.com/zhuchengguang317-eng/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
 
@@ -1975,6 +2386,15 @@ end)
 | 固定采样率/声道/压缩才兼容、FSB5 一定不能用 | audio-particles.md |
 | 同名 Mod 可直接复用、脚本 return 就可判成功 | testing-release.md、三个 scripts |
 | 离线端口永远10999、用猜测端口配置后杀别的进程 | environment-tools.md |
+| PushEvent 全部下一帧、GetAttacked 传 electric 自动加倍率 | spells-and-custom-stats.md |
+| 每隔 1 世界单位灌溉即每格加一次、睡眠原函数后无条件恢复 | spells-and-custom-stats.md |
+| 自定义属性必须使用 Class setter、构造中从 components 取回自身 | spells-and-custom-stats.md |
+| 项目料理 helper 当原版 API、AddCookerRecipe 自动建实体和调味 | cooker-dishes.md |
+| 17 个台词表等于全部角色、强制三目录或固定图集 | cooker-dishes.md |
+| 手持必须 BUILD_90s_90s、整包搜哈希就证明符号存在 | character-and-equipment-art.md |
+| 固定模板帧数/画布适合所有角色、删除整个 anim 强制编译 | character-and-equipment-art.md |
+| 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
+| 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
 公开的检查范围、工具回归结果及未覆盖内容见 [验证记录](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/docs/validation.md)。各专题保留相关源码文件/函数定位、适用条件与验证边界，供读者在自己的合法安装中复核。
 
@@ -1982,7 +2402,123 @@ end)
 
 ## 后续使用范围
 
-其他专项 DST 技能可以补充专门的制作流程，但不是本技能的必需依赖；其通用规则若与当前源码不符，按当前证据修正，不再反向引入旧口诀。首轮重建只审查两份通用技能及列明的材料，没有覆盖所有社区技能。新的游戏数值和美术决策仍由项目作者决定，不能从旧项目例子自动继承。
+统一入口按需加载内部专题，不再维护旧专项技能的独立规则。核验范围是两份通用技能、七份专项技能及列明材料，没有覆盖所有社区技能，也未证明任意游戏版本都适用。新的游戏数值和美术决策仍由项目作者决定，不能从旧项目例子自动继承。
+
+
+---
+
+## 来源：`references/spells-and-custom-stats.md`
+
+原始 SHA-256：`2c7e56534b8a8893baac5fd13b32534c80044cf9c9b45b1215be1f93071a147e`
+
+# 法术、资源数值与徽章
+
+适用：新增轮盘法术、地面或地图选点、魔力/能量等自定义数值、徽章和睡眠恢复。按 2026-09-27 核验环境的安装版源码整理，版本基线见 [environment-tools.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/environment-tools.md)。本篇是任务流程；组件、网络、生命周期、战斗和 UI 的通用契约链接到已有专题，不另维护一套。
+
+## 先写出本次玩法契约
+
+| 要明确的内容 | 实现前需要的答案 |
+|---|---|
+| 入口与施法者 | 自身、地面、地图；物品还是玩家载体；鼠标/手柄；骑乘能否施法 |
+| 目标与范围 | 施法距离、效果半径、地形/平台、阵营/PvP、是否允许空放、未探索地图是否可选 |
+| 资源与结算 | 值域与精度、消耗公式、目标排序、整次拒绝或部分生效、失败与中断是否消费 |
+| 长期状态 | 刷新/叠层、死亡、幽灵、断线、切世界、重启的保留规则 |
+| 反馈与验证 | 提示/动画/徽章、明确的成功结果、服务器拒绝路径与客户端验收场景 |
+
+已有项目决策直接沿用；缺少的数值和玩法由作者决定。以当前原版相近机制确定技术路径，再写“输入 → 校验 → 效果 → 消费/冷却 → 退出”流程。配置保持单一来源，但不强制所有项目把数值写在 `modmain.lua`。
+
+## 自定义数值：从服务端到 HUD
+
+1. **确定权威与可见范围。** 服务端组件拥有数值；netvar/Replica 提供客户端读取。角色公共 `common_postinit` 可声明直接 netvar；若只有拥有者需要数据，先评估 classified 的接收范围和生命周期，不能把普通角色字段当成私有数据。详细步骤见 [networking-rpc.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/networking-rpc.md)。
+2. **先建复制字段，再构造权威组件。** 使用项目命名空间命名组件、字段和事件；类型/顺序/名称在两端一致，按 `netvars.lua` 选择范围和精度。声明的 dirty 名必须与监听完全对应，并不要求它由字段名机械拼接；当前类型不止旧教程列出的十种。
+3. **建立统一修改入口。** 定义读取、增减、设置上限和百分比接口；所有输入检查类型、有限性与业务范围。上限变化时明确保持绝对值、比例或重置，统一规范化当前值；允许零上限时给百分比和 UI 定义禁用行为，不直接除零。编码的取整/缩放和溢出处理应与玩法精度一致。
+4. **初始化与同步。** `Class` 第三参属性 setter 是可选的原版范式；集中方法中显式同步也可行。setter 在构造赋值时已经运行，先设置 `self.inst` 和依赖；同值赋值也调用 setter，内部不要递归给自己赋值。`AddComponent` 在构造返回后才写入 `inst.components[name]`，构造期间使用 `self`，不要从该字段取回自己。其他组件可能尚未创建，跨组件依赖放在明确的装配阶段。参见 [core-lua-hooks.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/core-lua-hooks.md)、[entities-components.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/entities-components.md)。
+5. **保存与恢复。** `OnSave()` 返回纯数据；`OnLoad(data)` 容忍缺字段并校验非法/旧版本值。先恢复合法基准/上限，再规范化当前值，即使存档未带 current 也不能留下越界值。配置派生的上限是否保存由恢复策略决定；跨组件加载无固定顺序，需要协调阶段。任务保存剩余时间后重建，细节见 [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md)。
+6. **接入本地徽章。** 以 `Badge`/`StatusDisplays` 为起点；绑定后主动读快照，同时监听 current 和 max 的变化，处理数据源稍后到达和 HUD 重建。徽章数字与百分比使用同一合法最大值；初次幽灵状态与后续切换走已复制的 ghost/HUD 链，不能只监听服务器的死亡/复活事件。绑定、解绑及布局见 [ui-actions-controls.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/ui-actions-controls.md)。
+
+`Badge` 的 `iconbuild=nil` 有源码守卫，但资源是否含目标 symbol/frame 必须检查实际 build。旧结论“status_meter 一定没有 icon”没有足够资源证据，不作为规则。`dont_animate_circleframe` 只决定框是否跟百分比取帧；是否需要它取决于所用资源。独立 `Image` 可作为替代，明确设置所需注册点并实机检查，不能由 Lua 构造器猜引擎的默认锚点。换 build 仍需与复用的 bank/动画兼容，参见 [assets-animation.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)。
+
+## 睡眠恢复：复用任务，重新检查资格
+
+`sleepingbaguser:DoSleep` 建立周期任务，`DoWakeUp` 取消并清空 `sleeptask`。需要与床具 tick 同步的恢复可窄包装 `SleepTick`，无须再建一个独立周期任务；床卷、帐篷及其他支持床具以组件实际关系判断，不靠单个 SG 标签猜“正在睡觉”。
+
+当前 `SleepTick` 会扣饥饿、处理理智/生命/温度，并可能因饥饿调用床具 `DoWakeUp`。因此“先调旧函数，随后无条件回魔”不成立。包装前确认宿主、原床具和组件有效；调用原函数后，再确认同一睡眠会话仍有效、床具仍属于该玩家、`sleeptask` 未取消，以及设计要求的非饥饿/存活等条件，然后才恢复。若设计允许最后一次唤醒 tick 恢复，单独明确该规则。
+
+保留旧函数的参数、返回值和副作用；避免重复安装包装，组件被移除后仍需清理本 Mod 自持的监听/引用。不要把 `self.bed ~= nil` 当成完整睡眠证明：当前 `SleepingBagUser:DoWakeUp` 取消任务，但不负责把该字段清空。额外的自然恢复、进食或战斗恢复各自追事件生产端，核验 data、调用时机、来源与清理，不能用一个睡眠 hook 代替所有恢复生命周期。
+
+## 法术接线与选中状态
+
+| 交互 | 当前原版入口 | 必须继续追踪的部分 |
+|---|---|---|
+| 地面选点 | `aoetargeting` → `CASTAOE` → `aoespell` | 本地瞄准、动作构造、两端 SG、服务器 CanCast 与结算 |
+| 轮盘直接执行 | `spellbook:SetSpellFn` / 指定动作 | `CAST_SPELLBOOK` 或该动作的实际执行链，不等于在 UI 回调中直接改数值 |
+| 地图选点 | `playercontroller:PullUpMap` 与地图 Action | owner、地图动作收集、预测/RPC、服务器落点复验 |
+
+从当前 `waxwelljournal`、`abigail_flower` 读完整构造：轮盘和瞄准所需公共组件先准备，权威 `aoespell` 放服务端。不是“所有 SetPristine 之后的组件都只在服务器”，端别取决于执行分支和组件契约。
+
+`spellbook:SelectSpell(id)` 把**载体**交给 `onselect`，不是把玩家交给它。公共回调只配置该法术的瞄准/动作；服务端在依赖已装配时绑定结算函数。不同法术共用组件时，切换到新项要清除旧项独有的重复施法、地形允许、range、reticule、spell action 和备用 spellfn 状态；原版 journal 在两种结算组件间切换时也清空另一种 spellfn。
+
+`aoespell` 回调签名为 `(item, doer, pos)`；`spellbook` 直接回调为 `(item, user)`。`aoespell:CastSpell` 对无返回值的回调有默认成功处理，**返回 false 不会撤销已经发生的扣费或效果**。要显式表达预期结果。函数应在被捕获前定义或正确前置声明 `local`；不要保留旧模板中只有注释的 local 声明，却把 `function NewSpellFn` 写成全局。
+
+原版 `CASTAOE` 的 `book` tag 用于选择书本动作动画，另有其他分支及兜底；它不是所有施法物品必需的 tag。`aoetargeting` 当前 enabled 初始为 true，禁用/冷却策略仍由机制负责。连续施法是玩法选项，不因模板存在 `SetShouldRepeatCastFn` 就默认开启。
+
+指示圈的视觉、落点搜索、施法距离、实际效果范围分别核验。`reticuleaoe.lua` 的 scale 常量不能独立证明任意美术资源的世界半径；圈大小须对照资源和客户端边缘命中验证。targetfn 的搜索策略应符合设计范围，但不存在“搜索上限必须等于 range”的通用 API 契约。轮盘布局由条目数据计算，条目多时仍需验证文字、焦点、嵌套、分辨率和手柄，不能用“没有固定上限”承诺任意数量都可用。
+
+## 服务器结算、伤害与范围效果
+
+执行帧重新检查施法者、载体及持有权、技能选择、资源、冷却、地形与目标权限；不要只依赖打开轮盘时的检查。固定消费、总量消费、按有效目标部分消费是不同设计。部分消费需确定目标排序、单位成本合法性、失效目标处理及成功计数，不能未经检查计算 `floor(resource / cost)`。
+
+先准备和验证可完成的操作，再按约定的提交点应用效果、消费与冷却，防重入/重复请求。同步事件也可能改变资源或目标；跨帧效果必须定义取消、失败及补偿。不要声称任意 Lua 效果能自动事务回滚，也不能把“回调最后返回 false”当退款机制。
+
+- **电伤**：当前 `Combat:DoAttack` 在满足电 stimuli、且目标不满足 `IsEntityElectricImmune` 的条件下，按武器配置或 TUNING 和 `GetWetMultiplier()` 计算倍率，再交 `CalcDamage`。直接 `GetAttacked(..., "electric")` 不自动补这一倍率；选择与技能相符的原版攻击链，避免预乘后再走带倍率链导致重复增伤。普通/特殊伤害、防御、来源和阵营见 [combat-buffs-containers.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/combat-buffs-containers.md)。
+- **触电反应**：有 `electrocute` 状态不等于事件一定进入它。当前处理还检查绝缘、死亡、状态标签、`sg.mem.noelectrocute` 和恢复间隔；受击链本身也可能触发电反应。不要对所有命中目标无条件再推一次事件。火花可查 `SpawnElectricHitSparks`/`nightstick`，是否额外播放按当前链路决定，不写固定 SG 数量或“全部 Boss 都支持”。
+- **灌溉**：`AddSoilMoistureAtPoint` 先把世界点转为 tile index，然后给这一格累加。按世界坐标密集采样会重复加同一格；先以 tile 坐标去重，明确按格心/相交等哪种边界选格，再对每格调用一次。剂量由设计提供，不能把原版壶数值当所有法术默认值。`SetSoilMoisture` 还会将结果钳制到世界湿度与湿度上限之间；剂量不一定等于最终净增量，饱和可能掩盖重复调用，因此要同时验证每格调用次数。`wateryprotection:SpreadProtectionAtPoint` 的实体保护范围不等于会逐格给整片土壤加水。
+- **临时属性**：火伤优先查 `health.externalfiredamagemultipliers` 的来源接口；速度用 locomotor 来源倍率。`vigorbuff` 只改变查到它的原版消费者，当前装备减速分支也是有限补偿，未必完全免疫。温度伤害率、腐烂倍率等共享标量若必须替换，明确多来源策略，并只在仍持有该值时恢复；接口存在不代表叠加安全。
+
+天气、设备充能、燃烧与潮湿应先查对应组件及调用方，再写目标资格和副作用。复用带 aura/combat 的原版 FX 时先审伤害范围；复制所需过滤表，不能改共享常量。坐标 API 的三个返回值与 Vector3 不混用。现代农田使用 farming_manager；旧式 `slow_farmplot`/`fast_farmplot` 是另一系统，不把它们当作现代农田的通用测试替身。
+
+## Buff 与 SG 的补充边界
+
+可刷新效果优先走 [combat-buffs-containers.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) 的 debuff/timer 和来源修改器，再按 [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md) 完成所有出口。旧“target[key] 有任务就只续期”的模板不能证明属性/FX 仍在；提前移除、外部删实体、读档或回调错误都可能使缓存失真。用私有键、幂等 Ensure/Apply/Remove、有效对象检查和任务归属判断，避免旧回调清掉新效果；死亡政策仍由项目决定。
+
+`AddStategraphPostInit` 拿到的是定义表，states/events 按名称索引；只改 `wilson` 不会同时改 `wilson_client`。在受击 `onenter` 里直接跳 idle 可能跳过或打乱原状态副作用，先找窄事件/免疫入口并分别评估预测端。共享的 `sg.mem.noelectrocute` 也需所有权与恢复策略，不能把它写成永久通用免疫开关。
+
+`EntityScript:PushEvent` 先同步调用普通监听，再按条件给 SG 缓冲事件，并交 brain；不是所有事件都在下一帧执行。测试普通监听可立即断言；测试 SG 要追当前调度与状态转移，使用有期限的条件/行为标记，固定延时不能证明效果。全局 `XXX_HOOKED=true` 只表示某段注册代码运行，不能代替实际受击链、未受保护对象及中断测试。
+
+## 地图选点与临时传送门
+
+优先沿原版地图动作链扩展，避免为单一法术覆盖整个 `MapScreen:OnControl`。`PullUpMap` 在合法的本地玩家 HUD 上下文调用；只判断“不是 dedicated”不能证明当前实体是本地玩家。`onselect` 的书本不能直接作为 `MapScreen` 的 owner。
+
+按当前相近 Action 核对 `map_action`、`map_only`、`closes_map`、`customarrivecheck`、`instant` 和 `map_works_on_unexplored`。后者表示绕过可见性检查，是玩法选项；并非每个 `_MAP` 动作都设置 `map_action=true`，也并非每个地图动作都需要到达检查。载体的 `action_pulls_up_map` / `valid_map_actions` 按选用入口配置，不盲目堆叠所有字段。
+
+确需自定义 Screen/RPC 时，完整处理按下/抬起、取消、重复打开、手柄、角色失效与服务器拒绝。当前 MapScreen 在 MAP/CANCEL **抬起**时关闭；旧骨架按 down 清标记不能当通用关闭流程。坐标返回 `x, 0, z`；客户端只提交意图，服务端按 [networking-rpc.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/networking-rpc.md) 重验有限坐标、地形/洞边/平台、允许距离/探索规则、玩家/物品、资源与请求次数。`IsPassableAtPoint` 不传 allow_water 也可能接受视觉地面延伸或船上平台，不等于“严格陆地”；按设计另验实际 tile 与平台。
+
+相近的临时门可复用 `pocketwatch_portal_entrance:SpawnExit(worldid, x, y, z)`；nil 或当前 shard ID 是本地出口，其他 ID 进入原版迁移分支，跨 shard 需另验目标有效与迁移条件。复用机制不等于已经做完目标校验。确认生成和配对成功后才按约定提交消费，处理生成失败留下的半对门；关闭、外部移除和正在抵达的玩家按原版 CloseExit 流程收尾，见 [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md)。
+
+## 交付与原版检索
+
+按 [testing-release.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) 使用隔离副本并记录实际加载版本；无加载记录有多种原因，不直接断言为存档根错误。客户端正在运行并不等于隔离专服必然不能启动。部署只同步已授权目标，保留用户改动；删除临时调试注入，保留项目需要的正常诊断日志。
+
+| 检查层 | 本任务至少关注 |
+|---|---|
+| 语法/API/结构 | 函数作用域、两端组件装配、字段范围、回调签名、资源依赖和保存 schema |
+| 独立契约/专服（具备条件时） | 初值与上限变化、拒绝不误消费、重复施法/切换、目标失效、每格只浇一次、Buff 刷新/移除、睡眠最后 tick |
+| 实际存档 | 保存退出后另进程加载，缺字段/旧档、死亡规则、任务与效果不重复 |
+| 主机与真实远端客户端 | 后加入/重连、徽章 ghost 状态、鼠标/手柄、地图取消、预测与服务器拒绝、圈边缘和 HUD 资源 |
+
+未执行的检查明确列待验；解析通过不证明真实联网、图标或动画。旧项目的参数、私有组件接口和已测结论不随技能迁移为新项目承诺。本篇刻意不给“改四处即可”的成品法术模板：先完成玩法契约与对应原版链路，再生成项目内可验证实现。
+
+当前源码定位（相对 scripts 根目录；游戏更新后重新搜索函数）：
+
+- `class.lua:28-44,181-193`；`entityscript.lua:610-645,1286-1323`：属性 setter、组件装配和事件时序。
+- `prefabs/player_common.lua:2547-2549,2623-2627,2936-2938`；`components/health.lua:9-26,80-81,105-114`；`netvars.lua`：公共/权威初始化与数值同步。
+- `components/sleepingbaguser.lua:40-68,79-108`；`components/sleepingbag.lua:74-93`：周期任务、饥饿唤醒和床具退出。
+- `components/spellbook.lua:97-105,124-150`；`components/aoespell.lua`；`prefabs/waxwelljournal.lua:240-340,638-690`：选中与双结算组件切换。
+- `actions.lua:4516-4524`；`stategraphs/SGwilson.lua:1251-1266`；`stategraphs/SGwilson_client.lua:580-595`：CASTAOE 动作与两端动画选择。
+- `components/combat.lua:568-713,1170-1193`；`componentutil.lua:22-32,982-1009`；`stategraphs/commonstates.lua:325-345`：受击、电倍率和触电条件。
+- `components/farming_manager.lua:96-110,461-474`；`components/wateryprotection.lua:43-51`：按格灌溉、湿度钳制与范围保护的区别。
+- `widgets/badge.lua:6-104,127-146`；`widgets/statusdisplays.lua:SetGhostMode`；`prefabs/player_classified.lua:OnGhostModeDirty`：徽章资源与幽灵 HUD。
+- `actions.lua:344-348,690,719-724`；`components/playercontroller.lua:424-460,5272-5319`；`screens/mapscreen.lua:1298-1380`；`prefabs/pocketwatch_portal.lua:157-219`：地图动作与传送门生命周期。
 
 
 ---

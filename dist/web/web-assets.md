@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-assets
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`d0bc539afe166cc689cdfcc0f30e1e18d3c1d412ebdaca1e0c964f7b6c4af450`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`ce8e6c062a227888916614531efc887b22c72214ae2a934a53869c936fc319af`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -13,6 +13,8 @@
 - `references/assets-animation.md`
 - `references/dst-mod-tool.md`
 - `references/audio-particles.md`
+- `references/animation-recipes.md`
+- `references/character-and-equipment-art.md`
 - `LICENSE`
 
 
@@ -20,16 +22,16 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`c387e1581ac33181e66b67556f1cd586f3aa7faa4fad5006d1095f38ed4ac078`
+原始 SHA-256：`70dc759c800d9216b9c65346404c9eb7f0de69ea6dd687cc6ef92476af2ad020`
 
 ---
 name: dst-mod-engineering
-description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按当前游戏源码处理 Lua、主客机同步、存档生命周期、动作与 UI、物品角色、世界生成及资源工具链；用于新功能、崩溃修复、兼容排查和发布前验证。
+description: 开发、审查与验证《饥荒联机版》DST Mod。按当前源码处理角色、法术、自定义数值、料理、联机与存档，以及角色外观、装备、动画和音效；用于功能开发、崩溃修复、兼容排查与发布检查。
 ---
 
 # DST 模组工程
 
-按当前游戏源码开发、审查与验证 DST Mod。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
+这是 DST 开发、审查、排错与资源制作的统一入口，包含旧通用技能和专项制作流程的核验整合。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
 
 ## 工作顺序
 
@@ -57,13 +59,17 @@ description: 开发、审查、排错与验证《饥荒联机版》DST Mod。按
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/entities-components.md) |
 | 角色、Brain、Stategraph、自定义生物 | [characters-brains-stategraphs.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md) |
+| 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md) |
 | netvar、Replica、RPC、客户端与服务端 | [networking-rpc.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/networking-rpc.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/lifecycle-save.md) |
 | HUD、Widget、输入、Action、施法与预测 | [ui-actions-controls.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/ui-actions-controls.md) |
 | 伤害、Buff、容器、冷却、范围查询 | [combat-buffs-containers.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) |
 | 装备、投掷、维修、制作、锅料理、树木种植 | [items-food-plants.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/items-food-plants.md) |
+| 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/cooker-dishes.md) |
 | 地图生成、布局、地皮、空间判定 | [worldgen-spatial.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/worldgen-spatial.md) |
 | TEX/XML、SCML、bank/build/symbol、编译资源 | [assets-animation.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md) |
+| 角色换皮/拆件、手持装备、书籍外观与接入检查 | [character-and-equipment-art.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md) |
+| GIF/WebP 帧序列、旋转法阵、锚点与动画编译 | [animation-recipes.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md) |
 | DST Mod Tool 项目/脚本接口/预览 | [dst-mod-tool.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/dst-mod-tool.md) |
 | 音效、FMOD 与粒子 | [audio-particles.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md) |
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) |
@@ -536,11 +542,13 @@ Get-ChildItem -LiteralPath $TestMod -Recurse -File
 
 ## 来源：`references/assets-animation.md`
 
-原始 SHA-256：`92c8187fb6dc63f1c1152cc62b63dbc8eb8079e2dae0b94c06039cf8b9baa27b`
+原始 SHA-256：`a11bae29e483c56d6d692d7754a81e701a1bf159a5ee5d9da2b2b281908ee2bb`
 
 # 图像、图集与动画
 
 适用于库存图标、装备换符号、角色皮肤、SCML 与动画帧序列。先找到同类原版 prefab 的资源声明和调用，再确定要修改的资源层。只改 Lua 行为不必重编美术；改源图后要重建受影响产物。
+
+角色拆件与装备接入流程见 [角色与装备美术](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/character-and-equipment-art.md)；GIF/WebP、旋转法阵和锚点制作见 [帧序列制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md)。这两篇补充制作步骤，名称、资源职责和验收边界仍以本页为准。
 
 ## 先分清名称与资源职责
 
@@ -809,15 +817,15 @@ tool:select_frame(animation.frames[1])
 
 ## 来源：`references/audio-particles.md`
 
-原始 SHA-256：`022058221ad39717bd88d2ee77639453205038500f55c8e54d828da5ae5c687a`
+原始 SHA-256：`b9ca186fa77181d425cff039f8efacd5045d5f8bb9b891739966f4c148c129f7`
 
 # 音频与粒子特效
 
-本页涵盖声音事件银行和 `VFXEffect` 粒子。动画帧序列见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)。新工具名称不能替代兼容性验证；使用当前项目已验证的管线，并记录输入、工具版本、事件路径和产物。
+本页涵盖声音事件银行和 `VFXEffect` 粒子。动画帧序列见 [帧序列制作](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/animation-recipes.md)。使用当前项目已验证的音频管线，记录输入、工具版本、事件路径和产物；缺少工具时按 [工具安装与首次验证](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 检查官方 Mod Tools，不另装一整套无关动画工具。
 
 ## 音频资源与事件
 
-标准 Mod 声音路径是素材 → FMOD 工程 → FEV 事件元数据 + FSB 采样银行 → Asset 声明 → `SoundEmitter` 事件调用。`PlaySound` 接事件路径，不接任意 MP3/WAV 文件路径。
+已验证的 Designer 管线是素材 → FMOD FDP 工程 → FEV 事件元数据 + FSB 采样银行 → Asset 声明 → `SoundEmitter` 事件调用。`PlaySound` 接事件路径，不接任意 MP3/WAV 文件路径。
 
 ```lua
 Assets = {
@@ -846,38 +854,84 @@ inst.SoundEmitter:KillSound(SOUND_HANDLE)
 
 替换事件可使用 `RemapSoundEvent(old_event, new_event)`，先确认影响范围与撤销策略，不为单个角色的声音无意改掉全世界同类声音。
 
-## 编译和音质检查
+## 选择目标工具
 
-2026-09-27 核验环境中，官方 Mod Tools 的 FMOD Designer CLI 自报 **4.44.7**。目录中同时存在 FMOD Studio，并不能证明任意 Studio 新版产物可直接替换 DST 的已验证银行；先对照目标引擎和官方示例。不自动下载安装旧教程附件或新版本。
+2026-09-27 核验环境中，官方 Mod Tools 的 FMOD Designer CLI 自报 **4.44.7**，随附《FMOD Designer 2010》文档；以下命令针对这一管线。保留已有可工作的 FDP 工程，不因新工具名字就重做工程或升级版本。
 
-先读取当前 CLI help。已安装 Designer 的只读 help 列出 `-pc`、`-b` 输出目录、`-m` 依赖清单、`-l` 银行列表，以及 `-k` / `-K` 禁用工程的构建前/后命令。接手第三方 FDP 先审查其路径、事件和构建命令。
+工具包也确实包含 **FMOD Studio 1.10.10**、`Template/myDSTmod.fspro` 和 `DST_MOD_ConfigureMasterBank.js` / `DST_MOD_BuildBanks.js`。这些官方文件说明存在另一条候选制作路线，但不证明任意现代 Studio `.bank` 可由当前 DST Mod 直接加载。本轮未构建或加载 Studio 银行；选择它之前，要核对目标版本的 Mod 加载接口、示例工程、Master Bank 标识处理和客户端最小事件验证。官方配置脚本会改工程元数据、触发关闭 Studio；模板构建后批处理还包含复制银行，先审查并改为独立输出，不能盲跑到游戏目录。FEV/FSB 与 `.bank` 流程不可混写。
+
+## 素材加工与响度
+
+保留无损母带和加工参数，先读取文件声道、采样率、位深、时长，再决定裁剪、延迟、回声和增益。44.1 kHz / PCM 16-bit 是兼容排查起点，不是强制唯一格式；mono/stereo 选择按定位与素材设计决定，Designer 支持不同采样率、声道及重采样。
+
+PowerShell 中 `$Ffmpeg`、`$Ffprobe`、`$SourceAudio`、`$ProcessedWav` 是已确认的绝对路径；新输出不能覆盖母版。以下转换仅示范已选定 44.1 kHz、16-bit PCM、双声道的情况：
+
+```powershell
+& $Ffprobe -v error -show_entries 'stream=codec_name,sample_rate,channels,bits_per_sample:format=duration' -of json $SourceAudio
+& $Ffmpeg -hide_banner -nostdin -n -i $SourceAudio -ar 44100 -ac 2 -c:a pcm_s16le $ProcessedWav
+if ($LASTEXITCODE -ne 0) { throw '音频转换失败' }
+& $Ffmpeg -hide_banner -nostdin -i $ProcessedWav -af 'astats=metadata=1:reset=0' -f null -
+```
+
+直接调用 Windows 可执行文件时传 Windows 路径，由参数数组/调用运算符保持路径含空格的边界；Git Bash 是否转换 `/d/` 受环境影响，不把一次失败写成所有 Windows FFmpeg 的限制。
+
+| 操作 | 可用参数与需要核对的地方 |
+|---|---|
+| 截取 | `-ss`、`-t` 按秒；切点检查不连续和咔哒声，淡化时长由素材决定，循环接缝不能随意淡空 |
+| 回声 | `aecho=0.8:0.8:450\|900:0.4\|0.2` 的 delay 是毫秒；两段延迟/衰减数量对应。数值只是语法例 |
+| 延迟 | `adelay=150\|150` 表示双声道各 150 ms；按实际声道数量或当前版本的 `all` 参数处理 |
+| 多层混音 | `amix=inputs=2:duration=longest`；`normalize=0` 仅在已设计各路增益时选择，叠加后检查削波 |
+| 响度/峰值 | `loudnorm`、`astats` 用于测量或有目标的处理；短音效不能只以综合响度判断听感 |
+| 限幅 | 查看 `alimiter` 的自动电平设置；当前版本 `level` 默认开启，设置低 limit 后可能被自动补偿，不等于最终输出已经降低 |
+
+表格中的 `\|` 是 Markdown 转义；传给 FFmpeg 的完整滤镜字符串应使用普通 `|` 并整体加引号。单位与选项依据 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前再看已安装版本帮助。
+
+`peak=-10 dBFS`、固定增益和固定回声层数仅是旧项目取值。过响时沿母带 → 滤镜 → 事件/分类增益 → 叠加声部 → 游戏混音查原因，可在合适层修正；不能禁止代码/事件层调音量，也不能每次一律降低 WAV。保留干净母版，避免重复烘焙游戏播放层的 volume/pitch 参数。
+
+## FDP 工程与 3D 设置
+
+优先使用官方示例或有复用许可且已经验证的工程。FDP 是 XML，但复制另一 Mod 的素材或模板仍要有权限；私人临时脚本与 Workshop 项目名不作为本技能依赖。
+
+1. 在独立副本设置命名空间隔离的项目、事件组、事件、银行名，修正所有音频来源和构建输出路径；一个 FEV 可关联多个 FSB，银行名不必等于项目名。
+2. 项目/事件标识符不能无差别逐次 uuid4 替换。需要迁移 GUID 时保持同一旧 ID 到同一新 ID 的映射及内部引用，优先由目标编辑器生成；官方 Studio 的 Master Bank 操作不等同于 Designer 的全 GUID 重写。
+3. 声音事件组与混音分类不同。组不必叫 `sound`；分类需与游戏音量滑块路由匹配。事件路径变化后更新全部调用点。
+4. 一次性事件在实际工程里核对 One-shot、触发条件和声部释放；循环还要检查 Sound Def 实例、事件时间轴、停止方式和代码句柄。`loopmode=1, loopcount2=-1` 只是旧模板片段，不能跳过字段语义检查。
+5. 3D 声音同时需要正确的发声实体位置、事件模式、衰减方式及必要参数；把模板“两处 x_2d 改为 x_3d”不能覆盖所有工程。全局或 world 上的 emitter 不会因此把事件格式改成 2D，但其位置可能不符合预期。2D 同样受事件/分类/游戏增益控制，不代表全图恒定最大音量。
+
+Designer 文档的 Min Distance 是开始距离衰减的位置，具体单位须由目标游戏的坐标和音频尺度确认；`mindistance=3` **不能译成“3 格地皮”**。Inverse 模式的 Max Distance 是停止继续衰减的位置，Linear/Linear Square 通常在最大距离衰减至静音，Custom 可忽略这两个值。按实际曲线做近、中、远距离客户端试听，不能仅填 `3/30` 就宣称有正确空间感。依据随工具文档第 141、376 页；One-shot/循环实例语义见第 144、379 页。
+
+## 编译与交付
+
+先读 CLI help，再检查项目的预/后构建命令。`-m` 列出依赖且不构建银行，`-l` 生成波形银行清单，`-k` / `-K` 禁用工程的预/后构建命令。只有明确需要且已审核的构建动作才另行启用。
 
 ```powershell
 & $FmodDesignerCli -help
-# 实际编译前先创建独立输出目录，确认工程和素材路径。
-& $FmodDesignerCli -pc -k -K -b $OutputDirectory $ProjectFdp
+& $FmodDesignerCli -pc -k -K -m $ProjectFdp
+if ($LASTEXITCODE -ne 0) { throw 'FMOD 工程依赖检查失败' }
+New-Item -ItemType Directory -Path $OutputDirectory -ErrorAction Stop | Out-Null
+& $FmodDesignerCli -pc -k -K -l -b $OutputDirectory $ProjectFdp
+if ($LASTEXITCODE -ne 0) { throw '声音银行构建失败，请检查完整日志' }
+Get-ChildItem -LiteralPath $OutputDirectory -File
 ```
 
-本次技能重建只验证了 CLI 帮助、官方文档和现有原版银行头，**没有重编/试听新的声音银行**。上述编译参数来自当前 help；真实工程仍需按下列步骤验收。
+`$OutputDirectory` 选择本次新的独立目录，`$ProjectFdp` 指向副本；若已有输出，先确认归属，不递归删除整个 sound 目录。实际 FEV 与银行文件名由工程决定，以依赖清单和输出为准，不能假定总是同名一对。修改 WAV 或事件配置后重新构建对应产物，核对其哈希与日志，再同步运行时。
 
-- 保留无损母带。44.1 kHz / PCM 16-bit 是可选工作起点，不是 DST 只能接受的唯一采样率/位深；声道选择取决于空间定位和素材。Designer 官方文档支持多种采样率、mono/stereo/多声道及重采样设置。
-- 压缩格式不是必须 MP3。选择目标工具/平台支持的设置，检查循环接缝和音质。大小不可能对所有压缩方式都接近 WAV PCM 字节数。
-- 声音事件组与混音分类不同：自定义组名可命名空间隔离；分类需要与目标游戏音量滑块路由一致，参照当前官方样例/工程，不能从旧截图推导任意固定名字。
-- 音量取决于素材响度、事件增益、叠加声部、衰减与游戏混音；`peak=-10 dBFS` 是旧项目经验，不能一刀切。记录峰值/响度并在游戏里与同类音效对比。
-- 裁剪避免接缝爆音，淡入淡出应按内容设计；循环素材不能随意把首尾都淡掉。混音是否 `normalize=0` 取决于增益设计，必须检查削波，不把它列为强制参数。
-- ffmpeg 的 `aecho` delay 单位是毫秒；要 450 ms 回声应写 `450`，不能把 `.45` 当 0.45 秒。参见 [FFmpeg 官方滤镜文档](https://ffmpeg.org/ffmpeg-filters.html#aecho)，执行前核对已安装版本帮助。
-- 复制 FDP 模板时检查项目/事件/银行唯一性、素材路径和标识符。不要无差别替换所有 GUID 后假定内部引用仍正确。
-- 2D/3D 与距离衰减在实际事件和关联设置中核对；不能保证把模板中“两处 x_2d 改成 x_3d”就适配所有工程。
+```text
+交付目录/
+├── sound/             实际需要的 FEV 与全部 FSB
+├── source/            可编辑 FDP、音频母版及处理后输入
+└── integration.md     事件路径、Asset、循环/3D/混音参数、版本、验证记录
+```
 
-构建检查分层记录：
+每项验收明确证据：
 
-1. 日志、实际输出路径、输入依赖、FEV 中事件名与银行引用、FSB 头和可解析的样本信息。
-2. 极小银行可能提示遗漏采样，但“192 字节就是静默空壳”和“只看文件大小”不是格式规范。
-3. 当前原版 153 个本地 FSB 的头均为 `FSB5`；因此不能仅凭 FSB5 判定不兼容。同为 FSB5 也不能证明编码、FEV 配套和运行时都兼容。
-4. 专服中 `PlaySound` 后出现打印最多证明脚本走到了该处；无声后端可能不完成客户端解码/混音。不能把打印当成银行、事件和听感全部通过。
-5. 客户端实际播放，检查第一次触发、循环/停止、近远距离、多人观察、音量滑块、连续触发和切世界。保留失败日志，避免把所有播放崩溃先归因于 WAV 参数。
+1. **文件与工程**：退出码、完整日志、真实输出路径、输入依赖、FEV 事件及银行引用、FSB 可解析的样本数量/编码/采样信息。`strings` 能找到名字只作线索，不能证明完整事件存在或可播放。
+2. **编码**：压缩后大小不必接近 WAV PCM，头部标识也不说明 PCM。“192 字节必为空壳”“FSB5 必崩”均不可作判据。2026-09-27 再查当前 153 个原版 FSB 均为 FSB5，仅证明该容器存在；相同头不等于采样编码、FEV 配套和目标平台兼容。
+3. **隔离运行**：专服 `nosound` 下打印 `PlaySound` 之后的标记只证明脚本执行到该处，不能声称事件查找、解码、混音和银行加载全部通过。按 [测试与发布](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md) 运行行为测试并正常关闭，不复制旧 `os.exit()` / 强杀共享进程的临时 harness。
+4. **声音实测**：用目标工具试听作为中间检查，再到客户端检验第一次触发、循环/停止、近远距离、音量滑块、连续触发、多玩家观察和切世界。没有音频输出/客户端时保留这项待验收，不能用银行大小代替。
+5. **回修**：记录实际事件、主客机、Mod 列表、输入与银行版本和失败日志。Lua 无异常但客户端退出时结合原生崩溃记录排查，不先认定一定是 WAV 参数或 FSB 版本；未经解析的 dump 也不能当成根因。
 
-交付包含：运行时 FEV/FSB、可编辑工程与母带、事件完整路径、分类/3D/循环参数、工具版本、验证记录及未测范围。未经用户要求不调整游戏音量/声音设计。
+本轮核验了 Designer help、官方随附文档、Studio 模板/脚本存在及原版银行头，**没有编译或试听新声音银行，没有验证 Studio Mod 运行时接入**。交付记录应保留这些边界，不把工作流说明写成已完成的声音验收。
 
 ## 粒子系统与网络边界
 
@@ -909,10 +963,195 @@ local assets = {
 - `AddRotatingParticle` 的 angle 参数不是 UV 坐标。教程变量叫 `uv_offset` 却传给 angle，是误命名/机制混淆；需要图集帧时参考 `AddRotatingParticleUV`、`SetUVFrameSize` 的配套用法。
 - 粒子数量、寿命、发射频率一起决定负载。原版代码里的每 tick 随机倍率只代表具体效果，不等于严格的每秒目标数；要精确速率时先定义累积/抖动需求。
 - 客户端随机装饰可以各自不同。影响伤害/命中的范围和时刻由服务器判定，不用粒子的位置反推游戏逻辑。
-- `persist=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
+- `persists=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
 - 混合模式、泛光和 shader 需以当前资产及客户端效果验证；专服 PASS 不证明有画面。需要截图/视频验收时明确抽检的实例、时段和机位，不声称看过未播放素材。
 
 核验依据：当前 `prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；核验环境中的 FMOD Designer help；随工具提供的《FMOD Designer 2010》80、142、152-157、205 页；该环境中的 FSB 文件头统计。现代 FMOD Studio 文档可帮助理解概念，不能替代这些 DST 目标版本证据。
+
+
+---
+
+## 来源：`references/animation-recipes.md`
+
+原始 SHA-256：`39a5122b5a3225b7e9fa0078eeb79bcfd83df01637b399f259a088a8ae3515ae`
+
+# 帧序列、锚点与旋转动画
+
+用于 GIF/WebP/PNG 序列转运行时动画，以及静态图制作旋转效果。资源类型、bank/build、库存图和客户端检查先见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)；缺工具按 [工具安装与首次验证](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 推进，已有 SCML 或可编辑 DMT 工程优先保留，不强制改成逐帧烘焙。
+
+## 先确定输入和时间轴
+
+1. 登记源文件哈希、画布、逐帧时长、透明方式、循环次数、目标锚点和用途。已有手改 PNG 时以明确选定的输入为准，不用旧 GIF 再导出覆盖。
+2. 解码 GIF/WebP 时处理帧间合成和 disposal，导出完整 RGBA 帧并保留时长清单；只读取局部更新矩形会丢掉上一帧内容。抽检首尾、透明边缘和帧数。
+3. GIF 的透明索引不能保存连续 alpha；需要柔边时保留 PNG/WebP 母版，GIF 只作预览。预览播放器的时长取整不代表引擎实际帧率。
+4. 本页所核验的 `buildanimation.py` 对 XML `framerate` 调用 `int()`，再写入二进制 float；因此这条管线需要正整数 FPS，不能据此宣称所有 DST 动画只支持整数 FPS。
+
+每帧原时长为 `d_i` 时，总时长是 `T = sum(d_i)`。固定 FPS 输出有 N 个时间轴帧，其时长约为 `N/FPS`。非均匀时长要按累计时间重采样，允许重复引用同一张 PNG；不可仅用第一帧时长推算整个动画。把 33.33 直接截成 33 会改变时长，是否接受、降帧或改节奏属于设计选择。循环时间轴通常避免把首帧作为末帧再停一次；非循环动画保留完整尾部。
+
+## 透明、缩放与视觉锚点
+
+- 已有 alpha 就保留。黑底发光素材可试 `alpha=max(R,G,B)`，并在非零 alpha 上反算颜色以消除黑底污染；这是特定合成假设，不是通用抠图。黑色主体和阴影可能被删掉，先在黑、灰、白背景预览。
+- 白底淡彩图也不能简单反亮度后当成正确 alpha。JPEG 噪声、高光和白色主体都需要检查；固定阈值、gamma、增强倍数只属于具体素材，不写成默认配方。影响观感的“保留淡色/增强颜色”先出对比供用户选择。
+- 保留直通 alpha 的源 PNG，并核对编译器是否做 premultiply；已预乘图像再预乘会使边缘发黑。本页工具的 `textureconverter.Convert` 默认给转换器传 `--premultiply`。
+- 尽量从母版一次缩放，保持长宽比。`AnimState:SetScale` 只能放大已有细节；图像分辨率、几何尺寸、矩阵、实体缩放和镜头一起决定观感，没有“1 格恒等于 200 动画单位”的通用换算。
+
+对宽 W、高 H 的帧，若目标原点在原 PNG 左上角坐标系的 `(cx,cy)`，本页中间 build XML 可设置：
+
+```text
+x = W/2 - cx
+y = H/2 - cy
+顶点左上角 = (x-W/2, y-H/2) = (-cx,-cy)
+```
+
+因此底边中心锚点是 `x=0, y=-H/2`；居中锚点为 `x=0, y=0`。同时缩图和几何时，W/H 与 x/y 同比例变化。先区分“画布中心”“实际落点”“动画矩阵平移”，避免重复补偿。
+
+环形落点的自动定位只是辅助：行宽峰值可避开竖直光柱对整图质心的污染，但非对称环、火花、厚环都可能误判。限定合理区域后检查宽度分布；多行接近峰值时可求加权中心。若各帧内容没有真实位移，采用经确认的常量锚点；只有真实位移才逐帧修正。把所有帧按最终坐标叠到固定原点预览，排除计算造成的抖动，再用 DMT/客户端核对落点。
+
+## 中间 ZIP 与坐标
+
+`buildanimation.py` 输入是中间 XML/PNG ZIP，运行时 ZIP 是另一种内容。完整新动画的最小布局：
+
+```text
+my_fx_stage.zip
+├── build.xml
+├── animation.xml
+└── frame_000.png
+```
+
+```xml
+<Build name="my_fx_build">
+  <Symbol name="my_fx_symbol">
+    <Frame framenum="0" duration="1" w="32" h="24" x="0" y="-12" image="frame_000"/>
+  </Symbol>
+</Build>
+```
+
+```xml
+<animations>
+  <anim name="idle" root="my_fx_bank" framerate="30">
+    <frame x="0" y="-12" w="32" h="24">
+      <element name="my_fx_symbol" frame="0" layername="my_fx_layer" m_a="1" m_b="0" m_c="0" m_d="1" m_tx="0" m_ty="0" z_index="0"/>
+    </frame>
+  </anim>
+</animations>
+```
+
+这是说明字段的单帧样例，32×24 和 30 FPS 不是设计默认。多帧时逐项对应 symbol 帧号和时间轴；`duration` 表示 build symbol 帧覆盖范围，不等于 GIF 毫秒时长。`image` 写 ZIP 内 PNG 路径去掉 `.png`；标签及 `animation.xml` 文件名区分大小写。当前编译器把 build、symbol、图像、动画、root 等名称编码为 ASCII，名称使用 ASCII；这不等于所有工具的外部文件路径都禁止中文。
+
+- `SetBank("my_fx_bank")` 取自动画的 `root`，`SetBuild("my_fx_build")` 取自 Build.name；ZIP 文件名可不同。原版 spear 的 bank/build 也不同。
+- 矩阵排列为 `x'=m_a*x+m_c*y+m_tx`、`y'=m_b*x+m_d*y+m_ty`；不要交换 b/c，或把图片向下的 Y 直接当世界高度。先用单位矩阵和不对称测试图确认方向，再引入旋转/缩放。
+- build 的 x/y 是图像中心偏移。动画 frame 的 x/y/w/h 是包围框信息，不能用其代替 element 平移。旧记录把动画 x/y 固定解释成左上角并归因于裁剪，证据不足：公开官方 SCML 导出代码将包围中心写入 position。本样例采用该约定，复杂变换优先保留当前导出器计算的框，并核对四角变换后的范围，不沿用未经验证的“左上角”修复。
+- 动画名的 `_up`、`_down`、`_side` 等后缀会被本编译器识别为朝向并从动作名中拆掉；无意使用保留后缀会改变查找结果。z_index 决定导出排序，不是世界 Z 高度。
+
+坐标依据：[官方 SCML 导出代码](https://github.com/kleientertainment/ds_mod_tools/blob/master/src/app/scml/main.cpp) 的 `export_element`、`extend_bounding_box`、`export_animation_frame`；再对照实际安装版本的 `buildanimation.py`。公开源代码与已安装二进制不自动视为相同版本。
+
+## 图集预算与编译
+
+预算同时考虑独立图像数量、尺寸、透明占用、mipmap、元素数和并发实例。总像素面积只是下界；当前 `klei/atlas.py` 有面积排序、4 像素对齐和空位搜索，不是可用“每行张数×行数”精确预测的纯货架模型。要知道图集数量就运行实际打包器并检查输出。
+
+当前 `buildanimation.py` 默认最大图集边长 2048、带 alpha 默认 bc3；它允许多个 atlas，并在顶点第六个 float 保存 sampler。`atlas.py` 默认还会在空间允许时缩为非正方形。`--square` 是可选布局开关，不是多图集必需修复；“单 symbol 绝不能跨 atlas”不是已证实的引擎限制。出现某管线色块应保留可复现资产，查图集引用、UV、premultiply、几何和客户端效果。
+
+PowerShell：先把变量设为已确认的绝对路径，输出目录选择本次隔离工作区。这里不需要改全局 PATH，也不需要把原工程迁入工具目录。
+
+```powershell
+$Compiler = Join-Path $ModTools 'tools/scripts/buildanimation.py'
+$Python27 = Join-Path $ModTools 'buildtools/windows/Python27/python.exe'
+& $Python27 -B $Compiler --help
+if ($LASTEXITCODE -ne 0) { throw '编译环境不可用' }
+$CompileArgs = @('-B', $Compiler, $StageZip, '--force', '--outputdir', $OutputRoot)
+& $Python27 @CompileArgs
+if ($LASTEXITCODE -ne 0) { throw '动画编译失败，请检查完整日志' }
+$ResultZip = Join-Path $OutputRoot ('anim/' + [IO.Path]::GetFileNameWithoutExtension($StageZip) + '.zip')
+if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成预期动画 ZIP' }
+```
+
+使用随工具的 Python 2.7 和依赖，不用系统 Python 3 执行这份 Python 2 脚本。该版本绝对路径调用已在工具目录外成功；“cwd 必须 tools/scripts”不是固定要求。相对 `--outputdir` 会按输入路径的上级解析，明确绝对路径能避免找错产物。命令成功还要检查日志及二进制，`--ignoreexceptions` 会改变失败处理，不作为日常成功判据；`sitecustomize` 警告也不能仅凭退出码一概忽略。
+
+遇到路径错误先记录工具版本、原路径和编码；必要时在本次独立 ASCII 路径副本重现，不移动原素材。ktech 应按当前 help 使用位置参数及明确 `.png` 输出，不能把无扩展名文件盲当固定 2048² 裸 RGBA。
+
+## 静态图制作旋转效果
+
+先确认是一整层旋转还是内外层独立运动。若现有动画工程能够用多 symbol 和矩阵表达，优先沿用；只有需要逐帧烘焙或工具限制时，才把各层合成为帧序列，不为旧“单 symbol”推断强行合并。
+
+1. 在母版标明环心，必要时查看径向 alpha 分布选择内外层分界。低 alpha 区可减少接缝，但不保证硬切永远无痕；检查旋转后缝隙。
+2. 画布需覆盖绕锚点旋转的最远可见点，并留滤波边界。百分位去噪可能切掉合法装饰，不能代替人工检查。每一帧从母版旋转，避免上一帧接着旋转造成累积损失。
+3. 按目标时间轴生成角度；不同库正角方向不同，以不对称标记预览确认。双层反向旋转属于设计选择，不自动采用。
+4. 抽检全角度裁边、中心漂移、半透明接缝、循环首尾速度和颜色。图集预算不足时比较分辨率、图层复用、帧率和分段加载的代价；拆 bank/build 还要检查切换时机与资源可用性，不直接改变时长。
+
+## 验收与证据范围
+
+按 [资源交付检查](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md#交付检查) 分层验证：ZIP CRC；BILD/ANIM 版本与名字；symbol/帧号/朝向；顶点区间、UV 和 sampler；所有图集存在且能解码；时长与原点预览；真实客户端和远端观察。KTEX 用工具读取头和 mip 信息，不把固定字节偏移当成所有版本的通用格式。
+
+FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持客户端可见；后续动态变化使用正确的同步或客户端更新路径。`SetPristine()` 不是“所有属性之后永远不能变”的边界。循环动画需明确停止和清理，单次动画用匹配的完成事件/状态回收。泛光 shader 和 Light 照明不同，不能靠泛光掩盖缩放模糊。
+
+2026-09-27 的证据：合成 32×24 PNG 经原装 Python 2.7/compiler 在工具目录外生成 201 时间轴帧的 BILD6/ANIM4/KTEX ZIP，源 ZIP 哈希不变；小图集函数探针产生两个 atlas（64×64、64×32）和 sampler 0/1。原版 `alterguardian_phase1_lunar.zip` 的 `spawn_lunar` 另有 215 帧。这些排除编译器的“60/149 帧硬上限”说法，**不证明任意 201 张大图或跨图集资产已通过客户端渲染**。
+
+本轮未启动游戏、未做真实素材视觉验收；声音制作转到 [音频与粒子](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/audio-particles.md)，不在此重复维护第二份 FMOD 流程。
+
+
+---
+
+## 来源：`references/character-and-equipment-art.md`
+
+原始 SHA-256：`b2c59789d2c0623ec4a9c3b5a84365f5f3f016f70f53cf8b146c47d8d3967b5c`
+
+# 角色外观与装备手持资源
+
+用于角色换皮、全新角色部件、手持装备和施法书外观。资源层级、图集、编译工具和通用验收先见 [图像与动画](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/assets-animation.md)；角色注册与生命周期见 [角色机制](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md)。仅更换已有角色的造型通常复用其动作；自定义骨架、特殊形态或新增动作仍需要对应动画，不能概括为“所有角色永远只做 build”。
+
+## 角色外观：从参考到部件
+
+1. 先区分改色、局部重绘、全新造型与改变动作。记录原角色的 bank/build、符号帧、朝向、画布和 pivot，保留可回退的原工程。不要把某个模板的符号数、帧数或画布尺寸当成全角色标准。
+2. 选择当前角色兼容的模板或原有工程。仅改色/换图时保留既有帧编号与锚点可降低风险；改变轮廓或画布时可以调整 pivot 和位置，但必须同步坐标映射并检查完整动作。不能用“画布永远不准改”限制所有新角色。
+3. 三视图是拆件参考，不能直接当成可播放 build。按实际符号拆头、脸、头发、身体、手脚等，核对同一方向的遮挡关系、连接处和动作所需帧。表达式/头部位置取本角色测量值，不继承历史人物的像素偏移。
+4. 调色和重绘从未加工源文件生成，避免重复映射、反复重采样。已有透明图保留 alpha；白底素材有白色衣物/高光时，不能全局删白。检查边缘、半透明发丝与深浅背景下的颜色。
+5. 工具由当前可用能力决定，不固定某个本地生成模型、端口、工作流节点或去背阈值。若使用图像生成工具，仍需逐部件检查轮廓、朝向、设计一致性及原图授权。
+
+[Extended Sample Character 作者仓库](https://github.com/DragonWolfLeo/extendedsamplecharacter-dontstarvetogether)可作为模板来源和工程说明。其默认 SCML 使用方式不等于所有管线的格式限制；先核对所取版本、许可与当前游戏，再选择复用范围。本技能不捆绑模板素材或私人角色工程。
+
+## 编译与预览
+
+- 在独立输出目录编译受影响工程，记录输入与产物清单。仅改 ZIP 文件名不会改内部 build；重命名需沿资源声明、编译源、内部名称与调用方核对。缓存提示异常时先核对依赖和实际输出，不删除整个 `anim/` 强迫重编。
+- 解析实际 build 的符号、帧号、图集引用；需要动作时解析 anim 的 bank/动作/朝向。`krane` 导出与 DST Mod Tool 预览有助于交叉检查，但一个工具能打开不等于全部游戏行为通过。
+- 角色预览应组合真实动作和本角色 build。`BUILD_PLAYER` 等零件陈列动作只适合检查部件存在性，不能替代站立、跑动、受击与装备姿态。
+- 软件预览必须使用本工程的 pivot、矩阵、图层和朝向规则。不要把一份 krane/SCML 转换器的“反序绘制”或 Y 翻转公式无条件套到另一格式。用非对称小样本确认上下左右、旋转方向、锚点及遮挡后再批量渲染。
+- 模板 build 缺少某些原版符号时，检查目标动画是否真的引用、是否应该隐藏或复用；软件渲染器简单跳过缺符号只能作为诊断，不能作为游戏资源验收。
+
+## 新角色 Mod 的资源接入
+
+按实际工程建立映射表：角色 prefab → 注册名称/字符串键 → 皮肤定义/build → 选人、头像、小地图与幽灵资源 → XML Element 名及 TEX 路径。只改文本和目录不能改变二进制内部名称；只改 PNG 也不会自动更新 TEX/ZIP。
+
+`MakePlayerCharacter` 默认设置 `wilson` bank，并为调试生成设置默认 build，随后还有 skinner 路径。测试普通出生、调试生成、换肤和幽灵/复活时都需检查最终 build，不能只在初始化末尾强行 `SetBuild` 掩盖映射问题。
+
+角色专属组件先查工厂和相近角色是否添加。当前 `wes.lua` 在使用 `efficientuser` 前判空添加；`wickerbottom.lua` 自己添加 `reader`。组件不存在时不能直接调方法，也不能为所有角色无条件加同一组件。
+
+名称缺失先对照真实 prefab、`STRINGS.NAMES` 和对应消费者；台词的状态表/角色键另按 [角色机制](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/characters-brains-stategraphs.md)核查，不把所有字符串表都写成同一种结构。Lua 字符串可使用合法长字符串或转义换行，不需要一律禁止多行描述。
+
+新角色测试应实际生成角色并检查关键组件和出生路径，单纯启动世界不覆盖 `master_postinit`。使用 [当前测试器](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/testing-release.md)的 `TEST.After` / `TEST.Done` 完成协议；旧共享测试目录、打印标记、强杀占端口进程与私人存档路径不作为默认流程。
+
+## 手持装备：按引用链排错
+
+先分别列出 ZIP 路径、内部 build、源 symbol 和角色的目标 symbol。装备不显示时按以下顺序检查，而不是把所有名字统一后反复改动画名：
+
+1. 资源已加载，build 名与实际产物一致。
+2. `OverrideSymbol(目标, build, 源符号)` 的源符号存在，并有该动作所需的帧/朝向；原版 `sword_lunarplant.lua` 的 build 和源符号名称就不同。
+3. 装备回调确实执行，目标符号和 `ARM_carry` / `ARM_normal` 等显隐与同类原版一致；皮肤分支可能使用 `OverrideItemSkinSymbol`。
+4. 检查源图、pivot、矩阵、缩放、透明区域以及后续皮肤/变身/另一装备的覆盖。手持并不存在统一“必须填满 200 像素画布”的规则。
+5. 卸下或换装备时沿原版恢复路径处理本 Mod 拥有的外观。不能延迟无条件清空 `swap_object`，从而擦掉后来装备的覆盖。
+
+纯换符号可使用 build-only。当前原版 `swap_spear.zip` 无 `anim.bin`；角色不会为了显示手持物去播放该包的 `BUILD_90s_90s`。旧 SCML 模板的编译入口动画可以保留，但不要把它当成引擎显示条件。
+
+符号核验要读取 BILD 对应版本的符号记录及名称表；散扫明文或在整个二进制中搜索某个四字节哈希都可能误判。当前官方 `buildanimation.py` 的符号哈希逐字符转小写，再按 32 位 SDBM 累积；仅匹配字节串不证明它位于符号表、拥有所需帧或没有碰撞。
+
+## 书籍、灯光与验收
+
+使用原版 `book` 状态时，查 `SGwilson` 的 `book2` 和物品定义。当前路径支持 `book.swap_build` 与 `book.swap_prefix`（默认 `book`），用 `<prefix>_open` / `<prefix>_closed` 源符号覆盖角色的 `book_open` / `book_closed`。书本 FX、骑乘与皮肤是另行处理的分支，不要用挂在人物原点的整张大书图替代这些机制。法术与地图动作见 [法术与数值](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md)。
+
+灯光是引擎 `Light` 接口，原版使用 `inst.entity:AddLight()` 及 `inst.Light`；不能从“找不到 RemoveLight”推导应新增一个名为 `light` 的 Lua 组件。需要关闭/回收时沿同类原版的 `Light:Enable` 或独立灯光实体生命周期；发光贴图、Bloom 与照亮环境是不同效果。
+
+交付至少核对：源工程可追踪、内部名称和图集引用、目标动作与朝向预览、装备/卸下/换装、皮肤与形态变化、幽灵/复活、主机和远端观察者。静态检查、软件预览、专服加载和真实客户端视觉分别报告；不以字符数、文件大小或软件截图替代实际客户端结果。
+
+核验基线：2026-09-27 安装源码的 `prefabs/player_common.lua:MakePlayerCharacter`、`prefabs/wes.lua`、`prefabs/wickerbottom.lua`、`prefabs/spear.lua`、`prefabs/sword_lunarplant.lua`、`stategraphs/SGwilson.lua:book2`，实际 `data/anim/swap_spear.zip`，以及安装版 `mod_tools/tools/scripts/buildanimation.py:strhash/ExportBuild`。源码指纹见 [环境与来源](https://github.com/zhuchengguang317-eng/dst-mod-engineering/blob/main/references/environment-tools.md)。
 
 
 ---
