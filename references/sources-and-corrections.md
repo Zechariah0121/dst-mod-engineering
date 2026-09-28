@@ -1,10 +1,8 @@
 # 来源、可信度与纠错范围
 
-本技能于 2026-09-27 完成首轮重建，随后整理为独立可移植版本。资料输入包括两份既有通用技能 `dst-mod-development`、`dst-mod-devkit` 与 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial)。教程包含 2021 年内容和后续补充，并非当前游戏的官方 API 规范；使用本技能不需要安装这两份旧技能或下载教程附件。
+本技能参考 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial) 等开发资料，并对相关原版接口和工具进行核验。旧教程不等同于当前游戏 API 规范。
 
-同日继续核验七份专项技能：新增料理、法术、自定义数值、角色 build、装备 swap、帧序列动画和 FMOD 音频，包含旧法术模板与装备清单。内容按任务并入本技能，不再要求加载任何旧 DST 技能；逐项去向见 [整合记录](../docs/consolidation.md)。旧项目的私人素材与游戏缓存只留在本地归档，不纳入公开许可和分发包。
-
-旧 devkit 的测试工具注明来源 [Zechariah0121/dst-modtest](https://github.com/Zechariah0121/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
+测试工具的历史来源包括 [dst-modtest](https://github.com/Zechariah0121/dst-modtest) 与 [dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting)。当前辅助脚本实现直接 ZIP 读取、AST 声明检查与隔离专服测试；这些来源说明不代替运行验证。
 
 技术事实优先核对合法安装的游戏与官方 Mod Tools；本仓库不分发它们的源码、资源或二进制。工具与参数的公开参考包括 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)、[Klei 专服命令行说明](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/) 和 [FFmpeg 滤镜文档](https://ffmpeg.org/ffmpeg-filters.html)。具体调用以当前安装版本的帮助和相关游戏实现为准。
 
@@ -48,7 +46,7 @@
 | 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
 | 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
-公开的检查范围、工具回归结果及未覆盖内容见 [验证记录](../docs/validation.md)。各专题保留相关源码文件/函数定位、适用条件与验证边界，供读者在自己的合法安装中复核。
+公开的检查范围、工具回归结果及未覆盖内容见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。各专题保留相关源码文件/函数定位、适用条件与验证边界，供读者在自己的合法安装中复核。
 
 主参考引用当前源码的相对文件名和函数名，行号是该次快照的定位辅助；源码哈希见 [environment-tools.md](environment-tools.md)。安装更新后重新查证，不能把本技能的新结论变成永不过期的铁律。
 

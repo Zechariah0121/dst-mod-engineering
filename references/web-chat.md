@@ -154,4 +154,4 @@ OpenAI 的 [Build skills](https://learn.chatgpt.com/docs/build-skills) 同时区
 
 回传日志先复制必要范围，保留错误前后文、堆栈、版本及测试标记；将账号令牌、密码或无关私人聊天替换为清楚的占位符，记录哪些字段被剔除。原始日志留在本机，不为审查上传完整游戏、私人存档或无关目录。
 
-技术证据等级继续使用 [测试与交付](testing-release.md)，历史已测范围见 [验证记录](../docs/validation.md)。网页适配只改变资料传递和协作方式，不扩大测试结论或行动授权。
+技术证据等级继续使用 [测试与交付](testing-release.md)，历史已测范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。网页适配只改变资料传递和协作方式，不扩大测试结论或行动授权。

@@ -25,7 +25,7 @@
 
 `85d6aa0e24a290d81745f1fd18bd0769d6b82011a3ba5aba02b87389b62f41c8`
 
-这证明当时的解压副本匹配该安装版本，不证明它是读者当前版本，也不证明 Steam 上没有更新。游戏更新或哈希改变后，重新比较相关文件，不能继续沿用旧行号。验证范围见 [验证记录](../docs/validation.md)。
+这证明当时的解压副本匹配该安装版本，不证明它是读者当前版本，也不证明 Steam 上没有更新。游戏更新或哈希改变后，重新比较相关文件，不能继续沿用旧行号。验证范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
 
 源码先用 `rg --files`/`rg -n` 定位。没找到按 prefab 命名的文件时，查合并返回多个 Prefab 的文件、工厂函数、调用链；如帽子集中在 `prefabs/hats.lua`。Lua 中没定义的引擎方法可能来自 C++，不能凭一次搜索判不存在。
 

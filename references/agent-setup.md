@@ -112,4 +112,4 @@ macOS / Linux 的 Bash 或 Zsh 示例同样默认采用 `.agents/skills`；按�
 
 这些是能力要求，不指定任何 Agent 独有工具名。读取参考文档不要求拥有 GUI；服务器行为测试也不因换用 Claude、Cursor 或 Copilot 就失效，关键是执行它的主机、游戏版本、权限和依赖。没有相应能力时完成可验证部分并列出待验项，不能用产品名称代替证据。
 
-安装技能不会自动安装 Python、`luaparser`、DST、DMT、ktools 或 FMOD。新增工具只按当前任务需要准备；先检查已有工具与版本，再按用户授权安装，配置和验收方法见 [缺失工具的准备与安装](tool-bootstrap.md)。历史游戏实测与产品适配声明的边界见 [验证记录](../docs/validation.md)。
+安装技能不会自动安装 Python、`luaparser`、DST、DMT、ktools 或 FMOD。新增工具只按当前任务需要准备；先检查已有工具与版本，再按用户授权安装，配置和验收方法见 [缺失工具的准备与安装](tool-bootstrap.md)。历史游戏实测与产品适配声明的边界见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。

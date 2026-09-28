@@ -20,6 +20,10 @@ INDEX = 'bundle-index.json'
 LOCAL_ONLY_MARKER = '<!-- local-only -->'
 ROOT_FILES = ('SKILL.md', 'README.md', 'LICENSE', 'requirements.txt')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'scripts': '.py'}
+MAINTAINER_ONLY = frozenset({
+    'docs/maintainers.md', 'docs/consolidation.md', 'docs/validation.md',
+    'scripts/build_web_bundle.py', 'scripts/build_public_kb.py',
+})
 COMMON = ('SKILL.md', 'references/web-chat.md', 'references/environment-tools.md',
           'references/testing-release.md')
 PROFILE_EXTRA = {
@@ -82,6 +86,8 @@ def source_files(root):
         if path.suffix == '.md' and any(
                 line.strip() == LOCAL_ONLY_MARKER for line in data.decode('utf-8-sig').splitlines()):
             raise ValueError(f'Local-only source cannot be published: {name}')
+        if name in MAINTAINER_ONLY:
+            continue
         inputs[name] = data
     required = set(COMMON) | {'templates/local-validation.md'}
     required.update(f'references/{name}.md' for names in PROFILE_EXTRA.values() for name in names)

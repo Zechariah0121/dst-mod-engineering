@@ -78,6 +78,7 @@ class WebBundleTests(unittest.TestCase):
                 raw = (self.source / source).read_bytes()
                 self.assertEqual(index['inputs'][source], bundle.sha(raw))
                 self.assertIn(f'## 来源：`{source}`', body)
+
                 self.assertIn(f'原始 SHA-256：`{bundle.sha(raw)}`', body)
                 self.assertIn(bundle.rewrite_links(raw.decode('utf-8'), source), body)
         starter = outputs['web-starter.md'].decode('utf-8')
@@ -85,6 +86,18 @@ class WebBundleTests(unittest.TestCase):
         self.assertIn(f'{bundle.REPOSITORY}/blob/main/templates/local-validation.md#result', starter)
         self.assertIn(f'[sample]: {bundle.REPOSITORY}/blob/main/SKILL.md "Title"', starter)
         self.assertIn('```md\n[Example](keep-relative.md)\n```', starter)
+
+    def test_maintainer_material_stays_out_of_user_bundles(self):
+        for name in bundle.MAINTAINER_ONLY:
+            self.put(name, 'MAINTAINER_MATERIAL_ONLY\n')
+        outputs = bundle.make_outputs(self.source)
+        index = json.loads(outputs[bundle.INDEX])
+        self.assertFalse(bundle.MAINTAINER_ONLY.intersection(index['inputs']))
+        for name, data in outputs.items():
+            if name.endswith('.md'):
+                self.assertNotIn(b'MAINTAINER_MATERIAL_ONLY', data)
+        with zipfile.ZipFile(io.BytesIO(outputs[f'{bundle.NAME}.skill.zip'])) as archive:
+            self.assertFalse({bundle.NAME + '/' + p for p in bundle.MAINTAINER_ONLY}.intersection(archive.namelist()))
 
     def test_reading_zip_inner_and_outer_indexes_have_no_self_hash_cycle(self):
         outputs = bundle.make_outputs(self.source)

@@ -31,9 +31,5 @@
 
 - 完整仓库包含三层；网页技能 ZIP 只包含技能与辅助资料，不包含知识库和服务。
 - [服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 使用 Python 3.10+，不需要第三方 Python 包或 API Key。
-- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明证据范围；公开材料已脱敏，不能声称等于未修改的本机原始报告。
+- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明条目的来源、证据等级和版本范围。
 - 数据校验、服务回归、Agent 真正按任务自动检索、DST 实机验证是四种不同验收。
-
-## 维护公开派生包
-
-维护者使用 `scripts/build_public_kb.py` 的帮助查看显式输入/输出参数。输入是合法持有的知识资料副本，不能以本机 Skill 安装目录代替公开发布源。公开导出后核对来源/公开哈希、Schema、链接、Correction 与敏感内容，再重建网页资料包。原始冻结资料不应被导出流程覆盖；公开脱敏不提升证据等级或置信度。

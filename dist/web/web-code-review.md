@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-code-review
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`b6ce90bf22202a2dbcff3a25513270a89339ec8b9fc3ee3d282aa0f8a6f07ded`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`2a0bd8e17e41976ba6da0d381728ce582bf689ac3c7769c5381d1a6307382a87`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -22,7 +22,7 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`22f5d3f69fc8293718ff8a4a4492a8f6c8e8be8eb914f4b9c4a4454b33801168`
+原始 SHA-256：`d687b1ab8d6884ba1c7683a06697b08f27a59abd638af1156549d1da115d2b3b`
 
 ---
 name: dst-mod-engineering
@@ -31,7 +31,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-这是 DST 开发、审查、排错与资源制作的统一入口，包含旧通用技能和专项制作流程的核验整合。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
+这是 DST 开发、审查、排错与资源制作的统一入口。当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 用于提供线索，不代替源码核验。
 
 ## 工作顺序
 
@@ -86,7 +86,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - **生命周期**：自己注册的任务、事件、Hook、修改器、Widget 与子实体要有明确所有者和清理路径。还原字段之前确认仍是本 Mod 持有的值；避免覆盖其他 Mod 后续修改。
 - **资源**：文件名、prefab 名、bank、build、symbol、动画名分别查证。部分合法动画资源只有 build；不套用“三件套”“名称全相等”等旧口诀。
 - **证据**：源码查证、语法/清单检查、独立 Lua 合约、专服行为、真实远端客户端、视觉与听感分别报告。UI stub、服务器 SpawnPrefab 成功不能证明联网画面正确。
-- **部署**：只同步已确定的目标和授权内容。先比较差异，保留用户改动；不因为旧技能写过“三目录同步”就覆盖任意 Workshop 副本或删除文件。
+- **部署**：只同步已确定的目标和授权内容。先比较差异，保留用户改动；同步与删除前确认目标、差异和授权范围。
 
 ## 辅助脚本
 
@@ -95,7 +95,6 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
-- `scripts/build_web_bundle.py`：供维护者从公开仓库生成技能 ZIP 和按专题合并的网页资料；`--check` 只读核对产物是否匹配源文件，不编译 Mod，也不安装第三方工具。
 
 维护技能时，以“实际失败 → 原版/工具契约 → 可复现验证”为新增规则的依据。版本相关结论保留核验日期与源码定位；不可验证的经验保留为待查项，不升级为铁律。
 
@@ -104,7 +103,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 来源：`references/web-chat.md`
 
-原始 SHA-256：`188d87de54fff9ede6cd449dc24a70d2e8fb8db16993b5e47616d6621d3740e9`
+原始 SHA-256：`0b0290beafdfed5681936282378dca17010fbd6c62efaa1faae28c76c607d894`
 
 # 网页聊天中的 DST 开发协作
 
@@ -269,7 +268,7 @@ OpenAI 的 [Build skills](https://learn.chatgpt.com/docs/build-skills) 同时区
 
 ## 来源：`references/environment-tools.md`
 
-原始 SHA-256：`60b3e8d4de0bc2207bf89513d37b711db896f40f058902afae1cb70f3a51a071`
+原始 SHA-256：`535339a84106dd52f25121d27e943aa370b3a0bdd2d33ac52f3c5bce63d39733`
 
 # 环境发现与来源定位
 

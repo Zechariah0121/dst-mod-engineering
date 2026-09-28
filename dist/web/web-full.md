@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`b6ce90bf22202a2dbcff3a25513270a89339ec8b9fc3ee3d282aa0f8a6f07ded`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`2a0bd8e17e41976ba6da0d381728ce582bf689ac3c7769c5381d1a6307382a87`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -10,9 +10,7 @@
 - `references/environment-tools.md`
 - `references/testing-release.md`
 - `README.md`
-- `docs/consolidation.md`
 - `docs/knowledge-integration.md`
-- `docs/validation.md`
 - `references/agent-setup.md`
 - `references/animation-recipes.md`
 - `references/assets-animation.md`
@@ -41,7 +39,7 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`22f5d3f69fc8293718ff8a4a4492a8f6c8e8be8eb914f4b9c4a4454b33801168`
+原始 SHA-256：`d687b1ab8d6884ba1c7683a06697b08f27a59abd638af1156549d1da115d2b3b`
 
 ---
 name: dst-mod-engineering
@@ -50,7 +48,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-这是 DST 开发、审查、排错与资源制作的统一入口，包含旧通用技能和专项制作流程的核验整合。旧教程、既有技能和已有 Mod 都是可审查的资料；当前项目需求与当前版本的实际契约决定实现。本技能可独立使用，不要求安装其他 DST 技能。
+这是 DST 开发、审查、排错与资源制作的统一入口。当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 用于提供线索，不代替源码核验。
 
 ## 工作顺序
 
@@ -105,7 +103,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - **生命周期**：自己注册的任务、事件、Hook、修改器、Widget 与子实体要有明确所有者和清理路径。还原字段之前确认仍是本 Mod 持有的值；避免覆盖其他 Mod 后续修改。
 - **资源**：文件名、prefab 名、bank、build、symbol、动画名分别查证。部分合法动画资源只有 build；不套用“三件套”“名称全相等”等旧口诀。
 - **证据**：源码查证、语法/清单检查、独立 Lua 合约、专服行为、真实远端客户端、视觉与听感分别报告。UI stub、服务器 SpawnPrefab 成功不能证明联网画面正确。
-- **部署**：只同步已确定的目标和授权内容。先比较差异，保留用户改动；不因为旧技能写过“三目录同步”就覆盖任意 Workshop 副本或删除文件。
+- **部署**：只同步已确定的目标和授权内容。先比较差异，保留用户改动；同步与删除前确认目标、差异和授权范围。
 
 ## 辅助脚本
 
@@ -114,7 +112,6 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
-- `scripts/build_web_bundle.py`：供维护者从公开仓库生成技能 ZIP 和按专题合并的网页资料；`--check` 只读核对产物是否匹配源文件，不编译 Mod，也不安装第三方工具。
 
 维护技能时，以“实际失败 → 原版/工具契约 → 可复现验证”为新增规则的依据。版本相关结论保留核验日期与源码定位；不可验证的经验保留为待查项，不升级为铁律。
 
@@ -123,7 +120,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 来源：`references/web-chat.md`
 
-原始 SHA-256：`188d87de54fff9ede6cd449dc24a70d2e8fb8db16993b5e47616d6621d3740e9`
+原始 SHA-256：`0b0290beafdfed5681936282378dca17010fbd6c62efaa1faae28c76c607d894`
 
 # 网页聊天中的 DST 开发协作
 
@@ -288,7 +285,7 @@ OpenAI 的 [Build skills](https://learn.chatgpt.com/docs/build-skills) 同时区
 
 ## 来源：`references/environment-tools.md`
 
-原始 SHA-256：`60b3e8d4de0bc2207bf89513d37b711db896f40f058902afae1cb70f3a51a071`
+原始 SHA-256：`535339a84106dd52f25121d27e943aa370b3a0bdd2d33ac52f3c5bce63d39733`
 
 # 环境发现与来源定位
 
@@ -447,220 +444,74 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 
 ## 来源：`README.md`
 
-原始 SHA-256：`6cb8595c9b41b63e430f34177613d6196d04b4c2bc041e387dc3a4db030c788b`
+原始 SHA-256：`dff5310e3782d5de5b7b39cbc3fa68a6b039cc5013883799ae9fa467434a29b2`
 
 # dst-mod-engineering
 
-面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能：用当前游戏源码核对实现，区分真实故障与玩法决策，并为修复保留可复核的验证证据。
+面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能，覆盖功能开发、代码审查、崩溃排错、联机、存档和资源制作。
 
 [![Checks](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)
 
-适用于新功能、代码审查、崩溃排错、联机同步、存档生命周期、资源制作和发布前验证。可以作为支持 `SKILL.md` 的 AI 编程工具的技能，也可以直接阅读专题文档、单独运行辅助脚本。
+## 快速开始
 
-## 内容
-
-| 入口 | 用途 |
+| 使用方式 | 入口 |
 |---|---|
-| [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) | 工作流程、关键约束、制作专题和知识检索的按需导航 |
-| [dst-engineering-kb/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dst-engineering-kb/) | v0.1.1 公开派生知识库：64 条知识、来源、纠错、决策与测试候选 |
-| [dst-kb-service/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dst-kb-service/) | 可选的本地只读 MCP 检索服务，含 7 个工具和配置示例 |
-| [references/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/references) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
-| [scripts/dst_zip_tool.py](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
-| [scripts/check_api.py](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
-| [scripts/dst_modtest.py](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/scripts/dst_modtest.py) | Windows 离线单分片专服测试，使用唯一副本、明确完成标记和证据清单 |
-| [scripts/build_web_bundle.py](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/scripts/build_web_bundle.py) | 自动生成网页资料包，并检查与源文件的一致性 |
-| [tests/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
+| Codex、Claude Code、Cursor 等 Agent | 下载仓库，按 [接入指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md) 安装并加载 `SKILL.md` |
+| 网页 AI | 上传 [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，或使用下方专题 Markdown |
+| 阅读工程知识 | [知识库索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) |
+| 为 Agent 启用知识检索 | [MCP 服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) |
+| 获取全部内容 | [完整仓库 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/archive/refs/heads/main.zip) |
 
-技能可独立使用，不需要安装历史 `dst-mod-development` 或 `dst-mod-devkit`。现有旧技能不会被本仓库自动覆盖。
+不支持自动发现技能的 Agent，也可以直接使用：
 
-## Skill 与知识库一起使用
+> 请读取 `dst-mod-engineering/SKILL.md`，按相关专题处理我的 DST Mod 任务。先核对当前原版源码，再实现或修复；玩法取舍先确认，分别报告静态检查和实际游戏测试结果。
 
-Skill 决定什么时候检索和如何使用证据，知识库保存可追溯的工程经验，服务负责按需检索。设计、实现、审查、排错和案例研究按不同模式查询；简单机械修改无需重复加载知识库。当前项目与对应版本的原版源码仍须核对。
+技能 ZIP 包含使用指南和开发辅助脚本；知识库与 MCP 服务需下载完整仓库。普通网页附件是否能解压、注册技能，取决于平台能力，详见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。
 
-| 需求 | 获取方式 |
+## Skill 与知识库
+
+Skill 负责开发流程和按需导航；知识库提供可追溯的事实、模式、反例与测试候选；可选 MCP 服务负责检索。设计、实现、审查和排错使用不同的检索重点，简单机械修改不必重复查询。
+
+知识库 v0.1.1 包含 **64 条条目**，来自一个参考案例及限定的原版源码快照。模式和规则仍是候选，11 项游戏测试候选尚未执行。使用时仍须核对当前项目和游戏版本。具体任务示例见 [知识库使用说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
+
+## 网页阅读资料
+
+通常选择与任务相关的一份即可：
+
+| 任务 | 下载 |
 |---|---|
-| 完整本地 Agent 接入 | 克隆仓库，加载 Skill，再按 [服务指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 配置可选 MCP |
-| 只阅读知识 | 从 [知识索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) 按 ID、领域和关系阅读 |
-| 网页端分析 | 下载仓库 ZIP 后，选择相关知识和专题上传；不会自动连接本机服务 |
-| 仅安装 Skill | 使用下方技能 ZIP；它包含检索策略，不包含知识库、检索服务或游戏源码 |
+| 初次使用 | [入门](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
+| 代码审查与修复 | [代码专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
+| 联机、存档与 UI | [联机专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
+| 贴图、动画与音频 | [资源专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
+| 世界生成 | [世界生成专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
+| 全部专题 | [阅读 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip) · [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
 
-64 条知识来自单一参考案例及限定的原版快照，模式和规则仍是候选；11 项游戏测试候选均未执行，不能当作实机验证。公开包保留第三方案例署名、符号和经过脱敏的分析证据，不包含私人 Mod 内容、本机真实路径或游戏/Mod 原源码。它与本机冻结资料不是字节相同的副本；脱敏说明与源/公开哈希映射见 [PUBLICATION-PROVENANCE.json](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/PUBLICATION-PROVENANCE.json)。
+## 开发工具
 
-检索与实际任务示例见 [知识库使用说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。MCP 是可选能力：不可用时可以读取实际可访问的知识文件，或继续查当前源码，并准确说明本次没有检索到什么。
-
-料理、法术、自定义数值、角色外观、装备手持、GIF 动画和 FMOD 音效的旧专项流程已核验并并入本技能，按入口导航读取即可，无需同时安装旧专项技能。旧项目的配色、数值、绝对路径和固定同步目录不作为通用默认。各旧名称的内容去向见 [整合记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/consolidation.md)。
-
-## 网页 AI：下载后使用
-
-无需本地 Agent 或 Python。按当前网页实际支持的功能选择文件，然后照 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) 的启动提示词提供任务与材料：
-
-| 用法 | 下载 |
+| 工具 | 用途 |
 |---|---|
-| 平台提供原生“上传技能”入口 | [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，内含单一 `dst-mod-engineering/` 根目录；它不是插件安装包 |
-| 普通聊天，先确认材料和能力 | [入门 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
-| 代码审查 / 修复 | [代码审查 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
-| 联机 / 存档 / UI | [联机 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
-| 贴图 / 动画 / 音频工具 | [资源 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
-| 世界生成 / 空间判定 | [世界生成 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
-| 下载全部专题后自行选择 | [网页资料 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip)，解压后只上传本次需要的 Markdown |
-| 明确需要全部文档且平台容量允许 | [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+| `scripts/dst_zip_tool.py` | 检索游戏安装目录中的 `scripts.zip` |
+| `scripts/check_api.py` | Lua 语法及组件／Replica 方法声明检查 |
+| `scripts/dst_modtest.py` | Windows 隔离专服测试，记录加载与行为断言结果 |
 
-通常选择一份专题即可，其中已包含共同入口。ZIP 作为普通附件上传，不代表平台一定会解压或注册技能；无法读取时改传单个 Markdown。若 Markdown 不被接受，可按指南分段粘贴必要文本。
+脚本需要 Python 3.10+；语法检查器还需 `luaparser`，可用 `python -m pip install -r requirements.txt` 安装。参数通过各脚本的 `--help` 查看，操作示例及限制见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。静态检查和专服测试不能替代真实客户端的 UI、预测、画面与音频验收。
 
-平台的账号、工作区、上传和代码执行能力各不相同。资料包没有游戏源码或动画程序，也不会给予网页 AI 本机访问权限。需要本机编译或游戏测试时使用 [本机验证交接单](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/templates/local-validation.md)，把真实结果交回网页 AI 复核。各包的源文件指纹和输出哈希见 [bundle-index.json](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/bundle-index.json)。
-
-## 安装技能
-
-Claude Code、Cursor、GitHub Copilot 和 Codex 的安装目录、调用方式及首次加载检查见 [跨 Agent 接入指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。文档按各产品官方说明核对；格式兼容不等于已经逐个实测所有 Agent。
-
-克隆整个目录，保持文件夹名称为 `dst-mod-engineering`。例如，按 [Codex 当前官方说明](https://learn.chatgpt.com/docs/build-skills) 安装到用户技能目录，在 PowerShell 中运行：
-
-```powershell
-$skills = Join-Path $env:USERPROFILE '.agents/skills'
-$destination = Join-Path $skills 'dst-mod-engineering'
-if (Test-Path -LiteralPath $destination) { throw '目标已存在；请先核对和保存本地修改。' }
-New-Item -ItemType Directory -Path $skills -Force | Out-Null
-git clone https://github.com/Zechariah0121/dst-mod-engineering.git $destination
-if ($LASTEXITCODE -ne 0) { throw '技能克隆失败，请检查 Git 输出。' }
-```
-
-已有旧目录安装时，先确认当前 Agent 实际加载的位置，不自动迁移或同时安装多个同名副本。不支持技能发现机制的 Agent 也可使用完整目录，并明确要求它读取文件：
-
-> 请读取 `<技能目录>/SKILL.md`，按导航读取相关参考，然后审查这个 Mod。先核对当前游戏源码，再修复确定故障；玩法取舍先列出选项。分别报告静态检查、专服行为和客户端验收结果。
-
-原生技能调用按 Agent 的命令选择；例如 Codex 使用 `$dst-mod-engineering`。只有聊天能力时可阅读和分析，执行脚本需要终端与文件权限，视觉验收还需可访问的客户端或人工反馈。Windows 专服测试器的系统限制与 Agent 品牌无关。
-
-单纯阅读技能无需安装 Python 包。运行 `check_api.py` 和自动测试需要 Python 3.10+ 与 `luaparser`；建议为仓库单独创建虚拟环境：
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-## 脚本快速开始
-
-以下命令在仓库根目录执行。路径均为示例，需改成自己的合法游戏安装、Mod 源码和输出位置：
-
-```powershell
-$python = '.\.venv\Scripts\python.exe'
-$dst = 'C:\Games\steamapps\common\DontStarveTogether'
-$mod = 'C:\Mods\example_mod'
-
-# 查看源码包指纹，再检索原版定义
-& $python scripts/dst_zip_tool.py --dst $dst info
-& $python scripts/dst_zip_tool.py --dst $dst grep 'AddModRPCHandler' --path 'modutil.lua'
-& $python scripts/dst_zip_tool.py --dst $dst show 'scripts/components/weapon.lua' --start 1 --count 80
-
-# 语法与方法声明检查
-& $python scripts/check_api.py $mod --dst $dst --out 'api-report.json'
-
-# Windows：运行隔离专服加载测试
-& $python scripts/dst_modtest.py $mod --dst $dst --out 'test-evidence' --quiet
-```
-
-`dst_zip_tool.py` 也支持 `--zip` 指定单独的源码包；`check_api.py` 另支持 `--scripts-dir` 指定解压后的 `scripts` 目录。参数详情可运行各脚本的 `--help`。
-
-`check_api.py` 的 `DECLARED` 仅表示查到方法声明，不证明参数、端别、时序或整个 Mod 正确；`NEEDS_REVIEW` 需要人工追踪。退出码 `0` 表示枚举到的直接调用均有声明，`1` 表示语法错误，`2` 表示待查、输入问题或无直接调用。
-
-### 专服行为断言
-
-将以下内容保存为自己的 `test.lua`，再通过 `--script test.lua` 传入测试器：
-
-```lua
-local item = SpawnPrefab("spear")
-assert(item and item.components.weapon, "weapon did not spawn")
-TEST.After(0.2, function()
-    assert(item.components.weapon:GetDamage() > 0)
-    item:Remove()
-    TEST.Done("all assertions completed")
-end)
-```
-
-行为脚本必须在所有目标断言完成后调用 `TEST.Done()`。普通返回不代表通过，异步任务使用 `TEST.After()` 捕获异常。测试器核对本轮加载、完成和错误标记，并在完成后的观察窗口内继续检查失败。
-
-测试器会向游戏 `mods` 目录写入唯一测试副本，创建独立存档并启动、结束自己启动的专服进程。测试副本和证据保留，准确路径写入 `manifest.json`；清理前按清单确认归属。它支持 Windows 单分片离线测试，不适用于纯客户端 Mod，也不替代真实客户端的 UI、输入、预测、画面、音频或跨分片验收。更多参数与边界见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
-
-## 动画与音频工具
-
-**本机没有动画工具也有接入流程**：按 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 先识别任务，检查现有工具，再选择必需工具的官方或作者发布入口。Agent 应说明缺什么、从哪里获取、装到哪里及如何验证；已有安装授权就继续执行，没有授权时一次提出明确方案。不会因为安装了技能就无条件安装所有程序。
-
-指南覆盖 DST Mod Tool、Klei Don't Starve Mod Tools、`ktech` / `krane`，并说明无 GUI、断网和平台不匹配时的处理。首次验证包括实际的小型转换或编译；仅能显示 `--help` 不算产物验证。本仓库不捆绑这些工具。音频任务的 FMOD 流程另见对应专题。
-
-动画工作流见 [资源与动画](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md) 和 [DST Mod Tool](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/dst-mod-tool.md)；音效见 [音频与粒子](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/audio-particles.md)。
-
-## 验证与维护
-
-### 公开内容与本机资料分开
-
-GitHub 源码、网页 Markdown 和技能 ZIP 只发布通用开发知识、公开来源与自造示例。私人 Mod 的名称、代码、素材、设计数值、交接记录、测试日志、存档、用户名和真实目录留在本机；经验需先抽象成不依赖私人项目的规则，再进入公开版。本机安装目录不是发行源，发布从本仓库的已审查文件生成。
-
-本机专用 Markdown 用独立一行的 `<!-- local-only -->` 标记，位于 YAML frontmatter 之后或普通文档开头。生成器遇到该标记会拒绝打包，`--check` 同样拒绝，且保留已有产物。此检查只防止带标记文件误打包，不会识别所有未标记的私人内容，也不能阻止直接 Git 提交；提交前仍要审查暂存文件、示例和 ZIP 内文，确认没有带入本机资料。
-
-以下命令供维护者在 **GitHub 源码仓库** 根目录运行；网页上传用技能 ZIP 不包含测试目录或 CI 配置。网页资料从同一份文档生成，禁止手工改生成文件：
-
-```powershell
-& $python -m unittest discover -s tests -v
-& $python scripts/build_web_bundle.py
-& $python scripts/build_web_bundle.py --check
-```
-
-生成器仅需 Python 标准库；它不会下载或安装工具。GitHub Actions 在 Windows / Linux 上执行无需游戏的回归检查，并检查提交的网页包是否与源码一致。修改输入文档或脚本后重新生成 `dist/web/` 再提交，避免上传版与技能正文漂移。游戏引擎实测由本地合法安装完成，不在 CI 中下载或运行游戏。
-
-首轮整理日期为 **2026-09-27**；核验针对当时实际安装的源码快照，不宣称永远对应最新游戏版本。检查范围、源码指纹、已测结果和未测部分见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。游戏更新后，应重新核对相关实现与调用链。
-
-改进建议请附触发条件、相关源码位置和可复现证据；报告中不要上传账号令牌、私人存档或完整游戏资源。
+动画与音频工具按任务选择，见 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)、[动画制作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md) 和 [音频制作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/audio-particles.md)。
 
 ## 来源与许可
 
-本技能整理了历史技能与开发教程，并结合实际安装源码和工具核验纠错；材料来源、纠错索引见 [来源说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/sources-and-corrections.md)。
+仓库自有文档和脚本采用 [MIT](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)。参考案例“小穹”的作者为 FL；研究引用不代表其背书，也不重新授权原 Mod。游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
 
-仓库自有文档和脚本以 [MIT](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE) 许可发布。DST 属于 Klei Entertainment；游戏源码、资源和第三方工具没有随仓库分发，其权利与许可归各自权利人所有。
-
-
----
-
-## 来源：`docs/consolidation.md`
-
-原始 SHA-256：`3cb2d75872eace520c2a25a4a9bf7d03d05f5fbbbb47fc06bac60ebdf2d57cf7`
-
-# 统一技能的内容去向
-
-2026-09-27，在两个通用技能完成重建后，继续审查七个专项技能及随附法术模板、装备检查清单。目标是只使用 `dst-mod-engineering` 入口，详细资料按任务加载。归档保留原始经验，不意味着旧结论仍应执行。
-
-| 旧名称 | 当前内容去向 |
-|---|---|
-| `dst-mod-development` / `dst-mod-devkit` | [统一入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md)及现有核心专题、三个开发验证脚本 |
-| `dst-add-cooker-dish` | [独立料理流程](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/cooker-dishes.md)、[物品与植物](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/items-food-plants.md) |
-| `dst-add-spell` / `dst-custom-stat` | [法术与数值](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/spells-and-custom-stats.md)、动作、网络和生命周期专题 |
-| `dst-character-build` / `dst-swap-build` | [角色与装备美术](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/character-and-equipment-art.md)、[资源结构](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md)、角色与动作专题 |
-| `gif-to-dst-anim` | [帧序列与法阵制作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/animation-recipes.md)、资源结构与工具专题 |
-| `dst-sound-fmod` | [音频与粒子](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/audio-particles.md) |
-
-## 处理原则
-
-- 可复用的完整制作流程保留，但公共规则只维护一次；专题通过链接使用网络、生命周期、工具和测试规范。
-- 原版 API 与项目自定义 helper 分开；从当前安装源码确认签名、端别、调用顺序、注册与清理，不根据旧文件的“实锤”“铁律”措辞提高可信度。
-- 私人项目选定的数值、造型、工具路径、文件夹与 Workshop 副本信息只留在本机资料中，公开版仅保留通用方法。重新执行需要当前任务的目标与授权；不会自动覆盖用户环境。
-- 缺少上下文的旧 Lua 模板不直接分发为可用成品；需要实例化时从本项目和当前原版接口裁取，并补全实际生命周期与验证。
-- 个例缓解办法不升级为全局限制。图集大小、帧数、画布、锚点、音频参数等先以有效产物和目标平台证据核对。
-
-## 从旧技能迁移
-
-本仓库只分发一个 `SKILL.md`。若用户选择合并自己的旧安装，先列清所有技能发现目录，逐文件备份并校验哈希；核对新技能包含所需流程后，再将旧目录移到技能发现目录之外，不能只把目录改名留在同一 `skills/` 下。旧项目对技能名的引用改为本页对应入口，不保留需要再次自动加载的兼容技能。
-
-归档中可能含旧机器配置、游戏源码缓存、第三方素材或日志；它是用户的本地备份，不能直接上传为本仓库的 MIT 内容。不删除原项目、素材、游戏安装或存档。本仓库不会在安装或运行打包器时自动扫描、移动、删除用户的其他技能。
-
-## 验证范围
-
-专项整合核对了当前安装的 Lua 源码、官方编译器/工具资料及相关现有资源结构。检查包含参考链接、示例语法、技能入口、分发包一致性与独立情境评估；具体结果见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。本次技能归并不等于给任何实际 Mod 增加功能，也不替代真实客户端对角色、动画、声音和多人状态的验收。
+需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。
 
 
 ---
 
 ## 来源：`docs/knowledge-integration.md`
 
-原始 SHA-256：`cf1bb5604dbb34388d6f6413a315731f600728cd3268c886af5c74801c326764`
+原始 SHA-256：`00533c513e7a7c831676d1be69a344afead7c1f7fb7fdc240b7c3c9e15b329e8`
 
 # Skill、知识库与检索服务
 
@@ -695,131 +546,15 @@ GitHub 源码、网页 Markdown 和技能 ZIP 只发布通用开发知识、公�
 
 - 完整仓库包含三层；网页技能 ZIP 只包含技能与辅助资料，不包含知识库和服务。
 - [服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 使用 Python 3.10+，不需要第三方 Python 包或 API Key。
-- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明证据范围；公开材料已脱敏，不能声称等于未修改的本机原始报告。
+- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明条目的来源、证据等级和版本范围。
 - 数据校验、服务回归、Agent 真正按任务自动检索、DST 实机验证是四种不同验收。
-
-## 维护公开派生包
-
-维护者使用 `scripts/build_public_kb.py` 的帮助查看显式输入/输出参数。输入是合法持有的知识资料副本，不能以本机 Skill 安装目录代替公开发布源。公开导出后核对来源/公开哈希、Schema、链接、Correction 与敏感内容，再重建网页资料包。原始冻结资料不应被导出流程覆盖；公开脱敏不提升证据等级或置信度。
-
-
----
-
-## 来源：`docs/validation.md`
-
-原始 SHA-256：`968cb8c5219babd31101a19bc82ed40e3b1568e7213ee6c02f712aa55a97b8f5`
-
-# 验证记录与适用范围
-
-## 2026-09-29：知识库公开派生版与可选检索服务
-
-- 保留 64 条 canonical 知识的 ID、类型、证据等级、置信度、状态和关系；本机冻结来源文件的 SHA256 未改变。
-- 公开知识库通过 Schema、Manifest、4 个随包来源哈希、731 个内部链接和 12 项反例检查。59 个输出文件在第二个目录重新导出后 SHA256 一致。
-- 检索服务 24 项回归通过，包含真实 stdio 握手与工具调用、搬迁路径、过期索引拒绝、损坏数据拒绝、显式 Correction 和运行证据边界。
-- 原有工具与网页打包器 43 项自造夹具回归通过；Skill 入口校验通过。
-- 上述是本地数据、协议与工具验证，不是 DST 实机验证，也不代表所有 Agent 都已自动加载。业务测试候选仍为 `not_run`；未进行新的案例研究。
-
-公开副本与本机原报告字节不同。知识库的 `PUBLICATION-PROVENANCE.json` 记录源/公开哈希；外部游戏与 Mod 源码不随包。检索仍有关键词误命中限制，必须读取范围并筛选结果。
-
-在完整仓库可分别重跑：根目录 `python -B -m unittest discover -s tests -v`、`python -B scripts/build_web_bundle.py --check`、`python -B dst-engineering-kb/tools/validate.py`；进入 `dst-kb-service` 后运行 `python -B -m unittest discover -s tests -v`。
-
-首轮重建及发布整理：**2026-09-27**。本记录区分已完成的维护者检查和读者可以直接重跑的回归；未随仓库分发私人工作目录、完整游戏源码或原始游戏日志。
-
-## 接入与工具安装补充
-
-同日补充 [跨 Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md) 与 [工具安装引导](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)，当次达到 17 篇专题。目录与调用规则按产品官方说明核对；工具入口按作者页面、公开发布元数据及现有工具帮助核对。文档明确按任务选择最小工具、安装授权与首次产物验证，并给出缺少网络、GUI、匹配平台时的处理。
-
-本次补充不代表在 Claude Code、Cursor、Copilot 上逐一实测，也未从干净系统重新安装所有动画工具。无需游戏的脚本 CI 仍只证明工具回归；下载入口可访问、作者声明的平台支持、CLI 帮助可运行和实际产物通过是不同证据。
-
-## 网页资料包补充
-
-新增 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)、[本机验证交接模板](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/templates/local-validation.md) 和标准库打包器，当次达到 18 篇参考文档、3 个开发验证工具与 1 个分发工具。网页专题从现有文档生成，原生技能包保留单一根目录；来源指纹和逐文件哈希可用于追踪资料版本。
-
-包结构、确定性、资料归属、缺项处理和覆盖保护由自造输入回归检查；CI 另以 `build_web_bundle.py --check` 核对提交产物。它们不验证网页平台是否完整读取附件、是否正确自动触发技能，也不证明目标账户允许上传或执行代码。本次没有登录第三方 AI 平台上传用户项目，平台实际加载与任务效果仍需按网页指南进行验收。
-
-本次新增 14 个资料包回归，合计 41 个测试；覆盖生成失败回滚、用户修改保留、只读过期检测、来源哈希、许可证、嵌套链接和 ZIP 结构。生成物使用固定 ZIP 元数据与无压缩存储，避免不同系统和压缩库造成无意义漂移。
-
-## 专项技能统一整合
-
-同日继续审查七个专项技能及法术模板、装备检查清单，合并到一个入口与 **22 篇参考文档**。新增料理、法术与自定义数值、角色与装备美术、帧序列动画四篇流程，扩充音频专题；旧名称的内容去向见 [迁移说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/consolidation.md)。历史项目 helper、固定数值和机器路径不再作为通用 API 或默认部署目标。
-
-逐节记录区分保留、改写、纠错、项目特例和证据不足。查证时将实际使用的解压 Lua 文件与安装版 `scripts.zip` 比较，源码包指纹仍与下文一致。独立情境评估覆盖手持装备、长帧动画、料理调味、声音验收、睡眠回魔与 HUD、伤害与灌溉，6/6 场景能沿新入口形成正确的下一步方案，并补充湿度钳制与图鉴系统区分两项说明。这属于文档使用评估，不是六个已运行的 Mod。
-
-| 本次资源检查 | 实际证据与限制 |
-|---|---|
-| 官方动画编译器 | 使用随工具提供的 Python 2.7，从工具目录外编译自造 32×24 图像、201 个时间线帧的工程；核对 BILD v6、ANIM v4、KTEX 与 ZIP CRC，输入 ZIP 未改变。帧复用同一图像，不代表 201 张大型独立贴图均已验证 |
-| 图集排布 | 函数级输入生成 64×64 与 64×32 两页，引用 sampler 0/1；说明不能把“必须正方形、单图集”当通则，未完成这组产物的客户端渲染验收 |
-| 装备资源 | 解析原版 `swap_spear.zip` 的实际符号记录，确认 build-only 可用作原版换符号资源；不能从这一例推断任意装备均正确 |
-| 音频工具 | 核对现有 Designer 工具和资料；发现的 Studio 模板仅保留为待验证候选，没有新音效编译、运行或听感通过结论 |
-
-整合沿用并重跑 41 个无游戏回归，同时检查技能入口、相对链接、Python/Lua 示例与 PowerShell 文档语法。网页资料重新由源文件生成；代码审查、网络和资源资料包补入对应新专题。以上检查不替代真实客户端的美术、声音与联机验收，也未安装新工具或修改任何实际 Mod。
-
-## 公开分发边界补充
-
-本机定制内容与发行输入分开维护。打包器新增本机专用 Markdown 标记检查：被标记文件混入允许打包的目录时，生成与 `--check` 均在写出前拒绝。新增两个自造输入回归，覆盖首次生成无残留、已有产物保持，以及 BOM/CRLF 文本；总计 43 个回归。标记不是内容脱敏器，仍需检查实际待发布文件与归档内部内容。发布规则见 [README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.md#公开内容与本机资料分开)。
-
-## 资料与源码快照
-
-| 项目 | 首轮检查范围 |
-|---|---|
-| 历史教程 | 186 个文件，其中 54 篇 Markdown；压缩附件只检查清单、相关文本及结构，未运行所附旧 EXE / DLL |
-| 历史技能 | 两份通用技能入口、26 篇参考，以及相关说明和脚本 |
-| 纠错记录 | 135 条核对记录，含重叠记录；不等于 135 个独立 Bug |
-| 整理结果 | 一个入口、15 篇专题、3 个辅助脚本 |
-| 原版源码一致性 | 4,030 个解压 Lua 文件与当时安装版 `scripts.zip` 内容一致 |
-
-当时安装的 `scripts.zip` SHA-256：
-
-```text
-85d6aa0e24a290d81745f1fd18bd0769d6b82011a3ba5aba02b87389b62f41c8
-```
-
-该哈希描述本次核验快照，不证明 Steam 最新版本，也不是其他版本必须满足的条件。专题中的函数和相对路径供读者定位；更新后重新检索原版定义、调用方、端别和生命周期。
-
-## 可复现的脚本回归
-
-在仓库根目录安装 `requirements.txt` 后执行：
-
-```text
-python -m unittest discover -s tests -v
-```
-
-首发版包含 27 个回归测试，本地 Windows / Python 3.13.14 检查全部通过。测试使用自造 Lua / ZIP / 临时目录，不分发游戏代码，也不要求本机安装 DST。覆盖源码包定位与安全导出、组件和 replica 的声明区分、语法与依赖错误、测试副本隔离、完成标记、失败优先、缺少完成信号和非法时长等行为。
-
-[GitHub Actions](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml) 在 Windows / Linux 上运行仓库检查。Linux 上的工具回归不表示支持 Linux 专服启动；`dst_modtest.py` 的实际启动路径目前仅面向 Windows。
-
-## 实际游戏与资源工具检查
-
-以下是维护者在首轮重建时进行的本地检查；读者需要自己的游戏和工具环境才能复现。
-
-| 检查 | 实际结果 | 证明范围 |
-|---|---|---|
-| 专服正常异步脚本 | 通过：加载目标 Mod、生成 `spear`、检查伤害、异步结束后发出 Done | 该安装与配置下的加载及目标服务器断言 |
-| Done 后观察窗内异步失败 | 按预期失败 | 失败信号不会被先前的完成信号覆盖 |
-| 脚本返回但未发出 Done | 按预期超时失败 | 普通脚本返回不被误判为完成 |
-| 纯客户端 Mod | 按预期拒绝 | 强制在专服载入客户端脚本不被冒充客户端验收 |
-| `ktech` 4.4.0 | 自造 16×8 PNG 转换为 TEX + XML 成功，含中文路径；输入 PNG 未改变 | 本次转换链路和输出结构，不是所有图集的画面验收 |
-| DST Mod Tool 1.1.13 | 检查版本与帮助接口 | 未完成真实项目编辑和画面验收 |
-| `krane` | 检查帮助接口 | 未完成反编译、修改、重编译的完整往返 |
-| FMOD Designer 4.44.7 | 检查帮助与文档；核对 153 个原版 FSB 文件头 | 未完成新音效编译和客户端听感验收 |
-
-专服结果以对应运行的日志、加载目标集、唯一 ID 标记和 manifest 判定，不能仅凭进程退出码。发布版调整了测试器时长参数校验与平台检查的先后顺序，并修复 API 检查器把缺失 `luaparser` 误报为 Lua 语法错误的问题；两项均有无游戏回归。Windows 游戏执行逻辑沿用上述实测版本。
-
-## 尚需项目自行验收的部分
-
-- 实际主机与独立远端客户端的同步、预测、输入、UI 和资源解码。
-- 具体 Mod 的死亡复活、保存重启、重连、洞穴 / 跨分片行为。
-- 动画 pivot、层级、贴图边缘、音量、空间感及不同分辨率的视觉表现。
-- 项目实际启用的其他 Mod 组合、配置和存档迁移。
-
-静态声明检查不验证参数、继承注入、引擎绑定或运行时权限；专服无头模式不验证渲染与听感。本技能要求按任务补齐相关证据，不把本次回归结果外推成任意 Mod 的正确性保证。
 
 
 ---
 
 ## 来源：`references/agent-setup.md`
 
-原始 SHA-256：`a4425418d9c8aaacc29312e6cea1a2608691a8d397bbd07aac830919d056f084`
+原始 SHA-256：`435f2a18c61b555cb2656a9613b921e942e5233e61dd26a4eaab06ec8e0fa09f`
 
 # 不同 Agent 的安装、调用与能力边界
 
@@ -2502,15 +2237,13 @@ end)
 
 ## 来源：`references/sources-and-corrections.md`
 
-原始 SHA-256：`1ff5356a3d09e8ea2af07f9c55cba75b95759645cb2a228642174f5ec7cca6f0`
+原始 SHA-256：`fc3a50877b9b98aa6748372c39e0e9af6001d17db14a1a8e3e6fa69af0cc998b`
 
 # 来源、可信度与纠错范围
 
-本技能于 2026-09-27 完成首轮重建，随后整理为独立可移植版本。资料输入包括两份既有通用技能 `dst-mod-development`、`dst-mod-devkit` 与 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial)。教程包含 2021 年内容和后续补充，并非当前游戏的官方 API 规范；使用本技能不需要安装这两份旧技能或下载教程附件。
+本技能参考 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial) 等开发资料，并对相关原版接口和工具进行核验。旧教程不等同于当前游戏 API 规范。
 
-同日继续核验七份专项技能：新增料理、法术、自定义数值、角色 build、装备 swap、帧序列动画和 FMOD 音频，包含旧法术模板与装备清单。内容按任务并入本技能，不再要求加载任何旧 DST 技能；逐项去向见 [整合记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/consolidation.md)。旧项目的私人素材与游戏缓存只留在本地归档，不纳入公开许可和分发包。
-
-旧 devkit 的测试工具注明来源 [Zechariah0121/dst-modtest](https://github.com/Zechariah0121/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
+测试工具的历史来源包括 [dst-modtest](https://github.com/Zechariah0121/dst-modtest) 与 [dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting)。当前辅助脚本实现直接 ZIP 读取、AST 声明检查与隔离专服测试；这些来源说明不代替运行验证。
 
 技术事实优先核对合法安装的游戏与官方 Mod Tools；本仓库不分发它们的源码、资源或二进制。工具与参数的公开参考包括 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)、[Klei 专服命令行说明](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/) 和 [FFmpeg 滤镜文档](https://ffmpeg.org/ffmpeg-filters.html)。具体调用以当前安装版本的帮助和相关游戏实现为准。
 
