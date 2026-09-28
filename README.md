@@ -54,6 +54,9 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 
 ## 来源与许可
 
-仓库自有文档和脚本采用 [MIT](LICENSE)。参考案例“小穹”的作者为 FL；研究引用不代表其背书，也不重新授权原 Mod。游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
+仓库自有文档和脚本采用 [MIT](LICENSE)。
+免责申明：知识库代码及架构部分学习于风铃大佬的“穹”mod，且严格参照代码开放级别许可进行学习，并无直接搬运风铃的完整源码或素材等行为；公开内容主要是架构分析和技术评论；研究引用不代表其背书，也不重新授权原 Mod。
+游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。
+资料来源见 [来源说明](references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
 
 需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。
