@@ -1,0 +1,1130 @@
+小穹 Mod · 第五轮架构分析
+SoraEnv + SoraAPI + Hook Framework Deep Dive
+日期：2026-09-28
+
+分析边界与证据
+======================================================================
+本轮仅分析加载环境、公共能力出口和 Hook 框架。ClientDB、MainDB、
+sorachestmanager、Prefab、UI 仅用于确认依赖与接入边界，不展开其内部算法。
+没有修改参考项目代码；没有执行其初始化、自动更新或联网逻辑。
+
+引用约定：
+P = case-study/CASE-001/
+V = vanilla-snapshot/scripts/
+下文 P、V 后面的路径和行号共同组成完整、可定位的来源。
+
+验证：
+1. 参考目录：949 个文件，186 个 Lua 文件，总计 68,623,081 字节。
+2. 全目录内容摘要与上一轮一致：
+   52c1cbe65297d77ae006613c33955199f87b835a04fea9fe27427ac1c0361f71
+   算法：按路径排序，依次加入相对路径 UTF-8 字节及各文件 SHA-256 摘要。
+3. 10 个关键文件通过 luaparser 静态语法解析：modmain、init、baseapi、
+   soraenv、api、hook、ui、moretags、sorauserdatahook、soraupvaluehelper。
+4. 13 份原版对照文件与本机游戏 scripts.zip 逐字节一致：mods、modutil、
+   class、entityscript、mainfunctions、main、builder、container、
+   player_classified、craftingmenu_hud、trader、invslot、playerhud。
+   游戏包：vanilla-snapshot/scripts.zip
+5. 本报告是源码级结论，不等于 Host、远程客户端、Dedicated Server 或多 Mod
+   组合已经完成实机验收。本文所说“当前原版”指这份本机游戏包，不代表已经
+   查询并确认它是 Steam 最新发布版本。
+
+最重要的定位：
+这是一套以显式启动顺序为骨架、以共享环境和全局出口提供能力、以多种运行时
+Hook 接入 DST 的项目框架；其中包含服务定位器、共享命名空间、便利工具库和
+业务适配层，并不是具有统一注册、卸载和依赖校验的独立框架产品。
+
+
+1. 加载与环境建立：Bootstrapping Graph
+======================================================================
+1.1 原版先提供什么
+
+V/mods.lua:297–358 的 CreateEnvironment 创建 Mod 环境 env，放入 require、
+Class、TUNING、GLOBAL、modname、MODROOT 等。env.env 指回自身。
+InsertPostInitFunctions 再把带有当前 Mod 身份的配置与 Hook 注册接口放进去。
+
+modimport 的真实行为是：加载 Lua chunk → setfenv(chunk, env.env) → 执行。
+它不是 require 的缓存模块机制，也不把模块返回值作为导出契约。
+同一个文件再次 modimport 会重新执行，可能重复注册 Hook。
+
+1.2 项目启动顺序
+
+DST CreateEnvironment / InsertPostInitFunctions
+  ↓
+P/modmain.lua:31–65
+  给 env 设置 __index → rawget(GLOBAL, key)
+  sora-dev 分支额外统计 env 未命中的全局访问次数
+  ↓
+modimport("main/init")                         [modmain:67]
+  ↓
+MODKEY、SORADEBUG、DebugPrint、TUNING.SORA*     [init:33–76]
+mi() 加载器、原版能力别名                     [init:78–114]
+注册 world 回调：env.TheWorld = GLOBAL.TheWorld [init:116–118]
+  ↓
+baseapi                                      [init:120]
+  LeakTable*、Config、计时/线程/调试工具
+  ↓
+http                                         [init:122]
+  ↓
+soraenv                                      [init:124]
+  创建 soraenv；公开 GLOBAL.SoraEnv
+  InitSoraEnv → Widget 等类 → UI helpers → require sorastdui
+  ↓
+moreanimdata                                 [init:125]
+  ↓
+api                                          [init:126]
+  GLOBAL.SoraAPI / SORAAPI = env
+  up、json、userdata；替换 env.AddPlayerPostInit
+  工具、UI、Hook helpers；中途 mi("moretags")
+  ↓
+debug/main → logupload                        [init:128–130]
+  ↓
+maindb → maindbinit → clientdb → clientdbinit → globalchest
+                                              [init:133–138]
+  ↓
+skinapi → skin → assets → editedanim           [init:140–145]
+  ↓
+recipes → food → tile → containers → strings   [init:147–155]
+  ↓
+ui_multab 或空 MakeRecipeTabMul → ui           [init:157–163]
+  ↓
+action → hook → link → ban → kleibugfix         [init:165–173]
+  ↓
+scripts/soraupdate/main → SoraAssets → AddModCharacter
+                                              [init:175–182]
+  ↓
+返回 modmain，才建立 PrefabFiles 并继续 AddPreFile
+                                              [modmain:69 起]
+  ↓
+原版后续加载/注册 Prefab、创建世界与实体、创建 UI、执行各类回调
+
+这是“模块求值顺序”，不是所有业务对象此时已经创建。
+例如 ClientDB 模板的 clientfn 以后运行，才赋值 SeedCDB / SoraRPC。
+World/Component PostInit 的业务回调也要等相应对象产生。
+
+1.3 哪些顺序不能随便交换
+
+依赖 | 实际后果
+baseapi → api | api:478 在加载时调用 LeakTableKV；交换会遇到能力尚未定义。
+soraenv → 调用 SoraEnv 的模块 | SoraEnv 尚不存在时，文件入口就不能执行。
+Widget 初始化 → sorastdui | sorastdui:34 求值 Class(Widget, ...)，立即需要类。
+api → hook | hook 顶层就调用 AddComponentHook、userdata.MakeHook 等。
+api → DB 模块 | DB 加载时捕获 SoraAPI.hash/json；不是等到业务请求才寻找。
+skinapi → Prefab 求值 | sora3chest 顶层调用 MakeItemSkinDefaultImage。
+ui → hook | 两者叠加包装 RebuildRecipes；换序会改变最终外层包装。
+hook → world 创建 | world 回调安装 Manager；过晚注册不会追补已经创建的世界。
+clientfn 执行 → soraseed 首次 require | soraseed:68 把 SeedCDB 捕获为 local；过早加载
+  会捕获 nil，以后填充环境字段不会自动更新这个 local。
+
+不能把所有先后顺序都误认为硬依赖：SoraEnv 的核心实现没有调用 baseapi。
+baseapi 必须早于当前 api 的加载期使用，但“必须早于 soraenv 本身”并不成立。
+若调整顺序，还要同时核对 http 和后续立即求值的调用者，而不是只交换两行。
+
+还有延迟反向依赖：soraenv:85 的 AddImgButton 以后调用 SoraGetImage；
+sorastdui:50 以后调用 SoraMakeWidgetMovable。它们在 api 之前定义，之所以
+能够存在，是因为定义函数不等于立刻执行函数体。
+
+
+2. SoraEnv 的准确机制与 lookup chain
+======================================================================
+核心证据：P/main/soraenv.lua:33–44、112；P/main/api.lua:35–38。
+
+SoraEnv 是“把调用函数的 Lua 5.1 环境切换为共享表”的便利入口。
+它同时使用 environment table、setfenv 和 metatable fallback；有共享命名空间
+的效果，但不提供依赖声明、按实例注入、接口检查或隔离，因此不是严格的 DI。
+
+只需要两个最小机制片段即可理解：
+  setfenv(2, soraenv)
+  rawget(env, key) or rawget(GLOBAL, key)
+
+调用之后：
+- 改变调用它的函数/chunk 的环境，不会给当前文件复制一份全部全局变量。
+- 既有 local 和 upvalue 不改变；之后的非局部读写按新的环境处理。
+- 后续创建的嵌套函数继承创建时的函数环境。
+- 已经创建并保存在别处的函数不会因为另一文件调用 SoraEnv 而统一换环境。
+
+lookup chain：
+
+identifier
+  ↓ 编译期先决定是否是词法绑定
+local / enclosing upvalue                    → 直接使用该绑定
+  ↓ 非词法变量才进行环境查找
+soraenv[key] 自有字段                         → 包括 false，也能正常命中
+  ↓ 自有字段不存在
+rawget(mod env, key)
+  ↓ 此值为 nil 或 false 时，因为使用了 or
+rawget(GLOBAL, key)
+  ↓ 没有对应值
+nil
+
+这是一个重要的不对称：
+1. env 自己的 __index 能回退 GLOBAL；SoraEnv 却用 rawget 绕过 env.__index。
+   sora-dev 的 env 全局访问统计因此不能完整统计 SoraEnv 模块的 fallback。
+2. env 自有字段 false，在普通 env 读取时仍是 false；经 soraenv fallback
+   读取时却会继续查 GLOBAL，得到那里同名的值或 nil。
+   这是实现语义，不是断言当前某项玩法已经因此故障。
+3. soraenv 没有 __newindex。调用 SoraEnv 之后，裸赋值写 soraenv，
+   不会自动写回 mod env，也不会自动写 GLOBAL。
+
+三个表必须分清：
+  GLOBAL：DST 全局表，也承载显式公开的 SoraEnv/SoraAPI/SoraCD 等。
+  env：Mod 主环境；SoraAPI 和 SORAAPI 都指向它。
+  soraenv：另一个共享表；自己的字段优先，再回退 env/GLOBAL。
+
+所以并不存在“所有定义都自动进入 SoraAPI”。
+例如 InitSoraEnv 在切环境后写 Widget、AddButton；sorastdui 写 STDUI。
+这些是 soraenv 自有字段，SoraAPI=env 没有反向 fallback 去寻找它们。
+相反 SoraAPI.SoraCD 能读到 GLOBAL.SoraCD，是 env.__index 在起作用；
+rawget(SoraAPI,"SoraCD") 与遍历 pairs(SoraAPI) 并不等价于这个访问面。
+
+TheWorld 也不是注入参数：先来自 GLOBAL，init 的 world 回调又把它缓存在
+env.TheWorld。其有效时机依赖世界创建；不能在加载期假定已存在。
+
+
+3. Hidden Dependency Table：为什么 require 图不够
+======================================================================
+下表只统计特意选取的五个样本。显式 require 用 Lua AST 统计，排除注释。
+“隐式数”是表中列出的不同外部能力项数量，不是完整自由变量统计；不计 Class、
+字体常量、TheWorld 等通用 DST 符号，因此不能外推全项目隐式依赖百分比。
+
+文件 | 显式 require | 本表选取的隐式能力 | 真正定义与导入方式 | 时序要求
+P/scripts/widgets/sorastdui.lua:32–50
+  0 | Widget、Image、ImageButton、SoraMakeWidgetMovable（4）
+  Widget/Image/ImageButton 来自 soraenv:45–52；Movable 来自 api:522 的 GLOBAL。
+  调 SoraEnv 后按共享查找读取；父类必须先就绪，Movable 在 Test 被调用前就绪。
+
+P/scripts/widgets/sora2chestcontrol.lua:32–55
+  0 | Widget、Image、Text、ImageButton、SoraAPI.SoraRPC（5）
+  四个类来自 soraenv；RPC 来自 clientdbinit:419–438 的 clientfn 写 env。
+  父类在加载时需要；RPC 到构造时才延迟捕获，不能只看模块加载顺序。
+
+P/scripts/widgets/soraseed.lua:31–86
+  1：widgets/itemslot
+  Button、Image、Text、Widget、SoraAPI.SeedCDB、SoraAPI.SoraCD（6）
+  UI 类来自 soraenv；SeedCDB 来自 clientdbinit:236–239；CD 来自 GLOBAL。
+  SeedCDB 在模块顶层捕获，必须在首次 require 之前建立正确客户端 DB 对象。
+
+P/scripts/widgets/soralistcontainer.lua:31–78
+  0 | Widget、AddButton、SoraAPI.SoraRPC（3）
+  前两者来自 soraenv；RPC 是 env 中的服务对象。
+  Rpc() 运行时动态取 SoraAPI.SoraRPC，没有顶层复制对象这一额外限制。
+
+P/scripts/widgets/soraexp.lua:33–55
+  0 | Widget、TextButton、SoraCD（3）
+  类来自 soraenv；SoraCD 来自 api:282 的 GLOBAL。
+  类在加载期需要，冷却工厂在构造期需要；还依赖传入 owner 的 netvar 契约。
+
+样本合计：1 处显式 require，21 个已追踪的隐式“文件—能力”依赖项。
+不是“21 个 require 可以机械替代”，也不是“全项目只有 1 个显式依赖”。
+
+此外两种重要模式：
+- P/main/hook.lua 无 SoraEnv 调用，但通过 modimport 本来就处于 env，直接
+  使用 AddComponentHook、LeakTable、Config 等，仍是共享环境依赖。
+- P/scripts/components/sorachestmanager.lua 没有 SoraEnv，显式写 SoraAPI.xxx，
+  使依赖入口看得见，却仍未声明服务由谁创建、何时可用。
+
+
+4. SoraAPI Surface Map
+======================================================================
+SoraAPI 的实际表面大于 api.lua 中的函数集合。它等于 env，又能回退 GLOBAL，
+还包含后来模块写进去的服务、数据表、调试函数和 Mod 原版注册接口。
+
+职责 | 实际能力与来源 | 性质与依赖
+
+基础表工具
+  baseapi:36/45/54 LeakTable/LeakTableV/LeakTableKV；60 ClearTableBy。
+  api:448 copytotable、462 comparetable、1088 DeepEqual。
+  弱表和过滤可通用；copytotable/comparetable 主要处理嵌套表与字符串，
+  不是支持任意数据类型、环引用的通用复制/比较库。
+
+时间、调度
+  api:282/334 SoraCD/SoraCDExt；513 NextFrame；918 CreateTaskList。
+  baseapi:154 MaekFnInThread；164 ThreadCheckPoint。
+  CD 是取时钟的轻抽象；NextFrame/线程函数依赖实体和 DST 调度器。
+  CreateTaskList 本身只是手动 Push/Pop 的队列，不自动启动周期调度。
+
+配置与本地偏好
+  baseapi:94–153 SoraConfigClass/Config；api:633–643 getsora。
+  前者带本地持久化副作用，后者把 Mod 配置读成布尔或数字。
+
+Hook 基础设施
+  api:365–445 bhook/ehook/rhook/hook；1123/1128 AddComponentHook/AddClassHook。
+  api:647 AddLaterFn；utils/soraupvaluehelper 返回 up；userdatahook 返回 userdata。
+  这些机制契约并不统一，不能当作同一个安全 Hook 系统。
+
+实体/容器与资源适配
+  api:666 EntityScript:SoraAddComponentWithNoPostInit；792 CheckChestValid；
+  804 Say；835 IsValid；975 AddMulPrefabPostInit；981 MakeAssetTable；992 sorapath。
+  多数是 DST API 包装或约定化拼装，带 TheWorld/Entity/资源路径依赖。
+  EntityScript 方法是改原版类，并不是把普通函数放进 env。
+
+UI
+  api:119 SoraGetImage（查找和缓存图集）；226 Popup；522 可拖动 UI；
+  740/767 TryLoadUI/TryLoadSCR（开发热载入）；soraenv 的 Widget/helpers。
+  部分通用，但默认文案、资源目录、Config 和 SoraUpdate 等已绑定项目。
+  Widget/helpers 属于共享 soraenv 表面，不能误列成 env 的自有字段。
+
+序列化与哈希
+  api:39 json=require utils/jsonfl；1003 hash；Config 使用 DataDumper。
+  hash 本身是独立输入字符串的计算；DB 依赖这些公共能力，但 RPC 协议实现
+  并不在 api.lua 内。本轮不把 DB 协议重复讲成 API 核心逻辑。
+
+业务服务与数据出口
+  clientdb/mainDB 模块写工厂；clientdbinit 写 SoraClientDB、SeedCDB、SoraRPC；
+  containers:1089 写 container_params；manager:33 写 ChestData、877 写 UpdateAllEnts；
+  skinapi:233/712 提供 MakeItemSkinDefaultImage/GetSkin。
+  这是多个系统依赖的公共入口，同时也是服务定位和反向耦合来源。
+
+明确的小穹业务
+  api:815 GetSoraPackLevel；846 Gift（绑定、sora_wq、sora3packer）；
+  1018/1033 IsSuperAdmin/IsHttpUser（固定名单）；1059 FixPlacerSkin；1106 ExtDmg。
+  名字像工具不等于可脱离项目复用，Gift 尤其不是普通 SpawnPrefab 包装。
+
+兼容与诊断
+  api:53 IsModEnable、64 IsMythEnable；723 Pfn/MakePcallFn；1214 PutTable；
+  baseapi 的 TimeCall/TimeRecordCall/TrackStart/TrackStop；init:35 DebugPrint。
+  这些提供排查手段，但不构成统一日志和 Hook 来源追踪系统。
+
+
+5. API 如何扩展、覆盖和溯源
+======================================================================
+它同时使用四种扩展方式：
+1. modimport 文件在 env 下定义非 local 符号，自动成为 SoraAPI 自有成员。
+2. 模块显式 SoraAPI.Name = value，向同一个 env 注入能力/运行状态。
+3. 显式 GLOBAL.Name = value，通过 env fallback 暴露；影响范围跨 Mod。
+4. 调用 SoraEnv 后定义符号，进入 soraenv，不自动反向导出到 SoraAPI。
+
+重复名称没有统一检测：同一张表的同一个 key 后写覆盖先写。
+不同表的同名符号则按 lookup 优先级遮蔽；不是简单“全都写 _G”。
+
+已经确认的真实覆盖/改写：
+- api:102 重定义 env.AddPlayerPostInit，保留旧入口为 local 再聚合分发。
+- api:654 覆盖 GLOBAL.TranslateStringTable，先运行 laterfn 再调用旧函数。
+- hook:989 覆盖 GLOBAL.CanEntitySeeTarget，增加条件分支。
+- hook:1326 改 ModManager.RegisterPrefabs；1216 改 EntityScript.SetPersistData。
+- ui:682 与 hook:1443 在同一 UI 实例上叠加改 RebuildRecipes。
+
+项目存在局部命名分组，例如 SoraClientDB、container_params，但没有统一
+API 注册器、模块命名空间所有权、接口版本或 export 白名单。
+
+如何查来源：目前只能结合文本搜索、加载顺序、debug.getinfo、upvalue 追踪。
+PutTable 能输出函数源信息，但只看到当前函数，不自动还原所有旧包装和覆盖历史。
+因此“能查到最后一层函数在哪个文件”不等于“具有完整 Hook Registry”。
+
+
+6. baseapi 与 api：分层意图和真实边界
+======================================================================
+baseapi 先准备早期共享工具和本地 Config，api 再建立公开出口、DST/UI 适配和
+项目业务能力。分层有价值，但不是完全纯净的基础库与业务库隔离。
+
+类别 | baseapi | api / 其他
+弱表 | 三种弱引用模式 | UI/Manager/实体表使用它们。
+Table | ClearTableBy | copytotable、comparetable、DeepEqual。
+Cooldown | 没有 CD 工厂 | SoraCD/SoraCDExt 在 api，不能误归 baseapi。
+Entity | TrackStart 临时改 EntityScript/Entity 用于诊断 | IsValid、Say、容器检查等。
+Task | MaekFnInThread、ThreadCheckPoint | NextFrame、CreateTaskList、AddLaterFn。
+Config | 构造 Config 时立即 Load | getsora、拖动 UI 读取/保存 Config。
+Debug | 时间测量与调用追踪 | Pfn、UI 重载、函数/表转储。
+
+baseapi 本身也依赖 TheSim、Class、DataDumper、Sleep、debug；不是任意 Lua
+环境下 require 后就能运行的纯模块。Config = SoraConfigClass() 有加载期副作用。
+
+ThreadCheckPoint 使用模块级 LastCheck，所有使用者共享检查时刻，不是每个
+线程独立的预算计时器；弱表只处理 Lua GC 可达性，不等于实体 IsValid 校验。
+
+基础设施质量也需区分“有接口”和“接口可靠”：
+- TimeCp:Start() 把数字写入实例 self.Start，遮蔽同名方法；重复冒号调用会出问题。
+- RandomInst 构造器形参是 inst，函数体却写 self；本定义存在自由变量错误。
+- hook(endhook=true) 把 fn(...) 的第一个返回值当 table 索引，与 before 分支
+  收集多返回值的方式不一致。不能按注释统一理解回调返回契约。
+以上为静态可确认的接口缺陷；本轮不修改，也不把未证实执行的辅助功能说成
+当前必然触发的游戏崩溃。全项目搜索未找到 TimeCp/hook 的直接业务调用点；
+RandomInst 有调用方，但其模块加载环境与实际启用路径仍需另外确认。
+
+
+7. Hook Mechanism Table
+======================================================================
+说明：“未来实例”指注册完成后才创建的对象，不意味着自动扫描/补丁现存对象。
+
+API/机制 | 修改对象与时机 | 已有/未来实例 | 直接改 Class | 撤销能力 | 风险
+
+AddPrefabPostInit
+  原版登记回调，Prefab 构造结束后执行；项目 world、箱子、classified 等使用。
+  不回补现有实体；影响后续创建。自身不改类。无项目级注销入口。
+  主客机区分由回调自行处理；同名/所有 Prefab Hook 顺序需看原版分发。
+
+AddPrefabPostInitAny
+  每个 Prefab 构造完成后执行通用回调；api 的玩家聚合入口间接使用，
+  skin.lua:6901 也有直接使用。影响未来实体；不自动处理现存实体。
+  常驻全实体创建路径，筛选与工作量重要；皮肤混淆业务本轮不展开。
+
+AddComponentPostInit
+  EntityScript:AddComponent 在类构造后、挂入 components 后调用。
+  回调收到 component 实例和 entity；本项目可在实例字段上安装包装。
+  只自动覆盖以后创建的组件。无通用撤销；每实例闭包有分配成本。
+
+AddClassPostConstruct
+  注册时立即 require 类并包装 class._ctor；未来实例先构造，再 postfn。
+  技术上修改类的构造器，但 postfn 的业务目标是实例，不是共享方法表。
+  不回补旧对象；未来每个对象可持有自己的包装。无统一卸载。
+
+AddPlayerPostInit（项目版本）
+  api:94–105 用一个原版玩家入口分发 PlayerPostInitfns。
+  调用注册函数只入数组；玩家 Prefab 创建时统一执行。不是改玩家类。
+  无 Remove；pairs 分发不应被提升为严格的优先级协议。
+
+AddComponentHook
+  立即 require components/name，把类表传给 fn，立即修改共享方法。
+  方法经类查找的已有/未来实例可受影响；自有字段/旧引用可能绕过。
+  直接改类；没有自动 oldfn、注册记录、优先级、重复保护或撤销。
+
+AddClassHook
+  立即 require 指定路径、assert 返回 table，把表传给 fn。
+  与上一行相同，但路径不限定 components。断言只验证 table，不验证方法。
+
+bhook / ehook / rhook / hook
+  立即写目标 table[name]，目标可为类、实例、SG 状态等。
+  bhook：前置回调后 old；ehook：old 后回调，返回回调结果。
+  rhook：把旧返回值和参数装表交给回调；hook：有条件短路/替换返回。
+  返回 oldfn 和业务 fn，但不返回统一可注销句柄，不保证安全恢复。
+
+AddStategraphPostInit
+  原版加载 StateGraph 时应用；项目改 states、events、actionhandlers。
+  可同时接 wilson / wilson_client；不是针对每次状态进入重新注册。
+  不自动回溯改好已持有其他函数引用的对象；无项目级卸载机制。
+
+AddSimPostInit / AddLaterFn
+  前者用原版模拟初始化阶段；后者截获 TranslateStringTable 执行函数列表。
+  AddLaterFn 没有清空、执行一次标记或注销；再次调用翻译入口会再次执行。
+  它是依赖原版阶段顺序的替代接入点，不是原版“所有 Mod 加载完成”专用事件。
+
+GLOBAL / ACTIONS / ModManager / EntityScript 直接赋值
+  写哪个共享对象就改哪个对象；oldfn 完全由调用者自行保存。
+  无注册者身份或幂等控制，可能覆盖其他 Mod，也可能被后来者覆盖。
+
+up.Get / up.Set
+  递归寻找函数 upvalue，可按来源文件过滤；修改闭包内引用。
+  不受“只改当前实例”的直觉约束，多个实例可能共享同一闭包。
+  没有统一撤销；依赖私有变量名、源码结构和包装链可搜索性。
+
+userdata.MakeHook / Hook / UnHook / Call
+  把实体的 AnimState 等 userdata 暂替为 Lua 代理表，保留原 userdata。
+  Hook 指定实体即生效；支持多个 Hook、优先级、显式 UnHook、onremove 清理。
+  与普通类 Hook 完全不同；共享 Hook 对象 args/env 及重入仍需注意。
+
+以上原版机制来源：V/modutil.lua:153–175、566–599；
+V/entityscript.lua:610–645；V/mainfunctions.lua:347–391。
+
+
+8. AddComponentHook：类修改的真实影响范围
+======================================================================
+P/main/api.lua:1123–1126 只有两步：require 组件类，fn(cmp)。
+不创建组件实例，不等待组件出现，不代替 EntityScript:AddComponent。
+
+真实链：
+main/hook 加载
+  ↓ AddComponentHook("trader", callback)
+require("components/trader") 获取缓存类表
+  ↓ callback 当场保存 Trader.AcceptGift
+写 Trader.AcceptGift = wrapper
+  ↓ 原版 LoadComponent 取同一个 require 类
+Trader(entity) 创建组件 → components.trader
+  ↓ self:AcceptGift 查找类方法
+wrapper 调整特定 tag 交易参数
+  ↓ oldAcceptGift(self, giver, item, count)
+原版交易处理与返回
+
+来源：P/main/hook.lua:82–97；V/entityscript.lua:52–59、626–640。
+
+已有对象会不会变化，必须分情况：
+- 实例没有同名字段：原版 Class 通过元表查类，之后读方法会看到新方法。
+- 实例已有 self.AcceptGift = 某函数：优先命中自有字段，遮蔽新类方法。
+- 其他代码此前 local f = instance.AcceptGift：捕获旧引用，不自动更新。
+- 已创建的派生类：原版 Class(base, ...) 浅拷贝父类成员，不是动态父类链。
+  后改父类方法，不能声称所有既有派生类都同步变化。
+- 改的是构造器或字段初始化逻辑时，也不能倒推旧对象已经初始化新字段。
+
+来源：V/class.lua:28–34、83–109、181–204。
+
+oldfn 不是 AddComponentHook 保证的，是每个 callback 自己写的。
+一般组合按“实际赋值顺序”形成后装外层；没有中央排序或安全撤销。
+即使保存了旧函数，也不能无条件赋回：可能会抹掉后来其他 Mod 的包装。
+
+
+9. AddClassHook 与 AddClassPostConstruct：真实案例对照
+======================================================================
+全项目搜索确认：AddClassHook 的实际调用只有两处，且目标都是 widgets/invslot。
+因此本节给出这两处加三个 PostConstruct 对照，不虚构第三个 AddClassHook。
+
+案例 A：P/main/hook.lua:1405–1413
+  立即修改 InvSlot.TradeItem 类方法；调用期间把共享 IsTradeIteming 设 true，
+  返回后设 false。所有经该类方法查找的槽位都能使用同一包装。
+  与 P/main/containers.lua:564 的取物条件形成隐式同步调用上下文。
+
+案例 B：P/main/hook.lua:1967–1988
+  再次修改同一个 TradeItem，捕获 A 为 oldTradeItem。
+  记录当前物品到 TradeItemTemp，供 inventory_replica.GetOpenContainers 使用。
+  是共享类方法第二层 around 包装；不是创建第二种 InvSlot 类。
+
+案例 C：P/main/hook.lua:1989–2026
+  AddClassPostConstruct("components/inventory_replica")。
+  每个 replica 构造后才包装它自己的 GetOpenContainers；读取 B 的上下文。
+  不应因为路径含 components，就把它写成服务端 ComponentPostInit。
+
+案例 D：P/main/ui.lua:647–702 与 hook.lua:1493–1495
+  CraftingMenuHUD 每次构造后，按注册嵌套顺序安装实例 RebuildRecipes 包装。
+  owner、recipe cache 等适合实例私有状态。
+  原版构造器在 V/widgets/redux/craftingmenu_hud.lua:21 已调用过 RebuildRecipes；
+  这些 PostConstruct 包装不能影响那次已经执行的构造内调用。
+
+案例 E：P/main/hook.lua:1288–1312
+  PlayerHUD 构造后包装该实例 OpenSpellWheel，同时 up.Set 修改其可达闭包的
+  CloseAllChestContainerWidgets。后半部分可能影响共享原函数闭包，
+  所以“使用 PostConstruct”本身不保证副作用严格只在该实例内。
+
+适用区别：
+类修改适合无需实例私有捕获、希望复用一个包装的共同方法适配；
+实例 PostInit 适合读取 owner、安装事件、维护对象状态以及可按实体条件接入。
+类修改节省每实例包装分配，但有实例遮蔽和类继承复制边界；实例包装定位较清楚，
+但每对象创建闭包，重复初始化也可能重复包裹。
+
+
+10. main/hook.lua 的真实角色：DST Integration Map
+======================================================================
+它是集中组织玩法接入、原版行为补丁、表现适配和部分基础设施的集成层。
+不只是“兼容层”，也不是纯粹无业务含义的 Hook 库；Hook 库主要在 api 和 utils。
+
+被接入系统 | 入口/目标 | 集成职责
+World | hook:57、1751 | 安装世界组件、玩家退出事件、实体弱注册表清理线程。
+Player 生命周期 | 318、790、1035、1152、1703 | 动画扩展、userdata代理、退出/装备
+  关联、更新检查、soraitemcontrol 接入。
+生产与交互 | 82–289、323、844、863 | trader/cooker/harvestable/dryer/crop/
+  stewer、playeractionpicker、浇水与照料；以 tag/组件识别项目参与对象。
+StateGraph/Action | 338、391、556、575、930、1271、1620 | 原动作筛选、状态
+  回调和条件短路，主客机状态图分别适配。
+Inventory/Container | 971、998、1205、1314、1417、1642–1701、1989、2035 |
+  模块选择尝试、嵌套保鲜、箱子外观同步、开关箱、物品归属及快捷转移规则。
+Builder/Recipe/UI | 1019、1421–1640 | 资源图标补全、制作查询包装、UI 可用性提示。
+Combat/移动/控制 | 1041、1131、1167、1186、1243、1257、1867、1886、1937、2053 |
+  combat、locomotor、thief、孢子生成、冻结/睡眠、位面伤害、镜头/指示器、health。
+Save/资源注册 | 1216、1326 | SetPersistData 接入与额外图集资源收集。
+Farming/Regrowth | 1815、1877 | 给原版组件加能力/状态，按配置替换再生行为。
+
+Hook 不全在 hook.lua：
+- api 自己改玩家注册、翻译入口、EntityScript；
+- ui 集中改 Widget/Screen；
+- link 按其他 Mod 是否存在注册联动；
+- kleibugfix 使用同一 Hook 工具；
+- skin、moretags、utils 也会接原版对象。
+
+AST 统计的 hook.lua 活跃调用点：21 AddComponentHook、2 AddClassHook、
+10 AddComponentPostInit、4 AddClassPostConstruct、5 AddPlayerPostInit、
+9 AddPrefabPostInit、4 AddStategraphPostInit。
+这是“源码调用点数”，循环、条件会让运行时注册次数不同，不是 Hook 实例总数。
+
+
+11. 五条闭合的代表性 Hook Chain
+======================================================================
+图中先区分注册期与运行期，避免把“注册 Hook”误画成每次业务调用的一步。
+
+11.1 Builder / 全局制作：PostInit + Around + 临时实例 Monkey Patch
+
+注册期：
+main/init:167 → hook:1510 AddComponentPostInit("builder")
+  ↓ 原版 EntityScript:AddComponent 创建 Builder
+回调捕获实例 oldHasIngredients / oldGetIngredients，写入实例包装
+
+查询运行期：
+Builder 调用者 → s.HasIngredients(rec)
+  ↓ 全局制作 enable？否 → oldHasIngredients → 正常返回
+保存 inventory.Has → 临时替换它
+  ↓ 调用 oldHasIngredients
+V/components/builder.lua:918–947
+  ↓ 原版逐种材料调用 inventory:Has
+临时包装先 oldhas，再向 world.components.sorachestmanager:HasItem 查询缺口
+  ↓ 原版继续角色材料、科技材料等检查
+oldHasIngredients 返回
+  ↓ 恢复 inventory.Has
+返回制作检查结果
+
+取材运行期：
+s.GetIngredients → 临时 inventory.GetCraftingIngredient
+  ↓ oldGetIngredients，V/builder:500–515
+old 库存取材表 → Manager:GetIngredients 补足 → 回到原版材料组织
+  ↓ 恢复临时函数 → 返回材料表与折扣结果
+
+这是复用原版材料流程的适配，优点是无需整段复制 Builder。
+风险是中间的动态函数替换；并非统一事务或有保护的临界区。
+
+11.2 World / Manager 安装：Prefab PostInit
+
+注册：hook:57 AddPrefabPostInit("world", callback)
+  ↓ 原版 SpawnPrefabFromSim → world Prefab.fn 返回实例
+原版执行 world 专属 PostInit
+  ↓ callback 检查 inst.ismastersim
+inst:AddComponent("sorachestmanager" / "soraenttrack" / "soraexpsave")
+  ↓ 原版 LoadComponent → 类构造 → 挂 components → ComponentPostInit
+安装世界事件监听
+  ↓ world 实例完成后续原版创建流程
+
+这里没有被包装的 world 原函数，也没有应当补写的 oldfn 调用。
+它是“原构造之后扩展”，客户端会进入回调但在服务器分支外结束。
+来源：P/hook:57–79；V/mainfunctions:362–388；V/entityscript:626–645。
+
+11.3 Player lifecycle：玩家 PostInit 聚合 + 实体事件
+
+注册：api:94–105 保存原 AddPlayerPostInit，注册一次 DoPlayerPostInit
+  ↓ moretags、hook 等调用新的 AddPlayerPostInit，只加入内部列表
+原版创建玩家 Prefab
+  ↓ 专属 Prefab PostInit → PrefabPostInitAny
+原版玩家 tag 筛选 → DoPlayerPostInit
+  ↓ 逐个调用项目回调
+FixTag / 动画设置 / 服务端 userdata.Hook / unequip listener 等
+  ↓ 后续玩家 unequip
+tryDestroyReticule [hook:1140–1154]
+  ↓ 条件命中 → 调原版 reticule:DestroyReticule()
+
+另一个退出支路由世界持有：
+world 的 ms_playerdespawn / ms_playerdespawnandmigrate / ms_playerdespawnanddelete
+  ↓ hook:36 Onplayerdespawnanddelete
+调用组件 OnSoraSave → world soraexpsave 接口
+这只是玩家生命周期的框架挂点，本轮不继续展开保存业务。
+
+11.4 Container / Item：类包装 + Prefab 事件适配
+
+注册一：kleibugfix:75–123 → AddComponentHook("container") → 包装类 GiveItem
+注册二：hook:1669 → AddMulPrefabPostInit → 两种 bag Prefab 的 PostInit
+  ↓ 实体创建后监听 itemget/itemlose，安排首次状态刷新
+
+运行：
+某调用者 → container:GiveItem(item)
+  ↓ kleibugfix 包装检查/处理输入，正常路径调用 oldGiveItem
+V/components/container.lua:447 起原版插槽与归属处理
+  ↓ 538/547 PushEvent("itemget")
+onitemchange [hook:1655]
+  ↓ 根据 Container:IsEmpty 更新 inventoryitem.cangoincontainer
+返回容器调用路径
+
+移除运行：
+原版 RemoveItem_Internal → itemlose [V/container:1047]
+  ↓ 同一 onitemchange 重新计算
+
+已确认条件缺陷：FixContainer 配置走 else 分支时，kleibugfix:113–114 在
+只检测到 item.components.inventoryitem 后就 assert(false)，没有先判定
+它真的有多重归属。这是现有条件的行为，不宜因文件名叫“bugfix”就认为安全。
+是否走到该配置分支以及当前实际物品操作表现，需要实机验证。
+
+11.5 UI / classified：网络状态驱动原版事件 + 实例包装
+
+注册：hook:1422 的 player_classified PostInit 创建 soraglobalbuild net_bool；
+同处创建 1 秒周期任务，计算本地派生的 soraglobalbuildenable。
+  ↓ netvar dirty 或派生 enable 改变
+ingredientmoddirty
+  ↓ V/player_classified:1251 监听，fns.RefreshCrafting [571]
+parent:PushEvent("refreshcrafting")
+  ↓ V/craftingmenu_hud:129 的监听 → UpdateRecipes 标记 needtoupdate
+OnUpdate [370] → self:RebuildRecipes()
+  ↓ hook:1440/1493 的外层实例包装
+临时更改 owner.replica.inventory.Has / builder.HasIngredients
+  ↓ main/ui:682 的内层包装
+Config.recipe=true → FixRebuildRecipes；否则调用捕获的原版 RebuildRecipes
+  ↓ 外层恢复两个 replica 方法
+配方 UI 刷新
+
+原版构造内第一次 RebuildRecipes 在 PostConstruct 之前，见第 9 节。
+ui 也包装了 OnUpdate，所以运行中刷新存在其节流逻辑，不能说每次 dirty
+都立即重新构建完整 UI。这里的“可制作”是显示/点击通路的放行，真实服务端
+材料检查仍由 11.1 的 Builder 路径负责。
+
+
+12. Hook Composition：组合是写法约定，不是框架保证
+======================================================================
+假定 A、B、小穹依次给同一个对象的同一个函数做标准 around 包装，且都调用
+捕获的旧函数一次，那么：
+
+进入：Sora.before → B.before → A.before → Original
+退出：Original → A.after → B.after → Sora.after
+
+这只在同一赋值目标、同一引用链、无短路/异常时成立。
+如果 A 改类、B 改实例，小穹再改类，B 的实例字段可能遮住后一次类修改。
+如果 B 保存的是更早的旧引用，实际图也不会符合上述简单排序。
+
+原版 GetPostInitFns 按 enabledmods 和各 Mod 回调数组顺序汇集，组件回调用
+ipairs 执行（V/mods:857–876；V/entityscript:637–640）。小穹没有额外中央
+优先级机制。Prefab 和项目玩家聚合的部分分发使用 pairs，不应宣传严格优先级。
+
+真实例一：TradeItem 两层包装
+hook:1967 外层设置 TradeItemTemp
+  → hook:1405 内层设置 IsTradeIteming=true
+  → 当时捕获的 InvSlot.TradeItem
+  → 内层设 false
+  → 外层清 TradeItemTemp
+都正常返回时能闭合；任一旧函数抛错会跳过后面的清理。
+
+真实例二：ui 与 hook 的 RebuildRecipes
+ui 在 init 中先加载，其 PostConstruct 先安装实例包装。
+hook 后加载，构造器嵌套执行到它时捕获 ui 包装，成为外层。
+但 Config.recipe=true 分支直接进入 FixRebuildRecipes，不调用 ui 捕获的旧函数。
+因此已有其他 Mod 旧包装的行为也可能被这个分支绕过。
+这是已确认的替代路径；是否与特定 Mod 冲突仍需组合测试。
+
+真实例三：combat 类包装与角色实例包装
+hook:1041 改 combat.GetAttacked 类方法；1092 的 sora Prefab PostInit 再在
+角色组件实例上包一层。一般情况下实例 wrapper → 类 wrapper → 原函数；
+任一护盾短路分支都可以提前 return false。这是玩法拦截，不能叫“忘记 oldfn”。
+
+真实例四：临时 inventory.Has 可以捕获已有联动包装
+link:421–428 在特定 Mod 条件下安装角色 inventory.Has 包装。
+Builder 在调用时才读取当前 oldhas，正常能包含该包装；不能把它理解为始终
+直接调用未经修改的原版 Inventory.Has。
+
+遗漏/重复/覆盖结论：
+- 已确认有主动不调用 oldfn 的分支：FixRebuildRecipes、战斗拦截、禁再生替换。
+- 本轮追踪的 Builder/TradeItem 正常单次路径，没有发现显式把同一 oldfn 连调两次。
+  不把“可能重复”写成“已发生双调用”。
+- AddLaterFn 不清空，重复进入翻译入口会重复应用 callback；无幂等标记的
+  wrapper 可以叠多层。modimport 重执行也存在同类风险。
+- 临时恢复无 ownership 检查；调用期间若别人赋了新函数，恢复旧指针会覆盖它。
+
+userdata Hook 是局部例外：有列表和 priority，但排序后以 pairs 遍历，
+同优先级也没有稳定序契约。它的能力不能被外推成整个框架都有 Hook 管理。
+
+
+13. 临时 Monkey Patch：异常、yield、重入与恢复
+======================================================================
+确认对象：hook:1516–1535 的 inventory.Has；1544–1566 的 GetCraftingIngredient；
+1446–1458/1466–1482 的 UI replica 方法；api:666–675 的 GetPostInitFns；
+hook:1059–1067 的战斗字段；TradeItem 的共享 flag/context。
+
+共同结构：save old → assign temporary → call → restore。
+这些具体路径没有 pcall/xpcall 或 finally-like 清理保护。
+api 中存在 Pfn，不代表上述路径调用了它。
+
+场景 | 真实边界
+
+正常同步调用
+  call 正常返回就继续 restore；在没有插入其他写入时，能够恢复旧引用。
+
+call 抛出 error
+  Lua 不会自动执行后面的 restore；当前函数/字段留在临时值。
+  如果错误导致会话终止，影响终止于会话；如果外层捕获后继续运行，临时状态
+  可能持续污染后续操作。静态能确认“缺少恢复保证”，不能声称已经实机污染。
+
+yield
+  不能假设所有 DST/Lua 5.1 调用边界允许 yield；不允许时会形成错误。
+  若在允许的协程路径实际挂起，临时替换会跨越挂起期可见。
+  当前 Builder 原版片段未显示主动 yield；这是扩展/其他 Hook 插入后的风险边界。
+
+严格嵌套调用
+  内层保存外层 wrapper，正常按 LIFO 返回，可能正确恢复。
+  所以“嵌套一定破坏恢复”不成立；但内部会看到外层上下文，材料补查也可能
+  叠加语义。全局布尔 flag 直接设 true/false 不保存旧值，内层返回时能提前
+  关闭仍处于调用中的外层标记。TradeItemTemp 也不是上下文栈。
+
+其他 Hook 在 call 中修改同一字段
+  当前代码最后直接赋回 old，不检查 field 是否仍等于自己安装的 wrapper。
+  可能抹掉后来写入；Lua 单线程不能阻止回调内的重入/赋值。
+
+返回值契约
+  多处只保存 x,y,z，额外返回值会丢失；表包装返回值的 helpers 没记录 select('#',...)，
+  对尾部 nil 等也不是透明转发。现有被包装函数是否需要额外值要逐个验，
+  不能把包装器概括为“对任何 API 都透明”。
+
+范围更大的案例：
+- SoraAddComponentWithNoPostInit 暂改整个 ModManager.GetPostInitFns，期间屏蔽
+  指定组件 PostInit；其 fallback 传的是闭包 name 而非收到的 n（api:672）。
+  嵌套处理别的组件时可能错误查询回调。这也是未验证业务执行路径的接口风险。
+- hook:974 暂改 GLOBAL.require 和 package.path，恢复同样没有异常保护。
+  而 DST 创建 env 时已经把 require 复制为 env 自有字段（V/mods:313）。
+  此处紧随的裸 require("components/perishable") 通常读取 env.require，
+  不会因为写 GLOBAL.require 就自动读取新 wrapper；且 require 缓存会影响结果。
+  因而注释“禁止覆盖 perishable”不能当成已实现的保证。其他 Mod 若改 env.require
+  或模块内再次读取 GLOBAL.require，则执行路径还会不同，需要实机确认。
+
+
+14. 共享环境污染：已确认与理论风险分开
+======================================================================
+已确认的结构事实：
+1. env 与 soraenv 两个可写出口；main/ui:31 调 SoraEnv，不能把它的裸定义都
+   当成 api 所指 env 的成员。
+2. env.AddPlayerPostInit 确实被替换；这是有意的内部入口覆盖。
+3. STDUI、Widget、AddButton 等进入共享 soraenv；多个模块可直接消费它们。
+4. IsTradeIteming 在 hook 写入 env，containers 读取它；这是跨模块隐式上下文。
+5. AllInv 在 hook:1756 被替换为新弱表；Manager 通过 SoraAPI.AllInv 动态读取。
+   另一个调用者若提前 local 缓存旧表，将看到不同状态。
+6. baseapi.ThreadCheckPoint 的 LastCheck 为所有调用者共享；不是各任务独立状态。
+7. SoraEnv fallback 的 or 会丢失 env 层 false；与直接 SoraAPI 读取语义不一致。
+8. SoraAPI 同时包含工具、数据、原版 API 和世界/客户端对象，边界不由类型保证。
+
+理论风险，需要具体触发证据才能升级为故障：
+- 两个项目模块碰巧写同名函数；本轮没有证明一次已发生的意外业务覆盖。
+- 第三方 Mod 使用 GLOBAL.SoraAPI/SoraEnv 或更通用全局名字造成冲突。
+- 某自由变量拼错后恰好命中 GLOBAL 同名对象，产生更隐蔽错误。
+- 在已加载模块上替换服务对象，而 local 捕获仍持有旧对象。
+- 热重载同一模块造成 Hook 层数增加、服务/缓存分裂。
+
+这些代价不等于共享环境没有价值：大量 UI 少写重复 require，集中提供了
+一致工具和服务入口。问题在于它没有同时提供可检查的依赖契约和写入范围。
+
+
+15. 模块边界、移植与独立测试
+======================================================================
+模块 | 当前边界 | 复制到其他 Mod 的额外依赖 | 单测条件
+
+ClientDB（只看接线）
+  main/clientdb:1–2 从 env 取 MODKEY/DebugPrint；20–22 捕获 SoraAPI.hash/json；
+  工厂直接定义到 env。依赖 DST RPC、玩家/世界和调度上下文。
+  需明确 namespace、编码器、hash、transport、clock/world；单拷文件不足。
+
+MainDB（只看接线）
+  main/maindb:294–321 同样使用共享 key/hash/json 与 Shard/服务端环境。
+  工厂不是一个明确 return 出去的纯模块。需要 Shard transport、世界等适配。
+  两个 DB 的无 SoraAPI fallback 块内都重新 local function hash，遮蔽外层 hash，
+  所以“有 fallback”也不等于已证明可独立运行；这里只确认移植边界，不展开协议。
+
+sorachestmanager（只看依赖）
+  标准 require 返回组件类，但依赖 SoraAPI.json/LeakTable*、AllInv、Say 等；
+  反向向 SoraAPI 写 ChestData/UpdateAllEnts。需要世界、容器、实体调度上下文。
+  可以做局部 stub 测试，不能声称整个 Manager 已是无环境依赖的纯模块。
+
+sora3chest Prefab
+  明示 require prefabutil/manager 类；顶层 RegType 和 MakeAssetTable/皮肤登记；
+  实体创建时又依赖 TheWorld.components 中已经安装的服务。
+  需要资源约定、skin API、类型注册和世界安装四部分，复制构造函数不够。
+
+真正比较接近显式输入/输出的例子：api.hash(str)、部分表过滤；
+soraupvaluehelper 返回 {Get,Set,GetEventHandle}，接口比自动环境导出明确，
+但内部仍依赖 debug 和共享遍历状态，不是完全无副作用。
+
+测试难点不是 Lua 不能测，而是先需要提供一整组 ambient context；
+模块加载本身还会注册 Hook、启动配置读取或改全局，容易污染同进程其他测试。
+将“计算核心”与“DST 安装步骤”区分出来，比给全部代码套一层复杂测试框架更有用。
+
+
+16. Configuration：并没有一个统一配置层
+======================================================================
+必须区分四条路径：
+
+A. Mod 启动配置
+modinfo 配置值 → env.GetModConfigData
+  → 原版包装补上 env.modname [V/modutil:329–331]
+  → init:51–72 转换/钳制 → GLOBAL.TUNING.SORA*
+  → 各业务直接读 TUNING，另有 env.mode 别名
+这主要是启动期配置快照；不是玩家临时开关，也不自动跟随外部实时修改。
+mode 在 tonumber 后直接 math.ceil，若输入不是可转数字值会失败；不能因为
+后面有范围校验就认为所有无效配置都有兜底。
+
+B. getsora 懒读取
+GLOBAL.getsora(name) → TUNING.SORACONFIG 缓存 → GetModConfigData
+  → 布尔保留；其他值 tonumber 或 0 [api:633–643]
+使用 not cache[name] 判断缺失，因此 false 会重复读取；它也不能作为任意
+字符串配置读取器。Lua 中数字 0 为真，调用处若按布尔判断，需要确认选项类型。
+
+C. 本地用户偏好
+baseapi.Config → SoraConfigClass.config
+  → GetPersistentString("SoraConfig...") 加载
+  → Config:Set → DataDumper → SetPersistentString 保存
+ui 中 expui/wikiui/chestui/recipe/VisitURL 等；Movable 保存 ui_* 坐标。
+这是运行该进程的本地持久化，不是 world 存档或自动同步的玩家网络状态。
+Load 是回调式；没完成前 Get 用默认值，没有统一 ready barrier。
+
+D. soraconfig 业务数据
+scripts/soraconfig/config.lua:32–45 建列表，require sorabase/soracaneat/
+soralevelup/debug，最终 return soraconfig；Prefab sora 显式 require 它。
+但它仍写全局 mode、soraconfig，子文件如 soracaneat:34 又写该共享表。
+属于业务规则/数值数据聚合，不是把上面三类配置统一抽象起来的 Config Layer。
+
+世界运行状态另属第五种对象：TheWorld、AllInv、ChestData、实例 cache，
+以及 classified netvar/enable。它们有生命周期和网络所有权，不能因为也放表里
+就归到“配置”。UI 中某个按键既可能改本地偏好，也可能提交服务器业务请求，
+必须按具体写入链区分。
+
+
+17. 错误边界与 Debug 能力
+======================================================================
+已有能力：
+- init.DebugPrint：按 modname 是否含 dev 控制输出，处理长字符串。
+- modmain 的 sora-dev 分支：统计 env fallback 访问，GetGLOBAL 输出高频名字。
+  两者启用条件并不完全相同：一个是包含 dev，一个是特定名称 sora-dev。
+- baseapi.TimeCall/TimeRecordCall、TrackStart/Stop：耗时与 debug.sethook 跟踪。
+- api.Pfn/MakePcallFn：pcall 后打印函数源信息和错误，返回约定 fallback；
+  成功只返回捕获的一个业务值，不能当成任意多返回函数的透明包装。
+- api.TryLoadUI/TryLoadSCR：开发重载，清 package.loaded 再尝试构造。
+- api.PutTable：转储当前表和函数 debug 信息。
+- utils/upvaluehelper：按名字和文件来源查找私有引用。
+- userdatahook：打印版本加载情况、保存 Hook 描述表。
+- main/debug/main 无条件导入 track/test/cmd；test.lua:1 顶层主动 collectgarbage。
+  因此“DebugPrint 被关掉”不等于所有开发代码都未加载。
+
+原版边界：V/mods.lua:192–204 的 runmodfn 对注册回调做 xpcall，并关联 Mod 名。
+这有助于定位 PostInit 回调执行错误；但回调后来安装的方法包装在业务调用时
+不会自动因为曾在 PostInit 中创建，就永久获得这一层保护。
+而原版外层捕获也不会替项目回滚临时更改的 inventory.Has。
+
+不存在的统一能力：
+没有全框架 logger/event-id；没有“哪个模块在何时改了哪个函数”的注册历史；
+没有 API export 冲突记录；没有默认 wrapper owner/token 和撤销状态。
+GetDebugString 即使在具体业务组件中存在，也不是框架层的 Hook 溯源接口。
+
+排查应从当前函数 debug.getinfo 开始，核对实例自有字段和类方法，再沿捕获的
+oldfn/upvalue 查链，并对照 init 注册顺序。不能单看搜索到的最后一个定义。
+
+局部工具也有边界：TrackStart/Stop 保存全局旧值但没有嵌套与所有权保护；
+拖动 UI 的 MoveHandler 在 StopFollowMouse 移除，没有在该 helper 内确认 Kill/
+onremove 兜底。拖动中销毁 UI 的完整清理需实机或专门生命周期测试，不能由弱表
+直接推出全局输入监听一定被释放。
+
+
+18. 兼容性：有检测，也有强侵入
+======================================================================
+实际使用的兼容办法：
+1. tag / component existence：trader 的 soratrader、thief 的 soracontainlock、
+   freezable 的 inventory 等，只在有对应能力时启用特殊逻辑。
+2. function / field detection：PlayerHUD 的 OpenSpellWheel 和 upvalue 找不到
+   就 return；inventory_replica 针对 IsReadOnlyContainer 缺失留分支。
+3. mod presence：IsModEnable 检查加载列表中的目录和显示名；IsMythEnable 做多个
+   名称匹配；link 按功能勋章等有条件安装包装。
+4. config/capability：检测 gemrun 后禁用全局制作 UI 部分；检测 SMART_SIGN_DRAW_ENABLE
+   避免重复补图集；HTTP API 缺失才提供 fallback。
+5. 版本协调：userdatahook.currentversion=4，若 GLOBAL.UserDataHook 版本 >=4，
+   直接返回已有实现；这是该工具的版本协议，不是整个 SoraFramework 版本协商。
+
+主要脆弱点：
+- up.Get/Set 依赖 COMPONENT_ACTIONS、CloseAllChestContainerWidgets 等私有名字。
+  来源过滤能减少误取，但原版重命名/重构后仍可能失效。
+- 类上目标方法不总有存在性检查；AddClassHook 的 table assert 不能代替检查。
+- recipe/UI 替代实现和 stategraph actionhandler 修改绑定当前原版内部结构。
+- 固定 Prefab 清单、固定皮肤名、角色 tag、固定管理员规则是业务耦合。
+- perishable 的 require/path 尝试依赖 Lua loader 和缓存，且入口引用可能绕过。
+- 名称识别使用 string.match，是模式匹配；不是所有传入字符串都等价于字面匹配。
+- GLOBAL/EntityScript/ModManager 修改跨出本 Mod 私有范围，其他 Mod 也能改同处。
+
+额外的真实条件性缺陷：kleibugfix:156–168 的 AddLaterFn 回调，在 t[v] 存在时
+尝试 v[v] = function，其中 v 来自字符串列表。若该分支命中，这是写字符串的
+错误，不能因“加了 if t[v]”就认为能力检测完整。是否命中取决于实际取出的
+原版 handler 表，不在未执行情况下宣布启动必崩。
+
+未发现整个框架统一以 DST build version 分流。现有防御主要是 tag、字段、
+Mod 名称和局部版本判断。文件叫 kleibugfix 也不构成原版兼容正确性的证据。
+
+
+19. Sora Framework Dependency Graph
+======================================================================
+图例：[E] 显式加载/调用依赖；[I] 隐式环境/服务字段依赖；[H] 运行时 Hook。
+箭头表示左侧发起加载、使用或改写右侧，标签说明关系，避免混为单向分层图。
+
+DST CreateEnvironment
+  └─[E]→ modmain → init
+                    ├─[E]→ baseapi → Config / timing / weak tables
+                    ├─[E]→ soraenv → UI classes / sorastdui
+                    ├─[E]→ api → up / json / userdata
+                    ├─[E]→ DB init / skinapi / containers / ui
+                    └─[E]→ hook / link / kleibugfix
+
+soraenv ─[I fallback]→ env ─[I fallback]→ GLOBAL / DST APIs
+    └───────────────[I raw fallback]────────────→ GLOBAL
+GLOBAL.SoraAPI ─[alias]→ env
+GLOBAL.SoraEnv ─[setfenv]→ caller 使用 soraenv
+
+ui / widgets ─[I]→ soraenv 的 Widget/helpers
+ui / widgets ─[I]→ env.Config / SoraRPC / SeedCDB
+DB modules ─[I]→ env.MODKEY / DebugPrint / hash / json / DST runtime
+Manager ─[I]→ SoraAPI.LeakTable* / AllInv / json / Say
+Prefab ─[E]→ require Manager class；─[I]→ SoraAPI 资源/皮肤服务
+
+hook ─[H]→ DST World/Player/Component/Widget/SG/Action
+hook ─[I runtime]→ World.components.Manager
+hook ─[export]→ env.AllInv
+Manager ─[export]→ env.ChestData / UpdateAllEnts
+DB init ─[export]→ env 中的 DB 服务
+containers ─[export]→ env.container_params
+ui ─[H]→ CraftingMenuHUD ←[H]─ hook
+
+实际存在的循环与阶段依赖：
+- soraenv 定义 UI helper，helper 运行时又调用以后 api 才提供的函数。
+- api.FixPlacerSkin 运行时调用以后 skinapi 才定义的 GetSkin。
+- api.SoraMakeWidgetMovable 运行时访问以后更新入口才提供的 SoraUpdate。
+- hook 安装 Manager，Manager 读取 hook 提供的 AllInv，双方通过不同阶段解开。
+- 业务模块既消费 SoraAPI，又向它反向写入服务，API 不是只向下提供工具的底层。
+
+这些主要是运行期/注册期循环，不一定是 require 的循环加载错误。
+正确理解方式是同时维护“模块求值图”和“运行时服务可用图”。
+
+
+20. 架构评价：价值与代价
+======================================================================
+作者为什么建立 SoraEnv：从大量 Widget 不再逐个 require 公共类、统一读取配置
+和工具的实际结构，可以推断其目标是减少样板、加快模块接入。此处是由代码
+推断的设计动机，不冒充作者本人说明。
+
+为什么建立 SoraAPI：require 的组件/Prefab 通常不在 modmain 环境，GLOBAL.SoraAPI
+把 Mod 环境能力桥接给这些文件；显式 SoraAPI.Name 至少让“来自项目能力”的
+来源比完全裸变量更可见，也允许后续业务向同一入口添加服务。
+
+减少了什么重复：
+- 五个 UI 样本只保留一处 require，其余共同类与 helper 由一次初始化供应。
+- AddComponentHook 的 21 个 hook.lua 调用点复用“加载类再执行修改”的步骤。
+- 玩家 PostInit 从多个原版全实体 tag 检查入口聚合为一个入口再分发。
+- MakeAssetTable 统一一组资源声明与图集登记；CD、可移动 UI、json/hash 跨模块复用。
+没有基线实现或历史 diff，不能给出“减少多少百分比/多少行代码”的可靠数字。
+
+它如何支撑规模：
+统一加载顺序 + 随处可访问的公共工具/服务 + 原版多种扩展点 + 集中集成文件。
+以 186 个 Lua 文件为背景，这是有效的项目组织方法。
+
+代价：
+- 新模块的前置条件隐含在环境与阶段里；只看文件头不知道依赖全貌。
+- 工具、状态、注册器、业务规则共享同一出口；权限与层次靠开发者约定。
+- Hook 组合、安全恢复和卸载契约不统一，规模增长后更难定位冲突。
+- global/class patch 把局部修改放到更广的生命周期；重载和独立测试难度增加。
+- 弱表/缓存/临时上下文各自维护，缺少服务生命周期与调试清单。
+
+模式判断：E，多种模式的混合。
+  Framework：有明确 bootstrap、公共 helpers 和 DST 接入组织。
+  Service Locator：SoraAPI.SoraRPC、SeedCDB、Config 等按名称取服务。
+  Shared Namespace：env/soraenv/GLOBAL 可写，隐式供给能力。
+  Convenience Library：CD、资源表、UI helper、表工具。
+  业务适配层：hook/ui/link 的具体玩法接入。
+不能因为它能支撑大型项目就把每个机制评为最佳实践，也不能因共享环境就否认
+它确实减少了重复工作。
+
+
+21. Mod Framework Pattern
+======================================================================
+问题：多个 DST 子系统反复需要工具、资源约定、配置与原版接入，散写会难以维护。
+
+目标：提供可复用能力与确定的安装阶段，让业务专注自身状态和流程。
+
+Bootstrap：显式列出初始化顺序，区分定义阶段、注册阶段、world/player/UI 实例阶段。
+Environment：确定哪些变量属于模块局部、项目命名空间、DST 全局；读取规则应一致。
+API Surface：只公布确实跨模块使用的接口，业务数据出口和纯工具应能区分。
+Dependency：加载依赖与运行期服务依赖分别声明，不把延迟可用对象当加载期常量。
+Extension：按明确路径提供服务/注册类型；同名写入应可追踪。
+Hook：优先原版扩展点；需要包装时注明 before/after/around/replace 及返回契约。
+Configuration：分启动配置、业务规则、本地偏好；世界/玩家运行状态另归生命周期。
+Lifecycle：服务跟 world/player/widget 所有者绑定；任务、监听和可撤销 patch 有清理。
+Error Boundary：安装失败与业务调用失败分开；临时修改必须有恢复策略，不能仅吞错。
+Compatibility：用能力检测与最窄作用域适配，私有 upvalue 接入单独列为脆弱边界。
+Testing：纯计算可独立测；DST 接线用最小替身；Host/远程/专服和多 Mod 要实机验收。
+Debugging：能列出服务来源、当前 Hook 目标、包装 owner、依赖缺失与启用条件。
+
+优点：减少重复、统一接入约定、便于跨系统协作和定位共同问题。
+缺点：共享入口若无限扩大，会把所有模块连成隐式依赖网络；patch 易互相覆盖。
+适用项目规模：多个业务系统、多种 UI/组件、长期迭代的中大型 Mod。
+不适用场景：几项简单 Prefab 就能完成的功能，不应先建设庞大框架；独立纯工具也
+不应被迫依赖 TheWorld 和 UI 初始化。
+
+这个 Pattern 保留“统一能力和安装阶段”的思想，不要求复刻 setfenv 或整张 env 导出。
+
+
+22. Framework 2.0：只做架构建议，不修改实现
+======================================================================
+22.1 【原项目已有且值得保留】
+- 显式启动清单；模块定义与实体 PostInit 的阶段分离。
+- 公共 helpers 与标准资源约定，避免每个业务重新写一遍。
+- 普通玩法逻辑尽量用原版 Component/Prefab/Widget 扩展点。
+- 类方法包装可以减少每实例重复分配，但必须明确适用边界。
+- 玩家回调聚合思路；但需要保留清晰的注册顺序与回调身份。
+- userdata Hook 的实体所有权、显式 UnHook、onremove 清理和版本协调。
+- upvalue 查找带来源过滤，以及“功能不存在就跳过”的若干兼容分支。
+
+22.2 【应该收紧】
+
+事项 | 对应实际问题 | 轻量改进
+显式依赖 | SeedCDB 顶层捕获、阶段不透明 | 公共纯模块 local require；服务在构造
+  参数或明确 GetService 时获取；必要处 assert 给出模块名与缺失服务。
+共享出口 | SoraAPI=env 暴露所有内容 | 独立小表分 Utils/Services/UI/Config，先收紧
+  新模块，不必一次迁移 186 个文件。只暴露经过确认的跨模块能力。
+Hook ownership | 恢复可能覆盖后来者 | 保存 owner、target、name、old、wrapper；
+  撤销前检查当前引用仍属自己。已被别人包进中间层时报告不可直接摘除，
+  不假装一次赋回 old 能安全移除所有位置的 Hook。
+Safe cleanup | 临时 inventory 方法异常未恢复 | 同步不 yield 的作用域使用受保护调用，
+  无论成功失败都先恢复，再保留错误堆栈向上报告；正确保留返回值数量。
+  Lua 5.1 受保护调用和 yield 有限制，不能把一个 xpcall helper 用遍所有协程。
+可重入上下文 | TradeItem 布尔/单槽临时表 | 保存旧上下文或使用深度/小栈；按需要
+  限定到玩家/实例，不引入异步全局锁。
+配置 | false 缓存、转换散落、偏好混用 | 启动配置统一转换校验；与本地 Preference
+  对象分开，显式区分 nil 缺失；不把世界状态塞回配置表。
+幂等安装 | AddLaterFn 可重复包裹 | 安装 id 与一次性阶段标记；必要时允许显式重装。
+诊断 | 无法看覆盖来源 | Debug 下维护小型 Hook Registry，记录源位置、条件、
+  target、当前引用是否被别人替换；服务重复注册默认报清晰诊断。
+
+22.3 【应该拆分】
+- protocol-independent utilities：hash/表工具/纯计算脱离 RPC、TheWorld 与 UI。
+- preferences/persistence：Config 的存储 IO 与普通 Get/Set 分开，便于替身测试。
+- UI toolkit：Widget/helper/拖动工具明确返回模块表，输入监听清理由 widget 生命周期
+  负责，避免只靠弱引用期望清理。
+- business integrations：Gift、绑定/名单/伤害等退出通用 api；按 inventory、builder、
+  player、UI 等目标拆 hook 安装模块，中央 bootstrap 只负责顺序和开关。
+- fragile adapters：upvalue、GLOBAL loader、原版私有函数改写单列，随 DST 更新重点查。
+
+22.4 【不值得复杂化】
+- 不必建设带反射、自动扫描、复杂生命周期注解的 DI 容器；普通 Lua 参数足够。
+- 不必为每个 helper 注册服务；只有跨模块共享且有生命周期的对象才值得 Registry。
+- 不必给全部方法增加运行时检查/追踪；Debug 开关与安装时检查更便宜。
+- 不必给所有 Hook 套统一事件总线；原版 PostInit 和简单 local old 包装仍有用途。
+- 不必承诺跨任意 Mod 的自动优先级解决与任意中间层热卸载，那通常做不到。
+- 不必为了整齐一次性重写全部业务或转换纯数据表；风险大于当前收益。
+
+建议的验证重点：正常返回、抛错、尾 nil/多返回、同步重入、重复安装、其他 Mod
+先后包装、类方法与实例方法并存、widget 构造内调用、world/player 重新建立。
+这些是针对本次已找到边界的测试方向，不是本轮已经执行的实机测试。
+
+
+23. 新的大型 DST Mod 应不应该复刻 SoraEnv？三种方案比较
+======================================================================
+本节不给用户代选，也不把“纯显式依赖”说成完全消除 DST 的 GLOBAL。
+TheWorld、实体生命周期、RPC 和资源 API 仍需要通过游戏环境或适配层取得。
+
+方案 A：继续使用类似 SoraEnv 的共享环境
+优点：调用简短；大量 UI 共享类/工具方便；与本项目现有文件写法贴近；
+      熟悉加载顺序的小团队能较快继续开发。
+缺点：自由变量和服务阶段难看清；setfenv 写入范围容易混淆；多表 fallback、
+      false 值、全局命名、测试隔离与热重载需要额外约束。
+迁移成本：从当前项目迁移最低，但修正规则后仍需审查现有隐式读写；
+          新项目也要承担这套环境工具与约定的长期维护成本。
+适合规模/条件：UI 密集、单团队维护、明确统一 loader 且愿意维护依赖文档的项目。
+选择条件：能接受环境绑定，以开发便利为主，并对共享写入/导出建立明确规则。
+不建议原样继承的细节：false fallback、两张表无意混用、SoraAPI=完整 env、
+                      无来源/重复检查。采用 A 不等于必须照搬这些细节。
+
+方案 B：完全显式 require / module dependency
+优点：文件头与构造参数能表达依赖；静态搜索、迁移和局部测试容易；导出面清楚；
+      原版 UI 文件本身就大量采用 local require，这与 DST 的写法相容。
+缺点：重复 import 较多；world/player 服务的生命周期不能只靠 require 缓存处理；
+      不加区分地把服务也做全局 module singleton，仍会产生旧对象和循环依赖。
+迁移成本：从当前项目最高，需要整理自由变量、显式 exports、构造参数与阶段。
+          新项目可从一开始采用，成本主要是编写适配/接线代码。
+适合规模/条件：强调独立模块、多人协作、工具共享、自动测试的中大型项目；
+              小项目也适用，不必为了采用它建设复杂框架。
+选择条件：希望依赖尽量在代码中可见，愿意承担明确传参和接线成本。
+
+方案 C：明确模块依赖 + 小范围共享 Service/API Registry
+优点：纯工具和类显式 require；World/Player 等运行期服务有统一查找和来源记录；
+      不需要让每个底层函数都接一大串参数，也不把整个 env 开放。
+缺点：仍有一部分服务定位的隐式性；Registry 若不限制范围，会再次变成大杂烩；
+      要约定服务 ready、替换、销毁与作用域，增加少量维护成本。
+迁移成本：通常居中，可逐模块迁移；旧入口暂适配到新服务表时需要防止双重状态。
+          新项目需要设计一份很小的服务目录与启动顺序。
+适合规模/条件：业务系统较多，又同时需要可测试工具和 world/player 运行期服务。
+选择条件：愿意维护有限服务契约，同时保留实际开发中的便利入口。
+
+规模本身不足以决定方案：
+更关键的是模块需要独立复用到什么程度、谁维护加载顺序、是否多人协作、
+是否频繁热重载/独立测试，以及团队愿意承担多少隐式约定。
+本项目的证据支持“统一能力与接入阶段值得学习”，不支持“必须复刻 setfenv”。
+
+
+24. 仍需验证的边界与本轮停止点
+======================================================================
+- Host/远程/专服：UI/classified、SoraRPC/SeedCDB 的实际 ready 时刻与重建行为。
+- 指定多 Mod 组合：实例遮蔽、加载排序、RebuildRecipes 替代分支是否绕过他人能力。
+- 异常恢复：在受控环境注入错误，观察临时方法/上下文是否残留及外层错误处理行为。
+- 热重载/重复初始化：AddLaterFn、modimport、PostConstruct 是否重复叠加。
+- Widget 拖动中销毁、世界重建：输入句柄、任务与缓存引用的实际清理。
+- 私有 upvalue 随游戏更新的可达性，以及条件性兼容分支实际是否命中。
+- 未启用/未调用辅助 API 的运行情况，不能用语法解析替代行为验证。
+
+本轮已经还原加载、环境查找、API 组成、Hook 机制与代表性调用链，给出框架
+价值、限制和三种设计方案的选择条件；不继续深入 DB、物流、装备或角色业务。
+参考项目保持原样。
+[Public release note: this is a redacted derivative of the frozen local report. Original bytes and local filesystem paths are withheld; evidence conclusions and source line numbering above are retained.]

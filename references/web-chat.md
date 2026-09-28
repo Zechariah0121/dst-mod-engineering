@@ -14,19 +14,19 @@
 
 ## 下载哪一份
 
-所有产物位于 GitHub 的 [dist/web 目录](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/dist/web)。下表直链可保存为对应文件名；Markdown 在浏览器中显示为文本时保存文本内容，不要把 GitHub 的 HTML 文件页面当作资料上传。普通聊天按任务选 **一份**阅读材料即可；无需先装 Git。
+所有产物位于 GitHub 的 [dist/web 目录](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dist/web)。下表直链可保存为对应文件名；Markdown 在浏览器中显示为文本时保存文本内容，不要把 GitHub 的 HTML 文件页面当作资料上传。普通聊天按任务选 **一份**阅读材料即可；无需先装 Git。
 
 | 文件 | 使用场景 |
 |---|---|
-| [web-starter.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-starter.md) | 不确定从哪开始：通用入口、能力确认和材料选择 |
-| [web-code-review.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-code-review.md) | 代码审查、确定故障修复与验证 |
-| [web-networking.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-networking.md) | 主客机同步、RPC、UI、生命周期 |
-| [web-assets.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-assets.md) | 贴图、动画、音效与工具准备 |
-| [web-worldgen.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-worldgen.md) | 世界生成与空间判定 |
-| [web-full.md](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-full.md) | 可选完整阅读版；不是首次使用的默认选项 |
-| [dst-mod-engineering.skill.zip](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/dst-mod-engineering.skill.zip) | 原生技能导入器使用的完整目录包，**不是插件 ZIP** |
-| [web-reading.zip](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/web-reading.zip) | 一次取得阅读资料与本机回传模板；先在本机解压，再按任务选择上传 |
-| [bundle-index.json](https://raw.githubusercontent.com/zhuchengguang317-eng/dst-mod-engineering/main/dist/web/bundle-index.json) | 核对来源指纹、源文件与产物哈希；阅读 ZIP 内另附 `reading-index.json`，原生技能 ZIP 的文件哈希在此索引中核对 |
+| [web-starter.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-starter.md) | 不确定从哪开始：通用入口、能力确认和材料选择 |
+| [web-code-review.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-code-review.md) | 代码审查、确定故障修复与验证 |
+| [web-networking.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-networking.md) | 主客机同步、RPC、UI、生命周期 |
+| [web-assets.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-assets.md) | 贴图、动画、音效与工具准备 |
+| [web-worldgen.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-worldgen.md) | 世界生成与空间判定 |
+| [web-full.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-full.md) | 可选完整阅读版；不是首次使用的默认选项 |
+| [dst-mod-engineering.skill.zip](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/dst-mod-engineering.skill.zip) | 原生技能导入器使用的完整目录包，**不是插件 ZIP** |
+| [web-reading.zip](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-reading.zip) | 一次取得阅读资料与本机回传模板；先在本机解压，再按任务选择上传 |
+| [bundle-index.json](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/bundle-index.json) | 核对来源指纹、源文件与产物哈希；阅读 ZIP 内另附 `reading-index.json`，原生技能 ZIP 的文件哈希在此索引中核对 |
 
 专题阅读版各自带必要的共同说明，不必再叠加 starter 或 full。它们由仓库源文档生成；反馈或更新仍回到源文件，不维护另一套技术正文。记录本次所用资料的来源指纹，同一任务换版本后重新确认差异。
 

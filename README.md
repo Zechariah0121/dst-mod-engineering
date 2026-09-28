@@ -2,7 +2,7 @@
 
 面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能：用当前游戏源码核对实现，区分真实故障与玩法决策，并为修复保留可复核的验证证据。
 
-[![Checks](https://github.com/zhuchengguang317-eng/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/zhuchengguang317-eng/dst-mod-engineering/actions/workflows/ci.yml)
+[![Checks](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 适用于新功能、代码审查、崩溃排错、联机同步、存档生命周期、资源制作和发布前验证。可以作为支持 `SKILL.md` 的 AI 编程工具的技能，也可以直接阅读专题文档、单独运行辅助脚本。
@@ -11,15 +11,32 @@
 
 | 入口 | 用途 |
 |---|---|
-| [SKILL.md](SKILL.md) | 工作流程、关键约束、22 篇专题的按需导航 |
+| [SKILL.md](SKILL.md) | 工作流程、关键约束、制作专题和知识检索的按需导航 |
+| [dst-engineering-kb/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dst-engineering-kb/) | v0.1.1 公开派生知识库：64 条知识、来源、纠错、决策与测试候选 |
+| [dst-kb-service/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dst-kb-service/) | 可选的本地只读 MCP 检索服务，含 7 个工具和配置示例 |
 | [references/](references/) | Lua / Hook、Prefab / Component、RPC / Replica、动作 / UI、存档、战斗、物品、世界生成、动画、音频与测试 |
 | [scripts/dst_zip_tool.py](scripts/dst_zip_tool.py) | 直接检索安装版 `scripts.zip`，不依赖旧解压缓存 |
 | [scripts/check_api.py](scripts/check_api.py) | Lua 语法检查与组件 / replica 方法声明核对 |
 | [scripts/dst_modtest.py](scripts/dst_modtest.py) | Windows 离线单分片专服测试，使用唯一副本、明确完成标记和证据清单 |
 | [scripts/build_web_bundle.py](scripts/build_web_bundle.py) | 自动生成网页资料包，并检查与源文件的一致性 |
-| [tests/](https://github.com/zhuchengguang317-eng/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
+| [tests/](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/tests) | 源码仓库中的自造夹具回归，不要求安装游戏 |
 
 技能可独立使用，不需要安装历史 `dst-mod-development` 或 `dst-mod-devkit`。现有旧技能不会被本仓库自动覆盖。
+
+## Skill 与知识库一起使用
+
+Skill 决定什么时候检索和如何使用证据，知识库保存可追溯的工程经验，服务负责按需检索。设计、实现、审查、排错和案例研究按不同模式查询；简单机械修改无需重复加载知识库。当前项目与对应版本的原版源码仍须核对。
+
+| 需求 | 获取方式 |
+|---|---|
+| 完整本地 Agent 接入 | 克隆仓库，加载 Skill，再按 [服务指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 配置可选 MCP |
+| 只阅读知识 | 从 [知识索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) 按 ID、领域和关系阅读 |
+| 网页端分析 | 下载仓库 ZIP 后，选择相关知识和专题上传；不会自动连接本机服务 |
+| 仅安装 Skill | 使用下方技能 ZIP；它包含检索策略，不包含知识库、检索服务或游戏源码 |
+
+64 条知识来自单一参考案例及限定的原版快照，模式和规则仍是候选；11 项游戏测试候选均未执行，不能当作实机验证。公开包保留第三方案例署名、符号和经过脱敏的分析证据，不包含私人 Mod 内容、本机真实路径或游戏/Mod 原源码。它与本机冻结资料不是字节相同的副本；脱敏说明与源/公开哈希映射见 [PUBLICATION-PROVENANCE.json](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/PUBLICATION-PROVENANCE.json)。
+
+检索与实际任务示例见 [知识库使用说明](docs/knowledge-integration.md)。MCP 是可选能力：不可用时可以读取实际可访问的知识文件，或继续查当前源码，并准确说明本次没有检索到什么。
 
 料理、法术、自定义数值、角色外观、装备手持、GIF 动画和 FMOD 音效的旧专项流程已核验并并入本技能，按入口导航读取即可，无需同时安装旧专项技能。旧项目的配色、数值、绝对路径和固定同步目录不作为通用默认。各旧名称的内容去向见 [整合记录](docs/consolidation.md)。
 
@@ -29,18 +46,18 @@
 
 | 用法 | 下载 |
 |---|---|
-| 平台提供原生“上传技能”入口 | [技能 ZIP](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，内含单一 `dst-mod-engineering/` 根目录；它不是插件安装包 |
-| 普通聊天，先确认材料和能力 | [入门 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
-| 代码审查 / 修复 | [代码审查 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
-| 联机 / 存档 / UI | [联机 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
-| 贴图 / 动画 / 音频工具 | [资源 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
-| 世界生成 / 空间判定 | [世界生成 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
-| 下载全部专题后自行选择 | [网页资料 ZIP](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip)，解压后只上传本次需要的 Markdown |
-| 明确需要全部文档且平台容量允许 | [完整 Markdown](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+| 平台提供原生“上传技能”入口 | [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，内含单一 `dst-mod-engineering/` 根目录；它不是插件安装包 |
+| 普通聊天，先确认材料和能力 | [入门 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
+| 代码审查 / 修复 | [代码审查 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
+| 联机 / 存档 / UI | [联机 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
+| 贴图 / 动画 / 音频工具 | [资源 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
+| 世界生成 / 空间判定 | [世界生成 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
+| 下载全部专题后自行选择 | [网页资料 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip)，解压后只上传本次需要的 Markdown |
+| 明确需要全部文档且平台容量允许 | [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
 
 通常选择一份专题即可，其中已包含共同入口。ZIP 作为普通附件上传，不代表平台一定会解压或注册技能；无法读取时改传单个 Markdown。若 Markdown 不被接受，可按指南分段粘贴必要文本。
 
-平台的账号、工作区、上传和代码执行能力各不相同。资料包没有游戏源码或动画程序，也不会给予网页 AI 本机访问权限。需要本机编译或游戏测试时使用 [本机验证交接单](templates/local-validation.md)，把真实结果交回网页 AI 复核。各包的源文件指纹和输出哈希见 [bundle-index.json](https://github.com/zhuchengguang317-eng/dst-mod-engineering/raw/refs/heads/main/dist/web/bundle-index.json)。
+平台的账号、工作区、上传和代码执行能力各不相同。资料包没有游戏源码或动画程序，也不会给予网页 AI 本机访问权限。需要本机编译或游戏测试时使用 [本机验证交接单](templates/local-validation.md)，把真实结果交回网页 AI 复核。各包的源文件指纹和输出哈希见 [bundle-index.json](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/bundle-index.json)。
 
 ## 安装技能
 
@@ -53,7 +70,7 @@ $skills = Join-Path $env:USERPROFILE '.agents/skills'
 $destination = Join-Path $skills 'dst-mod-engineering'
 if (Test-Path -LiteralPath $destination) { throw '目标已存在；请先核对和保存本地修改。' }
 New-Item -ItemType Directory -Path $skills -Force | Out-Null
-git clone https://github.com/zhuchengguang317-eng/dst-mod-engineering.git $destination
+git clone https://github.com/Zechariah0121/dst-mod-engineering.git $destination
 if ($LASTEXITCODE -ne 0) { throw '技能克隆失败，请检查 Git 输出。' }
 ```
 

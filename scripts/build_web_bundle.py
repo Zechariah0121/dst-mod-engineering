@@ -14,7 +14,7 @@ from urllib.parse import quote, unquote, urlsplit, urlunsplit
 import zipfile
 
 NAME = 'dst-mod-engineering'
-REPOSITORY = 'https://github.com/zhuchengguang317-eng/dst-mod-engineering'
+REPOSITORY = 'https://github.com/Zechariah0121/dst-mod-engineering'
 GENERATOR = 'dst-mod-engineering/web-bundle-v1'
 INDEX = 'bundle-index.json'
 LOCAL_ONLY_MARKER = '<!-- local-only -->'
@@ -102,7 +102,7 @@ def public_link(target, source):
         raise ValueError(f'Link escapes repository in {source}: {target}')
     kind = 'tree' if path in DIRECTORIES or raw.split('#')[0].split('?')[0].endswith('/') else 'blob'
     encoded = quote(path, safe='/.-_')
-    rewritten = urlunsplit(('https', 'github.com', f'/zhuchengguang317-eng/{NAME}/{kind}/main/{encoded}',
+    rewritten = urlunsplit(('https', 'github.com', f'/Zechariah0121/{NAME}/{kind}/main/{encoded}',
                             parsed.query, parsed.fragment))
     return '<' + rewritten + '>' if wrapped else rewritten
 

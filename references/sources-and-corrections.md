@@ -4,7 +4,7 @@
 
 同日继续核验七份专项技能：新增料理、法术、自定义数值、角色 build、装备 swap、帧序列动画和 FMOD 音频，包含旧法术模板与装备清单。内容按任务并入本技能，不再要求加载任何旧 DST 技能；逐项去向见 [整合记录](../docs/consolidation.md)。旧项目的私人素材与游戏缓存只留在本地归档，不纳入公开许可和分发包。
 
-旧 devkit 的测试工具注明来源 [zhuchengguang317-eng/dst-modtest](https://github.com/zhuchengguang317-eng/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
+旧 devkit 的测试工具注明来源 [Zechariah0121/dst-modtest](https://github.com/Zechariah0121/dst-modtest)，文件桥注明受 [lw-0x4eb1a/dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting) 启发。本次没有把旧工具视为可靠黑箱：新工具重新实现直接 ZIP 读取、保守 AST 声明检查与隔离专服测试，不依赖共享响应文件。这里保留来源说明，不把第三方名字当作验证证据。
 
 技术事实优先核对合法安装的游戏与官方 Mod Tools；本仓库不分发它们的源码、资源或二进制。工具与参数的公开参考包括 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)、[Klei 专服命令行说明](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/) 和 [FFmpeg 滤镜文档](https://ffmpeg.org/ffmpeg-filters.html)。具体调用以当前安装版本的帮助和相关游戏实现为准。
 

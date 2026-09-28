@@ -2,11 +2,12 @@
   "generator": "dst-mod-engineering/web-bundle-v1",
   "inputs": {
     "LICENSE": "e5cf5589dd260cad1532b3ee5495ef253c4d08c473568d0740ff5383b3baa1e9",
-    "README.md": "a254b61d68db587e15a5b3b2b49f7e1ddfc436e79f1d32c396373c7e5cc0aca2",
-    "SKILL.md": "70dc759c800d9216b9c65346404c9eb7f0de69ea6dd687cc6ef92476af2ad020",
+    "README.md": "6cb8595c9b41b63e430f34177613d6196d04b4c2bc041e387dc3a4db030c788b",
+    "SKILL.md": "22f5d3f69fc8293718ff8a4a4492a8f6c8e8be8eb914f4b9c4a4454b33801168",
     "docs/consolidation.md": "3cb2d75872eace520c2a25a4a9bf7d03d05f5fbbbb47fc06bac60ebdf2d57cf7",
-    "docs/validation.md": "1bf96a45afc9197c2e7e64f5f7bf4f9b08071d597794ca49e6f7fe5fdcb4c376",
-    "references/agent-setup.md": "ec36b27a128d37b0ae2c3e01042d882cf6749313f5b2fc81cbe119f941352d02",
+    "docs/knowledge-integration.md": "cf1bb5604dbb34388d6f6413a315731f600728cd3268c886af5c74801c326764",
+    "docs/validation.md": "968cb8c5219babd31101a19bc82ed40e3b1568e7213ee6c02f712aa55a97b8f5",
+    "references/agent-setup.md": "a4425418d9c8aaacc29312e6cea1a2608691a8d397bbd07aac830919d056f084",
     "references/animation-recipes.md": "39a5122b5a3225b7e9fa0078eeb79bcfd83df01637b399f259a088a8ae3515ae",
     "references/assets-animation.md": "a11bae29e483c56d6d692d7754a81e701a1bf159a5ee5d9da2b2b281908ee2bb",
     "references/audio-particles.md": "a048ef2322416221a87717ede339f3e3fcf19f2e368c4f7a648c53e6d972a2b0",
@@ -19,17 +20,19 @@
     "references/entities-components.md": "fc02c099b51c5be036980feb1b57938f200c4b64c4198520ead800c8eef9918a",
     "references/environment-tools.md": "60b3e8d4de0bc2207bf89513d37b711db896f40f058902afae1cb70f3a51a071",
     "references/items-food-plants.md": "52dc5f24f5c5b94d03089837d69094d1e246564e0541053cda32af92262415be",
+    "references/kb-retrieval.md": "77fdd063fd56b05df8b86ace8dc54de06294f9977031a3bf9d3b03e1eb7227bd",
     "references/lifecycle-save.md": "94c7ddc7e2a294fc2650e42797fbee1a2051a3a3f170f11c218cd4402fd137fb",
     "references/networking-rpc.md": "0cea2f07b471708f091215b419b73dfe21859c7f8579fb909967fe26853f2848",
-    "references/sources-and-corrections.md": "2befdd9320ff25af275fddf370531ef637b900ae1d3ef98e32194f8242410432",
+    "references/sources-and-corrections.md": "1ff5356a3d09e8ea2af07f9c55cba75b95759645cb2a228642174f5ec7cca6f0",
     "references/spells-and-custom-stats.md": "2c7e56534b8a8893baac5fd13b32534c80044cf9c9b45b1215be1f93071a147e",
     "references/testing-release.md": "c679890aeeba7bde47c963d0ddbdc1adb10e6fc3ad245436eca6fb815b119b95",
     "references/tool-bootstrap.md": "f4b48414ae2e2c5fd6c2e5824976e98aaf0ec81c6edb00978ead752afa57e7dd",
     "references/ui-actions-controls.md": "83a2b5d424ce557339b5a48329f2792a8ed9e53f60d436f65d353f0e8def86c2",
-    "references/web-chat.md": "4bbb84e551c992ba4825137d7ef1e70e9863b9a4a2b85a687a4b5ce8c790a294",
+    "references/web-chat.md": "188d87de54fff9ede6cd449dc24a70d2e8fb8db16993b5e47616d6621d3740e9",
     "references/worldgen-spatial.md": "a007921c4c23575c1866053961522b665fd8d0d648e22503c5bf6d39662dc622",
     "requirements.txt": "95cd8e888f3bc38de1eba3f9eef53b09b642e53cfc279bf595290b85d154c46d",
-    "scripts/build_web_bundle.py": "0b349c45450a873315d86703c7aad466cbd3e5512e192c2b07439c1ad15330d7",
+    "scripts/build_public_kb.py": "499590b19345a29f4770f166f6a186c358fbdc6abab89830e27eb3fb792b062c",
+    "scripts/build_web_bundle.py": "3b983a31fe3574bc8d2cb51ea2ff0054826c43e9ee4d7137dc954a9ce34c4ec6",
     "scripts/check_api.py": "5e1e51286aa1cda4b992394a5d7df89b05808398cbbba219a15f6f3fbc60b4c5",
     "scripts/dst_modtest.py": "196c0fbced6de385e51fad0ec3a34461c88b4b4aeee23539bd37490bda1b17f5",
     "scripts/dst_zip_tool.py": "3a8a2f26b47b08b25907ba5eb71d428b6bc0e9fa896e294e68d99ee6ae00b068",
@@ -37,36 +40,36 @@
   },
   "outputs": {
     "dst-mod-engineering.skill.zip": {
-      "sha256": "7cc6cb9d6320cc50e08eeaea657e605814f0b0fd2aa700dc2f8285f485f485b7",
-      "size": 304795
+      "sha256": "095777bc514d68fc84f55384aaa5b6206256495a96e7acd99e3ced3d037e98b4",
+      "size": 336078
     },
     "web-assets.md": {
-      "sha256": "4590a8515cfe97d83fee77b8174b9413da17a3b8dcc2a37a05133806c0769cff",
-      "size": 110685
+      "sha256": "57caa289974c3e26d8b49e18c83b92d59227c9bdeff98a03e4ec20f493ffdb70",
+      "size": 110877
     },
     "web-code-review.md": {
-      "sha256": "cf95d5f7b98e8c858ba300bc7e95d40f933905200b153e0bdbb3b653f9cad5d8",
-      "size": 110933
+      "sha256": "5a1ca42efc3a48e9ca38c0060b3a399f6ffed57c12dccdf009253d622fe6541f",
+      "size": 111111
     },
     "web-full.md": {
-      "sha256": "c3b44c7fca5bb49fd3521b4868e339f8a72945924776f1cb8c8f5d194947ad58",
-      "size": 275978
+      "sha256": "2517b9652937e76eac411a63e90dc18161e02c4b546712d9b920743b75d704dd",
+      "size": 290799
     },
     "web-networking.md": {
-      "sha256": "ae2c2d9ad0405d51f84244de2ca5678f370ae78a888d7679ca05afaff6ba8946",
-      "size": 95418
+      "sha256": "c46da60e70adaa36a2e1c18687bf44c99762ad3c9643cdc2139814955324a379",
+      "size": 95638
     },
     "web-reading.zip": {
-      "sha256": "2ebeba41990ee93f1f55d9b6e0e5c982eb918880dbb8bfc498c2f9df88fb43a2",
-      "size": 741962
+      "sha256": "39e77ae28a43f7da5d7308a560f27dd0c7ff9a2781b4c4e49bbae32336a8f90f",
+      "size": 758358
     },
     "web-starter.md": {
-      "sha256": "dbb8fda5b0388321490c9675b9c8505bcfb18a02c5e32fd0f1a66ff24a5af165",
-      "size": 68014
+      "sha256": "e59a42f05d81c60fd9e1ba9fd751d39442fb7bfa4f83c0d3c5e0a97f5118bb12",
+      "size": 68276
     },
     "web-worldgen.md": {
-      "sha256": "f36ea42cc8d822095ba2fcc402ffc6d31b365b7211a3e527b9c1574fef581717",
-      "size": 69280
+      "sha256": "d20d160c61cfea35f264439ecb9bedc544c18602af8a76c09341d3b4714433be",
+      "size": 69619
     }
   },
   "profiles": {
@@ -103,6 +106,7 @@
       "references/testing-release.md",
       "README.md",
       "docs/consolidation.md",
+      "docs/knowledge-integration.md",
       "docs/validation.md",
       "references/agent-setup.md",
       "references/animation-recipes.md",
@@ -116,6 +120,7 @@
       "references/dst-mod-tool.md",
       "references/entities-components.md",
       "references/items-food-plants.md",
+      "references/kb-retrieval.md",
       "references/lifecycle-save.md",
       "references/networking-rpc.md",
       "references/sources-and-corrections.md",
@@ -158,5 +163,5 @@
       "LICENSE"
     ]
   },
-  "source_fingerprint": "51869d02d57f9c98754c0895e77590cf8f44d2dc016cff99cc98ad0a6db3ee34"
+  "source_fingerprint": "b6ce90bf22202a2dbcff3a25513270a89339ec8b9fc3ee3d282aa0f8a6f07ded"
 }

@@ -1,0 +1,6699 @@
+{
+  "schema_version": "0.1.1",
+  "kb_title": "DST Engineering Knowledge Base v0.1.1",
+  "extraction": "Case Study 001 Initial Extraction",
+  "created_at": "2026-09-28",
+  "entries": [
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-001",
+      "title": "EntityScript 组件持久化遍历",
+      "summary": "保存遍历 components 中提供 OnSave 的对象；加载按组件键寻找当前对象并调用 OnLoad。对象不必因由 AddComponent 创建才获调用。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "1903–1980；GetPersistData / SetPersistData",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "entityscript.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "entityscript.lua",
+              "symbol": "GetPersistData"
+            },
+            {
+              "type": "source_symbol",
+              "file": "entityscript.lua",
+              "symbol": "SetPersistData"
+            },
+            {
+              "type": "source_lines",
+              "file": "entityscript.lua",
+              "start_line": 1903,
+              "end_line": 1980
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7.1–7.2",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7.1–7.2"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "EntityScript 组件持久化遍历",
+        "observed_behaviour": "保存遍历 components 中提供 OnSave 的对象；加载按组件键寻找当前对象并调用 OnLoad。对象不必因由 AddComponent 创建才获调用。",
+        "source_file": [
+          "vanilla-snapshot/scripts/entityscript.lua"
+        ],
+        "relevant_function": "GetPersistData / SetPersistData",
+        "source_locator": "1903–1980",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "手工挂入的服务对象可参与世界保存，但应遵守这些函数契约。",
+        "do_not_infer": "不能推出组件加载有任意依赖顺序、任意对象都适合伪装成组件，或自动完成引用修复。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-002",
+      "title": "Container 的物品存档",
+      "summary": "有效且可持久化的槽位物品以 GetSaveRecord 记录；加载通过 SpawnSaveRecord 重建并 GiveItem 到槽位。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "979–1007；OnSave / OnLoad",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/container.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/container.lua",
+              "symbol": "OnSave"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/container.lua",
+              "symbol": "OnLoad"
+            },
+            {
+              "type": "source_lines",
+              "file": "components/container.lua",
+              "start_line": 979,
+              "end_line": 1007
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "16",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "Container 的物品存档",
+        "observed_behaviour": "有效且可持久化的槽位物品以 GetSaveRecord 记录；加载通过 SpawnSaveRecord 重建并 GiveItem 到槽位。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/container.lua"
+        ],
+        "relevant_function": "OnSave / OnLoad",
+        "source_locator": "979–1007",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "真实物品可沿原版容器保存，注册表不必重复保存同一批物品。",
+        "do_not_infer": "不能推出所有 runtime metadata、暂停/进度或玩家选择都自动保存。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-003",
+      "title": "Builder 查询与消耗边界",
+      "summary": "检查、形成材料实体分配表、消耗分别在不同函数中；普通库存产品分支先 SpawnPrefab，后 RemoveIngredients，再交付，manufactured 分支不同。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "500–583；657–755；HasIngredients / GetIngredients / RemoveIngredients / DoBuild",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/builder.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/builder.lua",
+              "symbol": "HasIngredients"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/builder.lua",
+              "symbol": "GetIngredients"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/builder.lua",
+              "symbol": "RemoveIngredients"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/builder.lua",
+              "symbol": "DoBuild"
+            },
+            {
+              "type": "source_lines",
+              "file": "components/builder.lua",
+              "start_line": 500,
+              "end_line": 583
+            },
+            {
+              "type": "source_lines",
+              "file": "components/builder.lua",
+              "start_line": 657,
+              "end_line": 755
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "9–11",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "9–11"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "Builder 查询与消耗边界",
+        "observed_behaviour": "检查、形成材料实体分配表、消耗分别在不同函数中；普通库存产品分支先 SpawnPrefab，后 RemoveIngredients，再交付，manufactured 分支不同。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/builder.lua"
+        ],
+        "relevant_function": "HasIngredients / GetIngredients / RemoveIngredients / DoBuild",
+        "source_locator": "500–583；657–755",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "新增材料来源必须匹配原版分配表及真实执行顺序。",
+        "do_not_infer": "不能推出查询即预留、整个过程是事务，或所有配方都先生成产物。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources",
+          "world"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-004",
+      "title": "InventoryItem 的 Owner 清理",
+      "summary": "物品销毁时，若仍有 owner，按其 Inventory 或 Container 移除该物品，并发送世界 forgetinventoryitem 事件。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "478–491；OnRemoveEntity",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/inventoryitem.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/inventoryitem.lua",
+              "symbol": "OnRemoveEntity"
+            },
+            {
+              "type": "source_lines",
+              "file": "components/inventoryitem.lua",
+              "start_line": 478,
+              "end_line": 491
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.2",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.2"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "InventoryItem 的 Owner 清理",
+        "observed_behaviour": "物品销毁时，若仍有 owner，按其 Inventory 或 Container 移除该物品，并发送世界 forgetinventoryitem 事件。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/inventoryitem.lua"
+        ],
+        "relevant_function": "OnRemoveEntity",
+        "source_locator": "478–491",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "物品所有权清理与管理器索引清理是两项不同职责。",
+        "do_not_infer": "不能推出失效引用会被任意业务缓存自动删除。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-005",
+      "title": "Stackable 拆分",
+      "summary": "堆叠拆分会产生分离物品并调整原堆叠数量；数量可由 Stackable 自身保存/恢复。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "88–109 起；Get / SetStackSize / OnSave / OnLoad",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/stackable.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/stackable.lua",
+              "symbol": "Get"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/stackable.lua",
+              "symbol": "SetStackSize"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/stackable.lua",
+              "symbol": "OnSave"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/stackable.lua",
+              "symbol": "OnLoad"
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.2",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.2"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "Stackable 拆分",
+        "observed_behaviour": "堆叠拆分会产生分离物品并调整原堆叠数量；数量可由 Stackable 自身保存/恢复。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/stackable.lua"
+        ],
+        "relevant_function": "Get / SetStackSize / OnSave / OnLoad",
+        "source_locator": "88–109 起",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "查询者引用一个 Stack 不代表获得独占权；消耗者须对照拆分行为。",
+        "do_not_infer": "不能推出跨容器/跨玩家分配自动去重，也不能认为拆分是一项跨系统事务。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-006",
+      "title": "Mod RPC / Shard RPC 的 Lua 边界",
+      "summary": "Lua 包装校验已注册的 namespace/id，并把参数交给 TheNet；Shard 接收回调被放入 RPC_Shard_Queue。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "1881–1893；1943–1953；SendModRPCToServer / SendModRPCToClient / SendModRPCToShard / HandleShardModRPC",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "networkclientrpc.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "networkclientrpc.lua",
+              "symbol": "SendModRPCToServer"
+            },
+            {
+              "type": "source_symbol",
+              "file": "networkclientrpc.lua",
+              "symbol": "SendModRPCToClient"
+            },
+            {
+              "type": "source_symbol",
+              "file": "networkclientrpc.lua",
+              "symbol": "SendModRPCToShard"
+            },
+            {
+              "type": "source_symbol",
+              "file": "networkclientrpc.lua",
+              "symbol": "HandleShardModRPC"
+            },
+            {
+              "type": "source_lines",
+              "file": "networkclientrpc.lua",
+              "start_line": 1881,
+              "end_line": 1893
+            },
+            {
+              "type": "source_lines",
+              "file": "networkclientrpc.lua",
+              "start_line": 1943,
+              "end_line": 1953
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4.1；6",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4.1；6"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "Mod RPC / Shard RPC 的 Lua 边界",
+        "observed_behaviour": "Lua 包装校验已注册的 namespace/id，并把参数交给 TheNet；Shard 接收回调被放入 RPC_Shard_Queue。",
+        "source_file": [
+          "vanilla-snapshot/scripts/networkclientrpc.lua"
+        ],
+        "relevant_function": "SendModRPCToServer / SendModRPCToClient / SendModRPCToShard / HandleShardModRPC",
+        "source_locator": "1881–1893；1943–1953",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "可把业务编码/路由与传输边界分开记录。",
+        "do_not_infer": "不能从这些 Lua 包装推出可靠投递、恰好一次、业务 ACK、事务或自动补偿。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "shard"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-007",
+      "title": "Prefab / Component / Class PostInit 时机",
+      "summary": "Prefab PostInit 在构造后应用；Component PostInit 在组件构造并挂入后应用；Class PostConstruct 包装构造器影响后续实例。不是注册时遍历回补旧实例。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "modutil:153–175,566–599；entityscript:610–645；mainfunctions:347–391；AddPrefabPostInit / AddComponentPostInit / AddClassPostConstruct / AddComponent / SpawnPrefab",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "modutil.lua"
+            },
+            {
+              "type": "file",
+              "file": "entityscript.lua"
+            },
+            {
+              "type": "file",
+              "file": "mainfunctions.lua"
+            },
+            {
+              "type": "source_lines",
+              "file": "modutil.lua",
+              "start_line": 153,
+              "end_line": 175
+            },
+            {
+              "type": "source_lines",
+              "file": "modutil.lua",
+              "start_line": 566,
+              "end_line": 599
+            },
+            {
+              "type": "source_lines",
+              "file": "entityscript.lua",
+              "start_line": 610,
+              "end_line": 645
+            },
+            {
+              "type": "source_lines",
+              "file": "mainfunctions.lua",
+              "start_line": 347,
+              "end_line": 391
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R5",
+          "locator": "7 Hook Mechanism Table；原版定位列表",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7 Hook Mechanism Table；原版定位列表"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "Prefab / Component / Class PostInit 时机",
+        "observed_behaviour": "Prefab PostInit 在构造后应用；Component PostInit 在组件构造并挂入后应用；Class PostConstruct 包装构造器影响后续实例。不是注册时遍历回补旧实例。",
+        "source_file": [
+          "vanilla-snapshot/scripts/modutil.lua",
+          "vanilla-snapshot/scripts/entityscript.lua",
+          "vanilla-snapshot/scripts/mainfunctions.lua"
+        ],
+        "relevant_function": "AddPrefabPostInit / AddComponentPostInit / AddClassPostConstruct / AddComponent / SpawnPrefab",
+        "source_locator": "modutil:153–175,566–599；entityscript:610–645；mainfunctions:347–391",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "需区分模块加载、注册回调、实体产生三个时点。",
+        "do_not_infer": "不能推出回调自动只在 Server 运行、任意回调顺序稳定，或存在通用自动卸载接口。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-008",
+      "title": "实体删除与组件单独卸载不同",
+      "summary": "Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "648 起；1705–1726；Remove / RemoveComponent",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "entityscript.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "entityscript.lua",
+              "symbol": "Remove"
+            },
+            {
+              "type": "source_symbol",
+              "file": "entityscript.lua",
+              "symbol": "RemoveComponent"
+            },
+            {
+              "type": "source_lines",
+              "file": "entityscript.lua",
+              "start_line": 1705,
+              "end_line": 1726
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R4",
+          "locator": "13 注销、重复注册与清理",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13 注销、重复注册与清理"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "实体删除与组件单独卸载不同",
+        "observed_behaviour": "Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。",
+        "source_file": [
+          "vanilla-snapshot/scripts/entityscript.lua"
+        ],
+        "relevant_function": "Remove / RemoveComponent",
+        "source_locator": "648 起；1705–1726",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "卸载回调应使用自身引用，不能假定 inst.components[name] 仍在；长命 Owner 的任务不会随短命业务对象自动取消。",
+        "do_not_infer": "不能把完整世界销毁的清理外推为任意独立服务注销均安全。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-009",
+      "title": "原版制作 Host / Remote 汇合",
+      "summary": "有服务端 builder 的本地对象可直接调用；远程端经 PlayerController 和原版 RPC 到服务端 Builder，预测路径还涉及 BufferedAction。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "builder_replica:424；playercontroller:5709；networkclientrpc:937；MakeRecipeFromMenu / RemoteMakeRecipeFromMenu / RPC.MakeRecipeFromMenu",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/builder_replica.lua"
+            },
+            {
+              "type": "file",
+              "file": "components/playercontroller.lua"
+            },
+            {
+              "type": "file",
+              "file": "networkclientrpc.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/builder_replica.lua",
+              "symbol": "MakeRecipeFromMenu"
+            },
+            {
+              "type": "source_lines",
+              "file": "components/builder_replica.lua",
+              "start_line": 424
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/playercontroller.lua",
+              "symbol": "RemoteMakeRecipeFromMenu"
+            },
+            {
+              "type": "source_lines",
+              "file": "components/playercontroller.lua",
+              "start_line": 5709
+            },
+            {
+              "type": "source_symbol",
+              "file": "networkclientrpc.lua",
+              "symbol": "RPC.MakeRecipeFromMenu"
+            },
+            {
+              "type": "source_lines",
+              "file": "networkclientrpc.lua",
+              "start_line": 937
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "9",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "原版制作 Host / Remote 汇合",
+        "observed_behaviour": "有服务端 builder 的本地对象可直接调用；远程端经 PlayerController 和原版 RPC 到服务端 Builder，预测路径还涉及 BufferedAction。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/builder_replica.lua",
+          "vanilla-snapshot/scripts/components/playercontroller.lua",
+          "vanilla-snapshot/scripts/networkclientrpc.lua"
+        ],
+        "relevant_function": "MakeRecipeFromMenu / RemoteMakeRecipeFromMenu / RPC.MakeRecipeFromMenu",
+        "source_locator": "builder_replica:424；playercontroller:5709；networkclientrpc:937",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "有现成原版业务协议时，可以扩展它而不另造 Mod RPC。",
+        "do_not_infer": "不能把该分支外推为所有 Host 业务都会绕开 RPC。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "source_fact",
+      "id": "FACT-DST-010",
+      "title": "原版材料来源与堆叠移除",
+      "summary": "GetCraftingIngredient 先查合规打开容器，再主槽、overflow、active；RemoveItem 对部分堆叠请求可先走 Stackable:Get，再进行常规来源搜索。",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "KLEI-LOCAL-20260928",
+          "role": "direct_evidence",
+          "locator": "1697 起；1390 起；GetCraftingIngredient / RemoveItem",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "components/inventory.lua"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/inventory.lua",
+              "symbol": "GetCraftingIngredient"
+            },
+            {
+              "type": "source_symbol",
+              "file": "components/inventory.lua",
+              "symbol": "RemoveItem"
+            }
+          ],
+          "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "10–11",
+          "note": "",
+          "role": "supplementary_interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "10–11"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ARP-DST-001"
+      ],
+      "status": "supported_by_klei",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "api_mechanism": "原版材料来源与堆叠移除",
+        "observed_behaviour": "GetCraftingIngredient 先查合规打开容器，再主槽、overflow、active；RemoveItem 对部分堆叠请求可先走 Stackable:Get，再进行常规来源搜索。",
+        "source_file": [
+          "vanilla-snapshot/scripts/components/inventory.lua"
+        ],
+        "relevant_function": "GetCraftingIngredient / RemoveItem",
+        "source_locator": "1697 起；1390 起",
+        "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+        "implication": "扩展来源时必须按实体身份去重，并审查原版与新来源的访问规则。",
+        "do_not_infer": "不能推出 Inventory API 自动验证额外 Provider 的所有权或与它合并资源预算。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "pattern",
+      "id": "PATTERN-NET-001",
+      "title": "Player Business Channel",
+      "summary": "用玩家绑定的业务通道集中路由意图；服务端生成 View，客户端保存可重建 Cache。",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "3–6；8–9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3–6；8–9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-006",
+        "FACT-DST-009",
+        "RULE-NET-001",
+        "RULE-NET-002",
+        "RULE-STATE-002",
+        "ANTI-NET-001",
+        "ANTI-LIFE-001",
+        "DECISION-NET-001",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "TEST-LIFE-001",
+        "TEST-NET-003"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Player Business Channel",
+        "category": "network",
+        "problem": "多个玩家 UI 各自重复定义 RPC、身份路由和缓存更新，容易混淆请求与权威结果。",
+        "context": "多个相关业务需要玩家级命令和定向视图；原版 Action/Replica 不能完整承载额外视图。",
+        "forces": [
+          "Host 快路径与远程验证一致",
+          "请求意图与状态同步不同",
+          "每玩家隔离与广播成本",
+          "断线时资源释放"
+        ],
+        "core_idea": "用玩家绑定的业务通道集中路由意图；服务端生成 View，客户端保存可重建 Cache。",
+        "structure": "Widget → Client Service → Transport → Identity/Business Adapter → State Owner；Owner notification → View → Cache → Widget",
+        "state_ownership": "Owner 保存真实业务状态；View 可是函数映射；Client Cache 和展示均为派生。",
+        "authority": "引擎玩家身份进入 Handler；业务仍校验参数、权限和当前状态。",
+        "lifecycle": "认证/连接创建绑定，玩家生成关联，退出解除监听并取消属于绑定的任务。",
+        "networking": "可用统一 RPC 分发业务命令；netvar/原版 Action 不应因引入通道而全部替换。",
+        "persistence": "保存业务 Owner；视图与客户端缓存通常由登录同步重建。",
+        "performance": "按业务/玩家裁剪更新；完整快照与键级更新需分别计算成本。",
+        "benefits": [
+          "身份与路由复用",
+          "同一视图供多个界面使用"
+        ],
+        "costs": [
+          "通道成为额外协议",
+          "初始化和生命周期责任增加"
+        ],
+        "failure_modes": [
+          "Host 验证旁路",
+          "缓存误当权威",
+          "无 ACK 却按已完成反馈",
+          "长命任务泄漏"
+        ],
+        "use_when": "多个 UI/业务确有玩家视图与统一路由需求。",
+        "avoid_when": "一个已有原版 Action 已完整解决的按钮；纯本地视觉。",
+        "implementation_notes": "命令与通知分开命名；业务 Handler 返回可解释结果；只在需要时加入请求关联与超时。",
+        "dst_klei_basis": [
+          "FACT-DST-006",
+          "FACT-DST-009"
+        ],
+        "case_evidence": "REPORT-R6 §3–6：ClientDB 的 seed 模板、BindRootFn、GetSeeds/CollectAllSeeds；Host 直调与 Remote 路由并存。",
+        "counter_evidence": "同一案例的全局制作只用统一业务通道传开关，真正制作走原版 RPC；不是所有交互都需要通道。",
+        "related_rules": [
+          "RULE-NET-001",
+          "RULE-NET-002",
+          "RULE-STATE-002"
+        ],
+        "related_anti_patterns": [
+          "ANTI-NET-001",
+          "ANTI-LIFE-001"
+        ],
+        "related_decision_trees": [
+          "DECISION-NET-001"
+        ],
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "pattern",
+      "id": "PATTERN-SHARD-001",
+      "title": "Shard Service Bus",
+      "summary": "把 Shard transport、服务路由和业务协议聚合；将 authority、复制与恢复作为显式契约。",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "6–7",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "6–7"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-006",
+        "FACT-DST-001",
+        "RULE-SHARD-001",
+        "RULE-STATE-001",
+        "RULE-STATE-004",
+        "ANTI-SHARD-001",
+        "ANTI-SHARD-002",
+        "DECISION-SHARD-001",
+        "TEST-SHARD-001",
+        "TEST-LIFE-002",
+        "TEST-SHARD-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Shard Service Bus",
+        "category": "shard",
+        "problem": "多个世界要交流共享业务状态或请求，散落的 Shard RPC 缺少统一路由和恢复语义。",
+        "context": "共享状态确实超出单世界；必须先决定其唯一/多写权威。",
+        "forces": [
+          "离线与重连",
+          "完整值与操作命令",
+          "消息顺序",
+          "共享稀缺资源正确性"
+        ],
+        "core_idea": "把 Shard transport、服务路由和业务协议聚合；将 authority、复制与恢复作为显式契约。",
+        "structure": "Local Business → Shard Service → Transport → Remote Service → Authority/Replica；Persistence 跟随 Owner",
+        "state_ownership": "区分真实权威、可写副本、只读缓存；不要仅凭 DB 名称决定。",
+        "authority": "由业务明确指定；总线本身不自动产生唯一权威。",
+        "lifecycle": "世界创建服务；连接完成恢复协商；断开处理未完成工作；世界退出释放任务/引用。",
+        "networking": "Shard RPC 可承载命令、事件或快照；每种有各自版本、幂等和恢复需求。",
+        "persistence": "明确每 Shard 保存什么，以及副本重载后向谁收敛。",
+        "performance": "按变化同步与按需快照；大桶完整复制可能扩大流量和冲突域。",
+        "benefits": [
+          "收敛通信入口",
+          "统一诊断和协议边界"
+        ],
+        "costs": [
+          "协议与恢复复杂度",
+          "需要跨 Shard 测试"
+        ],
+        "failure_modes": [
+          "覆盖更新",
+          "失联后旧副本继续写",
+          "没有恢复来源",
+          "实体转换与账本不同步"
+        ],
+        "use_when": "业务真的需要跨世界共享/协调。",
+        "avoid_when": "当前世界注册表或本地容器查询；原版已满足的迁移数据。",
+        "implementation_notes": "先列不变量，再选择单写命令或其他一致性方案；revision/epoch 不是无条件必加清单。",
+        "dst_klei_basis": [
+          "FACT-DST-006",
+          "FACT-DST-001"
+        ],
+        "case_evidence": "REPORT-R6 §6–7：SeedDB/MainDB 的 Set 完整值广播、世界持久化、noSyn=1 与任务条件缺陷。",
+        "counter_evidence": "该案例证明总线存在，也证明它不自动保证库存一致性；Case B 全局制作不需要该层。",
+        "related_rules": [
+          "RULE-SHARD-001",
+          "RULE-STATE-001",
+          "RULE-STATE-004"
+        ],
+        "related_anti_patterns": [
+          "ANTI-SHARD-001",
+          "ANTI-SHARD-002"
+        ],
+        "related_decision_trees": [
+          "DECISION-SHARD-001"
+        ],
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "pattern",
+      "id": "PATTERN-WORLD-001",
+      "title": "World Manager",
+      "summary": "集中维护成员关系与跨实体协调，保留实体自身的真实状态和生命周期。",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "world"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R4",
+          "locator": "3–8；12–15",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3–8；12–15"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "10–11",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "10–11"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-002",
+        "FACT-DST-008",
+        "FACT-DST-010",
+        "RULE-WORLD-001",
+        "RULE-WORLD-002",
+        "RULE-PERSIST-001",
+        "RULE-RESOURCE-001",
+        "ANTI-RESOURCE-001",
+        "ANTI-WORLD-001",
+        "DECISION-STATE-OWNER-001",
+        "TEST-LIFE-001",
+        "TEST-LIFE-002",
+        "TEST-LIFE-003",
+        "TEST-RESOURCE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "World Manager",
+        "category": "world",
+        "problem": "多个实体需要共享查询、预算或调度，逐实体扫描造成重复工作和分散生命周期。",
+        "context": "协作范围是一个 World，实体仍有各自 Component 状态。",
+        "forces": [
+          "注册与实体存在期一致",
+          "查询实时性与索引成本",
+          "局部行为与集中调度边界"
+        ],
+        "core_idea": "集中维护成员关系与跨实体协调，保留实体自身的真实状态和生命周期。",
+        "structure": "Prefab/Component → Registry；Consumer → Query → registered entities；Events/Tasks → Coordination",
+        "state_ownership": "Registry/派生索引归 Manager；真实物品、生命、单体计时等仍归相应实体组件。",
+        "authority": "需要权威 gameplay 的 Manager 放服务器世界；客户端只复制必要结果。",
+        "lifecycle": "World 创建 → 类型/实例注册 → 事件/调度 → 注销；重复注册和独立卸载需明确。",
+        "networking": "不必有 Replica；只在客户端确需 Manager 状态时定义最小视图。",
+        "persistence": "实体真实数据保存；能从重建实体恢复的 Registry 通常不独立保存。",
+        "performance": "候选缓存不等于数量索引；活跃集合/分批处理须以实际工作量选择。",
+        "benefits": [
+          "减少重复发现",
+          "集中查询契约",
+          "跨实体工作可统一计量"
+        ],
+        "costs": [
+          "注册和失效管理",
+          "集中层可能增长过度"
+        ],
+        "failure_modes": [
+          "失效引用",
+          "重复注册",
+          "遗漏 cleanup",
+          "Query 与资源占用混为一谈"
+        ],
+        "use_when": "确有跨实体配额、查询或协同调度。",
+        "avoid_when": "单体自足行为；为整齐把所有实体逻辑移进一个巨型对象。",
+        "implementation_notes": "优先显式注册、有效性检查和可观测计数；有性能证据再升级索引/任务队列。",
+        "dst_klei_basis": [
+          "FACT-DST-002",
+          "FACT-DST-008",
+          "FACT-DST-010"
+        ],
+        "case_evidence": "REPORT-R4 §3–8、12–15；REPORT-R6 §10–11：sorachestmanager 的 RegType/RegByType、候选缓存、HasItem/GetIngredients。",
+        "counter_evidence": "案例仍有注册表全遍历和空间检测；未测 10/100/1000 箱性能；不能称为恒定时间或证明 God Object 已发生。",
+        "related_rules": [
+          "RULE-WORLD-001",
+          "RULE-WORLD-002",
+          "RULE-PERSIST-001",
+          "RULE-RESOURCE-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-RESOURCE-001",
+          "ANTI-WORLD-001"
+        ],
+        "related_decision_trees": [
+          "DECISION-STATE-OWNER-001"
+        ],
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "pattern",
+      "id": "PATTERN-FRAMEWORK-001",
+      "title": "Mod Framework / Integration Layer",
+      "summary": "用显式启动阶段、有限服务出口和可追踪适配器连接业务与原版。",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "framework"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "1–14；20–24",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "1–14；20–24"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "13–14",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13–14"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-007",
+        "FACT-DST-008",
+        "RULE-HOOK-001",
+        "RULE-HOOK-002",
+        "RULE-HOOK-003",
+        "RULE-FRAMEWORK-001",
+        "ANTI-HOOK-001",
+        "ANTI-HOOK-002",
+        "ANTI-FRAMEWORK-001",
+        "DECISION-HOOK-001",
+        "TEST-NET-002",
+        "TEST-HOOK-001",
+        "TEST-HOOK-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Mod Framework / Integration Layer",
+        "category": "framework",
+        "problem": "大型 Mod 多模块需要接入原版生命周期与共享能力，隐式顺序和补丁叠加容易失控。",
+        "context": "模块数量和接入点已经使显式组织有收益；不意味着要另建通用框架产品。",
+        "forces": [
+          "加载期与运行期分离",
+          "接口可追溯",
+          "最窄 Hook 作用域",
+          "多 Mod 共存"
+        ],
+        "core_idea": "用显式启动阶段、有限服务出口和可追踪适配器连接业务与原版。",
+        "structure": "Bootstrap → Services → Registration；Vanilla Lifecycle → Adapter → Business → State Owner",
+        "state_ownership": "业务状态归业务 Owner；框架只拥有注册信息、适配上下文和自身生命周期。",
+        "authority": "框架不能代替业务做资源/身份决策；Hook 作用域需明确实例或共享类。",
+        "lifecycle": "区分注册与执行；设计重入、重复初始化、卸载和错误恢复。",
+        "networking": "复用原版 Action/Replica/传输；仅对真实缺口建立适配。",
+        "persistence": "不自动保存环境表或函数；持久化由业务数据 schema 决定。",
+        "performance": "检查全实体 PostInit 成本、每实例闭包、共享 hook 链和频繁运行的包装。",
+        "benefits": [
+          "接入位置集中",
+          "依赖可定位",
+          "复用原版行为"
+        ],
+        "costs": [
+          "包装链复杂",
+          "环境隐式依赖",
+          "版本敏感私有接口"
+        ],
+        "failure_modes": [
+          "临时补丁未恢复",
+          "覆盖别人的 Hook",
+          "共享命名冲突",
+          "过期私有 upvalue"
+        ],
+        "use_when": "多模块、多原版接入点，需要清晰启动和兼容边界。",
+        "avoid_when": "少量自足 Prefab；无需引入共享可写环境才能完成的普通模块。",
+        "implementation_notes": "显式模块导出优先；共享服务应有限且可查；私有 Patch 需能力检测和失败降级。",
+        "dst_klei_basis": [
+          "FACT-DST-007",
+          "FACT-DST-008"
+        ],
+        "case_evidence": "REPORT-R5 §1–14、20–24：SoraEnv/SoraAPI/多种 Hook；REPORT-R6 §13–14 展示两业务组合。",
+        "counter_evidence": "案例不是统一注册/卸载框架；局部 Hook helper 的能力不能推成全项目通用保证。",
+        "related_rules": [
+          "RULE-HOOK-001",
+          "RULE-HOOK-002",
+          "RULE-HOOK-003",
+          "RULE-FRAMEWORK-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-HOOK-001",
+          "ANTI-HOOK-002",
+          "ANTI-FRAMEWORK-001"
+        ],
+        "related_decision_trees": [
+          "DECISION-HOOK-001"
+        ],
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-NET-001",
+      "title": "Client 提交 Intent，服务端决定权威数量/材料。",
+      "summary": "Client 提交 Intent，服务端决定权威数量/材料。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4–5；9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4–5；9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "Client 提交 Intent，服务端决定权威数量/材料。",
+        "why": "伪造最终余额会跳过合法性检查。",
+        "applies_when": "客户端请求影响 gameplay。",
+        "does_not_mean": "不要求所有操作自建 RPC；可复用原版 Action/Builder/Replica。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "4–5；9",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "4–5；9"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：纯本地光效可由客户端决定。",
+        "failure_if_violated": "客户端越权设置结果。",
+        "detection_questions": [
+          "谁根据当前真实状态计算结果？"
+        ],
+        "related_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-NET-001"
+        ],
+        "origin_round6_rule": 1,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-STATE-001",
+      "title": "每个状态写清“相对于谁权威”。",
+      "summary": "每个状态写清“相对于谁权威”。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "3；7",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3；7"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "每个状态写清“相对于谁权威”。",
+        "why": "客户端权威边界不等于 Shard 间一致性。",
+        "applies_when": "多端或多分片状态。",
+        "does_not_mean": "不是所有数据都需要主世界集中持有。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "3；7",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "3；7"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：互不共享的每世界天气配置可各自权威。",
+        "failure_if_violated": "把多个可写副本误当唯一账本。",
+        "detection_questions": [
+          "谁能写？离线副本还能写吗？"
+        ],
+        "related_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-SHARD-002"
+        ],
+        "origin_round6_rule": 2,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-002"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-STATE-002",
+      "title": "分别记录 Owner、Server View、Client Cache 和 Display。",
+      "summary": "分别记录 Owner、Server View、Client Cache 和 Display。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "3；5",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3；5"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-FRAMEWORK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "分别记录 Owner、Server View、Client Cache 和 Display。",
+        "why": "相同键名不代表相同存储职责。",
+        "applies_when": "有映射/缓存/界面的业务。",
+        "does_not_mean": "不是强迫每层各建一个类或复制一份数据。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "3；5",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "3；5"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：小业务可直接读取已有 Replica。",
+        "failure_if_violated": "UI 或副本被当作保存真相。",
+        "detection_questions": [
+          "View 是函数还是一份副本？"
+        ],
+        "related_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-FRAMEWORK-001"
+        ],
+        "origin_round6_rule": 3,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-FRAMEWORK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-STATE-003",
+      "title": "缓存可重建只说明恢复来源，不说明来源正确。",
+      "summary": "缓存可重建只说明恢复来源，不说明来源正确。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7.3；17",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7.3；17"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "缓存可重建只说明恢复来源，不说明来源正确。",
+        "why": "同步陈旧服务器仍会得到陈旧值。",
+        "applies_when": "缓存依赖分布式/异步 Owner。",
+        "does_not_mean": "不是要求所有缓存强一致。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7.3；17",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7.3；17"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：非关键统计允许明确的延迟误差。",
+        "failure_if_violated": "客户端看似刷新却掩盖服务器分歧。",
+        "detection_questions": [
+          "恢复时向谁取值？该源如何保证正确？"
+        ],
+        "related_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-SHARD-001"
+        ],
+        "origin_round6_rule": 4,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-NET-002",
+      "title": "Host 快路径应保留与 Remote 相同的业务验证。",
+      "summary": "Host 快路径应保留与 Remote 相同的业务验证。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4.3；8.1；9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4.3；8.1；9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "Host 快路径应保留与 Remote 相同的业务验证。",
+        "why": "优化 transport 容易一起绕过 Adapter。",
+        "applies_when": "本地直调与远程 Handler 并存。",
+        "does_not_mean": "不是禁止 Host 直调或要求回环网络包。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "4.3；8.1；9",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "4.3；8.1；9"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：纯本地 UI 不涉及服务端权限。",
+        "failure_if_violated": "Host 正常而 Remote 拒绝，或权限条件不同。",
+        "detection_questions": [
+          "两条路径在哪里汇合验证？"
+        ],
+        "related_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-NET-001"
+        ],
+        "origin_round6_rule": 5,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-STATE-004",
+      "title": "实体与账本互换必须定义提交及失败补偿边界。",
+      "summary": "实体与账本互换必须定义提交及失败补偿边界。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4.4；5.2；7.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4.4；5.2；7.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "实体与账本互换必须定义提交及失败补偿边界。",
+        "why": "Remove/Spawn 与数字修改并非一个原子操作。",
+        "applies_when": "物理物品转为计数、积分或共享资源。",
+        "does_not_mean": "不要求所有普通容器操作实现分布式事务。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "4.4；5.2；7.3",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "4.4；5.2；7.3"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：无价值、可丢弃视觉实体无需账本守恒。",
+        "failure_if_violated": "物品已删未记账或已生成未可靠扣款。",
+        "detection_questions": [
+          "第几步失败时，实体和余额如何保持不变量？"
+        ],
+        "related_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-SHARD-001"
+        ],
+        "origin_round6_rule": 6,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-SHARD-001",
+      "title": "跨 Shard 稀缺资源应先定义写入权威和冲突语义。",
+      "summary": "跨 Shard 稀缺资源应先定义写入权威和冲突语义。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "6–7",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "6–7"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "跨 Shard 稀缺资源应先定义写入权威和冲突语义。",
+        "why": "基于同一旧值的完整 Set 会覆盖并行修改。",
+        "applies_when": "共享库存、积分等需要守恒。",
+        "does_not_mean": "不等于任何广播完整值都错误。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "6–7",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "6–7"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：唯一写者广播可覆盖的显示配置通常合理。",
+        "failure_if_violated": "丢更新、余额分歧、合计超提。",
+        "detection_questions": [
+          "操作是 delta 还是最终值？谁能拒绝旧写？"
+        ],
+        "related_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-SHARD-002"
+        ],
+        "origin_round6_rule": 7,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-002"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-WORLD-001",
+      "title": "真实物品留给 Container/Item；Manager 可持有成员和候选。",
+      "summary": "真实物品留给 Container/Item；Manager 可持有成员和候选。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "world"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "10.2–10.4",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "10.2–10.4"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-WORLD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "真实物品留给 Container/Item；Manager 可持有成员和候选。",
+        "why": "重复库存账本增加一致性责任。",
+        "applies_when": "世界级实体查询和协调。",
+        "does_not_mean": "不是禁止经测量后维护数量索引。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "10.2–10.4",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "10.2–10.4"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：大量高频聚合可用有明确失效协议的索引。",
+        "failure_if_violated": "Manager 数字与实际实体分离。",
+        "detection_questions": [
+          "查询读的是当前 Stack 还是另存的数量？"
+        ],
+        "related_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-WORLD-001"
+        ],
+        "origin_round6_rule": 8,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-WORLD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-PERSIST-001",
+      "title": "可从真实实体重建的 Registry/Cache 通常不独立持久化。",
+      "summary": "可从真实实体重建的 Registry/Cache 通常不独立持久化。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "persist"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7；15–16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7；15–16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-LIFE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "可从真实实体重建的 Registry/Cache 通常不独立持久化。",
+        "why": "保存两份关联需修复 GUID 与初始化顺序。",
+        "applies_when": "派生实体注册表、候选缓存。",
+        "does_not_mean": "不能把用户选择/进度一律归类成缓存丢弃。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7；15–16",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7；15–16"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：跨重启必须保留的排程/租约需单独设计保存。",
+        "failure_if_violated": "读档遗留失效引用或丢失不可重建意图。",
+        "detection_questions": [
+          "这是重算能等价恢复，还是只重置默认？"
+        ],
+        "related_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-LIFE-001"
+        ],
+        "origin_round6_rule": 9,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-LIFE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-RESOURCE-001",
+      "title": "多个资源 Provider 必须按实体身份和剩余预算组合。",
+      "summary": "多个资源 Provider 必须按实体身份和剩余预算组合。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "resource"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-RESOURCE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "多个资源 Provider 必须按实体身份和剩余预算组合。",
+        "why": "同一实体可以从多个来源被发现。",
+        "applies_when": "合并多个 Entity→amount 查询结果。",
+        "does_not_mean": "不是简单把重复项改成相加就修好。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "11.3",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "11.3"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：证明来源集合互斥时可直接组合。",
+        "failure_if_violated": "重复预算或覆盖已分配数量而少扣材料。",
+        "detection_questions": [
+          "Provider B 知道 A 已分配哪些实体多少吗？"
+        ],
+        "related_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-RESOURCE-001"
+        ],
+        "origin_round6_rule": 10,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-RESOURCE-002",
+      "title": "Query/分配建议不等于 reservation 或扣款。",
+      "summary": "Query/分配建议不等于 reservation 或扣款。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "resource"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "10.3；11.4",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "10.3；11.4"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-RESOURCE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "Query/分配建议不等于 reservation 或扣款。",
+        "why": "查询到执行之间可以有排队和同步回调。",
+        "applies_when": "延后执行、回调可变或共享资源。",
+        "does_not_mean": "不是断言 Lua 每行会被其他任务抢占。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "10.3；11.4",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "10.3；11.4"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：无回调、无让出且立即执行的小操作可保持简单。",
+        "failure_if_violated": "旧计划被当作承诺，扣款失败无补偿。",
+        "detection_questions": [
+          "执行前还有哪些状态变化点？"
+        ],
+        "related_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-RESOURCE-001"
+        ],
+        "origin_round6_rule": 11,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-NET-003",
+      "title": "乐观 UI 应与服务端最终可用性区分。",
+      "summary": "乐观 UI 应与服务端最终可用性区分。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "8.3；9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "8.3；9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "乐观 UI 应与服务端最终可用性区分。",
+        "why": "显示可尝试不代表客户端知道所有材料。",
+        "applies_when": "客户端没有完整权威库存。",
+        "does_not_mean": "不要求复制全世界库存才能显示按钮。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "8.3；9",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "8.3；9"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：局部完整 Replica 足以给精确提示时不必乐观。",
+        "failure_if_violated": "把界面可点误当成业务已成功。",
+        "detection_questions": [
+          "失败由谁反馈？何时重查？"
+        ],
+        "related_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-NET-001"
+        ],
+        "origin_round6_rule": 12,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-LIFE-001",
+      "title": "Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。",
+      "summary": "Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "life"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "16–17",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "16–17"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-LIFE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。",
+        "why": "短命对象注销不自动清理挂在长命实体上的资源。",
+        "applies_when": "绑定玩家、UI、世界服务。",
+        "does_not_mean": "不是实体正常 Remove 后仍需重复手动清所有引擎资源。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "16–17",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "16–17"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：任务本来就属于整世界时可持续运行。",
+        "failure_if_violated": "旧闭包、旧监听或临时字段继续影响会话。",
+        "detection_questions": [
+          "注销谁时应取消哪一个句柄？"
+        ],
+        "related_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-LIFE-001"
+        ],
+        "origin_round6_rule": 13,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-LIFE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-HOOK-001",
+      "title": "先确认原版消费、保存和卸载契约，再扩展接口。",
+      "summary": "先确认原版消费、保存和卸载契约，再扩展接口。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "9–11；16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "9–11；16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "先确认原版消费、保存和卸载契约，再扩展接口。",
+        "why": "名称与示意图不能代表真实顺序。",
+        "applies_when": "接入已有 API。",
+        "does_not_mean": "不是永远禁止自定义实现。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "9–11；16",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "9–11；16"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：原版确实缺少机制时应写明缺口。",
+        "failure_if_violated": "依赖错序、访问已清空组件、材料计划不兼容。",
+        "detection_questions": [
+          "被调用方如何处理参数/所有权/返回值？"
+        ],
+        "related_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-HOOK-001"
+        ],
+        "origin_round6_rule": 14,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-HOOK-002",
+      "title": "临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。",
+      "summary": "临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "12–13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "12–13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。",
+        "why": "old(...) 抛错会跳过普通赋值恢复。",
+        "applies_when": "绕现有调用临时改方法/上下文。",
+        "does_not_mean": "不是每个一次性启动赋值都要可热卸载。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "12–13",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "12–13"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：会话级固定替换可显式声明不可卸载，并仍审查异常。",
+        "failure_if_violated": "替换残留、其他 Mod 包装被抹掉。",
+        "detection_questions": [
+          "恢复时目标仍等于自己装的 wrapper 吗？"
+        ],
+        "related_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-HOOK-001"
+        ],
+        "origin_round6_rule": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-HOOK-003",
+      "title": "选择最小足够作用域的接入点，并保存原契约。",
+      "summary": "选择最小足够作用域的接入点，并保存原契约。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "7–9；12–13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7–9；12–13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "选择最小足够作用域的接入点，并保存原契约。",
+        "why": "类、实例、闭包共享状态的影响范围不同。",
+        "applies_when": "PostInit、实例包装、类改写或私有 patch。",
+        "does_not_mean": "不是私有 upvalue 一律禁止。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "7–9；12–13",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7–9；12–13"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：没有公开接入点且能版本检测、失败降级时可审慎采用。",
+        "failure_if_violated": "污染所有实例或丢失原始清理/返回值。",
+        "detection_questions": [
+          "该改动影响旧实例还是新实例？能否回退？"
+        ],
+        "related_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-HOOK-002"
+        ],
+        "origin_round6_rule": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-002"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-WORLD-002",
+      "title": "注册与失效管理先正确，再按测量选择 Active Set/索引。",
+      "summary": "注册与失效管理先正确，再按测量选择 Active Set/索引。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "world"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R4",
+          "locator": "6；8；13；15",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "6；8；13；15"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-WORLD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "注册与失效管理先正确，再按测量选择 Active Set/索引。",
+        "why": "一个 Manager 仍可能每秒遍历全部对象。",
+        "applies_when": "多个实体参与周期工作。",
+        "does_not_mean": "不是一定需要任务队列或把所有查询变 O(1)。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R4",
+            "locator": "6；8；13；15",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "6；8；13；15"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：小规模稀疏工作保持简单遍历更易维护。",
+        "failure_if_violated": "优化了任务数量，却仍有高扫描成本或漏注册。",
+        "detection_questions": [
+          "空闲时扫描什么？注销是否使缓存失效？"
+        ],
+        "related_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-WORLD-001"
+        ],
+        "origin_round6_rule": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-WORLD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "rule",
+      "id": "RULE-FRAMEWORK-001",
+      "title": "共享 API 应有可追溯的有限出口和初始化条件。",
+      "summary": "共享 API 应有可追溯的有限出口和初始化条件。",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "framework"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "2–5；14–15",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "2–5；14–15"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-FRAMEWORK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "statement": "共享 API 应有可追溯的有限出口和初始化条件。",
+        "why": "整个可写环境作为 API 会隐藏依赖与覆盖。",
+        "applies_when": "模块增多或多人维护。",
+        "does_not_mean": "不是禁止共享工具表或要求引入依赖注入容器。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "2–5；14–15",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "2–5；14–15"
+              }
+            ]
+          }
+        ],
+        "counterexample": "适用边界示例（未作为独立项目证据）：少量稳定、只读式公共工具可简单共享。",
+        "failure_if_violated": "顺序依赖、同名覆盖、接口面无控制增长。",
+        "detection_questions": [
+          "符号在哪里定义，何时可用，谁能写？"
+        ],
+        "related_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "related_anti_patterns": [
+          "ANTI-FRAMEWORK-001"
+        ],
+        "origin_round6_rule": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-FRAMEWORK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-NET-001",
+      "title": "Client / Host Divergent Validation",
+      "summary": "Host 直接调用业务方法，Remote 先经过校验 Adapter。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4.3；5.2",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4.3；5.2"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-009",
+        "RULE-NET-001",
+        "RULE-NET-002",
+        "PATTERN-NET-001",
+        "DECISION-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Client / Host Divergent Validation",
+        "symptoms": "Host 直接调用业务方法，Remote 先经过校验 Adapter。",
+        "why_it_happens": "把本地 transport 优化与验证入口一起绕过。",
+        "why_it_is_dangerous": "同一功能出现不同条件或权限；只测试 Host 容易漏远端错误。",
+        "when_it_is_actually_acceptable": "两条路径最终共享同一校验，或差异仅涉及本地视觉且明确设计时。",
+        "failure_modes": [
+          "Host 成功而 Remote 失败",
+          "校验遗漏"
+        ],
+        "detection": "比较两条调用链进入 State Owner 前的检查集合。",
+        "safer_alternatives": [
+          "共用服务器业务验证入口，仅省略传输",
+          "以端别对照测试确认预期差异"
+        ],
+        "case_evidence": "REPORT-R6 §4.3、5.2：种子 Host 直调 Handle 方法，Remote 经过手持组件 Adapter。",
+        "klei_basis": [
+          "FACT-DST-009"
+        ],
+        "related_rule": [
+          "RULE-NET-001",
+          "RULE-NET-002"
+        ],
+        "related_pattern": [
+          "PATTERN-NET-001"
+        ],
+        "assessment": "observed_structure"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-SHARD-001",
+      "title": "Writable Replica Read-Modify-Write",
+      "summary": "多个副本基于旧余额各自计算新余额。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-006",
+        "RULE-SHARD-001",
+        "RULE-STATE-004",
+        "PATTERN-SHARD-001",
+        "DECISION-SHARD-001",
+        "FAIL-CASE001-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Writable Replica Read-Modify-Write",
+        "symptoms": "多个副本基于旧余额各自计算新余额。",
+        "why_it_happens": "本地 Get/Set 接口掩盖了分布式写入。",
+        "why_it_is_dangerous": "各自操作合理，但合并不守恒。",
+        "when_it_is_actually_acceptable": "状态独立分区、不要求合并，或已有可证明的冲突处理协议。",
+        "failure_modes": [
+          "丢更新",
+          "旧副本覆写",
+          "超提"
+        ],
+        "detection": "查同一 key 是否多写者，值是操作还是读旧值后的结果。",
+        "safer_alternatives": [
+          "单写 authority 接受操作意图",
+          "有需求时设计带版本的条件提交与补偿"
+        ],
+        "case_evidence": "REPORT-R6 §7.3：SeedDB 两 Shard 基于同一个旧数值写回完整值。",
+        "klei_basis": [
+          "FACT-DST-006"
+        ],
+        "related_rule": [
+          "RULE-SHARD-001",
+          "RULE-STATE-004"
+        ],
+        "related_pattern": [
+          "PATTERN-SHARD-001"
+        ],
+        "assessment": "observed_structure"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-SHARD-002",
+      "title": "Broadcast Final Value Without Authority",
+      "summary": "广播完整最终值，却未声明谁能写、过期写如何判断。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "6–7",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "6–7"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-006",
+        "RULE-STATE-001",
+        "RULE-SHARD-001",
+        "PATTERN-SHARD-001",
+        "DECISION-SHARD-001",
+        "FAIL-CASE001-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Broadcast Final Value Without Authority",
+        "symptoms": "广播完整最终值，却未声明谁能写、过期写如何判断。",
+        "why_it_happens": "把复制机制当作一致性策略。",
+        "why_it_is_dangerous": "到达顺序替代业务顺序；重连和重启不知向谁恢复。",
+        "when_it_is_actually_acceptable": "唯一写者的配置/展示值广播，或明确允许最后到达覆盖的非关键状态。",
+        "failure_modes": [
+          "副本分歧",
+          "重连恢复错误"
+        ],
+        "detection": "记录 writer、revision 和恢复源；不要仅检查是否用了 Shard RPC。",
+        "safer_alternatives": [
+          "在协议前声明 authority",
+          "只为必要场景增加 revision/epoch/重新同步"
+        ],
+        "case_evidence": "REPORT-R6 §6–7：种子任意 Shard Set 广播，且 noSyn=1 使本业务缺少自动恢复。",
+        "klei_basis": [
+          "FACT-DST-006"
+        ],
+        "related_rule": [
+          "RULE-STATE-001",
+          "RULE-SHARD-001"
+        ],
+        "related_pattern": [
+          "PATTERN-SHARD-001"
+        ],
+        "assessment": "observed_structure"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-RESOURCE-001",
+      "title": "Duplicate Resource Provider Allocation",
+      "summary": "不同 Provider 返回同一 Item 实体，合并时当成独立数量或直接覆盖。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "resource"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-003",
+        "FACT-DST-010",
+        "RULE-RESOURCE-001",
+        "RULE-RESOURCE-002",
+        "PATTERN-WORLD-001",
+        "DECISION-STATE-OWNER-001",
+        "FAIL-CASE001-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Duplicate Resource Provider Allocation",
+        "symptoms": "不同 Provider 返回同一 Item 实体，合并时当成独立数量或直接覆盖。",
+        "why_it_happens": "按来源名区分资源，却未按实体身份计算交集。",
+        "why_it_is_dangerous": "Has 通过但计划不足，或同一 Stack 被重复预算。",
+        "when_it_is_actually_acceptable": "来源集合已证明互斥，或合并器按剩余预算统一分配。",
+        "failure_modes": [
+          "少扣材料",
+          "重复扣同一资源",
+          "虚假充足判断"
+        ],
+        "detection": "构造一个同时出现在两个来源中的实体，检查最终每实体数量和总需求。",
+        "safer_alternatives": [
+          "统一资源身份与排除/剩余预算",
+          "提交前验证计划总量与各实体可用量"
+        ],
+        "case_evidence": "REPORT-R6 §11.3：原版打开容器与 Manager 同指 E，finds[E]=2 覆盖原版的 4。",
+        "klei_basis": [
+          "FACT-DST-003",
+          "FACT-DST-010"
+        ],
+        "related_rule": [
+          "RULE-RESOURCE-001",
+          "RULE-RESOURCE-002"
+        ],
+        "related_pattern": [
+          "PATTERN-WORLD-001"
+        ],
+        "assessment": "observed_failure_path"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-HOOK-001",
+      "title": "Unsafe Temporary Monkey Patch",
+      "summary": "保存旧方法 → 临时替换 → 调用 → 正常返回后恢复，缺少异常恢复。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "17",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "17"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-003",
+        "RULE-HOOK-002",
+        "RULE-LIFE-001",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001",
+        "FAIL-CASE001-003"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Unsafe Temporary Monkey Patch",
+        "symptoms": "保存旧方法 → 临时替换 → 调用 → 正常返回后恢复，缺少异常恢复。",
+        "why_it_happens": "只为正常调用设计 around 包装。",
+        "why_it_is_dangerous": "异常使后续调用读到临时状态；恢复也可能覆盖回调期间的新赋值。",
+        "when_it_is_actually_acceptable": "可靠限定无异常/无重入的内部范围，或有异常安全且有所有权检查的恢复；须给出依据。",
+        "failure_modes": [
+          "临时函数残留",
+          "状态 flag 泄漏",
+          "返回值契约丢失"
+        ],
+        "detection": "检查 error、嵌套调用、允许 yield 的边界和替换期间第三方赋值。",
+        "safer_alternatives": [
+          "显式上下文参数优先",
+          "确需替换时保留错误与完整返回值，并执行受 ownership 保护的清理"
+        ],
+        "case_evidence": "REPORT-R5 §13；REPORT-R6 §17：inventory.Has/GetCraftingIngredient 临时替换后仅正常路径恢复。",
+        "klei_basis": [
+          "FACT-DST-003"
+        ],
+        "related_rule": [
+          "RULE-HOOK-002",
+          "RULE-LIFE-001"
+        ],
+        "related_pattern": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "assessment": "observed_failure_path"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-HOOK-002",
+      "title": "Hook Without Ownership",
+      "summary": "卸载直接写回旧指针，或替换清理回调却未保留原职责。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "12–13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "12–13"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R4",
+          "locator": "13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-008",
+        "RULE-HOOK-002",
+        "RULE-HOOK-003",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Hook Without Ownership",
+        "symptoms": "卸载直接写回旧指针，或替换清理回调却未保留原职责。",
+        "why_it_happens": "把函数槽当作自己独占的字段。",
+        "why_it_is_dangerous": "覆盖别的 Mod 后来安装的包装，或截断原版清理。",
+        "when_it_is_actually_acceptable": "显式独占、不可卸载的会话级替换；仍需承认对其他 Mod 的影响。",
+        "failure_modes": [
+          "卸载别人包装",
+          "漏 Close/cleanup",
+          "重装叠加"
+        ],
+        "detection": "记录目标、前驱、自己 wrapper；退出前确认当前字段归属。",
+        "safer_alternatives": [
+          "明确 wrapper ownership",
+          "保持原回调契约",
+          "限制到必要实例并提供诊断"
+        ],
+        "case_evidence": "REPORT-R5 §12–13：恢复无 ownership 检查；REPORT-R4 §13：Container 卸载 oldfn 保存后未调用。",
+        "klei_basis": [
+          "FACT-DST-008"
+        ],
+        "related_rule": [
+          "RULE-HOOK-002",
+          "RULE-HOOK-003"
+        ],
+        "related_pattern": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "assessment": "observed_structure"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-LIFE-001",
+      "title": "Lifecycle Owner Mismatch",
+      "summary": "短命 DB/UI 关闭，挂在长命 World 的 Task/Listener 仍持有它。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-008",
+        "RULE-LIFE-001",
+        "PATTERN-NET-001",
+        "PATTERN-WORLD-001",
+        "DECISION-PERSIST-001",
+        "DECISION-STATE-OWNER-001",
+        "FAIL-CASE001-004"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Lifecycle Owner Mismatch",
+        "symptoms": "短命 DB/UI 关闭，挂在长命 World 的 Task/Listener 仍持有它。",
+        "why_it_happens": "用调度宿主代替业务所有者，注销只删注册表。",
+        "why_it_is_dangerous": "旧对象保活、重复任务或对旧身份继续计算。",
+        "when_it_is_actually_acceptable": "任务确实服务整世界，并不捕获已退出用户上下文。",
+        "failure_modes": [
+          "Task 残留",
+          "Listener 残留",
+          "重连后旧闭包并存"
+        ],
+        "detection": "比较创建者、scheduler owner 和应该终止它的业务事件。",
+        "safer_alternatives": [
+          "绑定清理句柄到业务生命周期",
+          "在注销入口统一取消自己的任务与监听"
+        ],
+        "case_evidence": "REPORT-R6 §16：UpdateOwnerKeyTask 挂 World，ClientDB UnInit 未取消。",
+        "klei_basis": [
+          "FACT-DST-008"
+        ],
+        "related_rule": [
+          "RULE-LIFE-001"
+        ],
+        "related_pattern": [
+          "PATTERN-NET-001",
+          "PATTERN-WORLD-001"
+        ],
+        "assessment": "observed_failure_path"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-WORLD-001",
+      "title": "God Manager — risk candidate",
+      "summary": "候选征兆：查询、调度、资源真相、UI、联网及保存策略逐步集中进同一 Manager。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "world"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E0",
+      "confidence": "Low",
+      "sources": [
+        {
+          "source_id": "REPORT-R4",
+          "locator": "17–20",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "17–20"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "RULE-WORLD-001",
+        "RULE-WORLD-002",
+        "PATTERN-WORLD-001",
+        "DECISION-STATE-OWNER-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "God Manager — risk candidate",
+        "symptoms": "候选征兆：查询、调度、资源真相、UI、联网及保存策略逐步集中进同一 Manager。",
+        "why_it_happens": "把集中协调误解成集中所有实体行为。",
+        "why_it_is_dangerous": "跨领域耦合和测试面增长，局部变更需要理解全部系统。",
+        "when_it_is_actually_acceptable": "职责相邻、规模受控的领域 Manager 可同时协调查询和物流；行数多不直接证明 God Object。",
+        "failure_modes": [
+          "潜在改动扩散",
+          "潜在共享故障面"
+        ],
+        "detection": "检查职责变化原因、依赖方向及是否拥有本该归实体的状态；不能只数函数。",
+        "safer_alternatives": [
+          "先观察变化耦合和性能再拆分",
+          "让单体状态留在 Component"
+        ],
+        "case_evidence": "REPORT-R4 §17–20 证明多职责领域 Manager；不足以断言已经达到 God Object。仅登记待验证风险。",
+        "klei_basis": [],
+        "related_rule": [
+          "RULE-WORLD-001",
+          "RULE-WORLD-002"
+        ],
+        "related_pattern": [
+          "PATTERN-WORLD-001"
+        ],
+        "assessment": "risk_candidate_not_established"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "hypothesis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "anti_pattern",
+      "id": "ANTI-FRAMEWORK-001",
+      "title": "Unlimited Ambient Dependency / Shared Namespace Growth",
+      "summary": "整个可写环境作为公共 API，模块裸符号依赖难从 require 图看出。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "framework"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "2–5；14",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "2–5；14"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "FACT-DST-007",
+        "RULE-FRAMEWORK-001",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "name": "Unlimited Ambient Dependency / Shared Namespace Growth",
+        "symptoms": "整个可写环境作为公共 API，模块裸符号依赖难从 require 图看出。",
+        "why_it_happens": "便捷访问不断扩展到工具、业务对象和临时状态。",
+        "why_it_is_dangerous": "初始化顺序、覆盖和跨模块写入变成隐含契约。",
+        "when_it_is_actually_acceptable": "少量稳定公共能力、命名和写入责任明确、依赖可追溯时可采用共享表。",
+        "failure_modes": [
+          "错误时序",
+          "命名冲突风险",
+          "API 面不可控"
+        ],
+        "detection": "为消费符号追定义、首次可用时点和全部写者；不能仅统计 require。",
+        "safer_alternatives": [
+          "有限服务出口",
+          "显式模块返回值",
+          "记录启动阶段和可选能力"
+        ],
+        "case_evidence": "REPORT-R5 §2–5、14：SoraAPI 为 env 别名，soraenv 共享查找；未证明所有潜在冲突已实际发生。",
+        "klei_basis": [
+          "FACT-DST-007"
+        ],
+        "related_rule": [
+          "RULE-FRAMEWORK-001"
+        ],
+        "related_pattern": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "assessment": "observed_structure"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "failure_case",
+      "id": "FAIL-CASE001-001",
+      "title": "Seed cross-shard lost update",
+      "summary": "A 可为6，B可为15；任一合法串行存取后的余额应为11。实体转换已经发生。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4–7",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4–7"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ANTI-SHARD-001",
+        "ANTI-SHARD-002",
+        "RULE-SHARD-001",
+        "TEST-SHARD-001"
+      ],
+      "status": "needs_runtime_validation",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "preconditions": [
+          "A/B 属于同一公共种子域，初始余额均为10",
+          "两边在接收对方更新前分别以旧值计算",
+          "采用已确认的完整值 Set 广播路径"
+        ],
+        "steps": [
+          "A 存入5，删除实体后写15",
+          "B 取出4，生成实体后写6",
+          "两条消息交叉到达，各副本用对方最终值覆盖本地值"
+        ],
+        "result": "A 可为6，B可为15；任一合法串行存取后的余额应为11。实体转换已经发生。",
+        "expected_correctness": "若业务声明共享且守恒：最终可用余额应与合法操作总和一致，且不能通过旧副本合计超提。",
+        "evidence": "M07 main/maindb.lua:774–786；M06 main/clientdbinit.lua:143–153；M12 soraseedcontainer.lua:121、157–218（REPORT-R6 编号）",
+        "verification_status": [
+          "Static Confirmed Path",
+          "Not Runtime Reproduced"
+        ],
+        "runtime_reproduced": false,
+        "limits": "REPORT-R6 §7.3 的静态交错；是否出现这个到达顺序及玩家影响尚未实测。",
+        "static_path_confirmed": true,
+        "runtime_validation_status": "not_runtime_reproduced"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-SHARD-001"
+        },
+        {
+          "type": "illustrates",
+          "target": "ANTI-SHARD-002"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "failure_case",
+      "id": "FAIL-CASE001-002",
+      "title": "Duplicate Material Provider Allocation",
+      "summary": "最终材料计划只有 E=2，检查/分配层未保证总需求6。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ANTI-RESOURCE-001",
+        "RULE-RESOURCE-001",
+        "TEST-RESOURCE-001"
+      ],
+      "status": "needs_runtime_validation",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "preconditions": [
+          "同一已打开且注册的容器 Stack E=4",
+          "实际配方需要6，其他来源为空",
+          "全局制作已启用且 Manager 分类、距离条件成立"
+        ],
+        "steps": [
+          "原版查询返回 E=4",
+          "Manager 按同一实体保留1后可用3，足以补名义缺口2",
+          "返回 E=2，Adapter 用 finds[E]=2 覆盖4",
+          "need 按补齐计算完成，原版消耗接收到的表"
+        ],
+        "result": "最终材料计划只有 E=2，检查/分配层未保证总需求6。",
+        "expected_correctness": "来源重叠不应制造额外资源；总可用4时应拒绝需要6的制作，且最终计划不应静默覆盖。",
+        "evidence": "main/hook.lua:1510–1566；sorachestmanager.lua:1182–1236；原版 Inventory:GetCraftingIngredient 和 Builder:RemoveIngredients。",
+        "verification_status": [
+          "Static Confirmed Path",
+          "Not Runtime Reproduced"
+        ],
+        "runtime_reproduced": false,
+        "limits": "REPORT-R4 §9 已确认，REPORT-R6 §11.3 将其定位为 Provider/Builder Adapter 集成边界；非缓存故障。",
+        "static_path_confirmed": true,
+        "runtime_validation_status": "not_runtime_reproduced"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "failure_case",
+      "id": "FAIL-CASE001-003",
+      "title": "Unsafe temporary patch remains after error",
+      "summary": "恢复路径未执行；若会话继续且对象仍在，字段可保留临时 wrapper。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "17",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "17"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ANTI-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-HOOK-001"
+      ],
+      "status": "needs_runtime_validation",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "preconditions": [
+          "进入 Builder/UI 的临时方法替换分支",
+          "被包装的 old 调用抛出 Lua error",
+          "若讨论会话后续污染，还需外层捕获错误并继续运行"
+        ],
+        "steps": [
+          "保存 oldhas",
+          "安装临时 Has",
+          "调用 old 期间抛错",
+          "控制流跳过 restore 赋值"
+        ],
+        "result": "恢复路径未执行；若会话继续且对象仍在，字段可保留临时 wrapper。",
+        "expected_correctness": "操作无论成功或失败，都应按所有权规则恢复临时修改，并保留原错误。",
+        "evidence": "main/hook.lua:1446–1458、1516–1535、1544–1566。",
+        "verification_status": [
+          "Static Confirmed Path",
+          "Not Runtime Reproduced"
+        ],
+        "runtime_reproduced": false,
+        "limits": "静态确认异常分支缺少恢复保证；未注入异常，未声称正常游玩已发生持续污染。",
+        "static_path_confirmed": true,
+        "runtime_validation_status": "not_runtime_reproduced"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-HOOK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "failure_case",
+      "id": "FAIL-CASE001-004",
+      "title": "ClientDB owner task lifetime exceeds DB lifetime",
+      "summary": "任务与闭包仍可存活到 World 清理；Send 的 Inited 检查阻止正常发包，但不是取消任务。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "ANTI-LIFE-001",
+        "RULE-LIFE-001",
+        "TEST-LIFE-001"
+      ],
+      "status": "needs_runtime_validation",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "preconditions": [
+          "为玩家创建 seed 服务端 View，World 上建立 UpdateOwnerKeyTask",
+          "该玩家断开触发 ClientDB:UnInit",
+          "World 仍继续运行"
+        ],
+        "steps": [
+          "模板 serverfn 创建每3秒任务，闭包捕获 DB/玩家上下文",
+          "UnInit 调 bind.Remove，只解除两个 MainDB 监听",
+          "移除 DB 注册并设置 Inited=false",
+          "没有取消对应 World Task"
+        ],
+        "result": "任务与闭包仍可存活到 World 清理；Send 的 Inited 检查阻止正常发包，但不是取消任务。",
+        "expected_correctness": "与该玩家 DB 同生命周期的任务应在 DB 注销时终止；世界级任务若继续须不保留过期玩家绑定。",
+        "evidence": "main/clientdbinit.lua:178–186、227–230；main/clientdb.lua:151–175、184–187。",
+        "verification_status": [
+          "Static Confirmed Path",
+          "Not Runtime Reproduced"
+        ],
+        "runtime_reproduced": false,
+        "limits": "源码路径确认；未做重复重连的内存/任务数量测量。",
+        "static_path_confirmed": true,
+        "runtime_validation_status": "not_runtime_reproduced"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-LIFE-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "correction",
+      "id": "CORRECTION-CASE001-001",
+      "title": "撤回未使用 SeedCDB 顶层 local 的初始化故障判断",
+      "summary": "旧变量确实在顶层捕获，但未被使用；不能据此建立 UI 的运行时初始化依赖。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Very High",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "1.3；3",
+          "note": "",
+          "role": "historical",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "1.3；3"
+            }
+          ],
+          "claim_id": "CLAIM-CASE001-001"
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "0；5.1",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "0；5.1"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "RULE-FRAMEWORK-001"
+      ],
+      "status": "corrected",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "previous_claim": "soraseed.lua 顶层捕获 SeedCDB，因此 clientfn 必须在首次 require 前创建它，否则导致 UI 初始化 nil 问题。",
+        "target_claims": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "§1.3：clientfn→soraseed 首次 require；§3：soraseed 隐式依赖行",
+            "note": "",
+            "role": "historical",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "§1.3：clientfn→soraseed 首次 require；§3：soraseed 隐式依赖行"
+              }
+            ],
+            "claim_id": "CLAIM-CASE001-001"
+          }
+        ],
+        "subsequent_evidence": "REPORT-R6：local DB 全文未被使用；实际数量读取经过 soraseedcontainer:GetDB 动态选择后端。",
+        "result": "撤回“该 local 导致初始化故障”以及“该 local 必须有值”的硬依赖结论。",
+        "replacement": "分析符号的真实使用点，而非仅发现一次赋值；其他实际依赖仍分别验证。",
+        "superseded_claim_status": "superseded",
+        "correction_scope": "只替换该因果判断，不否认赋值存在，也不宣布种子全部初始化路径无风险。",
+        "history_policy": "保留原报告，不改写历史；检索旧报告该结论时必须附本 Correction。",
+        "target_claim_ids": [
+          "CLAIM-CASE001-001"
+        ]
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "corrects",
+          "target": "CLAIM-CASE001-001"
+        },
+        {
+          "type": "supersedes",
+          "target": "CLAIM-CASE001-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "decision",
+      "id": "DECISION-STATE-OWNER-001",
+      "title": "Prefab / Component / World Manager 如何选择？",
+      "summary": "按状态范围和协作需求分配，不按代码行数分层。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "state"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "2；10；15",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "2；10；15"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "RULE-WORLD-001",
+        "TEST-LIFE-003",
+        "TEST-RESOURCE-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "question": "Prefab / Component / World Manager 如何选择？",
+        "branches": [
+          {
+            "condition": "只是实体创建、资源和初始组件组装",
+            "recommended_direction": "Prefab 构造承担；避免把长期协调逻辑塞进构造。",
+            "evidence": [
+              "PATTERN-WORLD-001",
+              "FACT-DST-007"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "状态随单个实体生灭，行为基本自足",
+            "recommended_direction": "实体 Component 持有状态和 API。",
+            "evidence": [
+              "RULE-WORLD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "多个实体共享成员查询、配额或调度",
+            "recommended_direction": "World Manager 持有 Registry/协调；实体保留单体真相。",
+            "evidence": [
+              "PATTERN-WORLD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "状态跨 World",
+            "recommended_direction": "转交 Shard 决策树，不把单 World Manager 当跨世界服务。",
+            "evidence": [
+              "DECISION-SHARD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          }
+        ],
+        "recommended_direction": "按状态范围和协作需求分配，不按代码行数分层。",
+        "exceptions": "小业务可在 Prefab 上保持少量状态；没有强迫新增 Component。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "2；10；15",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "2；10；15"
+              }
+            ]
+          }
+        ],
+        "unknowns": "尚未由独立技能/Boss/Buff 项目验证；World Manager 是否值得增加需看规模。",
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "decision",
+      "id": "DECISION-NET-001",
+      "title": "netvar / Replica / RPC / 原版 Action / Client View 如何判断？",
+      "summary": "先问要传意图还是状态，再考虑接口层和已有原版链。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "3–9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3–9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "RULE-NET-002",
+        "RULE-NET-003",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "TEST-NET-003"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "question": "netvar / Replica / RPC / 原版 Action / Client View 如何判断？",
+        "branches": [
+          {
+            "condition": "原版 Action/Builder 已有对应权威请求链",
+            "recommended_direction": "优先扩展原版链，不另造同义 RPC。",
+            "evidence": [
+              "FACT-DST-009",
+              "RULE-NET-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "需要服务器向客户端展示小型持续状态",
+            "recommended_direction": "考虑 netvar；按现有组件模型通过 Replica 提供读取 API。",
+            "evidence": [
+              "FACT-DST-009",
+              "PATTERN-NET-001"
+            ],
+            "exceptions": "Replica 是客户端接口/组织方式，不是与 netvar 互斥的传输协议。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "额外一次性业务意图/返回结果",
+            "recommended_direction": "考虑 Mod RPC；按需要设计关联ID、校验与错误结果。",
+            "evidence": [
+              "FACT-DST-006",
+              "PATTERN-NET-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "每玩家裁剪的较复杂数据视图",
+            "recommended_direction": "考虑 Server View + Client Cache；需要明确初始同步和失效。",
+            "evidence": [
+              "PATTERN-NET-001",
+              "RULE-STATE-002"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "纯本地视觉/输入状态",
+            "recommended_direction": "可保留本地；不得冒充服务器 gameplay 决策。",
+            "evidence": [
+              "RULE-NET-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          }
+        ],
+        "recommended_direction": "先问要传意图还是状态，再考虑接口层和已有原版链。",
+        "exceptions": "所有路径均需检查端别；不能把可写客户端缓存当服务端 API。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "3–9",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "3–9"
+              }
+            ]
+          }
+        ],
+        "unknowns": "案例没有系统验证自定义 Replica 架构、预测回滚与高频流量阈值。",
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "decision",
+      "id": "DECISION-SHARD-001",
+      "title": "什么时候需要跨 Shard Service？",
+      "summary": "需求必须跨世界，且有明确的数据所有权，才引入服务。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7；12",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7；12"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001",
+        "RULE-STATE-001",
+        "TEST-SHARD-001",
+        "TEST-SHARD-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "question": "什么时候需要跨 Shard Service？",
+        "branches": [
+          {
+            "condition": "状态仅服务当前 World 的实体",
+            "recommended_direction": "保留 World 服务，不加 Shard 层。",
+            "evidence": [
+              "PATTERN-WORLD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "玩家迁移且原版已有适合的保存/迁移机制",
+            "recommended_direction": "先确认原版契约，避免再复制一份状态。",
+            "evidence": [
+              "RULE-PERSIST-001"
+            ],
+            "exceptions": "本案例没有完整迁移事实条目；此分支为待验证建议。",
+            "evidence_level": "E0",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "多个 Shard 必须共享同一稀缺资源",
+            "recommended_direction": "先定义 authority、不变量与故障恢复，再选择服务协议。",
+            "evidence": [
+              "RULE-SHARD-001",
+              "PATTERN-SHARD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "只需非关键的显示广播",
+            "recommended_direction": "可以允许明确的陈旧/覆盖，不无条件加入事务。",
+            "evidence": [
+              "ANTI-SHARD-002"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          }
+        ],
+        "recommended_direction": "需求必须跨世界，且有明确的数据所有权，才引入服务。",
+        "exceptions": "单写、分区、多写都有适用边界；当前证据不证明一种机制普适。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7；12",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7；12"
+              }
+            ]
+          }
+        ],
+        "unknowns": "缺少成功运行的多 Shard 一致性独立案例和延迟/重连测量。",
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "decision",
+      "id": "DECISION-PERSIST-001",
+      "title": "哪些状态保存，哪些重建？",
+      "summary": "用“能否等价恢复”判定，不用字段是否容易序列化判定。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "persist"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7；15–16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7；15–16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "RULE-PERSIST-001",
+        "FACT-DST-001",
+        "TEST-LIFE-001",
+        "TEST-LIFE-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "question": "哪些状态保存，哪些重建？",
+        "branches": [
+          {
+            "condition": "丢失会破坏资源/用户进度，且无法等价重算",
+            "recommended_direction": "存真实 Owner 状态，给出 schema 和迁移/版本策略。",
+            "evidence": [
+              "FACT-DST-001",
+              "FACT-DST-002"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "可从加载后的实体完整恢复的 Registry/Index",
+            "recommended_direction": "按生命周期重建，标注重建完成前的查询窗口。",
+            "evidence": [
+              "RULE-PERSIST-001",
+              "PATTERN-WORLD-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "Client View/Widget 显示副本",
+            "recommended_direction": "初始同步或重读，不由它恢复服务器真相。",
+            "evidence": [
+              "RULE-STATE-002",
+              "RULE-STATE-003"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "暂停、选项、计时器、临时锁是否算用户意图不明确",
+            "recommended_direction": "列出保存/重置后果交给项目决策，不套缓存口诀。",
+            "evidence": [
+              "RULE-PERSIST-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          }
+        ],
+        "recommended_direction": "用“能否等价恢复”判定，不用字段是否容易序列化判定。",
+        "exceptions": "某些缓存可为启动性能做可丢弃检查点，但不可反客为主。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7；15–16",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7；15–16"
+              }
+            ]
+          }
+        ],
+        "unknowns": "schema 升级、跨版本读档和分片独立回档尚未验证。",
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "decision",
+      "id": "DECISION-HOOK-001",
+      "title": "PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？",
+      "summary": "最小足够作用域，不把方案列表当固定强制优先级。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "7–9；12–13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7–9；12–13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "RULE-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-HOOK-001",
+        "TEST-HOOK-002"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "question": "PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？",
+        "branches": [
+          {
+            "condition": "已有公开事件、回调或组件配置能完成需求",
+            "recommended_direction": "使用既有扩展点；仍核对生命周期/端别。",
+            "evidence": [
+              "FACT-DST-007"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "仅新建特定实体/组件需要附加行为",
+            "recommended_direction": "相应 PostInit；实例包装只影响目标实例。",
+            "evidence": [
+              "FACT-DST-007",
+              "RULE-HOOK-003"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "确需共享类方法覆盖多实例",
+            "recommended_direction": "明确实例自有方法遮蔽和已有引用，保留契约及兼容诊断。",
+            "evidence": [
+              "PATTERN-FRAMEWORK-001",
+              "RULE-HOOK-003"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "只能通过私有闭包/upvalue 接入",
+            "recommended_direction": "隔离为版本敏感适配，能力检测、来源定位、失败降级和更新复核。",
+            "evidence": [
+              "PATTERN-FRAMEWORK-001",
+              "RULE-HOOK-003"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          },
+          {
+            "condition": "打算调用前临时换函数再恢复",
+            "recommended_direction": "优先考虑参数/上下文；若不可替代则加入异常/ownership 保护。",
+            "evidence": [
+              "RULE-HOOK-002",
+              "ANTI-HOOK-001"
+            ],
+            "exceptions": "需按本项目约束复核。",
+            "evidence_level": "E1",
+            "needs_more_cases": true
+          }
+        ],
+        "recommended_direction": "最小足够作用域，不把方案列表当固定强制优先级。",
+        "exceptions": "会话级受控类扩展可合理；不因看到 monkey patch 就认定有错。",
+        "evidence": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "7–9；12–13",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7–9；12–13"
+              }
+            ]
+          }
+        ],
+        "unknowns": "尚无多 Mod 加载顺序与私有 API 升级的运行验收。",
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-NET-001",
+      "title": "Host vs Remote Client parity",
+      "summary": "发现本地快路径校验旁路。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "4.3；5.2",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "4.3；5.2"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "发现本地快路径校验旁路。",
+        "setup": "同版本、同配置，Host 与远程玩家具备相同输入前置条件；分别测试合法/非法装备与状态。",
+        "action": "分别发起同一业务意图。",
+        "expected_invariant": "相同权威前置条件得到相同业务判定；传输差异不改变权限。",
+        "failure_signal": "仅 Host 成功或参数检查不同且无设计依据。",
+        "applicable_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "4.3；5.2",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "4.3；5.2"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-NET-002",
+      "title": "Dedicated Server request flow",
+      "summary": "排除对 ThePlayer/HUD 等本地客户端对象的服务器依赖。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "3.3；9",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "3.3；9"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "排除对 ThePlayer/HUD 等本地客户端对象的服务器依赖。",
+        "setup": "隔离专服与远程客户端，记录版本/配置/日志，服务端无本地玩家UI。",
+        "action": "进入、初始化通道、发送业务命令、退出。",
+        "expected_invariant": "服务端权威逻辑无需 HUD；客户端只经允许状态/结果更新。",
+        "failure_signal": "专服 nil 错误、未创建通道或只有 Host 能使用。",
+        "applicable_patterns": [
+          "PATTERN-NET-001",
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "3.3；9",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "3.3；9"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-SHARD-001",
+      "title": "Ground/Cave simultaneous modification",
+      "summary": "检查共享资源守恒。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "检查共享资源守恒。",
+        "setup": "地面/洞穴同一逻辑资源，记录初始余额和物理物品数；同步控制两个请求时点。",
+        "action": "跨分片并行存入/取出或其他写操作，等待通信稳定。",
+        "expected_invariant": "在声明共享守恒的业务中，余额和实体变化符合合法串行/明确冲突语义，不超发。",
+        "failure_signal": "分歧、丢更新或总量凭空变化。",
+        "applicable_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7.3",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7.3"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-LIFE-001",
+      "title": "Player reconnect",
+      "summary": "检查重连重建与旧绑定资源回收。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-WORLD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "检查重连重建与旧绑定资源回收。",
+        "setup": "记录每玩家 DB、任务、监听数量，准备可见状态。",
+        "action": "多次退出/重连；必要时换 Shard；逐次核对实例身份。",
+        "expected_invariant": "旧玩家绑定终止；新绑定拿到正确视图；任务数不随次数无界增长。",
+        "failure_signal": "旧 owner 任务继续运行、重复回调或旧缓存显示。",
+        "applicable_patterns": [
+          "PATTERN-NET-001",
+          "PATTERN-WORLD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "16",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "16"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-LIFE-002",
+      "title": "World save/load",
+      "summary": "区分真相保存与派生重建。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7；15–16",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7；15–16"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001",
+        "PATTERN-SHARD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "区分真相保存与派生重建。",
+        "setup": "记录真实物品/余额、用户选项及预期保存策略；正常保存。",
+        "action": "重启同一存档并等初始化完成。",
+        "expected_invariant": "真实状态符合保存点；派生 Registry 重建；被声明不保存的字段按约定重置。",
+        "failure_signal": "双份注册、漏物品、把默认值误认作旧选择恢复。",
+        "applicable_patterns": [
+          "PATTERN-WORLD-001",
+          "PATTERN-SHARD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7；15–16",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7；15–16"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-LIFE-003",
+      "title": "Entity removed during query",
+      "summary": "检查失效候选和查询执行边界。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R4",
+          "locator": "13–14",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13–14"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "检查失效候选和查询执行边界。",
+        "setup": "注册容器并建立候选缓存；使用实际允许的事件/动作阶段注入移除，不假装逐行并发。",
+        "action": "查询后、执行前或同步回调中删除实体/单独移除组件，再次请求。",
+        "expected_invariant": "无失效引用崩溃；失败可解释；不得使用已失效实体或重复扣款。",
+        "failure_signal": "nil/invalid Entity、旧计划执行、注销漏回调。",
+        "applicable_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R4",
+            "locator": "13–14",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "13–14"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-HOOK-001",
+      "title": "Wrapped function throws error",
+      "summary": "检查临时替换的异常恢复。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "检查临时替换的异常恢复。",
+        "setup": "在隔离测试对象的 old 调用加入可控 error；外层捕获以检查后态。",
+        "action": "进入 wrapper 触发异常，然后检查字段并执行第二次正常调用。",
+        "expected_invariant": "自己的临时修改被清理；原始错误保留；不覆盖第三方新赋值。",
+        "failure_signal": "wrapper/flag 残留或原错误被吞掉。",
+        "applicable_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "13",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "13"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-HOOK-002",
+      "title": "Two Mods wrap same function",
+      "summary": "验证包装组合与 ownership。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R5",
+          "locator": "12–13",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "12–13"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "验证包装组合与 ownership。",
+        "setup": "两个最小测试补丁分别包装同一目标，覆盖不同加载顺序及实例/类组合。",
+        "action": "调用、让一方撤销或在回调中重装另一方。",
+        "expected_invariant": "约定要保留的行为执行正确次数，撤销不抹掉别人包装，返回值契约保留。",
+        "failure_signal": "双调用、丢调用、后装 wrapper 被旧恢复覆盖。",
+        "applicable_patterns": [
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R5",
+            "locator": "12–13",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "12–13"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-RESOURCE-001",
+      "title": "Same Entity exposed by two resource providers",
+      "summary": "验证分配交集处理。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "resource"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "11.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "11.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-WORLD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "验证分配交集处理。",
+        "setup": "Provider A/B 返回同一 Stack；设真实可用量小于合并后的名义量。",
+        "action": "执行不足和足够两组查询/制作，记录每实体分配及真实扣除。",
+        "expected_invariant": "同一实体只消耗其实际可用预算；不足时拒绝或按声明的部分语义处理。",
+        "failure_signal": "Has 通过但计划少扣、重复预算、覆盖数量。",
+        "applicable_patterns": [
+          "PATTERN-WORLD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "11.3",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "11.3"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-SHARD-002",
+      "title": "Shard disconnect / reconnect recovery",
+      "summary": "验证恢复来源与陈旧写策略。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "7.3",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7.3"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-SHARD-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "验证恢复来源与陈旧写策略。",
+        "setup": "记录两个 Shard 状态，断开一个，另一边产生真实变更。",
+        "action": "重连后读/写，并测试各分片保存再重启。",
+        "expected_invariant": "恢复遵守声明的 authority/epoch/冲突策略；陈旧副本不能无条件覆写稀缺资源。",
+        "failure_signal": "旧余额恢复、无追赶机制、把客户端 Sync 当作 Shard 恢复。",
+        "applicable_patterns": [
+          "PATTERN-SHARD-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "7.3",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "7.3"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "test_case",
+      "id": "TEST-NET-003",
+      "title": "Stale cache and optimistic UI",
+      "summary": "验证 UI 与业务成功的边界。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "5.1；8.3；17",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "5.1；8.3；17"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "purpose": "验证 UI 与业务成功的边界。",
+        "setup": "延迟客户端状态更新或令材料变化；记录实际服务端数据。",
+        "action": "打开UI、发起操作、等待状态刷新或服务器拒绝。",
+        "expected_invariant": "客户端陈旧不导致越权；最终结果可解释；显示可尝试不被当作已成功。",
+        "failure_signal": "UI 永久显示旧值、客户端数字直接写入权威、失败无反馈。",
+        "applicable_patterns": [
+          "PATTERN-NET-001"
+        ],
+        "evidence_source": [
+          {
+            "source_id": "REPORT-R6",
+            "locator": "5.1；8.3；17",
+            "note": "",
+            "role": "interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "5.1；8.3；17"
+              }
+            ]
+          }
+        ],
+        "execution_status": "not_run",
+        "applicability": "仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。",
+        "result": null,
+        "needs_more_cases": true
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "playbook",
+      "id": "ARP-DST-001",
+      "title": "DST Architecture Reasoning Process v0.1",
+      "summary": "按需求、状态、权威与生命周期逐步选择结构，检索事实/反例后再决定模式。",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "dst"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "sources": [
+        {
+          "source_id": "REPORT-R6",
+          "locator": "2；12–19",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "2；12–19"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R5",
+          "locator": "7–15",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "7–15"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "RULE-NET-001",
+        "RULE-STATE-004",
+        "RULE-STATE-002",
+        "DECISION-STATE-OWNER-001",
+        "DECISION-SHARD-001",
+        "RULE-STATE-001",
+        "FAIL-CASE001-001",
+        "RULE-LIFE-001",
+        "FACT-DST-008",
+        "DECISION-NET-001",
+        "FACT-DST-006",
+        "DECISION-PERSIST-001",
+        "FACT-DST-001",
+        "RULE-RESOURCE-001",
+        "RULE-RESOURCE-002",
+        "RULE-WORLD-002",
+        "DECISION-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "CORRECTION-CASE001-001"
+      ],
+      "status": "candidate",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "process_version": "0.1",
+        "steps": [
+          {
+            "order": 1,
+            "name": "Requirement Decomposition",
+            "ai_should_ask": "哪些玩家行为必须发生，什么不变量不能破坏？",
+            "expected_output": "需求/非目标/验收场景列表。",
+            "common_errors": "从一个案例直接选架构，不先确认需求。",
+            "retrieve_entry_types": [
+              "case",
+              "rule",
+              "failure_case"
+            ],
+            "entry_ids": [
+              "RULE-NET-001",
+              "RULE-STATE-004"
+            ]
+          },
+          {
+            "order": 2,
+            "name": "State Inventory",
+            "ai_should_ask": "每个数字、实体关联、开关、视图和缓存是什么？",
+            "expected_output": "状态清单，区分真实/派生/短时上下文。",
+            "common_errors": "只列组件名，不列状态。",
+            "retrieve_entry_types": [
+              "case",
+              "source_fact"
+            ],
+            "entry_ids": [
+              "RULE-STATE-002"
+            ]
+          },
+          {
+            "order": 3,
+            "name": "State Ownership",
+            "ai_should_ask": "谁持有、写入和读取每项状态？",
+            "expected_output": "State | Owner | Writer | Reader | Replicated | Persisted | Rebuildable 矩阵。",
+            "common_errors": "把 View、Cache、Widget 都当 Owner。",
+            "retrieve_entry_types": [
+              "rule",
+              "decision"
+            ],
+            "entry_ids": [
+              "DECISION-STATE-OWNER-001",
+              "RULE-STATE-002"
+            ]
+          },
+          {
+            "order": 4,
+            "name": "Scope",
+            "ai_should_ask": "状态属于单实体、玩家、World 还是多个 Shard？",
+            "expected_output": "范围及依赖图，列出不存在的层。",
+            "common_errors": "为了图完整加 Manager/Shard 层。",
+            "retrieve_entry_types": [
+              "pattern",
+              "decision"
+            ],
+            "entry_ids": [
+              "DECISION-STATE-OWNER-001",
+              "DECISION-SHARD-001"
+            ]
+          },
+          {
+            "order": 5,
+            "name": "Authority",
+            "ai_should_ask": "对客户端、其他玩家、其他 Shard 分别谁能决定结果？",
+            "expected_output": "写入权威表及冲突/恢复语义。",
+            "common_errors": "使用 Server 一词掩盖多 Server 可写。",
+            "retrieve_entry_types": [
+              "rule",
+              "anti_pattern",
+              "failure_case"
+            ],
+            "entry_ids": [
+              "RULE-STATE-001",
+              "FAIL-CASE001-001"
+            ]
+          },
+          {
+            "order": 6,
+            "name": "Lifecycle",
+            "ai_should_ask": "对象何时建、绑定、暂停、注销？任务实际挂谁？",
+            "expected_output": "创建/加入/退出/移除/重载矩阵及 cleanup owner。",
+            "common_errors": "以世界销毁会清理代替玩家注销清理。",
+            "retrieve_entry_types": [
+              "rule",
+              "failure_case",
+              "source_fact"
+            ],
+            "entry_ids": [
+              "RULE-LIFE-001",
+              "FACT-DST-008"
+            ]
+          },
+          {
+            "order": 7,
+            "name": "Networking",
+            "ai_should_ask": "传 Intent 还是 State？原版是否已有链？",
+            "expected_output": "Host/Remote/Dedicated 请求和返回图，校验、超时/重试语义。",
+            "common_errors": "所有请求套自定义 RPC；把缓存更新当逐请求 ACK。",
+            "retrieve_entry_types": [
+              "decision",
+              "pattern",
+              "source_fact"
+            ],
+            "entry_ids": [
+              "DECISION-NET-001",
+              "FACT-DST-006"
+            ]
+          },
+          {
+            "order": 8,
+            "name": "Persistence",
+            "ai_should_ask": "重启后哪些信息无法等价重算？",
+            "expected_output": "保存 schema、重建来源、初始化完成条件和升级/回档问题。",
+            "common_errors": "把能序列化等同应该保存。",
+            "retrieve_entry_types": [
+              "decision",
+              "source_fact"
+            ],
+            "entry_ids": [
+              "DECISION-PERSIST-001",
+              "FACT-DST-001"
+            ]
+          },
+          {
+            "order": 9,
+            "name": "Coordination",
+            "ai_should_ask": "多实体/来源有交集吗？Query 到执行之间会变化吗？",
+            "expected_output": "资源分配图、预算/提交边界及失败补偿。",
+            "common_errors": "单线程就没有逻辑竞争；相同实体按来源重复预算。",
+            "retrieve_entry_types": [
+              "rule",
+              "anti_pattern",
+              "failure_case"
+            ],
+            "entry_ids": [
+              "RULE-RESOURCE-001",
+              "RULE-RESOURCE-002"
+            ]
+          },
+          {
+            "order": 10,
+            "name": "Performance",
+            "ai_should_ask": "多少任务/监听/扫描？空闲也扫描吗？",
+            "expected_output": "复杂度估计、规模变量、测量计划；先不捏造 benchmark。",
+            "common_errors": "Manager 等于高性能；提前引入重型索引。",
+            "retrieve_entry_types": [
+              "pattern",
+              "rule",
+              "test_case"
+            ],
+            "entry_ids": [
+              "RULE-WORLD-002"
+            ]
+          },
+          {
+            "order": 11,
+            "name": "Hook / Compatibility",
+            "ai_should_ask": "改实例、类还是闭包？异常/重装会怎样？",
+            "expected_output": "Hook 目标表、owner、前驱、恢复和私有接口版本边界。",
+            "common_errors": "仅正常返回保留 oldfn 就称兼容安全。",
+            "retrieve_entry_types": [
+              "decision",
+              "anti_pattern",
+              "source_fact"
+            ],
+            "entry_ids": [
+              "DECISION-HOOK-001",
+              "RULE-HOOK-002"
+            ]
+          },
+          {
+            "order": 12,
+            "name": "Validation Matrix",
+            "ai_should_ask": "每条主张需要哪种证据？哪些测试实际执行？",
+            "expected_output": "需求→代码事实→测试候选→执行环境→结果矩阵；明确待验证。",
+            "common_errors": "语法通过就升级 E4；测试候选写成执行记录。",
+            "retrieve_entry_types": [
+              "test_case",
+              "source_fact",
+              "correction"
+            ],
+            "entry_ids": [
+              "TEST-NET-001",
+              "TEST-NET-002",
+              "CORRECTION-CASE001-001"
+            ]
+          }
+        ],
+        "retrieval_policy": [
+          "先读取 status 和 Corrections；过期/撤回主张不可直接用于建议。",
+          "读取 Pattern 时同时取 Related Rule/Anti-Pattern/Decision/Test；不要只取支持它的正例。",
+          "给建议标注适用条件、证据等级、置信度和未测项；同一案例的多报告不是 E2。",
+          "E3 事实引用快照与函数；Recommendation 不因引用 E3 而自动变成 Klei Fact。"
+        ],
+        "stop_conditions": "不明确的玩法/数值/用户意图列出选项；只在有证据的工程边界自主选择。",
+        "revision_policy": "CASE-002+ 提供独立证据后修订；保留旧 version 与 Correction/Deprecated 状态。"
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": []
+    },
+    {
+      "schema_version": "0.1.1",
+      "entry_type": "case",
+      "id": "CASE-001",
+      "title": "小穹 v13.80",
+      "summary": "以玩家业务通道、分片共享状态、世界容器 Manager 和接入框架为主要研究面的一份静态案例。",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "001"
+      ],
+      "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "evidence_level": "E1",
+      "confidence": "High",
+      "sources": [
+        {
+          "source_id": "META-MODINFO",
+          "locator": "author/version/name 字段",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "file",
+              "file": "modinfo.lua"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R4",
+          "locator": "全文索引",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "全文索引"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R5",
+          "locator": "全文索引",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "全文索引"
+            }
+          ]
+        },
+        {
+          "source_id": "REPORT-R6",
+          "locator": "全文索引",
+          "note": "",
+          "role": "interpretation",
+          "locator_structured": [
+            {
+              "type": "report_section",
+              "section": "全文索引"
+            }
+          ]
+        }
+      ],
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-SHARD-001",
+        "PATTERN-WORLD-001",
+        "PATTERN-FRAMEWORK-001",
+        "CORRECTION-CASE001-001"
+      ],
+      "status": "validated_single_case",
+      "created_from_case": [
+        "CASE-001"
+      ],
+      "version": "0.1.1",
+      "details": {
+        "case_id": "CASE-001",
+        "name": "小穹",
+        "mod_version": "13.80",
+        "author": {
+          "declared": "FL",
+          "source": "modinfo.lua author 字段；本轮仅核对元数据，未执行文件。"
+        },
+        "analysis_date": "2026-09-28（本地第4–6轮报告日期；前3轮独立时间未恢复）",
+        "project_size": {
+          "files": 949,
+          "lua_files": 186,
+          "bytes": 68623081
+        },
+        "domains": [
+          "玩家业务通信/客户端视图",
+          "分片共享数据",
+          "容器注册/物流/制作整合",
+          "环境/Hook/模块接入"
+        ],
+        "research_rounds": [
+          {
+            "round": 1,
+            "topic": "Architecture Recon",
+            "availability": "completed_per_user; standalone_report_not_located"
+          },
+          {
+            "round": 2,
+            "topic": "ClientDB",
+            "availability": "completed_per_user; standalone_report_not_located"
+          },
+          {
+            "round": 3,
+            "topic": "MainDB",
+            "availability": "completed_per_user; standalone_report_not_located"
+          },
+          {
+            "round": 4,
+            "topic": "sorachestmanager",
+            "availability": "available_report"
+          },
+          {
+            "round": 5,
+            "topic": "SoraEnv + SoraAPI + Hook Framework",
+            "availability": "available_report"
+          },
+          {
+            "round": 6,
+            "topic": "种子/全局制作端到端组合验证",
+            "availability": "available_report"
+          }
+        ],
+        "analysis_file_count": {
+          "unique_mod_total": null,
+          "confirmed_mod_lower_bound": 17,
+          "count_note": "第6轮17个关键Mod文件有审读与语法记录；第5轮10个关键文件另有语法记录。不能相加视为六轮去重阅读总量。",
+          "project_lua_count_is_not_analysis_count": true
+        },
+        "runtime_tested": false,
+        "dedicated_tested": false,
+        "vanilla_context": {
+          "source_context_id": "KLEI-LOCAL-20260928",
+          "release_build": null,
+          "note": "第6轮18份、第5轮13份原版文件分别对照本机游戏 scripts.zip；未在线确认最新发行版；不把两批相加当去重总数。"
+        },
+        "project_hash": "52c1cbe65297d77ae006613c33955199f87b835a04fea9fe27427ac1c0361f71",
+        "hash_algorithm": "对按完整路径排序的文件：依次 hash.update(relative_posix_path.encode(UTF8)); hash.update(SHA256(file_bytes).digest())。",
+        "architecture_summary": [
+          "玩家通道把业务意图、服务器View和客户端Cache组织起来。",
+          "共享种子计数在各Shard本地可写并传播完整值；没有自动获得唯一权威。",
+          "世界Manager持有实体注册/候选；真实物品仍在Container/Stackable。",
+          "框架提供启动顺序、共享环境与多类Hook；并非统一可卸载的通用框架产品。"
+        ],
+        "observations": [
+          {
+            "claim": "种子服务器 ClientDB 为 View，客户端 SeedCDB 为缓存。",
+            "knowledge_kind": "Case Observation",
+            "evidence_level": "E1",
+            "source": {
+              "source_id": "REPORT-R6",
+              "locator": "3–6",
+              "note": "",
+              "role": "interpretation",
+              "locator_structured": [
+                {
+                  "type": "report_section",
+                  "section": "3–6"
+                }
+              ]
+            }
+          },
+          {
+            "claim": "全局制作使用当前Shard的注册容器，不经MainDB跨世界取材。",
+            "knowledge_kind": "Case Observation",
+            "evidence_level": "E1",
+            "source": {
+              "source_id": "REPORT-R6",
+              "locator": "8–11",
+              "note": "",
+              "role": "interpretation",
+              "locator_structured": [
+                {
+                  "type": "report_section",
+                  "section": "8–11"
+                }
+              ]
+            }
+          },
+          {
+            "claim": "Manager有候选缓存和活动集合，但不是数量总账，也未消除全部扫描。",
+            "knowledge_kind": "Case Observation",
+            "evidence_level": "E1",
+            "source": {
+              "source_id": "REPORT-R4",
+              "locator": "6；8；15",
+              "note": "",
+              "role": "interpretation",
+              "locator_structured": [
+                {
+                  "type": "report_section",
+                  "section": "6；8；15"
+                }
+              ]
+            }
+          },
+          {
+            "claim": "SoraAPI 为 env 别名，共享环境隐藏部分依赖。",
+            "knowledge_kind": "Case Observation",
+            "evidence_level": "E1",
+            "source": {
+              "source_id": "REPORT-R5",
+              "locator": "2–5",
+              "note": "",
+              "role": "interpretation",
+              "locator_structured": [
+                {
+                  "type": "report_section",
+                  "section": "2–5"
+                }
+              ]
+            }
+          }
+        ],
+        "identified_patterns": [
+          "PATTERN-NET-001",
+          "PATTERN-SHARD-001",
+          "PATTERN-WORLD-001",
+          "PATTERN-FRAMEWORK-001"
+        ],
+        "identified_anti_patterns": [
+          "ANTI-NET-001",
+          "ANTI-SHARD-001",
+          "ANTI-SHARD-002",
+          "ANTI-RESOURCE-001",
+          "ANTI-HOOK-001",
+          "ANTI-HOOK-002",
+          "ANTI-LIFE-001",
+          "ANTI-WORLD-001",
+          "ANTI-FRAMEWORK-001"
+        ],
+        "unverified": [
+          "所有Host/Remote/Dedicated运行结论",
+          "跨Shard并发/离线恢复实际时序",
+          "多Mod兼容与异常注入",
+          "大规模性能/长期泄漏测量",
+          "六轮准确去重审读文件总数及原版发行build"
+        ],
+        "corrections": [
+          "CORRECTION-CASE001-001"
+        ],
+        "exclusions": [
+          {
+            "topic": "Persisting / Treating Derived Runtime State As Truth",
+            "reason": "本案例有Registry/Cache重建正例；没有足够证据将错误保存派生状态登记为已发生反模式。可作未来检索问题。"
+          },
+          {
+            "topic": "God Manager",
+            "reason": "已建 E0 风险候选，未宣称案例达到 God Object。"
+          }
+        ],
+        "availability_limit": "前三轮独立报告未在工作区发现；本次采用第4–6轮已保留的交叉证据，不补造前三轮原文或发现。",
+        "static_failure_paths": [
+          "FAIL-CASE001-001",
+          "FAIL-CASE001-002",
+          "FAIL-CASE001-003",
+          "FAIL-CASE001-004"
+        ]
+      },
+      "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "shard",
+          "world",
+          "UI",
+          "lifecycle",
+          "framework"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": []
+    }
+  ]
+}

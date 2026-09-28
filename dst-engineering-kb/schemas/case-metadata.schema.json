@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "case-metadata.schema.json",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "author": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "analysis_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "file_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lua_file_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hash_algorithm": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime_tested": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "dedicated_server_tested": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "source_available_in_package": {
+      "type": "boolean"
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "case_id",
+    "name",
+    "version",
+    "author",
+    "analysis_date",
+    "file_count",
+    "lua_file_count",
+    "content_hash",
+    "hash_algorithm",
+    "runtime_tested",
+    "dedicated_server_tested",
+    "source_available_in_package",
+    "provenance"
+  ],
+  "additionalProperties": false
+}

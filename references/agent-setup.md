@@ -21,7 +21,7 @@
 
 ## 首次安装示例
 
-不需要为安装技能专门安装 Git。没有 Git 时，打开 [本仓库](https://github.com/zhuchengguang317-eng/dst-mod-engineering)，选择 **Code → Download ZIP**；也可用 Agent 已有的文件下载能力取得同一仓库的源码压缩包。该流程见 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)。
+不需要为安装技能专门安装 Git。没有 Git 时，打开 [本仓库](https://github.com/Zechariah0121/dst-mod-engineering)，选择 **Code → Download ZIP**；也可用 Agent 已有的文件下载能力取得同一仓库的源码压缩包。该流程见 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)。
 
 将压缩包解压到新的临时目录，找到**直接包含 `SKILL.md` 的那一层**（下载时通常带分支名后缀），将这一层目录命名为 `dst-mod-engineering`，再复制到上表选定的技能父目录。复制前确认目标不存在，避免覆盖已有技能。最终结构应是 `<技能父目录>/dst-mod-engineering/SKILL.md`，而不是在 `dst-mod-engineering` 里又套一层 `dst-mod-engineering-main`。保留其参考文档、脚本、依赖说明和许可证。
 
@@ -37,7 +37,7 @@ if (Test-Path -LiteralPath $skillTarget) {
 }
 Get-Command git -ErrorAction Stop | Out-Null
 New-Item -ItemType Directory -Path $skillParent -Force | Out-Null
-git clone -- https://github.com/zhuchengguang317-eng/dst-mod-engineering.git $skillTarget
+git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git $skillTarget
 if ($LASTEXITCODE -ne 0) { throw '克隆失败；检查原因，不要覆盖重试。' }
 foreach ($relative in @('SKILL.md', 'references', 'scripts', 'docs', 'requirements.txt', 'LICENSE')) {
     if (-not (Test-Path -LiteralPath (Join-Path $skillTarget $relative))) {
@@ -60,7 +60,7 @@ macOS / Linux 的 Bash 或 Zsh 示例同样默认采用 `.agents/skills`；按�
     fi
     command -v git >/dev/null
     mkdir -p "$skill_parent"
-    git clone -- https://github.com/zhuchengguang317-eng/dst-mod-engineering.git "$skill_target"
+    git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git "$skill_target"
     test -f "$skill_target/SKILL.md"
     test -d "$skill_target/references"
     test -d "$skill_target/scripts"

@@ -1,0 +1,66 @@
+# 全部知识条目
+
+- [FACT-DST-001](facts/klei-lua.md#fact-dst-001) — EntityScript 组件持久化遍历
+- [FACT-DST-002](facts/klei-lua.md#fact-dst-002) — Container 的物品存档
+- [FACT-DST-003](facts/klei-lua.md#fact-dst-003) — Builder 查询与消耗边界
+- [FACT-DST-004](facts/klei-lua.md#fact-dst-004) — InventoryItem 的 Owner 清理
+- [FACT-DST-005](facts/klei-lua.md#fact-dst-005) — Stackable 拆分
+- [FACT-DST-006](facts/klei-lua.md#fact-dst-006) — Mod RPC / Shard RPC 的 Lua 边界
+- [FACT-DST-007](facts/klei-lua.md#fact-dst-007) — Prefab / Component / Class PostInit 时机
+- [FACT-DST-008](facts/klei-lua.md#fact-dst-008) — 实体删除与组件单独卸载不同
+- [FACT-DST-009](facts/klei-lua.md#fact-dst-009) — 原版制作 Host / Remote 汇合
+- [FACT-DST-010](facts/klei-lua.md#fact-dst-010) — 原版材料来源与堆叠移除
+- [PATTERN-NET-001](patterns/PATTERN-NET-001.md#pattern-net-001) — Player Business Channel
+- [PATTERN-SHARD-001](patterns/PATTERN-SHARD-001.md#pattern-shard-001) — Shard Service Bus
+- [PATTERN-WORLD-001](patterns/PATTERN-WORLD-001.md#pattern-world-001) — World Manager
+- [PATTERN-FRAMEWORK-001](patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001) — Mod Framework / Integration Layer
+- [RULE-NET-001](rules/net.md#rule-net-001) — Client 提交 Intent，服务端决定权威数量/材料。
+- [RULE-STATE-001](rules/state.md#rule-state-001) — 每个状态写清“相对于谁权威”。
+- [RULE-STATE-002](rules/state.md#rule-state-002) — 分别记录 Owner、Server View、Client Cache 和 Display。
+- [RULE-STATE-003](rules/state.md#rule-state-003) — 缓存可重建只说明恢复来源，不说明来源正确。
+- [RULE-NET-002](rules/net.md#rule-net-002) — Host 快路径应保留与 Remote 相同的业务验证。
+- [RULE-STATE-004](rules/state.md#rule-state-004) — 实体与账本互换必须定义提交及失败补偿边界。
+- [RULE-SHARD-001](rules/shard.md#rule-shard-001) — 跨 Shard 稀缺资源应先定义写入权威和冲突语义。
+- [RULE-WORLD-001](rules/world.md#rule-world-001) — 真实物品留给 Container/Item；Manager 可持有成员和候选。
+- [RULE-PERSIST-001](rules/persist.md#rule-persist-001) — 可从真实实体重建的 Registry/Cache 通常不独立持久化。
+- [RULE-RESOURCE-001](rules/resource.md#rule-resource-001) — 多个资源 Provider 必须按实体身份和剩余预算组合。
+- [RULE-RESOURCE-002](rules/resource.md#rule-resource-002) — Query/分配建议不等于 reservation 或扣款。
+- [RULE-NET-003](rules/net.md#rule-net-003) — 乐观 UI 应与服务端最终可用性区分。
+- [RULE-LIFE-001](rules/life.md#rule-life-001) — Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。
+- [RULE-HOOK-001](rules/hook.md#rule-hook-001) — 先确认原版消费、保存和卸载契约，再扩展接口。
+- [RULE-HOOK-002](rules/hook.md#rule-hook-002) — 临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。
+- [RULE-HOOK-003](rules/hook.md#rule-hook-003) — 选择最小足够作用域的接入点，并保存原契约。
+- [RULE-WORLD-002](rules/world.md#rule-world-002) — 注册与失效管理先正确，再按测量选择 Active Set/索引。
+- [RULE-FRAMEWORK-001](rules/framework.md#rule-framework-001) — 共享 API 应有可追溯的有限出口和初始化条件。
+- [ANTI-NET-001](anti-patterns/case001.md#anti-net-001) — Client / Host Divergent Validation
+- [ANTI-SHARD-001](anti-patterns/case001.md#anti-shard-001) — Writable Replica Read-Modify-Write
+- [ANTI-SHARD-002](anti-patterns/case001.md#anti-shard-002) — Broadcast Final Value Without Authority
+- [ANTI-RESOURCE-001](anti-patterns/case001.md#anti-resource-001) — Duplicate Resource Provider Allocation
+- [ANTI-HOOK-001](anti-patterns/case001.md#anti-hook-001) — Unsafe Temporary Monkey Patch
+- [ANTI-HOOK-002](anti-patterns/case001.md#anti-hook-002) — Hook Without Ownership
+- [ANTI-LIFE-001](anti-patterns/case001.md#anti-life-001) — Lifecycle Owner Mismatch
+- [ANTI-WORLD-001](anti-patterns/case001.md#anti-world-001) — God Manager — risk candidate
+- [ANTI-FRAMEWORK-001](anti-patterns/case001.md#anti-framework-001) — Unlimited Ambient Dependency / Shared Namespace Growth
+- [FAIL-CASE001-001](failures/case001.md#fail-case001-001) — Seed cross-shard lost update
+- [FAIL-CASE001-002](failures/case001.md#fail-case001-002) — Duplicate Material Provider Allocation
+- [FAIL-CASE001-003](failures/case001.md#fail-case001-003) — Unsafe temporary patch remains after error
+- [FAIL-CASE001-004](failures/case001.md#fail-case001-004) — ClientDB owner task lifetime exceeds DB lifetime
+- [CORRECTION-CASE001-001](corrections/CASE-001.md#correction-case001-001) — 撤回未使用 SeedCDB 顶层 local 的初始化故障判断
+- [DECISION-STATE-OWNER-001](decisions/candidates.md#decision-state-owner-001) — Prefab / Component / World Manager 如何选择？
+- [DECISION-NET-001](decisions/candidates.md#decision-net-001) — netvar / Replica / RPC / 原版 Action / Client View 如何判断？
+- [DECISION-SHARD-001](decisions/candidates.md#decision-shard-001) — 什么时候需要跨 Shard Service？
+- [DECISION-PERSIST-001](decisions/candidates.md#decision-persist-001) — 哪些状态保存，哪些重建？
+- [DECISION-HOOK-001](decisions/candidates.md#decision-hook-001) — PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？
+- [TEST-NET-001](tests/candidates.md#test-net-001) — Host vs Remote Client parity
+- [TEST-NET-002](tests/candidates.md#test-net-002) — Dedicated Server request flow
+- [TEST-SHARD-001](tests/candidates.md#test-shard-001) — Ground/Cave simultaneous modification
+- [TEST-LIFE-001](tests/candidates.md#test-life-001) — Player reconnect
+- [TEST-LIFE-002](tests/candidates.md#test-life-002) — World save/load
+- [TEST-LIFE-003](tests/candidates.md#test-life-003) — Entity removed during query
+- [TEST-HOOK-001](tests/candidates.md#test-hook-001) — Wrapped function throws error
+- [TEST-HOOK-002](tests/candidates.md#test-hook-002) — Two Mods wrap same function
+- [TEST-RESOURCE-001](tests/candidates.md#test-resource-001) — Same Entity exposed by two resource providers
+- [TEST-SHARD-002](tests/candidates.md#test-shard-002) — Shard disconnect / reconnect recovery
+- [TEST-NET-003](tests/candidates.md#test-net-003) — Stale cache and optimistic UI
+- [ARP-DST-001](playbooks/ARP-DST-001.md#arp-dst-001) — DST Architecture Reasoning Process v0.1
+- [CASE-001](cases/CASE-001-sora/README.md#case-001) — 小穹 v13.80

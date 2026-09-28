@@ -1,0 +1,751 @@
+sorachestmanager — World Manager Architecture Deep Dive
+核验日期：2026-09-28
+分析对象：case-study/CASE-001
+
+范围与证据
+==========
+本报告只研究 sorachestmanager，以及为闭合其调用链必需的 Prefab、Container、Builder、UI 和原版接口。没有展开 MainDB 或 ClientDB 的内部实现，没有修改参考项目代码，没有启动模组或进行实机故障复现。
+本报告是单独生成的分析产物，位于 analysis-report-location/，不在参考项目内。
+“静态确认”表示可以从当前代码与原版契约推出；“风险／待实机验证”表示触发环境、时序或最终用户影响尚未实测。
+
+文件定位约定：下文 P 表示 case-study/CASE-001；V 表示 vanilla-snapshot/scripts。
+M = P/scripts/components/sorachestmanager.lua。
+例如 M:1317 表示该文件第 1317 行开始的实现，不是其他版本或注释示例。
+
+核心结论
+========
+sorachestmanager 是当前服务端世界内的容器注册、分类物流调度和共享制作材料查询服务；它是标准世界 Component，但主要注册表保存在模块局部变量中，依赖每个 Lua 世界只有一个 Manager 的使用方式。
+
+它的核心价值是：容器主动注册，世界统一安排物流，制作系统复用候选容器查询，容器的真实物品仍由原版 Container 保存和管理。
+它没有维护精确的“全世界物品数量总账”；chestcache 缓存的是可能提供某类材料的容器分组，查询时仍读取实际槽位。
+它是事件与周期任务混合的架构，不是完全事件驱动，也没有彻底消除扫描。
+客户端全局制作显示采用乐观放行，不是远程库存的准确镜像；服务端仍调用真实材料检查，但当前整合存在来源重叠和扣料清单覆盖问题。
+
+1. 准确定位与建立 Manager 的原因
+================================
+一句话定义：这是一个以世界为服务范围、主动注册容器、统一运行分类收集和宝石行为，并向 Builder 提供额外材料来源的业务 Manager。
+
+它同时具备：
+- 世界服务：TheWorld.components.sorachestmanager 是业务入口。
+- 实体注册中心：维护 type → entity → metadata。
+- 自动物流调度器：统一决定哪些容器在这一轮收集、目标分类与优先级。
+- 制作材料候选索引：维护材料名称到候选容器分组的短期缓存。
+- 容器行为协调层：配置分组类别、控制槽、宝石计时和放入槽位。
+
+它不是通用 Container 替代品，也没有一个明确的容器状态机图或状态机框架；状态分散在 metadata、Container 与实体字段中。
+
+没有 Manager 时，每个容器需要重复实现：注册发现、地面候选筛选、周期任务、同类目标竞争、分类与槽位规则、制作材料查询入口、移除通知及调试统计。统一服务减少了重复调度和重复候选筛选，使 Builder 不必认识每一种箱子。
+
+证据：M:33、M:356、M:751、M:1070、M:1143、M:1239。
+
+2. 生命周期、端别和对象持有
+============================
+实际链路：
+Prefab 文件被 require/加载
+  ↓ 调用类上的 RegType，声明类型模板
+World 实体创建
+  ↓ main/hook.lua 的 world postinit 判断 inst.ismastersim
+  ↓ inst:AddComponent("sorachestmanager")
+Manager 构造
+  ↓ 创建暂停状态、制作候选缓存、两个冷却闭包
+  ↓ 安装 1 秒周期任务、cycles watcher、entity_spawned listener
+Container Prefab 实例创建
+  ↓ 添加原版 container 并 WidgetSetup
+  ↓ Manager:RegByType(inst, type)
+  ↓ 复制类型模板、安装事件及 GiveItem 包装、安排延迟初始化
+运行
+  ↓ 关闭事件／手动收集／日周期／每秒更新／制作查询
+实体移除
+  ↓ onremove → UnReg
+世界保存
+  ↓ Container 保存真实槽位；Manager 自己没有保存方法
+世界加载
+  ↓ 重建 Manager；各实体重新执行构造及注册；重建派生数据
+世界销毁
+  ↓ 原版实体清理世界任务、监听和 watcher
+
+要点：
+1) 这是标准 AddComponent 创建的 Component，区别于手工塞进 components 的普通对象。
+2) 仅当前世界的 Master Sim 创建。地面和洞穴各有自己的 Manager，不表示只有主分片拥有。
+3) 远程客户端可能加载该 Lua 模块并执行类型声明，但没有对应的世界 Manager 实例，也没有 sorachestmanager replica。
+4) 容器展示复用原版 container replica/classified；制作模式使用 player_classified 的 net_bool。没有把整个 Manager 注册表复制给客户端。
+5) Host 与 Dedicated Server 使用相同的服务端 Manager 逻辑。Host 同时具备 UI；Dedicated Server 不具备本地 UI，玩家请求从远程到达。
+6) 类型注册在 Prefab 文件顶层，早于该类型的实体注册；它不需要先创建一个 Manager 实例。
+
+证据：P/main/hook.lua:57；M:1070；三个 Prefab 的 RegType/RegByType 位置见第 4 节。
+
+3. RegType 与 RegByType：模板和实例必须分开
+=========================================
+RegType(type, data)：注册一种容器的布局与策略模板。
+- controls：宝石控制槽的槽号数组。
+- containers：存储槽位的分组数组，例如一个 25 格组、50 个三格组。
+- pri：物流优先级。
+- overfull：手动/关闭收集后的剩余物品处理策略。
+- notdayupdate：是否跳过 DayUpdate 及其整理。
+- selfcontainer：是否排除 Manager 的额外制作材料候选查询。
+- bangreen：是否禁止绿色宝石对应的部署行为。
+- 同时初始化 c、gem、update、updated 表。
+
+这里没有注册 filter 回调、通用 behaviour 对象或完整 capability 接口。具体宝石行为和分类映射写在 Manager 内部；真实 itemtestfn 写在 main/containers.lua。
+update、updated 在当前文件中只初始化，没有形成可确认的运行机制，不能按名字推断它们是 dirty 队列。
+
+RegType 会更新 ChestData[type]，再重建并排序 orderData。重复声明同一个类型会替换模板，但已注册实例拿的是 deepcopy，不会自动获得新模板。
+
+RegByType(chest, type)：把一个具体、已经有 Container 的实体加入服务。
+- 按类型建立弱键实例表。
+- 深拷贝模板作为该实体独立的 metadata。
+- 同一 metadata 同时由注册表和 chest.sorachestdata 引用。
+- 设置 chest.sorachesttype。
+- 安装六个事件监听、sorasmartchest tag、GiveItem 包装和组件退出包装。
+- 安排 DoTaskInTime(0, ResetChestData)，从实际槽位重建派生状态。
+
+数据结构：
+模块作用域
+├─ ChestData[type] → 类型模板（也暴露为 SoraAPI.ChestData）
+├─ orderData → {type, pri} 排序数组
+├─ allchest[type]
+│    └─ [chest entity，弱键] → 独立 metadata
+│          ├─ containers / controls / pri / flags
+│          ├─ c[group] → 收集类别
+│          ├─ gem[prefab] → 控制槽宝石数量
+│          └─ gemtask / gemtick → 行为进度
+├─ updatechests[entity] → 需周期执行指定宝石行为的 metadata
+├─ AllEnts / cacheents → 地面候选实体集合
+└─ cmp → 当前 Manager 实例
+
+Manager 实例
+├─ inst → TheWorld
+├─ stoptime
+├─ chestcache[itemPrefab] → {time, chest={{entity, group}, ...}}
+├─ UpdateEntsCD / UpdateAllEntsCD
+└─ UpdateAllChestTask / HasDayUpdate
+
+注册实体
+├─ sorachesttype
+├─ sorachestdata ──→ 上述 metadata
+└─ components.container → 原版真实 slots
+
+模块局部表意味着该实现事实上依赖单 Manager；它不是可在同一 Lua 环境任意创建多个独立实例的通用类。
+证据：M:282、M:867、M:1070、M:1239、M:1317；弱表定义 P/main/baseapi.lua:33。
+
+4. 三种真实 Prefab 接入
+=======================
+类型             存储分组                控制槽          优先级  其他策略
+sora2chest       1 组 × 25 槽            26～30          50      overfull=1
+sora3chest       9 组 × 1 槽             无              0       notdayupdate=1，selfcontainer=1
+sora_light      50 组 × 3 槽（1～150）   155～159        100     bangreen=true
+
+sora_light 的 151～154 是 Prefab 的电池/科技等用途槽，不在 Manager 的物流存储组内。这体现了实体可以只把部分槽位交给 Manager。
+
+A. sora2chest
+P/scripts/prefabs/sora2chest.lua:186 RegType
+  ↓ 文件级类型模板
+fn:246 创建实体
+  ↓ 270 非 Master Sim 返回
+278 添加 container，279 WidgetSetup
+  ↓ 298 RegByType(inst, "sora2chest")
+M:1325 复制 metadata → 六个事件 → GiveItem 包装
+  ↓ 0 延迟 ResetChestData
+onhammered:77 → DropEverything → Remove
+  ↓ onremove → UnReg
+
+这个类型另有补丁接入路径：P/scripts/prefabs/sora2chest.lua:203 在替换现有实体的 Container 后，于 232 再注册。该路径与组件移除清理缺陷有关，见第 13 节。
+
+B. sora3chest
+P/scripts/prefabs/sora3chest.lua:36/44 RegType
+  ↓ fn:46
+62 非 Master Sim 返回，77 创建 container
+  ↓ 98 RegByType(inst, "sora3chest")
+  ↓ 同一套注册与监听
+实体 Remove → onremove → UnReg
+
+它跳过日整理和 Manager 额外制作材料查询，但仍可通过关闭/手动收集入口取物。selfcontainer 不表示原版已打开容器制作完全不能使用它，只约束 Manager 自己的候选查询。
+
+C. sora_light
+P/scripts/prefabs/sora_light.lua:299/309 RegType
+  ↓ fn:310
+334 非 Master Sim 返回，355 创建 container
+  ↓ 360 RegByType(inst, "sora_light")
+  ↓ 同一套注册与监听
+实体 Remove → onremove → UnReg
+
+灯的 itemget/itemlose 还会触发 Prefab 自己的 UpdateLightState。物流元数据归 Manager，灯光/科技状态归 Prefab，这两层同时监听同一个 Container。
+
+所有正常接入都是实体主动注册。Manager 没有通过 FindEntities 搜索 sora2chest/sora3chest/sora_light 来建立注册表。
+不能因此声称“完全没有世界搜索”：地面候选刷新、某些宝石行为以及玩家制作开关检测仍有扫描。
+
+5. 事件模型
+===========
+事件/变化          发送者                 监听者/处理器              用途                         安装/解除
+onopen             原版 Container         chest/OnOpen               当前处理器为空               RegByType / UnReg
+onclose            原版 Container         chest/OnClose              重建分类、安排收集/部署       RegByType / UnReg
+onremove           EntityScript           chest/OnChestRemove        调用世界 Manager 注销         RegByType / 实体销毁自动清理
+worked             原版 Workable          chest/HitProtect           调整敲击保护计数             RegByType / UnReg
+itemget            原版 Container         chest/OnItemGet            控制槽宝石增加 nocrafting    RegByType / UnReg
+itemlose           原版 Container         chest/OnItemLose           移走控制宝石去掉 nocrafting  RegByType / UnReg
+entity_spawned     原版 SpawnPrefab 路径  world/NewEnt               增量加入候选物品集合         Manager 构造 / 世界销毁
+cycles             原版 worldstate        world watcher              安排三轮 DayUpdate           Manager 构造 / 世界销毁
+ingredientmoddirty netvar/本地派生检测    原版 player_classified     刷新制作 UI                  原版监听生命周期
+stacksizechange    Stackable→InventoryItem→所属容器  Manager 未订阅    数量在查询时直接读           非 Manager 监听
+attacked           本轮 Manager 没有订阅  无                         实际保护事件是 worked         不适用
+
+补充：
+- Manager 不是在 itemget 时立即执行跨箱路由；该监听当前只维护控制宝石的 nocrafting 标签。
+- 类别更新主要来自 GiveItem 包装和 ResetChestData，后者通常由注册后的延迟初始化或关闭触发。
+- 容器内部 PushEvent 会同步执行普通监听回调；即使单线程，也存在调用栈中的重入。
+- 物流中的 gotnewitem、dropitem 和 Stackable 事件继续交给原版表现/所有权体系；它们没有组成一套 Manager 数量总账。
+- UnReg 没有主动解除 onremove；正常实体销毁会由原版清掉，单独注销仍存活实体时则留下该监听。
+
+判断：混合架构。注册、关闭和生成事件负责状态转换；周期任务负责自动收集和宝石工作；制作查询按需读槽位。
+证据：M:989、M:1029、M:1052、M:1070、M:1328；V/mainfunctions.lua:387；V/entityscript.lua:1286；V/components/inventoryitem.lua:41。
+
+6. 周期任务与延迟任务
+=====================
+Manager 文件中的有效调度：
+1) 世界 DoPeriodicTask(1, UpdateAllChest)：一个长期任务，不是每箱一个。
+2) cycles 改变后分别在 1、3、5 秒执行 DayUpdate：每次周期变化三次，均挂在世界。
+3) RegByType 后 DoTaskInTime(0, ResetChestData)：每次注册一个初始化任务。
+4) OnClose 后 DoTaskInTime(0, GetItem)：允许当前容器物品操作先完成，再收集。
+5) 符合绿色宝石条件时 DoTaskInTime(0.1, ...)：执行分组部署；受配置和 bangreen 约束。
+
+没有独立的每秒 UpdateEntsTask：那一行被注释。
+UpdateEntsCD(1) 与 UpdateAllEntsCD(10) 是调用时检查的限频闭包，不是周期任务。实际间隔是 GetTime 差值超过阈值，并且必须有人调用 UpdateEnts 才会刷新。
+
+每秒 UpdateAllChest 做什么：
+- 如果 HasDayUpdate 为 true，清标记并跳过本轮。
+- 遍历全部已注册实例，尝试清理失效项。
+- 遍历 updatechests，只执行已启用的指定宝石工作。
+- 执行 OrangeTask，重新遍历注册容器，找当前 tick 应收集的橙宝石容器。
+- 按类别组织需求，再读取 cacheents 并分配物品。
+
+即使这一轮没有橙宝石容器，OrangeTask 在未暂停时仍遍历已有 cacheents，只是不调用 UpdateEnts 刷新。它不是完全无工作量的空闲路径。
+
+OrangeTask 使用 50 tick 循环和 ceil(50/level²) 的取模表。1 颗橙宝石对应每 50 tick 一次；其他级别在 50 tick 边界存在间隔变化，不能笼统承诺固定每 50/level² 秒一次。
+
+DayUpdate 做什么：
+- 检查暂停。
+- 调用 UpdateAllChest，并设置 HasDayUpdate 避免紧接着重复更新。
+- AllChestDrop 检查非 notdayupdate 容器的分组槽位，把类别不符且不受 notdrop 保护的物品丢出。
+- 刷新地面候选并按类别分组。
+- 按类型优先级遍历注册容器，尝试放入。
+
+与 Manager 直接相关但定义在外围的长期工作：
+- 全局制作启用时，每个服务端 player_classified 每秒检查一次附近 10 距离的 smartchest 或随身同 tag 物品；对应客户端对象也执行本地派生检测。
+- AllInv 由 inventoryitem 的 ComponentPostInit 维护。外围世界协程约每 60 秒清理失效项，超过 1000 项分段 ThreadCheckPoint；该协程还服务其他集合，不应全算作 Manager 独占成本。
+
+Manager 的暂停只阻止 GetItem、DayUpdate 和 OrangeTask 的收集逻辑。UpdateAllChest 对 updatechests 的其他宝石工作仍执行；暂停不是停掉全部世界任务。
+证据：M:463、M:751、M:821、M:883、M:1010、M:1070；P/main/api.lua:282；P/main/hook.lua:1422、1751、1802。
+
+7. 自动物流：真实路径与目标选择
+===============================
+路径一：以模板物品指定要收集的类别。
+玩家往已注册容器放入物品
+  ↓ Container.GiveItem 的 Manager 包装
+  ↓ 指定槽：TryFixSlotData；未指定槽：FindBestSlot
+  ↓ 原版 GiveItem 保存实体并发送 itemget
+  ↓ 玩家关闭 / 手动 Collect / 周期调度
+  ↓ ResetChestData 从分组内容或 sora2chest 标牌确定 data.c[group]
+  ↓ GetItem → UpdateEnts → GetOneItem
+  ↓ 从地面候选选择相同 toprefab 类别，按配置判断距离
+  ↓ TryPutToContainer
+  ↓ 同 prefab、同皮肤且目标未满：尝试原版 Stackable:Put
+     否则搜索该分组空槽：原版 Container:GiveItem
+  ↓ 原版 itemget / stacksizechange，真实 Container 与玩家表现更新
+
+路径二：一个容器的错类物品最终转入另一容器。
+源容器分组已有类别 A，玩家放入不同类别 B
+  ↓ 关闭时 ResetChestData 或日整理 AllChestDrop
+  ↓ B 从源容器 DropItemBySlot，成为地面无主物品
+  ↓ 后续目标容器的 OrangeTask / DayUpdate 收集轮次
+  ↓ 根据目标分组类别 B 和优先级选接收容器
+  ↓ TryPutToContainer → 目标 Container
+
+这不是 itemget 触发的立即 A→B 直送。地面候选池是当前物流的中间状态，调度和缓存刷新会造成等待。
+
+规则分层：
+- Type：决定槽位分组与策略模板。
+- Priority：DayUpdate 使用类型优先级表；OrangeTask 对同类别目标按 metadata.pri 排序。相同优先级没有稳定距离/注册顺序的 tie-break；制作材料查询不使用此优先级。
+- Category：toprefab 用大量物品映射归类，例如 boards/charcoal→log。收集可按类别，制作最终仍要求精确 prefab。
+- Filter：catch 排除已被持有、不可装箱、仅口袋、装饰、场景、不可达或死亡等物品；距离在有限范围模式额外过滤。
+- Slot rule：各 containers[group] 决定可操作槽位；同类组优先堆叠、再空槽；FindBestSlot 可为未分类空组赋类别。
+- 保护名单：notdrop 保护礼物/打包类物品，避免整理时当作错类丢出，不是通用库存权限列表。
+- itemtestfn：仍由原版 Container 在 GiveItem 时调用；控制槽和电池槽约束放在 main/containers.lua，RegType 没有替代它。
+- Full fallback：本轮未放完的实体可继续交给后续候选容器；无目标则留在地面。overfull 在指定收集路径中可把剩余候选移到箱子位置，鸟类另有处理；不是无限容量。
+
+一次候选实体在一个目标分组中只有一次主要放入尝试；部分堆叠后不保证马上继续填该组其他空槽，剩余会留给后续目标或后续轮次。
+con.soragiving 临时阻止 Manager 自己的 GiveItem 包装再次选择槽位，它是重入标记，不是物品锁。
+
+限制：空槽 GiveItem 的返回值没有核验便把物品从当前候选集合移除。原版失败通常会把物品留/丢在地面，所以不能直接宣称吞物，但可能漏掉本轮后续目标。自定义 CanStack 没包含原版 stackable_CanStackWithFn，扩展物品的拒绝堆叠情况也需要复测。
+
+证据：M:289、346、356、426、463、590、751、898、1256、1282；P/main/containers.lua:283、391；V/components/container.lua:447；V/components/stackable.lua:72、159。
+
+8. 物品索引：有候选缓存，没有数量总账
+=====================================
+三类结构不能混为一谈：
+
+一、容器 Registry：allchest[type][entity]=metadata。
+它回答“哪些实体参与”，不直接回答“有多少木头”。
+
+二、地面物品候选：
+inventoryitem 初始化 → SoraAPI.AllInv（弱键）
+  ↓ UpdateAllEnts 遍历 AllInv，先排除 inlimbo
+AllEnts（弱键）
+  ↓ NewEnt 从原版 entity_spawned 增量加入
+  ↓ UpdateEnts 再排除死亡/装饰/飞行投射物/有主物品
+cacheents（弱键弱值）
+  ↓ 每轮按需要临时构造 topick[category][entity]
+
+这里没有每个容器各自 FindEntities，但仍存在对全世界 inventoryitem 登记集合的周期性筛选。
+
+三、制作候选：
+chestcache[精确 item prefab] = {
+  time = 构造时间,
+  chest = {{containerEntity, groupIndex}, ...}
+}
+GetCacheChest 缓存有效约 10 秒，失效时遍历所有注册容器的 data.c，选出类别匹配且非 selfcontainer 的分组。
+注意：缓存按精确 prefab 建键，不是按 toprefab 类别去重；多个同类别物品可能分别建立候选列表。
+
+HasItem/GetIngredients：
+候选列表 → GetItems 读取当前 slots → 判断距离 → 精确 prefab 匹配 → 排除 nocrafting → 读实际 stacksize。
+每个候选分组会为该精确 prefab 留下一个单位，作为分类模板；不是全世界只留一个。HasItem 返回是否足够及可取数量；GetIngredients 返回 entity→数量，没有预留或删除。
+
+优点：不需要查询全世界所有实体，也不需要每次扫描无关容器所有槽位；堆叠数量直接取当前值，避免维护复杂计数器。
+局限：冷缓存仍需遍历注册表；热缓存仍需遍历候选分组槽位。类别更改经 FindBestSlot/TryFixSlotData 不一定立即 ResetCache，候选可能滞后到重新构造；itemget/itemlose 并不统一使候选缓存失效。
+chestcache 是强引用普通表，10 秒是读取时 TTL，不是到时自动释放。正常 UnReg 会清空缓存；退出路径失效时不能指望弱注册表立即解决所有引用问题。
+
+证据：M:849、867、883、1131、1143、1169、1182、1204；P/main/hook.lua:1802。
+
+9. 制作系统集成与原版真实扣料
+=============================
+Hook 的是 Builder.HasIngredients 和 Builder.GetIngredients；当前模组没有直接替换 Builder.RemoveIngredients，也没有一条名为 ConsumeIngredients 的有效集成接口。扣料继续走当前原版 RemoveIngredients。
+
+检查链：
+服务端 Builder:HasIngredients(recipe)
+  ↓ 模组临时包装 inventory.Has
+  ↓ 先调用原版 inventory.Has
+  ↓ 原版来源不够时，把差额交给 Manager:HasItem
+  ↓ 原版 Builder 继续检查角色资源/科技材料等
+  ↓ 还原 inventory.Has
+
+选料链：
+服务端 Builder:GetIngredients(recipeName)
+  ↓ 模组临时包装 inventory.GetCraftingIngredient
+  ↓ 原版先生成 entity→count 清单
+  ↓ 计算差额 → Manager:GetIngredients
+  ↓ 合并到清单
+  ↓ 还原 inventory.GetCraftingIngredient
+
+原版移除链：
+Builder:RemoveIngredients(materials)
+  ↓ 按清单逐个单位调用 inventory:RemoveItem(entity, false, true)
+  ↓ 分割堆叠或取出实体
+  ↓ 必要时掉出被消耗容器的内容
+  ↓ item:Remove()
+  ↓ 原版 InventoryItem.OnRemoveEntity 从真实 owner/container 清除关联
+
+因此不能误判“远处箱子未打开，inventory.RemoveItem 就完全无法消耗物品”：多单位 Stack 可直接 Get 分割，完整实体移除也会走 InventoryItem 的 owner 清理。
+
+优先级不是简单“玩家背包总是先于箱子”。准确顺序是：
+先使用原版材料来源；原版 GetCraftingIngredient 当前顺序为已打开且允许制作的容器 → 玩家主物品栏 → overflow → active item。
+这些来源不足，才追加 Manager 找到的其他候选。Manager 候选之间没有优先级排序，也没有按距离选最近。
+
+普通制作请求会在原版 MakeRecipe/DoBuild 等阶段重新 HasIngredients。建筑的 BufferBuild 先验料、选料并扣除，再记录已缓冲建造资格；最终放置不会要求把同一批材料再扣一次。
+原版 DoBuild 对普通物品通常会先 SpawnPrefab，再执行 RemoveIngredients 和交付；因此不把“查询→扣料→产物”画成所有分支严格相同的调用顺序。
+
+【静态确认：原版材料来源与 Manager 未去重】
+原版 inventory.Has(..., true) 已计入打开的容器；Manager 没有排除这些容器。GetIngredients 合并用 finds[entity]=count，而不是在统一可用量中去重分配。
+
+可核对的数值路径（非实机复现）：
+- 一个已打开、已分类且可被 Manager 查询的注册箱子，只有一堆 4 个材料；配方需要 6 个，其他来源为零。
+- 原版 Has 看到 4；Manager 又看到同一堆，并在留 1 后认为可额外提供 3；差额 2 因而通过。
+- 原版选料得到 finds[同一实体]=4；Manager 为差额返回 [同一实体]=2。
+- 合并赋值把 4 覆盖成 2，最终清单只剩 2。
+- 原版 RemoveIngredients 按清单扣除，没有重新求和验证凑够配方。
+这不是靠两个玩家同时操作才出现的问题，是同一次调用内的来源重叠。实际成品、配方状态及日志仍需实机验证，但计数与覆盖路径已由源码确认。
+
+证据：P/main/hook.lua:1510–1568；M:1182、1204；V/components/inventory.lua:1507、1697、1390；V/components/inventoryitem.lua:478；V/components/builder.lua:500、546、629、657、918、1131。
+
+10. 客户端制作显示与服务端制作是两条链
+====================================
+模式与显示链：
+sora2chestcontrol UI 的 GlobalBuild 按钮
+  ↓ 已有业务通信入口：Sora2ChestControl
+服务端 Handler 验证玩家存在及功能配置
+  ↓ player_classified.soraglobalbuild:set(bool)
+net_bool 复制到客户端
+  ↓ 每秒检测：模式已开，且附近 10 距离有 sorasmartchest 或随身有该 tag 物品
+本地派生 soraglobalbuildenable
+  ↓ ingredientmoddirty → 原版 RefreshCrafting → refreshcrafting
+配方 UI/点击包装暂时把 replica 材料检查放宽
+  ↓ 可以显示可制作并尝试发请求
+
+这不是“客户端已知道全世界材料足够”。Manager 没有发送库存数量快照。
+main/ui.lua 的优化 RebuildRecipes 分支还明确使用 globalenable 直接放行材料条件；它受本地 Config recipe 选择控制。另一路是 main/hook.lua 对原版 UI 方法的包装。
+角色限制、配方知识等仍有原版检查，不能概括为所有配方和科技全部免费开放。
+
+真实制作链：
+DoRecipeClick
+  ↓ builder_replica:MakeRecipeFromMenu
+  ├─ Host：直接调用服务端 builder
+  └─ 远端：playercontroller:RemoteMakeRecipeFromMenu
+          ↓ 原版 RPC.MakeRecipeFromMenu
+          ↓ 原版 RPC Handler 找到配方并交给 builder
+服务端 MakeRecipeFromMenu / MakeRecipe / DoBuild
+  ↓ 服务端重新 HasIngredients
+  ↓ 原版来源 + Manager 当前槽位查询
+  ↓ GetIngredients 实体清单
+  ↓ 原版 RemoveIngredients、产物创建/交付流程
+
+如果普通请求材料不足，模组额外构造 sora_cantbuild 动作，使用 sorajusttest 汇总缺少量并说话。该标志在这条诊断查询中临时放宽结果，不是正常扣料开关。
+
+两个范围也不同：开启状态的邻近检测固定为 10；Manager 查材料使用 TUNING.SORACHESTRANGE，较大配置可以全世界取材。一个邻近/随身 smartchest 更像使用入口，不限定只从它自己取料。
+两端的 enable 都是每秒独立计算的派生状态，存在短时间显示差异；服务端采用自身结果，不相信客户端显示。
+
+证据：P/scripts/widgets/sora2chestcontrol.lua:82；P/main/clientdbinit.lua:284、318（仅业务入口，未分析通信框架）；P/main/hook.lua:1421、1440、1466、1510、1620；P/main/ui.lua:614、647；V/components/builder_replica.lua:424；V/components/playercontroller.lua:5709；V/networkclientrpc.lua:937；V/prefabs/player_classified.lua:571、1251。
+
+11. 状态所有权
+===============
+状态                         Owner                          保存/重建
+类型模板、类别 map、orderData 模块静态定义                   不保存，加载代码重建
+注册实体列表                 模块注册表，Manager 提供入口   不保存，Prefab 主动重建
+真实槽位与物品               Container / Item              原版保存
+分组类别 c                   Manager 的每实体 metadata     不保存，由槽位/标牌重建
+宝石数量 gem                 派生自实体控制槽               不保存，读取控制槽重建
+gemtask / gemtick            每实体 metadata                不保存，重载后重新计时
+OrangeCurrTick               模块调度状态                   不保存
+自动收集暂停 stoptime        当前世界 Manager               不保存，重载构造为 0
+chestcache                   Manager 实例                   可重建，不保存
+AllInv / AllEnts / cacheents  外围候选集合与 Manager 缓存    弱引用、可重建
+updatechests                 有指定宝石工作的实例子集       可重建
+HasDayUpdate / CD 闭包        调度派生状态                   不保存
+soragiving                   当前 Container 调用期标记      不保存，应随调用结束清除
+hitcount / hitcd             箱子实体的工作保护状态          当前接入未见专门保存
+sorasign                     sora2chest Prefab 状态          通过 sorasavecmp 另行保存
+soraglobalbuild              玩家 classified 的模式标志      有网络复制，未见持久化写入
+soraglobalbuildenable        两端各自的邻近检测结果          不保存，周期重算
+
+暂停是整个当前世界共享的，不是点击按钮那名玩家的私有暂停。业务 Handler 仅凭有效玩家即可改变该世界暂停，没有看到管理员或箱主限定；这是权限/玩法规则，应与系统作用域一起明确，不能自动当作用户要求修复。
+
+12. 保存与恢复
+===============
+Manager 没有 OnSave、OnLoad 或 LoadPostPass；没有保存注册实体 GUID 列表。
+
+恢复方式：
+世界重新创建 Manager
+  ↓ 每个已保存 Prefab 重新构造
+  ↓ 主动 RegByType
+  ↓ 原版 Container.OnLoad/SpawnSaveRecord 恢复槽位实体
+  ↓ 安排的 0 延迟 ResetChestData 从内容计算类别、宝石和活动集合
+
+这是值得学习的思想：保存真实业务数据，运行期 Registry/Index 从实体生命周期重建，避免同时保存两份“有哪些箱子”和复杂引用修复。
+代价是派生状态重建前有短初始化窗口，暂停、宝石进度和临时计时器也不会保留。是否应该持久化暂停属于设计取舍，不能一概判 Bug。
+ResetChestData 使用的是 if InGamePlay then，即测试函数对象存在，不是调用 InGamePlay()；当前原版确实定义了这个函数，所以该条件不是“游戏已加载完”的有效判断。初始化正确性不能依赖这行提供加载保护。
+
+证据：M:1070、1317、898；P/scripts/prefabs/sora2chest.lua:283；V/components/container.lua:979、996；V/entityscript.lua:1903、1954；V/mainfunctions.lua:1690。
+
+13. 注销、重复注册与清理
+=======================
+正常实体删除：
+EntityScript:Remove → PushEvent("onremove") → OnChestRemove → UnReg。
+UnReg 恢复 GiveItem，解除五个业务事件，移除 updatechests/注册表项，清空 sorachestdata，移除 tag，清空制作候选缓存。
+之后原版实体销毁还会清空事件、worldstate watcher、pending tasks。
+
+hammer：sora2chest 的 onhammered 先掉物再 Remove，走上述注销。
+burn：所查三个 Prefab 未安装明确的 burnable 接入，不能虚构一条现有燃烧链。若其他机制最终 Remove，走通用注销；若只是换组件/打 burnt tag，必须由对应路径处理。
+remove/destroy：实际调用 EntityScript.Remove 时可走通用注销；不能假设任意外部强制删除都有同样契约。
+sleep/unload：Manager 未监听 sleep/wake，也没有主动按实体睡眠注销。实体睡眠不等于实体已不存在。
+
+【静态确认：组件单独移除的生命周期错误】
+RegByType 将 container.OnRemoveFromEntity 替换为 self:UnReg(chest)，保存 oldfn 却没有调用它。
+当前原版 EntityScript:RemoveComponent 会先 self.components[name]=nil，再调用旧组件对象的 OnRemoveFromEntity。
+UnReg 随后直接读取 chest.components.container.SoraOldGiveItem，会访问 nil。
+这意味着单独 RemoveComponent("container") 的路径与当前原版契约不兼容；Prefab 的容器替换接入就是相关调用方。还丢掉了原版 Container.OnRemoveFromEntity=Close 的职责。
+
+【静态确认：失效项兜底清理写错键】
+UpdateAllChest 遍历时 k 是实体，v 是 metadata，却记录 UnReg[type][v]=1；清理时又把值 1 当作注册表键。实际实体键没有被删除。
+正常 onremove 成功注销时未必触发这个兜底问题；不能把弱键 GC 当成失效 Entity 一定立刻被清理。
+
+重复注册：
+- 无已注册/同类型幂等保护，直接重新 deepcopy 并安排任务。
+- GiveItem 包装有 SoraOldGiveItem 防二次包装，但六个 ListenForEvent 没有防重。
+- 原版 AddListener 是 table.insert，不自动按函数去重。
+- 不同类型重注册也不先删旧类型项，可能在两个类型下同时出现。
+- UnReg 不移除 onremove、不清 sorachesttype、不恢复替换的 OnRemoveFromEntity。
+- UnReg 不取消先前安排的 GetItem/ResetChestData/部署任务。实体真正 Remove 会由引擎取消；仅注销但实体仍活着时，旧任务仍可能运行。
+- Manager 本身也没有 OnRemoveFromEntity/OnRemoveEntity 做提前停服。完整世界销毁有原版兜底，单独移除 Manager 时世界上的任务和监听不能依赖该兜底。
+
+其他明确接口问题：com:UpdateChest(chest) 只传一个参数给 local UpdateChest(inst, data)，后者访问 data.gem；该公有包装缺参数。目前没有找到生产外部调用，不应写成已发生的每秒崩溃，周期路径本身会传 metadata。
+
+证据：M:821、1317、1351、1357、1376；V/entityscript.lua:648、1172、1705；V/components/container.lua:1086。
+
+14. 并发、多人和 TOCTOU
+=======================
+Lua 单线程避免了两个普通任务同时在不同 CPU 指令流里改同一个表。当前物流函数也没有 Sleep/yield，正常一轮通常完成后下一任务才运行。
+但以下逻辑竞争仍存在：
+
+两名玩家同时制作：
+两人 UI/早期请求都可能看到材料足够；DoBuild 会重新检查，普通串行执行下后执行者会看到先执行者的扣除。因此不能仅凭“没加锁”就宣称必然复制。
+然而没有材料预约、统一来源去重或完整扣料验证；第 9 节的来源重叠是确定问题，其他 Hook/事件重入也可改变过程。
+
+两个物流任务移动同一个 Stack：
+共享候选可能陈旧，但每次实际尝试会检查 owner/有效性等；先被放入箱子的物品通常会被后续 catch 排除。部分堆叠后使用的是已经变化的实体状态。
+没有独立预留或操作 ID；同步事件回调仍可能改动物品，当前 soragiving 只约束本容器槽位路由。
+
+玩家打开箱子，同时自动物流：
+物流未按 IsOpen/openlist 暂停，也没有把玩家正在查看的箱子排除。原版 Container 同步展示变化，但玩家操作与世界整理在不同回调中先后发生，槽位可能变化。
+
+箱子销毁，同时制作读取：
+正常 onremove 会清候选缓存，单线程下这条路径有帮助。组件退出错误、无效键清理失败或外部替换绕过注销时，GetItems 没有再次检查 IsValid/container 存在，可能访问失效引用。
+
+stacksizechange 与 itemlose：
+由原版同步事件链按顺序发生，不是两个线程。Manager 不维护数量计数器，也不订阅 stacksizechange，所以不会因这两个事件各加减一次而重复记账；类别和候选缓存仍可能滞后。
+
+TOCTOU 的准确边界：
+- UI 检查与服务器执行跨帧：存在时间差，但服务器重检覆盖了很多普通情况。
+- MakeRecipe 排队到 DoBuild：再次检查，不能只引用初始 HasIngredients 判定风险。
+- DoBuild 内检查、选料、回调、创建产物和扣除之间：无事务。recipe.canbuild、refreshcrafting、产物构造/onPreBuilt 等同步回调可执行其他代码，产生重入修改。
+- GetIngredients 可返回不完整清单，Hook 没有最终 assert/失败结果，RemoveIngredients 也不负责重新凑料或回滚。
+- 因此不能宣称原子性；但哪些兼容 Mod/具体时序会触发，需要实机验证。
+
+暂时替换 inventory/replica 方法的 Hook 没有异常保护；若 old 调用报错，恢复赋值不会执行。这个耦合风险与线程数无关。
+
+15. 性能：避免了什么，仍然扫描什么
+================================
+定义：N=注册容器数；K=每容器平均分组数；S=每组平均槽位数；U=有指定宝石工作的容器数；I=全世界已登记 inventoryitem 数；G=地面候选数；P=玩家数；Q=一次材料查询命中的候选分组数；R=参与 UI 重建的配方数。
+
+主要成本：
+- 注册：每实体 deepcopy 模板，安装 6 个监听；O(KS+控制槽数)。类型注册会重排类型表，类型数当前很小。
+- 每秒基本维护：遍历 allchest 清理 O(N)，OrangeTask 再遍历容器/分组；未暂停时还读 cacheents O(G)。
+- 指定宝石工作：O(U×KS)，部分工作还做局部实体搜索、生成或打包，常数可能远高于读表。
+- 地面候选全量筛选：按需每超过约 10 秒 O(I) 重建 AllEnts；候选过滤按需限频约 1 秒，O(AllEnts)。
+- 日整理：检查可整理槽位 O(NKS)，再构造类别候选与收集。按类别减少无关候选比较，但同类别多个满箱仍可能反复检查相同候选。
+- 物流最差情况：同类别候选容器分组 C 与物品 Gc 反复尝试，每次可能读 S 个槽，可接近 O(C×Gc×S)，不能整体宣称线性。
+- 制作冷缓存：每种精确材料名 O(NK) 建候选；热缓存查询 O(QS)，每次读当前数量。
+- 玩家模式检测：服务端约 P 个一秒任务；模式启用时附近 FindEntity 搜索及随身物品查询。客户端只对实际拥有的 classified 执行对应逻辑。
+- UI：模式不需要同步全部库存，但配方重建本身仍受 R 和原版/优化分支影响，不属于 Manager 的 O(1) 服务。
+
+FindEntities 的实际用途：
+1) Manager 不用它发现注册箱子。
+2) M:309 部署行为搜索邻近已存在实体。
+3) M:656 黄色宝石查找附近 sora2tree。
+4) 玩家模式派生检测通过 FindEntity 搜索附近 smartchest。
+“不用每箱查找容器”成立；“Manager 完全没有空间搜索/全局筛选”不成立。
+
+长期任务与监听数量（只统计本架构附加，不含原版容器/物品自己的任务）：
+- Manager：1 个长期每秒任务；1 个 cycles watcher；1 个 entity_spawned listener。
+- 注册容器：每实例 6 个 Manager 安装的 listener；没有每箱一个 Manager 周期任务。
+- 玩家制作状态：功能启用时服务端约 P 个每秒任务，客户端另有自身检测。
+- 外围共享清理：1 个世界协程，约每 60 秒分段维护 AllInv 等集合。
+- 注册、关闭、日切换另产生短期任务，不应误算成永久周期任务。
+
+规模示例：
+容器数   Manager 长期周期任务   正常一次注册产生的监听   全为 sora2chest 的受管存储槽
+10       1                       60                        250
+100      1                       600                       2,500
+1000     1                       6,000                     25,000
+
+若全为 sora_light，受管存储槽分别为 1,500 / 15,000 / 150,000。数字表示遍历规模，不是执行耗时；未做 benchmark。
+任务数保持常量并不表示 CPU 成本保持常量。世界负载还取决于地面候选数、类别集中程度、宝石行为、玩家制作频率和缓存命中率。
+
+设计收益：集中候选筛选、统一调度、只对有相关宝石的子集执行特定工作、弱引用减少无意义持有、制作候选短期缓存。
+扩展瓶颈：每秒全 Registry 遍历、空需求时仍遍历候选、同类别反复尝试、每材料各建缓存、日切换三轮峰值、无限堆叠下原版逐单位扣料成本。
+
+16. 主要 API 与真实调用者
+=========================
+Registration API
+- RegType(type,data)：Prefab 文件声明模板；不注册实体。
+- RegByType(entity,type)：Prefab 构造/容器改造接入；安装元数据和 Hook。
+- UnReg(entity)：onremove 或容器组件退出时注销；当前有第 13 节的契约缺陷。
+
+Query API
+- GetCacheChest(item)：Manager 内部按材料类别构造/复用候选组。
+- GetItems(chest,group)：读取实际槽位；返回当前实体数组，不是持久索引。
+- HasItem(doer,item,need)：Builder Hook 查询额外可取数量，扣掉各候选组的保留单位。
+- GetIngredients(doer,item,need)：Builder Hook 取实体→数量清单；不执行扣除，也不预约。
+- GetBuilderChest(doer)：遍历注册表按范围返回容器；当前未发现生产调用，不是实际 HasItem 路径。
+- IsStop/GetStopTime：物流入口和控制面板查询世界收集状态。
+
+Mutation/配置 API
+- TryFixSlotData/FindBestSlot：GiveItem 包装选择或更新分组类别；虽是方法，主要供内部使用。
+- ResetCache(item)：失效一个材料或全部候选缓存。
+- Pause/SetStopTime：控制面板改变世界收集状态。
+- OnClose(chest,doer,dontget)：手动 Collect 和 Prefab 敲击路径复用关闭处理逻辑。
+
+Scheduling API
+- UpdateAllChest：日整理调用，也可主动触发全体更新。
+- UpdateChest：当前公有包装缺少 metadata 参数，不应按可用接口照搬。
+- self.DayUpdate/self.GetItem：构造时暴露局部函数；调用签名保留原函数形式，不是经过校验的统一公有服务接口。
+
+Debug API
+- GetDebugCache：返回/打印弱候选集合。
+- GetDebugString：打印收集状态、类型实例数、部分 metadata 和候选数。
+
+没有公开的“预约材料→提交扣料”API；真实 Mutation 是原版 Container/Stackable/Inventory 的方法，以及 Manager 内部业务函数。
+证据：M:1088–1417；P/main/hook.lua:1510；P/main/clientdbinit.lua:284；P/scripts/prefabs/sora2chest.lua:170。
+
+17. 依赖方向与耦合
+===================
+三个 Container Prefab
+  ├─ 文件加载时 RegType
+  └─ 实体生成时 RegByType
+                 ↓
+       World.sorachestmanager
+       ├─ Registry / metadata / candidate cache
+       ├─ 调度和业务规则
+       └─ 原版 Container / Stackable / Item
+
+Server Builder Hook
+  ↓ HasItem / GetIngredients
+World.sorachestmanager
+  ↓ 返回额外实体材料清单
+原版 Builder / Inventory 完成扣除与生产
+
+控制 UI
+  ↓ 现有业务通信入口
+服务端 Sora2ChestControl Handler
+  ├─ 世界 Manager：Pause / OnClose / GetStopTime
+  └─ player_classified：制作模式 net_bool
+                         ↓
+                   客户端显示/请求放行
+
+Manager 没有直接依赖 ClientDB/MainDB 对象，也没有 Shard 数据复制。相关文件中的 Handler 只是外部适配层。
+
+它不是完全通用框架：
+- 大量具体 prefab→类别映射及其他 Mod 物品兼容表。
+- 直接识别宝石名称，内置 GemTask。
+- 查找 sora2tree、生成 sora3packer、调用 soragift。
+- 读取 sorasign、直接调整 preserver，包含 HitProtect。
+- 依赖 SoraAPI.AllInv、SoraCD、TUNING.SORA* 和单例 cmp。
+
+准确定位是“有可复用 Registry/调度骨架的穹模组业务 Manager”。不要把所有业务规则一起提炼成通用 World Manager 必备能力。
+
+18. 架构评价
+=============
+值得保留：
+1) 实体主动注册，避免制作系统每次从整个世界重新发现容器。
+2) 类型模板和实例数据分开，三种槽位布局复用调度代码。
+3) 世界统一调度，减少每实体独立任务和同类重复候选筛选。
+4) Registry/派生索引可重建，真实物品沿用原版保存体系。
+5) 优先委托原版 GiveItem/Stackable/RemoveIngredients，继续使用原版事件和复制。
+6) UI 不持有权威库存，最终请求交回服务端；但当前服务端来源合并需要正确处理。
+
+只适合当前业务：宝石控制、分类 map、保护某些打包物、每组保留模板、标牌类别、树/打包机联动、世界统一收集暂停。
+
+随着规模扩大需关注：全表遍历、缓存失效不完整、同步事件重入、来源重叠、类型/实体重复注册、提前卸载清理、某些公有接口未被实际使用和验证。
+
+职责边界：
+- World Manager：同一个世界进程内“哪些对象参与、怎样协作、什么时候工作”。
+- MainDB：世界之间传递消息/状态，属于另一层；本轮 Manager 没有依赖它，不继续展开。
+- Container/Item Component：真实槽位、物品所有权、堆叠、原版保存和网络同步。
+- Prefab：实体装配、动画声音、专属状态、接入与退出。
+- Builder：配方规则、动作流程、实际制作与消耗；Manager 只补充材料来源。
+
+19. World Manager Pattern
+=========================
+问题：一批实体需要共享查询、调度和有限资源协调，把逻辑放进每个实体会造成重复扫描与重复任务。
+目标：提供一个世界范围的服务入口，管理参与关系和跨实体协作，让实体继续拥有自己的真实状态。
+Owner：TheWorld 上的标准服务端 Component。
+Registry：类型模板与实体记录分离；实例主动注册和注销。
+Entity Lifecycle：Prefab 构造/组件安装时加入，实体移除/能力移除时退出，注册必须可重入且幂等。
+Event：通过原版事件更新派生状态；长时间行为由调度器运行；不把事件回调当作线程锁。
+Query：先缩小候选，再读取实体当前状态；只有收益明确时维护精确数量索引。
+Mutation：由真实状态拥有者的 API 执行；涉及共享资源时明确分配、验证与提交边界。
+Scheduling：统一时钟、活跃集合、按需工作，避免每实体无限增长的长期 Task。
+Persistence：优先保存实体业务真值；运行期 Registry/缓存重建。需要跨重启保留的世界政策单独保存。
+Networking：只复制玩家必要信息，服务端保持真实查询与修改权；无需为了 Manager 本身必建 Replica。
+Performance：减少发现成本，不消除所有遍历；用 N、候选数、活跃数、事件率分析扩展性。
+Concurrency：单线程能串行执行普通回调，不能消除跨帧陈旧数据、重复来源或同步回调重入。
+优点：职责入口清晰、调度集中、生命周期重建简单、实体实现可更轻。
+缺点：可能成为过大的业务中心；全表循环、隐式全局单例、清理责任和跨实体资源竞争需要控制。
+适用场景：多个实体确实共享资源、总量限制、查询目录、派发规则或世界时间。
+不适用场景：只有单实体内部状态、无共享协调需求，或为了统一名字而把所有局部逻辑集中。
+
+20. World Manager 2.0：按实际问题决定升级
+========================================
+【原项目已有】类型模板、弱键注册、单周期任务、活跃宝石集合、限频候选刷新、短期制作候选缓存、原版事件/容器 API、重建式 Registry、调试输出。
+
+【优先改进：直接对应已确认问题】
+1) Registry 成为实例字段：types/instances/activeSets 明确归 self，避免模块 cmp 和 allchest 造成伪独立实例。
+2) Register 幂等：同实体同类型返回现有记录；换类型先注销旧记录；类型更新明确只影响新实例还是主动迁移。
+3) 保存 component 引用/cleanup handle：注销不假设 chest.components.container 仍存在；调用并按所有权恢复原 OnRemoveFromEntity/GiveItem。
+4) 清理对称：记录所有监听与短期任务，Dispose/Unregister 可重复调用；保留原版实体销毁兜底，但覆盖组件单独卸载。
+5) 查询前验证：候选实体 IsValid、container、metadata 都存在；修正失效注册表键，不能用弱表替代有效性检查。
+6) 制作来源统一去重：原版来源和 Manager 来源按实体身份组成一份分配计划，不二次计算同一 Stack，也不覆盖已经分配的数量。
+7) 检查与提交一致：GetIngredients 返回是否凑齐、明确数量与来源；提交前验证，不把部分清单当成功。
+8) 对临时 Hook 使用可靠恢复结构；尽可能通过明确材料来源适配器减少临时替换共享方法。
+
+【有收益时加入】
+- Dirty flag：槽位类别/控制槽变化时标记 dirty，在本帧末合并 ResetChestData 与候选失效；不必每个 itemlose 立即全表重算。
+- 轻量类别索引：category → container/group，可增量更新；精确数量继续读槽位，先不要维护第二份全量库存。
+- Active sets：橙宝石容器单独维护；没有需求就不遍历地面候选；宝石设置变化时更新活动集合。
+- 调度预算：把大量箱子的整理分批，限制每 tick 容器/物品尝试数；重点削平日切换三轮峰值。
+- Mutation guard/queue：先处理同实体重入和批次归属。只有重入/延迟管线确有需要才加队列，不把所有简单 GiveItem 都强行异步化。
+- Transaction-like ingredient reservation：如制作流程要跨帧持有材料计划，才引入短期 reservation/token、取消和超时；同步立即制作优先做来源去重及提交前验证，不先造通用事务数据库。
+- Profiling counters：记录候选刷新数、遍历容器/槽位数、缓存命中、物品尝试/成功/失败、慢轮次。
+- Debug tooling：可查询某实体注册类型、metadata、活动任务、候选来源和拒收原因；现有 GetDebugString 作为基础。
+- UI：准确数量同步是独立产品需求；可以只保留“可尝试”的模式并明确失败反馈，或按当前配方请求摘要，不必广播所有库存。
+
+【不建议无条件增加】
+- 全局数据库、跨 Shard 共识、复制完整世界库存。
+- 所有物品都维护精确位置与数量总账。
+- 给每个箱子再加一套永久轮询。
+- 只为“现代化”而引入复杂事务框架、独立消息系统或多层抽象。
+
+21. 迁移到其他 DST 系统：集中什么，保留什么
+===========================================
+技能管理器
+适合集中：世界级技能注册定义、共享施法配额、跨施法者区域效果目录、统一昂贵扫描预算。
+仍留在玩家/技能 Component：个人冷却、资源、输入、施法阶段、死亡取消、个体存档。
+判断：只有跨施法者协调需求时需要 World Manager；普通角色技能不应把所有状态搬到世界。
+
+召唤物管理器
+适合集中：userid→召唤物 Registry、世界/玩家总量上限、批量召回、所有者迁移/离线清理策略、生成预算。
+仍留在召唤物 Component/Brain：生命、战斗、跟随、行为状态；玩家绑定状态可在 leader/petleash 等原版组件。
+判断：很适合借鉴主动注册与重建式目录，优先复用原版 leader/petleash；不要用 Manager 每帧替代全部 Brain。
+
+Boss 管理器
+适合集中：世界唯一性、重生计划、遭遇名额、场地占用、世界进度与多个 Boss 的互斥条件。
+仍留在 Boss Prefab/Component/SG：战斗阶段、攻击帧、仇恨、动画和单体状态。
+判断：管理“何时、在哪、允许存在几个”有价值；单个 Boss 自己的战斗 AI 不需要世界集中指挥。
+
+世界事件管理器
+适合集中：事件日历、世界阶段、互斥/优先级、参与者 Registry、全局开始/结束、跨重启计划。
+仍留在事件实体：局部触发器、特效、掉落、个体行为。
+判断：最适合世界 Owner，但应复用 worldstate/原版世界组件；真正世界进度要保存，参与实体目录可重建。
+
+Buff 管理器
+适合集中：区域光环发射器目录、世界级环境修正、跨实体扫描预算、全局 Buff 配额或互斥。
+仍留在目标 debuffable/Buff 实体：层数、剩余时间、属性 Modifier、死亡/移除清理、个体保存。
+判断：普通单体 Buff 用原版 debuffable 更自然；集中所有计时反而增加目标引用与清理风险。
+
+魔法书管理器
+适合集中：共享法术定义、全服解锁、世界仪式进度、书之间确实共享的资源/目录。
+仍留在书/玩家 Component：当前页、个人已学法术、耐久/充能、持有者、施法输入和 UI。
+判断：法术静态定义可以只是模块表，无需世界组件；只有世界级进度/共享资源才值得创建 Manager。
+
+共同原则：把“需要多个实体协作的政策、目录与调度”集中，把“实体自己的真值、生命周期和原版行为”留在实体。Manager 是协调层，不是所有 Component 的替代品。
+
+22. 验证记录与剩余实机项目
+===========================
+已做：
+- 完整读取 M 的活动实现，追踪三个真实容器类型、UI 业务入口、原版 Builder/Inventory/Container 和实体清理契约。
+- M、三个容器 Prefab、main/hook.lua 共 5 个 Lua 文件通过 luaparser 语法解析；语法通过不代表逻辑正确。
+- 12 个被引用原版核心文件与本机游戏 scripts.zip 对应文件逐字节一致：builder、builder_replica、inventory、container、inventoryitem、stackable、playercontroller、entityscript、networkclientrpc、mainfunctions、player_classified、widgetutil。
+- 参考项目 949 个文件的路径+内容 SHA256 汇总保持为：
+  52c1cbe65297d77ae006613c33955199f87b835a04fea9fe27427ac1c0361f71
+  与前轮快照一致。
+
+未做：启动游戏、专服行为测试、远端 UI 验收、性能 benchmark、存档重启复现。
+
+优先实机验证项（仅列计划，本轮不执行）：
+1) 已打开注册容器参与全局制作的来源重叠与实际扣除/产物。
+2) 容器 Component 替换/拆卸时的注销与原版关闭行为。
+3) 同实体同类型/不同类型重复注册后的监听数与活动记录。
+4) 候选缓存尚在时移除容器或换分类。
+5) 多玩家同时制作及同步回调修改材料后的失败行为。
+6) 不同宝石配置、大量同类别满箱、10/100/1000 容器的 profiling。
+7) Host 与真实远端客户端的模式开启、附近检测与制作失败提示。
+8) 保存重载后的类别/标牌、控制槽 nocrafting 标签与暂停默认状态。
+
+本轮结束：只分析 sorachestmanager；未修复、重构或替换实现。
+[Public release note: this is a redacted derivative of the frozen local report. Original bytes and local filesystem paths are withheld; evidence conclusions and source line numbering above are retained.]

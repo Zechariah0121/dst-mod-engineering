@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "relations.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "0.1.1"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "source_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "claim_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "supports",
+              "derived_from",
+              "illustrates",
+              "counterexample_of",
+              "mitigates",
+              "tests",
+              "corrects",
+              "supersedes",
+              "related"
+            ]
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "relation",
+          "to"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "correction_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "supports",
+              "derived_from",
+              "illustrates",
+              "counterexample_of",
+              "mitigates",
+              "tests",
+              "corrects",
+              "supersedes",
+              "related"
+            ]
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "relation",
+          "to"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "nodes",
+    "source_nodes",
+    "claim_nodes",
+    "edges",
+    "correction_edges"
+  ],
+  "additionalProperties": false
+}

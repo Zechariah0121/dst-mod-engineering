@@ -1,0 +1,2589 @@
+{
+  "schema_version": "0.1.1",
+  "counts": {
+    "source_fact": 10,
+    "pattern": 4,
+    "rule": 18,
+    "anti_pattern": 9,
+    "failure_case": 4,
+    "correction": 1,
+    "decision": 5,
+    "test_case": 11,
+    "playbook": 1,
+    "case": 1
+  },
+  "entries": [
+    {
+      "id": "FACT-DST-001",
+      "title": "EntityScript 组件持久化遍历",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-001"
+    },
+    {
+      "id": "FACT-DST-002",
+      "title": "Container 的物品存档",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-002"
+    },
+    {
+      "id": "FACT-DST-003",
+      "title": "Builder 查询与消耗边界",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources",
+          "world"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-003"
+    },
+    {
+      "id": "FACT-DST-004",
+      "title": "InventoryItem 的 Owner 清理",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-004"
+    },
+    {
+      "id": "FACT-DST-005",
+      "title": "Stackable 拆分",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-005"
+    },
+    {
+      "id": "FACT-DST-006",
+      "title": "Mod RPC / Shard RPC 的 Lua 边界",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "shard"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-006"
+    },
+    {
+      "id": "FACT-DST-007",
+      "title": "Prefab / Component / Class PostInit 时机",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-007"
+    },
+    {
+      "id": "FACT-DST-008",
+      "title": "实体删除与组件单独卸载不同",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-008"
+    },
+    {
+      "id": "FACT-DST-009",
+      "title": "原版制作 Host / Remote 汇合",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-009"
+    },
+    {
+      "id": "FACT-DST-010",
+      "title": "原版材料来源与堆叠移除",
+      "entry_type": "source_fact",
+      "knowledge_kind": "Klei Fact",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E3",
+      "confidence": "Very High",
+      "status": "supported_by_klei",
+      "related": [
+        "ARP-DST-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "resources"
+        ],
+        "evidence_modes": [
+          "vanilla_source",
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "facts/klei-lua.md",
+      "anchor": "fact-dst-010"
+    },
+    {
+      "id": "PATTERN-NET-001",
+      "title": "Player Business Channel",
+      "entry_type": "pattern",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-006",
+        "FACT-DST-009",
+        "RULE-NET-001",
+        "RULE-NET-002",
+        "RULE-STATE-002",
+        "ANTI-NET-001",
+        "ANTI-LIFE-001",
+        "DECISION-NET-001",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "TEST-LIFE-001",
+        "TEST-NET-003"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ],
+      "path": "patterns/PATTERN-NET-001.md",
+      "anchor": "pattern-net-001"
+    },
+    {
+      "id": "PATTERN-SHARD-001",
+      "title": "Shard Service Bus",
+      "entry_type": "pattern",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-006",
+        "FACT-DST-001",
+        "RULE-SHARD-001",
+        "RULE-STATE-001",
+        "RULE-STATE-004",
+        "ANTI-SHARD-001",
+        "ANTI-SHARD-002",
+        "DECISION-SHARD-001",
+        "TEST-SHARD-001",
+        "TEST-LIFE-002",
+        "TEST-SHARD-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ],
+      "path": "patterns/PATTERN-SHARD-001.md",
+      "anchor": "pattern-shard-001"
+    },
+    {
+      "id": "PATTERN-WORLD-001",
+      "title": "World Manager",
+      "entry_type": "pattern",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "world"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-002",
+        "FACT-DST-008",
+        "FACT-DST-010",
+        "RULE-WORLD-001",
+        "RULE-WORLD-002",
+        "RULE-PERSIST-001",
+        "RULE-RESOURCE-001",
+        "ANTI-RESOURCE-001",
+        "ANTI-WORLD-001",
+        "DECISION-STATE-OWNER-001",
+        "TEST-LIFE-001",
+        "TEST-LIFE-002",
+        "TEST-LIFE-003",
+        "TEST-RESOURCE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ],
+      "path": "patterns/PATTERN-WORLD-001.md",
+      "anchor": "pattern-world-001"
+    },
+    {
+      "id": "PATTERN-FRAMEWORK-001",
+      "title": "Mod Framework / Integration Layer",
+      "entry_type": "pattern",
+      "knowledge_kind": "Engineering Pattern Candidate",
+      "tags": [
+        "framework"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-007",
+        "FACT-DST-008",
+        "RULE-HOOK-001",
+        "RULE-HOOK-002",
+        "RULE-HOOK-003",
+        "RULE-FRAMEWORK-001",
+        "ANTI-HOOK-001",
+        "ANTI-HOOK-002",
+        "ANTI-FRAMEWORK-001",
+        "DECISION-HOOK-001",
+        "TEST-NET-002",
+        "TEST-HOOK-001",
+        "TEST-HOOK-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "derived_from",
+          "target": "CASE-001"
+        }
+      ],
+      "path": "patterns/PATTERN-FRAMEWORK-001.md",
+      "anchor": "pattern-framework-001"
+    },
+    {
+      "id": "RULE-NET-001",
+      "title": "Client 提交 Intent，服务端决定权威数量/材料。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ],
+      "path": "rules/net.md",
+      "anchor": "rule-net-001"
+    },
+    {
+      "id": "RULE-STATE-001",
+      "title": "每个状态写清“相对于谁权威”。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-002"
+        }
+      ],
+      "path": "rules/state.md",
+      "anchor": "rule-state-001"
+    },
+    {
+      "id": "RULE-STATE-002",
+      "title": "分别记录 Owner、Server View、Client Cache 和 Display。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-FRAMEWORK-001"
+        }
+      ],
+      "path": "rules/state.md",
+      "anchor": "rule-state-002"
+    },
+    {
+      "id": "RULE-STATE-003",
+      "title": "缓存可重建只说明恢复来源，不说明来源正确。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-001"
+        }
+      ],
+      "path": "rules/state.md",
+      "anchor": "rule-state-003"
+    },
+    {
+      "id": "RULE-NET-002",
+      "title": "Host 快路径应保留与 Remote 相同的业务验证。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ],
+      "path": "rules/net.md",
+      "anchor": "rule-net-002"
+    },
+    {
+      "id": "RULE-STATE-004",
+      "title": "实体与账本互换必须定义提交及失败补偿边界。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "state"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-001"
+        }
+      ],
+      "path": "rules/state.md",
+      "anchor": "rule-state-004"
+    },
+    {
+      "id": "RULE-SHARD-001",
+      "title": "跨 Shard 稀缺资源应先定义写入权威和冲突语义。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001",
+        "ANTI-SHARD-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-SHARD-002"
+        }
+      ],
+      "path": "rules/shard.md",
+      "anchor": "rule-shard-001"
+    },
+    {
+      "id": "RULE-WORLD-001",
+      "title": "真实物品留给 Container/Item；Manager 可持有成员和候选。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "world"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-WORLD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-WORLD-001"
+        }
+      ],
+      "path": "rules/world.md",
+      "anchor": "rule-world-001"
+    },
+    {
+      "id": "RULE-PERSIST-001",
+      "title": "可从真实实体重建的 Registry/Cache 通常不独立持久化。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "persist"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-LIFE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-LIFE-001"
+        }
+      ],
+      "path": "rules/persist.md",
+      "anchor": "rule-persist-001"
+    },
+    {
+      "id": "RULE-RESOURCE-001",
+      "title": "多个资源 Provider 必须按实体身份和剩余预算组合。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "resource"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-RESOURCE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ],
+      "path": "rules/resource.md",
+      "anchor": "rule-resource-001"
+    },
+    {
+      "id": "RULE-RESOURCE-002",
+      "title": "Query/分配建议不等于 reservation 或扣款。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "resource"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-RESOURCE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ],
+      "path": "rules/resource.md",
+      "anchor": "rule-resource-002"
+    },
+    {
+      "id": "RULE-NET-003",
+      "title": "乐观 UI 应与服务端最终可用性区分。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-NET-001"
+        }
+      ],
+      "path": "rules/net.md",
+      "anchor": "rule-net-003"
+    },
+    {
+      "id": "RULE-LIFE-001",
+      "title": "Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "life"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "ANTI-LIFE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-LIFE-001"
+        }
+      ],
+      "path": "rules/life.md",
+      "anchor": "rule-life-001"
+    },
+    {
+      "id": "RULE-HOOK-001",
+      "title": "先确认原版消费、保存和卸载契约，再扩展接口。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-001"
+        }
+      ],
+      "path": "rules/hook.md",
+      "anchor": "rule-hook-001"
+    },
+    {
+      "id": "RULE-HOOK-002",
+      "title": "临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-001"
+        }
+      ],
+      "path": "rules/hook.md",
+      "anchor": "rule-hook-002"
+    },
+    {
+      "id": "RULE-HOOK-003",
+      "title": "选择最小足够作用域的接入点，并保存原契约。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-HOOK-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-HOOK-002"
+        }
+      ],
+      "path": "rules/hook.md",
+      "anchor": "rule-hook-003"
+    },
+    {
+      "id": "RULE-WORLD-002",
+      "title": "注册与失效管理先正确，再按测量选择 Active Set/索引。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "world"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "ANTI-WORLD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-WORLD-001"
+        }
+      ],
+      "path": "rules/world.md",
+      "anchor": "rule-world-002"
+    },
+    {
+      "id": "RULE-FRAMEWORK-001",
+      "title": "共享 API 应有可追溯的有限出口和初始化条件。",
+      "entry_type": "rule",
+      "knowledge_kind": "Engineering Rule Candidate",
+      "tags": [
+        "framework"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "ANTI-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "mitigates",
+          "target": "ANTI-FRAMEWORK-001"
+        }
+      ],
+      "path": "rules/framework.md",
+      "anchor": "rule-framework-001"
+    },
+    {
+      "id": "ANTI-NET-001",
+      "title": "Client / Host Divergent Validation",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-009",
+        "RULE-NET-001",
+        "RULE-NET-002",
+        "PATTERN-NET-001",
+        "DECISION-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-net-001"
+    },
+    {
+      "id": "ANTI-SHARD-001",
+      "title": "Writable Replica Read-Modify-Write",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-006",
+        "RULE-SHARD-001",
+        "RULE-STATE-004",
+        "PATTERN-SHARD-001",
+        "DECISION-SHARD-001",
+        "FAIL-CASE001-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-shard-001"
+    },
+    {
+      "id": "ANTI-SHARD-002",
+      "title": "Broadcast Final Value Without Authority",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-006",
+        "RULE-STATE-001",
+        "RULE-SHARD-001",
+        "PATTERN-SHARD-001",
+        "DECISION-SHARD-001",
+        "FAIL-CASE001-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-shard-002"
+    },
+    {
+      "id": "ANTI-RESOURCE-001",
+      "title": "Duplicate Resource Provider Allocation",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "resource"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-003",
+        "FACT-DST-010",
+        "RULE-RESOURCE-001",
+        "RULE-RESOURCE-002",
+        "PATTERN-WORLD-001",
+        "DECISION-STATE-OWNER-001",
+        "FAIL-CASE001-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-resource-001"
+    },
+    {
+      "id": "ANTI-HOOK-001",
+      "title": "Unsafe Temporary Monkey Patch",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-003",
+        "RULE-HOOK-002",
+        "RULE-LIFE-001",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001",
+        "FAIL-CASE001-003"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-hook-001"
+    },
+    {
+      "id": "ANTI-HOOK-002",
+      "title": "Hook Without Ownership",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-008",
+        "RULE-HOOK-002",
+        "RULE-HOOK-003",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-hook-002"
+    },
+    {
+      "id": "ANTI-LIFE-001",
+      "title": "Lifecycle Owner Mismatch",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-008",
+        "RULE-LIFE-001",
+        "PATTERN-NET-001",
+        "PATTERN-WORLD-001",
+        "DECISION-PERSIST-001",
+        "DECISION-STATE-OWNER-001",
+        "FAIL-CASE001-004"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-life-001"
+    },
+    {
+      "id": "ANTI-WORLD-001",
+      "title": "God Manager — risk candidate",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "world"
+      ],
+      "evidence_level": "E0",
+      "confidence": "Low",
+      "status": "candidate",
+      "related": [
+        "RULE-WORLD-001",
+        "RULE-WORLD-002",
+        "PATTERN-WORLD-001",
+        "DECISION-STATE-OWNER-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "hypothesis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-world-001"
+    },
+    {
+      "id": "ANTI-FRAMEWORK-001",
+      "title": "Unlimited Ambient Dependency / Shared Namespace Growth",
+      "entry_type": "anti_pattern",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "framework"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "FACT-DST-007",
+        "RULE-FRAMEWORK-001",
+        "PATTERN-FRAMEWORK-001",
+        "DECISION-HOOK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "framework",
+          "hooks"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "anti-patterns/case001.md",
+      "anchor": "anti-framework-001"
+    },
+    {
+      "id": "FAIL-CASE001-001",
+      "title": "Seed cross-shard lost update",
+      "entry_type": "failure_case",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "needs_runtime_validation",
+      "related": [
+        "ANTI-SHARD-001",
+        "ANTI-SHARD-002",
+        "RULE-SHARD-001",
+        "TEST-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-SHARD-001"
+        },
+        {
+          "type": "illustrates",
+          "target": "ANTI-SHARD-002"
+        }
+      ],
+      "path": "failures/case001.md",
+      "anchor": "fail-case001-001"
+    },
+    {
+      "id": "FAIL-CASE001-002",
+      "title": "Duplicate Material Provider Allocation",
+      "entry_type": "failure_case",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "needs_runtime_validation",
+      "related": [
+        "ANTI-RESOURCE-001",
+        "RULE-RESOURCE-001",
+        "TEST-RESOURCE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-RESOURCE-001"
+        }
+      ],
+      "path": "failures/case001.md",
+      "anchor": "fail-case001-002"
+    },
+    {
+      "id": "FAIL-CASE001-003",
+      "title": "Unsafe temporary patch remains after error",
+      "entry_type": "failure_case",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "needs_runtime_validation",
+      "related": [
+        "ANTI-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-HOOK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-HOOK-001"
+        }
+      ],
+      "path": "failures/case001.md",
+      "anchor": "fail-case001-003"
+    },
+    {
+      "id": "FAIL-CASE001-004",
+      "title": "ClientDB owner task lifetime exceeds DB lifetime",
+      "entry_type": "failure_case",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "needs_runtime_validation",
+      "related": [
+        "ANTI-LIFE-001",
+        "RULE-LIFE-001",
+        "TEST-LIFE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "illustrates",
+          "target": "ANTI-LIFE-001"
+        }
+      ],
+      "path": "failures/case001.md",
+      "anchor": "fail-case001-004"
+    },
+    {
+      "id": "CORRECTION-CASE001-001",
+      "title": "撤回未使用 SeedCDB 顶层 local 的初始化故障判断",
+      "entry_type": "correction",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "case001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Very High",
+      "status": "corrected",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "RULE-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "corrects",
+          "target": "CLAIM-CASE001-001"
+        },
+        {
+          "type": "supersedes",
+          "target": "CLAIM-CASE001-001"
+        }
+      ],
+      "path": "corrections/CASE-001.md",
+      "anchor": "correction-case001-001"
+    },
+    {
+      "id": "DECISION-STATE-OWNER-001",
+      "title": "Prefab / Component / World Manager 如何选择？",
+      "entry_type": "decision",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "state"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "RULE-WORLD-001",
+        "TEST-LIFE-003",
+        "TEST-RESOURCE-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "decisions/candidates.md",
+      "anchor": "decision-state-owner-001"
+    },
+    {
+      "id": "DECISION-NET-001",
+      "title": "netvar / Replica / RPC / 原版 Action / Client View 如何判断？",
+      "entry_type": "decision",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "RULE-NET-002",
+        "RULE-NET-003",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "TEST-NET-003"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [],
+      "path": "decisions/candidates.md",
+      "anchor": "decision-net-001"
+    },
+    {
+      "id": "DECISION-SHARD-001",
+      "title": "什么时候需要跨 Shard Service？",
+      "entry_type": "decision",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001",
+        "RULE-STATE-001",
+        "TEST-SHARD-001",
+        "TEST-SHARD-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [],
+      "path": "decisions/candidates.md",
+      "anchor": "decision-shard-001"
+    },
+    {
+      "id": "DECISION-PERSIST-001",
+      "title": "哪些状态保存，哪些重建？",
+      "entry_type": "decision",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "persist"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "RULE-PERSIST-001",
+        "FACT-DST-001",
+        "TEST-LIFE-001",
+        "TEST-LIFE-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "persistence",
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "decisions/candidates.md",
+      "anchor": "decision-persist-001"
+    },
+    {
+      "id": "DECISION-HOOK-001",
+      "title": "PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？",
+      "entry_type": "decision",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001",
+        "RULE-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-HOOK-001",
+        "TEST-HOOK-002"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "decisions/candidates.md",
+      "anchor": "decision-hook-001"
+    },
+    {
+      "id": "TEST-NET-001",
+      "title": "Host vs Remote Client parity",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-net-001"
+    },
+    {
+      "id": "TEST-NET-002",
+      "title": "Dedicated Server request flow",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-net-002"
+    },
+    {
+      "id": "TEST-SHARD-001",
+      "title": "Ground/Cave simultaneous modification",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-shard-001"
+    },
+    {
+      "id": "TEST-LIFE-001",
+      "title": "Player reconnect",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-WORLD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-life-001"
+    },
+    {
+      "id": "TEST-LIFE-002",
+      "title": "World save/load",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001",
+        "PATTERN-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        },
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-life-002"
+    },
+    {
+      "id": "TEST-LIFE-003",
+      "title": "Entity removed during query",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "life"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "lifecycle"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-life-003"
+    },
+    {
+      "id": "TEST-HOOK-001",
+      "title": "Wrapped function throws error",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-hook-001"
+    },
+    {
+      "id": "TEST-HOOK-002",
+      "title": "Two Mods wrap same function",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "hook"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-FRAMEWORK-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "hooks",
+          "compatibility"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-FRAMEWORK-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-hook-002"
+    },
+    {
+      "id": "TEST-RESOURCE-001",
+      "title": "Same Entity exposed by two resource providers",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "resource"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-WORLD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "world",
+          "resources"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-WORLD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-resource-001"
+    },
+    {
+      "id": "TEST-SHARD-002",
+      "title": "Shard disconnect / reconnect recovery",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "shard"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-SHARD-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "shard",
+          "networking",
+          "state"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-SHARD-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-shard-002"
+    },
+    {
+      "id": "TEST-NET-003",
+      "title": "Stale cache and optimistic UI",
+      "entry_type": "test_case",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "net"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "PATTERN-NET-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "UI"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client"
+        ]
+      },
+      "typed_relations": [
+        {
+          "type": "tests",
+          "target": "PATTERN-NET-001"
+        }
+      ],
+      "path": "tests/candidates.md",
+      "anchor": "test-net-003"
+    },
+    {
+      "id": "ARP-DST-001",
+      "title": "DST Architecture Reasoning Process v0.1",
+      "entry_type": "playbook",
+      "knowledge_kind": "Recommendation",
+      "tags": [
+        "dst"
+      ],
+      "evidence_level": "E1",
+      "confidence": "Medium",
+      "status": "candidate",
+      "related": [
+        "RULE-NET-001",
+        "RULE-STATE-004",
+        "RULE-STATE-002",
+        "DECISION-STATE-OWNER-001",
+        "DECISION-SHARD-001",
+        "RULE-STATE-001",
+        "FAIL-CASE001-001",
+        "RULE-LIFE-001",
+        "FACT-DST-008",
+        "DECISION-NET-001",
+        "FACT-DST-006",
+        "DECISION-PERSIST-001",
+        "FACT-DST-001",
+        "RULE-RESOURCE-001",
+        "RULE-RESOURCE-002",
+        "RULE-WORLD-002",
+        "DECISION-HOOK-001",
+        "RULE-HOOK-002",
+        "TEST-NET-001",
+        "TEST-NET-002",
+        "CORRECTION-CASE001-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "architecture"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": []
+      },
+      "typed_relations": [],
+      "path": "playbooks/ARP-DST-001.md",
+      "anchor": "arp-dst-001"
+    },
+    {
+      "id": "CASE-001",
+      "title": "小穹 v13.80",
+      "entry_type": "case",
+      "knowledge_kind": "Case Observation",
+      "tags": [
+        "001"
+      ],
+      "evidence_level": "E1",
+      "confidence": "High",
+      "status": "validated_single_case",
+      "related": [
+        "PATTERN-NET-001",
+        "PATTERN-SHARD-001",
+        "PATTERN-WORLD-001",
+        "PATTERN-FRAMEWORK-001",
+        "CORRECTION-CASE001-001"
+      ],
+      "scope_structured": {
+        "game": "Don't Starve Together",
+        "cases": [
+          "CASE-001"
+        ],
+        "domains": [
+          "networking",
+          "shard",
+          "world",
+          "UI",
+          "lifecycle",
+          "framework"
+        ],
+        "evidence_modes": [
+          "static_analysis"
+        ],
+        "runtime_environments": [],
+        "sides": [
+          "server",
+          "client",
+          "shard"
+        ]
+      },
+      "typed_relations": [],
+      "path": "cases/CASE-001-sora/README.md",
+      "anchor": "case-001"
+    }
+  ]
+}

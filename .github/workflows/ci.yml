@@ -36,3 +36,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Verify generated web bundles match source files
         run: python scripts/build_web_bundle.py --check
+      - name: Validate portable public knowledge package
+        run: python -B dst-engineering-kb/tools/validate.py
+      - name: Test read-only knowledge retrieval
+        working-directory: dst-kb-service
+        run: python -B -m unittest discover -s tests -v

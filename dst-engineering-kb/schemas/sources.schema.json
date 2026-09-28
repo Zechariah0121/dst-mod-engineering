@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "sources.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "0.1.1"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "original_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "artifact_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "available_in_package": {
+            "type": "boolean"
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source_root": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verification": {},
+          "game": {
+            "type": "string"
+          },
+          "version_context": {
+            "type": "object"
+          },
+          "provenance": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "description",
+          "original_path",
+          "artifact_path",
+          "available_in_package"
+        ],
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "vanilla_source_snapshot"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "verification",
+                "game",
+                "version_context",
+                "source_root",
+                "provenance"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "available_in_package": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "sha256"
+              ],
+              "properties": {
+                "artifact_path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "sources"
+  ],
+  "additionalProperties": true
+}

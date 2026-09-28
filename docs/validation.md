@@ -1,5 +1,17 @@
 # 验证记录与适用范围
 
+## 2026-09-29：知识库公开派生版与可选检索服务
+
+- 保留 64 条 canonical 知识的 ID、类型、证据等级、置信度、状态和关系；本机冻结来源文件的 SHA256 未改变。
+- 公开知识库通过 Schema、Manifest、4 个随包来源哈希、731 个内部链接和 12 项反例检查。59 个输出文件在第二个目录重新导出后 SHA256 一致。
+- 检索服务 24 项回归通过，包含真实 stdio 握手与工具调用、搬迁路径、过期索引拒绝、损坏数据拒绝、显式 Correction 和运行证据边界。
+- 原有工具与网页打包器 43 项自造夹具回归通过；Skill 入口校验通过。
+- 上述是本地数据、协议与工具验证，不是 DST 实机验证，也不代表所有 Agent 都已自动加载。业务测试候选仍为 `not_run`；未进行新的案例研究。
+
+公开副本与本机原报告字节不同。知识库的 `PUBLICATION-PROVENANCE.json` 记录源/公开哈希；外部游戏与 Mod 源码不随包。检索仍有关键词误命中限制，必须读取范围并筛选结果。
+
+在完整仓库可分别重跑：根目录 `python -B -m unittest discover -s tests -v`、`python -B scripts/build_web_bundle.py --check`、`python -B dst-engineering-kb/tools/validate.py`；进入 `dst-kb-service` 后运行 `python -B -m unittest discover -s tests -v`。
+
 首轮重建及发布整理：**2026-09-27**。本记录区分已完成的维护者检查和读者可以直接重跑的回归；未随仓库分发私人工作目录、完整游戏源码或原始游戏日志。
 
 ## 接入与工具安装补充
@@ -63,7 +75,7 @@ python -m unittest discover -s tests -v
 
 首发版包含 27 个回归测试，本地 Windows / Python 3.13.14 检查全部通过。测试使用自造 Lua / ZIP / 临时目录，不分发游戏代码，也不要求本机安装 DST。覆盖源码包定位与安全导出、组件和 replica 的声明区分、语法与依赖错误、测试副本隔离、完成标记、失败优先、缺少完成信号和非法时长等行为。
 
-[GitHub Actions](https://github.com/zhuchengguang317-eng/dst-mod-engineering/actions/workflows/ci.yml) 在 Windows / Linux 上运行仓库检查。Linux 上的工具回归不表示支持 Linux 专服启动；`dst_modtest.py` 的实际启动路径目前仅面向 Windows。
+[GitHub Actions](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml) 在 Windows / Linux 上运行仓库检查。Linux 上的工具回归不表示支持 Linux 专服启动；`dst_modtest.py` 的实际启动路径目前仅面向 Windows。
 
 ## 实际游戏与资源工具检查
 
