@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-worldgen
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`2a0bd8e17e41976ba6da0d381728ce582bf689ac3c7769c5381d1a6307382a87`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`4737f2dc013ab23d7d863368f4b4b443964025a662ec9587827e613fa5ede37f`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 

@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`2a0bd8e17e41976ba6da0d381728ce582bf689ac3c7769c5381d1a6307382a87`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`4737f2dc013ab23d7d863368f4b4b443964025a662ec9587827e613fa5ede37f`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -444,7 +444,7 @@ Lua 改动不自动要求重编译美术；PNG/SCML 改动重编译实际依赖�
 
 ## 来源：`README.md`
 
-原始 SHA-256：`dff5310e3782d5de5b7b39cbc3fa68a6b039cc5013883799ae9fa467434a29b2`
+原始 SHA-256：`5f6e27908a21d050b4fb75a8a2830fc185f8c5ca03a21c2355e1968d092048c4`
 
 # dst-mod-engineering
 
@@ -502,7 +502,10 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 
 ## 来源与许可
 
-仓库自有文档和脚本采用 [MIT](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)。参考案例“小穹”的作者为 FL；研究引用不代表其背书，也不重新授权原 Mod。游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
+仓库自有文档和脚本采用 [MIT](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)。
+免责申明：知识库代码及架构部分学习于风铃大佬的“穹”mod，且严格参照代码开放级别许可进行学习，并无直接搬运风铃的完整源码或素材等行为；公开内容主要是架构分析和技术评论；研究引用不代表其背书，也不重新授权原 Mod。
+游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。
+资料来源见 [来源说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
 
 需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。
 
