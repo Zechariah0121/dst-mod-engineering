@@ -1,10 +1,11 @@
 # dst-mod-engineering
 
 面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能，覆盖功能开发、代码审查、崩溃排错、联机、存档和资源制作。
-请不要利用此技能进行盈利等行为，该技能仅允许用于自制mod
+
+**非商业使用**：允许学习、研究、非商业合作和免费制作、分享 Mod；未经另行书面授权，不得用于收费接单、付费 Mod／服务，也不得售卖或付费转发本项目。允许无权益交换的自愿打赏、赞助及免费公开教程的广告收益。完整边界见 [使用许可](LICENSE) 和 [常见情形](docs/licensing.md)。
 
 [![Checks](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-orange.svg)](LICENSE)
 
 ## 快速开始
 
@@ -55,7 +56,7 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 
 ## 来源与许可
 
-仓库自有文档和脚本采用 [MIT](LICENSE)。
+本次许可变更起发布的仓库自有内容（Skill、配套脚本、知识库原创分析和 MCP 服务）采用 [自定义非商业使用许可](LICENSE)。这是公开可读的非商业项目，不再以 MIT 或 OSI 开源许可描述本次发布；第三方材料沿用原许可，历史有效 MIT 授权不追溯撤销。详情见 [许可说明](docs/licensing.md)。
 免责申明：知识库代码及架构部分学习于风铃大佬的“穹”mod，且严格参照代码开放级别许可进行学习，并无直接搬运风铃的完整源码或素材等行为；公开内容主要是架构分析和技术评论；研究引用不代表其背书，也不重新授权原 Mod。
 游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。
 资料来源见 [来源说明](references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。

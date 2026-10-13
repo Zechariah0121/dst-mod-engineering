@@ -1,5 +1,7 @@
 # DST KB Service
 
+服务的自有代码与文档适用 [非商业使用许可](LICENSE)，包括禁止未经书面授权用它提供收费服务；第三方及历史 MIT 权利边界见 [许可说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。
+
 本地、只读的 DST 工程知识检索服务。Python 3.10+ 标准库与 SQLite FTS5，无需 API Key；不依赖特定模型。完整仓库中的 `../dst-engineering-kb` 是经过脱敏的 v0.1.1 公开派生包，不是 Mod 源码。
 
 ## 快速验证

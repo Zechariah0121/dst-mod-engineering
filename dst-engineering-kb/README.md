@@ -1,5 +1,7 @@
 # DST Engineering Knowledge Base v0.1.1
 
+本公开派生包的自有原创内容适用仓库的 [非商业使用许可](LICENSE)；第三方材料及历史有效 MIT 授权保留原有边界，见 [许可说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。本次许可说明更新不改变以下知识版本、内容和证据等级。
+
 本版只修订数据结构、证据溯源与可移植性。64 条知识的正文语义、证据等级、置信度及六轮历史结论不重新分析。没有运行 DST 测试，没有推进 Case Study 002。
 
 ## 阅读入口

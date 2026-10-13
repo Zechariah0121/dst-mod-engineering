@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-worldgen
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`4737f2dc013ab23d7d863368f4b4b443964025a662ec9587827e613fa5ede37f`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`b7d05198fcad609724fbc043f820bdfa4affeb2170452bc936ffc6b1349a9d4b`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -19,7 +19,7 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`d687b1ab8d6884ba1c7683a06697b08f27a59abd638af1156549d1da115d2b3b`
+原始 SHA-256：`6723871b3bdce051e35a1a52b2cafe5caed227485282ffcdb0e9216ecf8a744c`
 
 ---
 name: dst-mod-engineering
@@ -29,6 +29,12 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 # DST 模组工程
 
 这是 DST 开发、审查、排错与资源制作的统一入口。当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 用于提供线索，不代替源码核验。
+
+## 使用许可
+
+本技能及仓库自有配套内容按 [非商业使用许可](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE) 提供。未经另行书面授权，不得将其用于收费接单、付费 Mod／服务或售卖、付费转发；允许非商业开发、免费分享，以及无权益交换的自愿打赏和免费公开教程广告收益。第三方材料与历史 MIT 授权保留原有边界。
+
+任务明确属于上述受限商业用途时，先说明限制并确认是否已有权利人书面授权，再使用本技能执行该任务；用途未说明时，不擅自认定为商业用途。使用技能不使项目代码自动归本技能作者所有。具体情形见 [许可说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。
 
 ## 工作顺序
 
@@ -794,26 +800,77 @@ end
 
 ## 来源：`LICENSE`
 
-原始 SHA-256：`e5cf5589dd260cad1532b3ee5495ef253c4d08c473568d0740ff5383b3baa1e9`
+原始 SHA-256：`61ab35cf1a8484c5e8951f4df13748ccdb25e4d72369c08eef6b25f511b4f891`
 
-MIT License
+DST Mod Engineering 非商业使用许可
+Non-Commercial Use License
+2026-10-13
 
-Copyright (c) 2026 zhuchengguang317-eng
+Copyright (c) 2026 zhuchengguang317-eng (GitHub: Zechariah0121)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. 适用范围
+本许可适用于从本次许可变更提交开始发布、且权利人有权许可的仓库自有
+内容，包括 Skill 文档、示例、配套脚本、知识库原创分析和 MCP 检索服务。
+本许可是自定义的非商业许可，不是 MIT，也不应标为 OSI 开源许可。
+第三方材料、历史已授许可及法定权利按第 5、6 条处理。
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. 允许的使用
+在遵守本许可的前提下，允许为非商业目的阅读、使用、复制、修改并免费
+分发本材料，包括个人学习、研究、制作及免费分享自己的 DST Mod，以及
+非商业合作开发、修复和技术交流。向 AI Agent 提供本材料也属于使用。
+复制或分发本材料或其实质性部分时，应保留版权声明、本许可及原有来源
+和第三方声明；修改过的分发版本应说明已作修改，不得冒充原作者发布。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. 未经另行书面授权禁止的使用
+不得将本材料用于收费接单、受偿定制开发、付费 Mod、付费功能或付费服务；
+不得售卖、付费转发本材料，或将其改名、打包、嵌入收费产品、订阅、课程、
+托管 Agent / MCP 服务等方式获取报酬。成品最终免费发布，不豁免收费接单。
+不得以“赞助”“打赏”“会员”等名称规避付费解锁、访问限制或有偿交付。
+其他主要为商业利益或金钱报酬而进行的使用，也须事先取得权利人的书面
+授权，第 4 条明确允许的情形除外。
+
+4. 打赏、赞助与公开教程例外
+允许免费公开作品接受自愿打赏或赞助，前提是没有权益交换：不以付款换取
+访问、提前获取、专属功能、定制开发、优先服务或其他回报。
+允许免费公开的使用教程获得广告收益，前提是教程及所需使用资料不设
+付费门槛，不借教程售卖本材料。支付通用模型、网络或托管基础设施费用，
+本身不使一个非商业使用场景变为商业使用；收费代用本材料提供服务则不适用。
+
+5. 第三方和生成成果的权利边界
+Klei、参考 Mod 作者、外部工具及其他第三方保留各自权利；其材料仍按原
+许可或适用法律处理。本许可不代表第三方授权、认可或背书，也不授予其
+商标、游戏源码、素材等权利。
+使用本材料辅助产生的 Mod 或代码，不因此自动归本项目所有，也不因此
+整体继承本许可；其中实际复制的本材料片段和第三方材料仍须遵守各自
+适用的许可。第 3 条约束对本材料的商业使用，不以本项目拥有全部输出
+版权为前提。不把相同功能、通用设计思想或原版 API 用法视为使用本材料
+的充分证据。本许可不限制依法无须许可的独立创作、事实、思想或使用。
+
+6. 历史 MIT 授权
+本次变更不追溯撤销先前已经有效授予的 MIT 权利。变更前的版本仍按当时
+的许可处理；此前按 MIT 发布的相同材料，不因被重新收录而丧失原授权。
+历史参考提交：ef682cb95f4b4e2171f3c2c634c88ddecefe75de。
+随后仅修改 README 的提交 7c1f177a0632883c4c08d25956c07a939dc73d2e
+仍保留 MIT LICENSE；本许可不声称该次 README 修改已撤销 MIT 授权。
+在仍适用 MIT 的材料中，应保留原 MIT 版权及许可文本；可从对应历史提交
+的 LICENSE 取得。新规则不能作为对历史合规使用追溯追责的依据。
+
+7. 授权联系与责任限制
+需要本许可之外的商业使用时，请事先联系权利人取得明确书面授权：
+https://github.com/Zechariah0121/dst-mod-engineering/issues
+仅提交申请、未收到答复或保留署名，均不等于已获商业授权。
+本材料按“原样”提供，不保证准确、适用、不侵权或无缺陷；使用者应核对
+自己的游戏版本、源码和实际测试结果。在适用法律允许的范围内，作者及
+权利人不对因本材料使用产生的损失承担责任。
+
+English summary (the Chinese terms above control this new license):
+Project-owned materials in this release are offered for non-commercial use,
+modification, and free redistribution with notices retained. Paid commissions,
+paid mods/features/services, resale, and paid redistribution require separate
+written permission. Unconditional voluntary donations/sponsorship and ad revenue
+from freely accessible tutorials are allowed as specified above. Third-party
+rights and valid prior MIT grants are preserved. Generated output does not
+automatically become project property or inherit this license. This license
+does not claim exclusive rights over facts, ideas, or independent work.
+The materials are provided as is, without warranty, to the extent permitted
+by applicable law. This is a custom non-commercial license, not MIT.
