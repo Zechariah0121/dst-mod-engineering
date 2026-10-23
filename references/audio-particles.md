@@ -35,9 +35,9 @@ inst.SoundEmitter:KillSound(SOUND_HANDLE)
 
 ## 选择目标工具
 
-2026-09-27 核验环境中，官方 Mod Tools 的 FMOD Designer CLI 自报 **4.44.7**，随附《FMOD Designer 2010》文档；以下命令针对这一管线。保留已有可工作的 FDP 工程，不因新工具名字就重做工程或升级版本。
+以下命令针对 **FMOD Designer 4.44.7 / FEV + FSB** 管线。使用其他版本时先核对 CLI 帮助与工程兼容性；保留已有可工作的 FDP 工程。
 
-工具包也确实包含 **FMOD Studio 1.10.10**、`Template/myDSTmod.fspro` 和 `DST_MOD_ConfigureMasterBank.js` / `DST_MOD_BuildBanks.js`。这些官方文件说明存在另一条候选制作路线，但不证明任意现代 Studio `.bank` 可由当前 DST Mod 直接加载。本轮未构建或加载 Studio 银行；选择它之前，要核对目标版本的 Mod 加载接口、示例工程、Master Bank 标识处理和客户端最小事件验证。官方配置脚本会改工程元数据、触发关闭 Studio；模板构建后批处理还包含复制银行，先审查并改为独立输出，不能盲跑到游戏目录。FEV/FSB 与 `.bank` 流程不可混写。
+如果所用 Mod Tools 包提供 Studio 模板 `Template/myDSTmod.fspro` 和 `DST_MOD_ConfigureMasterBank.js` / `DST_MOD_BuildBanks.js`，将它作为另一条候选管线。该路线尚未完成本技能的运行时接入验证，不能推断任意现代 Studio `.bank` 均可直接加载。使用前核对目标版本的加载接口、Master Bank 标识和客户端最小事件。配置脚本可能修改工程元数据、关闭 Studio，构建批处理还可能复制银行；先检查脚本并设置独立输出。FEV/FSB 与 `.bank` 流程不可混写。
 
 ## 素材加工与响度
 
@@ -110,7 +110,7 @@ Get-ChildItem -LiteralPath $OutputDirectory -File
 4. **声音实测**：用目标工具试听作为中间检查，再到客户端检验第一次触发、循环/停止、近远距离、音量滑块、连续触发、多玩家观察和切世界。没有音频输出/客户端时保留这项待验收，不能用银行大小代替。
 5. **回修**：记录实际事件、主客机、Mod 列表、输入与银行版本和失败日志。Lua 无异常但客户端退出时结合原生崩溃记录排查，不先认定一定是 WAV 参数或 FSB 版本；未经解析的 dump 也不能当成根因。
 
-本轮核验了 Designer help、官方随附文档、Studio 模板/脚本存在及原版银行头，**没有编译或试听新声音银行，没有验证 Studio Mod 运行时接入**。交付记录应保留这些边界，不把工作流说明写成已完成的声音验收。
+本页提供制作与排错流程；新声音银行仍需编译、客户端加载和试听验收。已核验范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
 
 ## 粒子系统与网络边界
 

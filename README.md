@@ -12,10 +12,12 @@
 | 使用方式 | 入口 |
 |---|---|
 | Codex、Claude Code、Cursor 等 Agent | 下载仓库，按 [接入指南](references/agent-setup.md) 安装并加载 `SKILL.md` |
-| 网页 AI | 上传 [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/dst-mod-engineering.skill.zip)，或使用下方专题 Markdown |
+| 网页 AI | 上传 [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.skill.zip)，或使用下方专题 Markdown |
 | 阅读工程知识 | [知识库索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) |
 | 为 Agent 启用知识检索 | [MCP 服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) |
-| 获取全部内容 | [完整仓库 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/archive/refs/heads/main.zip) |
+| 获取全部内容 | [完整发行包](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering-full.zip)（Skill、知识库、MCP） |
+
+[发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest)提供版本说明和下载校验文件；需要尚未发行的改动时可下载 [main 分支 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/archive/refs/heads/main.zip)。
 
 不支持自动发现技能的 Agent，也可以直接使用：
 
@@ -40,7 +42,7 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 | 联机、存档与 UI | [联机专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
 | 贴图、动画与音频 | [资源专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
 | 世界生成 | [世界生成专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
-| 全部专题 | [阅读 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-reading.zip) · [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+| 全部专题 | [阅读 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/web-reading.zip) · [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
 
 ## 开发工具
 
@@ -56,9 +58,8 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 
 ## 来源与许可
 
-本次许可变更起发布的仓库自有内容（Skill、配套脚本、知识库原创分析和 MCP 服务）采用 [自定义非商业使用许可](LICENSE)。这是公开可读的非商业项目，不再以 MIT 或 OSI 开源许可描述本次发布；第三方材料沿用原许可，历史有效 MIT 授权不追溯撤销。详情见 [许可说明](docs/licensing.md)。
-免责申明：知识库代码及架构部分学习于风铃大佬的“穹”mod，且严格参照代码开放级别许可进行学习，并无直接搬运风铃的完整源码或素材等行为；公开内容主要是架构分析和技术评论；研究引用不代表其背书，也不重新授权原 Mod。
-游戏、Mod 源码和素材未随本仓库分发，其权利仍归原权利人。
-资料来源见 [来源说明](references/sources-and-corrections.md)，知识证据与版本限制见知识库各条目。
+仓库自有内容采用 [自定义非商业使用许可](LICENSE)，不是 MIT 或 OSI 开源许可；第三方材料与历史有效 MIT 授权的边界见 [许可说明](docs/licensing.md)。
+
+知识库参考风铃（FL）的“穹”Mod，公开内容为架构分析与技术评论，不代表原作者背书，也不重新授权原 Mod。游戏、Mod 原始源码及素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](references/sources-and-corrections.md)，证据与版本范围见各知识条目。
 
 需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。

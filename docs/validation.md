@@ -1,5 +1,7 @@
 # 验证记录与适用范围
 
+本页保留历史验证证据，供追溯专题结论；其中的版本、样本和数量只适用于对应记录。最新发行的检查结果见 [Releases](https://github.com/Zechariah0121/dst-mod-engineering/releases)，自行复查见 [维护指南](maintainers.md)。
+
 ## 2026-09-29：知识库公开派生版与可选检索服务
 
 - 保留 64 条 canonical 知识的 ID、类型、证据等级、置信度、状态和关系；本机冻结来源文件的 SHA256 未改变。

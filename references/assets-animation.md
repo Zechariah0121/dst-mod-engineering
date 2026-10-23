@@ -42,11 +42,11 @@ owner.AnimState:Hide("ARM_normal")
 
 ## 图像尺寸、透明与位置
 
-64×64 库存图、128×128 modicon 是常见制作起点，230/256 大小的地面图、200 宽的手持图是项目经验，不是统一引擎下限或强制尺寸。源图尺寸、编译图集尺寸、symbol 几何范围、pivot、动画矩阵、实体缩放和镜头共同影响观感。
+64×64 库存图、128×128 modicon 可作制作起点，具体尺寸参照原版同类资产和项目需求。源图尺寸、编译图集尺寸、symbol 几何范围、pivot、动画矩阵、实体缩放和镜头共同影响观感。
 
-- “64×64 atlas 必定加载失败”“长枪宽度必须填满画布”“1024 px 恒等于 1.7 块地皮”不能作为规则。先查资源/图集引用和原版同类资产，再测实际大小。
+- 加载失败先检查资源与图集引用；画布留白和实际显示大小通过原版同类资产及客户端预览确定。
 - 区分源 PNG 与打包后的图集。工具可把非 2 次幂源图打包/扩边到图集；不要强制每张源图都是 2 次幂，也不要擅自改变已有编译管线的尺寸政策。
-- 透明背景保留 alpha。白色主体、白色高光不能直接用全局白色阈值删除；检查透明边缘和预乘 alpha，避免白边/黑边。抠图是按需操作，不是每张图都必须执行的三步仪式。
+- 透明背景保留 alpha。抠图时保护白色主体与高光，检查透明边缘和预乘 alpha，避免白边/黑边。
 - pivot 表示锚点，不等于画布中心。先在原图标注握持点/落点，导出预览后再调整；不同工具的 Y 方向和归一化约定需核对。
 - 缩放和旋转保持长宽比，尽量从原图一次生成结果，避免多轮重采样。图像坐标的正方向、SCML pivot 和世界坐标不同；用简单可视样本确认变换方向。
 - 灯光 `inst.entity:AddLight()` 和渲染亮度/泛光是不同机制；只看图片发亮不能证明实体照亮周围。
@@ -83,12 +83,12 @@ RegisterInventoryItemAtlas("images/inventoryimages/my_item.xml", "my_item.tex")
 
 ## 工具选择与编译
 
-先发现实际安装路径、版本和 help，不用资料夹名当版本。2026-09-27 核验环境快照：DMT 1.1.13；ktech 自报 4.4.0；官方 Mod Tools 有 `scml.exe`、`buildanimation.py`、`image_build.py` 和 Python 2.7。这些是历史快照，不是固定依赖版本；换机器/工具后重新发现。缺少必需工具时进入 [工具安装与首次验证](tool-bootstrap.md)，按实际任务和已有授权处理下载安装，不依据旧版本号自行升级。
+先发现实际安装路径、程序自报版本和 help。缺少必需工具时进入 [工具安装与首次验证](tool-bootstrap.md)，按当前任务和已有授权处理下载安装。
 
 | 任务 | 合适工具 | 边界 |
 |---|---|---|
 | 动画层级、符号、批量编辑与 PNG/GIF 预览 | DST Mod Tool | 先读 [DMT 工作流](dst-mod-tool.md)，先取当前 `script --help` |
-| SCML 工程 → 运行时 ZIP | 官方 `scml.exe` | 独立临时输出，检查日志和产物；本次技能重建未重编真实项目 |
+| SCML 工程 → 运行时 ZIP | 官方 `scml.exe` | 独立临时输出，检查日志、产物和客户端效果 |
 | TEX ↔ PNG、TEX 信息、简单 atlas | 已安装 ktech | 只承诺当前 help/实测格式；不能泛称支持所有新 KTEX 压缩格式 |
 | 编译资源 → SCML 学习工程 | krane | 反编译不保证完全保真；用 `--check-animation-fidelity` 并抽检 |
 | 已有帧序列/中间 XML ZIP → 运行时 ZIP | 官方 `buildanimation.py` | 使用其依赖环境和实际 XML 结构；不是任意 PNG ZIP 都能输入 |
@@ -105,7 +105,7 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 & $Krane $UnpackedAnimDirectory $OutputScmlDirectory
 ```
 
-本次对合成 16×8 PNG 的 ktech 检查确认：中文路径可用、TEX 与 XML 都生成、DXT5/5 层 mip、输入 PNG 哈希不变。它证明该安装版本的这条路径，不能推导所有工具/编码/路径都兼容，也不能代替游戏验收。`krane` 当前 help 支持输入 BIN 文件或目录；ZIP 支持按版本验证，不要假定。
+转换后重新读取 TEX/XML，检查透明、方向及输入哈希；样本转换通过不能代替游戏验收。`krane` 的 BIN、目录和 ZIP 输入能力按已安装版本的 help 核对。
 
 官方 SCML 编译通常从 `mod_tools` 工作目录调用：
 
@@ -115,13 +115,13 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 
 具体输出位置以该版本实际结果为准。源 SCML 引用图片路径必须可解析；保留源工程和输出之间的映射。
 
-自动编译器不是一概不可用。核验环境的官方 `scripts/resize.py` 确实会对目标 PNG 重采样并保存，整套工具可能运行额外预处理、缓存或清理。需要保护原素材时在隔离副本运行、前后比较哈希，或明确调用单资源编译器。不能据一次事故断言所有 autocompiler 必然破坏透明度/姿态；也不能为强制更新直接删除整个 `anim/`。
+自动编译流程可能包含原图重采样、缓存或清理；已查阅的官方 `scripts/resize.py` 会重采样并保存目标 PNG。先核对所用脚本，在隔离副本运行并比较输入哈希，或选择单资源编译器。强制更新时只处理确认属于本轮的缓存与产物。
 
 ## 帧序列与性能
 
-- 没有“所有动画最多 60 帧、149 帧必崩”的通用结论。当前原版 `alterguardian_phase1_lunar.zip` 的 `spawn_lunar` 有 215 帧，`archive_lockbox.zip` 的 `activation` 有 196 帧。
+- 不以 60 或 149 帧作为通用硬上限：已核验的原版 `alterguardian_phase1_lunar.zip` 的 `spawn_lunar` 有 215 帧，`archive_lockbox.zip` 的 `activation` 有 196 帧。这不代表任意大图序列都能承受相同帧数。
 - 时间轴帧数不等于独立贴图数量。内存与解码成本还取决于独立图像、图集面积、mipmap、元素数、并发实例和加载时机。
-- 某项目把大图序列重采样到 60 帧后恢复，只能记录为该资产的缓解办法。查清资源有效性和负载，再按视觉质量预算优化，不预先改用户动画时长。
+- 先查资源有效性和负载，再按视觉质量预算优化；降帧时同时核对时长与节奏。
 - “同一 symbol 绝不能跨图集”也未建立为通用限制；由支持该格式的打包器生成并检查 build 中的引用，遇到特定管线问题保留最小复现。
 - `FRAMES = 1/30` 秒，约 0.033333 秒；动画资源自身 FPS 可以不同。制作端降 FPS 会改变时长，除非同步调整取帧与时间轴；不能把两者混为一谈。
 - `AnimState:SetScale` 可以大于 1，原版有 `SetScale(2, 2)`。属性在哪些端设置以同类原版和实机同步为准，不把“SetPristine 前设置”当成所有后续变化的唯一方法。
@@ -136,4 +136,4 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 5. 加载/无头运行验证与真实客户端视觉验收分开记录。客户端检查装备、卸下、皮肤/变身、运动方向、特效结束和远程观察。
 6. 修改范围内同步 source/runtime，逐文件哈希；保留可重编的源素材和工具参数。资源删减要先查所有引用再隔离测试。
 
-核验依据：当前 `spear.lua:13,37-38`、`sword_lunarplant.lua:115`、`simutil.lua:658-699`、`standardcomponents.lua:1772-1791`、`constants.lua:16`；官方 `buildanimation.py:101-105,168-173,406-422`；核验环境的原版 ZIP 解析与 ktech 探针。工具分工另见 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)，其说明也要求以当前 help 为准。旧教程保留制作思路，具体 API 表与工具命令以这些证据重新核对。
+源码核对入口：`spear.lua`、`sword_lunarplant.lua`、`simutil.lua`、`standardcomponents.lua`、`constants.lua`，以及官方 `buildanimation.py`；按 [环境发现](environment-tools.md) 定位当前版本。工具分工见 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)，历史样本和原版 ZIP 检查范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。

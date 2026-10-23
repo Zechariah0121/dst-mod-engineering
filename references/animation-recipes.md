@@ -59,22 +59,22 @@ my_fx_stage.zip
 </animations>
 ```
 
-这是说明字段的单帧样例，32×24 和 30 FPS 不是设计默认。多帧时逐项对应 symbol 帧号和时间轴；`duration` 表示 build symbol 帧覆盖范围，不等于 GIF 毫秒时长。`image` 写 ZIP 内 PNG 路径去掉 `.png`；标签及 `animation.xml` 文件名区分大小写。当前编译器把 build、symbol、图像、动画、root 等名称编码为 ASCII，名称使用 ASCII；这不等于所有工具的外部文件路径都禁止中文。
+这是说明字段的单帧样例，32×24 和 30 FPS 不是设计默认。多帧时逐项对应 symbol 帧号和时间轴；`duration` 表示 build symbol 帧覆盖范围，不等于 GIF 毫秒时长。`image` 写 ZIP 内 PNG 路径去掉 `.png`；标签及 `animation.xml` 文件名区分大小写。本页核验的编译器把 build、symbol、图像、动画、root 等名称编码为 ASCII，名称使用 ASCII；外部文件路径的编码支持另行核对。
 
 - `SetBank("my_fx_bank")` 取自动画的 `root`，`SetBuild("my_fx_build")` 取自 Build.name；ZIP 文件名可不同。原版 spear 的 bank/build 也不同。
 - 矩阵排列为 `x'=m_a*x+m_c*y+m_tx`、`y'=m_b*x+m_d*y+m_ty`；不要交换 b/c，或把图片向下的 Y 直接当世界高度。先用单位矩阵和不对称测试图确认方向，再引入旋转/缩放。
-- build 的 x/y 是图像中心偏移。动画 frame 的 x/y/w/h 是包围框信息，不能用其代替 element 平移。旧记录把动画 x/y 固定解释成左上角并归因于裁剪，证据不足：公开官方 SCML 导出代码将包围中心写入 position。本样例采用该约定，复杂变换优先保留当前导出器计算的框，并核对四角变换后的范围，不沿用未经验证的“左上角”修复。
+- build 的 x/y 是图像中心偏移；动画 frame 的 x/y/w/h 是包围框信息，element 平移由矩阵决定。公开官方 SCML 导出代码将包围中心写入 position，本样例采用该约定。复杂变换保留所用导出器计算的框，并核对四角变换后的范围。
 - 动画名的 `_up`、`_down`、`_side` 等后缀会被本编译器识别为朝向并从动作名中拆掉；无意使用保留后缀会改变查找结果。z_index 决定导出排序，不是世界 Z 高度。
 
 坐标依据：[官方 SCML 导出代码](https://github.com/kleientertainment/ds_mod_tools/blob/master/src/app/scml/main.cpp) 的 `export_element`、`extend_bounding_box`、`export_animation_frame`；再对照实际安装版本的 `buildanimation.py`。公开源代码与已安装二进制不自动视为相同版本。
 
 ## 图集预算与编译
 
-预算同时考虑独立图像数量、尺寸、透明占用、mipmap、元素数和并发实例。总像素面积只是下界；当前 `klei/atlas.py` 有面积排序、4 像素对齐和空位搜索，不是可用“每行张数×行数”精确预测的纯货架模型。要知道图集数量就运行实际打包器并检查输出。
+预算同时考虑独立图像数量、尺寸、透明占用、mipmap、元素数和并发实例。总像素面积只是下界；本页核验的 `klei/atlas.py` 使用面积排序、4 像素对齐和空位搜索。图集数量应以实际打包器输出为准。
 
-当前 `buildanimation.py` 默认最大图集边长 2048、带 alpha 默认 bc3；它允许多个 atlas，并在顶点第六个 float 保存 sampler。`atlas.py` 默认还会在空间允许时缩为非正方形。`--square` 是可选布局开关，不是多图集必需修复；“单 symbol 绝不能跨 atlas”不是已证实的引擎限制。出现某管线色块应保留可复现资产，查图集引用、UV、premultiply、几何和客户端效果。
+本页核验的 `buildanimation.py` 默认最大图集边长 2048、带 alpha 默认 bc3；它允许多个 atlas，并在顶点第六个 float 保存 sampler。`atlas.py` 默认还会在空间允许时缩为非正方形。`--square` 是可选布局开关，不是多图集必需修复；“单 symbol 绝不能跨 atlas”不是已证实的引擎限制。出现某管线色块应保留可复现资产，查图集引用、UV、premultiply、几何和客户端效果。
 
-PowerShell：先把变量设为已确认的绝对路径，输出目录选择本次隔离工作区。这里不需要改全局 PATH，也不需要把原工程迁入工具目录。
+PowerShell：把变量设为已确认的绝对路径，输出目录选择独立工作区。
 
 ```powershell
 $Compiler = Join-Path $ModTools 'tools/scripts/buildanimation.py'
@@ -88,13 +88,13 @@ $ResultZip = Join-Path $OutputRoot ('anim/' + [IO.Path]::GetFileNameWithoutExten
 if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成预期动画 ZIP' }
 ```
 
-使用随工具的 Python 2.7 和依赖，不用系统 Python 3 执行这份 Python 2 脚本。该版本绝对路径调用已在工具目录外成功；“cwd 必须 tools/scripts”不是固定要求。相对 `--outputdir` 会按输入路径的上级解析，明确绝对路径能避免找错产物。命令成功还要检查日志及二进制，`--ignoreexceptions` 会改变失败处理，不作为日常成功判据；`sitecustomize` 警告也不能仅凭退出码一概忽略。
+该示例针对随工具提供的 Python 2 脚本，使用其匹配的 Python 2.7 和依赖。已核验版本可从工具目录外用绝对路径调用；相对 `--outputdir` 按输入路径的上级解析，因此建议明确绝对输出路径。检查日志及二进制；`--ignoreexceptions` 会改变失败处理，`sitecustomize` 警告也需核对原因。
 
 遇到路径错误先记录工具版本、原路径和编码；必要时在本次独立 ASCII 路径副本重现，不移动原素材。ktech 应按当前 help 使用位置参数及明确 `.png` 输出，不能把无扩展名文件盲当固定 2048² 裸 RGBA。
 
 ## 静态图制作旋转效果
 
-先确认是一整层旋转还是内外层独立运动。若现有动画工程能够用多 symbol 和矩阵表达，优先沿用；只有需要逐帧烘焙或工具限制时，才把各层合成为帧序列，不为旧“单 symbol”推断强行合并。
+先确认是一整层旋转还是内外层独立运动。现有动画工程能用多 symbol 和矩阵表达时优先沿用；需要逐帧烘焙或受工具限制时，再把各层合成为帧序列。
 
 1. 在母版标明环心，必要时查看径向 alpha 分布选择内外层分界。低 alpha 区可减少接缝，但不保证硬切永远无痕；检查旋转后缝隙。
 2. 画布需覆盖绕锚点旋转的最远可见点，并留滤波边界。百分位去噪可能切掉合法装饰，不能代替人工检查。每一帧从母版旋转，避免上一帧接着旋转造成累积损失。
@@ -107,6 +107,6 @@ if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成�
 
 FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持客户端可见；后续动态变化使用正确的同步或客户端更新路径。`SetPristine()` 不是“所有属性之后永远不能变”的边界。循环动画需明确停止和清理，单次动画用匹配的完成事件/状态回收。泛光 shader 和 Light 照明不同，不能靠泛光掩盖缩放模糊。
 
-2026-09-27 的证据：合成 32×24 PNG 经原装 Python 2.7/compiler 在工具目录外生成 201 时间轴帧的 BILD6/ANIM4/KTEX ZIP，源 ZIP 哈希不变；小图集函数探针产生两个 atlas（64×64、64×32）和 sampler 0/1。原版 `alterguardian_phase1_lunar.zip` 的 `spawn_lunar` 另有 215 帧。这些排除编译器的“60/149 帧硬上限”说法，**不证明任意 201 张大图或跨图集资产已通过客户端渲染**。
+历史验证仅覆盖合成小图编译、多个 atlas/sampler 输出及部分原版资源解析，**未覆盖真实大图序列或跨图集资产的客户端渲染**；详见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。按本页制作的素材仍需完成上述客户端验收。
 
-本轮未启动游戏、未做真实素材视觉验收；声音制作转到 [音频与粒子](audio-particles.md)，不在此重复维护第二份 FMOD 流程。
+声音制作见 [音频与粒子](audio-particles.md)。

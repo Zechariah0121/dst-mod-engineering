@@ -1,8 +1,8 @@
 # 环境发现与来源定位
 
-先发现当前项目实际使用的游戏、源码与工具，再配置绝对路径。本技能不绑定某台机器的目录，也不随仓库分发游戏源码、编译器或第三方可执行程序。不要根据历史环境快照自动安装、更新或迁移工具。
+先发现当前项目实际使用的游戏、源码与工具，再配置绝对路径。本技能不绑定固定安装目录，也不随仓库分发游戏源码、编译器或第三方可执行程序。
 
-当前任务确实缺少工具时，按 [工具安装与首次验证](tool-bootstrap.md) 主动给出来源、平台、最小安装方案和验收方法；授权后继续执行。这里禁止的是照抄旧机器配置，不是忽略新用户的环境搭建需求。其他 Agent 的加载路径与能力检查见 [Agent 接入](agent-setup.md)。
+当前任务缺少工具时，按 [工具安装与首次验证](tool-bootstrap.md) 给出来源、平台、最小安装方案和验收方法；授权后继续执行。其他 Agent 的加载路径与能力检查见 [Agent 接入](agent-setup.md)。
 
 在网页或远端执行环境中，先区分文件、解释器和工具属于哪台主机。上传文件不会暴露用户的本机盘符；云端下载或安装 DMT 也不等于用户电脑已安装。按 [网页使用指南](web-chat.md) 确认实际能力，需要本机执行时交付具体步骤并等待真实日志。
 
@@ -19,13 +19,9 @@
 
 接手项目时读取该项目的约定、交接文档与当前配置。历史报告不证明今天的副本相同。环境路径应保存在项目自己的本地配置或会话变量中，避免把开发者用户名和绝对目录写入可公开的技能。
 
-## 已记录的源码基线
+## 查阅当前源码
 
-2026-09-27 的 Windows 核验环境：安装包内 4030 个 Lua 与当时的解压副本逐字节相同，无缺失、无漂移。该次 `scripts.zip` SHA-256：
-
-`85d6aa0e24a290d81745f1fd18bd0769d6b82011a3ba5aba02b87389b62f41c8`
-
-这证明当时的解压副本匹配该安装版本，不证明它是读者当前版本，也不证明 Steam 上没有更新。游戏更新或哈希改变后，重新比较相关文件，不能继续沿用旧行号。验证范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+使用解压副本前，核对它与当前安装包的相关条目是否一致。游戏更新或哈希改变后，重新比较相关文件与行号。历史源码指纹与核验范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
 
 源码先用 `rg --files`/`rg -n` 定位。没找到按 prefab 命名的文件时，查合并返回多个 Prefab 的文件、工厂函数、调用链；如帽子集中在 `prefabs/hats.lua`。Lua 中没定义的引擎方法可能来自 C++，不能凭一次搜索判不存在。
 
@@ -41,17 +37,17 @@
 
 ## 工具采用原则
 
-“新”不是正确性的证据。读取已安装程序的 metadata/`--help`，在副本上运行相关操作，再检查输出产物。2026-09-27 核验环境中，ktech 自报 `4.4.0`，DMT 文件版本为 `1.1.13`；目录名称曾与 ktech 实际版本不同。它们是历史快照，不是固定依赖版本；具体 DMT 脚本接口看 [dst-mod-tool.md](dst-mod-tool.md)。
+读取已安装程序的 metadata/`--help`，在副本上运行所需操作，再检查输出产物。以程序自报版本为准，不用目录名推断版本。DMT 脚本接口见 [dst-mod-tool.md](dst-mod-tool.md)。
 
 历史教程附带的可执行文件不作为默认工具；先做压缩包清单/文本源码审查。需要换工具时先比较现有工具能否完成同一产物，再按用户授权处理安装。
 
-不同 shell 的 stdout、编码、引号与路径行为用当前实际调用确认；旧机器经验不能当作永久不可用声明。含复杂字符串的操作优先使用脚本文件，清理文件始终在同一 shell 中用明确路径执行。核验环境中 Python 可以读取中文源码，但 Windows 引擎无法从被测中文存档根路径读取配置/保存，测试器因此要求独立 ASCII 引擎存档路径；报告目录可位于中文工作区。这是已测路径的兼容性记录，不是所有平台和字符组合的结论。
+不同 shell 的 stdout、编码、引号与路径行为用实际调用确认。含复杂字符串的操作优先使用脚本文件，清理文件在同一 shell 中用明确路径执行。随附测试器使用独立 ASCII 引擎存档路径，以避开已遇到的 Windows 中文存档路径兼容问题；报告目录可位于中文工作区。解释器能读取中文源码，不代表引擎也能处理同一路径。
 
 ## 随附测试器的特殊边界
 
 - 默认引擎存档位于系统临时目录 `dst_mod_engineering/<运行ID>/DME/Cluster`；可传 `--storage-root ASCII_DIRECTORY`。命令同时传 `-persistent_storage_root`、`-conf_dir`、`-cluster`、`-shard`，不依赖当前账户的真实存档。
-- 核验环境的离线 LAN 日志声明允许端口 `10998..11018`，实测 `11018` 有效；工具先查空闲端口，但查完到启动仍可能竞争。换游戏版本后先核对引擎日志。端口冲突是环境故障，不能为释放端口杀无关服务器。
+- LAN 测试端口按引擎日志允许的范围选择。工具先查空闲端口，但查完到启动仍可能竞争；端口冲突时换用空闲端口，不终止无关服务器。
 - runner 只终止自己 `Popen` 创建的进程。每轮保留日志、manifest、唯一 staged Mod 与存档，便于排查；清理时先核对 manifest、绝对路径归属与进程状态，勿通配删除真实 `mods`/Klei 目录。
 - 唯一测试目录会改变 `modname`。依赖 Workshop ID、硬编码文件夹名、跨 Mod 名称探测的场景必须单独验证配置映射与真实安装环境。
 
-存档路径参数依据 Klei 开发者 [Dedicated Server Command Line Options Guide](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/)，上述路径/端口行为另经核验环境的实际引擎日志验证。
+存档路径参数依据 Klei 开发者 [Dedicated Server Command Line Options Guide](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/)。历史实测环境及范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。

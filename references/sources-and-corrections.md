@@ -1,25 +1,25 @@
 # 来源、可信度与纠错范围
 
-本技能参考 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial) 等开发资料，并对相关原版接口和工具进行核验。旧教程不等同于当前游戏 API 规范。
+开发资料参考 [atjiu/dstmod-tutorial](https://github.com/atjiu/dstmod-tutorial)；教程用于提供线索，接口与行为以当前游戏实现为准。
 
-测试工具的历史来源包括 [dst-modtest](https://github.com/Zechariah0121/dst-modtest) 与 [dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting)。当前辅助脚本实现直接 ZIP 读取、AST 声明检查与隔离专服测试；这些来源说明不代替运行验证。
+辅助脚本实现 ZIP 读取、AST 声明检查与隔离专服测试。当前专服测试工具入口为 [scripts/dst_modtest.py](../scripts/dst_modtest.py)，历史来源包括 [dst-ai-scripting](https://github.com/lw-0x4eb1a/dst-ai-scripting)。具体检查能力见 [测试与交付](testing-release.md)。
 
 技术事实优先核对合法安装的游戏与官方 Mod Tools；本仓库不分发它们的源码、资源或二进制。工具与参数的公开参考包括 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)、[Klei 专服命令行说明](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/) 和 [FFmpeg 滤镜文档](https://ffmpeg.org/ffmpeg-filters.html)。具体调用以当前安装版本的帮助和相关游戏实现为准。
 
-## 材料如何进入新规则
+## 怎样判断资料
 
-| 分类 | 采用方式 | 例子 |
+| 情况 | 采用方式 | 例子 |
 |---|---|---|
-| 仍可用 | 保留概念，更新检索入口与边界 | Component/Replica 分工、WorldGen 的 room/task/layout |
-| 需要修正 | 更正签名/端别/时序并提供原版定位 | Client RPC 没有隐式 player；实体与组件 OnSave 不同 |
-| 有更合适做法 | 说明适用条件，以维护成本和实测结果选择 | 局部控件拖拽替代全局 FollowMouse 覆盖；源码直读替代旧缓存 |
-| 暂未验证 | 不写成执行要求，记录验证入口 | 旧附件工具运行兼容、部分引擎接口、真实客户端画面/听感 |
+| 概念仍适用 | 核对当前实现与适用边界 | Component/Replica 分工、WorldGen 的 room/task/layout |
+| 签名、端别或时序有误 | 追查原版定义与调用方 | Client RPC 没有隐式 player；实体与组件 OnSave 不同 |
+| 存在多种实现 | 按适用条件、维护成本与实测结果选择 | 局部控件拖拽与全局 FollowMouse 覆盖 |
+| 尚无运行证据 | 保留待验证标记与验证方法 | 旧工具兼容、引擎接口、客户端画面与听感 |
 
-资料读过不等于其全部行为已在游戏中运行。教程中的 API 列表只用于定位，未能从当前 Lua/工具文档确认的引擎绑定不直接标为不存在。教程截图作为历史步骤示意，不冒充本次实机截图；不逐张重新验收其画面。压缩包只检查清单、相关文本/结构和 Lua 语法，没有运行附带旧 EXE/DLL。
+Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存在。教程截图仅作步骤示意；附件的清单、结构或语法检查不能证明旧 EXE/DLL 可运行，也不能代替游戏验收。
 
 ## 高影响纠错索引
 
-| 旧说法/做法 | 新规则的维护位置 |
+| 常见误区 | 参考专题 |
 |---|---|
 | env 代理必须、pcall 全禁、scripts 下 GLOBAL 一律错 | core-lua-hooks.md |
 | modinfo 赋值末尾逗号、GetModConfigData 第二参是默认值 | core-lua-hooks.md |
@@ -46,10 +46,8 @@
 | 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
 | 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
-公开的检查范围、工具回归结果及未覆盖内容见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。各专题保留相关源码文件/函数定位、适用条件与验证边界，供读者在自己的合法安装中复核。
+检查范围、工具回归结果与未覆盖内容见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。各专题提供源码文件/函数定位、适用条件和验证边界，供读者复核。
 
-主参考引用当前源码的相对文件名和函数名，行号是该次快照的定位辅助；源码哈希见 [environment-tools.md](environment-tools.md)。安装更新后重新查证，不能把本技能的新结论变成永不过期的铁律。
+源码定位使用相对文件名与函数名，行号仅对应引用快照；源码哈希见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。游戏更新后需重新核对相关实现。
 
-## 后续使用范围
-
-统一入口按需加载内部专题，不再维护旧专项技能的独立规则。核验范围是两份通用技能、七份专项技能及列明材料，没有覆盖所有社区技能，也未证明任意游戏版本都适用。新的游戏数值和美术决策仍由项目作者决定，不能从旧项目例子自动继承。
+专题中的项目案例用于说明机制，数值与美术效果需由当前项目决定。

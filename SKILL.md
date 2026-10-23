@@ -60,7 +60,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](references/testing-release.md) |
 | 资料来历、旧规则纠错与可信度 | [sources-and-corrections.md](references/sources-and-corrections.md) |
 
-## 每次都要守住的边界
+## 技术边界
 
 - **端别**：服务器拥有游戏状态；客户端可见数据、预测和视觉按原版链路组织。`ismastersim`、dedicated 与本地玩家是不同问题。方法在文件中存在，不代表当前端的对象有该方法。
 - **生命周期**：自己注册的任务、事件、Hook、修改器、Widget 与子实体要有明确所有者和清理路径。还原字段之前确认仍是本 Mod 持有的值；避免覆盖其他 Mod 后续修改。
@@ -75,5 +75,3 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
-
-维护技能时，以“实际失败 → 原版/工具契约 → 可复现验证”为新增规则的依据。版本相关结论保留核验日期与源码定位；不可验证的经验保留为待查项，不升级为铁律。
