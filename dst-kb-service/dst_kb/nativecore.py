@@ -88,8 +88,48 @@ def expanded(entry, artifacts):
         for ref in references(entry)]}
 
 
+def _historical_marker(node):
+    return (node.get('evidence_role') == 'historical_comparison' or
+            node.get('supports_current_behavior') is False or
+            node.get('payload_status') == 'metadata_only')
+
+
+def _historical_comparison(node):
+    """An explicit, bounded history record is never current NSF evidence."""
+    if not (node.get('evidence_role') == 'historical_comparison' and
+            node.get('supports_current_behavior') is False and
+            node.get('payload_status') == 'metadata_only'):
+        return False
+    path = node.get('path') or node.get('file') or node.get('source_file') or node.get('source_path')
+    first, last = node.get('line_start'), node.get('line_end')
+    metadata = node.get('original_payload_metadata')
+    if (not isinstance(path, str) or not path.startswith('scripts/') or
+            not path.endswith('.lua') or '\\' in path or ':' in path or
+            any(part in ('', '.', '..') for part in path.split('/')) or
+            any(not isinstance(node.get(key), str) or not HEX.fullmatch(node[key])
+                for key in ('file_sha256', 'range_sha256')) or
+            not isinstance(node.get('snapshot_id'), str) or not node['snapshot_id'].strip() or
+            type(first) is not int or first <= 0 or type(last) is not int or last < first or
+            not isinstance(metadata, dict) or
+            metadata.get('content_sha256') != node['range_sha256'] or
+            type(metadata.get('content_bytes')) is not int or metadata['content_bytes'] <= 0 or
+            type(metadata.get('line_count')) is not int or metadata['line_count'] != last - first + 1 or
+            not isinstance(metadata.get('original_json_value_sha256'), str) or
+            not HEX.fullmatch(metadata['original_json_value_sha256'])):
+        return False
+    # A metadata-only marker cannot conceal source payload or nested locators.
+    payload_keys = {'source_excerpt', 'excerpt', 'declaration_header', 'header', '$dst_source_payload_slot'}
+    locator_keys = {'path', 'file', 'source_file', 'source_path', 'symbol', 'function',
+                    'line_start', 'line_end', 'file_sha256', 'range_sha256'}
+    return all(not (payload_keys & child.keys()) and
+               (child is node or not (locator_keys & child.keys()))
+               for child in native.walk(node))
+
+
 def _locator_nodes(value, inherited_path=None, inherited_hash=None):
     if isinstance(value,dict):
+        if _historical_comparison(value):
+            return
         own_path=value.get('path') or value.get('file') or value.get('source_file') or value.get('source_path')
         path=own_path or inherited_path
         fingerprint=value.get('file_sha256',value.get('sha256')) or inherited_hash
@@ -126,10 +166,13 @@ def _exact_excerpt_locator(node, path, fingerprint):
 
 
 def _has_nsf_locator(values, scope):
+    if any(_historical_marker(node) and not _historical_comparison(node)
+           for value in values for node in native.walk(value)):
+        return False
     snapshots = [scope.get('snapshot_id'), scope.get('source_snapshot_id')]
-    snapshots.extend(item for value in values+[scope] for node in native.walk(value) for key,item in node.items()
+    snapshots.extend(item for value in values+[scope] for node,_,_,_ in _locator_nodes(value) for key,item in node.items()
                      if key=='snapshot_id' or key.endswith('_snapshot_id'))
-    snapshots.extend(item for value in values+[scope] for node in native.walk(value) for key,item in node.items()
+    snapshots.extend(item for value in values+[scope] for node,_,_,_ in _locator_nodes(value) for key,item in node.items()
                      if (key=='source_commit' or key.endswith('_source_commit')) and isinstance(item,str) and re.fullmatch('[a-f0-9]{40}',item))
     if not any(isinstance(item, str) and item.strip() for item in snapshots):
         return False
@@ -245,6 +288,10 @@ def load(root, schema_errors, check_supported_schema, legacy_native_present=Fals
                     # Claim 的直接定位优先；entry 引用可补 snapshot 或无定位的 fact，不能掩盖损坏 citation。
                     has_claim_locator=any(((node.get('symbol') or node.get('function')) and (path or fingerprint or node.get('line_start',node.get('start_line')) is not None)) or (own_path and node.get('line_start',node.get('start_line')) is not None)
                                           for value in values for node,path,fingerprint,own_path in _locator_nodes(value))
+                    # Explicit comparison-only refs cannot borrow entry evidence
+                    # to become current-behavior claims, even when well formed.
+                    has_claim_locator = has_claim_locator or any(_historical_marker(node)
+                        for value in values for node in native.walk(value))
                     if not valid and not has_claim_locator:valid=_has_nsf_locator(values+entry_values,context)
                     if not valid:
                         errors.append('NativeCore NSF citation lacks snapshot/path/symbol/hash/anchor: ' + entry['id'])

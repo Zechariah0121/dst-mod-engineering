@@ -6,7 +6,7 @@
 
 公开证据为经审片段与新哈希，不等于全部原始研究公开。4项依赖私有情境的政策/推断公开隐去并保留UNK。
 JSON中的 `$dst_source_payload_slot` 是待本地恢复的游戏源码片段，不是已读原文；文件阅读不能把该槽当成证据。
-MCP使用完整包根目录的 `prepare_sources.py` 与 `run_kb.py`，见 [接入说明](../docs/knowledge-integration.md)。来源未准备时默认提供目录导航与公开材料审阅；完整九工具模式仍需准备合法来源，Core Coding HOLD不变。
+MCP使用完整包根目录的 `prepare_sources.py` 与 `run_kb.py`，见 [接入说明](../docs/knowledge-integration.md)。用一份合法持有、匹配759671的当前 `scripts.zip` 即可准备完整九工具，不要求旧版源码；历史比较节点保留原来源信息并标记为 `metadata_only`，不当作已读当前源码证据。来源未准备时默认可用目录审阅；Core Coding HOLD不变。
 当前包仅提供759671运行环境；每条知识仍保留原来源范围，不能据此推断所有条目均适配759671。历史环境和旧目录可从Git历史取回。
 项目自有内容采用随包LICENSE，游戏源码和私人原始资料不随包分发。
 

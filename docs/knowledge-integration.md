@@ -18,11 +18,11 @@
 
 ## 运行 MCP：目录审阅与完整检索
 
+正常完整使用按 [安装说明](install-and-use.md) 运行 `prepare_sources.py --source "<759671 scripts.zip>"`，再用 `run_kb.py mcp-config --mode full` 生成九工具配置。一份合法持有、与当前支持快照匹配的源码即可准备完整九工具，不需要旧版源码。历史比较节点显式标记为 `metadata_only`，保留原快照、哈希、行范围与上游引用；这些元数据不要求恢复旧原文，也不作为已读当前源码证据。准备只写 `cache/runtime/`，恢复的游戏 Lua 片段不属于公开再分发内容。
+
 在包根目录运行 `python -B -X utf8 run_kb.py mcp-config`，把输出配置接入客户端。默认 `--mode auto` 只在来源未准备（`SOURCES_NOT_PREPARED`）时启动公开目录模式：`search_catalog` 导航全部 187 条记录，`read_public_entry` 仅以 `purpose="review"` 审阅公开材料。目录命中不是正文已读；读取预算不足时不截断正文，应选择返回提示中的 JSON Pointer 继续定向阅读。
 
 目录模式不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不表示任何运行验证，Core Coding HOLD 不变。已准备缓存损坏或包版本变化时，`auto` 明确报错；可显式 `--mode catalog` 审阅公开材料。
-
-完整模式按 [安装说明](install-and-use.md) 运行 `prepare_sources.py`，提供合法持有的 `759671` 及全部必需历史源码范围。缺项时程序列出实际要求；不能用当前版本替换旧证据。准备只写 `cache/runtime/`，恢复的游戏 Lua 片段不属于公开再分发内容。
 
 服务的工具集在启动时固定。准备成功后重启 MCP 会话，默认 `auto` 才会切换到九工具；`mcp-config --mode full` 可生成锁定完整模式的配置。实际工具发现与一次任务查询仍需在客户端验证。工具、版本与预算见 [检索策略](../references/kb-retrieval.md)。
 
@@ -30,6 +30,6 @@
 
 当前 Mod 与目标游戏源码仍是工程判断依据。保留来源 epoch、Scope、版本、Correction、缺失/延期与 Coding HOLD；检索命中、声明存在或文件可读都不等于完整行为已交付。仅在用户明确要求维护知识库时写库，检索服务本身是只读接口。
 
-The single complete distribution includes 187 public records in one `knowledge/` tree, source preparation and MCP. File reading follows selected catalog `file` and JSON `pointer` values and reports record IDs as file access. Default `auto` starts two public catalog tools only when sources are unprepared; prepared-cache corruption or a package version change is an error. Explicit `catalog` enables navigation and public review without Coding context, restored source evidence or original Source/Identity Guards. Full mode requires all authorized current and historical ranges. Restart the MCP session after preparation to switch from two tools to nine. Native AI Coding uses the declared ten-field projection and at most five records; Core Coding HOLD remains binding. Preserve Scope, claim types, versions, corrections, gaps and admission limits. Source slots are missing local Lua payloads, not evidence already read; restored source stays local in `cache/runtime/`.
+The single complete distribution includes 187 public records in one `knowledge/` tree, source preparation and MCP. For full use, prepare one authorized `scripts.zip` matching supported snapshot `759671`; older source is not required. Historical comparisons retain original metadata as `metadata_only`, not restored current-source evidence. File reading follows selected catalog `file` and JSON `pointer` values and reports record IDs as file access. Default `auto` starts two public catalog tools only when sources are unprepared; prepared-cache corruption or a package version change is an error. Explicit `catalog` enables public review without Coding context, restored source evidence or original Source/Identity Guards. Restart a connected catalog session after preparation to obtain nine tools. Native AI Coding uses the declared ten-field projection and at most five records; Core Coding HOLD remains binding. Preserve Scope, types, versions, corrections, gaps and admission limits. Source slots are not evidence already read; restored source stays local in `cache/runtime/`. Future game versions need separate source comparison.
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。

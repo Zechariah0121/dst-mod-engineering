@@ -224,9 +224,9 @@ def prepared_runtime(root=ROOT):
     config = child(root, 'cache/runtime/retrieval-config.json')
     if not config.is_file():
         raise PreparationError('SOURCES_NOT_PREPARED',
-            'Prepare local sources first: python -B -X utf8 prepare_sources.py --source "<current scripts.zip>" '
-            '--source "<authorized historical scripts.zip or directory>". '
-            'Public JSON slots are reading templates, not source evidence; a 759671 ZIP alone lacks historical ranges.')
+            'Prepare local sources first: python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>". '
+            'Public JSON slots are reading templates, not source evidence. '
+            'Current-source preparation does not require historical comparison payloads.')
     value = read(config)
     state = value.get('prepared_runtime', {})
     if state.get('schema') != SCHEMA:
@@ -250,7 +250,11 @@ def prepared_runtime(root=ROOT):
 def same_source_inputs(build, sources):
     receipt = read(build / 'PREPARATION-RECEIPT.json')
     previous = receipt.get('source_inputs', [])
-    if len(previous) != len(sources) or receipt['hydration']['missing_optional_identity_cache_count']:
+    if len(previous) != len(sources):
+        return False
+    # Whole-archive hashes detect every input change, including optional ranges.
+    # A directory can acquire previously missing files without changing matches.
+    if receipt['hydration']['missing_optional_identity_cache_count'] and any(p.is_dir() for p in sources):
         return False
     for row, source in zip(previous, sources):
         if source.is_file():
@@ -368,7 +372,7 @@ def prepare(root, values):
             hydrated, _ = payload.hydrate(templates, recipe, sources, output_root=assembled)
             if (hydrated.get('missing_required_count') or hydrated.get('missing_noncache_source_literal_count')):
                 raise PreparationError('SOURCE_GAP',
-                    'Required historical source ranges are missing. Add authorized older sources with another --source; no partial runtime was activated.',
+                    'Required source ranges do not match the supplied input. Use the supported 759671 source archive or review the reported source-version gaps; no partial runtime was activated.',
                     {'hydration_status': hydrated['status'], 'missing_required_count': hydrated['missing_required_count'],
                      'missing_noncache_source_literal_count': hydrated['missing_noncache_source_literal_count'],
                      'source_gaps': unique_gaps(hydrated)})

@@ -170,7 +170,7 @@ class PublicProtocolTests(unittest.TestCase):
         self.assertEqual([reply['id'] for reply in replies], [1, 2, 3, 4])
         self.assertEqual(replies[0]['error']['code'], -32000)
         self.assertEqual(replies[1]['result']['protocolVersion'], '2025-06-18')
-        self.assertEqual(replies[1]['result']['serverInfo']['version'], '0.3.1')
+        self.assertEqual(replies[1]['result']['serverInfo']['version'], '0.3.2')
         specs = {item['name']: item for item in replies[2]['result']['tools']}
         self.assertEqual(set(specs), TOOLS)
         for name, spec in specs.items():

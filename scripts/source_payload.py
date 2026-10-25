@@ -109,6 +109,56 @@ def coordinate(node):
     return None
 
 
+def historical_comparison(node):
+    """Recognize only complete metadata-only history, never a payload waiver."""
+    marked = (node.get('evidence_role') == 'historical_comparison' or
+              node.get('supports_current_behavior') is False or
+              node.get('payload_status') == 'metadata_only')
+    if not marked:
+        return False
+    ref = coordinate(node)
+    metadata = node.get('original_payload_metadata')
+    path = node.get('path') or node.get('file') or node.get('source_file') or node.get('source_path')
+    valid = (node.get('evidence_role') == 'historical_comparison' and
+             node.get('supports_current_behavior') is False and
+             node.get('payload_status') == 'metadata_only' and ref and
+             isinstance(path, str) and path.startswith('scripts/') and
+             '\\' not in path and ':' not in path and
+             all(part not in ('', '.', '..') for part in path.split('/')) and
+             isinstance(node.get('file_sha256'), str) and HASH.fullmatch(node['file_sha256']) and
+             isinstance(node.get('range_sha256'), str) and HASH.fullmatch(node['range_sha256']) and
+             isinstance(node.get('snapshot_id'), str) and node['snapshot_id'].strip() and
+             isinstance(metadata, dict) and
+             metadata.get('content_sha256') == node['range_sha256'] and
+             type(metadata.get('content_bytes')) is int and metadata['content_bytes'] > 0 and
+             type(metadata.get('line_count')) is int and
+             metadata['line_count'] == ref['line_end'] - ref['line_start'] + 1 and
+             isinstance(metadata.get('original_json_value_sha256'), str) and
+             HASH.fullmatch(metadata['original_json_value_sha256']))
+    payload_keys = {'source_excerpt', 'excerpt', 'declaration_header', 'header', MARKER}
+    locator_keys = {'path', 'file', 'source_file', 'source_path', 'symbol', 'function',
+                    'line_start', 'line_end', 'file_sha256', 'range_sha256'}
+    if (not valid or any(payload_keys & child.keys() or
+                         (child is not node and locator_keys & child.keys())
+                         for child, _, _ in walk(node))):
+        raise ValueError('Malformed historical comparison metadata or source payload')
+    return True
+
+
+def source_walk(value, pointer='', ancestors=()):
+    """Walk current source evidence without propagating historical hashes."""
+    if isinstance(value, dict):
+        if historical_comparison(value):
+            return
+        yield value, pointer, ancestors
+        for key, item in value.items():
+            escaped = key.replace('~', '~0').replace('/', '~1')
+            yield from source_walk(item, pointer + '/' + escaped, ancestors + (value,))
+    elif isinstance(value, list):
+        for i, item in enumerate(value):
+            yield from source_walk(item, pointer + '/' + str(i), ancestors)
+
+
 def json_documents(root):
     root = Path(root).resolve()
     for path in sorted(root.rglob('*.json')):
@@ -137,7 +187,7 @@ def strict_excerpt_locations(documents):
                     doc = documents.get(target)
                     if doc is None:
                         continue
-                    for node, pointer, ancestors in walk(at(doc, ref['pointer']), ref['pointer']):
+                    for node, pointer, ancestors in source_walk(at(doc, ref['pointer']), ref['pointer']):
                         if (not (node.get('symbol') or node.get('function'))
                                 and source_name(node) and node.get('line_start', node.get('start_line')) is not None):
                             strict.add((target, pointer))
@@ -156,7 +206,7 @@ def generate_recipe(private_root, public_root=None):
     public = private if public_root is None else dict(json_documents(public_root))
     coordinates = {}
     for document in private.values():
-        for node, pointer, ancestors in walk(document):
+        for node, pointer, ancestors in source_walk(document):
             ref = coordinate(node)
             fingerprint = node.get('range_sha256', node.get('cited_range_sha256'))
             if ref and isinstance(fingerprint, str) and HASH.fullmatch(fingerprint):
@@ -173,7 +223,7 @@ def generate_recipe(private_root, public_root=None):
             continue
         target = copy.deepcopy(public[name])
         file_slots = []
-        for node, pointer, ancestors in walk(document):
+        for node, pointer, ancestors in source_walk(document):
             for field in ('ranges', 'raw_ranges'):
                 table = node.get(field)
                 if (not isinstance(table, dict) or node.get('schema') != 'derived-source-identity-index/1'):

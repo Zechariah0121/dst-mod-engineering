@@ -32,7 +32,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
 
-MCP 默认 `--mode auto`：来源尚未准备时可用 `search_catalog` 导航全部 187 条目录、用 `read_public_entry` 显式按 `purpose="review"` 审阅公开材料；目录模式不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不代表运行验证。完整九工具模式需合法当前与历史来源全部准备完成；准备成功后重启 MCP 会话才能切换工具集。已准备缓存损坏或包版本变化时 `auto` 报错；可显式 `--mode catalog` 阅读公开材料。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
+完整九工具 MCP 用一份合法持有、匹配当前支持快照 `759671` 的 `scripts.zip` 运行来源准备，再以 `--mode full` 或默认 `auto` 接入，不需要旧版源码。历史比较材料保留原来源标记，显式按 `metadata_only` 阅读，不当作已读的当前源码证据；未来版本需另做源码对照。工具集启动时固定，准备后重启已连接的目录会话才能切换。`auto` 仅在来源未准备时提供两工具目录模式；已准备缓存损坏或包版本变化时报错。目录模式用 `search_catalog` 导航、用 `read_public_entry` 显式按 `purpose="review"` 审阅，不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不代表运行验证，Core Coding HOLD 不变。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
 
 ## 按问题读取
 
