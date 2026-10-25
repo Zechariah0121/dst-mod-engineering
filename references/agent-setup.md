@@ -1,115 +1,33 @@
-# 不同 Agent 的安装、调用与能力边界
+# Agent 安装与能力
 
-安装路径与调用方式按 **2026-09-27** 核验的官方文档列出；尚未经各产品端到端实测。技能加载、脚本执行和 DST 功能验收需分别确认。
+本技能采用 [Agent Skills 格式](https://agentskills.io/specification)。完整安装步骤与路径表见 [安装与使用](../docs/install-and-use.md)；下面的官方资料用于核对各产品当前入口。技能可被发现、脚本可执行与 DST 功能通过验收是不同结果。
 
-本仓库采用 [Agent Skills 公开格式](https://agentskills.io/specification)。安装时保留完整目录，不能只复制 `SKILL.md`；Agent 需能读取参考文件，执行脚本还需相应环境。各产品的发现路径、命令和权限可能不同。
+## 官方入口
 
-## 放在哪里、怎样调用
-
-下表中的 `~` 表示运行 Agent 的那台机器上的用户目录；项目路径相对于当前项目根目录。每个目录下再放一个完整的 `dst-mod-engineering/` 文件夹。
-
-| Agent | 项目级技能目录 | 个人技能目录 | 明确调用或确认加载 |
-|---|---|---|---|
-| Codex | `.agents/skills/` | `~/.agents/skills/` | CLI / IDE 中用 `$dst-mod-engineering`，或通过 `/skills` 选择。见 [OpenAI 文档](https://learn.chatgpt.com/docs/build-skills)。 |
-| Claude Code | `.claude/skills/` | `~/.claude/skills/` | 输入 `/dst-mod-engineering`。见 [Claude Code 文档](https://code.claude.com/docs/en/skills)。 |
-| Cursor | `.cursor/skills/`，也支持 `.agents/skills/` | `~/.cursor/skills/`，也支持 `~/.agents/skills/` | 在 Agent 聊天中输入 `/` 并选技能；该调用附着于当前消息。见 [Cursor 文档](https://cursor.com/docs/skills)。 |
-| GitHub Copilot | `.github/skills/`，也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/`，也支持 `~/.agents/skills/` | CLI 可在提示中写 `/dst-mod-engineering`；其他界面用明确命名的请求，并确认实际读取的文件。见 [Copilot 安装说明](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) 和 [CLI 调用说明](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills)。 |
-
-优先选一个安装位置，避免同名副本混淆；已有安装先核对实际加载路径，再决定是否迁移。
-
-云端会话需另行确认文件可用性：Claude Code 的本地个人技能不会由该路径直接进入云端；Cursor 需使用其支持的同步或远端部署方式；项目技能须存在于远端工作区。见 [Claude Code 云端范围](https://code.claude.com/docs/en/skills#use-skills-in-cowork-and-cloud-sessions) 与 [Cursor 云端范围](https://cursor.com/help/customization/skills#are-user-level-skills-available-on-cloud-agents-and-remote-workers)。技能同步不包含 DST，也不提供本机游戏目录访问权。
-
-## 首次安装示例
-
-没有 Git 时，打开 [本仓库](https://github.com/Zechariah0121/dst-mod-engineering)，选择 **Code → Download ZIP**。见 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)。
-
-解压后，将**直接包含 `SKILL.md` 的完整目录**命名为 `dst-mod-engineering`，复制到上表选定的技能父目录。先确认目标不存在；最终结构应是 `<技能父目录>/dst-mod-engineering/SKILL.md`，不要多套分支目录。
-
-已有 Git 时可使用以下首次安装命令；目标已存在会停止，需先比较已有内容。
-
-Windows PowerShell 示例默认采用 Codex 的个人目录。使用其他 Agent 时，只修改 `$skillParent` 的末段：Claude Code 用 `.claude/skills`，Cursor 用 `.cursor/skills`，Copilot 用 `.copilot/skills`。
-
-```powershell
-$skillParent = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.agents/skills'
-$skillTarget = Join-Path $skillParent 'dst-mod-engineering'
-if (Test-Path -LiteralPath $skillTarget) {
-    throw "目标已存在，请先核对已有技能：$skillTarget"
-}
-Get-Command git -ErrorAction Stop | Out-Null
-New-Item -ItemType Directory -Path $skillParent -Force | Out-Null
-git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git $skillTarget
-if ($LASTEXITCODE -ne 0) { throw '克隆失败；检查原因，不要覆盖重试。' }
-foreach ($relative in @('SKILL.md', 'references', 'scripts', 'docs', 'requirements.txt', 'LICENSE')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $skillTarget $relative))) {
-        throw "技能内容缺失：$relative"
-    }
-}
-Get-Content -LiteralPath (Join-Path $skillTarget 'SKILL.md') -TotalCount 8
-```
-
-macOS / Linux 的 Bash 或 Zsh 示例同样默认采用 `.agents/skills`；按上表修改 `skill_parent` 即可。此处允许安装和阅读技能，不表示随附专服启动器支持这些平台。
-
-```sh
-(
-    set -eu
-    skill_parent="$HOME/.agents/skills"
-    skill_target="$skill_parent/dst-mod-engineering"
-    if [ -e "$skill_target" ] || [ -L "$skill_target" ]; then
-        printf '%s\n' "目标已存在，请先核对已有技能：$skill_target" >&2
-        exit 1
-    fi
-    command -v git >/dev/null
-    mkdir -p "$skill_parent"
-    git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git "$skill_target"
-    test -f "$skill_target/SKILL.md"
-    test -d "$skill_target/references"
-    test -d "$skill_target/scripts"
-    test -d "$skill_target/docs"
-    test -f "$skill_target/requirements.txt"
-    test -f "$skill_target/LICENSE"
-)
-```
-
-项目级安装需随项目提交时，复制完整技能文件，保留依赖说明和许可证；不要一并提交来源仓库的 `.git` 目录。
-
-## 最小读入检查
-
-先让 Agent 只读检查，不启动游戏、不安装依赖、不编辑 Mod：
-
-> 使用 dst-mod-engineering。先报告你实际读取的 SKILL.md 路径，再读取 references/environment-tools.md 和 references/testing-release.md，说明三个辅助脚本各自能验证什么、不能验证什么。列出当前环境已找到和缺少的工具，但先不要安装、编译或运行游戏。
-
-根据产品确认技能被发现：
-
-- Codex：从技能选择器选中；更新后仍看不到时重启会话。自动匹配依赖任务与描述，不能把没自动触发解释为文件必然无效。[官方加载说明](https://learn.chatgpt.com/docs/build-skills)
-- Claude Code：使用上表的 `/dst-mod-engineering`，核对实际来源路径，避免同名个人/项目技能混淆。[官方技能说明](https://code.claude.com/docs/en/skills)
-- Cursor：在 `/` 菜单选择技能，也可到 Customize → Skills 查看已发现的条目。[官方技能说明](https://cursor.com/docs/skills)
-- Copilot CLI：已启动会话可用 `/skills reload`，再用 `/skills info dst-mod-engineering` 确认位置；其他 Copilot 界面不照搬 CLI 命令。[官方 CLI 说明](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills)
-
-结合文件路径与读取记录确认参考文件可读。只读检查应能区分声明检查、服务器行为和真实客户端验收，并指出专服测试器只支持 Windows。
-
-已有合适 Python 时，可在技能根目录分别运行 `python scripts/dst_zip_tool.py --help`、`python scripts/check_api.py --help` 和 `python scripts/dst_modtest.py --help`；用实际解释器路径替换 `python`。帮助成功只证明入口可运行，不能确认 `luaparser` 已安装或游戏测试通过。依赖与运行命令见 [环境与工具准备](environment-tools.md) 和 [测试与交付](testing-release.md)。
-
-## 没有 Skills 自动加载的 Agent
-
-网页聊天、附件或原生技能 ZIP 的用法见 [网页使用指南](web-chat.md)。能读取工作区文件的 Agent 也可显式读取技能，无需自动加载：
-
-把完整目录放在可访问的位置，将下列路径换成实际位置：
-
-> 请先读取 `<技能绝对目录>/SKILL.md`，按当前任务读取其中链接的参考文件。脚本和文档的相对路径以技能目录为准；待修改的 Mod 是 `<Mod 绝对目录>`。以当前原版源码为依据完成任务，区分确定故障与玩法选择，并说明实际执行了哪些验证。不要因未注册 Skills 就跳过该目录，也不要只读 README 代替技能入口。
-
-参考文档按任务读取，无需每轮全部载入。不能读取本地文件时，由用户提供相关材料；分析和验证结论限于实际取得的内容与执行记录。
-
-## 按任务准备能力
-
-| 能力 | 可完成的工作 | 缺少时的实际边界 |
+| Agent | 官方说明 | 加载后确认 |
 |---|---|---|
-| 读取和检索文件 | 读技能、追踪 Mod 与合法安装的原版源码 | 只有对话文本时，只能讨论已提供的片段 |
-| 编辑文件 | 修改已授权的项目并生成报告 | 只能提供补丁建议，由使用者应用 |
-| 终端 / 进程执行 | 执行 Python、资源工具和定向测试 | 可以审查命令与代码，不能报告“运行通过” |
-| 网络读取 | 获取本仓库、核对官方文档与版本、取得所需工具 | 已有完整本地材料仍可使用；未联网核对的版本明确标注 |
-| Windows 本地游戏环境与进程权限 | 运行随附 `dst_modtest.py`，写唯一测试副本和隔离存档 | Linux CI、云端推理或另一品牌 Agent 不会自动具备该环境 |
-| 查看图像、试听音频、操作 GUI 与真实客户端 | 检查动画、输入、HUD、声音和实际联机效果；需要时由用户参与 | 导出文件或专服日志不能代替画面、听感和多人验收 |
+| Codex | [Build skills](https://learn.chatgpt.com/docs/build-skills) | 用 `$dst-mod-engineering` 或技能选择器，核对实际文件路径 |
+| Claude Code | [Skills](https://code.claude.com/docs/en/skills) | 用 `/dst-mod-engineering`；同名个人/项目技能需核对来源 |
+| Cursor | [Agent Skills](https://cursor.com/docs/skills) | 在 Agent 聊天的 `/` 菜单选择，或到 Customize → Skills 查看 |
+| GitHub Copilot | [安装技能](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills)、[CLI 技能](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills) | 使用所用界面的技能入口；CLI 命令不套用到其他界面 |
 
-按实际主机、游戏版本、权限和依赖判断能力。缺少能力时完成可验证部分，列出待验项。
+让 Agent 确认实际读到的 `SKILL.md` 和当前任务相关参考。没有 Skills 自动发现能力时，提供其绝对路径并显式读取即可。只有对话文本、没有文件访问时，使用 [网页附件方式](web-chat.md)。本 Skill 未逐一完成所有产品的端到端安装与执行测试。
 
-Python、`luaparser`、DST、DMT、ktools 和 FMOD 需按任务另行准备；先检查已有工具与版本。安装和验收见 [缺失工具的准备与安装](tool-bootstrap.md)，已测范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+## 本地与云端
+
+安装路径属于运行 Agent 的主机。云端工作区不能直接读取用户电脑上的 DST、Mod 或工具：
+
+- Claude 的本地个人技能不会自动成为 Cowork/云端会话技能；按 [官方云端说明](https://code.claude.com/docs/en/skills#use-skills-in-cowork-and-cloud-sessions) 使用账户技能或该环境支持的部署方式。
+- Cursor 的个人技能同步需另行启用，且只同步其支持的位置；项目技能与远端工作区也要实际可读。见 [官方同步说明](https://cursor.com/docs/skills#use-personal-skills-with-cloud-agents)。
+
+## 按任务确认能力
+
+| 能力 | 可完成的工作 | 缺少时 |
+|---|---|---|
+| 读写、检索文件 | 读取 Skill、Mod 和原版源码，修改授权项目 | 仅分析已提供片段或交付补丁 |
+| 终端与进程权限 | 运行 Python、资源工具与定向测试 | 提供命令，运行结果保持未验证 |
+| 网络读取 | 核对官方文档、版本和工具来源 | 使用已有材料并注明版本未联网核对 |
+| Windows DST 环境 | 运行随附隔离专服测试器 | Linux/云端不因此具备本机游戏测试能力 |
+| 图像、音频、GUI 与真实客户端 | 检查动画、HUD、输入、声音与联机效果 | 由具备相应能力的执行者验收 |
+
+脚本入口可用 `python scripts/<脚本名>.py --help` 检查。帮助成功只证明入口可运行，不证明依赖齐全或游戏功能通过。Python、`luaparser` 和素材工具按任务准备，见 [环境发现](environment-tools.md)、[工具安装](tool-bootstrap.md) 与 [测试](testing-release.md)。

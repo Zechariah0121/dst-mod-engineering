@@ -18,7 +18,7 @@ REPOSITORY = 'https://github.com/Zechariah0121/dst-mod-engineering'
 GENERATOR = 'dst-mod-engineering/web-bundle-v1'
 INDEX = 'bundle-index.json'
 LOCAL_ONLY_MARKER = '<!-- local-only -->'
-ROOT_FILES = ('SKILL.md', 'README.md', 'LICENSE', 'requirements.txt')
+ROOT_FILES = ('SKILL.md', 'README.md', 'README.en.md', 'LICENSE', 'requirements.txt')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'scripts': '.py'}
 MAINTAINER_ONLY = frozenset({
     'docs/maintainers.md', 'docs/consolidation.md', 'docs/validation.md',

@@ -1,65 +1,48 @@
-# dst-mod-engineering
+# DST Mod Engineering
 
-面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能，覆盖功能开发、代码审查、崩溃排错、联机、存档和资源制作。
+面向《饥荒联机版》Mod 开发的 AI 工程 Skill：核对当前源码，再设计、实现、审查和验证。适合借助 AI 制作角色、物品、法术和资源，也适合排查联机、存档与兼容问题。[English README](README.en.md)
 
-**非商业使用**：允许学习、研究、非商业合作和免费制作、分享 Mod；未经另行书面授权，不得用于收费接单、付费 Mod／服务，也不得售卖或付费转发本项目。允许无权益交换的自愿打赏、赞助及免费公开教程的广告收益。完整边界见 [使用许可](LICENSE) 和 [常见情形](docs/licensing.md)。
+本独立 Skill 包含工作方法、专题参考和三个辅助脚本，**不附完整工程知识库、MCP 服务、游戏源码或私人 Mod 工程**。没有额外 KB 时，仍可配合你合法取得的本地源码工作。
 
-[![Checks](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml)
-[![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-orange.svg)](LICENSE)
+## 下载
 
-## 快速开始
+本版：[Public Beta 1 发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25)。
 
-| 使用方式 | 入口 |
+| 附件 | 适用方式 |
 |---|---|
-| Codex、Claude Code、Cursor 等 Agent | 下载仓库，按 [接入指南](references/agent-setup.md) 安装并加载 `SKILL.md` |
-| 网页 AI | 上传 [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.skill.zip)，或使用下方专题 Markdown |
-| 阅读工程知识 | [知识库索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) |
-| 为 Agent 启用知识检索 | [MCP 服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) |
-| 获取全部内容 | [完整发行包](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering-full.zip)（Skill、知识库、MCP） |
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Agent 安装；完整 Skill、专题与三个开发辅助脚本 |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | 网页 AI 或离线阅读；按任务选择专题 |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | 完整公开仓库；另含64条早期参考知识及其只读 MCP 服务 |
 
-[发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest)提供版本说明和下载校验文件；需要尚未发行的改动时可下载 [main 分支 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/archive/refs/heads/main.zip)。
+下载校验见发行页的 `SHA256SUMS.txt`。完整公开仓库不包含另行私用的完整版知识库或私人研究材料。
 
-不支持自动发现技能的 Agent，也可以直接使用：
+## 安装与开始使用
 
-> 请读取 `dst-mod-engineering/SKILL.md`，按相关专题处理我的 DST Mod 任务。先核对当前原版源码，再实现或修复；玩法取舍先确认，分别报告静态检查和实际游戏测试结果。
+1. 从 [仓库发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载独立 Skill 附件并完整解压，找到直接含 `SKILL.md` 的 `dst-mod-engineering/` 文件夹。
+2. 把完整目录放入 Agent 支持的技能目录。例如项目内的 `.agents/skills/dst-mod-engineering/`（Codex），或 `.claude/skills/dst-mod-engineering/`（Claude Code）。其他产品与个人安装位置见 [安装说明](docs/install-and-use.md)。已有同名目录时先保留定制内容。
+3. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和本地 `scripts.zip` 位置。确认 Agent 能读取 `SKILL.md` 及相关专题；没有自动发现能力时，直接指定该文件的实际路径。
 
-技能 ZIP 包含使用指南和开发辅助脚本；知识库与 MCP 服务需下载完整仓库。普通网页附件是否能解压、注册技能，取决于平台能力，详见 [网页使用指南](references/web-chat.md)。
+网页聊天使用附件或平台支持的技能导入，见 [网页使用指南](references/web-chat.md)。大部分专题为中文；英文 README 不代表全部内容已翻译。
 
-## Skill 与知识库
+## 按任务使用
 
-Skill 负责开发流程和按需导航；知识库提供可追溯的事实、模式、反例与测试候选；可选 MCP 服务负责检索。设计、实现、审查和排错使用不同的检索重点，简单机械修改不必重复查询。
-
-知识库 v0.1.1 包含 **64 条条目**，来自一个参考案例及限定的原版源码快照。模式和规则仍是候选，11 项游戏测试候选尚未执行。使用时仍须核对当前项目和游戏版本。具体任务示例见 [知识库使用说明](docs/knowledge-integration.md)。
-
-## 网页阅读资料
-
-通常选择与任务相关的一份即可：
-
-| 任务 | 下载 |
+| 目标 | 起点 |
 |---|---|
-| 初次使用 | [入门](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
-| 代码审查与修复 | [代码专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
-| 联机、存档与 UI | [联机专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
-| 贴图、动画与音频 | [资源专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
-| 世界生成 | [世界生成专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
-| 全部专题 | [阅读 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/web-reading.zip) · [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+| 实现角色、法术、装备、配方、UI 或资源 | [SKILL.md](SKILL.md) 的专题索引；提供期望效果与触发条件 |
+| 源码研究、崩溃、联机与存档故障 | 追踪定义、调用方、端别、初始化、退出和保存链路 |
+| 语法、API 声明或隔离专服检查 | [测试与交付](references/testing-release.md) |
+| 接入已有 KB | [可选知识库](docs/knowledge-integration.md)，以实际可用服务及其版本为准 |
 
-## 开发工具
+脚本需 Python 3.10+；语法检查另需 `requirements.txt` 中的 `luaparser`。随附专服测试器仅支持 Windows。读取 Skill 无需运行脚本，动画和音频工具按任务另行准备，来源与首次验证见 [工具安装](references/tool-bootstrap.md)。
 
-| 工具 | 用途 |
-|---|---|
-| `scripts/dst_zip_tool.py` | 检索游戏安装目录中的 `scripts.zip` |
-| `scripts/check_api.py` | Lua 语法及组件／Replica 方法声明检查 |
-| `scripts/dst_modtest.py` | Windows 隔离专服测试，记录加载与行为断言结果 |
+专题中的版本、样例与源码定位有各自适用范围，不保证当前在线版本或所有 Mod 兼容。静态检查、专服行为、真实远端客户端、视觉与音频分别验证，见 [能力与版本限制](docs/public-limits.md)。
 
-脚本需要 Python 3.10+；语法检查器还需 `luaparser`，可用 `python -m pip install -r requirements.txt` 安装。参数通过各脚本的 `--help` 查看，操作示例及限制见 [测试与交付](references/testing-release.md)。静态检查和专服测试不能替代真实客户端的 UI、预测、画面与音频验收。
+## 可选公开参考知识库
 
-动画与音频工具按任务选择，见 [工具安装](references/tool-bootstrap.md)、[动画制作](references/assets-animation.md) 和 [音频制作](references/audio-particles.md)。
+完整公开仓库保留 **v0.1.1、64条**参考知识和只读检索服务，内容范围与该版本的来源说明保持不变。
+需要时阅读 [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) 和 [MCP 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md)；独立 Skill ZIP 未携带它们。
+这是可选参考资料，不是最新全量游戏知识；具体条目的状态、版本、证据与未执行测试仍须分别读取。
 
-## 来源与许可
+## 许可
 
-仓库自有内容采用 [自定义非商业使用许可](LICENSE)，不是 MIT 或 OSI 开源许可；第三方材料与历史有效 MIT 授权的边界见 [许可说明](docs/licensing.md)。
-
-知识库参考风铃（FL）的“穹”Mod，公开内容为架构分析与技术评论，不代表原作者背书，也不重新授权原 Mod。游戏、Mod 原始源码及素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](references/sources-and-corrections.md)，证据与版本范围见各知识条目。
-
-需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。
+项目自有材料使用 [自定义非商业 LICENSE](LICENSE)，不是 MIT 或 OSI 开源许可。商业使用须另获书面授权；有效历史 MIT 授权与第三方权利仍按各自条款处理。见 [许可说明](docs/licensing.md)。

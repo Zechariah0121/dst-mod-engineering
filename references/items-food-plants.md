@@ -122,3 +122,9 @@ end
 | 生长与种植 | `components/growable.lua:42-78,121-148,207-218,249-311`；`components/deployable.lua:104-146`；`components/inventoryitem_replica.lua:327-352`；`prefabs/pinecone.lua:3-16` |
 
 按实际改动验证：装备/卸下与伤害只结算一次；破损后修复菜单与消费；配方可见性/科技/蓝图；食材正例反例和冲突组合；种植剩余堆叠数量；生长、休眠、保存后重载。显示资源、客户端动作预测、远程玩家菜单与几何放置兼容必须用真实客户端，语法或无头成功不能代替。
+
+## 759671：嵌套所有者与施工停止
+
+`components/inventoryitem.lua:501–506` 的 `GetGrandOwner` 沿 owner 的 inventoryitem 向上递归；递归结果为 nil 时回退本层 owner，无直接 owner 时返回 nil；地面容器本身可以成为返回值。因此 `GetGrandOwner() ~= nil` 不等于玩家持有，访问 combat/inventory 前要判断实际实体及组件，不能与只检查直接 owner 的 `IsHeld` 互换。地面容器、套娃容器与真实玩家场景仍需复验。
+
+`constructionbuilder:StopConstruction` 在 `:107` 改为 `PushEventImmediate("stopconstruction")`；SGwilson `constructing` 的 `:19941–19957` 使用 `statemem.stoppedconstruction` 避免退出时再次停止。包装该方法或复制 onexit 时保留新重入/退出边界。这是 constructionbuilder 的链路，不能泛化成普通 builder API 全部改版。

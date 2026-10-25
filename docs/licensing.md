@@ -1,8 +1,8 @@
 # 使用许可与常见情形
 
-本次许可变更发布于 2026-10-13，完整条款以仓库根目录的 [LICENSE](../LICENSE) 为准。覆盖仓库自有的 Skill、脚本、知识库原创分析和 MCP 服务；第三方材料不在重新授权范围内。
+完整条款以 [LICENSE](../LICENSE) 为准。本说明概括项目自有材料的非商业使用条件，不重新授权第三方材料。
 
-| 情形 | 本次许可的处理 |
+| 情形 | 许可要求 |
 |---|---|
 | 学习、研究，个人或合作制作免费 Mod | 允许 |
 | 免费分享或修改本项目材料 | 允许；保留版权、许可及来源，修改版注明修改 |
@@ -18,7 +18,6 @@
 原项目曾按 MIT 发布。新许可不追溯撤销有效的历史授权，也不能阻止他人依原 MIT 条款继续使用已获许可的旧材料。此前已按 MIT 发布的相同内容不会因本次重新打包而失去原授权。
 
 - [历史 MIT LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/ef682cb95f4b4e2171f3c2c634c88ddecefe75de/LICENSE)
-- [2026-10-13 的 README 单独修改](https://github.com/Zechariah0121/dst-mod-engineering/commit/7c1f177a0632883c4c08d25956c07a939dc73d2e)：该次提交仍保留 MIT LICENSE；后续本次提交才统一许可文本与分发包。
 
 Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或本项目许可不等于获得其商业使用授权；本项目也不代表他们背书。
 
@@ -29,3 +28,9 @@ Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或�
 通用思想、原版 API 用法和相似代码风格，不能单独证明使用过本 Skill。许可是使用条件，不是技术防复制措施；争议中的效力与举证仍取决于具体事实和适用法律。
 
 需要另行商业授权时，可通过 [仓库 Issues](https://github.com/Zechariah0121/dst-mod-engineering/issues) 联系权利人；提交申请或未收到回复不等于获得授权。
+
+## 分发范围 / Distribution scope
+
+独立 Skill 不附游戏源码、完整 KB/MCP 或私人项目。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
+
+Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. The standalone Skill contains no game source, complete KB/MCP or private projects. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.

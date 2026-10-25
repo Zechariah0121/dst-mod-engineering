@@ -106,3 +106,7 @@
 - `components/farming_manager.lua:96-110,461-474`；`components/wateryprotection.lua:43-51`：按格灌溉、湿度钳制与范围保护的区别。
 - `widgets/badge.lua:6-104,127-146`；`widgets/statusdisplays.lua:SetGhostMode`；`prefabs/player_classified.lua:OnGhostModeDirty`：徽章资源与幽灵 HUD。
 - `actions.lua:344-348,690,719-724`；`components/playercontroller.lua:424-460,5272-5319`；`screens/mapscreen.lua:1298-1380`；`prefabs/pocketwatch_portal.lua:157-219`：地图动作与传送门生命周期。
+
+## 759671 核验补充
+
+`DoAttack` 的电倍率仍在 `components/combat.lua:1195–1213` 计算，公共/内部受击方法不自动补该倍率；`GetWetMultiplier:748–769` 的 wet、moistureimmunity、inventoryitem 与 moisture 分支需独立看，不能把受击入口拆分当电倍率更改。SGwilson `attacked:1847–1944` 中 nointerrupt+canelectrocute 仍有触电分支，其余分支还受绝缘、noelectrocute、恢复窗口等限制。没有据此保证所有角色/Boss响应一致；见 [759671范围](../docs/public-limits.md)。

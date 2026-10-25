@@ -107,6 +107,6 @@ if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成�
 
 FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持客户端可见；后续动态变化使用正确的同步或客户端更新路径。`SetPristine()` 不是“所有属性之后永远不能变”的边界。循环动画需明确停止和清理，单次动画用匹配的完成事件/状态回收。泛光 shader 和 Light 照明不同，不能靠泛光掩盖缩放模糊。
 
-历史验证仅覆盖合成小图编译、多个 atlas/sampler 输出及部分原版资源解析，**未覆盖真实大图序列或跨图集资产的客户端渲染**；详见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。按本页制作的素材仍需完成上述客户端验收。
+小图编译、atlas/sampler 结构与资源解析检查不能代替真实大图序列、跨图集资产的客户端渲染验收。按本页制作的素材仍需完成上述客户端检查。
 
 声音制作见 [音频与粒子](audio-particles.md)。

@@ -92,3 +92,9 @@ end
 | 范围预览 | `prefabs/firesuppressor.lua:239-273,308-312,460-490`；`components/deployhelper.lua`；`components/placer.lua` |
 
 验证报告分开记录：Lua/数据结构检查、新地图生成结果、服务器运行与存读档、真实客户端视觉和多人行为。单个固定 seed 成功不能证明所有生成条件可用。
+
+## 759671：虚拟房间集合与瞬移
+
+该快照中的旧 Vault helper 已由 VirtualRoomSet（VRS）链替代；不要继续访问 `world.net.components.vault_floor_helper` 或依赖旧传送器世界事件。`components/map.lua` 的 Vault 公共包装改用 VRS 查询；其底层引擎实现与复制不能仅靠 Lua 读取证明。
+
+`componentutil.lua:1344–1435` 对瞬移检查集合进入/离开、大厅及同集合寻路；`IsVisibleRespectingVRSFromPointToPoint` 共享边界判断但忽略同集合寻路，不是瞬移权限的等价别名。自定义 Blink/传送不能仅检查 tile passable。玩家读档安全点也按 VRS 寻找，不保证一律搬到大厅中心。见 [版本核验范围](../docs/public-limits.md)；Lua 源码检查不能代替专服与远端行为验证。

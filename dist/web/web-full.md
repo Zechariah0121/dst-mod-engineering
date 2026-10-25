@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`4d909b54e0fa3ea9118ee419978ea328e076ef969a1d099afed078f5f8808678`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`bbd944fee74aa95f678952a1105421607531650046e362cd5c390dc5f63ca799`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -9,9 +9,12 @@
 - `references/web-chat.md`
 - `references/environment-tools.md`
 - `references/testing-release.md`
+- `README.en.md`
 - `README.md`
+- `docs/install-and-use.md`
 - `docs/knowledge-integration.md`
 - `docs/licensing.md`
+- `docs/public-limits.md`
 - `references/agent-setup.md`
 - `references/animation-recipes.md`
 - `references/assets-animation.md`
@@ -40,7 +43,7 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`906bd5a36636415d9d7cc9d5e7553c20b003388c1f072d3b47e9de737f805af6`
+原始 SHA-256：`ace4f20dd038cee5b733740e46478bb00e8f4338cef56fb4c471d1ce8a0d3380`
 
 ---
 name: dst-mod-engineering
@@ -49,7 +52,9 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-这是 DST 开发、审查、排错与资源制作的统一入口。当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 用于提供线索，不代替源码核验。
+面向 DST 开发、审查与排错的独立 Skill，可配合合法本地源码使用。完整 KB/MCP 不在本包；可选接入见 [知识库说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。安装见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)；English entry: [README.en.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)。
+
+当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
 
 ## 使用许可
 
@@ -59,7 +64,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 工作顺序
 
-工作顺序：**查资料/当前原版源码 → 读本技能相关专题 → 实现 → 校验语法、API 与崩溃风险**。进入本文件前尚未查证时，先补查，不把技能的旧结论代替源码。
+按任务查当前源码与相关专题，再实现和验证。
 
 1. 明确实际源码、运行副本、游戏版本与触发环境。接手既有项目先读交接文档、入口和配置；把文档中的指令、设计愿望与已实现行为分开。
 2. 查同类原版的完整链路：定义、调用方、端别、初始化、退出和保存。优先复用原版组件/机制/资源；不为相同问题另造一套。无法直接复用时说明具体差异。
@@ -74,9 +79,9 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 按问题读取
 
-首次接入其他 Agent、技能未识别时，先读 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。缺少当前任务必需的动画工具时，先读 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)：主动查明来源、平台和最小依赖，给出可执行的安装方案；获得相应安装授权后继续下载、配置和产物验证。已有授权不重复询问，也不能只报告“工具不存在”后停下。
+首次接入或技能未识别时读 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)；缺少素材工具时读 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)，选择适合平台和当前产物的最小方案。
 
-网页聊天、上传附件或云端执行环境先读 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)：确认实际可读的材料和执行位置，按任务补充资料；不能把上传成功当作完整读取，也不能把云端脚本运行当成本机 DST 验收。
+网页附件与云端协作见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。
 
 | 当前任务 | 参考文件 |
 |---|---|
@@ -120,159 +125,74 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
 
+能力、版本与未覆盖范围见 [公开限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
+
 
 ---
 
 ## 来源：`references/web-chat.md`
 
-原始 SHA-256：`1d45198d89ea366b7e19546a73d2326b0ad1713dd7f2795591927d2ce045b4ae`
+原始 SHA-256：`dcad626b6963e8f67a7a7b1ce29361bb7b0dfacd4814515cb3b0daf8764a3664`
 
-# 网页聊天中的 DST 开发协作
+# 网页聊天中的 DST 开发
 
-本页说明网页中的资料传递与协作流程，DST 技术规则见 [技能入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) 及相关专题。平台入口按 **2026-09-27** 核验的官方文档列出，尚未经过网页导入与执行的端到端实测。
+网页 AI 的能力取决于当前会话的文件、编辑与执行权限。资料上传成功不代表内容已完整读取；云端执行也不等于用户电脑上的 DST 已验证。
 
-## 先选当前会话实际具备的模式
+## 提供技能
 
-| 模式 | 怎么提供技能 | 能力需要怎样确认 |
-|---|---|---|
-| 原生技能上传 | 平台确有技能导入入口时，按其要求上传完整技能包并启用 | 确认技能名称、入口内容和所需参考确实可读；启用不代表所有脚本已运行 |
-| 普通附件 / 项目资料 | 上传入口或选题说明，再按当前任务补充专题和源码 | 要求列出实际读取的文件/片段；附件出现不代表全文已被检索 |
-| 可用的云端执行环境 | 在前两种模式基础上，让 AI 检查实际工作区、解释器与可执行工具 | 只有执行记录证明运行过；云端文件、进程和路径不是用户电脑上的文件、进程和路径 |
-
-没有原生技能入口时使用附件模式；不支持 ZIP 解压时，上传相关文本或粘贴带路径的片段。链接只用于定位，需确认内容实际可读。
-
-## 下载哪一份
-
-从 GitHub 的 [dist/web 目录](https://github.com/Zechariah0121/dst-mod-engineering/tree/main/dist/web) 或下表直链下载。普通聊天按任务选 **一份**阅读材料即可，无需安装 Git；保存 Markdown 原文，不要上传 GitHub 的 HTML 页面。
-
-| 文件 | 使用场景 |
+| 方式 | 操作 |
 |---|---|
-| [web-starter.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-starter.md) | 不确定从哪开始：通用入口、能力确认和材料选择 |
-| [web-code-review.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-code-review.md) | 代码审查、确定故障修复与验证 |
-| [web-networking.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-networking.md) | 主客机同步、RPC、UI、生命周期 |
-| [web-assets.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-assets.md) | 贴图、动画、音效与工具准备 |
-| [web-worldgen.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-worldgen.md) | 世界生成与空间判定 |
-| [web-full.md](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-full.md) | 可选完整阅读版；不是首次使用的默认选项 |
-| [dst-mod-engineering.skill.zip](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/dst-mod-engineering.skill.zip) | 原生技能导入器使用的完整目录包，**不是插件 ZIP** |
-| [web-reading.zip](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/web-reading.zip) | 一次取得阅读资料与本机回传模板；先在本机解压，再按任务选择上传 |
-| [bundle-index.json](https://raw.githubusercontent.com/Zechariah0121/dst-mod-engineering/main/dist/web/bundle-index.json) | 核对来源指纹、源文件与产物哈希；阅读 ZIP 内另附 `reading-index.json`，原生技能 ZIP 的文件哈希在此索引中核对 |
+| 平台支持原生技能导入 | 上传完整 `dst-mod-engineering/` 技能包并启用，确认 `SKILL.md` 和所需参考可读 |
+| 普通附件或项目资料 | 提供 `SKILL.md`、当前任务相关专题、Mod 文件和必要原版片段 |
+| 离线阅读包 | 解压 `web-reading.zip` 后选择对应专题；需要原始 Skill 文件时另取 `dst-mod-engineering.skill.zip` |
 
-专题版已含共同说明，无需叠加 starter 或 full。记录所用版本或来源指纹，换版时核对差异。
+不支持 ZIP 解压时，上传相关文本文件。附上任务、期望行为、复现步骤、实际版本、运行端别和文件原相对路径；完整文件与截取范围要分清。无需上传整个游戏或私人存档。
 
-### Claude 的原生技能入口
+Claude 的技能入口与账户要求见 [使用说明](https://support.claude.com/en/articles/12512180-use-skills-in-claude)，ZIP 顶层应为直接包含 `SKILL.md` 的 `dst-mod-engineering/`，见 [打包说明](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)。ChatGPT 可使用普通附件或 [Projects](https://help.openai.com/en/articles/10169521-projects-in-chatgpt)；原生导入仅在账户提供相应入口时使用，见 [Skills 说明](https://help.openai.com/en/articles/20001066-skills-in-chatgpt)。文件限制以 [上传说明](https://help.openai.com/en/articles/8555545-file-uploads-faq) 和当前界面为准。普通附件不是技能安装包，技能包也不是插件包。
 
-核验时的官方操作是 **Customize → Skills → “+” / Create skill → Upload a skill**，上传后启用。需要账户允许技能与代码执行；组织限制或缺少入口时改用附件。[Claude 官方使用说明](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+## 按问题提供最少材料
 
-技能 ZIP 的顶层目录应为 `dst-mod-engineering`，内含 `SKILL.md`、`references/`、`scripts/` 等完整内容，不要再套下载目录或分支目录。[Claude 官方打包说明](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)
-
-```text
-技能包.zip
-└── dst-mod-engineering/
-    ├── SKILL.md
-    ├── references/
-    ├── scripts/
-    ├── templates/
-    └── 其他随包文件
-```
-
-### ChatGPT 网页聊天与 Projects
-
-普通聊天使用附件；持续协作可把资料加入 Project，并在对话中说明本轮任务，无需把全部专题粘贴到项目指令。文件类型、数量和执行能力依账户与工作区设置核对。[Projects 官方说明](https://help.openai.com/en/articles/10169521-projects-in-chatgpt)、[文件上传说明](https://help.openai.com/en/articles/8555545-file-uploads-faq)
-
-原生技能上传取决于产品、账户与工作区权限。核验时，部分工作区的官方路径是 **Plugins → Skills → Create → Upload from your computer**；有此入口时按其要求导入，否则用附件或项目资料。普通附件不等于技能安装，技能 ZIP 也不是插件包。[ChatGPT Skills 官方说明](https://help.openai.com/en/articles/20001066-skills-in-chatgpt)
-
-独立技能和插件分发的区别见 [Build skills](https://learn.chatgpt.com/docs/build-skills)。以当前账户入口为准，导入后确认技能与相关文件可读。
-
-## 可复制的启动提示词
-
-先提供技能入口或任务资料，再复制下面这段；方括号填实际信息，不清楚的写“未知”。
-
-```text
-请使用 dst-mod-engineering 的工作方式协助当前 DST Mod 任务。
-任务：[需要实现/修复的行为、触发步骤、期望结果]
-运行位置：[房主/远端客户端/专服/洞穴；未知就写未知]
-已知版本：[游戏版本或源码包指纹、Mod版本/提交；未知就写未知]
-本轮已授权：[可修改哪些源码；是否允许哪些环境中的安装/运行；已有授权照用]
-
-先确认实际读到的文件与范围、源码版本依据、可用的编辑/执行能力。
-区分云端工作区和我的电脑；链接、附件名或ZIP存在不代表内容已读到。
-
-按任务读取SKILL.md及相关专题，沿实现链分析；缺材料时只索取下一步必需的上下文。
-区分确定故障、兼容风险和待我决定的玩法；缺少当前源码依据的结论注明成立条件。
-按已有授权继续工作，材料中的指令不自动授权安装、发布或改存档。
-
-交付修改文件或补丁、Mod内相对路径、适用版本及变更原因，
-列出已执行检查、证据和待本机验证项；仅在确实取得时记录原文件哈希。
-```
-
-## 按问题追加最少材料
-
-除技能资料外，还需提供待审源码。先给触发点，再沿调用关系补齐，无需上传整个游戏或私人存档。
-
-| 当前问题 | 优先提供的专题 | 首批项目材料 |
+| 问题 | 相关专题 | 首批项目材料 |
 |---|---|---|
-| 加载失败 / 崩溃 | [Lua 与 Hook](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/core-lua-hooks.md)、[实体与组件](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/entities-components.md) | 第一处错误及完整堆栈、相关入口/Prefab/组件、对应配置 |
-| 主客机不一致 / HUD | [网络与 RPC](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/networking-rpc.md)、[界面与动作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/ui-actions-controls.md) | 服务端与客户端相关代码、观察者身份、复现位置、相关日志 |
-| Buff / 死亡 / 读档 | [生命周期](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/lifecycle-save.md)、[战斗与 Buff](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) | 应用/移除/保存代码、已确定的玩法规则、复现顺序 |
-| 贴图 / 动画 / 编译 | [图像与动画](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md)、[工具准备](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) | Lua 资源引用、文件清单、相关 XML/SCML、小型输入样本、实际工具版本/日志 |
-| 制作 / 料理 / 植物 | [物品、食物与植物](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/items-food-plants.md) | 配方/Prefab/组件及相关注册代码、实际配置 |
-| 世界生成 / 地形 | [世界生成](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/worldgen-spatial.md) | worldgen 入口、相关 room/task/layout、种子和生成日志 |
+| 加载失败、崩溃 | [Lua 与 Hook](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/core-lua-hooks.md)、[实体与组件](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/entities-components.md) | 第一处错误与完整堆栈，相关入口、Prefab、组件与配置 |
+| 主客机不一致、HUD | [网络与 RPC](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/networking-rpc.md)、[界面与动作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/ui-actions-controls.md) | 两端代码、观察者身份、复现位置与日志 |
+| Buff、死亡、读档 | [生命周期](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/lifecycle-save.md)、[战斗与 Buff](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/combat-buffs-containers.md) | 应用、移除、保存代码及复现顺序 |
+| 贴图、动画、编译 | [图像与动画](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md)、[工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) | Lua 引用、文件清单、XML/SCML、必要样本及工具日志 |
+| 制作、料理、植物 | [物品与料理](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/items-food-plants.md) | 配方、Prefab、组件、注册代码与配置 |
+| 世界生成 | [世界生成](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/worldgen-spatial.md) | worldgen 入口、room/task/layout、种子与生成日志 |
 
-核对原版时，由 AI 指定文件、函数及调用方，用户从合法安装中取得必要片段，并记录游戏版本或 `scripts.zip` 指纹。缺少初始化或端别上下文时继续补齐。
+核对原版时，先定位所需文件、函数与调用方，再从合法安装提供必要片段和版本依据。缺少初始化、端别或调用上下文时补齐；无法补齐时保留候选原因和成立条件。
 
-粘贴或上传时注明原相对路径、完整文件或片段范围、版本依据。同名附件可编码路径，如 `scripts__components__my_component.lua`，并附映射。
+同名附件可把路径编码为 `scripts__components__my_component.lua` 并说明映射。文本副本需注明原扩展名，执行前恢复正确路径。TEX、动画与压缩包仍需相应解析工具，改成 `.txt` 不会使二进制可读。
 
-平台不接收文本后缀时，可上传内容不变的文本副本并注明原扩展名；执行前恢复路径和文件类型。二进制动画、TEX 或压缩包需使用相应解析工具，不能靠改名 `.txt` 读取。
+## 执行与本机交接
 
-无法补齐源码时，给出候选原因、成立条件和检查方法；涉及 API、顺序或端别的修复标为待确认。
+具备 Python 和完整输入的云端可做 [静态检查](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)；依赖、编辑、联网下载与执行权限分别确认。仅有片段时记录检查范围。随附专服测试器需要 Windows DST 环境，不能访问用户电脑盘符的云端沙盒无法替用户运行。
 
-## 云端能运行时，怎样使用脚本
+缺少工具时按 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 提供作者来源、平台、最小依赖和样本验证方法。有本机执行连接且已获授权时继续；否则交付具体命令和输入，由本机执行者完成。
 
-先确认脚本、输入、依赖和执行权限，记录实际环境。有 Python 不代表可以安装包、联网下载或运行 Windows EXE。
+交付应包含：
 
-- 已有 Python / `luaparser` 且输入完整时，可做 [静态检查](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)；没有实际运行就交付命令，不编造输出。
-- 只有部分源码片段时，记录检查范围；`check_api.py` 需要它支持的原版源码输入布局，不能拿不完整摘要冒充完整目录。
-- PNG/XML/ZIP 结构检查与模拟测试可在具备相应能力的环境执行，但不等于引擎解码、真实 UI 或联机通过。
-- 随附专服启动器需要其支持的 Windows 游戏环境。普通云端沙盒不能使用用户电脑的盘符，也不能由云端 Python 的成功结果推断本机专服通过。
-- 若会话另有明确授权的本机执行连接，先核对实际主机、路径和权限；只有相应调用记录才能报告本机执行。
+- 修改文件相对于 Mod 根目录的路径，以及完整文件或补丁；注明所依据的版本，实际取得哈希时再记录哈希。
+- 改动原因、已执行检查及证据、待本机验证项；静态、模拟、专服与真实客户端结果分别说明。
+- 在目标副本应用前的差异核对和冲突处理；云端产物不会自动同步到运行副本或 Workshop。
 
-云端产物需确认可下载且完整，再应用到 Mod 源目录或游戏运行副本；不会自动同步或发布到 Workshop。
-
-## 缺工具与安装授权
-
-按 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 准备当前任务所需工具。缺项时说明官方/作者来源、适用平台、必要依赖、安装目录与样本验证步骤。
-
-有执行连接与已有授权时继续执行；缺少本机连接时，提供方案和命令，由用户或本机 Agent 运行。只为尚未授权的操作或未决定的效果请求确认。
-
-## 交付和本机回传
-
-交付须能对应明确的原文件：
-
-1. 列出每个新增/修改文件相对于 **Mod 根目录** 的路径，说明交付的是完整文件还是补丁；不要提供云端绝对路径作为用户安装目标。
-2. 记录适用的原提交/版本与原文件 SHA-256（确实取得时）。只有粘贴文本时不得声称知道本机原文件哈希；文本副本哈希需标明编码/换行范围。
-3. 给出改动原因、影响和剩余玩法决策；原文件版本不匹配时先重新比较，不能强行覆盖后来的修改。
-4. 分开列已执行的检查、命令/环境/证据与待用户执行步骤；“静态通过”“云端模拟通过”“专服通过”“客户端通过”分别记。
-5. 在副本上应用并比较差异，保留私人存档；发布需单独授权。
-6. 用 [本机验证回传模板](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/templates/local-validation.md) 收集对应副本、结果和未测项，再根据新证据继续修复。
-
-回传日志保留错误前后文、堆栈、版本和测试标记；令牌、密码及无关私人内容用占位符替换，注明删改字段。原始日志留在本机。
-
-证据等级见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)，已测范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+本机回传实际加载副本、配置、复现步骤、完整堆栈、日志或截图，以及未测项；可用 [验证结果清单](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/templates/local-validation.md) 记录。日志中的令牌、密码和无关私人内容用占位符替换。证据等级见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
 
 ---
 
 ## 来源：`references/environment-tools.md`
 
-原始 SHA-256：`c35440d8954037f75cae2916b928db934f9f783555a2bf7281e1a52cf9000186`
+原始 SHA-256：`db750b76856694ab177e82e91ef98f17a439ee9e3badbeab509a14d6d6ab5b12`
 
 # 环境发现与来源定位
 
 先发现当前项目实际使用的游戏、源码与工具，再配置绝对路径。本技能不绑定固定安装目录，也不随仓库分发游戏源码、编译器或第三方可执行程序。
 
-当前任务缺少工具时，按 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 给出来源、平台、最小安装方案和验收方法；授权后继续执行。其他 Agent 的加载路径与能力检查见 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。
+缺少当前任务所需工具时，按 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 选择最小方案；Agent 的加载路径与能力见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。
 
-在网页或远端执行环境中，先区分文件、解释器和工具属于哪台主机。上传文件不会暴露用户的本机盘符；云端下载或安装 DMT 也不等于用户电脑已安装。按 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) 确认实际能力，需要本机执行时交付具体步骤并等待真实日志。
+远端执行环境需核对文件、解释器和工具所属主机；本机资料交接见 [网页指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。
 
 | 用途 | 发现与核对方法 |
 |---|---|
@@ -285,11 +205,11 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | ktech / krane | 从已安装 ktools 位置定位，分别检查 `--help`；不要把文件夹名当成工具版本 |
 | Mod 源码与运行副本 `$mod` | 从当前项目配置或作者说明确定；分别记录路径和哈希，不能只看同名文件夹 |
 
-接手项目时读取该项目的约定、交接文档与当前配置。历史报告不证明今天的副本相同。环境路径应保存在项目自己的本地配置或会话变量中，避免把开发者用户名和绝对目录写入可公开的技能。
+环境路径保存在项目本地配置或会话变量中；用实际文件确认源码与运行副本，不能只凭同名目录。
 
 ## 查阅当前源码
 
-使用解压副本前，核对它与当前安装包的相关条目是否一致。游戏更新或哈希改变后，重新比较相关文件与行号。历史源码指纹与核验范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+使用解压副本前，核对它与当前安装包的相关条目是否一致。游戏更新或哈希改变后，重新比较相关文件与行号。专题中的版本范围见 [能力与版本限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
 
 源码先用 `rg --files`/`rg -n` 定位。没找到按 prefab 命名的文件时，查合并返回多个 Prefab 的文件、工厂函数、调用链；如帽子集中在 `prefabs/hats.lua`。Lua 中没定义的引擎方法可能来自 C++，不能凭一次搜索判不存在。
 
@@ -301,7 +221,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 & $python scripts/dst_zip_tool.py --dst $dst show components/health.lua --start 1 --count 100
 ```
 
-`$python`、`$dst` 由当前已验证路径赋值。全局参数 `--dst`/`--zip` 放子命令前；`extract MEMBER --out EXACT_NEW_FILE` 只导出单文件且拒绝覆盖。
+全局参数 `--dst`/`--zip` 放子命令前；`extract MEMBER --out EXACT_NEW_FILE` 只导出单文件且拒绝覆盖。
 
 ## 工具采用原则
 
@@ -309,7 +229,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 历史教程附带的可执行文件不作为默认工具；先做压缩包清单/文本源码审查。需要换工具时先比较现有工具能否完成同一产物，再按用户授权处理安装。
 
-不同 shell 的 stdout、编码、引号与路径行为用实际调用确认。含复杂字符串的操作优先使用脚本文件，清理文件在同一 shell 中用明确路径执行。随附测试器使用独立 ASCII 引擎存档路径，以避开已遇到的 Windows 中文存档路径兼容问题；报告目录可位于中文工作区。解释器能读取中文源码，不代表引擎也能处理同一路径。
+不同 shell 的 stdout、编码、引号与路径行为用实际调用确认。含复杂字符串的操作优先使用脚本文件，清理文件在同一 shell 中用明确路径执行。随附测试器的引擎存档路径要求 ASCII，以避开 Windows 中文路径兼容问题；报告目录可位于中文工作区。
 
 ## 随附测试器的特殊边界
 
@@ -318,7 +238,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - runner 只终止自己 `Popen` 创建的进程。每轮保留日志、manifest、唯一 staged Mod 与存档，便于排查；清理时先核对 manifest、绝对路径归属与进程状态，勿通配删除真实 `mods`/Klei 目录。
 - 唯一测试目录会改变 `modname`。依赖 Workshop ID、硬编码文件夹名、跨 Mod 名称探测的场景必须单独验证配置映射与真实安装环境。
 
-存档路径参数依据 Klei 开发者 [Dedicated Server Command Line Options Guide](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/)。历史实测环境及范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+存档路径参数依据 Klei 开发者 [Dedicated Server Command Line Options Guide](https://kleiforums.com/forums/topic/64743-dedicated-server-command-line-options-guide/)。测试范围见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
 
 ---
@@ -413,84 +333,190 @@ PNG/SCML 改动需重编译对应产物，Lua 改动本身不要求重编译美�
 
 ---
 
+## 来源：`README.en.md`
+
+原始 SHA-256：`3ae51d99ce2ee317a07bb28b24ffed7869a0fa3af4f1fa92cf1459ff46fd0433`
+
+# DST Mod Engineering
+
+An AI engineering skill for Don't Starve Together mod development: inspect the current source, then design, implement, review and validate. It covers characters, items, spells, assets, networking, persistence and compatibility. [中文 README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.md)
+
+The standalone Skill includes engineering guidance, topic references and three helper scripts. **It does not include the complete engineering KB, an MCP server, game source or private mod projects.** It can work with your legally obtained local source without an additional KB.
+
+## Downloads
+
+[Public Beta 1 release](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25).
+
+| Asset | Use |
+|---|---|
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Install the Skill, references and three developer helpers |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | Topic-based reading for web chat or offline use |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | Full public repository, including the earlier 64-entry reference KB and its read-only MCP service |
+
+Verify downloads with the release's `SHA256SUMS.txt`. The public snapshot excludes the separate private full KB and private research.
+
+## Install and use
+
+1. Download the standalone Skill attachment from the [repository releases](https://github.com/Zechariah0121/dst-mod-engineering/releases) and fully extract it. Locate the `dst-mod-engineering/` directory that directly contains `SKILL.md`.
+2. Copy the complete directory to a skill location supported by your agent, such as `.agents/skills/dst-mod-engineering/` in a Codex project or `.claude/skills/dst-mod-engineering/` in a Claude Code project. Preserve existing customizations. See [installation](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) for personal locations and other agents.
+3. Invoke `dst-mod-engineering` and provide your task, mod directory, actual DST version and local `scripts.zip` location. Confirm that the Skill and relevant references are readable. If discovery is unavailable, explicitly provide the path to `SKILL.md`.
+
+For web chat, use attachments or a supported native skill-import feature as described in the [web guide](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md). Most detailed references are in Chinese.
+
+## Entry points
+
+| Task | Where to start |
+|---|---|
+| Characters, spells, items, recipes, UI or assets | Topic index in [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) |
+| Source investigation, crashes, networking or save issues | Definitions, callers, execution side, initialization, cleanup and persistence |
+| Syntax, API declarations or isolated server checks | [Testing and delivery](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) |
+| An existing KB | [Optional KB integration](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md); inspect the actual service and version |
+
+The scripts need Python 3.10+. Syntax checks additionally need `luaparser` from `requirements.txt`. The server test helper supports Windows only. Reading the Skill needs no script execution. Install asset tools only as needed; see [tool sources and validation](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md).
+
+Versioned notes and examples have bounded scope. They do not guarantee compatibility with the latest game or every mod. Report static, server, real remote-client, visual and audio validation separately. See [capabilities and limits](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md).
+
+## Optional public reference KB
+
+The full public repository retains the earlier **v0.1.1, 64-entry** reference KB and its read-only service.
+See the [KB entrypoint](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) and [MCP setup](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md).
+The standalone Skill ZIP excludes both. This is a bounded historical reference set, not a complete or current-game knowledge claim.
+Read each entry's status, source version, evidence and unexecuted test candidates.
+
+## License
+
+Project-owned material uses the [custom non-commercial LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE), not MIT or an OSI open-source license. Commercial use requires separate written permission. Valid historical MIT grants and third-party rights remain in force. See [licensing](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md).
+
+
+---
+
 ## 来源：`README.md`
 
-原始 SHA-256：`435a0a08f7a6d1c10acc952700c3e83b82a1aa02bca02008a21dd70343857f69`
+原始 SHA-256：`7b298062bf7a585823c79ee18b37331e8c44246ad3f1abac613ac7855a4dfefb`
 
-# dst-mod-engineering
+# DST Mod Engineering
 
-面向《饥荒联机版》（Don't Starve Together）的中文 AI 开发技能，覆盖功能开发、代码审查、崩溃排错、联机、存档和资源制作。
+面向《饥荒联机版》Mod 开发的 AI 工程 Skill：核对当前源码，再设计、实现、审查和验证。适合借助 AI 制作角色、物品、法术和资源，也适合排查联机、存档与兼容问题。[English README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)
 
-**非商业使用**：允许学习、研究、非商业合作和免费制作、分享 Mod；未经另行书面授权，不得用于收费接单、付费 Mod／服务，也不得售卖或付费转发本项目。允许无权益交换的自愿打赏、赞助及免费公开教程的广告收益。完整边界见 [使用许可](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE) 和 [常见情形](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。
+本独立 Skill 包含工作方法、专题参考和三个辅助脚本，**不附完整工程知识库、MCP 服务、游戏源码或私人 Mod 工程**。没有额外 KB 时，仍可配合你合法取得的本地源码工作。
 
-[![Checks](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/Zechariah0121/dst-mod-engineering/actions/workflows/ci.yml)
-[![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-orange.svg)](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)
+## 下载
 
-## 快速开始
+本版：[Public Beta 1 发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25)。
 
-| 使用方式 | 入口 |
+| 附件 | 适用方式 |
 |---|---|
-| Codex、Claude Code、Cursor 等 Agent | 下载仓库，按 [接入指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md) 安装并加载 `SKILL.md` |
-| 网页 AI | 上传 [技能 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.skill.zip)，或使用下方专题 Markdown |
-| 阅读工程知识 | [知识库索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) |
-| 为 Agent 启用知识检索 | [MCP 服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) |
-| 获取全部内容 | [完整发行包](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering-full.zip)（Skill、知识库、MCP） |
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Agent 安装；完整 Skill、专题与三个开发辅助脚本 |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | 网页 AI 或离线阅读；按任务选择专题 |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | 完整公开仓库；另含64条早期参考知识及其只读 MCP 服务 |
 
-[发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest)提供版本说明和下载校验文件；需要尚未发行的改动时可下载 [main 分支 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/archive/refs/heads/main.zip)。
+下载校验见发行页的 `SHA256SUMS.txt`。完整公开仓库不包含另行私用的完整版知识库或私人研究材料。
 
-不支持自动发现技能的 Agent，也可以直接使用：
+## 安装与开始使用
 
-> 请读取 `dst-mod-engineering/SKILL.md`，按相关专题处理我的 DST Mod 任务。先核对当前原版源码，再实现或修复；玩法取舍先确认，分别报告静态检查和实际游戏测试结果。
+1. 从 [仓库发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载独立 Skill 附件并完整解压，找到直接含 `SKILL.md` 的 `dst-mod-engineering/` 文件夹。
+2. 把完整目录放入 Agent 支持的技能目录。例如项目内的 `.agents/skills/dst-mod-engineering/`（Codex），或 `.claude/skills/dst-mod-engineering/`（Claude Code）。其他产品与个人安装位置见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)。已有同名目录时先保留定制内容。
+3. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和本地 `scripts.zip` 位置。确认 Agent 能读取 `SKILL.md` 及相关专题；没有自动发现能力时，直接指定该文件的实际路径。
 
-技能 ZIP 包含使用指南和开发辅助脚本；知识库与 MCP 服务需下载完整仓库。普通网页附件是否能解压、注册技能，取决于平台能力，详见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。
+网页聊天使用附件或平台支持的技能导入，见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。大部分专题为中文；英文 README 不代表全部内容已翻译。
 
-## Skill 与知识库
+## 按任务使用
 
-Skill 负责开发流程和按需导航；知识库提供可追溯的事实、模式、反例与测试候选；可选 MCP 服务负责检索。设计、实现、审查和排错使用不同的检索重点，简单机械修改不必重复查询。
-
-知识库 v0.1.1 包含 **64 条条目**，来自一个参考案例及限定的原版源码快照。模式和规则仍是候选，11 项游戏测试候选尚未执行。使用时仍须核对当前项目和游戏版本。具体任务示例见 [知识库使用说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
-
-## 网页阅读资料
-
-通常选择与任务相关的一份即可：
-
-| 任务 | 下载 |
+| 目标 | 起点 |
 |---|---|
-| 初次使用 | [入门](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-starter.md) |
-| 代码审查与修复 | [代码专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-code-review.md) |
-| 联机、存档与 UI | [联机专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-networking.md) |
-| 贴图、动画与音频 | [资源专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-assets.md) |
-| 世界生成 | [世界生成专题](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-worldgen.md) |
-| 全部专题 | [阅读 ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/web-reading.zip) · [完整 Markdown](https://github.com/Zechariah0121/dst-mod-engineering/raw/refs/heads/main/dist/web/web-full.md) |
+| 实现角色、法术、装备、配方、UI 或资源 | [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) 的专题索引；提供期望效果与触发条件 |
+| 源码研究、崩溃、联机与存档故障 | 追踪定义、调用方、端别、初始化、退出和保存链路 |
+| 语法、API 声明或隔离专服检查 | [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) |
+| 接入已有 KB | [可选知识库](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)，以实际可用服务及其版本为准 |
 
-## 开发工具
+脚本需 Python 3.10+；语法检查另需 `requirements.txt` 中的 `luaparser`。随附专服测试器仅支持 Windows。读取 Skill 无需运行脚本，动画和音频工具按任务另行准备，来源与首次验证见 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)。
 
-| 工具 | 用途 |
+专题中的版本、样例与源码定位有各自适用范围，不保证当前在线版本或所有 Mod 兼容。静态检查、专服行为、真实远端客户端、视觉与音频分别验证，见 [能力与版本限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
+
+## 可选公开参考知识库
+
+完整公开仓库保留 **v0.1.1、64条**参考知识和只读检索服务，内容范围与该版本的来源说明保持不变。
+需要时阅读 [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) 和 [MCP 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md)；独立 Skill ZIP 未携带它们。
+这是可选参考资料，不是最新全量游戏知识；具体条目的状态、版本、证据与未执行测试仍须分别读取。
+
+## 许可
+
+项目自有材料使用 [自定义非商业 LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)，不是 MIT 或 OSI 开源许可。商业使用须另获书面授权；有效历史 MIT 授权与第三方权利仍按各自条款处理。见 [许可说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。
+
+
+---
+
+## 来源：`docs/install-and-use.md`
+
+原始 SHA-256：`87ed14a7ac42ae3050af2560b9218e3c13a0c02780074469a95b16486741edb6`
+
+# 安装与使用 / Installation and use
+
+## 安装独立 Skill
+
+从 [发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载 `dst-mod-engineering.skill.zip` 并完整解压。目录应为 `dst-mod-engineering/SKILL.md`，同时保留 `references/`、`docs/`、`scripts/`、`templates/`、`requirements.txt` 与 `LICENSE`。`web-reading.zip` 只提供阅读材料，不是可安装的 Skill。不要只复制 `SKILL.md`。
+
+选一个安装位置，每种产品的目标路径中都包含 `dst-mod-engineering/`：
+
+| Agent | 项目安装位置 | 个人安装位置 | 调用 |
+|---|---|---|---|
+| Codex | `.agents/skills/dst-mod-engineering/` | `~/.agents/skills/dst-mod-engineering/` | `$dst-mod-engineering` 或技能选择器 |
+| Claude Code | `.claude/skills/dst-mod-engineering/` | `~/.claude/skills/dst-mod-engineering/` | `/dst-mod-engineering` |
+| Cursor | `.cursor/skills/dst-mod-engineering/` 或 `.agents/skills/dst-mod-engineering/` | `~/.cursor/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | Agent 聊天中输入 `/` 并选择技能 |
+| GitHub Copilot | `.github/skills/dst-mod-engineering/`；也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | 按所用界面选择或明确命名技能 |
+
+`~` 是运行 Agent 的主机的用户目录。Windows 可用用户目录下的对应文件夹。以上位置来自各产品官方文档；官方来源、云端差异与能力要求见 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。
+
+安装后刷新技能列表或重新开始会话，确认实际读取的 `SKILL.md` 路径和相关专题。未自动发现时，直接让 Agent 读取该文件的绝对路径。更新前比较同名目录，保存定制版；回退时恢复旧目录，并确认加载路径。
+
+Download and fully extract the standalone Skill. Copy the complete `dst-mod-engineering/` directory to one supported project or personal location above. `~` means the home directory on the agent's host. Preserve custom copies, refresh discovery, and verify the loaded file and relevant references. Explicit file reading works when automatic discovery is unavailable.
+
+## 提供 Mod 与当前源码
+
+给 Agent 提供任务、Mod 根目录、实际游戏版本，以及自己合法安装的 DST 中的 `data/databundles/scripts.zip`。在 Skill 根目录运行：
+
+```text
+python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" info
+python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" show scripts/components/combat.lua --start 1 --count 80
+```
+
+这两条命令只需 Python 3.10+ 标准库，不修改游戏。若要检查 Mod 的 Lua 语法和部分直接 API 调用，在自己的虚拟环境安装依赖后运行：
+
+```text
+python -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt
+.venv/Scripts/python -B scripts/check_api.py "<Mod目录>" --zip "<scripts.zip>"
+```
+
+上例为 Windows；macOS/Linux 使用 `.venv/bin/python`。用实际路径替换占位符。`DECLARED` 只是查到声明，`NEEDS_REVIEW` 需要追踪源码；均不是运行正确性证明。隔离专服检查的 Windows 环境、参数与限制见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
+
+Provide your task, mod root, actual game version and authorized `data/databundles/scripts.zip`. Run the first commands from the Skill root with Python 3.10+. The checker additionally needs `luaparser`; use a virtual environment and replace `.venv/Scripts/python` with `.venv/bin/python` on macOS/Linux. Declaration matches do not prove runtime correctness.
+
+## 可选 KB 与故障排查
+
+本独立 Skill 不包含完整 KB/MCP。已有服务时，按 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 检查其实际工具、版本和一次查询结果；没有时说明 `KB unavailable`，继续本地源码工作。
+
+| 现象 | 处理 |
 |---|---|
-| `scripts/dst_zip_tool.py` | 检索游戏安装目录中的 `scripts.zip` |
-| `scripts/check_api.py` | Lua 语法及组件／Replica 方法声明检查 |
-| `scripts/dst_modtest.py` | Windows 隔离专服测试，记录加载与行为断言结果 |
+| 找不到 Skill | 检查目录层级、发现位置和会话刷新；用绝对路径显式读取 |
+| 只能读 README | 保留完整目录，读取 `SKILL.md` 及相关专题 |
+| 找不到源码或组件 | 检查路径、实际游戏版本和 ZIP 成员，不静默换用旧源码 |
+| 缺少 Python / luaparser | 确认实际解释器与所需依赖；准备方法见上文 |
+| 网页 AI 无本地权限 | 按 [网页指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) 提供有权共享的必要材料 |
+| MCP 已配置却无响应 | 在服务主机检查启动命令、解释器、路径、stderr 和客户端连接 |
 
-脚本需要 Python 3.10+；语法检查器还需 `luaparser`，可用 `python -m pip install -r requirements.txt` 安装。参数通过各脚本的 `--help` 查看，操作示例及限制见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。静态检查和专服测试不能替代真实客户端的 UI、预测、画面与音频验收。
-
-动画与音频工具按任务选择，见 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)、[动画制作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/assets-animation.md) 和 [音频制作](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/audio-particles.md)。
-
-## 来源与许可
-
-仓库自有内容采用 [自定义非商业使用许可](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)，不是 MIT 或 OSI 开源许可；第三方材料与历史有效 MIT 授权的边界见 [许可说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md)。
-
-知识库参考风铃（FL）的“穹”Mod，公开内容为架构分析与技术评论，不代表原作者背书，也不重新授权原 Mod。游戏、Mod 原始源码及素材未随本仓库分发，其权利仍归原权利人。资料来源见 [来源说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/sources-and-corrections.md)，证据与版本范围见各知识条目。
-
-需要贡献内容或重建发布包时，阅读 [维护指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/maintainers.md)。
+This standalone Skill has no complete KB/MCP. Connect an existing authorized service only after checking its real tools, version and a query result. Otherwise report `KB unavailable` and continue source-based work.
 
 
 ---
 
 ## 来源：`docs/knowledge-integration.md`
 
-原始 SHA-256：`44163b50d41a67aed76230b06efaa6c6936cb2089b754df3b8e0ec45cd2f1760`
+原始 SHA-256：`15fc3a3c5b0ac0c6d2e9ffb897cc243d1176e6091e312284065208a480fbc31b`
 
 # Skill、知识库与检索服务
+
+> 本页介绍完整公开仓库保留的 **v0.1.1、64条参考知识** 及其可选只读服务。独立 Skill ZIP 不包含这些数据和服务；该公开参考集不代表其他配套 KB 的内容或版本。
 
 三个目录职责不同：根目录 `SKILL.md` 与 `references/` 保存工作策略；`dst-engineering-kb/` 保存知识；`dst-kb-service/` 只读检索，SQLite 索引位于知识库以外。知识条目不是代码模板，也不是让 Agent 无条件执行的指令。
 
@@ -531,13 +557,13 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 
 ## 来源：`docs/licensing.md`
 
-原始 SHA-256：`2a8bb5f84c8a68fd48b1c7a2c5f168e7f439f94a4ad0bc711f98249caad4c7c3`
+原始 SHA-256：`7056d3ebc39e88ef1005a12fb66c0a6e2c4726b0e1507f95cd90d5b395118d79`
 
 # 使用许可与常见情形
 
-本次许可变更发布于 2026-10-13，完整条款以仓库根目录的 [LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE) 为准。覆盖仓库自有的 Skill、脚本、知识库原创分析和 MCP 服务；第三方材料不在重新授权范围内。
+完整条款以 [LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE) 为准。本说明概括项目自有材料的非商业使用条件，不重新授权第三方材料。
 
-| 情形 | 本次许可的处理 |
+| 情形 | 许可要求 |
 |---|---|
 | 学习、研究，个人或合作制作免费 Mod | 允许 |
 | 免费分享或修改本项目材料 | 允许；保留版权、许可及来源，修改版注明修改 |
@@ -553,7 +579,6 @@ Skill 负责开发流程和按需导航；知识库提供可追溯的事实、�
 原项目曾按 MIT 发布。新许可不追溯撤销有效的历史授权，也不能阻止他人依原 MIT 条款继续使用已获许可的旧材料。此前已按 MIT 发布的相同内容不会因本次重新打包而失去原授权。
 
 - [历史 MIT LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/ef682cb95f4b4e2171f3c2c634c88ddecefe75de/LICENSE)
-- [2026-10-13 的 README 单独修改](https://github.com/Zechariah0121/dst-mod-engineering/commit/7c1f177a0632883c4c08d25956c07a939dc73d2e)：该次提交仍保留 MIT LICENSE；后续本次提交才统一许可文本与分发包。
 
 Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或本项目许可不等于获得其商业使用授权；本项目也不代表他们背书。
 
@@ -565,135 +590,83 @@ Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或�
 
 需要另行商业授权时，可通过 [仓库 Issues](https://github.com/Zechariah0121/dst-mod-engineering/issues) 联系权利人；提交申请或未收到回复不等于获得授权。
 
+## 分发范围 / Distribution scope
+
+独立 Skill 不附游戏源码、完整 KB/MCP 或私人项目。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
+
+Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. The standalone Skill contains no game source, complete KB/MCP or private projects. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.
+
+
+---
+
+## 来源：`docs/public-limits.md`
+
+原始 SHA-256：`4086c8bc9e2451c63a6ab4c5aa92c71c8b628e5654ad56d36d7c2c1602169633`
+
+# 能力与版本限制 / Capabilities and limits
+
+独立公开 Skill 提供工程工作方法、专题参考和三个 Python 辅助脚本；不提供完整 KB/MCP、游戏源码或第三方工具。可选 KB 以实际接入服务的版本、工具与记录范围为准，见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
+
+| 项目 | 实际边界 |
+|---|---|
+| 游戏版本 | 专题中标注的 `756039`、`759671` 等是保存源码快照。只适用于注明的函数、链路与条件；行号可能随更新变化，不代表全部专题已按同一版本复核 |
+| Agent | 安装路径参考各产品官方文档；没有逐一完成所有产品、账户和云端环境的端到端安装测试 |
+| 源码读取 | 需使用者提供合法可读的本地源码或必要片段；缺少材料时只能给出条件性判断 |
+| 静态检查 | `check_api.py` 检查语法和部分直接方法声明，不能证明签名、时序、端别或运行结果 |
+| 游戏测试 | `dst_modtest.py` 仅支持 Windows 离线单分片；不替代真实远端客户端、洞穴/跨分片、Mod 组合、UI/预测、视觉或音频验收 |
+| 动画与音频 | 工具接口按安装版本确认；导出成功或无头专服通过不代表引擎解码与实际效果通过 |
+
+具体 Mod 应分别记录实际源码版本、检查范围、测试环境与未测项。游戏更新后重新核对相关定义与调用链；历史样例、方法存在或单处调用不能直接推广为通用契约。验证方法见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
+
+The standalone Skill provides guidance, references and three Python helpers. It does not supply the full KB/MCP, game source or third-party tools. Versioned notes describe bounded source snapshots, not blanket compatibility with the latest game. Agent installation paths follow official documentation; not every product, account or cloud environment has been tested end to end. Static declaration checks do not prove runtime behavior. The server helper is Windows-only and single-shard; real remote-client, cross-shard, UI, prediction, visual and audio behavior needs separate validation for each mod. Record the actual version, environment, evidence and untested scope.
+
 
 ---
 
 ## 来源：`references/agent-setup.md`
 
-原始 SHA-256：`a91b023002f6a69491597a3cbf33c5f3954866ddadf997745cbc546a6668aa19`
+原始 SHA-256：`9ac1f15b3de150075c95dd9f1059aa67110ca24804230fc92ed24c83b917a482`
 
-# 不同 Agent 的安装、调用与能力边界
+# Agent 安装与能力
 
-安装路径与调用方式按 **2026-09-27** 核验的官方文档列出；尚未经各产品端到端实测。技能加载、脚本执行和 DST 功能验收需分别确认。
+本技能采用 [Agent Skills 格式](https://agentskills.io/specification)。完整安装步骤与路径表见 [安装与使用](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)；下面的官方资料用于核对各产品当前入口。技能可被发现、脚本可执行与 DST 功能通过验收是不同结果。
 
-本仓库采用 [Agent Skills 公开格式](https://agentskills.io/specification)。安装时保留完整目录，不能只复制 `SKILL.md`；Agent 需能读取参考文件，执行脚本还需相应环境。各产品的发现路径、命令和权限可能不同。
+## 官方入口
 
-## 放在哪里、怎样调用
-
-下表中的 `~` 表示运行 Agent 的那台机器上的用户目录；项目路径相对于当前项目根目录。每个目录下再放一个完整的 `dst-mod-engineering/` 文件夹。
-
-| Agent | 项目级技能目录 | 个人技能目录 | 明确调用或确认加载 |
-|---|---|---|---|
-| Codex | `.agents/skills/` | `~/.agents/skills/` | CLI / IDE 中用 `$dst-mod-engineering`，或通过 `/skills` 选择。见 [OpenAI 文档](https://learn.chatgpt.com/docs/build-skills)。 |
-| Claude Code | `.claude/skills/` | `~/.claude/skills/` | 输入 `/dst-mod-engineering`。见 [Claude Code 文档](https://code.claude.com/docs/en/skills)。 |
-| Cursor | `.cursor/skills/`，也支持 `.agents/skills/` | `~/.cursor/skills/`，也支持 `~/.agents/skills/` | 在 Agent 聊天中输入 `/` 并选技能；该调用附着于当前消息。见 [Cursor 文档](https://cursor.com/docs/skills)。 |
-| GitHub Copilot | `.github/skills/`，也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/`，也支持 `~/.agents/skills/` | CLI 可在提示中写 `/dst-mod-engineering`；其他界面用明确命名的请求，并确认实际读取的文件。见 [Copilot 安装说明](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) 和 [CLI 调用说明](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills)。 |
-
-优先选一个安装位置，避免同名副本混淆；已有安装先核对实际加载路径，再决定是否迁移。
-
-云端会话需另行确认文件可用性：Claude Code 的本地个人技能不会由该路径直接进入云端；Cursor 需使用其支持的同步或远端部署方式；项目技能须存在于远端工作区。见 [Claude Code 云端范围](https://code.claude.com/docs/en/skills#use-skills-in-cowork-and-cloud-sessions) 与 [Cursor 云端范围](https://cursor.com/help/customization/skills#are-user-level-skills-available-on-cloud-agents-and-remote-workers)。技能同步不包含 DST，也不提供本机游戏目录访问权。
-
-## 首次安装示例
-
-没有 Git 时，打开 [本仓库](https://github.com/Zechariah0121/dst-mod-engineering)，选择 **Code → Download ZIP**。见 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)。
-
-解压后，将**直接包含 `SKILL.md` 的完整目录**命名为 `dst-mod-engineering`，复制到上表选定的技能父目录。先确认目标不存在；最终结构应是 `<技能父目录>/dst-mod-engineering/SKILL.md`，不要多套分支目录。
-
-已有 Git 时可使用以下首次安装命令；目标已存在会停止，需先比较已有内容。
-
-Windows PowerShell 示例默认采用 Codex 的个人目录。使用其他 Agent 时，只修改 `$skillParent` 的末段：Claude Code 用 `.claude/skills`，Cursor 用 `.cursor/skills`，Copilot 用 `.copilot/skills`。
-
-```powershell
-$skillParent = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.agents/skills'
-$skillTarget = Join-Path $skillParent 'dst-mod-engineering'
-if (Test-Path -LiteralPath $skillTarget) {
-    throw "目标已存在，请先核对已有技能：$skillTarget"
-}
-Get-Command git -ErrorAction Stop | Out-Null
-New-Item -ItemType Directory -Path $skillParent -Force | Out-Null
-git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git $skillTarget
-if ($LASTEXITCODE -ne 0) { throw '克隆失败；检查原因，不要覆盖重试。' }
-foreach ($relative in @('SKILL.md', 'references', 'scripts', 'docs', 'requirements.txt', 'LICENSE')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $skillTarget $relative))) {
-        throw "技能内容缺失：$relative"
-    }
-}
-Get-Content -LiteralPath (Join-Path $skillTarget 'SKILL.md') -TotalCount 8
-```
-
-macOS / Linux 的 Bash 或 Zsh 示例同样默认采用 `.agents/skills`；按上表修改 `skill_parent` 即可。此处允许安装和阅读技能，不表示随附专服启动器支持这些平台。
-
-```sh
-(
-    set -eu
-    skill_parent="$HOME/.agents/skills"
-    skill_target="$skill_parent/dst-mod-engineering"
-    if [ -e "$skill_target" ] || [ -L "$skill_target" ]; then
-        printf '%s\n' "目标已存在，请先核对已有技能：$skill_target" >&2
-        exit 1
-    fi
-    command -v git >/dev/null
-    mkdir -p "$skill_parent"
-    git clone -- https://github.com/Zechariah0121/dst-mod-engineering.git "$skill_target"
-    test -f "$skill_target/SKILL.md"
-    test -d "$skill_target/references"
-    test -d "$skill_target/scripts"
-    test -d "$skill_target/docs"
-    test -f "$skill_target/requirements.txt"
-    test -f "$skill_target/LICENSE"
-)
-```
-
-项目级安装需随项目提交时，复制完整技能文件，保留依赖说明和许可证；不要一并提交来源仓库的 `.git` 目录。
-
-## 最小读入检查
-
-先让 Agent 只读检查，不启动游戏、不安装依赖、不编辑 Mod：
-
-> 使用 dst-mod-engineering。先报告你实际读取的 SKILL.md 路径，再读取 references/environment-tools.md 和 references/testing-release.md，说明三个辅助脚本各自能验证什么、不能验证什么。列出当前环境已找到和缺少的工具，但先不要安装、编译或运行游戏。
-
-根据产品确认技能被发现：
-
-- Codex：从技能选择器选中；更新后仍看不到时重启会话。自动匹配依赖任务与描述，不能把没自动触发解释为文件必然无效。[官方加载说明](https://learn.chatgpt.com/docs/build-skills)
-- Claude Code：使用上表的 `/dst-mod-engineering`，核对实际来源路径，避免同名个人/项目技能混淆。[官方技能说明](https://code.claude.com/docs/en/skills)
-- Cursor：在 `/` 菜单选择技能，也可到 Customize → Skills 查看已发现的条目。[官方技能说明](https://cursor.com/docs/skills)
-- Copilot CLI：已启动会话可用 `/skills reload`，再用 `/skills info dst-mod-engineering` 确认位置；其他 Copilot 界面不照搬 CLI 命令。[官方 CLI 说明](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills)
-
-结合文件路径与读取记录确认参考文件可读。只读检查应能区分声明检查、服务器行为和真实客户端验收，并指出专服测试器只支持 Windows。
-
-已有合适 Python 时，可在技能根目录分别运行 `python scripts/dst_zip_tool.py --help`、`python scripts/check_api.py --help` 和 `python scripts/dst_modtest.py --help`；用实际解释器路径替换 `python`。帮助成功只证明入口可运行，不能确认 `luaparser` 已安装或游戏测试通过。依赖与运行命令见 [环境与工具准备](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md) 和 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
-
-## 没有 Skills 自动加载的 Agent
-
-网页聊天、附件或原生技能 ZIP 的用法见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。能读取工作区文件的 Agent 也可显式读取技能，无需自动加载：
-
-把完整目录放在可访问的位置，将下列路径换成实际位置：
-
-> 请先读取 `<技能绝对目录>/SKILL.md`，按当前任务读取其中链接的参考文件。脚本和文档的相对路径以技能目录为准；待修改的 Mod 是 `<Mod 绝对目录>`。以当前原版源码为依据完成任务，区分确定故障与玩法选择，并说明实际执行了哪些验证。不要因未注册 Skills 就跳过该目录，也不要只读 README 代替技能入口。
-
-参考文档按任务读取，无需每轮全部载入。不能读取本地文件时，由用户提供相关材料；分析和验证结论限于实际取得的内容与执行记录。
-
-## 按任务准备能力
-
-| 能力 | 可完成的工作 | 缺少时的实际边界 |
+| Agent | 官方说明 | 加载后确认 |
 |---|---|---|
-| 读取和检索文件 | 读技能、追踪 Mod 与合法安装的原版源码 | 只有对话文本时，只能讨论已提供的片段 |
-| 编辑文件 | 修改已授权的项目并生成报告 | 只能提供补丁建议，由使用者应用 |
-| 终端 / 进程执行 | 执行 Python、资源工具和定向测试 | 可以审查命令与代码，不能报告“运行通过” |
-| 网络读取 | 获取本仓库、核对官方文档与版本、取得所需工具 | 已有完整本地材料仍可使用；未联网核对的版本明确标注 |
-| Windows 本地游戏环境与进程权限 | 运行随附 `dst_modtest.py`，写唯一测试副本和隔离存档 | Linux CI、云端推理或另一品牌 Agent 不会自动具备该环境 |
-| 查看图像、试听音频、操作 GUI 与真实客户端 | 检查动画、输入、HUD、声音和实际联机效果；需要时由用户参与 | 导出文件或专服日志不能代替画面、听感和多人验收 |
+| Codex | [Build skills](https://learn.chatgpt.com/docs/build-skills) | 用 `$dst-mod-engineering` 或技能选择器，核对实际文件路径 |
+| Claude Code | [Skills](https://code.claude.com/docs/en/skills) | 用 `/dst-mod-engineering`；同名个人/项目技能需核对来源 |
+| Cursor | [Agent Skills](https://cursor.com/docs/skills) | 在 Agent 聊天的 `/` 菜单选择，或到 Customize → Skills 查看 |
+| GitHub Copilot | [安装技能](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills)、[CLI 技能](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills) | 使用所用界面的技能入口；CLI 命令不套用到其他界面 |
 
-按实际主机、游戏版本、权限和依赖判断能力。缺少能力时完成可验证部分，列出待验项。
+让 Agent 确认实际读到的 `SKILL.md` 和当前任务相关参考。没有 Skills 自动发现能力时，提供其绝对路径并显式读取即可。只有对话文本、没有文件访问时，使用 [网页附件方式](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。本 Skill 未逐一完成所有产品的端到端安装与执行测试。
 
-Python、`luaparser`、DST、DMT、ktools 和 FMOD 需按任务另行准备；先检查已有工具与版本。安装和验收见 [缺失工具的准备与安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)，已测范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+## 本地与云端
+
+安装路径属于运行 Agent 的主机。云端工作区不能直接读取用户电脑上的 DST、Mod 或工具：
+
+- Claude 的本地个人技能不会自动成为 Cowork/云端会话技能；按 [官方云端说明](https://code.claude.com/docs/en/skills#use-skills-in-cowork-and-cloud-sessions) 使用账户技能或该环境支持的部署方式。
+- Cursor 的个人技能同步需另行启用，且只同步其支持的位置；项目技能与远端工作区也要实际可读。见 [官方同步说明](https://cursor.com/docs/skills#use-personal-skills-with-cloud-agents)。
+
+## 按任务确认能力
+
+| 能力 | 可完成的工作 | 缺少时 |
+|---|---|---|
+| 读写、检索文件 | 读取 Skill、Mod 和原版源码，修改授权项目 | 仅分析已提供片段或交付补丁 |
+| 终端与进程权限 | 运行 Python、资源工具与定向测试 | 提供命令，运行结果保持未验证 |
+| 网络读取 | 核对官方文档、版本和工具来源 | 使用已有材料并注明版本未联网核对 |
+| Windows DST 环境 | 运行随附隔离专服测试器 | Linux/云端不因此具备本机游戏测试能力 |
+| 图像、音频、GUI 与真实客户端 | 检查动画、HUD、输入、声音与联机效果 | 由具备相应能力的执行者验收 |
+
+脚本入口可用 `python scripts/<脚本名>.py --help` 检查。帮助成功只证明入口可运行，不证明依赖齐全或游戏功能通过。Python、`luaparser` 和素材工具按任务准备，见 [环境发现](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md)、[工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 与 [测试](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
 
 ---
 
 ## 来源：`references/animation-recipes.md`
 
-原始 SHA-256：`649e2bc455ab30d6e86b51bb2070405277795583b4a1ba7bf3ebe744f1551eb7`
+原始 SHA-256：`94801522bc7b4a3dd4023d8b688e1078a5edc1c550550144cbd7bb2c7427f936`
 
 # 帧序列、锚点与旋转动画
 
@@ -804,7 +777,7 @@ if (-not (Test-Path -LiteralPath $ResultZip -PathType Leaf)) { throw '未生成�
 
 FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持客户端可见；后续动态变化使用正确的同步或客户端更新路径。`SetPristine()` 不是“所有属性之后永远不能变”的边界。循环动画需明确停止和清理，单次动画用匹配的完成事件/状态回收。泛光 shader 和 Light 照明不同，不能靠泛光掩盖缩放模糊。
 
-历史验证仅覆盖合成小图编译、多个 atlas/sampler 输出及部分原版资源解析，**未覆盖真实大图序列或跨图集资产的客户端渲染**；详见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。按本页制作的素材仍需完成上述客户端验收。
+小图编译、atlas/sampler 结构与资源解析检查不能代替真实大图序列、跨图集资产的客户端渲染验收。按本页制作的素材仍需完成上述客户端检查。
 
 声音制作见 [音频与粒子](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/audio-particles.md)。
 
@@ -813,7 +786,7 @@ FX 公共初始化中的 AnimState 视觉配置参照当前同类原版，保持
 
 ## 来源：`references/assets-animation.md`
 
-原始 SHA-256：`48b75f47b613a11b3e219a239a91097b6986520c6444c3de5e1e1901152fb952`
+原始 SHA-256：`a4f1511a05cb0b7334eb681f1cbf0758546a77e886a7a08d6b64cf494bb9b13f`
 
 # 图像、图集与动画
 
@@ -953,14 +926,14 @@ PowerShell 示例（先把变量设为当前环境中已确认的绝对路径）
 5. 加载/无头运行验证与真实客户端视觉验收分开记录。客户端检查装备、卸下、皮肤/变身、运动方向、特效结束和远程观察。
 6. 修改范围内同步 source/runtime，逐文件哈希；保留可重编的源素材和工具参数。资源删减要先查所有引用再隔离测试。
 
-源码核对入口：`spear.lua`、`sword_lunarplant.lua`、`simutil.lua`、`standardcomponents.lua`、`constants.lua`，以及官方 `buildanimation.py`；按 [环境发现](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md) 定位当前版本。工具分工见 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)，历史样本和原版 ZIP 检查范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+源码核对入口：`spear.lua`、`sword_lunarplant.lua`、`simutil.lua`、`standardcomponents.lua`、`constants.lua`，以及官方 `buildanimation.py`；按 [环境发现](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md) 定位当前版本。工具分工见 [ktools 作者说明](https://github.com/nsimplex/ktools/blob/master/README.md)，验证边界见 [公开限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
 
 
 ---
 
 ## 来源：`references/audio-particles.md`
 
-原始 SHA-256：`35e88ac3a0595c917a8e90287d66efd6d1bed1de8a4520bc1de7f84701125121`
+原始 SHA-256：`d81aac5c170f5c36722472b686ffdee755ec3d243a370abfca603ecb2feb69c7`
 
 # 音频与粒子特效
 
@@ -1074,7 +1047,7 @@ Get-ChildItem -LiteralPath $OutputDirectory -File
 4. **声音实测**：用目标工具试听作为中间检查，再到客户端检验第一次触发、循环/停止、近远距离、音量滑块、连续触发、多玩家观察和切世界。没有音频输出/客户端时保留这项待验收，不能用银行大小代替。
 5. **回修**：记录实际事件、主客机、Mod 列表、输入与银行版本和失败日志。Lua 无异常但客户端退出时结合原生崩溃记录排查，不先认定一定是 WAV 参数或 FSB 版本；未经解析的 dump 也不能当成根因。
 
-本页提供制作与排错流程；新声音银行仍需编译、客户端加载和试听验收。已核验范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+本页提供制作与排错流程；新声音银行仍需编译、客户端加载和试听验收。验证边界见 [公开限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
 
 ## 粒子系统与网络边界
 
@@ -1109,7 +1082,7 @@ local assets = {
 - `persists=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
 - 混合模式、泛光和 shader 需以当前资产及客户端效果验证；专服 PASS 不证明有画面。需要截图/视频验收时明确抽检的实例、时段和机位，不声称看过未播放素材。
 
-核验依据：当前 `prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；核验环境中的 FMOD Designer help；随工具提供的《FMOD Designer 2010》80、142、152-157、205 页；该环境中的 FSB 文件头统计。现代 FMOD Studio 文档可帮助理解概念，不能替代这些 DST 目标版本证据。
+源码核对入口：`prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；参数参考随工具提供的《FMOD Designer 2010》80、142、152-157、205 页。行号与工具文档有各自版本范围；现代 FMOD Studio 文档可帮助理解概念，不能代替目标 DST 版本的实际验证。
 
 
 ---
@@ -1291,7 +1264,7 @@ Brain 的行为节点选择目标
 
 ## 来源：`references/combat-buffs-containers.md`
 
-原始 SHA-256：`e56f20c3525c0ec546b8835bfe5ab281297498286057e5110265664188dacf44`
+原始 SHA-256：`fc90ccde47fe31f3fcbf452259f7f23c00ab2d4dc3a8d968b5aa21bb8579e2a7`
 
 # 战斗、Buff、容器与冷却
 
@@ -1299,7 +1272,7 @@ Brain 的行为节点选择目标
 
 ## 范围伤害和位面伤害
 
-原版已有 `combat:DoAreaAttack(target, range, weapon, validfn, stimuli, excludetags, onlyontarget)`。它排除普通范围分支中的主目标和攻击者，检查目标、发 `onareaattackother`、通过 `CalcDamage` 同时取得普通及特殊伤害并调用 `GetAttacked`。现成路径符合需求时优先复用；自定义形状须保留完整结算链。
+原版已有 `combat:DoAreaAttack(target, range, weapon, validfn, stimuli, excludetags, onlyontarget)`。它排除普通范围分支中的主目标和攻击者，检查目标、发 `onareaattackother`、通过 `CalcDamage` 同时取得普通及特殊伤害。756039 的该链调用公共 `GetAttacked`；759671 的普通查询与 `onlyontarget` 分支调用 `GetAttacked_Internal(..., true)`。现成路径符合需求时优先复用；自定义形状须保留完整结算链。
 
 教程火腿棒例子直接替换 `weapon.onattack`、硬编码满新鲜伤害且遗漏特殊伤害；不能当可直接复用模板。叠加效果应保存原回调并按正确签名调用，检查空 target、目标有效性和组件。`IsValidTarget` 也不自动表达设计上的“不伤盟友/随从/同类”；将 PvP、阵营、随从、主目标重复伤害明确列入筛选。
 
@@ -1375,6 +1348,16 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 - `prefabs/moonrockseed.lua`；`components/builder.lua:235-301`；`components/playerprox.lua:44-59,165-180`：科技选择与纯邻近触发。
 
 伤害测试需比较普通/位面/护甲/PvP、主目标不重复、范围边缘和叠加来源；Buff 测重复/到期/移除/死亡/读档；容器测多人打开、转移、召回与磁盘重启。网络展示、真实玩家输入和第三方 Mod 组合另做客户端验收。
+
+## 759671：受击入口、返回与 Hook 覆盖
+
+核验源为 public/759671/build26148036。`components/combat.lua:570–572` 的公共 `GetAttacked` 调用 `GetAttacked_Internal(..., nil)`，没有 `return`，因此正常返回 nil；内部方法 `:574–738` 仍返回 `not blocked`，已死亡目标早退 true。两者都不能作为实际扣血成功的布尔证明。不要把所有直接伤害机械改为 `Internal(..., true)`。
+
+759671 的 `DoAttack` 直接结算、反伤、重定向接收者与 `DoAreaAttack` 直接调用 Internal。仅包装公共方法会漏这些路径；要覆盖此收口时按当前定义保留全部参数/返回、其他 Mod 的包装及清理，只包一个收口避免双处理。`attacked/onhitother/blocked/killed` 载荷的 `from_doattack` 是调用路径标记；重定向和反伤也会传 true，不等同近战、玩家攻击或有效伤害。事件载荷与函数回调参数不能混用。
+
+标准 `projectile:Hit` 经 `DoAttack` 进入内部链，且759671在 DoAttack 移除投射物后会跳过后续 onhit；`complexprojectile:Hit` 基类只取消并调用 prefab 的 onhitfn，实际伤害要查具体回调。不能说所有投射物都走同一路径。结算、buff触发、耐久与事件收益均需按具体调用者复核；详见 [版本核验范围](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
+
+SGwilson 的 `nointerrupt`、`canelectrocute`、`superheavyarmor` 及各分支条件影响759671受击/击退；事件被发出不证明状态机接受它。这些是源码边界，仍需针对实际目标做游戏验证。
 
 
 ---
@@ -1633,13 +1616,13 @@ end)
 
 ## 来源：`references/dst-mod-tool.md`
 
-原始 SHA-256：`500c05f3cb84d7851266ca0737dbcca93ddbdd3e2195bad1bd262de66a189926`
+原始 SHA-256：`54d9c2333c48ea483a6a64e7c79d4fd8904b3261c75d05be08e1f89a175137aa`
 
 # DST Mod Tool：文档编辑、脚本接口与视觉验收
 
 这是 DMT 的 Lua 脚本工作流参考页，适用于提供下述 `script --help` 接口的版本。先读取已安装程序的帮助，核对 API、参数和支持格式后再执行示例。
 
-适用：`.dmt` 工作区、SCML/ZIP 资源导入、符号和动作批量编辑、PNG/GIF 预览。接口说明不代表各格式导入、导出或编译均已实测；资源加载与联机效果仍需在游戏中验收。历史接口核对范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+适用：`.dmt` 工作区、SCML/ZIP 资源导入、符号和动作批量编辑、PNG/GIF 预览。接口说明不代表各格式导入、导出或编译均已实测；资源加载与联机效果仍需在游戏中验收。使用前核对当前版本的实际帮助；没有实际执行的格式与功能保持未验证。
 
 尚未安装 DMT 时，先按 [工具安装与首次验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) 选择匹配系统的作者发行包并验证所需功能。
 
@@ -1885,7 +1868,7 @@ return Counter
 
 ## 来源：`references/items-food-plants.md`
 
-原始 SHA-256：`52dc5f24f5c5b94d03089837d69094d1e246564e0541053cda32af92262415be`
+原始 SHA-256：`78bdd9d72859beb7ae965320cd957538085c6d36af620ee279f70c00b175bb1f`
 
 # 物品、武器、料理与植物
 
@@ -2012,16 +1995,24 @@ end
 
 按实际改动验证：装备/卸下与伤害只结算一次；破损后修复菜单与消费；配方可见性/科技/蓝图；食材正例反例和冲突组合；种植剩余堆叠数量；生长、休眠、保存后重载。显示资源、客户端动作预测、远程玩家菜单与几何放置兼容必须用真实客户端，语法或无头成功不能代替。
 
+## 759671：嵌套所有者与施工停止
+
+`components/inventoryitem.lua:501–506` 的 `GetGrandOwner` 沿 owner 的 inventoryitem 向上递归；递归结果为 nil 时回退本层 owner，无直接 owner 时返回 nil；地面容器本身可以成为返回值。因此 `GetGrandOwner() ~= nil` 不等于玩家持有，访问 combat/inventory 前要判断实际实体及组件，不能与只检查直接 owner 的 `IsHeld` 互换。地面容器、套娃容器与真实玩家场景仍需复验。
+
+`constructionbuilder:StopConstruction` 在 `:107` 改为 `PushEventImmediate("stopconstruction")`；SGwilson `constructing` 的 `:19941–19957` 使用 `statemem.stoppedconstruction` 避免退出时再次停止。包装该方法或复制 onexit 时保留新重入/退出边界。这是 constructionbuilder 的链路，不能泛化成普通 builder API 全部改版。
+
 
 ---
 
 ## 来源：`references/kb-retrieval.md`
 
-原始 SHA-256：`77fdd063fd56b05df8b86ace8dc54de06294f9977031a3bf9d3b03e1eb7227bd`
+原始 SHA-256：`34b50086e00ce7e4c172a0a61dce7f89f93c368cfe6c054de9ef25792300c44d`
 
 # DST 工程知识库检索策略
 
 ## 范围与可用性
+
+独立公开 Skill 不附完整 KB 或 MCP；下列检索约定只在你另行取得且有权使用的服务/资料实际可访问时适用。没有 KB 时，使用自己的合法本地源码继续工作，不能虚构查询。参见 [接入边界](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
 
 知识库保存可复用的工程经验；当前 Mod 源码、目标游戏版本的原版实现和实际验证仍是判断依据。本策略适用于不同 Agent 和运行环境，不要求某个厂商、MCP 服务、工具命名或固定的知识库目录结构。
 
@@ -2056,7 +2047,7 @@ end
 | 任务上下文包（`get_context_bundle`） | 需要多个知识类别协同的复杂任务。用当前接口支持的模式和预算；摘要不足时再读取少量关键记录全文，不追求填满上限。 |
 | 知识库校验（`validate_kb`） | 知识库维护或明确的可用性诊断。普通开发、审查和排错无需每次全库校验。 |
 
-本仓库可选服务的实际参数见 [工具定义](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/docs/mcp-tools.json)：模式参数使用小写（如 `architect`、`debug`），上下文预算为 `compact`、`normal`、`deep`。复杂设计命中相关 ARP 时读取完整条目，再围绕实际问题选择决策、规则、事实、模式、反例与测试；不要对每个小函数重跑整个流程。
+以当前服务的 `tools/list` 和随服务提供的接口文档为准；不同版本可能只有部分能力。复杂设计读取少量关键记录全文，再查必要的决策、事实、反例与测试，不为每个小函数重跑全部检索。
 
 ## 命中筛选与检索范围
 
@@ -2076,6 +2067,18 @@ end
 ## 缺口与故障回退
 
 知识库无匹配、范围不覆盖或检索工具不可用时，将相应结论记作 Knowledge Gap 或说明 KB unavailable，并写明具体原因和可确认的检索范围。然后继续用当前项目代码与适用版本的原版源码、官方资料完成可做的调查。检索失败不能升级成“知识不存在”；未成功调用不能写成“已查询知识库”。
+
+
+## 可选服务的接口限制
+
+以下约束仅在实际服务暴露相应接口时适用；安装本 Skill 不会获得这些工具，旧版或其他 KB 也不保证支持全部字段。
+
+- **来源版本**：若工具支持 `source_epoch`，先查看合法 token 和默认来源，再核对本地源码；后续 `get_entry`、证据解析和关联展开继续使用同一显式 epoch，不能丢失后落回默认。不同树身份不互相替代。若 `lookup_api` 支持 `source_file`，使用精确相对路径消歧；该字段不自动属于其他工具。声明与存在性仅作导航，不是行为证据，file-local 函数不因此成为公共 API。
+- **投影与角色**：若使用配套服务的 Native Coding 投影，每条恰好十字段、最多五条。研究展开需显式 reviewer 时，`mode=review/research` 不代替角色授权，也不解除 Coding HOLD。模式参数按接口使用小写，如 `architect`、`debug`。分别读取 `knowledge_status`、`retrieval_status`、`coding_status`：canonical 接纳、可检索与可用于 Coding 是不同状态，保留 hold/prohibited 和排除范围。
+- **预算**：采用该预算合同的服务中，`compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节，按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录的多个原子合为一张卡，不能拆卡突破限制。其他服务按自己的实际合同处理。
+- **完整性**：记录命中不代表其中行为、分支、副作用、返回、依赖及证据全部交付。读取 `atomic_delivery`、`withheld_atoms`、`knowledge_gaps`、`atomic_budget_withheld_count` 与 `budget_withheld_count` 等实际返回字段；未知依赖不能自行称为 optional，延期、UNKNOWN、partial closure 与缺失正文保留原状。具名样例只支持自己的行为、主体、版本与 Scope，不推广为通用契约。
+- **响应内引用**：若返回 `metadata_ref`、`metadata_template`、`shared_metadata` 或同卡 `statement_ref`，按该服务的恢复规则展开后再读。提供 `expand_l1_metadata` 的实现可用它恢复；等价解析需使用同卡 JSON Pointer，拒绝悬空、链式、循环、跨卡或跨 kind 正文引用。正文复用不合并来源与 Scope，也无法补回延期诊断、缺失证据或未知依赖。
+- **响应身份**：若某服务的默认 `get_entry` 十字段投影不带来源元数据，需用其支持的显式视图（例如 `view="decision"`）读取身份；其余响应核对实际返回的 `source_environment`，不补造未返回字段。来源 token 或导航不授予源码正文，也不证明整项任务已覆盖。
 
 
 ---
@@ -2163,7 +2166,7 @@ Buff 的 `persists=false` 不等于一定不存档：当前 `debuffable:OnSave` 
 
 ## 来源：`references/networking-rpc.md`
 
-原始 SHA-256：`0cea2f07b471708f091215b419b73dfe21859c7f8579fb909967fe26853f2848`
+原始 SHA-256：`6feec131bc56dd9e55e6e01bb9afb98fd8a5a7a4fafe2ec506dc0a20874d9991`
 
 # 联机权威、Replica 与 RPC
 
@@ -2248,12 +2251,16 @@ end)
 - `modutil.lua:852-916`：Mod API 注入和 legacy 表说明。
 - `prefabs/player_classified.lua:815-823,1208,1314`：dirty 加初始同步的原版例子。
 
+## 759671：玩家 classified 上的吞食声音状态
+
+吞食声音从旧玩家 `_wormdigestionsound` 搬到 `player.player_classified.wormdigestionsound`。新 `prefabs/player_classified.lua:1088–1104,1274,1650–1651` 定义 dirty 处理、监听与 net_bool；生产方为 `worm_boss_util.lua:290–296`，SGwilson `:14814–14816` 退出清理。使用时处理 classified 尚未附着/已经移除，事件监听对象及声音/DSP恢复按新链核对；客户端分支需要 parent 与 HUD。沿用当前原版角色工厂和SG时不必自行重建该 netvar。这一迁移不代表所有 Mod RPC 或 netvar 契约改变。
+
 
 ---
 
 ## 来源：`references/sources-and-corrections.md`
 
-原始 SHA-256：`eb6d798e34697104413cfb3dfdc50de7940cc041b65d19b464b8dcd6b2eba1e8`
+原始 SHA-256：`f62d0c27b26f39633ae745fed119c7080ec2a5463b382d60876c3b7d90c8b6cc`
 
 # 来源、可信度与纠错范围
 
@@ -2303,18 +2310,20 @@ Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存�
 | 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
 | 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
-检查范围、工具回归结果与未覆盖内容见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。各专题提供源码文件/函数定位、适用条件和验证边界，供读者复核。
-
-源码定位使用相对文件名与函数名，行号仅对应引用快照；源码哈希见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。游戏更新后需重新核对相关实现。
+各专题提供源码文件/函数定位、适用条件和验证方法。行号仅对应引用快照，游戏更新后需重新核对相关实现；整体边界见 [能力与版本限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
 
 专题中的项目案例用于说明机制，数值与美术效果需由当前项目决定。
+
+## 版本化技术说明
+
+`759671` 的公共 `GetAttacked` 返回、内部攻击入口和 `from_doattack` 与旧快照存在差异；电伤仍需区分 `DoAttack` 与直接受击链。具体行为见 [战斗专题](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/combat-buffs-containers.md)。不同版本的证据保留各自范围，源码差异不能代替实际游戏验证。
 
 
 ---
 
 ## 来源：`references/spells-and-custom-stats.md`
 
-原始 SHA-256：`2c7e56534b8a8893baac5fd13b32534c80044cf9c9b45b1215be1f93071a147e`
+原始 SHA-256：`1779c377451d378dc073f29edda76ef40d96e6cc2bdc57e79839027a677113b8`
 
 # 法术、资源数值与徽章
 
@@ -2425,16 +2434,20 @@ Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存�
 - `widgets/badge.lua:6-104,127-146`；`widgets/statusdisplays.lua:SetGhostMode`；`prefabs/player_classified.lua:OnGhostModeDirty`：徽章资源与幽灵 HUD。
 - `actions.lua:344-348,690,719-724`；`components/playercontroller.lua:424-460,5272-5319`；`screens/mapscreen.lua:1298-1380`；`prefabs/pocketwatch_portal.lua:157-219`：地图动作与传送门生命周期。
 
+## 759671 核验补充
+
+`DoAttack` 的电倍率仍在 `components/combat.lua:1195–1213` 计算，公共/内部受击方法不自动补该倍率；`GetWetMultiplier:748–769` 的 wet、moistureimmunity、inventoryitem 与 moisture 分支需独立看，不能把受击入口拆分当电倍率更改。SGwilson `attacked:1847–1944` 中 nointerrupt+canelectrocute 仍有触电分支，其余分支还受绝缘、noelectrocute、恢复窗口等限制。没有据此保证所有角色/Boss响应一致；见 [759671范围](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
+
 
 ---
 
 ## 来源：`references/tool-bootstrap.md`
 
-原始 SHA-256：`910a0a84e148c55d70e082319d152ce6351081131d35153920baaf0acbb05159`
+原始 SHA-256：`4a51c21075856e61f7cf30dd563095c7f138158c9c2c66084194ac2dd8a365d1`
 
 # 动画工具安装与首次验证
 
-用于首次搭建环境，或当前任务缺少可用工具时。先查 [环境发现](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md)，不要以“未找到”结束工作：提出能完成当前产物的最小安装方案；已有工具能通过同样验证时优先复用。本页不捆绑程序，也不要求一次装齐所有工具。
+首次搭建或缺少工具时，先查 [已有环境](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/environment-tools.md)，选择能完成当前产物的最小方案。本页不捆绑程序，已有工具通过相同验证时可继续使用。
 
 ## 按任务选择最小工具
 
@@ -2452,8 +2465,8 @@ Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存�
 
 1. 读取项目配置，确认操作系统、CPU 架构、GUI/终端/联网能力、已有工具的绝对路径与版本。Windows 可用 `Get-Command ktech,krane -ErrorAction SilentlyContinue` 查 PATH；未命中不代表未安装，继续查用户指定目录和 Steam 库。macOS/Linux 可查 `uname -m`、`command -v ktech`。不根据当前 Agent 名称猜测宿主平台。
 2. 对缺项一次说明：任务需要什么产物、候选工具和作者来源、实际包版本/平台/架构、目标目录、必要依赖、首次验证方法。只有具体功能需要时才建议安装；不要把整套工具清单变成前置条件。
-3. **先检查已有安装授权。** 用户已经同意本任务的工具及必要依赖安装时，在该范围内继续下载、安装和验证，不逐个步骤重复提问；尚无授权时先让用户选择具体方案。仅要求“开发 Mod”或“补写安装文档”不自动等于同意新增软件。更换来源、增加未包含的系统依赖或改变安装范围时补充说明并取得相应授权。
-4. 授权后从下表作者入口选择实际存在的包，记录页面、版本、平台/架构和下载文件 SHA-256。有作者校验值/签名时对照；自己计算的哈希仅作记录，不能冒充作者认证。版本号不明或平台不匹配时先解决，不拼接猜测的下载 URL。
+3. 按用户已有授权安装；新增软件、系统依赖或改变安装范围尚未授权时，说明具体方案并确认。
+4. 从下表作者入口选择匹配平台/架构的实际发行包，记录版本与下载文件 SHA-256。有作者校验值/签名时对照；自算哈希只标识文件，不证明来源。
 5. 免安装 ZIP 解压到独立版本目录，例如 `C:\Tools\DST\工具名\版本\`；保留随包 DLL/配置，不覆盖已有版本，不改全局 PATH。安装器按已确认的范围执行；Steam 登录、验证码、账号授权和协议确认交由用户完成。安装完成后定位实际可执行文件，用绝对路径运行。
 
 ## 作者入口与安装路线
@@ -2476,13 +2489,13 @@ Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存�
 
 - 原作者下载页说明历史 Windows 包名以 `-win32` 结尾，需要 **VC++ 2013 x86** 运行库，且该二进制包不含 ZIP 输入支持；因此先解压动画 ZIP 再传目录。运行库确实缺失时，从[Microsoft 官方入口](https://www.microsoft.com/en-us/download/details.aspx?id=40784)按已批准的依赖范围处理，不从 DLL 下载站补文件。此要求针对该历史构建，不套用到所有 ktools 构建。
 - GitHub 自动生成的 `Source code` 压缩包不是免安装程序。下载前查看实际附件清单；没有匹配二进制时，再评估源码构建或其他工具。
-- 需要从源码构建时，按所选分支 README 确定编译器、CMake、ImageMagick 开发库，按需使用 libzip；两分支依赖版本可能不同。先说明新增依赖和构建范围，再执行授权的安装/构建；输出保留在独立目录，不默认 `sudo make install`。已有 Docker 环境可评估维护分支作者提供的容器路线；不要为一次图片转换默认引入 Docker 或整套编译环境。
+- 需要从源码构建时，按所选分支 README 确定编译器、CMake、ImageMagick 开发库，按需使用 libzip；两分支依赖版本可能不同。构建依赖纳入安装范围；输出保留在独立目录，不默认 `sudo make install`。已有 Docker 环境可评估维护分支作者提供的容器路线；不要为一次图片转换默认引入 Docker 或整套编译环境。
 
 ## 首次验证：得到产物才算工具可用
 
 在自有临时目录放入一张小型 RGBA PNG，含透明边缘和非对称图案；动画任务再放入一份图片引用完整的极简 SCML 副本。记录输入哈希、工具版本、命令、输出及日志。不对现有工程直接运行会预处理原图的自动编译器。
 
-下面是 PowerShell 示例：将路径替换为**实际已安装且获准运行**的工具和自有输入。先创建本轮输出目录，再仅运行已选择的那条管线；不覆盖素材。
+下面是 PowerShell 示例：将路径替换为实际工具和自有输入，创建独立输出目录，只运行所选管线。
 
 ```powershell
 $ProbeOut = Join-Path ([IO.Path]::GetTempPath()) ('dst-tool-probe-' + [guid]::NewGuid().ToString('N'))
@@ -2637,7 +2650,7 @@ Lua 契约测试可验证调用顺序、清理和 preview 回调次数；不能�
 
 ## 来源：`references/worldgen-spatial.md`
 
-原始 SHA-256：`a007921c4c23575c1866053961522b665fd8d0d648e22503c5bf6d39662dc622`
+原始 SHA-256：`2e14b0ce9ba8f7db85c286b10be68b76c60156657e9b7a962a25bb1039a2b8f8`
 
 # 世界生成、地形与空间可视化
 
@@ -2734,56 +2747,36 @@ end
 
 验证报告分开记录：Lua/数据结构检查、新地图生成结果、服务器运行与存读档、真实客户端视觉和多人行为。单个固定 seed 成功不能证明所有生成条件可用。
 
+## 759671：虚拟房间集合与瞬移
+
+该快照中的旧 Vault helper 已由 VirtualRoomSet（VRS）链替代；不要继续访问 `world.net.components.vault_floor_helper` 或依赖旧传送器世界事件。`components/map.lua` 的 Vault 公共包装改用 VRS 查询；其底层引擎实现与复制不能仅靠 Lua 读取证明。
+
+`componentutil.lua:1344–1435` 对瞬移检查集合进入/离开、大厅及同集合寻路；`IsVisibleRespectingVRSFromPointToPoint` 共享边界判断但忽略同集合寻路，不是瞬移权限的等价别名。自定义 Blink/传送不能仅检查 tile passable。玩家读档安全点也按 VRS 寻找，不保证一律搬到大厅中心。见 [版本核验范围](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)；Lua 源码检查不能代替专服与远端行为验证。
+
 
 ---
 
 ## 来源：`templates/local-validation.md`
 
-原始 SHA-256：`3117ea62a892340c4128a4cd3e82cb61bb88ca7c7ef715adcd80ebf3013352e9`
+原始 SHA-256：`1c967f73cbf7cb70ce8c504bb01e156eeac962b10d0bd614c986d456e53d8732`
 
-# 本机验证回传
+# 本机验证结果
 
-复制填写；不知道写“未知”，未执行写“未执行”。仅回传相关证据，原始日志与私人存档留在本机。
+用于记录云端补丁在实际 DST 环境中的结果；只填写本次改动相关项。
 
-## 任务与环境
+- 任务、补丁版本与验证时间：
+- 游戏版本、Mod 版本与配置、相关兼容 Mod：
+- 实际加载副本及判定依据：
+- 场景：房主 / 远端客户端 / 专服，地表 / 洞穴：
+- 复现步骤、期望结果与实际结果：
 
-- 任务 / 补丁编号 / 验证时间：
-- 期望结果 / 实际结果：
-- 操作系统 / 架构 / 执行者（本人或本机 Agent）：
-- 场景：房主 / 远端客户端 / 专服；地表 / 洞穴；单人 / 多人：
-- 游戏版本 / scripts.zip SHA-256（已取得才填）：
-- Mod 版本 / 提交 / 配置 / 同时启用的相关 Mod：
-- 源码副本 / 游戏运行副本（可用本地别名，说明对应关系）：
-- 本轮实际加载的 Mod 路径或标识 / 判定依据：
-- 使用的工具、版本与路径别名：
-- 本轮授权范围 / 未授权或不可执行的步骤：
+| 检查 | 实际步骤 / 命令 | 结果与证据 |
+|---|---|---|
+| 语法、声明、资源结构 | | |
+| 专服行为、保存与重启 | | |
+| 真实客户端、视觉、音频 | | |
 
-## 文件与应用结果
-
-| Mod 相对路径 | 原文件 SHA-256 / 版本 | 应用后 SHA-256 | 新增/修改 | 应用结果 |
-|---|---|---|---|---|
-| 待填写 | 未知 | 未执行 | 待填写 | 待填写 |
-
-- 补丁是否与原版本匹配 / 冲突处理：
-- 是否在独立副本应用 / 源码与运行副本差异：
-- 存档保护方式（不得覆盖私人存档） / 回退位置：
-
-## 执行证据
-
-| 检查层级 | 工作目录别名与完整命令 / 手工步骤 | 退出码 | 本轮 ID / 完成或失败标记 | 日志/截图/产物 |
-|---|---|---|---|---|
-| 语法/API/资源结构 | 未执行 | 不适用 | 不适用 | 无 |
-| 专服行为/保存重启 | 未执行 | 不适用 | 不适用 | 无 |
-| 房主+远端客户端/视觉/听感 | 未执行 | 不适用 | 不适用 | 无 |
-
-- 复现步骤 / 第一个失败点 / 错误前后文与完整堆栈：
-- 专服实际断言 / 观察窗 / 保存与重启是否发生：
-- 截图观察者、动作与时间点 / 声音实际试听结果：
-- 日志剔除字段（令牌/密码/无关私人内容；保留结构占位）：
-- 已确认结论 / 条件性结论 / 仍待决定的玩法：
-- 未测项、原因与下一步：
-
-退出码、标记和日志应结合判断；记录命令不表示已执行。不要用模拟或专服结果替代真实客户端验收。
+附首个失败点、完整堆栈及相关日志或截图；未执行项记为未测。回传前替换令牌、密码与无关私人内容。静态或专服结果不能代替真实客户端验收，见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
 
 ---

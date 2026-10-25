@@ -46,8 +46,10 @@ Lua 源码或工具文档中未找到的引擎绑定，不能直接判为不存�
 | 多图集必须正方形、所有素材可用同一抠图与锚点算法 | animation-recipes.md |
 | 专服打印即音效通过、全部 GUID 可无差别替换 | audio-particles.md |
 
-检查范围、工具回归结果与未覆盖内容见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。各专题提供源码文件/函数定位、适用条件和验证边界，供读者复核。
-
-源码定位使用相对文件名与函数名，行号仅对应引用快照；源码哈希见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。游戏更新后需重新核对相关实现。
+各专题提供源码文件/函数定位、适用条件和验证方法。行号仅对应引用快照，游戏更新后需重新核对相关实现；整体边界见 [能力与版本限制](../docs/public-limits.md)。
 
 专题中的项目案例用于说明机制，数值与美术效果需由当前项目决定。
+
+## 版本化技术说明
+
+`759671` 的公共 `GetAttacked` 返回、内部攻击入口和 `from_doattack` 与旧快照存在差异；电伤仍需区分 `DoAttack` 与直接受击链。具体行为见 [战斗专题](combat-buffs-containers.md)。不同版本的证据保留各自范围，源码差异不能代替实际游戏验证。

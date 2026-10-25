@@ -110,7 +110,7 @@ Get-ChildItem -LiteralPath $OutputDirectory -File
 4. **声音实测**：用目标工具试听作为中间检查，再到客户端检验第一次触发、循环/停止、近远距离、音量滑块、连续触发、多玩家观察和切世界。没有音频输出/客户端时保留这项待验收，不能用银行大小代替。
 5. **回修**：记录实际事件、主客机、Mod 列表、输入与银行版本和失败日志。Lua 无异常但客户端退出时结合原生崩溃记录排查，不先认定一定是 WAV 参数或 FSB 版本；未经解析的 dump 也不能当成根因。
 
-本页提供制作与排错流程；新声音银行仍需编译、客户端加载和试听验收。已核验范围见 [验证记录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/validation.md)。
+本页提供制作与排错流程；新声音银行仍需编译、客户端加载和试听验收。验证边界见 [公开限制](../docs/public-limits.md)。
 
 ## 粒子系统与网络边界
 
@@ -145,4 +145,4 @@ local assets = {
 - `persists=false` 仅表示不存档，不代表自动在动画/计时结束时移除。父子关系、事件监听、延迟任务、EmitterManager 注册的清理都要核对；重复进入世界/复活要防止重复生成。
 - 混合模式、泛光和 shader 需以当前资产及客户端效果验证；专服 PASS 不证明有画面。需要截图/视频验收时明确抽检的实例、时段和机位，不声称看过未播放素材。
 
-核验依据：当前 `prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；核验环境中的 FMOD Designer help；随工具提供的《FMOD Designer 2010》80、142、152-157、205 页；该环境中的 FSB 文件头统计。现代 FMOD Studio 文档可帮助理解概念，不能替代这些 DST 目标版本证据。
+源码核对入口：`prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；参数参考随工具提供的《FMOD Designer 2010》80、142、152-157、205 页。行号与工具文档有各自版本范围；现代 FMOD Studio 文档可帮助理解概念，不能代替目标 DST 版本的实际验证。

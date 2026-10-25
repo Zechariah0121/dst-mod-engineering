@@ -4,7 +4,7 @@
 
 ## 范围伤害和位面伤害
 
-原版已有 `combat:DoAreaAttack(target, range, weapon, validfn, stimuli, excludetags, onlyontarget)`。它排除普通范围分支中的主目标和攻击者，检查目标、发 `onareaattackother`、通过 `CalcDamage` 同时取得普通及特殊伤害并调用 `GetAttacked`。现成路径符合需求时优先复用；自定义形状须保留完整结算链。
+原版已有 `combat:DoAreaAttack(target, range, weapon, validfn, stimuli, excludetags, onlyontarget)`。它排除普通范围分支中的主目标和攻击者，检查目标、发 `onareaattackother`、通过 `CalcDamage` 同时取得普通及特殊伤害。756039 的该链调用公共 `GetAttacked`；759671 的普通查询与 `onlyontarget` 分支调用 `GetAttacked_Internal(..., true)`。现成路径符合需求时优先复用；自定义形状须保留完整结算链。
 
 教程火腿棒例子直接替换 `weapon.onattack`、硬编码满新鲜伤害且遗漏特殊伤害；不能当可直接复用模板。叠加效果应保存原回调并按正确签名调用，检查空 target、目标有效性和组件。`IsValidTarget` 也不自动表达设计上的“不伤盟友/随从/同类”；将 PvP、阵营、随从、主目标重复伤害明确列入筛选。
 
@@ -80,3 +80,13 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 - `prefabs/moonrockseed.lua`；`components/builder.lua:235-301`；`components/playerprox.lua:44-59,165-180`：科技选择与纯邻近触发。
 
 伤害测试需比较普通/位面/护甲/PvP、主目标不重复、范围边缘和叠加来源；Buff 测重复/到期/移除/死亡/读档；容器测多人打开、转移、召回与磁盘重启。网络展示、真实玩家输入和第三方 Mod 组合另做客户端验收。
+
+## 759671：受击入口、返回与 Hook 覆盖
+
+核验源为 public/759671/build26148036。`components/combat.lua:570–572` 的公共 `GetAttacked` 调用 `GetAttacked_Internal(..., nil)`，没有 `return`，因此正常返回 nil；内部方法 `:574–738` 仍返回 `not blocked`，已死亡目标早退 true。两者都不能作为实际扣血成功的布尔证明。不要把所有直接伤害机械改为 `Internal(..., true)`。
+
+759671 的 `DoAttack` 直接结算、反伤、重定向接收者与 `DoAreaAttack` 直接调用 Internal。仅包装公共方法会漏这些路径；要覆盖此收口时按当前定义保留全部参数/返回、其他 Mod 的包装及清理，只包一个收口避免双处理。`attacked/onhitother/blocked/killed` 载荷的 `from_doattack` 是调用路径标记；重定向和反伤也会传 true，不等同近战、玩家攻击或有效伤害。事件载荷与函数回调参数不能混用。
+
+标准 `projectile:Hit` 经 `DoAttack` 进入内部链，且759671在 DoAttack 移除投射物后会跳过后续 onhit；`complexprojectile:Hit` 基类只取消并调用 prefab 的 onhitfn，实际伤害要查具体回调。不能说所有投射物都走同一路径。结算、buff触发、耐久与事件收益均需按具体调用者复核；详见 [版本核验范围](../docs/public-limits.md)。
+
+SGwilson 的 `nointerrupt`、`canelectrocute`、`superheavyarmor` 及各分支条件影响759671受击/击退；事件被发出不证明状态机接受它。这些是源码边界，仍需针对实际目标做游戏验证。

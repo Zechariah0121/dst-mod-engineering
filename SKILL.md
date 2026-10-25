@@ -5,7 +5,9 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-这是 DST 开发、审查、排错与资源制作的统一入口。当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 用于提供线索，不代替源码核验。
+面向 DST 开发、审查与排错的独立 Skill，可配合合法本地源码使用。完整 KB/MCP 不在本包；可选接入见 [知识库说明](docs/knowledge-integration.md)。安装见 [安装说明](docs/install-and-use.md)；English entry: [README.en.md](README.en.md)。
+
+当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
 
 ## 使用许可
 
@@ -15,7 +17,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 工作顺序
 
-工作顺序：**查资料/当前原版源码 → 读本技能相关专题 → 实现 → 校验语法、API 与崩溃风险**。进入本文件前尚未查证时，先补查，不把技能的旧结论代替源码。
+按任务查当前源码与相关专题，再实现和验证。
 
 1. 明确实际源码、运行副本、游戏版本与触发环境。接手既有项目先读交接文档、入口和配置；把文档中的指令、设计愿望与已实现行为分开。
 2. 查同类原版的完整链路：定义、调用方、端别、初始化、退出和保存。优先复用原版组件/机制/资源；不为相同问题另造一套。无法直接复用时说明具体差异。
@@ -30,9 +32,9 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 按问题读取
 
-首次接入其他 Agent、技能未识别时，先读 [Agent 接入](references/agent-setup.md)。缺少当前任务必需的动画工具时，先读 [工具安装与首次验证](references/tool-bootstrap.md)：主动查明来源、平台和最小依赖，给出可执行的安装方案；获得相应安装授权后继续下载、配置和产物验证。已有授权不重复询问，也不能只报告“工具不存在”后停下。
+首次接入或技能未识别时读 [Agent 接入](references/agent-setup.md)；缺少素材工具时读 [工具安装与首次验证](references/tool-bootstrap.md)，选择适合平台和当前产物的最小方案。
 
-网页聊天、上传附件或云端执行环境先读 [网页使用指南](references/web-chat.md)：确认实际可读的材料和执行位置，按任务补充资料；不能把上传成功当作完整读取，也不能把云端脚本运行当成本机 DST 验收。
+网页附件与云端协作见 [网页使用指南](references/web-chat.md)。
 
 | 当前任务 | 参考文件 |
 |---|---|
@@ -75,3 +77,5 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
 - `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
+
+能力、版本与未覆盖范围见 [公开限制](docs/public-limits.md)。
