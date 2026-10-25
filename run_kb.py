@@ -8,9 +8,11 @@ from pathlib import Path
 import sqlite3
 import subprocess
 
-from prepare_sources import PreparationError, prepared_runtime
-
 ROOT = Path(__file__).resolve().parent
+# Locate our packaged helper even when the caller uses Python isolated mode.
+# Never depend on the client's working directory or inherited PYTHONPATH.
+sys.path.insert(0, str(ROOT))
+from prepare_sources import PreparationError, prepared_runtime
 
 
 def main(argv=None):

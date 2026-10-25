@@ -8,6 +8,7 @@ import io
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -25,6 +26,15 @@ REBIND = HERE.parent / 'scripts/public_rebind.py'
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_isolated_launcher_locates_packaged_helper_from_other_directory(self):
+        with tempfile.TemporaryDirectory(prefix='isolated-client-') as working:
+            result = subprocess.run([sys.executable, '-I', '-B', '-X', 'utf8',
+                str(HERE.parent / 'run_kb.py'), 'mcp-config'], cwd=working,
+                capture_output=True, text=True, encoding='utf-8', timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        config = json.loads(result.stdout)['mcpServers']['dst_engineering_kb']
+        self.assertIn(str(HERE.parent / 'run_kb.py'), config['args'])
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='synthetic-', dir=HERE)
         self.addCleanup(self.temporary.cleanup)
