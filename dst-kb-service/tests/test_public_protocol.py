@@ -170,7 +170,7 @@ class PublicProtocolTests(unittest.TestCase):
         self.assertEqual([reply['id'] for reply in replies], [1, 2, 3, 4])
         self.assertEqual(replies[0]['error']['code'], -32000)
         self.assertEqual(replies[1]['result']['protocolVersion'], '2025-06-18')
-        self.assertEqual(replies[1]['result']['serverInfo']['version'], '0.3.0')
+        self.assertEqual(replies[1]['result']['serverInfo']['version'], '0.3.1')
         specs = {item['name']: item for item in replies[2]['result']['tools']}
         self.assertEqual(set(specs), TOOLS)
         for name, spec in specs.items():
@@ -280,7 +280,7 @@ class PublicProtocolTests(unittest.TestCase):
         service = package / 'dst-kb-service/dst_kb_cli.py'
         service.parent.mkdir()
         service.write_text('from pathlib import Path\nPath(__file__).parents[1].joinpath("service-was-started").write_text("bad")\n', encoding='utf-8')
-        run = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(package / 'run_kb.py'), 'serve'],
+        run = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(package / 'run_kb.py'), '--mode', 'full', 'serve'],
                              capture_output=True, text=True, encoding='utf-8', timeout=30)
         self.assertEqual(run.returncode, 2, run.stderr)
         self.assertEqual(run.stdout, '')

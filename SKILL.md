@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 当前 187 条公开知识（64 基础 + 13 Native AI + 110 Core）。同一发行包包含 MCP 九工具服务与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
+面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 当前 187 条公开知识（64 基础 + 13 Native AI + 110 Core）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
 当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
 
@@ -32,7 +32,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
 
-MCP 需先从合法当前与历史源码运行来源准备；单份当前 ZIP 仍缺历史范围时，继续文件阅读，不声称完整 MCP 可用。模式、九工具、当前来源环境、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
+MCP 默认 `--mode auto`：来源尚未准备时可用 `search_catalog` 导航全部 187 条目录、用 `read_public_entry` 显式按 `purpose="review"` 审阅公开材料；目录模式不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不代表运行验证。完整九工具模式需合法当前与历史来源全部准备完成；准备成功后重启 MCP 会话才能切换工具集。已准备缓存损坏或包版本变化时 `auto` 报错；可显式 `--mode catalog` 阅读公开材料。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
 
 ## 按问题读取
 

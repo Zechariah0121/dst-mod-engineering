@@ -1,6 +1,6 @@
 # DST 工程知识库读取与检索
 
-当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。同一完整发行包支持直接文件阅读，也包含 MCP 九工具服务与来源准备工具。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
+当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。同一完整发行包支持直接文件阅读，也包含 MCP 目录模式、完整九工具模式与来源准备工具。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
 
 ## 按任务读取文件
 
@@ -20,7 +20,18 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 ## MCP 接入与模式
 
-先按 [安装说明](../docs/install-and-use.md) 在包根目录准备来源，再发现当前客户端实际暴露的九工具：
+启动选项 `--mode auto|full|catalog` 与下文的任务 `mode` 是不同参数。`run_kb.py` 默认 `auto`：仅在来源未准备（`SOURCES_NOT_PREPARED`）时进入目录模式，准备有效时启动完整模式。已准备缓存损坏或包版本变化时明确报错，不静默退回目录模式。`--mode catalog` 可显式阅读公开材料；`--mode full` 要求全部来源已准备。`mcp-config` 输出相同的启动选择，也可用 `mcp-config --mode full` 锁定完整模式。
+
+目录模式只有以下两工具，可以导航全部 187 条记录：
+
+| 工具 | 参数与用途 |
+|---|---|
+| `search_catalog` | `query`；`limit` 默认 5、最大 20。只返回目录导航，不代表正文已读 |
+| `read_public_entry` | `id`；`purpose` 只允许 `"review"`，调用时必须显式填写；可选 `pointer` 为条目内 JSON Pointer；`max_bytes` 默认 12000、最大 24000。审阅所选公开材料 |
+
+目录审阅不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不冒称运行验证，也不放松 Scope、类型、三轴状态或 Core Coding HOLD。若所选正文超过预算，服务不截断正文；按响应提示选择较小 `pointer` 再读。不要把目录摘要当作事实投影或完整证据。
+
+完整模式先按 [安装说明](../docs/install-and-use.md) 准备合法当前及全部必需历史来源。两种模式的工具集均在启动时固定；准备成功后重启 MCP 会话，才能从两工具切换到下列九工具，并在客户端核对实际暴露的工具：
 
 | 工具 | 用途 |
 |---|---|
@@ -36,7 +47,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 先做小范围查询，复杂问题再展开少量关键记录。模式参数使用小写：`architect` 设计，`implement` 已确定方案实现，`review` 审查，`debug` 排错，`research` 案例研究。`kb_curator` 只用于用户明确要求的维护；检索接口不是写入接口。
 
-## 版本、角色与预算
+## 完整模式的版本、角色与预算
 
 - 当前唯一运行环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；服务不提供历史环境切换。条目保留历史原版证据和各自适用范围，不能改名为当前源码事实；目标游戏仍需单独核对。
 - 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
@@ -55,6 +66,6 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-The single complete package contains 187 records for task-specific file reading and provides MCP after local source preparation. File mode preserves the same Scope, claim types, states and admission limits: Native AI Coding uses exactly the ten fields above and at most five records; Core Coding HOLD remains binding. The only runtime source epoch is 759671; historical evidence retains its original scope. Budget limits, evidence-node selection, deferred content and same-card reference rules apply to MCP responses. A source slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
+The single complete package contains 187 records for file reading and MCP. Default `auto` uses two public catalog tools only when sources are unprepared (`SOURCES_NOT_PREPARED`); prepared-cache corruption and package version changes remain errors. Explicit `catalog` provides navigation and public review only, without Coding context, restored source evidence or original Source/Identity Guards. `search_catalog` has a default limit of 5 and maximum of 20; `read_public_entry` accepts only `purpose="review"`, optional record-relative JSON Pointer, and a default 12000 / maximum 24000 byte budget. Oversized content is withheld rather than truncated; select a smaller pointer. Full mode requires all authorized source ranges. Restart the MCP session after preparation to switch from two to nine tools. File and MCP access preserve Scope, types, states and admission limits: Native AI Coding uses exactly ten fields and at most five records; Core Coding HOLD remains binding. The only full runtime epoch is 759671; historical evidence keeps its original scope. A slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。

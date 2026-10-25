@@ -2,6 +2,8 @@
 import sys
 sys.dont_write_bytecode = True
 import argparse
+from contextlib import contextmanager
+import errno
 import hashlib
 import importlib.util
 import json
@@ -11,6 +13,7 @@ import shutil
 import stat
 import subprocess
 import tempfile
+import uuid
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
@@ -264,33 +267,87 @@ def same_source_inputs(build, sources):
     return True
 
 
+@contextmanager
+def preparation_lock(path):
+    """Keep one stable lock inode; the OS releases ownership on process death.
+
+    The persistent file is deliberately never unlinked or interpreted as a PID:
+    unlinking allows waiters to lock different files, and PID reuse is ambiguous.
+    Windows permits locking a byte beyond EOF, including an empty legacy file.
+    """
+    with path.open('a+b') as handle:
+        try:
+            if os.name == 'nt':
+                import msvcrt
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            if exc.errno not in (errno.EACCES, errno.EAGAIN, errno.EDEADLK):
+                raise
+            raise PreparationError('PREPARATION_BUSY',
+                'Another preparation holds cache/runtime/.prepare.lock; keep the current runtime.') from exc
+        # Closing this non-inheritable handle releases ownership on every exit.
+        yield
+
+
+def install_build(assembled, final, manifest_hash, runtime):
+    """Preserve a damaged build before installing its verified replacement."""
+    verify_build(assembled, manifest_hash)
+    quarantined = None
+
+    def quarantine_path(label):
+        folder = child(runtime, 'quarantine')
+        folder.mkdir(exist_ok=True)
+        return child(runtime, 'quarantine/' + final.name + '-' + label + '-' + uuid.uuid4().hex)
+
+    if final.exists():
+        try:
+            verify_build(final, manifest_hash)
+            return None
+        except (PreparationError, OSError, ValueError, KeyError, TypeError):
+            # Never delete unrecognized/user files from an existing build.
+            quarantined = quarantine_path('previous')
+            final.rename(quarantined)
+    installed = False
+    try:
+        assembled.rename(final)
+        installed = True
+        verify_build(final, manifest_hash)
+    except BaseException:
+        if quarantined is not None:
+            # Preserve even a failed replacement; restore the previous directory
+            # when installation/verification raises, including cancellation.
+            if installed:
+                final.rename(quarantine_path('failed-replacement'))
+            quarantined.rename(final)
+        raise
+    return quarantined
+
+
 def prepare(root, values):
     root = Path(root).resolve()
     sources = source_inputs(values)
     rows = package_inputs(root)
     package_hash = digest(rows)
-    if child(root, 'cache/runtime/retrieval-config.json').is_file():
-        try:
-            _, previous = prepared_runtime(root)
-            if same_source_inputs(previous, sources):
-                return {'status': 'LOCAL_RUNTIME_ALREADY_PREPARED',
-                    'runtime_build': previous.relative_to(root).as_posix(), 'source_epochs': list(EPOCHS),
-                    'client_configuration_modified': False, 'service_started': False,
-                    'local_source_payload_do_not_publish': True}
-        except (PreparationError, OSError, ValueError, KeyError, TypeError):
-            # Rebuild from explicit sources; an existing activation stays intact
-            # until the new build independently passes all original checks.
-            pass
     runtime = child(root, 'cache/runtime')
     runtime.mkdir(parents=True, exist_ok=True)
     lock = child(root, 'cache/runtime/.prepare.lock')
-    try:
-        lockfile = lock.open('x', encoding='utf-8')
-    except FileExistsError as exc:
-        raise PreparationError('PREPARATION_BUSY', 'Another preparation holds cache/runtime/.prepare.lock; keep the current runtime.') from exc
-    try:
-        with lockfile:
-            lockfile.write(str(os.getpid()))
+    with preparation_lock(lock):
+        if child(root, 'cache/runtime/retrieval-config.json').is_file():
+            try:
+                _, previous = prepared_runtime(root)
+                if same_source_inputs(previous, sources):
+                    return {'status': 'LOCAL_RUNTIME_ALREADY_PREPARED',
+                        'runtime_build': previous.relative_to(root).as_posix(), 'source_epochs': list(EPOCHS),
+                        'client_configuration_modified': False, 'service_started': False,
+                        'local_source_payload_do_not_publish': True}
+            except (PreparationError, OSError, ValueError, KeyError, TypeError):
+                # Rebuild from explicit sources; an existing activation stays intact
+                # until the new build independently passes all original checks.
+                pass
         payload = load_helper(helper_path(root, 'source_payload.py'), 'dst_public_source_payload')
         rebind = load_helper(helper_path(root, 'public_rebind.py'), 'dst_public_rebind')
         recipe = read(root / 'source-payload-recipe.json')
@@ -346,10 +403,7 @@ def prepare(root, values):
             builds = child(root, 'cache/runtime/builds')
             builds.mkdir(exist_ok=True)
             final = child(root, 'cache/runtime/builds/' + build_id)
-            if final.exists():
-                verify_build(final, manifest_hash)
-            else:
-                assembled.rename(final)
+            quarantined = install_build(assembled, final, manifest_hash, runtime)
             activation = {'source_epochs_path': 'builds/' + build_id + '/source-epochs.json',
                 'default_source_epoch': '759671', 'prepared_runtime': {'schema': SCHEMA,
                     'runtime_build': 'builds/' + build_id, 'package_input_sha256': package_hash,
@@ -357,11 +411,12 @@ def prepare(root, values):
             pending = temporary / 'activation.json'
             write(pending, activation)
             os.replace(pending, runtime / 'retrieval-config.json')
-            return {'status': 'LOCAL_RUNTIME_PREPARED', 'runtime_build': 'cache/runtime/builds/' + build_id,
+            result = {'status': 'LOCAL_RUNTIME_PREPARED', 'runtime_build': 'cache/runtime/builds/' + build_id,
                     'source_epochs': list(EPOCHS), 'client_configuration_modified': False,
                     'service_started': False, 'local_source_payload_do_not_publish': True}
-    finally:
-        lock.unlink()
+            if quarantined is not None:
+                result['previous_build_preserved_at'] = quarantined.relative_to(root).as_posix()
+            return result
 
 
 def main(argv=None):

@@ -1,4 +1,4 @@
-"""Portable KB entrypoint. Prepare authorized local sources before starting MCP."""
+"""Portable KB entrypoint: public catalog or fully source-verified MCP."""
 import sys
 sys.dont_write_bytecode = True
 import argparse
@@ -21,20 +21,17 @@ def main(argv=None):
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
     parser.add_argument('--source-epoch', choices=['759671'])
+    parser.add_argument('--mode', choices=['auto', 'full', 'catalog'], default='auto',
+                        help='auto uses the public catalog only when sources are unprepared; full requires verified sources')
     args = parser.parse_args(argv)
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required')
-    try:
-        with sqlite3.connect(':memory:') as database:
-            database.execute('CREATE VIRTUAL TABLE runtime_fts5_check USING fts5(value)')
-    except sqlite3.Error as exc:
-        parser.error('This Python must include SQLite FTS5: ' + str(exc))
     if args.command != 'call' and (args.tool or args.arguments_file or args.source_epoch):
         parser.error('--tool, --arguments-file and --source-epoch apply only to call')
     if args.command == 'mcp-config':
         print(json.dumps({'mcpServers': {'dst_engineering_kb': {
             'command': sys.executable,
-            'args': ['-B', '-X', 'utf8', str(ROOT / 'run_kb.py'), 'serve']
+            'args': ['-B', '-X', 'utf8', str(ROOT / 'run_kb.py'), 'serve', '--mode', args.mode]
         }}}, ensure_ascii=False, indent=2))
         return 0
     try:
@@ -49,7 +46,27 @@ def main(argv=None):
                 if values.get('source_epoch', args.source_epoch) != args.source_epoch:
                     parser.error('Conflicting source_epoch values')
                 values['source_epoch'] = args.source_epoch
-        config, build = prepared_runtime(ROOT)
+        config = build = None
+        if args.mode != 'catalog':
+            try:
+                config, build = prepared_runtime(ROOT)
+            except PreparationError as exc:
+                if (args.mode != 'auto' or exc.code != 'SOURCES_NOT_PREPARED'
+                        or (ROOT / 'cache/runtime/retrieval-config.json').exists()):
+                    raise
+        if build is None:
+            sys.path.insert(0, str(ROOT / 'dst-kb-service'))
+            from dst_kb.public_catalog import main as catalog_main
+            from dst_kb.config import KBError
+            try:
+                return catalog_main(ROOT, args.command, args.tool, values)
+            except KBError as exc:
+                raise PreparationError(exc.code, str(exc)) from exc
+        try:
+            with sqlite3.connect(':memory:') as database:
+                database.execute('CREATE VIRTUAL TABLE runtime_fts5_check USING fts5(value)')
+        except sqlite3.Error as exc:
+            raise PreparationError('FTS5_REQUIRED', 'Full MCP requires SQLite FTS5: ' + str(exc)) from exc
         command = [sys.executable, '-B', '-X', 'utf8', str(build / 'dst-kb-service' / 'dst_kb_cli.py'),
                    '--config', str(config), args.command]
         if values is not None:

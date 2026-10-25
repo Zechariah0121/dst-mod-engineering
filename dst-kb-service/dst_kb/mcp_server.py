@@ -78,10 +78,12 @@ def check_arguments(spec,args):
         if k=='subpointer' and v and not v.startswith('/'):raise KBError('INVALID_ARGUMENT','subpointer must be empty or an absolute JSON pointer')
 
 class Server:
+    tools=TOOLS
+    instructions=INSTRUCTIONS
     def __init__(self,config=None):
         self.config=config;self.service=None;self.services={};self.initialized=False
     def call(self,name,args):
-        spec=next((x for x in TOOLS if x['name']==name),None)
+        spec=next((x for x in self.tools if x['name']==name),None)
         if spec is None:raise KBError('INVALID_TOOL','Unknown tool '+str(name))
         check_arguments(spec,args)
         arguments=dict(args)
@@ -113,11 +115,11 @@ class Server:
             requested=params.get('protocolVersion')
             version=requested if requested in ['2024-11-05','2025-03-26','2025-06-18','2025-11-25'] else '2025-06-18'
             return base|{'result':{'protocolVersion':version,'capabilities':{'tools':{'listChanged':False}},
-                'serverInfo':{'name':'dst-kb','version':__version__},'instructions':INSTRUCTIONS}}
+                'serverInfo':{'name':'dst-kb','version':__version__},'instructions':self.instructions}}
         if method=='ping':return base|{'result':{}}
         if method not in ['tools/list','tools/call']:return base|{'error':{'code':-32601,'message':'Method not found; this server uses initialize negotiation'}}
         if not self.initialized:return base|{'error':{'code':-32000,'message':'Initialize first'}}
-        if method=='tools/list':return base|{'result':{'tools':TOOLS}}
+        if method=='tools/list':return base|{'result':{'tools':self.tools}}
         try:
             result=self.call(params.get('name'),params.get('arguments',{}))
             return base|{'result':{'content':[{'type':'text','text':json.dumps(result,ensure_ascii=False)}],'structuredContent':result,'isError':False}}

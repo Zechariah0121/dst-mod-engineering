@@ -29,6 +29,13 @@ from pathlib import Path
 
 INDEX_VERSION=17
 _BUNDLE_WIRE_TOKEN=object()
+N001_CODING_SUBSET_LIMIT=5
+
+def coding_subset_full(projection,family,selected):
+    """Count delivered N001 records, independently of rank or byte budgets."""
+    return (projection=='coding' and family=='n001' and
+            sum(item.get('family')=='n001' for item in selected)>=N001_CODING_SUBSET_LIMIT)
+
 ALIASES={'networking':'联机 网络 同步 rpc replica','authority':'权威 服务端','server':'服务器 服务端',
  'client':'客户端 预测','world':'世界','manager':'管理器 注册表','lifecycle':'生命周期 清理 移除',
  'persistence':'存档 保存 加载','shard':'分片 洞穴','hook':'包装 hook','resource':'资源 材料',
@@ -669,8 +676,15 @@ class Service:
         rows,diagnosis=ranker.search(query,projection,max(top_k,len(ranker.documents)),filters,scope_logic,mode=mode,**rank_options)
         results=[]
         delivery_withheld=0
+        subset_withheld=0
         for row in rows:
             record,family=row['document']['entry'],row['document']['family']
+            # Bundle candidates are not delivered yet: its byte-aware accept
+            # step applies this same cap, allowing rejected cards to be refilled.
+            if not _budget_wire and coding_subset_full(projection,family,results):
+                subset_withheld+=1
+                dt.terminal(record['id'],'SERVICE_RESULT','CODING_SUBSET_LIMIT')
+                continue
             anchor=row['match_reason'].get('source_atom_pointer')
             preferred=(anchor,) if isinstance(anchor,str) and anchor.startswith('/') else ()
             supported=tuple(row['match_reason'].get('source_supported_atom_pointers',()))
@@ -714,6 +728,8 @@ class Service:
                 'independent_generic_evidence_assessment':'REQUIRED_SEPARATELY'}
         if delivery_withheld:
             payload['exclusions_summary']['ACTUAL_VIEW_NO_TASK_ATOM']=delivery_withheld
+        if subset_withheld:
+            payload['exclusions_summary']['CODING_SUBSET_LIMIT']=subset_withheld
         payload['results_truncated']=diagnosis['candidate_matches']>len(results)+delivery_withheld
         payload['delivery_withheld_count']=delivery_withheld
         payload['top_k_applies_to']='actual_task_admitted_views'
@@ -1046,6 +1062,8 @@ class Service:
         def accept(row,trial):
             position=row['position']
             if position is None and len(entries)>=count:
+                return False
+            if position is None and coding_subset_full(projection,trial.get('family'),entries):
                 return False
             proposed=entries+[trial] if position is None else entries[:position]+[trial]+entries[position+1:]
             if serialized_payload_cost(packet(proposed,byte_withheld,reserve=len(proposed)<count),maximum,trial=trial)>maximum:

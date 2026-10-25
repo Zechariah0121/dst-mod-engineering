@@ -6,10 +6,12 @@ validation are mocked for these deliberately tiny non-KB fixtures.
 import contextlib
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import time
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -23,6 +25,35 @@ import run_kb as launcher
 HERE = Path(__file__).resolve().parent
 PAYLOAD = HERE.parent / 'scripts/source_payload.py'
 REBIND = HERE.parent / 'scripts/public_rebind.py'
+
+# These are real competing preparation processes. Only rebind/original-KB
+# guards use the same explicit synthetic stubs as build(); locking, hydration,
+# manifests, filesystem installation and activation are production code.
+PREPARE_WORKER = r'''
+import json
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+sys.path.insert(0, sys.argv[1])
+import prepare_sources as prepare
+original = prepare.load_helper
+def loader(path, name):
+    if path.name == 'public_rebind.py':
+        return SimpleNamespace(rebind=lambda root, origin: ({'unresolved': [], 'typed_reference_updates': []}, {}))
+    return original(path, name)
+def guard(root):
+    Path(sys.argv[5]).write_text('guard entered with lock held', encoding='utf-8')
+    sys.stdin.readline()
+    return {'status': 'SYNTHETIC_GUARD_STUB_NOT_REAL_VALIDATION'}
+prepare.load_helper = loader
+prepare.check_in_subprocess = guard
+try:
+    result = prepare.prepare(Path(sys.argv[2]), [Path(sys.argv[3]), Path(sys.argv[4])])
+except prepare.PreparationError as exc:
+    print(json.dumps({'error': exc.code}), flush=True)
+    sys.exit(2)
+print(json.dumps(result), flush=True)
+'''
 
 
 class BootstrapTests(unittest.TestCase):
@@ -81,15 +112,33 @@ class BootstrapTests(unittest.TestCase):
         self.historical.mkdir()
         (self.historical / 'a.lua').write_text('first\n' + self.body, encoding='utf-8')
 
-    def build(self, sources):
+    def build(self, sources, guard_error=None):
         original_loader = prepare.load_helper
         def loader(path, name):
             if path.name == 'public_rebind.py':
                 return SimpleNamespace(rebind=lambda root, origin: ({'unresolved': [], 'typed_reference_updates': []}, {}))
             return original_loader(path, name)
         with patch.object(prepare, 'load_helper', side_effect=loader), patch.object(
-                prepare, 'check_in_subprocess', return_value={'status': 'SYNTHETIC_GUARD_STUB_NOT_REAL_VALIDATION'}):
+                prepare, 'check_in_subprocess', side_effect=guard_error,
+                return_value={'status': 'SYNTHETIC_GUARD_STUB_NOT_REAL_VALIDATION'}):
             return prepare.prepare(self.root, sources)
+
+    def start_preparation(self):
+        ready = self.folder / 'worker-ready'
+        process = subprocess.Popen([sys.executable, '-B', '-X', 'utf8', '-c', PREPARE_WORKER,
+            str(HERE.parent), str(self.root), str(self.current), str(self.historical), str(ready)],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, encoding='utf-8')
+        def cleanup():
+            if process.poll() is None:
+                process.kill()
+            process.communicate(timeout=10)
+        self.addCleanup(cleanup)
+        deadline = time.monotonic() + 15
+        while not ready.exists() and process.poll() is None and time.monotonic() < deadline:
+            time.sleep(0.02)
+        self.assertTrue(ready.exists(), 'preparation worker failed to acquire lock and enter guard')
+        return process
 
     def test_two_explicit_sources_hydrate_and_activate_without_touching_templates(self):
         original = (self.root / 'knowledge/evidence.json').read_bytes()
@@ -114,7 +163,9 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, 'SOURCE_GAP')
         self.assertEqual(caught.exception.details['source_gaps'][0]['source_file'], 'scripts/a.lua')
         self.assertEqual(active.read_bytes(), original)
-        self.assertFalse((self.root / 'cache/runtime/.prepare.lock').exists())
+        self.assertTrue((self.root / 'cache/runtime/.prepare.lock').exists())
+        with prepare.preparation_lock(self.root / 'cache/runtime/.prepare.lock'):
+            pass
         self.assertFalse(list((self.root / 'cache/runtime').glob('.prepare-*')))
 
     def test_invalid_explicit_source_is_rejected_before_cache_write(self):
@@ -133,11 +184,108 @@ class BootstrapTests(unittest.TestCase):
         with self.assertRaises(prepare.PreparationError):
             prepare.child(self.root, '../outside')
 
+    def test_same_sources_repair_corrupt_build_and_preserve_all_previous_data(self):
+        self.build([self.current, self.historical])
+        active = self.root / 'cache/runtime/retrieval-config.json'
+        original_activation = active.read_bytes()
+        _, build = prepare.prepared_runtime(self.root)
+        damaged = build / 'knowledge/evidence.json'
+        damaged.write_text('{broken fixture', encoding='utf-8')
+        (build / 'user-notes.txt').write_text('preserve this user file', encoding='utf-8')
+        result = self.build([self.current, self.historical])
+        self.assertEqual(result['status'], 'LOCAL_RUNTIME_PREPARED')
+        _, repaired = prepare.prepared_runtime(self.root)
+        self.assertEqual(repaired, build)
+        self.assertEqual(active.read_bytes(), original_activation)
+        self.assertEqual(prepare.read(repaired / 'knowledge/evidence.json')['citation']['source_excerpt'], self.body)
+        preserved = self.root / result['previous_build_preserved_at']
+        self.assertEqual((preserved / 'knowledge/evidence.json').read_text(encoding='utf-8'), '{broken fixture')
+        self.assertEqual((preserved / 'user-notes.txt').read_text(encoding='utf-8'), 'preserve this user file')
+
+    def test_missing_manifest_can_be_rebuilt_from_identical_sources(self):
+        self.build([self.current, self.historical])
+        _, build = prepare.prepared_runtime(self.root)
+        (build / 'RUNTIME-MANIFEST.json').unlink()
+        result = self.build([self.current, self.historical])
+        self.assertTrue((self.root / result['previous_build_preserved_at']).is_dir())
+        self.assertEqual(prepare.prepared_runtime(self.root)[1], build)
+
+    def test_failed_replacement_install_restores_damaged_build_and_activation(self):
+        self.build([self.current, self.historical])
+        _, build = prepare.prepared_runtime(self.root)
+        (build / 'user-notes.txt').write_text('keep me', encoding='utf-8')
+        activation = self.root / 'cache/runtime/retrieval-config.json'
+        previous = activation.read_bytes()
+        original_rename = Path.rename
+        def rename(path, target):
+            if path.name == 'assembled' and target == build:
+                raise OSError('synthetic installation failure')
+            return original_rename(path, target)
+        with patch.object(Path, 'rename', new=rename), self.assertRaisesRegex(OSError, 'installation failure'):
+            self.build([self.current, self.historical])
+        self.assertEqual((build / 'user-notes.txt').read_text(encoding='utf-8'), 'keep me')
+        self.assertEqual(activation.read_bytes(), previous)
+        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_PREPARED')
+
+    def test_guard_failure_never_displaces_damaged_build(self):
+        self.build([self.current, self.historical])
+        _, build = prepare.prepared_runtime(self.root)
+        (build / 'knowledge/evidence.json').write_text('{}', encoding='utf-8')
+        with self.assertRaises(prepare.PreparationError) as caught:
+            self.build([self.current, self.historical], guard_error=prepare.PreparationError(
+                'VALIDATION_FAILED', 'synthetic guard rejection'))
+        self.assertEqual(caught.exception.code, 'VALIDATION_FAILED')
+        self.assertEqual((build / 'knowledge/evidence.json').read_text(encoding='utf-8'), '{}')
+        self.assertFalse((self.root / 'cache/runtime/quarantine').exists())
+
+    def test_failed_installed_build_verification_restores_previous_directory(self):
+        self.build([self.current, self.historical])
+        _, build = prepare.prepared_runtime(self.root)
+        (build / 'user-notes.txt').write_text('previous build data', encoding='utf-8')
+        original_rename = Path.rename
+        def rename(path, target):
+            result = original_rename(path, target)
+            if path.name == 'assembled' and target == build:
+                (target / 'knowledge/evidence.json').write_text('injected post-install damage', encoding='utf-8')
+            return result
+        with patch.object(Path, 'rename', new=rename), self.assertRaises(prepare.PreparationError) as caught:
+            self.build([self.current, self.historical])
+        self.assertEqual(caught.exception.code, 'RUNTIME_CHANGED')
+        self.assertEqual((build / 'user-notes.txt').read_text(encoding='utf-8'), 'previous build data')
+        self.assertEqual(prepare.read(build / 'knowledge/evidence.json')['citation']['source_excerpt'], self.body)
+        failed = list((self.root / 'cache/runtime/quarantine').glob('*-failed-replacement-*'))
+        self.assertEqual(len(failed), 1)
+        self.assertEqual((failed[0] / 'knowledge/evidence.json').read_text(encoding='utf-8'), 'injected post-install damage')
+
+    def test_concurrent_process_cannot_prepare_until_owner_finishes(self):
+        process = self.start_preparation()
+        contender = subprocess.run([sys.executable, '-B', '-X', 'utf8', '-c', PREPARE_WORKER,
+            str(HERE.parent), str(self.root), str(self.current), str(self.historical),
+            str(self.folder / 'contender-ready')], capture_output=True, text=True, encoding='utf-8', timeout=15)
+        self.assertEqual(contender.returncode, 2, contender.stderr)
+        self.assertEqual(json.loads(contender.stdout)['error'], 'PREPARATION_BUSY')
+        self.assertFalse((self.folder / 'contender-ready').exists())
+        output, error = process.communicate('\n', timeout=15)
+        self.assertEqual(process.returncode, 0, error)
+        self.assertEqual(json.loads(output)['status'], 'LOCAL_RUNTIME_PREPARED')
+        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_ALREADY_PREPARED')
+
+    def test_hard_killed_process_does_not_leave_preparation_busy(self):
+        process = self.start_preparation()
+        process.kill()
+        process.communicate(timeout=10)
+        lock = self.root / 'cache/runtime/.prepare.lock'
+        self.assertTrue(lock.exists())
+        # Legacy PID contents are also ignored: only live OS ownership matters.
+        lock.write_text(str(os.getpid()), encoding='utf-8')
+        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_PREPARED')
+        prepare.prepared_runtime(self.root)
+
     def test_unprepared_launcher_never_starts_service_and_config_only_prints(self):
         with patch.object(launcher, 'ROOT', self.root), patch.object(launcher.subprocess, 'run') as execute:
             error, output = io.StringIO(), io.StringIO()
             with contextlib.redirect_stderr(error):
-                self.assertEqual(launcher.main(['serve']), 2)
+                self.assertEqual(launcher.main(['serve', '--mode', 'full']), 2)
             self.assertIn('prepare_sources.py', error.getvalue())
             with contextlib.redirect_stdout(output):
                 self.assertEqual(launcher.main(['mcp-config']), 0)

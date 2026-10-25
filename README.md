@@ -6,28 +6,33 @@
 
 ## 下载
 
-本版：[v2026.10.25.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.2)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。
+本版：[v2026.10.25.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.3)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。
 
 | 附件 | 包含内容与用途 |
 |---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.2/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 187 条知识、开发辅助脚本、来源准备工具与 MCP 九工具服务 |
+| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.3/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 187 条知识、开发辅助脚本、来源准备工具与 MCP 服务 |
 
 下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
 
-本版统一安装 Skill、187 条知识与 MCP。已针对来源准备、九工具连接、知识完整性、自然语言查询及证据读取做集成检查，并修复中英混写的任务清理／回调顺序漏查和明确方法排除未生效的问题。检索不保证覆盖所有表达方式；空结果可按统一目录复查，不能据此认定库中无知识。具体适用范围见 [能力与限制](docs/public-limits.md)。
+本版统一安装 Skill、187 条知识与 MCP。未准备游戏来源时，默认可启动两工具公开目录模式，检索目录并审阅公开材料；准备完整合法来源后可启动九工具完整模式。目录模式不提供 Coding 上下文或已恢复源码证据，Core Coding HOLD 保持有效。检索不保证覆盖所有表达方式；空结果可按统一目录复查，不能据此认定库中无知识。具体适用范围见 [能力与限制](docs/public-limits.md)。
 
 ## 开始使用
 
 1. 完整解压，找到直接包含 `SKILL.md` 的目录。把该目录完整放入 Agent 支持的技能位置，例如 Codex 的 `.agents/skills/dst-mod-engineering/`；其他安装位置见 [安装说明](docs/install-and-use.md)。
 2. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和合法本地 `scripts.zip` 位置。没有 MCP 也可按 [知识库接入](docs/knowledge-integration.md) 读取少量相关知识文件，不默认加载全库。
-3. 使用 MCP 时，先在包根目录准备合法来源，再生成客户端配置：
+3. 使用 MCP 时，在包根目录生成客户端配置；默认 `auto` 在来源未准备时提供公开目录模式：
 
 ```text
-python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<合法保留的756039 scripts.zip或源码目录>"
 python -B -X utf8 run_kb.py mcp-config
 ```
 
-需要 Python 3.10+ 与 SQLite FTS5。当前知识的部分证据依赖历史源码范围；准备程序会列出实际缺项，不能用当前版本替换旧证据。缺少历史来源时仍可文件阅读 187 条知识，但完整 MCP 尚未备妥。将打印配置按客户端要求接入后，入口为 `python -B -X utf8 run_kb.py serve`。配置打印不代表连接或查询成功，详见 [安装与验证](docs/install-and-use.md)。
+需要 Python 3.10+；完整模式另需 SQLite FTS5。将打印配置按客户端要求接入后，服务默认按 `auto` 启动。用 `--mode catalog` 可显式选择目录模式，用 `--mode full` 可要求完整来源，见 [安装与验证](docs/install-and-use.md)。已准备缓存损坏或包版本变化时，`auto` 报错，不静默降级。
+
+完整模式先运行以下命令。部分证据依赖历史源码范围；准备程序会列出实际缺项，不能用当前版本替换旧证据。准备成功后重启 MCP 会话，才能从两工具切换到九工具。配置打印不代表连接或查询成功。
+
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<合法保留的756039 scripts.zip或源码目录>"
+```
 
 准备生成的 `cache/runtime/` 含本地恢复的游戏源码片段，留在本地，不随公开包上传。JSON 中的 `$dst_source_payload_slot` 是待恢复的本地原文槽，不是已读源码或行为证据。
 

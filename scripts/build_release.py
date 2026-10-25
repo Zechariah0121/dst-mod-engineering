@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 NAME = 'dst-mod-engineering'
-VERSION = 'v2026.10.25.2'
+VERSION = 'v2026.10.25.3'
 ARCHIVE = NAME + '.zip'
 CHECKSUMS = 'SHA256SUMS.txt'
 MANIFEST = 'RELEASE-MANIFEST.json'
@@ -20,7 +20,7 @@ ROOT_FILES = ('SKILL.md', 'README.md', 'README.en.md', 'LICENSE', 'requirements.
               'source-epochs.json', 'source-payload-recipe.json', 'PUBLICATION-ORIGIN-MAP.json')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'examples': '.json'}
 SCRIPTS = ('dst_zip_tool.py', 'check_api.py', 'dst_modtest.py', 'source_payload.py', 'public_rebind.py')
-SERVICE_FILES = ('LICENSE', 'README.md', 'config.example.json', 'dst_kb_cli.py')
+SERVICE_FILES = ('LICENSE', 'README.md', 'config.example.json', 'dst_kb_cli.py', 'export_mcp_tools.py')
 SERVICE_DATA = ('dst-kb-service/dst_kb/contract_map.json',
                 'dst-kb-service/dst_kb/source_identity_map.json',
                 'dst-kb-service/dst_kb/projection_profiles.json',
