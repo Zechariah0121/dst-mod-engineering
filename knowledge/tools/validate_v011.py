@@ -81,14 +81,81 @@ def semantic_errors(db,src,claims):
     if k.get('version_context',{}).get('steam_build') is not None:errors.append('Unexpected invented Steam build')
     return errors
 
+def resolve_pointer(document,pointer):
+    if pointer.startswith('#'):pointer=pointer[1:]
+    if not pointer:return document
+    if not pointer.startswith('/'):raise ValueError('invalid JSON pointer '+pointer)
+    value=document
+    for token in pointer[1:].split('/'):
+        token=token.replace('~1','/').replace('~0','~')
+        value=value[int(token)] if isinstance(value,list) else value[token]
+    return value
+
+
+def validate_catalog_native(root,errors):
+    """Check the single 187-entry machine catalog and retained native evidence."""
+    catalog=read(root/'CATALOG.json');rows=catalog['entries'];cache={};raw_cache={};reference_count=0
+    expected=[]
+    families={'legacy':('data/entries.json',None),
+              'native_ai':('data/native001/canonical-native001-ai-knowledge.json','native-ai.schema.json'),
+              'native_core':('data/nativecore/native-core.json','native-core.schema.json')}
+    for family,(relative,schemafile) in families.items():
+        doc=read(contained(root,relative));cache[relative]=doc
+        if schemafile:
+            schema=read(root/'schemas'/schemafile);errors.extend(schema_errors(doc,schema,schema,family))
+        for entry in doc['entries']:expected.append((entry['id'],family))
+    counts={'total':len(rows),**dict(Counter(row['family'] for row in rows))}
+    if counts!=catalog.get('counts') or counts!={'total':187,'legacy':64,'native_ai':13,'native_core':110}:errors.append('catalog counts mismatch')
+    actual=[(row['id'],row['family']) for row in rows]
+    if len(set(row['id'] for row in rows))!=len(rows) or actual!=expected:errors.append('catalog ID/family/order mismatch')
+    for row in rows:
+        try:
+            relative=row['file'];path=contained(root,relative)
+            if relative not in cache:cache[relative]=read(path)
+            entry=resolve_pointer(cache[relative],row['pointer'])
+            if entry['id']!=row['id'] or entry['title']!=row['title']:errors.append('catalog pointer identity '+row['id'])
+            for key in ['status','knowledge_status','retrieval_status','coding_status']:
+                if key in entry and row.get(key)!=entry[key]:errors.append('catalog state mismatch '+row['id']+':'+key)
+        except (OSError,ValueError,KeyError,IndexError,TypeError) as exc:errors.append('catalog pointer '+row['id']+': '+str(exc))
+    core=cache[families['native_core'][0]]
+    for entry in core['entries']:
+        if entry.get('coding_status')!='hold':errors.append('NativeCore Coding HOLD changed '+entry['id'])
+    def refs(value):
+        nonlocal reference_count
+        if isinstance(value,dict):
+            if value.get('artifact_path'):
+                relative=value['artifact_path']
+                try:
+                    path=contained(root,relative)
+                    if relative not in raw_cache:raw_cache[relative]=path.read_bytes()
+                    raw=raw_cache[relative];reference_count+=1
+                    expected_hash=value.get('sha256',value.get('artifact_sha256'))
+                    if expected_hash and sha256(raw).hexdigest()!=expected_hash:errors.append('native artifact hash '+relative)
+                    if value.get('pointer') is not None and path.suffix=='.json':
+                        if relative not in cache:cache[relative]=json.loads(raw)
+                        resolve_pointer(cache[relative],value['pointer'])
+                except (OSError,ValueError,KeyError,IndexError,TypeError) as exc:errors.append('native artifact '+relative+': '+str(exc))
+            for child in value.values():refs(child)
+        elif isinstance(value,list):
+            for child in value:refs(child)
+    refs(core);refs(read(root/'data/native001/canonical-native001-research-map.json'))
+    return len(rows),reference_count
+
+
 def validate_root(root,external=False):
     db=read(root/'data/entries.json');src=read(root/'data/sources.json');claims=read(root/'data/claims.json');schema=read(root/'schemas/entries.schema.json')
     errors=collection_errors(db,schema,src)+semantic_errors(db,src,claims)
-    legacy=read(root/'history/v0.1/data/entries.json')
-    migration_diff=semantic_migration_diff(legacy,db)
-    errors+=['semantic migration: '+x for x in migration_diff]
-    compatibility=schema_errors(legacy,schema,schema)
-    errors+=['legacy schema: '+x for x in compatibility]
+    baseline=read(root/'data/legacy-integrity-baseline.json')
+    migration_diff=[]
+    baseline_paths={'data/entries.json','data/sources.json','data/claims.json','data/relations.json','data/index.json','review-support/case-metadata.json'} | {p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json') if p.name not in ('native-ai.schema.json','native-core.schema.json')}
+    if baseline.get('schema')!='dst-legacy-integrity-baseline/1' or {row['path'] for row in baseline['files']}!=baseline_paths:errors.append('legacy baseline schema/file registry')
+    for row in baseline['files']:
+        p=contained(root,row['path'])
+        if not p.is_file() or len(p.read_bytes())!=row['bytes'] or sha256(p.read_bytes()).hexdigest()!=row['sha256']:
+            errors.append('legacy baseline SHA256 mismatch '+row['path'])
+    record_hashes=[{'id':e['id'],'sha256':sha256(json.dumps(e,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()} for e in db['entries']]
+    if len(record_hashes)!=64 or record_hashes!=baseline['entries']:errors.append('legacy baseline record mismatch')
+    catalog_count,reference_count=validate_catalog_native(root,errors)
     ids={e['id'] for e in db['entries']}
     for filename,schemafile in [('sources.json','sources.schema.json'),('claims.json','claims.schema.json'),('relations.json','relations.schema.json')]:
         sc=read(root/'schemas'/schemafile);errors+=schema_errors(read(root/'data'/filename),sc,sc,filename)
@@ -184,9 +251,13 @@ def validate_root(root,external=False):
         for row in manifest['files']:
             p=contained(root,row['path'])
             if not p.is_file() or len(p.read_bytes())!=row['bytes'] or sha256(p.read_bytes()).hexdigest()!=row['sha256']:errors.append('manifest SHA256 mismatch '+row['path'])
+    if any('manifest ' in error for error in errors):manifest_status='FAIL'
     return {'status':'PASS' if not errors else 'FAIL','schema_validation':'PASS' if not errors else 'see_errors',
         'schema_engine':'stdlib subset covering current schema keywords; no third-party validator',
-        'entries':len(db['entries']),'legacy_0_1_schema_accepted':not compatibility,
+        'entries':catalog_count,'legacy_entries':len(db['entries']),
+        'legacy_preservation':'SHA256_BASELINE_CHECKED','legacy_0_1_schema_accepted':None,
+        'historical_0_1_migration_comparison':baseline.get('legacy_v0_1_migration_comparison'),
+        'native_artifact_references_checked':reference_count,
         'semantic_migration_diff':migration_diff,'graph_edges':len(graph['edges']),
         'evidence_levels':dict(Counter(e['evidence_level'] for e in db['entries'])),
         'packaged_sources_checked':packaged,'internal_links_checked':link_count,'external_original_path_links':external_links,

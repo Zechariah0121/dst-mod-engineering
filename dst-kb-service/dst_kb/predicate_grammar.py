@@ -25,11 +25,11 @@ _RETIRE_RESOURCE = _rx(r'\b' + _RETIRE_VERB + r'\b\s+'
 _RESOURCE_RETIRED = _rx(r'\b' + _RESOURCE + r'\b\s+'
     r'(?:(?:is|are|was|were|gets?|have|has|been|explicitly|first|then)\s+){0,4}'
     + r'(?:removed|cancelled|canceled|unregistered|unsubscribed|detached|cleared|released)\b')
-_RETIRE_ZH = re.compile(
+_RETIRE_ZH = _rx(
     r'(?:解除|移除|解绑|取消|卸除|清理|清除|注销|删除)'
     r'(?:(?:已(?:经)?|所)(?:登记|注册|创建)(?:的)?'
     r'|(?!登记|注册|创建|返回|调用|执行|触发|之后|随后|然后|后|以及|同时|并且)[^，,。；;！？!?\n]){0,18}'
-    r'(?:回调|监听(?:器)?|订阅|任务|句柄)')
+    r'(?:回调|监听(?:器)?|订阅|任务|句柄|(?i:\b' + _RESOURCE + r'\b))')
 _RESOURCE_RETIRED_ZH = re.compile(r'(?:任务|句柄|回调|监听(?:器)?|订阅)(?:被|已被|已经|已)?'
                                  r'(?:解除|移除|解绑|取消|清理|清除|注销|删除)')
 _RELEASE_OBJECT_ZH = (r'(?:(?:回调|监听器|监听(?!器)|订阅|任务)(?:句柄|(?!句柄))|句柄|\b' + _RESOURCE + r'\b)'
@@ -154,6 +154,17 @@ _CALLBACK_CALL = _rx(
 _CALLBACK_INVOCATION = _rx(
     r'(?:' + _CALLBACK_CALL.pattern + r')(?:\s+as\s+(?:a\s+)?method)?'
     r'\s*(?:with\b|\(|（|并传入|，传入|传入)')
+_ARROW_CALLBACK_CALL = _rx(r'(?:→|->)\s*' + _CALLBACK_NAME + r'\s*\(')
+
+
+def _arrow_callback_call(clause):
+    # Arrow prose can omit the invocation verb, but a callback name or a
+    # quoted example is still not an invocation predicate.
+    unquoted = re.sub(r'\[(=*)\[.*?\]\1\]', lambda match: ' ' * len(match.group()), clause)
+    unquoted = re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|`[^`]*`|“[^”]*”|‘[^’]*’',
+                      lambda match: ' ' * len(match.group()), unquoted)
+    return bool(not re.search(r'["\'`“”‘’]|\[(?:=*)\[|\](?:=*)\]', unquoted)
+                and _ARROW_CALLBACK_CALL.search(unquoted))
 _EVENT_FINITE = (r'(?:emits?|emitted|push(?:es|ed)?|sends?|sent|dispatch(?:es|ed)?|'
                  r'fires?|fired|deliver(?:s|ed)?|receives?|received)')
 _EVENT_ING = r'(?:emitting|pushing|sending|dispatching|firing|delivering|receiving)'
@@ -204,9 +215,10 @@ def literal_relations(text):
             found.add('field_mutation')
         if _retires_resource(clause):
             found.add('task_cancellation')
-        if _CALLBACK_CALL.search(clause):
+        arrow_callback = _arrow_callback_call(clause)
+        if _CALLBACK_CALL.search(clause) or arrow_callback:
             found.add('callback_binding')
-        if _CALLBACK_INVOCATION.search(clause):
+        if _CALLBACK_INVOCATION.search(clause) or arrow_callback:
             found.add('argument_binding')
         parameter = _PARAM_VERB.search(clause)
         if parameter:

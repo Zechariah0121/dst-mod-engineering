@@ -58,18 +58,32 @@ def pointer(value, path):
 
 def fixture_source():
     explicit = os.environ.get('DST_KB_PROTOCOL_FIXTURE')
-    candidates = [Path(explicit)] if explicit else [
-        PACKAGE / 'compatibility/v0.1/dst-engineering-kb',
-        SERVICE / 'compatibility/v0.1/dst-engineering-kb',
-        PACKAGE / 'dst-engineering-kb',
-    ]
+    candidates = [Path(explicit)] if explicit else [PACKAGE / 'knowledge']
     for path in candidates:
         if (path / 'data/entries.json').is_file():
             records = read(path / 'data/entries.json')['entries']
-            if len(records) != 64 or (path / 'data/nativecore/native-core.json').exists():
-                raise AssertionError('Protocol fixture must be the public64 reference, not full187 templates/runtime')
+            if len(records) != 64:
+                raise AssertionError('Protocol fixture requires the unchanged 64 legacy records')
             return path.resolve()
-    raise AssertionError('Provide the preserved public64 reference via DST_KB_PROTOCOL_FIXTURE; do not use unprepared full187 templates')
+    raise AssertionError('Protocol fixture requires the package knowledge root or DST_KB_PROTOCOL_FIXTURE')
+
+
+def derive_legacy_fixture(source, destination):
+    # Derive a protocol-only fixture in test scratch from the single canonical
+    # root. Native source templates are deliberately absent from this fixture.
+    shutil.copytree(source, destination, ignore=shutil.ignore_patterns(
+        'native001', 'nativecore', 'research', 'history', '__pycache__'))
+    catalog = read(destination / 'CATALOG.json')
+    catalog['entries'] = [row for row in catalog['entries'] if row['family'] == 'legacy']
+    catalog['counts'] = {'total': len(catalog['entries']), 'legacy': len(catalog['entries']),
+                         'native_ai': 0, 'native_core': 0}
+    write(destination / 'CATALOG.json', catalog)
+    manifest = read(destination / 'PACKAGE-MANIFEST.json')
+    manifest['files'] = [{'path': path.relative_to(destination).as_posix(),
+                          'bytes': path.stat().st_size, 'sha256': checksum(path)}
+                         for path in sorted(destination.rglob('*'))
+                         if path.is_file() and path.name != 'PACKAGE-MANIFEST.json']
+    write(destination / 'PACKAGE-MANIFEST.json', manifest)
 
 
 def initialized(server):
@@ -94,7 +108,7 @@ class PublicProtocolTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='public-protocol-', dir=parent)
         cls.work = Path(cls.temporary.name)
         cls.kb = cls.work / 'public64'
-        shutil.copytree(cls.source, cls.kb)
+        derive_legacy_fixture(cls.source, cls.kb)
         cls.records = {record['id']: record for record in read(cls.kb / 'data/entries.json')['entries']}
         assets = cls.work / 'assets'
         write(assets / 'contract.json', {'records': {}})

@@ -1,6 +1,7 @@
 """Bounded stdio MCP adapter (legacy initialize protocol family). No listening port."""
 import json
 import sys
+from . import __version__
 from .config import KBError
 from .service import Service,MODE_TYPES,FILTERS
 from .source_epoch_runtime import resolve_epoch, bind_epoch
@@ -48,7 +49,7 @@ INSTRUCTIONS=('Use this read-only DST engineering KB for mod coding/design/revie
  'A delivered unit is a whole original typed atom with its necessary semantic Scope and evidence metadata. Positive-only object limits and explicit exclusions apply to direct facts and every context expansion. '
  'The unchanged payload budget never authorizes cutting text or borrowing another atom evidence; withheld atoms, missing Scope and unresolved evidence must remain explicit gaps. '
  'A unique accepted physical declaration may select its own original sample identity and bounded behavior only with that original behavior evidence; identity alone never proves behavior or public API status. '
- 'The release default source_epoch is 759671. Select 756039 or original48-w1-f35a16fad3f4e44a only for their explicit historical source environments. '
+ 'The release source_epoch is 759671. Only environments explicitly present in the configured catalog are accepted. '
  'Use the same source_epoch for search, lookup, bundle, get_entry and resolve_evidence. Environment identity is separate from each record source Scope and never promotes evidence or runtime status. '
  'Search and context bundles rank a unified pool of Legacy, N001 and Native Core candidates; inspect match explanations and scope. '
  'projection selects consumption role/admission; view independently selects response detail. Neither ranking, exact symbol/ID lookup, '
@@ -112,7 +113,7 @@ class Server:
             requested=params.get('protocolVersion')
             version=requested if requested in ['2024-11-05','2025-03-26','2025-06-18','2025-11-25'] else '2025-06-18'
             return base|{'result':{'protocolVersion':version,'capabilities':{'tools':{'listChanged':False}},
-                'serverInfo':{'name':'dst-kb','version':'0.3.0'},'instructions':INSTRUCTIONS}}
+                'serverInfo':{'name':'dst-kb','version':__version__},'instructions':INSTRUCTIONS}}
         if method=='ping':return base|{'result':{}}
         if method not in ['tools/list','tools/call']:return base|{'error':{'code':-32601,'message':'Method not found; this server uses initialize negotiation'}}
         if not self.initialized:return base|{'error':{'code':-32000,'message':'Initialize first'}}

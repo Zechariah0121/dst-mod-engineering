@@ -1,4 +1,4 @@
-"""No network, installed skill, game, or real publication output is needed."""
+"""Synthetic complete-release checks; no installed game or private input required."""
 import contextlib
 import io
 import json
@@ -11,33 +11,12 @@ from unittest import mock
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-import build_web_bundle as bundle
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import build_release as bundle
+import prepare_sources as bootstrap
 
 
-class WebBundleTests(unittest.TestCase):
-    def test_current_knowledge_bytes_are_in_both_skill_and_reading_zip(self):
-        data = b'{"entries": [{"id": "PUBLIC-FACT", "statement": "bounded fact"}]}\n'
-        self.put('knowledge/data/entries.json', data.decode('utf-8'))
-        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': [
-            {'path': 'data/entries.json', 'bytes': len(data), 'sha256': bundle.sha(data)}]}))
-        outputs = bundle.make_outputs(self.source)
-        with zipfile.ZipFile(io.BytesIO(outputs['dst-mod-engineering.skill.zip'])) as archive:
-            self.assertEqual(archive.read('dst-mod-engineering/knowledge/data/entries.json'), data)
-        with zipfile.ZipFile(io.BytesIO(outputs['web-reading.zip'])) as archive:
-            self.assertEqual(archive.read('knowledge/data/entries.json'), data)
-
-    def test_changed_knowledge_cannot_bypass_its_manifest(self):
-        self.put('knowledge/data/entries.json', '{"entries": []}\n')
-        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': [
-            {'path': 'data/entries.json', 'sha256': '0' * 64, 'bytes': 16}]}))
-        with self.assertRaises(ValueError):
-            bundle.make_outputs(self.source)
-
-    def test_knowledge_directory_requires_public_manifest(self):
-        self.put('knowledge/unreviewed.json', 'PRIVATE_UNREGISTERED_SOURCE\n')
-        with self.assertRaises(ValueError):
-            bundle.make_outputs(self.source)
-
+class CompleteReleaseTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.base = Path(self.temp.name).resolve()
@@ -45,17 +24,31 @@ class WebBundleTests(unittest.TestCase):
         self.source.mkdir()
         for directory in bundle.DIRECTORIES:
             (self.source / directory).mkdir()
-        names = set(bundle.ROOT_FILES) | set(bundle.COMMON) | {'templates/local-validation.md'}
-        names.update(f'references/{name}.md' for entries in bundle.PROFILE_EXTRA.values() for name in entries)
-        names.update({'docs/validation.md', 'scripts/tool.py'})
-        for name in names:
-            self.put(name, f'# {name}\n\nOriginal body 中文\n')
-        self.put('SKILL.md', '---\nname: dst-mod-engineering\ndescription: fixture\n---\n\n'
-                 '[Environment](references/environment-tools.md)\n')
-        self.put('references/web-chat.md', '# Web\n\n[Template](../templates/local-validation.md#result)\n'
-                 '[Source][sample]\n[sample]: ../SKILL.md "Title"\n'
-                 '```md\n[Example](keep-relative.md)\n```\n')
-        self.output = self.source / 'dist/web'
+        for name in bundle.ROOT_FILES:
+            self.put(name, '# fixture\n')
+        for name in bundle.SCRIPTS:
+            self.put('scripts/' + name, '# fixture\n')
+        for name in bundle.SERVICE_FILES:
+            self.put('dst-kb-service/' + name, '# fixture\n')
+        self.put('dst-kb-service/dst_kb/mcp_server.py', '# MCP\n')
+        self.put('dst-kb-service/docs/mcp-tools.md', '# Nine tools\n')
+        self.put('dst-kb-service/docs/mcp-tools.json', '{"tools": []}\n')
+        self.put('dst-kb-service/tests/test_public_service.py', '# Public regression\n')
+        for name in ('contract_map.json', 'projection_profiles.json', 'source_identity_map.json'):
+            self.put('dst-kb-service/dst_kb/' + name, '{}\n')
+        for name in ('contract_map.json', 'source_identity_map.json', 'source-manifest.json'):
+            self.put('epoch-assets/759671/' + name, '{}\n')
+        self.put('source-epochs.json', json.dumps({'default_source_epoch': '759671', 'epochs': {'759671': {}}}))
+        self.put('references/web-chat.md', '# Web use\n')
+        self.put('templates/local-validation.md', '# Validation\n')
+        self.put('examples/review.json', '{}\n')
+        self.put('knowledge/data/entries.json', '{"entries": []}\n')
+        self.catalog = {'entries': [
+            {'id': f'{family}-{index}', 'family': family, 'file': 'data/entries.json'}
+            for family, count in bundle.EXPECTED_COUNTS.items() for index in range(count)]}
+        self.put('knowledge/CATALOG.json', json.dumps(self.catalog))
+        self.manifest()
+        self.output = self.source / 'dist/release'
 
     def tearDown(self):
         self.temp.cleanup()
@@ -65,9 +58,49 @@ class WebBundleTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content.encode('utf-8'))
 
+    def manifest(self):
+        files = []
+        for name in ('CATALOG.json', 'data/entries.json'):
+            data = (self.source / 'knowledge' / name).read_bytes()
+            files.append({'path': name, 'sha256': bundle.sha(data), 'bytes': len(data)})
+        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': files}))
+
     def cli(self, *args):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             return bundle.main(['--source', str(self.source), '--out', str(self.output), *args])
+
+    def test_single_archive_has_skill_187_catalog_and_complete_mcp_without_duplicate_knowledge(self):
+        for path in ('cache/runtime/private.lua', 'dist/old.zip', '.git/config',
+                     'knowledge-history/old/data/entries.json', 'dst-engineering-kb/data/entries.json',
+                     'compatibility/v0.1/data/entries.json', 'epoch-assets/756039/old.json',
+                     'references/secret.dat', 'dst-kb-service/config.local.json'):
+            self.put(path, 'DO NOT PACKAGE')
+        outputs = bundle.make_outputs(self.source)
+        self.assertEqual(set(outputs), {bundle.ARCHIVE, bundle.CHECKSUMS})
+        self.assertEqual(outputs[bundle.CHECKSUMS], (bundle.sha(outputs[bundle.ARCHIVE])
+                         + '  ' + bundle.ARCHIVE + '\n').encode('ascii'))
+        inputs = bundle.source_files(self.source)
+        with zipfile.ZipFile(io.BytesIO(outputs[bundle.ARCHIVE])) as archive:
+            names = archive.namelist()
+            self.assertEqual(len(names), len(set(names)))
+            self.assertEqual(set(names), {bundle.NAME + '/' + name for name in inputs}
+                             | {bundle.NAME + '/' + bundle.MANIFEST})
+            self.assertIn(bundle.NAME + '/SKILL.md', names)
+            self.assertIn(bundle.NAME + '/prepare_sources.py', names)
+            self.assertIn(bundle.NAME + '/run_kb.py', names)
+            self.assertIn(bundle.NAME + '/scripts/public_rebind.py', names)
+            self.assertIn(bundle.NAME + '/dst-kb-service/dst_kb/mcp_server.py', names)
+            self.assertIn(bundle.NAME + '/dst-kb-service/dst_kb/projection_profiles.json', names)
+            self.assertIn(bundle.NAME + '/dst-kb-service/docs/mcp-tools.json', names)
+            catalog = json.loads(archive.read(bundle.NAME + '/knowledge/CATALOG.json'))
+            self.assertEqual(len(catalog['entries']), 187)
+            manifest = json.loads(archive.read(bundle.NAME + '/' + bundle.MANIFEST))
+            self.assertEqual(manifest['knowledge_records'], 187)
+            self.assertEqual(manifest['knowledge_families'], bundle.EXPECTED_COUNTS)
+            for name, record in manifest['files'].items():
+                data = archive.read(bundle.NAME + '/' + name)
+                self.assertEqual(record, {'sha256': bundle.sha(data), 'bytes': len(data)})
+                self.assertNotIn(b'DO NOT PACKAGE', data)
 
     def test_deterministic_bytes_ignore_mtime(self):
         first = bundle.make_outputs(self.source)
@@ -75,163 +108,100 @@ class WebBundleTests(unittest.TestCase):
             if path.is_file():
                 os.utime(path, (1000000000, 1000000000))
         self.assertEqual(first, bundle.make_outputs(self.source))
-
-    def test_native_zip_layout_raw_content_and_allowlist(self):
-        for name in ['private/secret.md', 'tests/test.py', '.git/config', 'dist/old.py',
-                     'references/private.dat', 'references/nested/extra.md']:
-            self.put(name, 'DO NOT PACKAGE')
-        inputs = bundle.source_files(self.source)
-        outputs = bundle.make_outputs(self.source)
-        with zipfile.ZipFile(io.BytesIO(outputs[f'{bundle.NAME}.skill.zip'])) as archive:
-            self.assertEqual(set(archive.namelist()), {bundle.NAME + '/' + name for name in inputs})
-            self.assertIn(bundle.NAME + '/SKILL.md', archive.namelist())
+        with zipfile.ZipFile(io.BytesIO(first[bundle.ARCHIVE])) as archive:
             for info in archive.infolist():
-                self.assertEqual(archive.read(info), inputs[info.filename.split('/', 1)[1]])
-                self.assertEqual(info.compress_type, zipfile.ZIP_STORED)
                 self.assertEqual(info.date_time, (1980, 1, 1, 0, 0, 0))
+                self.assertEqual(info.compress_type, zipfile.ZIP_DEFLATED)
 
-    def test_profiles_source_hashes_complete_text_and_link_destinations(self):
-        outputs = bundle.make_outputs(self.source)
-        index = json.loads(outputs[bundle.INDEX])
-        for profile, sources in index['profiles'].items():
-            body = outputs[f'web-{profile}.md'].decode('utf-8')
-            self.assertTrue(set(bundle.COMMON).issubset(sources))
-            self.assertEqual(sources[-1], 'LICENSE')
-            for source in sources:
-                raw = (self.source / source).read_bytes()
-                self.assertEqual(index['inputs'][source], bundle.sha(raw))
-                self.assertIn(f'## 来源：`{source}`', body)
+    def test_source_preparation_input_closure_is_packaged(self):
+        inputs = bundle.source_files(self.source)
+        required = {row['path'] for row in bootstrap.package_inputs(self.source)}
+        self.assertFalse(required - inputs.keys())
 
-                self.assertIn(f'原始 SHA-256：`{bundle.sha(raw)}`', body)
-                self.assertIn(bundle.rewrite_links(raw.decode('utf-8'), source), body)
-        starter = outputs['web-starter.md'].decode('utf-8')
-        self.assertIn(f'{bundle.REPOSITORY}/blob/main/references/environment-tools.md', starter)
-        self.assertIn(f'{bundle.REPOSITORY}/blob/main/templates/local-validation.md#result', starter)
-        self.assertIn(f'[sample]: {bundle.REPOSITORY}/blob/main/SKILL.md "Title"', starter)
-        self.assertIn('```md\n[Example](keep-relative.md)\n```', starter)
+    def test_changed_knowledge_missing_manifest_and_invalid_paths_fail(self):
+        self.put('knowledge/data/entries.json', 'tampered')
+        self.assertEqual(self.cli(), 2)
+        self.assertFalse(self.output.exists())
+        self.manifest()
+        self.assertEqual(self.cli(), 0)
+        (self.source / 'knowledge/PACKAGE-MANIFEST.json').unlink()
+        self.assertEqual(self.cli(), 2)
+        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': [
+            {'path': '../private.json', 'bytes': 0, 'sha256': '0' * 64}]}))
+        self.assertEqual(self.cli(), 2)
 
-    def test_maintainer_material_stays_out_of_user_bundles(self):
-        for name in bundle.MAINTAINER_ONLY:
-            self.put(name, 'MAINTAINER_MATERIAL_ONLY\n')
-        outputs = bundle.make_outputs(self.source)
-        index = json.loads(outputs[bundle.INDEX])
-        self.assertFalse(bundle.MAINTAINER_ONLY.intersection(index['inputs']))
-        for name, data in outputs.items():
-            if name.endswith('.md'):
-                self.assertNotIn(b'MAINTAINER_MATERIAL_ONLY', data)
-        with zipfile.ZipFile(io.BytesIO(outputs[f'{bundle.NAME}.skill.zip'])) as archive:
-            self.assertFalse({bundle.NAME + '/' + p for p in bundle.MAINTAINER_ONLY}.intersection(archive.namelist()))
+    def test_incomplete_duplicate_and_wrong_family_catalogs_fail(self):
+        for change in ('missing', 'duplicate', 'family'):
+            with self.subTest(change=change):
+                altered = json.loads(json.dumps(self.catalog))
+                if change == 'missing':
+                    altered['entries'].pop()
+                elif change == 'duplicate':
+                    altered['entries'][1]['id'] = altered['entries'][0]['id']
+                else:
+                    altered['entries'][0]['family'] = 'native_ai'
+                self.put('knowledge/CATALOG.json', json.dumps(altered))
+                self.manifest()
+                self.assertEqual(self.cli(), 2)
 
-    def test_reading_zip_inner_and_outer_indexes_have_no_self_hash_cycle(self):
-        outputs = bundle.make_outputs(self.source)
-        outer = json.loads(outputs[bundle.INDEX])
-        self.assertNotIn(bundle.INDEX, outer['outputs'])
-        for name, record in outer['outputs'].items():
-            self.assertEqual(record, bundle.metadata(outputs[name]))
-        with zipfile.ZipFile(io.BytesIO(outputs['web-reading.zip'])) as archive:
-            inner = json.loads(archive.read('reading-index.json'))
-            self.assertNotIn('reading-index.json', inner['outputs'])
-            self.assertEqual(inner['source_fingerprint'], outer['source_fingerprint'])
-            self.assertEqual(archive.read('local-validation.md'),
-                             (self.source / 'templates/local-validation.md').read_bytes())
-            self.assertEqual(archive.read('LICENSE'), (self.source / 'LICENSE').read_bytes())
-            for name, record in inner['outputs'].items():
-                self.assertEqual(record, bundle.metadata(archive.read(name)))
+    def test_other_runtime_epoch_is_rejected(self):
+        self.put('source-epochs.json', json.dumps({'default_source_epoch': '759671',
+                                                 'epochs': {'759671': {}, '756039': {}}}))
+        self.assertEqual(self.cli(), 2)
 
-    def test_check_detects_missing_stale_extra_without_writing(self):
+    def test_local_only_input_and_missing_mcp_fail_without_output(self):
+        self.put('references/web-chat.md', '\ufeff  <!-- local-only -->\nprivate\n')
+        self.assertEqual(self.cli(), 2)
+        self.assertFalse(self.output.exists())
+        self.put('references/web-chat.md', '# Public\n')
+        (self.source / 'dst-kb-service/dst_kb/mcp_server.py').unlink()
+        self.assertEqual(self.cli(), 2)
+
+    def test_check_is_read_only_and_owned_release_can_update(self):
         self.assertEqual(self.cli('--check'), 1)
         self.assertFalse(self.output.exists())
         self.assertEqual(self.cli(), 0)
         self.assertEqual(self.cli('--check'), 0)
-        original = {p.name: p.read_bytes() for p in self.output.iterdir()}
-        self.put('README.md', '# Changed source\n')
+        original = bundle.existing_files(self.output)
+        self.put('README.md', '# Updated\n')
         self.assertEqual(self.cli('--check'), 1)
-        self.assertEqual({p.name: p.read_bytes() for p in self.output.iterdir()}, original)
-        (self.output / 'stale-user.md').write_bytes(b'keep')
-        self.assertEqual(self.cli('--check'), 1)
-        self.assertEqual(self.cli(), 2)
-        self.assertEqual((self.output / 'stale-user.md').read_bytes(), b'keep')
-
-    def test_missing_profile_source_fails_without_partial_output(self):
-        (self.source / 'references/worldgen-spatial.md').unlink()
-        self.assertEqual(self.cli(), 2)
-        self.assertFalse(self.output.exists())
-
-    def test_local_only_source_refuses_build_without_creating_output(self):
-        self.put('references/environment-tools.md', '\ufeff  <!-- local-only -->\r\n'
-                 '# Private environment\r\nSynthetic confidential configuration\r\n')
-        self.assertEqual(self.cli(), 2)
-        self.assertFalse(self.output.exists())
-
-    def test_local_only_source_preserves_existing_bundles_in_build_and_check(self):
-        self.assertEqual(self.cli(), 0)
-        before = {p.name: p.read_bytes() for p in self.output.iterdir()}
-        path = self.source / 'SKILL.md'
-        path.write_bytes(path.read_bytes() + b'\n<!-- local-only -->\nPrivate project notes\n')
-        for args in ((), ('--check',)):
-            with self.subTest(args=args):
-                self.assertEqual(self.cli(*args), 2)
-                self.assertEqual({p.name: p.read_bytes() for p in self.output.iterdir()}, before)
-
-    def test_rebuild_updates_owned_outputs_and_repairs_missing_owned_file(self):
-        self.assertEqual(self.cli(), 0)
-        (self.output / 'web-starter.md').unlink()
-        self.put('README.md', '# Revised source\n')
+        self.assertEqual(bundle.existing_files(self.output), original)
         self.assertEqual(self.cli(), 0)
         self.assertEqual(self.cli('--check'), 0)
 
-    def test_unowned_or_user_modified_outputs_are_preserved(self):
+    def test_modified_or_unowned_outputs_are_preserved(self):
         self.output.mkdir(parents=True)
-        target = self.output / 'web-starter.md'
-        target.write_bytes(b'user note')
+        self.put('dist/release/user.md', 'keep')
         self.assertEqual(self.cli(), 2)
-        self.assertEqual(target.read_bytes(), b'user note')
-        target.unlink()
+        self.assertEqual((self.output / 'user.md').read_text(), 'keep')
+        (self.output / 'user.md').unlink()
         self.assertEqual(self.cli(), 0)
-        target.write_bytes(b'edited generated file')
-        before = {p.name: p.read_bytes() for p in self.output.iterdir()}
+        (self.output / bundle.ARCHIVE).write_bytes(b'user modification')
+        before = bundle.existing_files(self.output)
         self.assertEqual(self.cli(), 2)
-        self.assertEqual({p.name: p.read_bytes() for p in self.output.iterdir()}, before)
+        self.assertEqual(bundle.existing_files(self.output), before)
 
-    def test_dangerous_output_locations_are_rejected(self):
-        for path in [self.source, self.base, self.source / 'scripts/output',
-                     self.source / 'references/output', self.source / 'docs']:
+    def test_failed_replace_restores_both_assets(self):
+        self.assertEqual(self.cli(), 0)
+        before = bundle.existing_files(self.output)
+        self.put('README.md', '# Revised\n')
+        real_replace = os.replace
+        calls = 0
+        def fail_once(source, target):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise OSError('simulated failure')
+            return real_replace(source, target)
+        with mock.patch.object(bundle.os, 'replace', side_effect=fail_once):
+            self.assertEqual(self.cli(), 2)
+        self.assertEqual(bundle.existing_files(self.output), before)
+        self.assertEqual(list(self.output.parent.glob('.dme-release-*')), [])
+
+    def test_output_locations_and_symlinks_are_rejected(self):
+        for path in (self.source, self.base, self.source / 'scripts/output', self.source / 'docs'):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 bundle.output_path(self.source, path)
-
-    def test_modified_index_is_not_silently_overwritten(self):
-        self.assertEqual(self.cli(), 0)
-        path = self.output / bundle.INDEX
-        data = json.loads(path.read_bytes())
-        data['user_note'] = 'keep this'
-        path.write_bytes(bundle.json_bytes(data))
-        before = path.read_bytes()
-        self.assertEqual(self.cli(), 2)
-        self.assertEqual(path.read_bytes(), before)
-
-    def test_relative_link_resolution_and_escape_rejection(self):
-        self.assertEqual(bundle.public_link('<../README.md#intro>', 'references/web-chat.md'),
-                         f'<{bundle.REPOSITORY}/blob/main/README.md#intro>')
-        self.assertEqual(bundle.public_link('#intro', 'README.md'), f'{bundle.REPOSITORY}/blob/main/README.md#intro')
-        self.assertEqual(bundle.public_link('scripts/', 'SKILL.md'), f'{bundle.REPOSITORY}/tree/main/scripts')
-        self.assertEqual(bundle.public_link('https://example.com/a', 'SKILL.md'), 'https://example.com/a')
-        with self.assertRaises(ValueError):
-            bundle.public_link('../../private.md', 'references/web-chat.md')
-
-    def test_linked_badge_rewrites_outer_destination_in_flat_document(self):
-        badge = '[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)'
-        expected = ('[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)]'
-                    f'({bundle.REPOSITORY}/blob/main/LICENSE)')
-        self.put('README.md', '# Readme\n\n' + badge + '\n')
-        self.assertEqual(bundle.rewrite_links(badge, 'README.md'), expected)
-        flattened = bundle.make_outputs(self.source)['web-full.md'].decode('utf-8')
-        self.assertIn(expected, flattened)
-        self.assertNotIn(badge, flattened)
-        self.assertEqual(bundle.rewrite_links('[![Badge](badge.svg)](README.md "Read")', 'SKILL.md'),
-                         f'[![Badge]({bundle.REPOSITORY}/blob/main/badge.svg)]'
-                         f'({bundle.REPOSITORY}/blob/main/README.md "Read")')
-
-    def test_symlink_input_and_output_are_rejected(self):
         target = self.base / 'outside.md'
         target.write_bytes(b'outside')
         link = self.source / 'references/linked.md'
@@ -241,30 +211,18 @@ class WebBundleTests(unittest.TestCase):
             self.skipTest(f'Host cannot create symlinks: {exc}')
         with self.assertRaises(ValueError):
             bundle.make_outputs(self.source)
-        link.unlink()
-        external = self.base / 'outside-output'
-        external.mkdir()
-        self.output.parent.mkdir(parents=True)
-        self.output.symlink_to(external, target_is_directory=True)
-        with self.assertRaises(ValueError):
-            bundle.output_path(self.source, self.output)
 
-    def test_transaction_restores_owned_output_after_replace_failure(self):
-        self.assertEqual(self.cli(), 0)
-        before = {p.name: p.read_bytes() for p in self.output.iterdir()}
-        self.put('README.md', '# Changed\n')
-        real_replace = os.replace
-        calls = 0
-        def fail_once(source, destination):
-            nonlocal calls
-            calls += 1
-            if calls == 3:
-                raise OSError('simulated disk error')
-            return real_replace(source, destination)
-        with mock.patch.object(bundle.os, 'replace', side_effect=fail_once):
-            self.assertEqual(self.cli(), 2)
-        self.assertEqual({p.name: p.read_bytes() for p in self.output.iterdir()}, before)
-        self.assertEqual(list(self.output.parent.glob('.dme-web-*')), [])
+
+class RepositoryReleaseTests(unittest.TestCase):
+    def test_real_repository_preparation_input_closure_and_unique_187_catalog(self):
+        root = Path(__file__).resolve().parents[1]
+        inputs = bundle.source_files(root)
+        required = {row['path'] for row in bootstrap.package_inputs(root)}
+        self.assertFalse(required - inputs.keys(), 'Runtime inputs absent from release')
+        catalog = json.loads(inputs['knowledge/CATALOG.json'])
+        self.assertEqual(len(catalog['entries']), 187)
+        self.assertFalse(any(name.startswith(('knowledge-history/', 'dst-engineering-kb/',
+                                              'compatibility/', 'knowledge/history/')) for name in inputs))
 
 
 if __name__ == '__main__':

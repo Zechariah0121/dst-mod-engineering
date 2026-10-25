@@ -1,3 +1,5 @@
+[当前布局注：以下是历史迁移记录；文中的history/v0.1快照现由Git历史保留，当前包不再重复存放旧知识。当前完整入口为CATALOG.json，64条正文保留由SHA256基线检查。]
+
 # KB v0.1.1 Migration Report
 
 本轮仅进行数据结构与可移植性修订。64 条 canonical knowledge 保持原有语义；未重新分析小穹源码，未重写历史报告，未进行任何 DST runtime validation，未继续 Case Study 002。

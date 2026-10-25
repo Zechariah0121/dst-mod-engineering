@@ -149,11 +149,38 @@ def validate(root):
         core_data,core_report=nativecore.load(root,schema_errors,check_supported_schema,bool(native_data),known)
         data['nativecore']=core_data
         if native_data:
-            for relative in INPUTS+[p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json')
-                                     if p.name not in ('native-ai.schema.json','native-core.schema.json')]+['tools/validate_v011.py']:
-                frozen=root/'history/v0.1.1'/relative
-                if not frozen.is_file() or frozen.read_bytes()!=(root/relative).read_bytes():
-                    errors.append('frozen legacy preservation '+relative)
+            baseline=read(root/'data/legacy-integrity-baseline.json')
+            required=set(INPUTS)|{p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json')
+                                    if p.name not in ('native-ai.schema.json','native-core.schema.json')}
+            baseline_files=baseline.get('files',[])
+            if baseline.get('schema')!='dst-legacy-integrity-baseline/1' or {row['path'] for row in baseline_files}!=required:
+                errors.append('legacy baseline file registry')
+            for row in baseline_files:
+                p=inside(root,row['path'])
+                if not p.is_file() or p.stat().st_size!=row['bytes'] or sha256(p.read_bytes()).hexdigest()!=row['sha256']:
+                    errors.append('legacy baseline preservation '+row['path'])
+            record_hashes=[{'id':e['id'],'sha256':sha256(json.dumps(e,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()} for e in entries]
+            if len(record_hashes)!=64 or record_hashes!=baseline.get('entries'):errors.append('legacy baseline record preservation')
+        catalog=read(root/'CATALOG.json');catalog_rows=catalog['entries']
+        documents={relative:read(inside(root,relative)) for relative in {row['file'] for row in catalog_rows}}
+        catalog_ids=[]
+        for row in catalog_rows:
+            value=documents[row['file']]
+            pointer=row['pointer']
+            if not pointer.startswith('/'):errors.append('catalog invalid pointer '+row['id']);continue
+            for token in pointer[1:].split('/'):
+                token=token.replace('~1','/').replace('~0','~')
+                value=value[int(token)] if isinstance(value,list) else value[token]
+            catalog_ids.append(value['id'])
+            if row['id']!=value['id'] or row['title']!=value['title']:errors.append('catalog pointer identity '+row['id'])
+            for key in ('status','knowledge_status','retrieval_status','coding_status'):
+                if key in value and row.get(key)!=value[key]:errors.append('catalog state '+row['id']+':'+key)
+        expected_catalog_ids=[e['id'] for e in entries]+[e['id'] for e in (native_data or {}).get('entries',[])]+[e['id'] for e in (core_data or {}).get('entries',[])]
+        if catalog_ids!=expected_catalog_ids or len(set(catalog_ids))!=len(catalog_ids):errors.append('catalog full ID registry')
+        family_counts={name:sum(row['family']==name for row in catalog_rows) for name in ('legacy','native_ai','native_core')}
+        expected_families={'legacy':64,'native_ai':13,'native_core':110} if native_data or core_data else {'legacy':64,'native_ai':0,'native_core':0}
+        declared_counts={key:catalog.get('counts',{}).get(key,0) for key in ('total','legacy','native_ai','native_core')}
+        if declared_counts!={'total':len(catalog_rows),**family_counts} or family_counts!=expected_families:errors.append('catalog full family counts')
         manifest=read(root/'PACKAGE-MANIFEST.json')
         expected={x['path'] for x in manifest['files']}
         actual={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() and p!=root/'PACKAGE-MANIFEST.json' and '__pycache__' not in p.parts}
@@ -167,11 +194,12 @@ def validate(root):
         knowledge_version=title_version.group(1) if title_version else (next(iter(versions)) if len(versions)==1 else None)
         return data, {'status':'PASS','schema_version':SCHEMA_VERSION,'kb_version':'0.1.2' if native_data else knowledge_version,
             'base_kb_version':knowledge_version,'native':native_report,'nativecore':core_report,
-            'legacy_preservation':'BYTE_IDENTICAL_TO_V0_1_1_HISTORY' if native_data else 'not_applicable',
+            'legacy_preservation':'SHA256_IDENTICAL_TO_RECORDED_BASELINE' if native_data else 'not_applicable',
+            'catalog':'PASS','catalog_entries':len(catalog_rows),
             'entries':len(entries)+native_report['entries']+core_report['entries'],'legacy_entries':len(entries),
             'native001_entries':native_report['entries'],'nativecore_entries':core_report['entries'],
             'relations':len(edges),'manifest':'PASS','runtime_validation_performed':False,
             'limitations':['Schema subset checked fail-closed for unknown keywords.','Correction guard covers explicit claim references, not natural-language meaning.']}
     except KBError:raise
-    except (OSError,ValueError,KeyError,TypeError) as exc:
+    except (OSError,ValueError,KeyError,IndexError,TypeError) as exc:
         raise KBError('CORRUPTED_KB',str(exc)) from exc

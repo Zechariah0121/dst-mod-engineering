@@ -31,13 +31,15 @@ jobs:
       - name: Install Python test dependency
         run: python -m pip install -r requirements.txt
       - name: Compile Python sources
-        run: python -m compileall -q scripts tests
+        run: python -m compileall -q scripts tests prepare_sources.py run_kb.py dst-kb-service/dst_kb
       - name: Run unit tests with synthetic fixtures (no DST installation)
         run: python -m unittest discover -s tests -v
-      - name: Verify generated web bundles match source files
-        run: python scripts/build_web_bundle.py --check
-      - name: Validate portable public knowledge package
-        run: python -B dst-engineering-kb/tools/validate.py
+      - name: Verify public knowledge integrity and corruption rejection
+        run: python -B -m unittest discover -s knowledge/tests -v
+      - name: Build single complete release and verify reproducibility
+        run: |
+          python -B scripts/build_release.py
+          python -B scripts/build_release.py --check
       - name: Test read-only knowledge retrieval
         working-directory: dst-kb-service
         run: python -B -m unittest discover -s tests -v

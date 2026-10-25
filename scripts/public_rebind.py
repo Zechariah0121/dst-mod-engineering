@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 
 CORE = 'data/nativecore/native-core.json'
 N001 = 'data/native001/canonical-native001-ai-knowledge.json'
-ROOTS = ('knowledge', 'knowledge-history/e42')
+ROOTS = ('knowledge',)
 _HASHES = {}
 
 
@@ -204,13 +204,7 @@ def rebind(target, originmapping, report_path=None):
             doc = read(path)
             bind_refs(doc)
             write(path, doc)
-        # Legacy preservation is a real public byte identity, not the original
-        # private archive identity. Only validator-required baseline is mirrored.
-        for relative in origins.get('legacy_mirror_files', []):
-            path = child(kb, relative)
-            dest = child(kb, 'history/v0.1.1/' + relative)
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_bytes(path.read_bytes())
+        # Historical baselines are hashes, not duplicated canonical directories.
         records = {}
         for relative in ('data/entries.json', N001, CORE):
             for record in read(kb / relative)['entries']:

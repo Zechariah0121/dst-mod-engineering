@@ -5,7 +5,7 @@ import re
 from .request_analysis import analyzed_request, memoized_analysis, memoized_support
 
 from .intent_scope import (
-    BROAD_CONCEPTS, DOMAIN_SUBJECTS, SOURCE_METADATA_LABEL, SUBJECT_CONCEPTS,
+    BROAD_CONCEPTS, DOMAIN_SUBJECTS, SOURCE_METADATA_LABEL, SUBJECT_CONCEPTS, SEMANTIC_REGEX,
     _business_component_names, _explicit_task_owners, _lexical_tokens, _narrow_context, _operations, _precise_symbols,
     _relations, _source_units, _structured_source_units, _structured_competing_head, _source_relation_witness,
     _source_unknown_owner_frames, _verified_method_head, CONCRETE_BEHAVIOR, COMPARISON_REQUEST,
@@ -184,7 +184,7 @@ def _valid_frames(request, unit, context, source_owners=None):
     if ('reference_binding_phase' in matched
             and not _reference_phase_method(request, unit, context)):
         matched -= {'reference_binding_phase'}
-    if 'operation_order' in matched and not _ordered_step_anchors(request, unit, context=None):
+    if 'operation_order' in matched and not _ordered_step_anchors(request, unit, context):
         matched -= {'operation_order'}
     if ('mechanism_distinction' in matched
             and not _comparison_method_context(request, unit, context)):
@@ -504,6 +504,50 @@ def _order_anchor_tokens(text):
             for token in (latin or tokens)}
 
 
+def _nominal_method_order(request, unit, context):
+    """Bind a nominal cleanup/callback order to its proved original method head.
+
+    This only supplies navigation for an existing literal order. It cannot
+    supply missing steps, a different receiver, or a callback's own contract.
+    """
+    requested = _qualified_symbols(request)
+    verified, _ = _verified_method_head(unit, context)
+    verified = {name.lower().replace('.', ':') for name in verified if ':' in name or '.' in name}
+    if len(requested) != 1 or not requested <= verified:
+        return False
+    for continuation in re.split(r'[;；。!?！？\n]', unit)[1:]:
+        competing = _primary_method(continuation, context)
+        if _structured_competing_head(continuation) or competing and not competing <= requested:
+            return False
+    if 'operation_order' not in source_relations(unit):
+        return False
+    residual = _callsite_prose(request)
+    if re.search(r'→|->|\b(?:before|after|first|then|followed\s+by)\b|之前|之后|然后|先.{0,40}再', residual, re.I):
+        return False
+    # effective_text can prepend the already-resolved object referent. Keep
+    # its qualified method check above, then inspect the actual review noun.
+    review = re.search(r'请?(?:审查|核对|说明)|\b(?:review|check|explain|describe)\b', residual, re.I)
+    if review:
+        residual = residual[review.start():]
+    residual = re.sub(r'\b[A-Za-z_]\w*[.:][A-Za-z_]\w*\b', ' ', residual, flags=re.ASCII)
+    residual = re.sub(r'(?:限定|仅限|只看|仅看)(?:这个|该|此|本)?(?:方法|函数)(?:的)?(?:实际)?(?:路径|实现)',
+                      ' ', residual)
+    residual = re.sub(r'(?:这个|该|此|本)(?:组件|方法|函数)', ' ', residual)
+    # Every named aspect must be present in this same original sentence.
+    # Unknown nouns remain in the residual and cannot borrow its method name.
+    relations = literal_relations(unit)
+    if 'callback_binding' in relations:
+        residual = re.sub(r'\bcallbacks?\b|回调', ' ', residual, flags=re.I)
+    if 'cancel_task' in _operations(unit, source=True):
+        residual = re.sub(r'\b(?:cleanup|cancellation|retirement|tasks?|handles?)\b|清理|取消|收尾|任务|句柄',
+                          ' ', residual, flags=re.I)
+    for concept in semantic_concepts(unit) & semantic_concepts(request):
+        residual = SEMANTIC_REGEX[concept].sub(' ', residual)
+    residual = re.sub(r'\b(?:review|check|explain|describe|please|the|of|and|order|ordering|sequence)\b'
+                      r'|请|审查|核对|说明|先后|顺序|的|与|和|及', ' ', residual, flags=re.I)
+    return not re.search(r'[A-Za-z0-9_\u3400-\u9fff]', residual)
+
+
 def _ordered_step_anchors(request, unit, context=None):
     # Internal ordering belongs to the requested implementation, not to a
     # caller that happens to invoke it as one step in a different sequence.
@@ -519,6 +563,8 @@ def _ordered_step_anchors(request, unit, context=None):
         owner = next(value for value in internal.groups() if value).lower().replace('.', ':')
         if owner not in _primary_method(unit, context):
             return False
+    if context and _nominal_method_order(request, unit, context):
+        return True
     # A single named received/invoked callback can be a caller dispatch step.
     # Additional requested steps still go through the complete anchor check.
     requested = {match.group().lower().replace('.', ':') for match in
@@ -1103,7 +1149,8 @@ def _single_request_support(query, statement, context='', request_frame=None):
     source_symbols = _qualified_symbols(text) | set().union(*(
         _verified_method_head(unit, context)[0] for unit in _source_units(text)))
     if excluded_symbols & source_symbols:
-        return original
+        return {**original, 'supported': False, 'whole_atom_delivery_allowed': False,
+                'supported_task_units': [], 'excluded_source_scope': True}
     helper_reference = _direct_callee_shortage_reference(positive, statement, context, original,
                                                         operation_request, requested_operations)
     if helper_reference is not None:

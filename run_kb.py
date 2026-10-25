@@ -20,7 +20,7 @@ def main(argv=None):
     parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config'])
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
-    parser.add_argument('--source-epoch', choices=['759671', '756039', 'original48-w1-f35a16fad3f4e44a'])
+    parser.add_argument('--source-epoch', choices=['759671'])
     args = parser.parse_args(argv)
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required')

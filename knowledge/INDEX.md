@@ -1,4 +1,6 @@
-# 全部知识条目
+# 基础64条知识视图
+
+完整187条机器入口为 [CATALOG.json](CATALOG.json)。本页与 `data/index.json` 保留基础64条的既有格式，供旧消费者读取。
 
 - [FACT-DST-001](facts/klei-lua.md#fact-dst-001) — EntityScript 组件持久化遍历
 - [FACT-DST-002](facts/klei-lua.md#fact-dst-002) — Container 的物品存档

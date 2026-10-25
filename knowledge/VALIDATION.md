@@ -1,6 +1,8 @@
-# v0.1.1 验证边界与复核
+# 187条统一知识库验证边界与复核
 
-执行 `python -B tools/validate.py`：检查 Schema、ID 唯一性、Index 一致性、Source 文件哈希、内部链接、typed relation 目标、Correction 目标、Manifest SHA256、Evidence 等级及 Runtime 状态。额外对比归档 v0.1 的正文与旧 SourceRef，去除允许的结构变化后应完全相同。
+执行 `python -B tools/validate.py`：检查完整187条CATALOG的ID、file/pointer、标题、三轴状态与家族计数，检查三套知识Schema、Native证据引用的包内路径/哈希/JSON pointer，并保留基础64条的Index、Source、内部链接、typed relation、Correction、Evidence及Runtime检查。Manifest覆盖唯一knowledge目录。
+
+基础64条正文、来源/Claim/关系注册表、旧Index与支持Schema通过 `data/legacy-integrity-baseline.json` 的SHA256核对；基线只存哈希，不复制旧知识正文。移除重复快照前，原v0.1与当前64条的独立 `semantic_migration_diff` 实跑为空；该结果作为历史比较记录，不宣称本次仍读取已删除的快照。历史数据与Schema可从Git历史恢复。
 
 本公开副本只运行包内校验：`python -B tools/validate.py`。外部源码与原始报告均未随包，`--check-external` 不适用。冻结版历史校验结果保留为已脱敏的历史记录。
 
@@ -17,4 +19,4 @@
 - 不宣称 Linux/macOS 实测；不同目录解压复核验证的是包内相对路径和无原路径依赖。
 - 第三方通用 JSON Schema 验证器未运行；本包标准库检查器覆盖当前使用的约束。
 
-原 v0.1 的 624 个链接与 8 项反例结果保存在 history/v0.1/data/validation.json。新版本因来源、Claim、typed relations 和文档增加，链接数会变化；应以本版实际执行输出核对，不能沿用旧数字。
+旧v0.1的链接与反例结果留在Git历史。当前实际检查数量以本次运行输出为准，不沿用历史数字。

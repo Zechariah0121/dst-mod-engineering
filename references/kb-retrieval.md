@@ -1,10 +1,10 @@
 # DST 工程知识库读取与检索
 
-当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。Skill 与网页阅读包可直接文件阅读；完整包额外提供现代 MCP 九工具服务 `0.3.0`。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
+当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。同一完整发行包支持直接文件阅读，也包含 MCP 九工具服务与来源准备工具。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
 
 ## 按任务读取文件
 
-1. 从 `knowledge/data/index.json` 找基础记录的 ID、路径与锚点；Native AI 在 `knowledge/data/native001/canonical-native001-ai-knowledge.json`，Core 与状态在 `knowledge/data/nativecore/native-core.json`。
+1. 从 `knowledge/CATALOG.json` 的 187 条统一目录找相关记录 ID，按其 `file`（相对 `knowledge/`）和 JSON `pointer` 定向读取。目录覆盖 64 基础、13 Native AI 和 110 Core；目录命中只用于导航，仍需读实际正文、状态与证据。
 2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
 3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
 
@@ -20,7 +20,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 ## MCP 接入与模式
 
-先按 [安装说明](../docs/install-and-use.md) 在完整包准备来源，再发现当前客户端实际暴露的九工具：
+先按 [安装说明](../docs/install-and-use.md) 在包根目录准备来源，再发现当前客户端实际暴露的九工具：
 
 | 工具 | 用途 |
 |---|---|
@@ -38,7 +38,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 ## 版本、角色与预算
 
-- 九工具接受可选 `source_epoch`。默认 `759671`；历史 `756039` 与 `original48-w1-f35a16fad3f4e44a` 是独立来源。显式选择后，后续记录读取、关联与证据解析继续传同一 epoch；来源树身份不能互相改名，默认来源也不保证等于用户安装版本。
+- 当前唯一运行环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；服务不提供历史环境切换。条目保留历史原版证据和各自适用范围，不能改名为当前源码事实；目标游戏仍需单独核对。
 - 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
 - Native AI Coding 保持十字段、最多五条。研究展开需显式 reviewer；`mode=review/research` 不授予角色权限、不解除 Core Coding HOLD。分别读取三轴状态与排除范围。
 - `compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节；按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录多个行为原子合为一张卡，不拆卡绕过条数限制。
@@ -55,6 +55,6 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-Current knowledge has 187 records and supports task-specific file reading in every distribution. MCP is available only in the prepared full package. File mode preserves the same Scope, claim types, states and admission limits: Native AI Coding uses exactly the ten fields above and at most five records; Core Coding HOLD remains binding. Keep explicitly selected epochs across follow-up calls. Budget limits, evidence-node selection, deferred content and same-card reference rules apply to MCP responses. A source slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
+The single complete package contains 187 records for task-specific file reading and provides MCP after local source preparation. File mode preserves the same Scope, claim types, states and admission limits: Native AI Coding uses exactly the ten fields above and at most five records; Core Coding HOLD remains binding. The only runtime source epoch is 759671; historical evidence retains its original scope. Budget limits, evidence-node selection, deferred content and same-card reference rules apply to MCP responses. A source slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。

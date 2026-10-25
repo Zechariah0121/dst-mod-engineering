@@ -14,12 +14,12 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
-EPOCHS = ('759671', '756039', 'original48-w1-f35a16fad3f4e44a')
+EPOCHS = ('759671',)
 MARKER = '$dst_source_payload_slot'
 SCHEMA = 'dst-prepared-local-runtime/1'
 RUNTIME_FILES = ('source-epochs.json', 'retrieval-config.json',
                  'source-payload-recipe.json', 'PUBLICATION-ORIGIN-MAP.json')
-RUNTIME_TREES = ('knowledge', 'knowledge-history', 'epoch-assets', 'dst-kb-service')
+RUNTIME_TREES = ('knowledge', 'epoch-assets', 'dst-kb-service')
 
 
 class PreparationError(Exception):
