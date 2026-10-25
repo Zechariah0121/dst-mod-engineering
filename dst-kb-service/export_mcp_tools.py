@@ -21,7 +21,7 @@ def main():
         if actual != expected:
             parser.exit(1, 'MCP schema differs from mcp_server.TOOLS; run export_mcp_tools.py\n')
     else:
-        target.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        target.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 
 
 if __name__ == '__main__':
