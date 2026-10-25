@@ -35,6 +35,14 @@ class BootstrapTests(unittest.TestCase):
         config = json.loads(result.stdout)['mcpServers']['dst_engineering_kb']
         self.assertIn(str(HERE.parent / 'run_kb.py'), config['args'])
 
+    def test_isolated_service_cli_locates_its_packaged_modules(self):
+        with tempfile.TemporaryDirectory(prefix='isolated-service-') as working:
+            result = subprocess.run([sys.executable, '-I', '-B', '-X', 'utf8',
+                str(HERE.parent / 'dst-kb-service/dst_kb_cli.py'), '--help'],
+                cwd=working, capture_output=True, text=True, encoding='utf-8', timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('Read-only DST KB service', result.stdout)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='synthetic-', dir=HERE)
         self.addCleanup(self.temporary.cleanup)
