@@ -16,6 +16,8 @@
 
 下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
 
+Skill 与知识文件阅读可作为 Public Beta 使用。完整 KB/MCP 仍是有已知限制的候选：来源准备、九工具连接、精确条目与行为证据读取、历史版本切换已经实测；自然语言检索仍可能漏交已有事实，本次一条腐败回调顺序问题返回了空结果。遇到空结果可按目录读取条目，不能据此认定库中无知识。完整 MCP 尚不标记为 `PUBLIC_BETA_RELEASE_READY`。
+
 ## 开始使用
 
 1. 完整解压，找到直接包含 `SKILL.md` 的目录。把该目录完整放入 Agent 支持的技能位置，例如 Codex 的 `.agents/skills/dst-mod-engineering/`；其他安装位置见 [安装说明](docs/install-and-use.md)。

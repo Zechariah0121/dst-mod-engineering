@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-code-review
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`22955607c9f2d3fe965b1ef02e01525e61c8fcebc765e386eeabe0f38ff7f3b6`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`57176ee32b06f7673d42b57ce35d93e9baf47751ffd34e093dcf6e900bef5098`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 

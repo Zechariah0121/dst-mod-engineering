@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`22955607c9f2d3fe965b1ef02e01525e61c8fcebc765e386eeabe0f38ff7f3b6`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`57176ee32b06f7673d42b57ce35d93e9baf47751ffd34e093dcf6e900bef5098`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -373,7 +373,7 @@ PNG/SCML 改动需重编译对应产物，Lua 改动本身不要求重编译美�
 
 ## 来源：`README.en.md`
 
-原始 SHA-256：`d1ad65638cf1025fece6ad65d6925263502deb4877eb41845c94606092c84a78`
+原始 SHA-256：`6220904fe21fb1b7bbadd77666dbb510ae4ccfb48d8af154648093cb7b8ca8f5`
 
 # DST Mod Engineering
 
@@ -392,6 +392,8 @@ Release: [v2026.10.25.1](https://github.com/Zechariah0121/dst-mod-engineering/re
 | [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip) | Web/offline reading material and 187 public records; no MCP service or source preparation tools |
 
 Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
+
+The Skill and knowledge-file reading are available as a Public Beta. The full KB/MCP remains a candidate with a known limitation: source preparation, nine-tool connection, exact records, behavioral evidence and historical-source switching were exercised, but natural-language retrieval can omit existing facts. One decay callback-order question returned no entries. Use the catalog to read selected records when needed; an empty result does not establish a knowledge gap. The full MCP is not marked `PUBLIC_BETA_RELEASE_READY`.
 
 ## Start
 
@@ -417,7 +419,7 @@ Project-owned material uses the [custom non-commercial LICENSE](https://github.c
 
 ## 来源：`README.md`
 
-原始 SHA-256：`c62296da6a9cc92fafae1d6629e6ec7d57b7754dbfe0486cb8e7680f6766ad76`
+原始 SHA-256：`5a55e317b986912f8d27635fef26529e3e737f192d154af2caa3ab46a028042b`
 
 # DST Mod Engineering
 
@@ -436,6 +438,8 @@ Project-owned material uses the [custom non-commercial LICENSE](https://github.c
 | [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip) | 网页与离线阅读材料、187 条公开知识；不含 MCP 服务与来源准备工具 |
 
 下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
+
+Skill 与知识文件阅读可作为 Public Beta 使用。完整 KB/MCP 仍是有已知限制的候选：来源准备、九工具连接、精确条目与行为证据读取、历史版本切换已经实测；自然语言检索仍可能漏交已有事实，本次一条腐败回调顺序问题返回了空结果。遇到空结果可按目录读取条目，不能据此认定库中无知识。完整 MCP 尚不标记为 `PUBLIC_BETA_RELEASE_READY`。
 
 ## 开始使用
 
@@ -652,7 +656,7 @@ Project-owned material uses the custom non-commercial LICENSE. Valid historical 
 
 ## 来源：`docs/public-limits.md`
 
-原始 SHA-256：`ff823488912fca969c7b5860eeb2f39f61d278492c44b95adb35649abed21e7f`
+原始 SHA-256：`70614bb60b217bc3e124c10d7b029205402524724125d0803bec30b6cc514670`
 
 # 能力与限制 / Capabilities and limits
 
@@ -667,12 +671,13 @@ Project-owned material uses the custom non-commercial LICENSE. Valid historical 
 | 来源依赖 | 当前 `759671` ZIP 单独缺 13 种历史范围、9 个旧文件；没有这些来源仍可文件阅读，但完整 MCP 不可用 |
 | 版本 | `759671`、`756039` 与独立历史树是不同来源；记录与专题只覆盖注明的函数、端别和条件，不保证当前在线版本或全部 Mod 兼容 |
 | 客户端接入 | 打印配置、生成缓存或服务校验不等于客户端连接与实际查询成功；没有逐一完成所有 Agent/账户/云端环境自动加载测试 |
+| 自然检索 | 已知一条 `Perishable:Perish` 回调与清理顺序需求返回空结果，而 `ID-C06` 正文及行为证据可精确读取；不是预算扣留，也不证明知识不存在。完整 MCP 仍为候选，不宣称已达 Public Beta 完整服务就绪 |
 | 验证 | 静态检查、受控合约、专服行为、真实远端、视觉与音频分别报告；未执行项保留未测 |
 | 开发辅助脚本 | `check_api.py` 只检查语法和部分直接方法声明；`dst_modtest.py` 仅支持 Windows 离线单分片，不替代洞穴/跨分片、Mod 组合或客户端效果 |
 
 来源准备生成的 `cache/runtime/` 含本地游戏源码片段，不能随公开包上传。知识检索仍受角色、预算、Scope、缺失/延期和 HOLD 约束，见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 与 [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。具体工程验收见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
-The public release includes 187 knowledge records, not unrestricted Coding admission or complete original evidence. Three project policies and one EI retain private context as `UNK`; no replacement general facts are invented. Other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five task-relevant records; 110 Core records retain Coding HOLD. Game Lua is excluded. Source slots need authorized local restoration, including historical ranges absent from a single current ZIP. All packages support file reading; only the full package provides MCP and preparation. Printed configuration, cache creation or validation does not prove client connection or real queries. Version, environment, remote-client, visual and audio limits require separate evidence. Restored source caches must stay local.
+The public release includes 187 knowledge records, not unrestricted Coding admission or complete original evidence. Three project policies and one EI retain private context as `UNK`; no replacement general facts are invented. Other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five task-relevant records; 110 Core records retain Coding HOLD. Game Lua is excluded. Source slots need authorized local restoration, including historical ranges absent from a single current ZIP. All packages support file reading; only the full package provides MCP and preparation. Printed configuration, cache creation or validation does not prove client connection or real queries. One Perishable callback-order query returned no entries despite readable ID-C06 facts and behavioral evidence; it was not a budget hold. The full MCP remains a candidate, not PUBLIC_BETA_RELEASE_READY. Version, environment, remote-client, visual and audio limits require separate evidence. Restored source caches must stay local.
 
 
 ---

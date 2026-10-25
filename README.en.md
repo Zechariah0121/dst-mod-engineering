@@ -16,6 +16,8 @@ Release: [v2026.10.25.1](https://github.com/Zechariah0121/dst-mod-engineering/re
 
 Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
 
+The Skill and knowledge-file reading are available as a Public Beta. The full KB/MCP remains a candidate with a known limitation: source preparation, nine-tool connection, exact records, behavioral evidence and historical-source switching were exercised, but natural-language retrieval can omit existing facts. One decay callback-order question returned no entries. Use the catalog to read selected records when needed; an empty result does not establish a knowledge gap. The full MCP is not marked `PUBLIC_BETA_RELEASE_READY`.
+
 ## Start
 
 Extract the package completely and install the directory containing `SKILL.md` in a supported agent skill location. Invoke `dst-mod-engineering` with your task, mod directory, actual game version and authorized local source. Without MCP, read a small relevant subset from the knowledge files. See [installation](docs/install-and-use.md) and [KB integration](docs/knowledge-integration.md).
