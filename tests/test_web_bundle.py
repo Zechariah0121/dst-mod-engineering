@@ -15,6 +15,29 @@ import build_web_bundle as bundle
 
 
 class WebBundleTests(unittest.TestCase):
+    def test_current_knowledge_bytes_are_in_both_skill_and_reading_zip(self):
+        data = b'{"entries": [{"id": "PUBLIC-FACT", "statement": "bounded fact"}]}\n'
+        self.put('knowledge/data/entries.json', data.decode('utf-8'))
+        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': [
+            {'path': 'data/entries.json', 'bytes': len(data), 'sha256': bundle.sha(data)}]}))
+        outputs = bundle.make_outputs(self.source)
+        with zipfile.ZipFile(io.BytesIO(outputs['dst-mod-engineering.skill.zip'])) as archive:
+            self.assertEqual(archive.read('dst-mod-engineering/knowledge/data/entries.json'), data)
+        with zipfile.ZipFile(io.BytesIO(outputs['web-reading.zip'])) as archive:
+            self.assertEqual(archive.read('knowledge/data/entries.json'), data)
+
+    def test_changed_knowledge_cannot_bypass_its_manifest(self):
+        self.put('knowledge/data/entries.json', '{"entries": []}\n')
+        self.put('knowledge/PACKAGE-MANIFEST.json', json.dumps({'files': [
+            {'path': 'data/entries.json', 'sha256': '0' * 64, 'bytes': 16}]}))
+        with self.assertRaises(ValueError):
+            bundle.make_outputs(self.source)
+
+    def test_knowledge_directory_requires_public_manifest(self):
+        self.put('knowledge/unreviewed.json', 'PRIVATE_UNREGISTERED_SOURCE\n')
+        with self.assertRaises(ValueError):
+            bundle.make_outputs(self.source)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.base = Path(self.temp.name).resolve()

@@ -1,0 +1,1608 @@
+{
+  "scope": "Bounded dot-cloud-only static source distillation of common fan/walkable helper and entity query consumer contracts. Research ready for the selected questions does not mean canonical integration.",
+  "validation": {
+    "all_new_citations_match_snapshot": true,
+    "all_new_ranges_LF_joined_no_terminal_LF": true,
+    "source_read_log_selected_ranges_only": true,
+    "raw_lua_in_deliverable": false,
+    "runtime_or_lua_executed": false,
+    "no_repo_or_baseline_writes": true,
+    "independent_review_pending": true,
+    "compact_callable_signatures_units_results_callback_shapes_preserved": true
+  },
+  "direct_facts": [
+    {
+      "fact_id": "SPATIAL-FAN-INPUTS",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindValidPositionByFan takes start_angle, radius, attempts, test_fn. attempts defaults through attempts or 8. The helper has no origin parameter, constructs an XZ-plane Vector3 with y=0, and passes that relative offset to test_fn.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindValidPositionByFan",
+          "line_start": 291,
+          "line_end": 325,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "dc2f6efbcb22baa86db35d290874c71ff46a34e0a530189c7a18ad5ef2496bee",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L291-L325"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Caller supplies an angular search start, radial distance, number of angular attempts and a candidate predicate."
+        ],
+        "ordered_branches": [
+          "attempts is replaced with 8 when nil or false.",
+          "Each candidate is Vector3(radius*cos(check_angle), 0, -radius*sin(check_angle)).",
+          "The predicate is called with that candidate offset only."
+        ],
+        "observable_lua_result": [
+          "No world point is created by this helper."
+        ],
+        "callback_contract": [
+          "test_fn(offset): one relative Vector3; Lua truthiness controls acceptance."
+        ],
+        "failure_or_limits": [
+          "There is no nil guard for test_fn. Radius is not defaulted.",
+          "There is no built-in ground, wall, occupancy, hole, boat or line-of-sight test."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Capture the origin in the predicate and add offset to it before querying world geometry. Validate a positive integer attempts value at the calling boundary rather than assuming malformed values have a safe failure contract."
+      }
+    },
+    null,
+    {
+      "fact_id": "SPATIAL-FAN-ANGLE-UNITS",
+      "evidence_kind": "direct_lua_source_fact_with_bounded_coordinate_inference",
+      "source_fact": "FindWalkableOffset explicitly documents radians; the shared fan uses math.cos/math.sin. constants.lua defines DEGREES=PI/180 and RADIANS=180/PI. A representative gallop consumer multiplies Transform:GetRotation() by DEGREES before cosine and negative-sine coordinate construction.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindValidPositionByFan",
+          "line_start": 315,
+          "line_end": 322,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "33f91fe3b01f9064d9a23431ef5d2456726ee96f670b704400e6e1eb9fac4bb3",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L315-L322"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 327,
+          "line_end": 330,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "290e4388a0e0cb7172f4f1388d9390a7a92a3673624491bb46692f12e007b2b4",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L327-L330"
+        },
+        {
+          "path": "scripts/constants.lua",
+          "symbol": "PI / DEGREES / RADIANS / TILE_SCALE",
+          "line_start": 6,
+          "line_end": 18,
+          "file_sha256": "4c7e9be82d569874218c080d5c50215811057128d127ec193b444682c6791fd2",
+          "range_sha256": "c8d31ca92f26190060579a463441c78f53086163a8f3d64b2e822e202d10ce22",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/constants.lua#L6-L18"
+        },
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "symbol": "TryGallopCollideUpdate",
+          "line_start": 755,
+          "line_end": 761,
+          "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+          "range_sha256": "1c8cbc998bfa72e9af5f15476ecb0a7aa55d364957f71875ec73b01f689d0302",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L755-L761"
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "GetAngleToPoint / ForceFacePoint",
+          "line_start": 1363,
+          "line_end": 1389,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "e37be76e89c80a74e429bc5ab7f91df03265f90da6dad045ffb21a39b326d7df",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1363-L1389"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Angle and distance supplied to spatial helpers or manually constructed offsets."
+        ],
+        "ordered_branches": [
+          "Helper consumes an angular value in radians.",
+          "Representative Transform rotation consumer converts degree-valued rotation with DEGREES.",
+          "Radius multiplies the XZ coordinate vector directly."
+        ],
+        "observable_lua_result": [
+          "Offset direction is +X at zero and -Z as the radian angle increases toward PI/2, by the expression used.",
+          "Radius is in the same coordinate scale as world positions; TILE_SCALE=4 is a separate constant."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "Do not label radius as pixels, tile count or physics diameter. No real-world meter calibration is established here.",
+          "The rotation-unit relationship is backed by this Lua consumer and inverse conversion in EntityScript:GetAngleToPoint, not native Transform implementation."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Convert a degree rotation to radians before passing it as start_angle. Convert the returned check_angle back with RADIANS only when the receiving API expects the degree convention."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-FAN-ANGLE-NORMALIZATION",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "After adding start_angle and a fan angle, FindValidPositionByFan subtracts TWOPI once only when check_angle is strictly greater than TWOPI. It has no negative-angle correction and no repeated/full modulo normalization.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindValidPositionByFan",
+          "line_start": 315,
+          "line_end": 322,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "33f91fe3b01f9064d9a23431ef5d2456726ee96f670b704400e6e1eb9fac4bb3",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L315-L322"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "start_angle+fan offset."
+        ],
+        "ordered_branches": [
+          "check_angle>TWOPI: subtract TWOPI once.",
+          "check_angle<=TWOPI: leave it untouched."
+        ],
+        "observable_lua_result": [
+          "Returned check_angle is exactly the value after that conditional."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "A negative value, exactly TWOPI, or a sufficiently large multi-turn value is not guaranteed to be canonical in [0,TWOPI).",
+          "The cosine/sine expression does not imply the returned numeric angle is fully normalized."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "If your consumer requires a canonical angle interval, normalize at your own boundary; do not treat the helper as a general angle-normalization utility."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-FAN-RETURNS",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "On the first accepted predicate, FindValidPositionByFan returns offset, check_angle, and i>1. If none is accepted, it reaches the function end without an explicit return. FindWalkableOffset directly forwards these results.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindValidPositionByFan",
+          "line_start": 315,
+          "line_end": 325,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "efbc3583cb2b2dd4106fb8ce4dd45147a2e50b1a71b0f8057952f8cf6a35d794",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L315-L325"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 330,
+          "line_end": 348,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "fe8705808a7858614b387f744b9ef05f821570ccc13378ea7a2648066399f136",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L330-L348"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Each candidate predicate result."
+        ],
+        "ordered_branches": [
+          "Truthy: return three values immediately.",
+          "All candidates falsy: fall through."
+        ],
+        "observable_lua_result": [
+          "Success: relative Vector3, radian angle, boolean deflected flag.",
+          "Exhaustion: no returned values; ordinary caller assignments observe nil."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "deflected is the accepted list index being greater than one; it is not a native collision-report payload.",
+          "At radius zero the generated offsets coincide, so the index flag need not represent a changed geometric point.",
+          "Failure is not an explicit false, a zero offset, an origin point or a thrown error as a defined return contract."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Branch on offset being non-nil before reading its fields or adding it to an origin. Choose and document your own fallback or abort policy."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-WALK-INPUTS",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindWalkableOffset has the Lua signature position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks. Its candidate world coordinates are position.x/y/z plus the fan offset components; y therefore stays position.y.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 327,
+          "line_end": 348,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "331f1c679dd7f9d5d271ae193bfc3953430529cd8b0c875eaab62700bc47c552",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L327-L348"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "position supplies x,y,z fields.",
+          "start_angle/radius/attempts feed the fan helper."
+        ],
+        "ordered_branches": [
+          "Construct relative offset in the delegated fan.",
+          "Translate offset to x,y,z world coordinates for validation."
+        ],
+        "observable_lua_result": [
+          "Returned value remains a relative offset even though validation uses absolute coordinates."
+        ],
+        "callback_contract": [
+          "customcheckfn(Vector3(x,y,z)): one absolute candidate world point."
+        ],
+        "failure_or_limits": [
+          "Neither position, angle nor radius has a local default or validation guard.",
+          "Returning an offset is different from setting an entity position or rotation."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Add the successful offset to the same origin exactly once. Do not add the origin again inside a customcheckfn that already receives an absolute candidate."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-WALK-CHECK-PIPELINE",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "The walkable candidate predicate short-circuits in this order: IsAboveGroundAtPoint(x,y,z,allow_water) or allowed platform; teleport permission unless ignored; optional Pathfinder:IsClear; then optional customcheckfn at the absolute point. A later callback is not evaluated when an earlier conjunct rejects.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 334,
+          "line_end": 347,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "040c347ccc1b28a3c2367fb2d3fb20da987c4da2eb03967f7f99e2d6b670edd8",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L334-L347"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Candidate translated to absolute x,y,z."
+        ],
+        "ordered_branches": [
+          "Ground gate: IsAboveGroundAtPoint with allow_water, or allow_boats truthy and GetPlatformAtPoint(x,z) non-nil.",
+          "Teleport gate: ignore_teleportchecks truthy, or IsTeleportingPermittedFromPointToPoint(origin,candidate).",
+          "LOS gate: check_los falsy, or Pathfinder:IsClear(origin,candidate,options).",
+          "Custom gate: customcheckfn nil, or customcheckfn(worldpoint) truthy."
+        ],
+        "observable_lua_result": [
+          "Candidate is accepted only when the entire chained expression is truthy."
+        ],
+        "callback_contract": [
+          "customcheckfn receives only candidates that passed every earlier gate."
+        ],
+        "failure_or_limits": [
+          "allow_boats only contributes an alternative to the first ground gate; it does not bypass teleport, LOS or custom checks.",
+          "No independent nearby-entity occupancy or physics-size query appears in this helper body. This absence does not prove what native map/pathfinder calls internally do."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Keep customcheckfn limited to extra candidate acceptance. Do not depend on its being invoked for every angular candidate or use it as an unconditional side-effect hook."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-WALK-FLAG-DEFAULTS",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "When ignore_teleportchecks is nil, it becomes radius==0. LOS runs only for truthy check_los. Its options use ignorewalls=ignore_walls~=false, ignorecreep=true and allowocean=allow_water. Thus a nil ignore_walls means ignorewalls=true inside an executed LOS call; literal false makes it false.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 330,
+          "line_end": 348,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "fe8705808a7858614b387f744b9ef05f821570ccc13378ea7a2648066399f136",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L330-L348"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Optional flags."
+        ],
+        "ordered_branches": [
+          "Default only a nil ignore_teleportchecks using radius==0; explicit false is preserved.",
+          "check_los falsy bypasses Pathfinder entirely.",
+          "In an executed LOS call only literal false for ignore_walls yields ignorewalls=false."
+        ],
+        "observable_lua_result": [
+          "No global or separate wall check is enabled by ignore_walls alone."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "allow_water is forwarded unchanged to two native calls, including nil if omitted; their omitted-value defaults are not established.",
+          "ignorecreep=true is the local option passed, not proof of native creep implementation.",
+          "Non-boolean truthy values follow Lua truthiness; a caller should use ordinary booleans."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Pass check_los=true and ignore_walls=false when you intend to request the source-defined LOS branch with walls included. Treat the native result and exact obstruction model as outside this static proof."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-WALK-TELEPORT-GATE",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "The pinned Lua teleport-permission helper rejects crossing the WagPunk arena membership boundary when the barrier is up. A destination in a vault room is allowed only if the origin is also in a vault room and vaultroom_defs.IsPathClear succeeds; otherwise it returns false. Non-vault destinations pass after the arena check.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindWalkableOffset",
+          "line_start": 330,
+          "line_end": 346,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "cc417d3aa95099db4e72797911fd7f53ca266d79e52ddce5fb7e7687980e23c9",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L330-L346"
+        },
+        {
+          "path": "scripts/componentutil.lua",
+          "symbol": "IsTeleportingPermittedFromPointToPoint",
+          "line_start": 1184,
+          "line_end": 1204,
+          "file_sha256": "9bff1873580c9b568a5469ab44993c752457108bfe22c495eaa9701d9f67ddd9",
+          "range_sha256": "cfab6cb8a34465c287da24db6c50773717321af123417dfc8b5c4bc0aad0da3e",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentutil.lua#L1184-L1204"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "FindWalkableOffset invokes this gate unless ignore_teleportchecks is truthy."
+        ],
+        "ordered_branches": [
+          "Barrier up and source/destination arena membership differ: false.",
+          "Destination in vault room: origin in vault room plus IsPathClear gives true; otherwise false.",
+          "Remaining path: true."
+        ],
+        "observable_lua_result": [
+          "This gate can reject a ground-valid candidate independently of check_los."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "Native map predicates and vaultroom_defs.IsPathClear internals are not audited here.",
+          "This is a local gate in placement search, not a guarantee that all teleport systems use identical restrictions."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-POINT-TRANSLATION-CONSUMER",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindNearbyLand demonstrates a fan predicate that translates offset by position.x/z before ground/hole checks. On success it mutates the offset x/z by adding the origin and returns that absolute point; on exhaustion it falls through. FindNearbyOcean follows the same translation and result shape with IsOceanAtPoint.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindNearbyLand / FindNearbyOcean",
+          "line_start": 201,
+          "line_end": 225,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "ce6c2a670e2c451bcd538b545eec15dd03615372a243178c8d352b83cdfab095",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L201-L225"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "position and optional range."
+        ],
+        "ordered_branches": [
+          "Fan radius is range or 8, with eight attempts and a random radian start.",
+          "Predicate computes absolute x,z, fixes y to zero and rejects points near a hole.",
+          "Success adds origin to finaloffset.x/z and returns it.",
+          "Failure falls through."
+        ],
+        "observable_lua_result": [
+          "These wrappers return an absolute Vector3 at y=0 or no values."
+        ],
+        "callback_contract": [
+          "Fan predicate receives relative offset; wrapper performs its own world translation."
+        ],
+        "failure_or_limits": [
+          "These sample default distances and attempt counts are wrapper-local values, not universal placement constants.",
+          "FindNearbyLand absolute output must not be added to origin a second time."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-ENTITIES-LUA-CALL",
+      "evidence_kind": "direct_lua_usage_with_named_contract_inference",
+      "source_fact": "The common Lua-facing TheSim:FindEntities call in simutil passes x, y, z, radius, musttags, canttags, mustoneoftags. The coordinates come from Transform:GetWorldPosition, and callers consume the result with ipairs, numeric indexes or length. The wrapper parameter names identify the required-tag, excluded-tag and one-of-tag positions.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindEntity",
+          "line_start": 31,
+          "line_end": 42,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "de6b33d7a845564e27f4ebb312ef509dae4b9f09e28e1f06ace6d3c47ab1b373",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L31-L42"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindPickupableItem",
+          "line_start": 471,
+          "line_end": 494,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "40f7e7720cfe8725335d1e3b39e579cdf1c15024b77d6e60b0e9f769410d6d89",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L471-L494"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "GetRandomInstWithTag / GetClosestInstWithTag",
+          "line_start": 227,
+          "line_end": 237,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "1ef620d5520d70194fb3d8c8f8ca962d68143d6a5ba6493ef3d18e7ba7547307",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L227-L237"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Lua wrapper has an instance or explicit world coordinates and a linear search radius."
+        ],
+        "ordered_branches": [
+          "Position/radius occupy the first four arguments.",
+          "Tag tables occupy positions five to seven; callers can pass nil to retain a later tag position.",
+          "Consumers treat the result as an entity sequence."
+        ],
+        "observable_lua_result": [
+          "Direct Lua usage expects a list of candidate entities, then performs further logic."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "This is the common seven-argument usage, not proof that it is the maximal native signature.",
+          "All/none/one-of tag intent is inferred from Lua-facing names and consumers; exact native argument validation, table semantics, result allocation and error returns are unavailable.",
+          "Distance is expressed in world-coordinate scale by these calls; native shape, Y participation and inclusive boundary are not proven."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Use explicit nil placeholders before a later canttags or mustoneoftags table. Treat the output as candidates and apply the actual gameplay predicate afterward."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-ENTITY-PREDICATE",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindEntity only queries when inst is non-nil and valid. It then walks the FindEntities list and returns the first v that differs from inst, is visible, and passes optional fn(v,inst). If the instance guard fails or no candidate qualifies, it falls through.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindEntity",
+          "line_start": 31,
+          "line_end": 42,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "de6b33d7a845564e27f4ebb312ef509dae4b9f09e28e1f06ace6d3c47ab1b373",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L31-L42"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "inst,radius,fn,musttags,canttags,mustoneoftags."
+        ],
+        "ordered_branches": [
+          "Reject nil or invalid inst by skipping the entire query.",
+          "Query using tag tables.",
+          "For each result test v~=inst, visibility, then optional entity predicate.",
+          "Return the first passing entity immediately."
+        ],
+        "observable_lua_result": [
+          "Entity or no values."
+        ],
+        "callback_contract": [
+          "fn(v,inst): candidate entity and querying instance, distinct from point predicates."
+        ],
+        "failure_or_limits": [
+          "The wrapper does not test dead/ghost status; FindClosestEntity has a separate dead/ghost test.",
+          "Explicit self/visibility checks show wrapper ownership of those conditions; they do not prove an exhaustive native exclusion contract."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Do not put an entity predicate in the tag-table argument position. Use FindEntity’s fn argument or filter the returned list yourself, and add any dead/ghost/component requirements you need."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-CLOSEST-LUA-SCAN",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindClosestEntity queries at x,(ignoreheight and 0 or y),z, then independently filters self, dead/ghost, visibility and optional fn(v,inst). It compares candidate GetDistanceSqToPoint(x,y,z) against an initial radius*radius with strict < and keeps the best. On a valid instance it returns closestEntity and its distance squared, or nil,nil.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindClosestEntity",
+          "line_start": 45,
+          "line_end": 62,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "8d430e3d3c8bd76b66fd6f86c5114f9975f809d32300273b217b774173bc44cf",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L45-L62"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Valid inst, radius, ignoreheight, tags and optional predicate."
+        ],
+        "ordered_branches": [
+          "Query Y is replaced by zero only for truthy ignoreheight.",
+          "Distance calculation still uses the original world-position y.",
+          "A candidate updates the winner only when distsq<rangesq.",
+          "Final return carries the winning distance squared only if a winner exists."
+        ],
+        "observable_lua_result": [
+          "For valid inst: entity,distanceSquared or nil,nil.",
+          "For nil/invalid inst: function falls through."
+        ],
+        "callback_contract": [
+          "fn(v,inst) is called only after self/dead-or-ghost/visibility gates."
+        ],
+        "failure_or_limits": [
+          "Equal-distance ties do not replace an earlier winner in this Lua scan.",
+          "The strict < boundary is this wrapper’s acceptance rule; do not attribute it to the native query.",
+          "ignoreheight is not proof of a general 2D native search or 2D final distance."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "When relying on this wrapper, distinguish a squared-distance result from the linear radius you passed. Keep query-center Y handling separate from final distance calculations."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-ENTITIES-ORDER-COMMENT",
+      "evidence_kind": "source_comment_assertion_plus_direct_lua_consumer_usage",
+      "source_fact": "A source comment at simutil.lua line 44 states that TheSim:FindEntities already returns sorted by distance. It is a source-author assertion, not the native sorting implementation. GetClosestInstWithTag selects ents[1] unless it equals inst, then ents[2]; FindPickupableItem can traverse the native sequence in reverse for furthestfirst.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindClosestEntity source comment",
+          "line_start": 44,
+          "line_end": 44,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "71d18ea6211262eb0007822daf5fad91795e67dac3743d6b69dd570c272a115e",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L44-L44"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "GetClosestInstWithTag",
+          "line_start": 233,
+          "line_end": 237,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "5a8cde239b60c5fc923e36cb1a3f41fc2c6149848a6380974389603276f3154c",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L233-L237"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindPickupableItem",
+          "line_start": 482,
+          "line_end": 494,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "a439527e8d775838b9f5aa05ac583fb6f341c4601698b712efaf9e5853e70975",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L482-L494"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Native result sequence used by wrappers."
+        ],
+        "ordered_branches": [
+          "Closest-with-tag chooses the leading result after one self skip.",
+          "Pickup starts at 1 and moves forward, or at #ents and moves backward for furthestfirst."
+        ],
+        "observable_lua_result": [
+          "These are Lua reliance patterns compatible with the source comment."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "No native comparator, tie-breaking, stable order, determinism across runs, Y metric or invalid-entity ordering is proven.",
+          "A comment and consumer reliance are weaker evidence than the engine implementation or a runtime test."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Preserve this useful source-comment ordering expectation with its evidence label. If exact ties or project-specific ranking matter, rank/filter explicitly rather than inventing a native guarantee."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-ENTITIES-EMPTY-CONSUMERS",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "GetRandomInstWithTag returns nil when #ents is zero. GetClosestInstWithTag uses numeric indexing and yields nil when no entries exist. FindPickupableItem returns nil,nil after exhausting candidates and has an earlier explicit nil return when owner or inventory is missing.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "GetRandomInstWithTag / GetClosestInstWithTag",
+          "line_start": 227,
+          "line_end": 237,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "1ef620d5520d70194fb3d8c8f8ca962d68143d6a5ba6493ef3d18e7ba7547307",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L227-L237"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindPickupableItem",
+          "line_start": 471,
+          "line_end": 494,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "40f7e7720cfe8725335d1e3b39e579cdf1c15024b77d6e60b0e9f769410d6d89",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L471-L494"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "No matching or qualifying candidate in an expected entity list."
+        ],
+        "ordered_branches": [
+          "Random wrapper checks list length.",
+          "Closest wrapper indexes available slots.",
+          "Pickup wrapper exhausts traversal then returns nil,nil."
+        ],
+        "observable_lua_result": [
+          "No-match result belongs to each Lua wrapper; FindEntities itself has no native implementation shown."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "Do not claim a native false/nil/error return from these wrapper branches.",
+          "Empty entity list differs from point-fan exhaustion: Lua users expect a sequence for the native query and test its entries."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-PICKUP-TAGS-VS-FILTER",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "FindPickupableItem queries with nil required tags, PICKUP_CANT_TAGS and PICKUP_MUST_ONEOF_TAGS={_inventoryitem,pickable}. It then computes ispickable from a tag and runs a Lua filter checking extra_filter(worker,v,owner), equipment/weapon/tool exclusions, burning, pickup eligibility, held/container/bundle/trap state, inventory capacity and buffered-action conflict before accepting.",
+      "citations": [
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "PICKUP_MUST_ONEOF_TAGS / PICKUP_CANT_TAGS",
+          "line_start": 401,
+          "line_end": 413,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "0c45b1c045156d1e752812177873ce7fd87b290a2714b3daf50780a01b6b74bf",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L401-L413"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindPickupableItem_filter",
+          "line_start": 414,
+          "line_end": 469,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "334de7abefbf4eb62ac05ad826ab99a4556efc87fc318285c3a040c6d5289ff4",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L414-L469"
+        },
+        {
+          "path": "scripts/simutil.lua",
+          "symbol": "FindPickupableItem",
+          "line_start": 471,
+          "line_end": 494,
+          "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+          "range_sha256": "40f7e7720cfe8725335d1e3b39e579cdf1c15024b77d6e60b0e9f769410d6d89",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L471-L494"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Candidate entities passing query-tag stage."
+        ],
+        "ordered_branches": [
+          "FindEntities provides the coarse candidate sequence.",
+          "Per-entity Lua logic checks gameplay state; extra_filter is evaluated first if supplied.",
+          "Passing wrapper returns v,ispickable."
+        ],
+        "observable_lua_result": [
+          "Candidate tag matching alone is insufficient for this pickup contract."
+        ],
+        "callback_contract": [
+          "extra_filter(worker,v,owner) differs from FindEntity fn(v,inst) and spatial point predicates."
+        ],
+        "failure_or_limits": [
+          "The detailed pickup rules are a representative consumer, not a generic FindEntities rule.",
+          "The tag string _inventoryitem does not replace a check of candidate component availability in arbitrary code."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-COLLISION-POSTFILTER",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "TryGallopCollideUpdate queries around a forward XZ offset with radius+MAX_PHYSICS_RADIUS and excluded tags. Its Lua loop separately checks self exclusion, Physics existence, collision-mask compatibility and center-distance against combined physics radii, then chooses a nearest adjusted distance. Only after that does it push attacked/knockback events and perform work/effect logic.",
+      "citations": [
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "symbol": "TryGallopCollideUpdate",
+          "line_start": 755,
+          "line_end": 795,
+          "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+          "range_sha256": "192a97fa0954a86917f1e605ad68ebdb08b8c00cb94f2a2f603eac84f176b7fb",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L755-L795"
+        },
+        {
+          "path": "scripts/constants.lua",
+          "symbol": "MAX_PHYSICS_RADIUS",
+          "line_start": 1504,
+          "line_end": 1504,
+          "file_sha256": "4c7e9be82d569874218c080d5c50215811057128d127ec193b444682c6791fd2",
+          "range_sha256": "105d6d67c5cf21ebaf87e19ea6bcf122c91f854efcc9171b85d1b7db4ff09a1d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/constants.lua#L1504-L1504"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Representative gallop collision-effect consumer."
+        ],
+        "ordered_branches": [
+          "Query candidate list with an expanded search radius.",
+          "Check candidate Physics and collision mask.",
+          "Accept physical overlap only if distsq<combinedRadiusSquared.",
+          "Choose minimum adjusted distance.",
+          "When target non-nil, dispatch Lua events and related work."
+        ],
+        "observable_lua_result": [
+          "No qualified target means these post-query effects do not run."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "This is direct proof of this Lua consumer’s extra collision and event steps, not native query collision semantics.",
+          "No synchronous delivery, ordering, recipient processing, networking or eventual-event guarantee is established.",
+          "The .5 forward offset, default .5 self radius and MAX_PHYSICS_RADIUS=4 are sample constants, not a universal query recipe."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "For collision-sensitive effects, choose the intended physics/mask/distance predicate explicitly. A spatial-query candidate is not proof that the gameplay effect was delivered."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-BOAT-INTERSECTION-POSTFILTER",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "EntityScript:GetBoatIntersectingPhysics queries boat-tag candidates with self physics radius plus MAX_PHYSICS_RADIUS+0.18, then excludes self and computes actual XZ center distance minus each boat’s selected safe/hull radius. It returns the first boat with dist-boat_radius<=self_radius, otherwise nil.",
+      "citations": [
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "GetPhysicsRadius",
+          "line_start": 1325,
+          "line_end": 1331,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "dd0c878936a6b45f6596a398c0d8da5aa145a7594106e4a6b787113b59f45de8",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1325-L1331"
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "GetBoatIntersectingPhysics",
+          "line_start": 1333,
+          "line_end": 1353,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "ccf29bfc89d8e66caacea3de5dc85ece36c1c051f602897e0b82228f96e8fb2d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1333-L1353"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Representative boat-intersection helper."
+        ],
+        "ordered_branches": [
+          "Query broad candidate radius.",
+          "Use direct self Physics:GetRadius, intentionally ignoring physics override by source comment.",
+          "Compute per-boat radius and XZ distance.",
+          "Return first passing intersection."
+        ],
+        "observable_lua_result": [
+          "Boat entity or explicit nil."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "The <= intersection boundary is local Lua math; the native query boundary is unknown.",
+          "The broad query may contain non-intersecting smaller boats; the source comment expressly notes this.",
+          "This is not proof of a native broadphase algorithm, collision event or platform-attachment guarantee."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-FAILURE-KEEP-ORIGIN",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "The moonspore spawnpoint function captures inst:GetPosition, samples distance 0.1..2.0 and calls FindWalkableOffset with eight attempts. On success it returns pos+offset; on failure it returns pos. The moonspore hat registers this function with PeriodicSpawner:SetGetSpawnPointFn.",
+      "citations": [
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "symbol": "mushroom_spawnpoint_moonspore",
+          "line_start": 1867,
+          "line_end": 1878,
+          "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+          "range_sha256": "3d2cd3fd15f3bfcb2436d29ff48842c78ca29e37117cb55a8f2ee6532329279a",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/hats.lua#L1867-L1878"
+        },
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "symbol": "moonspore periodicspawner setup",
+          "line_start": 1963,
+          "line_end": 1972,
+          "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+          "range_sha256": "cb6ed2c5311511f32f56b8495945dd4b34a938af5214397031db123aa6f7b279",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/hats.lua#L1963-L1972"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Moonspore consumer samples a nearby spawnpoint."
+        ],
+        "ordered_branches": [
+          "offset non-nil: add origin once.",
+          "offset nil: preserve original position.",
+          "Registration connects returned point to periodic spawning."
+        ],
+        "observable_lua_result": [
+          "Consumer supplies a point even when the search fails."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "Falling back to origin does not prove origin passed helper checks.",
+          "0.1..2.0 radius and eight attempts are this consumer’s sample choices."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Use a preserve-origin fallback only when your own spawn/effect semantics permit it. Do not describe this fallback as a successful walkable search."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-FAILURE-BOUNDED-RETRY",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "getpollyspawnlocation retries FindWalkableOffset while offset is nil and count<12. Each helper call uses a random start, random radius below five, twelve angular attempts, check_los=false, ignore_walls=false, nil custom check, allow_water=false, allow_boats=true. Only success modifies x,z; after exhaustion it keeps origin x,z and returns y=15 for polly_rogershat, otherwise zero.",
+      "citations": [
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "symbol": "getpollyspawnlocation",
+          "line_start": 2548,
+          "line_end": 2564,
+          "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+          "range_sha256": "3cb0f3cf0613e2b378db68965d64f9dfbf7a40b1bfc57726a9c9e6a6465a13f0",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/hats.lua#L2548-L2564"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Owner position when available; otherwise inst position."
+        ],
+        "ordered_branches": [
+          "Repeat helper calls until a non-nil offset or twelve calls.",
+          "Successful offset changes pos.x/z.",
+          "Choose consumer-specific output y."
+        ],
+        "observable_lua_result": [
+          "Finite retry plus consumer-local origin fallback, not a helper retry mechanism."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "Twelve calls of twelve angular attempts are separate retry layers. Early success and short-circuit predicates can reduce actual native/map calls.",
+          "allow_boats does not mean allow_water; these are separate flags.",
+          "The returned y is consumer-specific and not a FindWalkableOffset result guarantee."
+        ]
+      },
+      "runtime_tested": false
+    },
+    {
+      "fact_id": "SPATIAL-FAILURE-MIGRATION-REUSE",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "GetMigrationPortalLocation first caches portal coordinates and a FindWalkableOffset result, then activates the portal because activation may remove/replace it. Success returns cached x,z plus offset at y=0; failed search returns the cached portal point at y=0. With complete destination coordinates it adds a successful offset or Vector3(0,0,0); otherwise it uses GetAnySpawnPoint.",
+      "citations": [
+        {
+          "path": "scripts/componentutil.lua",
+          "symbol": "GetMigrationPortalLocation",
+          "line_start": 1069,
+          "line_end": 1101,
+          "file_sha256": "9bff1873580c9b568a5469ab44993c752457108bfe22c495eaa9701d9f67ddd9",
+          "range_sha256": "3b3f7fcf12f3881afbb7549d4ce94dc43bad479bbe16bc59f869d82580191948",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentutil.lua#L1069-L1101"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "Selected portal, complete destination coordinates, or neither."
+        ],
+        "ordered_branches": [
+          "Portal branch caches geometry before ActivatedByOther.",
+          "Portal search success/failure picks translated/cached point.",
+          "Complete destination branch uses offset or zero-vector fallback.",
+          "Missing portal and incomplete destination branch uses default spawnpoint."
+        ],
+        "observable_lua_result": [
+          "This is a direct re-audit of an already-covered SHARD-004 failure consumer."
+        ],
+        "callback_contract": [],
+        "failure_or_limits": [
+          "No canonical new synonym for the migration contract is proposed.",
+          "Fallback coordinate validity is not a proof of a successful helper search."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "Reuse VANILLA-SHARD-004 for migration; link the generic offset contract only where needed."
+      }
+    },
+    {
+      "fact_id": "SPATIAL-PERIODIC-SPAWNPOINT-CONSUMPTION",
+      "evidence_kind": "direct_lua_source_fact",
+      "source_fact": "PeriodicSpawner:TrySpawn starts with its own world position, replaces spawnpos with getspawnpointfn(self.inst) when installed, and returns false,15 if the callback yields no point. It queries density candidates centered on the original x,y,z; detailed spacing distance can use spawnpos. Later it uses spawnpos:Get for placement. DoSpawn ignores the first return and forwards the second as Start’s timeoverride.",
+      "citations": [
+        {
+          "path": "scripts/components/periodicspawner.lua",
+          "symbol": "MISSING_SPAWN_POS_RETRY_TIME",
+          "line_start": 9,
+          "line_end": 10,
+          "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+          "range_sha256": "58a3eb3f4e402c746d46b7001fab04ab069f92856cffe00f1e4cb308f7b02c93",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/periodicspawner.lua#L9-L10"
+        },
+        {
+          "path": "scripts/components/periodicspawner.lua",
+          "symbol": "SetGetSpawnPointFn / SetDensityFilterFn",
+          "line_start": 75,
+          "line_end": 85,
+          "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+          "range_sha256": "76f96aa93401d557bedaaddfad74df18fb363d5f549e9953b2e39cc0caa26e2d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/periodicspawner.lua#L75-L85"
+        },
+        {
+          "path": "scripts/components/periodicspawner.lua",
+          "symbol": "TrySpawn",
+          "line_start": 117,
+          "line_end": 170,
+          "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+          "range_sha256": "c04826ff3147633326069797e05d4a04cadc6837cff0a7e5b5846e1fb6d1390d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/periodicspawner.lua#L117-L170"
+        },
+        {
+          "path": "scripts/components/periodicspawner.lua",
+          "symbol": "TrySpawn / DoSpawn",
+          "line_start": 178,
+          "line_end": 203,
+          "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+          "range_sha256": "e15055647cf04951da6598e364b8561640d1af88a9882622297372df7e08ac15",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/periodicspawner.lua#L178-L203"
+        },
+        {
+          "path": "scripts/components/periodicspawner.lua",
+          "symbol": "Start",
+          "line_start": 89,
+          "line_end": 96,
+          "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+          "range_sha256": "ddfb1bba90fd609c7afe22fe0cc1dd349b6a1c1e4aee4b39380e5dccd988d04d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/periodicspawner.lua#L89-L96"
+        }
+      ],
+      "reviewer_anatomy": {
+        "trigger_or_inputs": [
+          "PeriodicSpawner registered point callback and optional density/spacing constraints."
+        ],
+        "ordered_branches": [
+          "Missing custom spawnpoint: false plus 15 retry time.",
+          "Density query retains original spawner center even if custom spawnpoint changed.",
+          "Spacing may compute candidate distance to spawnpos.",
+          "Placement extracts coordinates from spawnpos.",
+          "DoSpawn restarts using timeoverride or ordinary timing."
+        ],
+        "observable_lua_result": [
+          "Nil spawnpoint aborts before spawn; point fallback continues into later gates."
+        ],
+        "callback_contract": [
+          "getspawnpointfn(self.inst): expected point object with Get().",
+          "densityfilterfn(self.inst,nearby_ent): entity filter after native query.",
+          "onspawn(self.inst,ent): later consumer callback, not a helper validation callback."
+        ],
+        "failure_or_limits": [
+          "15 is this consumer’s retry value, not a FindWalkableOffset default.",
+          "TrySpawn returns true at its end even when SpawnPrefab returned nil; therefore this wrapper boolean is not universal entity-creation proof.",
+          "This density scan’s origin difference is source-local; do not promote it as the ideal generic placement algorithm."
+        ]
+      },
+      "runtime_tested": false,
+      "implementation_guidance": {
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "text": "When integrating a custom spawnpoint, make its failure contract explicit. If candidate-centered density is required, inspect the consuming spawner instead of assuming changing spawnpos changes every query center."
+      }
+    }
+  ],
+  "reviewer_notes": {
+    "anatomy": "Each fact records exact trigger/inputs, ordered branches, observable Lua results, callback arguments and failure/non-guarantee boundaries.",
+    "confidence_layers": [
+      "Direct Lua expressions/branches/results",
+      "Bounded arithmetic/coordinate inference, labeled",
+      "Source-author ordering comment, labeled",
+      "Engineering recommendations, separate from source facts",
+      "Native implementations/project acceptance unknown, classified"
+    ]
+  },
+  "source_reading_log": [
+    {
+      "path": "scripts/simutil.lua",
+      "source_cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/simutil.lua",
+      "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+      "snapshot_bytes": 34171,
+      "snapshot_git_blob_sha": "e1109b401f477ea5ab31bc67947996208f5592d5",
+      "snapshot_hash_match": true,
+      "line_count": 937,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 31,
+          "line_end": 62,
+          "range_sha256": "ac23afc826185d9848f28008d2ea635c488194069cdfa2f40cbc8b4fe94bb44a",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 201,
+          "line_end": 245,
+          "range_sha256": "12618dec2688608657b6e7c4492ceaee11e169dd154d7bcde76b9699cc1de4f6",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 291,
+          "line_end": 399,
+          "range_sha256": "1ce415b26be88cf55cf7968535b490d85af1205818d76fedf9df364061e2c73f",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 401,
+          "line_end": 494,
+          "range_sha256": "13f639525ba120d09ca83b2ddeb14d2efa4af6192b4b51c6c969f077839ba764",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "official GitHub fetch_file exact pinned ref; UTF-8 content restored without an added trailing LF and full snapshot SHA-256 matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/componentutil.lua",
+      "source_cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/componentutil.lua",
+      "file_sha256": "9bff1873580c9b568a5469ab44993c752457108bfe22c495eaa9701d9f67ddd9",
+      "snapshot_bytes": 81495,
+      "snapshot_git_blob_sha": "850ab8c4946604131469aed9563d0de0e5d6b1ec",
+      "snapshot_hash_match": true,
+      "line_count": 2193,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 1054,
+          "line_end": 1101,
+          "range_sha256": "268beeccaa9cd022f959fab56970196810bf238c6d26329ee44be523f6a5bd5d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 1184,
+          "line_end": 1204,
+          "range_sha256": "cfab6cb8a34465c287da24db6c50773717321af123417dfc8b5c4bc0aad0da3e",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "official GitHub fetch_file exact pinned ref; UTF-8 content restored without an added trailing LF and full snapshot SHA-256 matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/constants.lua",
+      "source_cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/constants.lua",
+      "file_sha256": "4c7e9be82d569874218c080d5c50215811057128d127ec193b444682c6791fd2",
+      "snapshot_bytes": 80000,
+      "snapshot_git_blob_sha": "66e37055e18b9f73f1b1e82c71ff7ef13bd62124",
+      "snapshot_hash_match": true,
+      "line_count": 3041,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 6,
+          "line_end": 18,
+          "range_sha256": "c8d31ca92f26190060579a463441c78f53086163a8f3d64b2e822e202d10ce22",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 1504,
+          "line_end": 1504,
+          "range_sha256": "105d6d67c5cf21ebaf87e19ea6bcf122c91f854efcc9171b85d1b7db4ff09a1d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "official GitHub fetch_file exact pinned ref; UTF-8 content restored without an added trailing LF and full snapshot SHA-256 matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/prefabs/hats.lua",
+      "source_cache_path": "/workspace/shared/native004-005/source-cache/scripts/prefabs/hats.lua",
+      "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+      "snapshot_bytes": 260114,
+      "snapshot_git_blob_sha": "f5443679705e9fd19944e81d28715bf5d5d065d7",
+      "snapshot_hash_match": true,
+      "line_count": 7683,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 1867,
+          "line_end": 1878,
+          "range_sha256": "3d2cd3fd15f3bfcb2436d29ff48842c78ca29e37117cb55a8f2ee6532329279a",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 1963,
+          "line_end": 1972,
+          "range_sha256": "cb6ed2c5311511f32f56b8495945dd4b34a938af5214397031db123aa6f7b279",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 2548,
+          "line_end": 2564,
+          "range_sha256": "3cb0f3cf0613e2b378db68965d64f9dfbf7a40b1bfc57726a9c9e6a6465a13f0",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "existing predecessor cache; exact snapshot byte hash matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/components/periodicspawner.lua",
+      "source_cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/periodicspawner.lua",
+      "file_sha256": "f0bc85e2d139fc9a37ab28fe73a25a22be9fd322ab0c9b4c5004450b01beec96",
+      "snapshot_bytes": 6900,
+      "snapshot_git_blob_sha": "a78b1813205e4b42ad6f948c3f0ea4028a03710d",
+      "snapshot_hash_match": true,
+      "line_count": 254,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 9,
+          "line_end": 10,
+          "range_sha256": "58a3eb3f4e402c746d46b7001fab04ab069f92856cffe00f1e4cb308f7b02c93",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 75,
+          "line_end": 85,
+          "range_sha256": "76f96aa93401d557bedaaddfad74df18fb363d5f549e9953b2e39cc0caa26e2d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 89,
+          "line_end": 96,
+          "range_sha256": "ddfb1bba90fd609c7afe22fe0cc1dd349b6a1c1e4aee4b39380e5dccd988d04d",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 115,
+          "line_end": 203,
+          "range_sha256": "c1db7a056fad9a4355040fd244dcf22cf358eadb80284c14b17db6a7e6383ee4",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "official GitHub fetch_file exact pinned ref; UTF-8 content restored without an added trailing LF and full snapshot SHA-256 matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/entityscript.lua",
+      "source_cache_path": "/workspace/shared/native004-005/source-cache/scripts/entityscript.lua",
+      "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+      "snapshot_bytes": 66639,
+      "snapshot_git_blob_sha": "228a42b74bb436a8acc37f5b9f07fcfa4f85eef3",
+      "snapshot_hash_match": true,
+      "line_count": 2177,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 1325,
+          "line_end": 1389,
+          "range_sha256": "6753d3e36ac896b33edf9b4eb9cdc14fa1bc018fc08cf0db46147535bed7aef9",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "existing predecessor cache; exact snapshot byte hash matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/stategraphs/SGwilson.lua",
+      "source_cache_path": "/workspace/shared/native005-006/private-source-cache/scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+      "snapshot_bytes": 1001940,
+      "snapshot_git_blob_sha": "f40061668b42bbeaae15e795fc77764876b94a46",
+      "snapshot_hash_match": true,
+      "line_count": 28601,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 755,
+          "line_end": 795,
+          "range_sha256": "192a97fa0954a86917f1e605ad68ebdb08b8c00cb94f2a2f603eac84f176b7fb",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "existing predecessor cache; exact snapshot byte hash matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    },
+    {
+      "path": "scripts/components/combat.lua",
+      "source_cache_path": "/workspace/shared/native004-005/source-cache/scripts/components/combat.lua",
+      "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+      "snapshot_bytes": 47678,
+      "snapshot_git_blob_sha": "81b5c22b1d07d9c97c90c8340568a20941fe94ca",
+      "snapshot_hash_match": true,
+      "line_count": 1349,
+      "wholefile_read": false,
+      "ranges_read": [
+        {
+          "line_start": 189,
+          "line_end": 220,
+          "range_sha256": "29cfcd5fd1928ad59f62cb45de0d51d3a9ec189300c26a9160852c9e24a2e3f1",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        },
+        {
+          "line_start": 1286,
+          "line_end": 1315,
+          "range_sha256": "d93adb75acedd0d0540eb3e75df471eabc04eeec315da820818ed212ad533470",
+          "range_hash_scheme": "utf8_sig_decoded_splitlines_LF_joined_1based_inclusive_no_trailing_newline"
+        }
+      ],
+      "acquisition": "existing predecessor cache; exact snapshot byte hash matched",
+      "notes": "Only selected ranges substantively read. Raw Lua remains outside the research deliverable."
+    }
+  ],
+  "compact_coding_projection": [
+    {
+      "id": "SPATIAL-CODE-RELATIVE-ABSOLUTE",
+      "question": "哪个回调和返回值是相对偏移，哪个是绝对坐标？",
+      "answer": "FindValidPositionByFan 的 test_fn 接收相对偏移；FindWalkableOffset 的 customcheckfn 接收 origin+offset 的绝对世界坐标。两个 helper 都返回被接受的相对 offset，只向原点加一次。FindNearbyLand/Ocean 是另一层封装，已经返回绝对坐标。",
+      "fact_ids": [
+        "SPATIAL-FAN-INPUTS",
+        "SPATIAL-WALK-INPUTS",
+        "SPATIAL-POINT-TRANSLATION-CONSUMER"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+        "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)",
+        "FindNearbyLand(position, range)",
+        "FindNearbyOcean(position, range)"
+      ],
+      "units": {
+        "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+        "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+        "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+        "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+      },
+      "results": {
+        "fan_and_walkable": {
+          "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+          "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+          "mutation": "不移动实体，不设置旋转"
+        },
+        "nearby_wrappers": "成功：绝对 Vector3，y=0；耗尽：无显式返回"
+      },
+      "callback_args": {
+        "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+        "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+      }
+    },
+    {
+      "id": "SPATIAL-CODE-ANGLE-RADIUS",
+      "question": "旋转角和半径怎样对应坐标？",
+      "answer": "start_angle 使用弧度；已读消费者用 DEGREES 把 Transform 的角度值转换为弧度。偏移为 (radius*cos(angle),0,-radius*sin(angle))，radius 是世界坐标尺度下的线性距离。不要混成地块数量、半径平方或有现实米制校准的距离。返回角度也没有完整的模运算归一化。",
+      "fact_ids": [
+        "SPATIAL-FAN-ANGLE-UNITS",
+        "SPATIAL-FAN-ANGLE-NORMALIZATION"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+        "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)"
+      ],
+      "units": {
+        "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+        "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+        "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+        "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+      },
+      "results": {
+        "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+        "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+        "mutation": "不移动实体，不设置旋转"
+      },
+      "callback_args": {
+        "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+        "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+      },
+      "conversion": "Transform 旋转消费者使用 rotation*DEGREES；需要角度值的接收端再按其合同使用 check_angle*RADIANS"
+    },
+    {
+      "id": "SPATIAL-CODE-WALK-CHECKS",
+      "question": "怎样请求源码定义的地面、LOS 和额外候选检查？",
+      "answer": "FindWalkableOffset 依次短路检查地面/平台、传送许可、可选 LOS、customcheckfn 世界坐标谓词。若要请求源码中考虑墙的 LOS 分支，传 check_los=true 和 ignore_walls=false。allow_boats 只是地面门禁的备选条件，不会绕过后续检查；allow_water 独立转发。原生阻挡模型仍未知。",
+      "fact_ids": [
+        "SPATIAL-WALK-CHECK-PIPELINE",
+        "SPATIAL-WALK-FLAG-DEFAULTS",
+        "SPATIAL-WALK-TELEPORT-GATE"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)"
+      ],
+      "units": {
+        "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+        "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+        "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+        "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+      },
+      "results": {
+        "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+        "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+        "mutation": "不移动实体，不设置旋转"
+      },
+      "callback_args": {
+        "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+      },
+      "branch_priority": [
+        "ground OR allowed platform",
+        "teleport permission unless ignored",
+        "LOS only when check_los truthy",
+        "customcheckfn if non-nil"
+      ],
+      "flag_defaults": {
+        "ignore_teleportchecks": "仅 nil 时设为 radius==0；显式 false 保留",
+        "check_los": "nil/false 绕过 Pathfinder",
+        "ignore_walls": "已执行 LOS 的 ignorewalls=(ignore_walls~=false)",
+        "allow_water": "原值转发到 Map 与 LOS options",
+        "allow_boats": "只提供 ground gate 的 OR 分支"
+      }
+    },
+    {
+      "id": "SPATIAL-CODE-FAILURE-POLICY",
+      "question": "怎样消费落点搜索失败？",
+      "answer": "offset 为 nil 表示没有扇形候选被接受；访问字段或加原点前先判断。明确选择中止、重试或原点回退。原版消费者不同：nearby-land 不返回点，moonspore 保留原点，Polly 重试后保留原点，迁移使用已有记录中的回退。回退坐标不证明几何检查已经通过。",
+      "fact_ids": [
+        "SPATIAL-FAN-RETURNS",
+        "SPATIAL-POINT-TRANSLATION-CONSUMER",
+        "SPATIAL-FAILURE-KEEP-ORIGIN",
+        "SPATIAL-FAILURE-BOUNDED-RETRY",
+        "SPATIAL-FAILURE-MIGRATION-REUSE"
+      ],
+      "reuse_ids": [
+        "VANILLA-SHARD-004"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+        "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)",
+        "FindNearbyLand(position, range)",
+        "FindNearbyOcean(position, range)"
+      ],
+      "units": {
+        "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+        "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+        "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+        "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+      },
+      "results": {
+        "helper": {
+          "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+          "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+          "mutation": "不移动实体，不设置旋转"
+        },
+        "consumer_policy": "nearby: 无点；moonspore: origin fallback；Polly: 至多 12 helper calls 后 origin x/z fallback；migration: 复用 SHARD-004"
+      },
+      "callback_args": {
+        "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+        "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+      }
+    },
+    {
+      "id": "SPATIAL-CODE-FILTER-CALLBACK",
+      "question": "原生标签过滤和 Lua 谓词有什么区别？",
+      "answer": "常见 FindEntities 调用为 x,y,z,radius,musttags,canttags,mustoneoftags；使用后面的标签表时保留前面位置的 nil。原生列表随后仍需实体逻辑过滤。FindEntity 的 fn 接收 candidate,inst；walkable 的 customcheckfn 接收一个绝对点；fan 的 test_fn 接收一个 offset。这些合同不能混用。",
+      "fact_ids": [
+        "SPATIAL-ENTITIES-LUA-CALL",
+        "SPATIAL-ENTITY-PREDICATE",
+        "SPATIAL-PICKUP-TAGS-VS-FILTER"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+        "FindEntity(inst, radius, fn, musttags, canttags, mustoneoftags)",
+        "FindPickupableItem(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker, extra_filter, inventoryoverride)"
+      ],
+      "signature_scope": {
+        "native_query": "common Lua usage，七个参数位置；不宣称 maximal native signature",
+        "FindEntity": "完整已读 Lua 参数顺序",
+        "FindPickupableItem": "完整已读 Lua 参数顺序"
+      },
+      "units": {
+        "x_y_z": "世界坐标",
+        "radius": "Lua 调用中的线性世界距离",
+        "tag_slots": "5=musttags，6=canttags，7=mustoneoftags；后置表保留前置 nil"
+      },
+      "results": {
+        "FindEntities": {
+          "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+          "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+          "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+        },
+        "FindEntity": "首个 passing entity；guard 失败或耗尽则无显式返回",
+        "FindPickupableItem": "passing entity, ispickable；耗尽 nil,nil；owner/inventory 缺失为显式 nil"
+      },
+      "callback_args": {
+        "FindEntity_fn": "fn(v, inst): candidate entity, querying instance",
+        "pickup_extra_filter": "extra_filter(worker, v, owner)",
+        "fan_test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+        "walkable_customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+      }
+    },
+    {
+      "id": "SPATIAL-CODE-NEAREST-ORDER",
+      "question": "最近结果和排序有哪些证据？",
+      "answer": "源码第 44 行声称 FindEntities 按距离排序，一些封装依赖返回列表顺序；应保留为注释证据。FindClosestEntity 自己扫描严格 distsq<radius²，并返回距离平方。原生比较器、等距排序/稳定性、查询几何和 Y 度量尚未证明。",
+      "fact_ids": [
+        "SPATIAL-CLOSEST-LUA-SCAN",
+        "SPATIAL-ENTITIES-ORDER-COMMENT",
+        "SPATIAL-ENTITIES-EMPTY-CONSUMERS"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+        "FindClosestEntity(inst, radius, ignoreheight, musttags, canttags, mustoneoftags, fn)",
+        "GetClosestInstWithTag(tag, inst, radius)"
+      ],
+      "units": {
+        "radius": "线性世界距离",
+        "returned_rangesq": "距离平方，与 radius 的单位次方不同",
+        "ignoreheight": "只将 native query 的中心 y 替换为 0；最终 Lua distsq 使用原始 y"
+      },
+      "results": {
+        "FindEntities": {
+          "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+          "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+          "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+        },
+        "FindClosestEntity": "有效 inst：closestEntity, rangesq；无候选 nil,nil；无效/nil inst 则无显式返回",
+        "GetClosestInstWithTag": "ents[1]，若等于 inst 则 ents[2]；空列表产生 nil"
+      },
+      "callback_args": {
+        "FindClosestEntity_fn": "fn(v, inst): candidate entity, querying instance；在 self/dead-or-ghost/visibility gates 之后"
+      },
+      "ordering_evidence": "simutil.lua L44 的 distance-sorted 注释；native ties/stability 未证明；closest Lua scan 为 strict distsq<rangesq"
+    },
+    {
+      "id": "SPATIAL-CODE-COLLISION-EFFECT",
+      "question": "FindEntities 是否证明物理碰撞或效果送达？",
+      "answer": "本轮没有引擎实现证据。已读 gallop 和 boat 消费者还要自己检查 mask、物理半径和 XZ 距离；事件/效果只在消费者接受候选后发出。明确实现效果谓词，并分别验证送达。DoAreaAttack 已属 VANILLA-COMBAT-001，引用已有记录，不新增同义条目。",
+      "fact_ids": [
+        "SPATIAL-COLLISION-POSTFILTER",
+        "SPATIAL-BOAT-INTERSECTION-POSTFILTER"
+      ],
+      "reuse_ids": [
+        "VANILLA-COMBAT-001"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+        "EntityScript:GetBoatIntersectingPhysics()"
+      ],
+      "signature_scope": {
+        "native_query": "common Lua usage；not maximal native signature"
+      },
+      "units": {
+        "radius": "query 输入的线性世界距离",
+        "gallop_postfilter": "XZ center distance squared 对比 combined physics radii squared，strict <",
+        "boat_postfilter": "XZ distance - boat_radius <= self_radius"
+      },
+      "results": {
+        "FindEntities": {
+          "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+          "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+          "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+        },
+        "GetBoatIntersectingPhysics": "首个 Lua intersection passing boat；否则显式 nil",
+        "gallop": "内部选择 target 后才发事件；不提供 native collision/delivery 返回保证"
+      },
+      "callback_args": {
+        "FindEntities": "本轮常见调用仅传坐标/radius/tag tables，没有 Lua entity predicate 参数；谓词在消费者循环中"
+      }
+    },
+    {
+      "id": "SPATIAL-CODE-CUSTOM-SPAWNER",
+      "question": "spawner 消费自定义出生点时有什么边界？",
+      "answer": "检查实际消费者。PeriodicSpawner 在自定义点缺失时返回 false,15，并通过 DoSpawn/Start 重试；原点回退则继续后续门禁。它的密度 FindEntities 查询保留原 spawner 中心，而细粒度 spacing 使用 spawnpos。替换点回调不会自动改写全部查询中心。",
+      "fact_ids": [
+        "SPATIAL-PERIODIC-SPAWNPOINT-CONSUMPTION",
+        "SPATIAL-FAILURE-KEEP-ORIGIN"
+      ],
+      "classification": "engineering_recommendation_not_runtime_validated",
+      "canonical": false,
+      "callable_signatures": [
+        "PeriodicSpawner:SetGetSpawnPointFn(fn)",
+        "PeriodicSpawner:SetDensityFilterFn(fn)",
+        "PeriodicSpawner:TrySpawn(prefab)",
+        "PeriodicSpawner:DoSpawn()",
+        "PeriodicSpawner:Start(timeoverride)"
+      ],
+      "units": {
+        "spawnpos": "点对象；placement 用 spawnpos:Get() 的世界 x/y/z",
+        "range_and_spacing": "Lua 查询线性世界距离；spacing 距离比较使用平方",
+        "timeoverride": "该 spawner 的任务时间值；missing point 局部 retry 常量为 15"
+      },
+      "results": {
+        "SetGetSpawnPointFn": "赋值 getspawnpointfn；无显式返回",
+        "SetDensityFilterFn": "赋值 densityfilterfn；无显式返回",
+        "TrySpawn": "missing custom point: false,15；初始 guard: false,basetime*0.25；密度/spacing 拒绝: false；尾部 true 不保证 SpawnPrefab 非 nil",
+        "DoSpawn": "取 TrySpawn 第二返回作为 Start override；无显式返回",
+        "Start": "安排 DoTaskInTime；无显式返回"
+      },
+      "callback_args": {
+        "getspawnpointfn": "getspawnpointfn(self.inst): expected point with Get()；nil/false 中止",
+        "densityfilterfn": "densityfilterfn(self.inst, nearby_ent): query 后 entity filter",
+        "onspawn": "onspawn(self.inst, ent): placement 后回调，ent 可为 nil"
+      }
+    }
+  ]
+}

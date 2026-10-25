@@ -1,0 +1,399 @@
+{
+  "entries": [
+    {
+      "id": "NC-N003-INT-01",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "候选收集保持只读并保留角色上下文",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C01-NSF06",
+          "statement": "ModComponentWarning 明确提示 Mod component actions 不同步很可能因为 AddComponentAction 没有在客户端和服务端同时调用；CollectActions 使用实体 actioncomponents/modactioncomponents 中的索引选择 collector 并调用 collector(self, ...)。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C01-NSF07",
+          "statement": "PlayerActionPicker 的调用点给出参数顺序：SCENE 为 inst,doer,actions,right；USEITEM 与 EQUIPPED 为 inst,doer,target,actions,right；POINT 为 inst,doer,pos,actions,right,target；INVENTORY 为 inst,doer,actions,right。其中 inst 是调用 CollectActions 的 useitem，而 doer 是 picker 所属玩家。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "新增场景、物品、装备、地面或背包动作；collector 中出现扣资源/发奖励。",
+        "generate": [
+          "分开 Action 注册、AddComponentAction eligibility、picker 包装和具体执行逻辑；按 actiontype 使用已核对的 collector 参数。",
+          "在候选层仅判断当前端可见资格；将 doer、target、invobject 和 inst 分别按真实调用链传递。"
+        ],
+        "avoid": [
+          "在共享 collector 调用 action.fn 或扣资源。",
+          "把 USEITEM 的 inst 当 target，或把 AddAction 当成 collector/SG 已完整接入。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-01",
+      "evidence_refs": [
+        "N003-C01-NSF06",
+        "N003-C01-NSF07"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-02",
+      "track": "NATIVE-003",
+      "role": "SUPPORTING",
+      "title": "请求分发与移动到执行的交接保留分支和所有权",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C02-NSF04",
+          "statement": "EntityScript:PerformPreviewBufferedAction 通过 playercontroller:RemoteBufferedAction 发送预演请求并标记 ispreviewing；RemoteBufferedAction 在 classified 控制器启用时调用 buffered action 的 preview_cb。它与 PerformBufferedAction 调用 bufferedaction:Do 的路径不同。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "NATIVE003-Q2-DISPATCH-05",
+          "statement": "DoAction 的主分发先判断 self.ismastersim：真时调用 self.locomotor:PushAction(buffaction, true)。非 master 且 self.locomotor 为 nil 时，仅在 non_preview_cb 与 action.pre_action_cb 同时存在时先调用 pre_action_cb(buffaction)，再调用 non_preview_cb()。非 master 且具有 locomotor 时，仅 CanLocomote() 为真才调用 PreviewAction(buffaction, true)。该分支段不直接调用 action.fn 或 BufferedAction:Do。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C10-NSF02",
+          "statement": "到达且非冷却时发 onreachdestination、调用 atdestfn；移交动作前先把 locomotor.bufferedaction 置 nil，再按 mastersim 调 PushBufferedAction 或 PreviewBufferedAction，最后 Stop/Clear。注释说明置 nil 用于避免已移交动作被 Clear 失败处理。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C10-NSF04",
+          "statement": "LocoMotor:Clear 清目标、到达回调和移动意图，并 SetBufferedAction(nil)；SetBufferedAction 对旧动作调用 Fail。Stop 重置目标/路径、停止移动或交给 softstop SG、发 locomote 并停止更新，但清 bufferedaction 的语句被注释。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "动作能走到目标却失败、预测关掉后失效、把 Stop 改为 Clear、预演回调直接执行业务。",
+        "generate": [
+          "按 self.ismastersim、locomotor 是否存在、CanLocomote 和 pre_action_cb/non_preview_cb 条件追踪实际分发。",
+          "区别 locomotor.bufferedaction 和实体 bufferedaction；交接后避免让旧 owner 再 Fail 已转交动作。",
+          "适用 LeftClick 请求保留 code 与 mod_name；远端服务器重新生成和匹配候选后才进入 DoAction。"
+        ],
+        "avoid": [
+          "假设所有本地 valid/busy 检查都在发请求之前。",
+          "把 DoAction、PreviewAction、preview_cb 或到达目标当 action.fn 已成功。",
+          "以 Clear 代替仅停止移动的 Stop。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-02",
+      "evidence_refs": [
+        "N003-C02-NSF04",
+        "NATIVE003-Q2-DISPATCH-05",
+        "N003-C10-NSF02",
+        "N003-C10-NSF04"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-03",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "SG 选态、客户端预演与权威效果分别接入",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C03-NSF01",
+          "statement": "AddStategraphActionHandler 按传入 stategraph 名称保存 handler；StateGraph 构造器将 Mod 的 handler 按 action 对象写入 actionhandlers 表。ActionHandler 的 state 参数可为字符串或返回状态名的函数。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C03-NSF02",
+          "statement": "StateGraphInstance:PreviewAction 有匹配 handler 时检查 condition/deststate；缺少 handler 且不是 instant 时进入 previewaction 回退，否则可直接 PerformPreviewBufferedAction。StartAction 则没有同样的缺失 handler 回退；匹配后进入状态，或在无 deststate 时 PerformBufferedAction。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "新增 ActionHandler/状态，或把服务端 timeline 复制到 wilson_client。",
+        "generate": [
+          "按实际 graph 名称、入口、condition 和 deststate 注册 handler；分别检查 PreviewAction 与 StartAction 的回退。",
+          "客户端状态只沿选定预演/确认路径工作；权威效果从已经明确的执行路径触发。",
+          "将选态、动画、preview 请求、效果调用和结果五个信号分别表达。"
+        ],
+        "avoid": [
+          "假设所有动作必须有两套 SG。",
+          "客户端复制服务端 PerformBufferedAction timeline。",
+          "把 handler 命中、目的状态或动画播放当成功。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-03",
+      "evidence_refs": [
+        "N003-C03-NSF01",
+        "N003-C03-NSF02"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-04",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "执行结果、回调生命周期与状态确认分开",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C05-NSF01",
+          "statement": "BufferedAction:Do 先调用 IsValid，再调用 action.fn，并根据返回值执行成功或失败回调。IsValid 检查物品/执行者/目标有效性、所有权相关状态、平台和 self.validfn；action.validfn 额外只在 TheWorld.ismastersim 时评估。该 Do 函数自身没有总的 mastersim 门禁。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "NATIVE003-Q5-CALLBACK-02",
+          "statement": "BufferedAction:Do 在 IsValid() 为假时直接 return false；这一早退没有调用 action.fn、Fail 或 Succeed，也未更新 self.reason 或清空成功/失败回调表。这只描述 Do 自身，不排除调用者另行执行 Fail。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "NATIVE003-Q5-CALLBACK-03",
+          "statement": "第一返回值 success 为真值时，若 invobject 仍存在且有效则先调用 OnUsedAsItem，随后无论有无有效 invobject 都调用 Succeed；仅第一返回值为假值时调用 Fail。函数先保存 reason，最后返回 success, reason。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "NATIVE003-Q5-CALLBACK-04",
+          "statement": "Succeed 用 pairs 遍历 onsuccess 并以 v()、无参数方式调用各回调；遍历正常完成后，把 onsuccess 与 onfail 都替换为空表。它没有在这个函数中调用 action.fn。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "NATIVE003-Q5-CALLBACK-05",
+          "statement": "Fail 用 pairs 遍历 onfail 并以 v()、无参数方式调用各回调；遍历正常完成后同样把 onsuccess 与 onfail 都替换为空表。它没有在这个函数中调用 action.fn，也没有撤销 action.fn 已产生效果的逻辑。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C11-NSF01",
+          "statement": "State 将 server_states 名称 hash 为集合并保存 forward_server_states；GoToState 的客户端分支按条件继承前态集合或使用新态集合。ServerStateMatches 用集合索引 classified.currentstate，源码刻意不检查 server_states 是否 nil。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "执行重复、失败反馈缺失、状态 match 被用作奖励依据、相信 Do 自带服务器保护。",
+        "generate": [
+          "沿实际权威路径抵达 PerformBufferedAction -> BufferedAction:Do -> action.fn；在需要处显式限定业务 mutation 的端别。",
+          "区别 IsValid 早退、action.fn 假值返回、action.fn 真值返回和回调正常完成。",
+          "业务成功依具体权威结果；server_states/currentstate 缓存仅按状态确认契约使用。"
+        ],
+        "avoid": [
+          "用客户端 preview/state match 调 Do 或发奖励。",
+          "把每次 Do 返回 false 当 onfail 已派发。",
+          "把 Succeed/Fail 清双表当退款、原子事务或网络 ACK。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-04",
+      "evidence_refs": [
+        "N003-C05-NSF01",
+        "NATIVE003-Q5-CALLBACK-02",
+        "NATIVE003-Q5-CALLBACK-03",
+        "NATIVE003-Q5-CALLBACK-04",
+        "NATIVE003-Q5-CALLBACK-05",
+        "N003-C11-NSF01"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-05",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "效果时点、timeout、中断与资源清理有各自 owner",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C06-NSF01",
+          "statement": "GoToState 先查目标状态，不存在时打印信息并直接返回；存在时先执行当前状态 onexit(inst, 目标状态名)，然后替换 statemem、状态标签和当前状态，清空 timeout、重置 timeinstate 与 timelineindex，最后调用目标 onenter(inst, params)。这条路径没有跳过同名状态重入的判断。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C06-NSF02",
+          "statement": "GoToState 每次把 statemem 设为新表，但该函数不重建 mem；onexit 位于 statemem 重建之前，onenter 位于重建之后。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C08-NSF02",
+          "statement": "UpdateState 先把 dt 加到 timeinstate，再处理 timeout；timeout 减去 dt 后小于 0.0001 时清空并执行 ontimeout。若该回调把 currentstate 换成不同状态对象，本轮立即返回，不继续旧状态的 timeline 与 onupdate。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C08-NSF03",
+          "statement": "timeout 处理之后，UpdateState 逐个执行时间不大于 timeinstate 的 timeline 事件；在调用事件前先推进 timelineindex。若事件改变状态对象或使 timeinstate 变小，代码转入额外 Update 调用并返回；没有触发该分支时才继续 timeline，之后调用 onupdate(inst, dt)。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "动画中断仍扣两次资源、退出态执行第二次效果、替换动作被误清、监听/任务残留。",
+        "generate": [
+          "选定这次动作设计需要的效果点，再分别审查到该点之前和之后的 timeout/中断。",
+          "GoToState 的 onexit 在旧 statemem 重建前；按原动作身份和拥有的资源清理，不覆盖替换动作或他人资源。",
+          "任务、监听和 modifier 各自记录 owner；SG-local reset 之外的资源有明确解绑/取消。"
+        ],
+        "avoid": [
+          "在 onexit 再调用一次 PerformBufferedAction 当清理。",
+          "给 timeout 和同时间 timeline 各放一份效果，假设 timeline 优先。",
+          "把 ClearBufferedAction、GoToState 或取消解释成退款。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-05",
+      "evidence_refs": [
+        "N003-C06-NSF01",
+        "N003-C06-NSF02",
+        "N003-C08-NSF02",
+        "N003-C08-NSF03"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-06",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "局部事件真值消费与全局回退分别检查",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C07-NSF02",
+          "statement": "State:HandleEvent 只在 data 非 table、data.state 为 nil 或 data.state 等于当前 State.name 时尝试状态内处理器，并直接返回该处理器的返回值；未命中时返回 false。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C07-NSF03",
+          "statement": "StateGraphInstance:HandleEvent 先调用当前状态 HandleEvent，只有其返回值为真值才跳过同名全局处理器。因此状态内处理器执行了逻辑但返回 nil，并不表示已经消费该事件。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C07-NSF05",
+          "statement": "由于状态内事件要核对入队时的 data.state，而全局处理器不做相同状态名过滤，事件从入队到处理之间发生状态切换时，可能跳过当前状态处理器而继续到同名全局处理器。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "状态事件与全局事件均执行效果、GoToState 后同名事件仍触发、缓存事件跨态。",
+        "generate": [
+          "检查状态内 handler 的返回值及同名全局 handler；有意消费事件时返回真值。",
+          "检查入队 data.state 与处理时 currentstate；普通状态切换不当作事件消费。"
+        ],
+        "avoid": [
+          "本地处理器执行 mutation 后返回 nil，同时全局处理器再执行相同 mutation。",
+          "假设过期 state-bound 事件会全局丢弃。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-06",
+      "evidence_refs": [
+        "N003-C07-NSF02",
+        "N003-C07-NSF03",
+        "N003-C07-NSF05"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-07",
+      "track": "NATIVE-003",
+      "role": "SUPPORTING",
+      "title": "共享定义、SG 实例与每次入态记忆分开",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C09-NSF01",
+          "statement": "LoadStateGraph 按名称缓存 require 返回的 StateGraph 定义；SetStateGraph 则为实体新建 StateGraphInstance，并立即进入定义的 defaultstate。StateGraphInstance 保存独立的 tags、statemem 与 mem 表。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C09-NSF03",
+          "statement": "GoToState 每次把 statemem 设为新表，但该函数不重建 mem；onexit 位于 statemem 重建之前，onenter 位于重建之后。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C09-NSF04",
+          "statement": "State 构造器将声明的 tags 转为集合；实例进入状态时复制到自己的 tags。只有 SGTagsToEntTags 白名单中的标签，且在 mastersim 或实体没有 Network 时，才在切换状态、AddStateTag 或 RemoveStateTag 中同步为实体标签；HasStateTag 仅读取实例 tags。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "多玩家共享执行标记、状态重入遗留标记、自定义 SG tag 被当网络标签。",
+        "generate": [
+          "每次入态 bookkeeping 放实例 statemem；刻意跨态的数据才放 mem，并另定义清理。",
+          "SG tag 用 SG API 检查；不要从任意自定义 tag 推断实体/网络同步。"
+        ],
+        "avoid": [
+          "把 per-player/attempt mutation 标记写在共享 State 定义。",
+          "把 sg.mem 当存档，或认为 onexit 后旧 statemem 仍是当前表。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-07",
+      "evidence_refs": [
+        "N003-C09-NSF01",
+        "N003-C09-NSF03",
+        "N003-C09-NSF04"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-08",
+      "track": "NATIVE-003",
+      "role": "CORE",
+      "title": "预测开关改变客户端拓扑并限定临时状态寿命",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C12-NSF01",
+          "statement": "EnableMovementPrediction 主体仅在 USE_MOVEMENT_PREDICTION 且非 mastersim 时执行。开启且 locomotor 缺失时，先添加 embarker、locomotor 并配置玩家/幽灵移动，再设置对应客户端 SG，同时更新 playercontroller.locomotor。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C12-NSF02",
+          "statement": "开启路径调用 entity:EnableMovementPrediction(true)、设置 locomotor.is_prediction_enabled，并安排 DoTaskInTime(0) 发送开关 RPC；关闭路径解除取消预测监听、关闭预测、清动作/SG、清 controller.locomotor，移除 locomotor/embarker，随后安排 false RPC。"
+        },
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C12-NSF04",
+          "statement": "CanLocomote 在 mastersim 直接返回真；客户端要求 locomotor、SG 非 busy、实体无 pausepredict、暂停预测帧非正并通过 entity:CanPredictMovement。IsBusy 服务器只读 SG busy，客户端还检查实体 busy 和暂停预测帧。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "只在 Host/预测开启时成功、客户端 locomotor/SG nil、预测倍率或 performaction 监听残留。",
+        "generate": [
+          "访问前核对当前端及预测拓扑；开启/关闭可添加/移除 locomotor/embarker、SG 和 controller.locomotor。",
+          "按实际 CanLocomote/IsBusy 条件处理动作；pause dirty 的事件和安排 task 分支分别判断。",
+          "临时 task/listener/modifier 有明确 owner 与停止函数，按实际分支清理。"
+        ],
+        "avoid": [
+          "假设每个远端客户端永久有 locomotor/SG。",
+          "把 pausepredict/busy 当通用取消或退款系统。",
+          "把 channel-cast 倍率/performaction cleanup 模板强制套到所有预测技能。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-08",
+      "evidence_refs": [
+        "N003-C12-NSF01",
+        "N003-C12-NSF02",
+        "N003-C12-NSF04"
+      ],
+      "runtime_verified": false
+    },
+    {
+      "id": "NC-N003-INT-09",
+      "track": "NATIVE-003",
+      "role": "BOUNDARY_GUARDRAIL",
+      "title": "Lua 调用事实不能补写原生预测内部",
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "atom_id": "N003-C13-NSF01",
+          "statement": "State 将 server_states 名称 hash 为集合并保存 forward_server_states；GoToState 的客户端分支按条件继承前态集合或使用新态集合。ServerStateMatches 用集合索引 classified.currentstate，源码刻意不检查 server_states 是否 nil。"
+        }
+      ],
+      "coding_projection": {
+        "trigger": "解释自动 rollback、网络顺序、延迟补偿、FlattenMovementPrediction 内部或统一退款。",
+        "generate": [
+          "只陈述已引 Lua 的状态集合、hash/cache、EnableMovementPrediction 调用与布尔返回分支。",
+          "原生机制明确 UNKNOWN；真实 Mod 验收只回答该实现的观察，不填引擎研究空白。"
+        ],
+        "avoid": [
+          "从方法名或 ServerStateMatches 反推出引擎事务/回滚算法。",
+          "为尚不存在的 Mod 建 native/packet/latency 大型 harness。",
+          "把 research-ready 或已有独立静态 PASS 当 canonical/评测/运行验收。"
+        ]
+      },
+      "scope": "Only cited Lua branches and the named task dependencies. Sample-specific CHOP/REPAIR/channel frames and full call chains remain Reviewer; no Runtime/engine proof.",
+      "reviewer_ref": "input/main-integration/data/n003-staging.json#NC-N003-INT-09",
+      "evidence_refs": [
+        "N003-C13-NSF01"
+      ],
+      "runtime_verified": false
+    }
+  ]
+}

@@ -1,0 +1,4446 @@
+{
+  "facets": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C01",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "RC-C01",
+        "question": "怎样配置可工作对象并识别资格、扣work与完成？",
+        "signatures": [
+          "CanBeWorked()",
+          "GetWorkAction()",
+          "SetWorkAction(act)",
+          "SetWorkLeft(work)",
+          "SetMaxWork(work)",
+          "WorkedBy(worker,numworks)",
+          "Destroy(destroyer)"
+        ],
+        "units": {
+          "work": "work units, not click count or seconds",
+          "worker": "non-nil entity for direct WorkedBy",
+          "act": "action object; action equality checked by DoToolWork"
+        },
+        "source_contract": "CanBeWorked只ready；SetWorkLeft重新启用且至少1。直接WorkedBy不再检查ready/action，先当前HANDS recoil再Internal。numworks默认1，乘数后>0才扣；workleft<=1时任意正work即归零，否则减量并清<0.01。Destroy仍受这些转换，不保证finish。",
+        "fact_ids": [
+          "RC-W01",
+          "RC-W02",
+          "RC-W03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "调用直接入口前自行核验资格及非nil worker；不要通过SetWorkLeft(0)表达完成。判断扣减/完成用实际state与完成回调，不能把组件nil返回或动作true当证据。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-W01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "RC-W02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "RC-W03",
+          "pointer": "#/direct_facts/2"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C02",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "RC-C02",
+        "question": "onwork与onfinish能否改变本次完成，参数在哪一阶段读？",
+        "signatures": [
+          "onwork(inst,worker,workleft,numworks)",
+          "onfinish(inst,worker)",
+          "SetWorkMultiplierFn(fn)"
+        ],
+        "units": {
+          "workleft,numworks": "post-decrement current work units and final multiplied amount",
+          "callback_return": "ignored"
+        },
+        "source_contract": "扣减→working→worked→onwork→重新读workleft<=0→捕获plant条件/位置→onfinish→workfinished→finishedwork→plantkilled。普通event listener及onwork可改后续state；worked数据在该event构造时读；onfinish返回值不控制完成通知。",
+        "fact_ids": [
+          "RC-W03",
+          "RC-W04",
+          "RC-W05",
+          "RC-W07"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "实现阶段重置时明确在onwork中重设workleft会阻止本次完成；增加已有rocks产物回调前先查它的OnWork，避免重复掉落。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-W03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "RC-W04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "RC-W05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "RC-W07",
+          "pointer": "#/direct_facts/18"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C03",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "RC-C03",
+        "question": "采摘的数量、掉落、交付与loot返回有什么分支？",
+        "signatures": [
+          "SetUp(product,regen,number)",
+          "SpawnProductLoot(picker)",
+          "Pick(picker)"
+        ],
+        "units": {
+          "product": "prefab name or nil when deliberately using lootdropper product mode",
+          "number": "quantity; ordinary single branch stacks only when >1 and stackable; drop branch numeric loop",
+          "dropheight": "world y-coordinate offset",
+          "regen": "duration in game scheduling time units, conventionally seconds; not work units or saved external ratio"
+        },
+        "source_contract": "普通product要求非nil picker；lootdropper模式例外允许nil picker。droppicked+lootdropper走ground drop并返回nil。其余lootdropper返回生成entity列表；普通product只生一实体，可堆数量>1。inventory时先picksomething再尝试GiveItem；不读取GiveItem结果。Pick接受可返回true,nil；loot实体在最终Pick返回时转成单元素表，callback/event仍收到原形状。",
+        "fact_ids": [
+          "RC-P02",
+          "RC-P03",
+          "RC-P04",
+          "RC-P05"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "不要在onpickedfn再发同一基础产物；预置有效lootdropper与可生成prefab。若需证明物品已入包，复用GiveItem完整接收/销毁/掉落合同，别根据Pick第二返回值或picksomething判断。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-P02",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "RC-P03",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "RC-P04",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "RC-P05",
+          "pointer": "#/direct_facts/10"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C04",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "RC-C04",
+        "question": "采摘到恢复的callback和cycle消费顺序是什么？",
+        "signatures": [
+          "Pick(picker)",
+          "onpickedfn(inst,picker,loot)",
+          "Regen()",
+          "onregenfn(inst)",
+          "makefullfn(inst)",
+          "MakeEmpty()",
+          "MakeBarren()"
+        ],
+        "units": {
+          "cycles": "harvest-cycle count; nil cycles_left is not zero/barren",
+          "time": "regrow duration transformed by SpringGrowthMod only at specified paths"
+        },
+        "source_contract": "Pick实际guard=ready&&interactable&&!truthy stuck；先减transplanted cycles与保护周期→产物→onpickedfn→ready=false→条件regrow→picked→可选Remove→返回。onpickedfn不回放makeemptyfn，且执行时ready尚未被本函数清掉。Regen无资格guard，ready=true→onregenfn→makefullfn→清task/targettime。MakeEmpty callback在ready=false前，且不检查barren/withered；MakeBarren停止计时并把旧empty状态交callback。",
+        "fact_ids": [
+          "RC-P01",
+          "RC-P05",
+          "RC-P06",
+          "RC-P10",
+          "RC-P12"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "onpickedfn依据扣减后cycles做自己的视觉变化；避免在自己的onpickedfn或picksomething listener中递归Pick，源码没有先置ready=false的重入锁。需要仅消耗周期或提前长成时保留各方法不同的副作用。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-P01",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "RC-P05",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "RC-P06",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "RC-P10",
+          "pointer": "#/direct_facts/15"
+        },
+        {
+          "id": "RC-P12",
+          "pointer": "#/direct_facts/17"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C05",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/4",
+      "coding": {
+        "id": "RC-C05",
+        "question": "保存恢复会回放采摘/完成吗，false和time=0怎样处理？",
+        "signatures": [
+          "Workable:OnSave()/OnLoad(data)",
+          "Pickable:OnSave()/OnLoad(data)"
+        ],
+        "units": {
+          "data": "non-nil table for these component OnLoad methods",
+          "workleft/maxwork": "work units, restored raw; zero is valid truthy Lua value",
+          "pickable.time": "floor(remaining duration), may be zero; local timer only",
+          "external.timeleft": "ratio, via WorldSettingsTimer rather than Pickable.time"
+        },
+        "source_contract": "Workable只在savestate=true保存两个数，OnLoad原值赋→onloadfn；不回放work/finish。Pickable保存schema见RC-P07：可视empty/barren/full callback先执行，随后才assign ready；不回放onpicked/onregen、产物或picked。false interactable未保存/未加载。local paused优先于time，time非nil含0均安排task；external时间交已安装timer，复用比例保存合同。",
+        "fact_ids": [
+          "RC-W06",
+          "RC-P07",
+          "RC-P08",
+          "RC-P11",
+          "RC-W07"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "在prefab构造重新建立product、callback及timer adapter；恢复可视状态callback不要假设CanBePicked已经是目标状态。需要持久保存关闭interactable时显式设计额外字段，不把默认schema当完整布尔序列化。petrified树启用savestate时核验其自有onload重设。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-W06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "RC-P07",
+          "pointer": "#/direct_facts/12"
+        },
+        {
+          "id": "RC-P08",
+          "pointer": "#/direct_facts/13"
+        },
+        {
+          "id": "RC-P11",
+          "pointer": "#/direct_facts/16"
+        },
+        {
+          "id": "RC-W07",
+          "pointer": "#/direct_facts/18"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "008",
+      "topic": "Workable/Pickable 消耗、完成、产物与恢复",
+      "id": "RC-C06",
+      "source_artifact": "batch008/research/resource-completion-research.json",
+      "artifact_sha256": "ffdc125f842906f0c0581bf591aa0ada9860308ed7d0877a08e7049ec9f30dc3",
+      "source_pointer": "#/coding_projection/5",
+      "coding": {
+        "id": "RC-C06",
+        "question": "动作success是否能证明工作完成或拿到产物？",
+        "signatures": [
+          "ACTIONS.CHOP/MINE/HAMMER/DIG.fn(act)",
+          "ACTIONS.PICK.fn(act)",
+          "相关validfn"
+        ],
+        "units": {
+          "act.target/doer/invobject": "target entity / actor entity / offered tool",
+          "action result": "wrapper acceptance convention, not final completion/ownership"
+        },
+        "source_contract": "工作wrapper普通DoToolWork guard false会返回true，只有false+non-nil reason回false,reason；PICK stuck==true回false,STUCK，否则调用Pick后直接true，未传播guard拒绝及loot。validfn separate；CanBePicked与IsStuck不共同覆盖actual Pick guard。",
+        "fact_ids": [
+          "RC-W05",
+          "RC-P01",
+          "RC-P09"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text": "行为实际mutation与ready guard各自核验；保留已有dispatch/SG回调解释，避免新建success=完成/产物送达的统一core。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "RC-W05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "RC-P01",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "RC-P09",
+          "pointer": "#/direct_facts/14"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-RELATIVE-ABSOLUTE",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/0",
+      "coding": {
+        "id": "SPATIAL-CODE-RELATIVE-ABSOLUTE",
+        "question": "哪个回调和返回值是相对偏移，哪个是绝对坐标？",
+        "answer": "FindValidPositionByFan 的 test_fn 接收相对偏移；FindWalkableOffset 的 customcheckfn 接收 origin+offset 的绝对世界坐标。两个 helper 都返回被接受的相对 offset，只向原点加一次。FindNearbyLand/Ocean 是另一层封装，已经返回绝对坐标。",
+        "fact_ids": [
+          "SPATIAL-FAN-INPUTS",
+          "SPATIAL-WALK-INPUTS",
+          "SPATIAL-POINT-TRANSLATION-CONSUMER"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+          "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)",
+          "FindNearbyLand(position, range)",
+          "FindNearbyOcean(position, range)"
+        ],
+        "units": {
+          "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+          "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+          "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+          "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+        },
+        "results": {
+          "fan_and_walkable": {
+            "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+            "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+            "mutation": "不移动实体，不设置旋转"
+          },
+          "nearby_wrappers": "成功：绝对 Vector3，y=0；耗尽：无显式返回"
+        },
+        "callback_args": {
+          "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+          "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-FAN-INPUTS",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "SPATIAL-WALK-INPUTS",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "SPATIAL-POINT-TRANSLATION-CONSUMER",
+          "pointer": "#/direct_facts/9"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-ANGLE-RADIUS",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/1",
+      "coding": {
+        "id": "SPATIAL-CODE-ANGLE-RADIUS",
+        "question": "旋转角和半径怎样对应坐标？",
+        "answer": "start_angle 使用弧度；已读消费者用 DEGREES 把 Transform 的角度值转换为弧度。偏移为 (radius*cos(angle),0,-radius*sin(angle))，radius 是世界坐标尺度下的线性距离。不要混成地块数量、半径平方或有现实米制校准的距离。返回角度也没有完整的模运算归一化。",
+        "fact_ids": [
+          "SPATIAL-FAN-ANGLE-UNITS",
+          "SPATIAL-FAN-ANGLE-NORMALIZATION"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+          "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)"
+        ],
+        "units": {
+          "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+          "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+          "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+          "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+        },
+        "results": {
+          "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+          "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+          "mutation": "不移动实体，不设置旋转"
+        },
+        "callback_args": {
+          "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+          "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+        },
+        "conversion": "Transform 旋转消费者使用 rotation*DEGREES；需要角度值的接收端再按其合同使用 check_angle*RADIANS"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-FAN-ANGLE-UNITS",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "SPATIAL-FAN-ANGLE-NORMALIZATION",
+          "pointer": "#/direct_facts/3"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-WALK-CHECKS",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/2",
+      "coding": {
+        "id": "SPATIAL-CODE-WALK-CHECKS",
+        "question": "怎样请求源码定义的地面、LOS 和额外候选检查？",
+        "answer": "FindWalkableOffset 依次短路检查地面/平台、传送许可、可选 LOS、customcheckfn 世界坐标谓词。若要请求源码中考虑墙的 LOS 分支，传 check_los=true 和 ignore_walls=false。allow_boats 只是地面门禁的备选条件，不会绕过后续检查；allow_water 独立转发。原生阻挡模型仍未知。",
+        "fact_ids": [
+          "SPATIAL-WALK-CHECK-PIPELINE",
+          "SPATIAL-WALK-FLAG-DEFAULTS",
+          "SPATIAL-WALK-TELEPORT-GATE"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)"
+        ],
+        "units": {
+          "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+          "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+          "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+          "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+        },
+        "results": {
+          "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+          "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+          "mutation": "不移动实体，不设置旋转"
+        },
+        "callback_args": {
+          "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+        },
+        "branch_priority": [
+          "ground OR allowed platform",
+          "teleport permission unless ignored",
+          "LOS only when check_los truthy",
+          "customcheckfn if non-nil"
+        ],
+        "flag_defaults": {
+          "ignore_teleportchecks": "仅 nil 时设为 radius==0；显式 false 保留",
+          "check_los": "nil/false 绕过 Pathfinder",
+          "ignore_walls": "已执行 LOS 的 ignorewalls=(ignore_walls~=false)",
+          "allow_water": "原值转发到 Map 与 LOS options",
+          "allow_boats": "只提供 ground gate 的 OR 分支"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-WALK-CHECK-PIPELINE",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "SPATIAL-WALK-FLAG-DEFAULTS",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "SPATIAL-WALK-TELEPORT-GATE",
+          "pointer": "#/direct_facts/8"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-FAILURE-POLICY",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/3",
+      "coding": {
+        "id": "SPATIAL-CODE-FAILURE-POLICY",
+        "question": "怎样消费落点搜索失败？",
+        "answer": "offset 为 nil 表示没有扇形候选被接受；访问字段或加原点前先判断。明确选择中止、重试或原点回退。原版消费者不同：nearby-land 不返回点，moonspore 保留原点，Polly 重试后保留原点，迁移使用已有记录中的回退。回退坐标不证明几何检查已经通过。",
+        "fact_ids": [
+          "SPATIAL-FAN-RETURNS",
+          "SPATIAL-POINT-TRANSLATION-CONSUMER",
+          "SPATIAL-FAILURE-KEEP-ORIGIN",
+          "SPATIAL-FAILURE-BOUNDED-RETRY",
+          "SPATIAL-FAILURE-MIGRATION-REUSE"
+        ],
+        "reuse_ids": [
+          "VANILLA-SHARD-004"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "FindValidPositionByFan(start_angle, radius, attempts, test_fn)",
+          "FindWalkableOffset(position, start_angle, radius, attempts, check_los, ignore_walls, customcheckfn, allow_water, allow_boats, ignore_teleportchecks)",
+          "FindNearbyLand(position, range)",
+          "FindNearbyOcean(position, range)"
+        ],
+        "units": {
+          "start_angle": "弧度；返回 check_angle 也为弧度，不保证完整归一化",
+          "radius": "世界坐标尺度下的线性距离；不是 tile 数或距离平方",
+          "position": "具有 x/y/z 字段的原点；fan offset.y=0",
+          "attempts": "角度候选数；源码 attempts or 8，调用方应提供正整数"
+        },
+        "results": {
+          "helper": {
+            "success": "offset: relative Vector3, check_angle: radians, deflected: boolean (accepted index > 1)",
+            "exhaustion": "无显式返回；普通多变量赋值观察到 nil",
+            "mutation": "不移动实体，不设置旋转"
+          },
+          "consumer_policy": "nearby: 无点；moonspore: origin fallback；Polly: 至多 12 helper calls 后 origin x/z fallback；migration: 复用 SHARD-004"
+        },
+        "callback_args": {
+          "test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+          "customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-FAN-RETURNS",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "SPATIAL-POINT-TRANSLATION-CONSUMER",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "SPATIAL-FAILURE-KEEP-ORIGIN",
+          "pointer": "#/direct_facts/18"
+        },
+        {
+          "id": "SPATIAL-FAILURE-BOUNDED-RETRY",
+          "pointer": "#/direct_facts/19"
+        },
+        {
+          "id": "SPATIAL-FAILURE-MIGRATION-REUSE",
+          "pointer": "#/direct_facts/20"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-FILTER-CALLBACK",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/4",
+      "coding": {
+        "id": "SPATIAL-CODE-FILTER-CALLBACK",
+        "question": "原生标签过滤和 Lua 谓词有什么区别？",
+        "answer": "常见 FindEntities 调用为 x,y,z,radius,musttags,canttags,mustoneoftags；使用后面的标签表时保留前面位置的 nil。原生列表随后仍需实体逻辑过滤。FindEntity 的 fn 接收 candidate,inst；walkable 的 customcheckfn 接收一个绝对点；fan 的 test_fn 接收一个 offset。这些合同不能混用。",
+        "fact_ids": [
+          "SPATIAL-ENTITIES-LUA-CALL",
+          "SPATIAL-ENTITY-PREDICATE",
+          "SPATIAL-PICKUP-TAGS-VS-FILTER"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+          "FindEntity(inst, radius, fn, musttags, canttags, mustoneoftags)",
+          "FindPickupableItem(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker, extra_filter, inventoryoverride)"
+        ],
+        "signature_scope": {
+          "native_query": "common Lua usage，七个参数位置；不宣称 maximal native signature",
+          "FindEntity": "完整已读 Lua 参数顺序",
+          "FindPickupableItem": "完整已读 Lua 参数顺序"
+        },
+        "units": {
+          "x_y_z": "世界坐标",
+          "radius": "Lua 调用中的线性世界距离",
+          "tag_slots": "5=musttags，6=canttags，7=mustoneoftags；后置表保留前置 nil"
+        },
+        "results": {
+          "FindEntities": {
+            "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+            "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+            "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+          },
+          "FindEntity": "首个 passing entity；guard 失败或耗尽则无显式返回",
+          "FindPickupableItem": "passing entity, ispickable；耗尽 nil,nil；owner/inventory 缺失为显式 nil"
+        },
+        "callback_args": {
+          "FindEntity_fn": "fn(v, inst): candidate entity, querying instance",
+          "pickup_extra_filter": "extra_filter(worker, v, owner)",
+          "fan_test_fn": "test_fn(offset): 一个相对 Vector3；Lua 真值接受",
+          "walkable_customcheckfn": "customcheckfn(Vector3(x,y,z)): 一个 origin+offset 的绝对世界坐标点；Lua 真值接受；仅在前置门禁均通过后调用"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-ENTITIES-LUA-CALL",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "SPATIAL-ENTITY-PREDICATE",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "SPATIAL-PICKUP-TAGS-VS-FILTER",
+          "pointer": "#/direct_facts/15"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-NEAREST-ORDER",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/5",
+      "coding": {
+        "id": "SPATIAL-CODE-NEAREST-ORDER",
+        "question": "最近结果和排序有哪些证据？",
+        "answer": "源码第 44 行声称 FindEntities 按距离排序，一些封装依赖返回列表顺序；应保留为注释证据。FindClosestEntity 自己扫描严格 distsq<radius²，并返回距离平方。原生比较器、等距排序/稳定性、查询几何和 Y 度量尚未证明。",
+        "fact_ids": [
+          "SPATIAL-CLOSEST-LUA-SCAN",
+          "SPATIAL-ENTITIES-ORDER-COMMENT",
+          "SPATIAL-ENTITIES-EMPTY-CONSUMERS"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+          "FindClosestEntity(inst, radius, ignoreheight, musttags, canttags, mustoneoftags, fn)",
+          "GetClosestInstWithTag(tag, inst, radius)"
+        ],
+        "units": {
+          "radius": "线性世界距离",
+          "returned_rangesq": "距离平方，与 radius 的单位次方不同",
+          "ignoreheight": "只将 native query 的中心 y 替换为 0；最终 Lua distsq 使用原始 y"
+        },
+        "results": {
+          "FindEntities": {
+            "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+            "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+            "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+          },
+          "FindClosestEntity": "有效 inst：closestEntity, rangesq；无候选 nil,nil；无效/nil inst 则无显式返回",
+          "GetClosestInstWithTag": "ents[1]，若等于 inst 则 ents[2]；空列表产生 nil"
+        },
+        "callback_args": {
+          "FindClosestEntity_fn": "fn(v, inst): candidate entity, querying instance；在 self/dead-or-ghost/visibility gates 之后"
+        },
+        "ordering_evidence": "simutil.lua L44 的 distance-sorted 注释；native ties/stability 未证明；closest Lua scan 为 strict distsq<rangesq"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-CLOSEST-LUA-SCAN",
+          "pointer": "#/direct_facts/12"
+        },
+        {
+          "id": "SPATIAL-ENTITIES-ORDER-COMMENT",
+          "pointer": "#/direct_facts/13"
+        },
+        {
+          "id": "SPATIAL-ENTITIES-EMPTY-CONSUMERS",
+          "pointer": "#/direct_facts/14"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-COLLISION-EFFECT",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/6",
+      "coding": {
+        "id": "SPATIAL-CODE-COLLISION-EFFECT",
+        "question": "FindEntities 是否证明物理碰撞或效果送达？",
+        "answer": "本轮没有引擎实现证据。已读 gallop 和 boat 消费者还要自己检查 mask、物理半径和 XZ 距离；事件/效果只在消费者接受候选后发出。明确实现效果谓词，并分别验证送达。DoAreaAttack 已属 VANILLA-COMBAT-001，引用已有记录，不新增同义条目。",
+        "fact_ids": [
+          "SPATIAL-COLLISION-POSTFILTER",
+          "SPATIAL-BOAT-INTERSECTION-POSTFILTER"
+        ],
+        "reuse_ids": [
+          "VANILLA-COMBAT-001"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "TheSim:FindEntities(x, y, z, radius, musttags, canttags, mustoneoftags)",
+          "EntityScript:GetBoatIntersectingPhysics()"
+        ],
+        "signature_scope": {
+          "native_query": "common Lua usage；not maximal native signature"
+        },
+        "units": {
+          "radius": "query 输入的线性世界距离",
+          "gallop_postfilter": "XZ center distance squared 对比 combined physics radii squared，strict <",
+          "boat_postfilter": "XZ distance - boat_radius <= self_radius"
+        },
+        "results": {
+          "FindEntities": {
+            "result": "Lua 消费者按实体 sequence 使用：ipairs / #ents / numeric indexing",
+            "empty": "已读封装处理空列表或无合格候选；不将封装 nil 返回宣称为 native 返回",
+            "native_unknown": "最大签名、引擎校验/异常、分配、排序 ties、Y/几何/边界未知"
+          },
+          "GetBoatIntersectingPhysics": "首个 Lua intersection passing boat；否则显式 nil",
+          "gallop": "内部选择 target 后才发事件；不提供 native collision/delivery 返回保证"
+        },
+        "callback_args": {
+          "FindEntities": "本轮常见调用仅传坐标/radius/tag tables，没有 Lua entity predicate 参数；谓词在消费者循环中"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-COLLISION-POSTFILTER",
+          "pointer": "#/direct_facts/16"
+        },
+        {
+          "id": "SPATIAL-BOAT-INTERSECTION-POSTFILTER",
+          "pointer": "#/direct_facts/17"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "009",
+      "topic": "空间 helper 的参数、候选、过滤与失败消费",
+      "id": "SPATIAL-CODE-CUSTOM-SPAWNER",
+      "source_artifact": "batch009/research/spatial-helpers-research.json",
+      "artifact_sha256": "6467ab24e2ac664011e60ee3d5b578df28abc56413e48647ba789a2bb7c42b7a",
+      "source_pointer": "#/compact_coding_projection/7",
+      "coding": {
+        "id": "SPATIAL-CODE-CUSTOM-SPAWNER",
+        "question": "spawner 消费自定义出生点时有什么边界？",
+        "answer": "检查实际消费者。PeriodicSpawner 在自定义点缺失时返回 false,15，并通过 DoSpawn/Start 重试；原点回退则继续后续门禁。它的密度 FindEntities 查询保留原 spawner 中心，而细粒度 spacing 使用 spawnpos。替换点回调不会自动改写全部查询中心。",
+        "fact_ids": [
+          "SPATIAL-PERIODIC-SPAWNPOINT-CONSUMPTION",
+          "SPATIAL-FAILURE-KEEP-ORIGIN"
+        ],
+        "classification": "engineering_recommendation_not_runtime_validated",
+        "canonical": false,
+        "callable_signatures": [
+          "PeriodicSpawner:SetGetSpawnPointFn(fn)",
+          "PeriodicSpawner:SetDensityFilterFn(fn)",
+          "PeriodicSpawner:TrySpawn(prefab)",
+          "PeriodicSpawner:DoSpawn()",
+          "PeriodicSpawner:Start(timeoverride)"
+        ],
+        "units": {
+          "spawnpos": "点对象；placement 用 spawnpos:Get() 的世界 x/y/z",
+          "range_and_spacing": "Lua 查询线性世界距离；spacing 距离比较使用平方",
+          "timeoverride": "该 spawner 的任务时间值；missing point 局部 retry 常量为 15"
+        },
+        "results": {
+          "SetGetSpawnPointFn": "赋值 getspawnpointfn；无显式返回",
+          "SetDensityFilterFn": "赋值 densityfilterfn；无显式返回",
+          "TrySpawn": "missing custom point: false,15；初始 guard: false,basetime*0.25；密度/spacing 拒绝: false；尾部 true 不保证 SpawnPrefab 非 nil",
+          "DoSpawn": "取 TrySpawn 第二返回作为 Start override；无显式返回",
+          "Start": "安排 DoTaskInTime；无显式返回"
+        },
+        "callback_args": {
+          "getspawnpointfn": "getspawnpointfn(self.inst): expected point with Get()；nil/false 中止",
+          "densityfilterfn": "densityfilterfn(self.inst, nearby_ent): query 后 entity filter",
+          "onspawn": "onspawn(self.inst, ent): placement 后回调，ent 可为 nil"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SPATIAL-PERIODIC-SPAWNPOINT-CONSUMPTION",
+          "pointer": "#/direct_facts/21"
+        },
+        {
+          "id": "SPATIAL-FAILURE-KEEP-ORIGIN",
+          "pointer": "#/direct_facts/18"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C01",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "ID-C01",
+        "question_zh": "次数上限、比例和扣减怎样设，什么时刻调用onfinished？",
+        "signatures": [
+          "SetMaxUses(val)",
+          "SetUses(val)",
+          "SetPercent(amount)",
+          "Use(num)",
+          "Repair(repairvalue)",
+          "SetOnFinished(fn)"
+        ],
+        "arguments": {
+          "val": "绝对uses数值；SetMaxUses不改变current",
+          "amount": "比例，SetPercent不clamp",
+          "num": "nil/false默认1；0保持；负值增加",
+          "repairvalue": "增加uses，以上界total限制",
+          "fn": "fn(inst)，返回值忽略"
+        },
+        "units": {
+          "uses": "允许小数的uses单位，不是秒或保证整数次",
+          "percent": "current/total，比例而非0..100"
+        },
+        "source_contract_zh": "SetUses上限不clamp；旧current>0→新/监听后current<=0时归零并回调，重复零不回放；组件不自动删物。percentusedchange在归零前，可携带负比例。",
+        "callback_order": [
+          "capture old>0",
+          "assign current",
+          "percentusedchange ordinary listeners",
+          "read current<=0",
+          "clamp zero",
+          "usesdepleted tag",
+          "onfinished(inst)"
+        ],
+        "result": {
+          "return": "所列setter/Use/Repair无显式返回；GetUses返回数值，GetPercent返回未clamp比值",
+          "validity": "onfinished可Remove，调用后不要假定item仍有效"
+        },
+        "fact_ids": [
+          "ID-FU01",
+          "ID-FU02",
+          "ID-FU03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "配置正total并自己约束目标uses/percent。耗尽后续逻辑以状态和回调合同判断；不要把nil当消费失败，不要重复制造同一删除/替代产物。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-FU01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "ID-FU02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "ID-FU03",
+          "pointer": "#/direct_facts/2"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C02",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "ID-C02",
+        "question_zh": "普通工具action消费和保存零次恢复怎样衔接？",
+        "signatures": [
+          "SetConsumption(action,uses)",
+          "OnUsedAsItem(action,doer,target)",
+          "SetModifyUseConsumption(fn)",
+          "SetDoesNotStartFull(enabled)",
+          "OnSave()",
+          "OnLoad(data)"
+        ],
+        "arguments": {
+          "action": "ACTIONS对象映射key",
+          "doer": "允许nil；efficientuser仅有效doer",
+          "modify_fn": "fn(uses,action,doer,target,inst)返回uses",
+          "data": "非nil表；uses!=nil时SetUses",
+          "enabled": "仅控制保存完整初值"
+        },
+        "units": {
+          "uses": "原始action消耗量，可经倍率改变",
+          "saved.uses": "绝对current，不是percent"
+        },
+        "source_contract_zh": "未映射action不扣；mapped uses→efficientuser→modify→Use，modify=nil会变Use默认1。OnSave省略默认满值；OnLoad会正常SetUses，可能触发耗尽删除。",
+        "callback_order": [
+          "action map",
+          "efficientuser multiplier",
+          "modifyuseconsumption",
+          "Use / ID-C01",
+          "save current when non-full or doesnotstartfull",
+          "load SetUses"
+        ],
+        "result": {
+          "return": "OnSave为表或nil；OnLoad/OnUsedAsItem无显式状态返回",
+          "consumer": "spear在正默认值恢复0可调用inst.Remove"
+        },
+        "fact_ids": [
+          "ID-FU04",
+          "ID-FU05",
+          "ID-S01"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "需要零消耗就明确返回0；定义保存不满初始值时用SetDoesNotStartFull。恢复回调必须在prefab构造时正确配置，不能套用Fueled不回放depleted的假设。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-FU04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "ID-FU05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "ID-S01",
+          "pointer": "#/direct_facts/18"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C03",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "ID-C03",
+        "question_zh": "燃料初始化和普通delta/percent的回调为什么不相同？",
+        "signatures": [
+          "InitializeFuelLevel(fuel)",
+          "SetPercent(amount)",
+          "DoDelta(amount,doer)",
+          "MakeEmpty()",
+          "SetSections(num)",
+          "SetSectionCallback(fn)",
+          "SetDepletedFn(fn)",
+          "GetPercent()"
+        ],
+        "arguments": {
+          "fuel": "绝对fuel；可扩大max，仅OnLoad外部包装归非负",
+          "amount": "SetPercent为比例；DoDelta为正/负fuel差量",
+          "num": "section数，正常配置为正",
+          "section_fn": "delta: fn(newsection,oldsection,inst,doer)；initialize: fn(newsection,oldsection,inst)",
+          "depleted_fn": "fn(inst)，返回值忽略"
+        },
+        "units": {
+          "fuel": "燃料容量单位；不自动等于秒",
+          "percent": "0..1比例",
+          "section": "离散档位0空"
+        },
+        "source_contract_zh": "Initialize扩max且不depleted/percentusedchange。DoDelta在正常max下clamp，只有section改变才section callback/event→重读current<=0→depleted；最后percentusedchange总发生。单独SetPercent/DoDelta不StopConsuming。",
+        "callback_order": [
+          "DoDelta: oldsection",
+          "clamp/assign currentfuel",
+          "capture newsection",
+          "if changed: sectionfn",
+          "onfueldsectionchanged",
+          "if still currentfuel<=0: depleted",
+          "percentusedchange"
+        ],
+        "result": {
+          "return": "setter/init/delta无显式结果；GetPercent返回clamp比例",
+          "empty_repeat": "0→0不回放depleted；MakeEmpty若已非正直接不做事"
+        },
+        "fact_ids": [
+          "ID-F01",
+          "ID-F02",
+          "ID-F03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "初始化容量用InitializeFuelLevel；ordinary补扣用DoDelta/SetPercent。section callback可能改变是否耗尽，事件section值不保证反映随后callback修改的状态。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-F01",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "ID-F02",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "ID-F03",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C04",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "ID-C04",
+        "question_zh": "消费、加燃料与零燃料load会不会自动销毁或恢复运行？",
+        "signatures": [
+          "StartConsuming()",
+          "StopConsuming()",
+          "DoUpdate(dt)",
+          "LongUpdate(dt)",
+          "CanAcceptFuelItem(item)",
+          "TakeFuelItem(item,doer)",
+          "SetCanTakeFuelItemFn(fn)",
+          "SetMultiplierFn(fn)",
+          "SetTakeFuelItemFn(fn)",
+          "SetTakeFuelFn(fn)",
+          "SetUpdateFn(fn)",
+          "SetFirstPeriod(firstperiod,firstperiodfull)",
+          "OnSave()",
+          "OnLoad(data)"
+        ],
+        "arguments": {
+          "dt": "游戏调度时间差",
+          "item": "燃料实体或nil；nil以doer为fuel_obj",
+          "fuel_obj": "必须有fuel/fueler及匹配fueltype；accepting=true",
+          "data": "非nil表，fuel数值0也会load",
+          "cantakefuelitemfn": "fn(inst,item,doer)，真值才能继续",
+          "multfn": "fn(inst,fuel_obj)，返回真值倍率或fallback 1",
+          "ontakefuelitemfn": "fn(inst,item,fuelvalue,doer)，item!=nil时在item.Remove之前调用，返回值忽略",
+          "ontakefuelfn": "fn(inst,fuelvalue)，在原料处理之后调用，返回值忽略",
+          "updatefn": "fn(inst)，在DoUpdate的empty/StopConsuming检查之后调用，返回值忽略",
+          "fn": "所列Set...Fn只保存callback，无校验、立即调用或显式返回",
+          "firstperiod": "非nil时启用首次wall更新消费，传给DoUpdate的初次时间差",
+          "firstperiodfull": "可选；Start时current>=max且此值真值才用它，否则firstperiod",
+          "CanAcceptFuelItem.item": "可为nil而返回false；有实体时需fuel/fueler组件，accepting为真才比较fueltype"
+        },
+        "units": {
+          "rate": "fuel单位/游戏时间单位",
+          "effective_delta": "-dt*rate*rate_modifiers:Get()",
+          "takefuel.event.fuelvalue": "乘后请求值，非保证实际增加量",
+          "firstperiod,firstperiodfull": "游戏时间差，作为初次DoUpdate(dt)的dt；不是燃料差量或下一次period长度"
+        },
+        "source_contract_zh": "配置callback setter仅保存函数。SetFirstPeriod仅配置首次消费dt，Start时选full或常规dt。Start仅在无task时建任务；DoUpdate消费后若空Stop，再updatefn。TakeFuelItem无full guard，成功分支即使实际增量0仍Taken/Remove原料/事件并true。OnLoad初始化非负fuel，只可能section恢复，不depleted、不持久化consuming。",
+        "callback_order": [
+          "update: consuming扣delta",
+          "read empty then StopConsuming",
+          "updatefn(inst)",
+          "refuel: guards→DoDelta→fuel:Taken→ontakefuelitemfn→item.Remove→ontakefuelfn→takefuel→true"
+        ],
+        "result": {
+          "return": "所列配置setter/Start/Stop/DoUpdate/LongUpdate/OnLoad无显式返回；CanAcceptFuelItem对满足组件前提的输入返回boolean；TakeFuelItem成功true，guard失败无显式返回；OnSave表或nil",
+          "consumer": "strawhat耗尽callback删帽，minerhat耗尽callback关灯保留帽；这不意味着OnLoad(0)直接重演"
+        },
+        "fact_ids": [
+          "ID-F04",
+          "ID-F05",
+          "ID-F06",
+          "ID-S02"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "补燃料前核验燃料组件、接受条件与是否需要满量保护；需要load后继续消费/显示应由自己的consumer恢复合同处理并做ModQA，不新增Nativegap。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-F04",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "ID-F05",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "ID-F06",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "ID-S02",
+          "pointer": "#/direct_facts/19"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C05",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/4",
+      "coding": {
+        "id": "ID-C05",
+        "question_zh": "腐败时间、百分比和停止/重启会立即腐败吗？",
+        "signatures": [
+          "SetPerishTime(time)",
+          "SetNewMaxPerishTime(newtime)",
+          "SetPercent(percent)",
+          "ReducePercent(amount)",
+          "AddTime(time)",
+          "StartPerishing()",
+          "StopPerishing()",
+          "IsPerishing()"
+        ],
+        "arguments": {
+          "time,newtime": "总/增加的游戏时间；有效正总值由caller配置",
+          "percent": "0..1比例；SetPercent预clamp",
+          "amount": "减少比例，可为负以增加",
+          "StartPerishing": "不先核验remaining是否正，总是重建任务"
+        },
+        "units": {
+          "perishtime": "基础游戏时间，不是无环境修正的墙钟剩余秒",
+          "percent": "remaining/perishtime，上限1；Update负remaining可使GetPercent负"
+        },
+        "source_contract_zh": "SetPerishTime重置remaining；SetNewMax保留旧比例。SetPercent只改剩余/事件并在已活动时重排task，不自动开启已停止任务、不直接Perish。Stop保留remaining，AddTime只活动时有效。",
+        "callback_order": [
+          "setter assign remaining",
+          "property标签/forceperishchange可发生",
+          "explicit perishchange when applicable",
+          "if task active: restart",
+          "later Update decay",
+          "perishchange only when floor(old_remaining*100)!=floor(new_remaining*100)",
+          "if remaining<=0 then Perish"
+        ],
+        "result": {
+          "return": "这些setter/start/stop无显式状态；IsPerishing仅task!=nil",
+          "zero": "paused SetPercent(0)仍paused，活动零值到后续Update才Perish"
+        },
+        "fact_ids": [
+          "ID-P01",
+          "ID-P02",
+          "ID-P03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "基础时长/比例赋值后明确是否开始，别把SetPercent(0)当立即转换。若需求是立即完成，直接Perish需要接受其callback/产物副作用并自己保证只调一次。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-P01",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "ID-P02",
+          "pointer": "#/direct_facts/12"
+        },
+        {
+          "id": "ID-P03",
+          "pointer": "#/direct_facts/13"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C06",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/5",
+      "coding": {
+        "id": "ID-C06",
+        "question_zh": "腐败callback、替代品和所有权的顺序怎样写？",
+        "signatures": [
+          "SetOnPerishFn(fn)",
+          "Perish()",
+          "onperishreplacement = prefab_name",
+          "onreplacedfn(old,new)"
+        ],
+        "arguments": {
+          "perish_fn": "fn(inst)，返回值忽略；Remove会截断之后有效性分支",
+          "prefab_name": "有效预声明prefab字符串；nil代表不替换",
+          "onreplacedfn": "fn(old,new)，旧物尚未由组件Remove，后续无新增validity guard"
+        },
+        "units": {
+          "stack": "两边stackable才继承旧StackSize，超过new.maxsize时忽略max",
+          "slot": "holder:GetItemSlot(old)结果；不是装备自动恢复证明"
+        },
+        "source_contract_zh": "先停task→perishfn→有效时perished→再有效且配置replacement才Spawn；nil结果不删旧。成功后尺寸/位置→onreplacedfn→此时owner选择inventory或container→slot→删旧→GiveItem；无holder保留新物在原位置并删旧。未读取GiveItem结果、未Equip。",
+        "callback_order": [
+          "cancel task",
+          "perishfn(old)",
+          "if valid: perished ordinary listeners",
+          "if valid and replacement: SpawnPrefab",
+          "if nonnil: stack then position",
+          "onreplacedfn(old,new)",
+          "read owner/holder/slot",
+          "Remove old",
+          "GiveItem(new,slot) if holder"
+        ],
+        "result": {
+          "return": "Perish无显式产物/成功返回；原物可能删、保留，新物可能交付尝试或留地面",
+          "nil_spawn": "只证明Lua分支保留旧物且停task，Native返回/异常映射unknown"
+        },
+        "fact_ids": [
+          "ID-P04",
+          "ID-P05",
+          "ID-P06",
+          "ID-S03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "把onreplacedfn用于装饰新物；不要在该回调先Remove旧物或假定它仍会重查有效性。需要确认入包复用GiveItem合同，不能将成功Spawn当入包成功；不要同时回调手造产物和配置同一replacement。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-P04",
+          "pointer": "#/direct_facts/14"
+        },
+        {
+          "id": "ID-P05",
+          "pointer": "#/direct_facts/15"
+        },
+        {
+          "id": "ID-P06",
+          "pointer": "#/direct_facts/16"
+        },
+        {
+          "id": "ID-S03",
+          "pointer": "#/direct_facts/20"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "010",
+      "topic": "普通物品耗尽、腐败、替换与恢复",
+      "id": "ID-C07",
+      "source_artifact": "batch010/research/item-depletion-research.json",
+      "artifact_sha256": "0b546ad4a33a746c498df55cc23df2ee022509fe15fdb1ce51ec9ba7e37bba59",
+      "source_pointer": "#/coding_projection/6",
+      "coding": {
+        "id": "ID-C07",
+        "question_zh": "腐败load的零/负时间和暂停状态怎样恢复？",
+        "signatures": [
+          "OnSave()",
+          "OnLoad(data)"
+        ],
+        "arguments": {
+          "data": "nil安全；time非nil直接赋值，不clamp",
+          "data.paused": "真时停；否则time非nil重新开始",
+          "time": "绝对remaining，可为0/负"
+        },
+        "units": {
+          "saved.time": "剩余基础游戏时间，不保存percent或period相位",
+          "saved.paused": "活动task有无"
+        },
+        "source_contract_zh": "OnSave总表，paused仅停止时true。OnLoad先直接remaining，再paused Stop或有time Start；没有直接Perish/产物或显式perishchange。onpercent属性路径仍可能forceperishchange。active零/负值等待下一Update；paused零/负值不自动完成。",
+        "callback_order": [
+          "assign saved time when present",
+          "property onpercent tags/forceperishchange",
+          "if paused: Stop",
+          "else if time present: Start",
+          "later Update only if active"
+        ],
+        "result": {
+          "return": "无显式load结果；保存paused/time表",
+          "scope": "不证明所有prefab存档pipeline或runtime时刻，仅组件入口局部合同"
+        },
+        "fact_ids": [
+          "ID-P07",
+          "ID-P03"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "分别验暂停/活动的零时间恢复；不要把FiniteUses load会回放onfinished、或Fueled load不depleted，泛化成全部组件的统一restore规则。"
+        },
+        "status": "ResearchReady_scoped_static",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "ID-P07",
+          "pointer": "#/direct_facts/17"
+        },
+        {
+          "id": "ID-P03",
+          "pointer": "#/direct_facts/13"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "011",
+      "topic": "普通 DEPLOY 校验、单件移交、回调与结果",
+      "id": "DC-C01",
+      "source_artifact": "batch011/research/deployment-consumption-research.json",
+      "artifact_sha256": "3e2a520d132ef7bfd462d1cb52d89d81bc5cd81872114a8f300edb7175fcb041",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "DC-C01",
+        "question_zh": "部署predicate该配置在哪，默认/自定义模式收到什么输入？",
+        "signatures": [
+          "Deployable:SetDeployMode(mode)",
+          "Deployable:SetDeploySpacing(spacing)",
+          "Deployable:DeploySpacingRadius()",
+          "Deployable:IsDeployable(deployer)",
+          "Deployable:CanDeploy(pt, mouseover, deployer, rot)",
+          "inst._custom_candeploy_fn(inst, pt, mouseover, deployer, rot)",
+          "replica.inventoryitem:CanDeploy(pt, mouseover, deployer, rot)",
+          "MakePlacer(name, bank, build, anim, onground, snap, metersnap, scale, fixedcameraoffset, facing, postinit_fn, offset, onfailedplacement)",
+          "replica.inventoryitem:GetDeployPlacerName()"
+        ],
+        "arguments": {
+          "mode": "DEPLOYMODE符号；CUSTOM才调用实体_custom_candeploy_fn，NONE拒绝为nil",
+          "spacing": "DEPLOYSPACING符号；返回radius由对应表查得",
+          "pt": "支持Get()及x/y/z的world Vector3；不可无条件传nil",
+          "mouseover": "实体或nil；ordinary action及Deploy均传nil",
+          "deployer": "角色/执行实体；IsDeployable可处理nil，但Deploy后续必需实体",
+          "rot": "原样传入predicate；直接Deploy省略rot时predicate见nil，callback才fallback到0",
+          "selected_MakePlacer": "dug_sapling_placer名字，与物品prefab.._placer默认相符；只传name/bank/build/anim四项，其他preview参数省略。构造的是不持久化、非networked preview实体。",
+          "preview_input": "playercontroller testfn向replica提供pt、可能mouseover、self.inst和preview Transform:GetRotation；authority action/Deploy则mouseover=nil。"
+        },
+        "units": {
+          "pt": "游戏world坐标，不是平台local坐标或屏幕像素；不等于真实米",
+          "spacing_radius": "游戏world距离值，非秒/格数保证",
+          "rot": "此范围只证明原样转发及0缺省，没有独立建立角值计量单位",
+          "predicate_return": "Lua truthiness；false/nil拒绝，可用第二返回reason"
+        },
+        "branches": [
+          "先restriction/mounted/floater过滤，再mode route。",
+          "DEFAULT与PLANT用Map入口；CUSTOM直接return实体predicate或旧MAST fallback。",
+          "本版本component.customtestfn没有读取，不作为可用部署接口。",
+          "Replica预览可调用同一实体predicate，但ANYWHERE无组件路径与server实现不同。",
+          "部署placer名可由usegridplacer或override改变，否则prefab.._placer；MakePlacer提供preview组件。",
+          "controller preview testfn转发replica资格与局部鼠标/HUD阻挡；不自行消费或证明服务端成功。"
+        ],
+        "source_contract_zh": "先restriction/mounted/floater过滤，再mode route。 DEFAULT与PLANT用Map入口；CUSTOM直接return实体predicate或旧MAST fallback。 本版本component.customtestfn没有读取，不作为可用部署接口。 Replica预览可调用同一实体predicate，但ANYWHERE无组件路径与server实现不同。 部署placer名可由usegridplacer或override改变，否则prefab.._placer；MakePlacer提供preview组件。 controller preview testfn转发replica资格与局部鼠标/HUD阻挡；不自行消费或证明服务端成功。",
+        "results": {
+          "return": "CanDeploy返回委托结果；IsDeployable布尔；mode未匹配时nil；setter无显式结果",
+          "reason": "仅委托显式返回时有第二值；caller不得假定所有拒绝都有reason",
+          "mutation": "地图/predicate是资格判断；组件没有保证customfn纯函数",
+          "preview": "preview资格不是产品完成/请求送达证明；权威Do与action结果链复用N003-S04。"
+        },
+        "result": {
+          "return": "CanDeploy返回委托结果；IsDeployable布尔；mode未匹配时nil；setter无显式结果",
+          "reason": "仅委托显式返回时有第二值；caller不得假定所有拒绝都有reason",
+          "mutation": "地图/predicate是资格判断；组件没有保证customfn纯函数"
+        },
+        "callback_order": [
+          "IsDeployable",
+          "match mode",
+          "map validation OR custom predicate"
+        ],
+        "callback_args": {
+          "custom_predicate": "fn(inst,pt,mouseover,deployer,rot)，直接读取返回值；建议返回明确bool[,reason]",
+          "MakePlacer_postinit": "postinit_fn(preview_inst)；selected plantables不传此参数",
+          "placer_testfn": "controller写入function(pt)，其中转发CanDeploy(pt,mouseover,controller.inst,preview_rotation)且另返回鼠标/HUD阻挡指示"
+        },
+        "fact_ids": [
+          "DC-F01",
+          "DC-F02",
+          "DC-F03",
+          "DC-F12",
+          "DC-F13",
+          "DC-F14"
+        ],
+        "citation_ids": [
+          "D-eligibility",
+          "D-validation",
+          "M-default-plant",
+          "R-validation",
+          "PU-placer",
+          "PC-placer",
+          "R-placer-name"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "把共有且可安全在client判断的predicate放在实体共同构造区，再仅master添加组件并选CUSTOM。不可在predicate里删原料或生成产品；ordinary action与Deploy会检查两次。想用默认地图限制且加额外条件，应在自定义predicate明确调用合适Map入口。本批不提供所有特殊Map/placer的通用替代。"
+        },
+        "status": "ScopedResearchReady",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "DC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "DC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "DC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "DC-F12",
+          "pointer": "#/direct_facts/13"
+        },
+        {
+          "id": "DC-F13",
+          "pointer": "#/direct_facts/14"
+        },
+        {
+          "id": "DC-F14",
+          "pointer": "#/direct_facts/15"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "011",
+      "topic": "普通 DEPLOY 校验、单件移交、回调与结果",
+      "id": "DC-C02",
+      "source_artifact": "batch011/research/deployment-consumption-research.json",
+      "artifact_sha256": "3e2a520d132ef7bfd462d1cb52d89d81bc5cd81872114a8f300edb7175fcb041",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "DC-C02",
+        "question_zh": "Deploy的true、ondeploy返回值及事件实际说明什么？",
+        "signatures": [
+          "Deployable:Deploy(pt, deployer, rot)",
+          "deployable.ondeploy = fn",
+          "deployer:PushEvent(\"deployitem\", data)",
+          "TheWorld:PushEvent(\"itemplanted\", data)"
+        ],
+        "arguments": {
+          "pt": "world Vector3，同一个pt交给predicate、callback及itemplanted.pos",
+          "deployer": "非nil且支持PushEvent的实体；不可用本地ThePlayer替代",
+          "rot": "callback为rot or 0；predicate为原始rot",
+          "fn": "fn(inst,pt,deployer,rot_or_0)"
+        },
+        "units": {
+          "success": "资格通过+callback及事件正常返回后的true；不是产品实体/消费证明",
+          "reason": "复检CanDeploy第一值false/nil时的第二返回",
+          "rotation": "同DC-C01，0为缺省值而非证明单位"
+        },
+        "branches": [
+          "CanDeploy失败→false,reason，callback/事件未到达。",
+          "资格通过→捕获deployedplant→可选ondeploy→deployitem→条件itemplanted→true。",
+          "ondeploy正常返回false或nil也不控制Deploy的true；未配置callback也无内建消费。"
+        ],
+        "source_contract_zh": "CanDeploy失败→false,reason，callback/事件未到达。 资格通过→捕获deployedplant→可选ondeploy→deployitem→条件itemplanted→true。 ondeploy正常返回false或nil也不控制Deploy的true；未配置callback也无内建消费。",
+        "results": {
+          "return": "false,reason OR true；不返回product，不读取ondeploy结果",
+          "validity": "callback可Remove/变更inst；回调后无IsValid guard；prefab字段于回调后读",
+          "exceptions": "未见pcall或undo；抛错不能当成组件false-result恢复路径"
+        },
+        "result": {
+          "return": "false,reason OR true；不返回product，不读取ondeploy结果",
+          "validity": "callback可Remove/变更inst；回调后无IsValid guard；prefab字段于回调后读",
+          "exceptions": "未见pcall或undo；抛错不能当成组件false-result恢复路径"
+        },
+        "callback_order": [
+          "CanDeploy(pt,nil,deployer,rot)",
+          "capture isplant",
+          "ondeploy(inst,pt,deployer,rot or 0)",
+          "deployitem(prefab read now)",
+          "if captured isplant: itemplanted(doer,pos)",
+          "true"
+        ],
+        "callback_args": {
+          "ondeploy": "fn(inst,pt,deployer,rot or 0)，返回值忽略",
+          "deployitem": "{prefab=self.inst.prefab}，prefab late-read",
+          "itemplanted": "{doer=deployer,pos=pt}，以callback前isplant决定"
+        },
+        "fact_ids": [
+          "DC-F04",
+          "DC-F05",
+          "DC-F06"
+        ],
+        "citation_ids": [
+          "D-deploy"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "只把Deploy成功解释成此调用链已走到末尾。若业务需要产品身份或可恢复失败，需自己的明确状态协议/consumer设计，不能靠ondeploy return false启用vanilla返还。后续读实例时检查有效性。不要把deployitem/itemplanted当成产品存在或消费完成回执。"
+        },
+        "status": "ScopedResearchReady",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "DC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "DC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "DC-F06",
+          "pointer": "#/direct_facts/5"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "011",
+      "topic": "普通 DEPLOY 校验、单件移交、回调与结果",
+      "id": "DC-C03",
+      "source_artifact": "batch011/research/deployment-consumption-research.json",
+      "artifact_sha256": "3e2a520d132ef7bfd462d1cb52d89d81bc5cd81872114a8f300edb7175fcb041",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "DC-C03",
+        "question_zh": "ordinary ACTIONS.DEPLOY何时拿出单件，复检失败如何返还？",
+        "signatures": [
+          "ACTIONS.DEPLOY.fn(act)",
+          "BufferedAction:GetActionPoint()",
+          "Inventory:RemoveItem(item, wholestack, checkallcontainers, keepoverstacked)",
+          "Container:RemoveItem(item, wholestack, _checkallcontainers_, keepoverstacked)",
+          "holder:GiveItem(obj)"
+        ],
+        "arguments": {
+          "act": "invobject、doer、rotation及GetActionPoint，ordinary路径要求无complexprojectile且keep_in_inventory_on_deploy非真",
+          "holder": "doer.inventory优先，否则doer.container；不是invobject原owner的重新验证",
+          "invobject": "初始action物品，可能是仍留下的多件堆叠",
+          "obj": "RemoveItem返回的单件，清prevcontainer/prevslot后作为Deploy self.inst",
+          "act_pos": "执行时GetActionPoint解析得到world point；本fn只解析一次"
+        },
+        "units": {
+          "quantity": "wholestack省略，有效堆叠普通拆1件；quantity不是整个堆叠",
+          "point": "DynamicPosition平台local→当前world，两个validation共享一次解析的Vector3",
+          "results": "Lua真假+可选reason；nil guard返回与显式false不同"
+        },
+        "branches": [
+          "前CanDeploy拒绝→false,reason，无RemoveItem。",
+          "普通holder RemoveItem返回非nil→清恢复位置hint→obj Deploy复检。",
+          "复检/Deploy成功→true；返回false/nil→GiveItem attempted，再false,reason。",
+          "无holder/无obj/无组件→隐式nil；readonly及未匹配RemoveItem行为见reuse，返回非nil不是detach证明。"
+        ],
+        "source_contract_zh": "前CanDeploy拒绝→false,reason，无RemoveItem。 普通holder RemoveItem返回非nil→清恢复位置hint→obj Deploy复检。 复检/Deploy成功→true；返回false/nil→GiveItem attempted，再false,reason。 无holder/无obj/无组件→隐式nil；readonly及未匹配RemoveItem行为见reuse，返回非nil不是detach证明。",
+        "results": {
+          "return": "true OR false,reason OR implicit nil；action忽略GiveItem返回",
+          "restore": "尝试GiveItem，没有原slot参数且prevcontainer/prevslot已清；接收/合堆/掉落/部分结果见N004 reuse",
+          "used_item": "BufferedAction成功后若初始invobject仍有效，会OnUsedAsItem并Succeed；不是调用obj消费的替代",
+          "point_invalid": "正常BufferedAction会先校验平台；直接fn/Deploy没有自动nil point保护"
+        },
+        "result": {
+          "return": "true OR false,reason OR implicit nil；action忽略GiveItem返回",
+          "restore": "尝试GiveItem，没有原slot参数且prevcontainer/prevslot已清；接收/合堆/掉落/部分结果见N004 reuse",
+          "used_item": "BufferedAction成功后若初始invobject仍有效，会OnUsedAsItem并Succeed；不是调用obj消费的替代",
+          "point_invalid": "正常BufferedAction会先校验平台；直接fn/Deploy没有自动nil point保护"
+        },
+        "callback_order": [
+          "act:GetActionPoint once",
+          "initial invobject CanDeploy",
+          "holder:RemoveItem(invobject)",
+          "clear obj prevcontainer/prevslot",
+          "obj:Deploy with same point",
+          "success→true OR holder:GiveItem(obj) then false,reason",
+          "BufferedAction result consumption (reused)"
+        ],
+        "callback_args": {
+          "caller_success": "BufferedAction onsuccess callbacks no args (reuse)",
+          "caller_failure": "BufferedAction onfail callbacks no args (reuse)",
+          "GiveItem": "called as holder:GiveItem(obj); return not captured"
+        },
+        "fact_ids": [
+          "DC-F07",
+          "DC-F08",
+          "DC-F09",
+          "DC-I01",
+          "DC-I02"
+        ],
+        "citation_ids": [
+          "A-precheck",
+          "A-neighbors",
+          "A-ordinary",
+          "B-point",
+          "U-dynamic",
+          "I-remove",
+          "C-remove",
+          "B-do"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "在自己的consumer接收obj后只处理这个移交单位。不要再按原invobject或库存重复扣1。返还需核验最终owner/slot/世界实体状态，不能由false返回、非nil RemoveItem或一次GiveItem保证。动态平台位置在实际执行处解析，不能保存旧world点当以后部署点。"
+        },
+        "status": "ScopedResearchReady",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "DC-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "DC-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "DC-F09",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "DC-I01",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "DC-I02",
+          "pointer": "#/direct_facts/12"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "011",
+      "topic": "普通 DEPLOY 校验、单件移交、回调与结果",
+      "id": "DC-C04",
+      "source_artifact": "batch011/research/deployment-consumption-research.json",
+      "artifact_sha256": "3e2a520d132ef7bfd462d1cb52d89d81bc5cd81872114a8f300edb7175fcb041",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "DC-C04",
+        "question_zh": "dug_sapling如何生成产品并消费单件，产品为nil会怎样？",
+        "signatures": [
+          "make_plantable(data) → Prefab(\"dug_\"..data.name, fn, assets)",
+          "ondeploy(inst, pt, deployer)",
+          "SpawnPrefab(data.name, inst.linked_skinname, inst.skin_id)",
+          "Stackable:Get(num)",
+          "Pickable:OnTransplant()"
+        ],
+        "arguments": {
+          "representative": "data.name=sapling，factory输出dug_sapling；未设置keep_in_inventory_on_deploy/complexprojectile的该master配置",
+          "input": "ordinary action返回的obj，预期size=1，非仍留在holder的原堆叠",
+          "product": "SpawnPrefab的sapling结果；非nil时才消费input",
+          "pt": "world Vector3；product.Transform:SetPosition(pt:Get())",
+          "deployer": "产品声音代码允许nil/missing SoundEmitter，但外围Deploy event仍需deployer"
+        },
+        "units": {
+          "input_quantity": "普通action分离1件；obj size=1的Get()只返回自己",
+          "product_quantity": "此consumer一次SpawnPrefab调用，非nil产品定位；不保证Native必成功",
+          "spacing": "PLANT + MEDIUM symbol，数值解剖留reviewer"
+        },
+        "branches": [
+          "product非nil→定位→Get():Remove输入→OnTransplant→可选声音/manager。",
+          "普通obj size=1→Get返回self，所以删除移交单件，不再拆原N-1堆。",
+          "product=nil→consumer不消费/定位，但外围Deploy仍返回true；ordinary action不尝试GiveItem。"
+        ],
+        "source_contract_zh": "product非nil→定位→Get():Remove输入→OnTransplant→可选声音/manager。 普通obj size=1→Get返回self，所以删除移交单件，不再拆原N-1堆。 product=nil→consumer不消费/定位，但外围Deploy仍返回true；ordinary action不尝试GiveItem。",
+        "results": {
+          "return": "ondeploy无显式返回；Deploy不读取它",
+          "success_means": "真实产品状态与组件true分开",
+          "product_nil": "条件式静态分支；没有实测SpawnPrefab nil，没有引擎sentinel/异常映射结论",
+          "post_transplant": "sapling master pickable绑定ontransplantfn→MakeEmpty；不重做regrowth/timer合同"
+        },
+        "result": {
+          "return": "ondeploy无显式返回；Deploy不读取它",
+          "success_means": "真实产品状态与组件true分开",
+          "product_nil": "条件式静态分支；没有实测SpawnPrefab nil，没有引擎sentinel/异常映射结论",
+          "post_transplant": "sapling master pickable绑定ontransplantfn→MakeEmpty；不重做regrowth/timer合同"
+        },
+        "callback_order": [
+          "SpawnPrefab sapling",
+          "if product nonnil",
+          "product world position",
+          "consume transferred unit",
+          "pickable OnTransplant",
+          "optional deployer SoundEmitter",
+          "optional plantspawner",
+          "outer Deploy events / true"
+        ],
+        "callback_args": {
+          "consumer": "ondeploy(inst,pt,deployer)，忽略外围传来的第4rot参数",
+          "pickable_transplant": "ontransplantfn(product)，已有consumer→component局部链"
+        },
+        "fact_ids": [
+          "DC-F10",
+          "DC-F11",
+          "DC-I01",
+          "DC-I02"
+        ],
+        "citation_ids": [
+          "P-consumer",
+          "P-master",
+          "P-sapling",
+          "P-export",
+          "S-get",
+          "A-ordinary",
+          "Sap-bind",
+          "Sap-transplant",
+          "Pick-transplant"
+        ],
+        "local_advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "为具体新prefab明确输入单位、产品成功条件与失败所有权。可借鉴代表顺序，但不能假设ondeploy return false会返还，也不能把所有种子/船/容器部署统一成此模式。任何SpawnPrefab Native映射依赖仍保留条件unknown，本批不运行probe。"
+        },
+        "status": "ScopedResearchReady",
+        "canonical": false,
+        "runtime_tested": false
+      },
+      "reviewer_expansion": [
+        {
+          "id": "DC-F10",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "DC-F11",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "DC-I01",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "DC-I02",
+          "pointer": "#/direct_facts/12"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "012",
+      "topic": "普通 GIVE 与 Trader 接受、消耗、拒绝与奖励",
+      "id": "TR-C01",
+      "source_artifact": "batch012/research/trader-consumption-research.json",
+      "artifact_sha256": "f6bc3a8cf1506c62db710e35a044e3c8cd53def7fd23cfb68ab4b87c1f01201d",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "TR-C01",
+        "title_zh": "分开能力门禁和意愿拒绝",
+        "load_when_zh": "给普通 NPC 配置 Trader 测试与拒绝反馈时",
+        "signatures": [
+          "Trader:SetAbleToAcceptTest(fn)",
+          "Trader:SetAcceptTest(fn)",
+          "Trader:AbleToAccept(item,giver,count)",
+          "Trader:WantsToAccept(item,giver,count)",
+          "Trader:SetOnRefuse(fn)"
+        ],
+        "args_units_zh": "item=原候选实体；giver=给物者；count=传入件数，测试阶段可为 nil，尚未规范为 1。",
+        "branches": [
+          "Able: disabled/item=nil → false；mimic 未允许 → false,\"ITEMMIMIC\"；自定义 fn(inst,item,giver,count) 存在则 return 其结果；否则 dead/asleep/busy → false + 对应 reason，asleep/busy 对 inventoryitem.owner~=nil 的 Trader 豁免；其余 true。",
+          "Want: enabled and (not test or test(inst,item,giver,count))；AcceptGift 的能力拒绝不调用 onrefuse，意愿拒绝调用。"
+        ],
+        "results_zh": "Able 可返回 able,reason；Wants 返回真值表达式结果；setter 无显式返回；AcceptGift 的能力/意愿拒绝都只返回 false。",
+        "callback_args": {
+          "abletoaccepttest": [
+            "inst",
+            "item",
+            "giver",
+            "count"
+          ],
+          "test": [
+            "inst",
+            "item",
+            "giver",
+            "count"
+          ],
+          "onrefuse": [
+            "inst",
+            "giver",
+            "item"
+          ]
+        },
+        "decision_rule_zh": "普通偏好用 SetAcceptTest 保留默认能力门禁；需要自定义 action fail reason 才用 SetAbleToAcceptTest，并显式决定原 dead/asleep/busy 规则是否要保留。测试避免依赖只调用一次。",
+        "decision_rule_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "fact_ids": [
+          "TR-F01",
+          "TR-F02",
+          "TR-F03",
+          "TR-F04",
+          "TR-F14"
+        ],
+        "citation_ids": [
+          "TR-CONFIG",
+          "TR-ABLE",
+          "TR-WANT",
+          "TR-ACCEPT"
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "TR-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "TR-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "TR-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "TR-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "TR-F14",
+          "pointer": "#/direct_facts/13"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "012",
+      "topic": "普通 GIVE 与 Trader 接受、消耗、拒绝与奖励",
+      "id": "TR-C02",
+      "source_artifact": "batch012/research/trader-consumption-research.json",
+      "artifact_sha256": "f6bc3a8cf1506c62db710e35a044e3c8cd53def7fd23cfb68ab4b87c1f01201d",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "TR-C02",
+        "title_zh": "保留 GIVE 的数量来源和零容量分支",
+        "load_when_zh": "选择单件或整堆 NPC GIVE 时",
+        "signatures": [
+          "Trader:IsAcceptingStacks()",
+          "Trader:SetAcceptStacks()",
+          "Inventory:CanAcceptCount(item,maxcount)",
+          "ACTIONS.GIVE.fn(act)"
+        ],
+        "args_units_zh": "count/maxcount 是件数；act.invobject 为源实体。普通 GIVE 不带 count，整堆 GIVE 调 CanAcceptCount(item) 而非提供 maxcount。",
+        "branches": [
+          "acceptstacks 不真 → count=nil；真 → 目标 inventory 容量值优先，次为源 stacksize，次为 1；count<=0 → action false，0 不触发 or fallback。",
+          "CanAcceptCount 初值 stackable:StackSize() or 1；locked → math.max(maxcount or math.huge,stacksize-1)，非 locked → maxcount or stacksize；<=0 → 0。容量来自普通槽、合适 overflow/specialized 与 equipstack；达目标返回目标量，否则累计量。"
+        ],
+        "results_zh": "IsAcceptingStacks 返回属性原值；SetAcceptStacks 无显式返回且设 true。CanAcceptCount 返回数值，不转移；locked/maxcount 规则不能概括为原堆上限。",
+        "callback_args": {
+          "GIVE_precheck_abletoaccepttest": [
+            "target",
+            "act.invobject",
+            "act.doer",
+            "count"
+          ]
+        },
+        "decision_rule_zh": "测试中的 nil 不能当最终消费数；接受回调读规范后的 count。即使 deleteitemonaccept=true，启用整堆且目标有 inventory 仍受上述容量查询影响。",
+        "decision_rule_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "fact_ids": [
+          "TR-F01",
+          "TR-F04",
+          "TR-F07",
+          "TR-F09",
+          "TR-F10"
+        ],
+        "citation_ids": [
+          "TR-CONFIG",
+          "GIVE-TR",
+          "COUNT-INPUT",
+          "COUNT-BODY"
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "TR-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "TR-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "TR-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "TR-F09",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "TR-F10",
+          "pointer": "#/direct_facts/9"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "012",
+      "topic": "普通 GIVE 与 Trader 接受、消耗、拒绝与奖励",
+      "id": "TR-C03",
+      "source_artifact": "batch012/research/trader-consumption-research.json",
+      "artifact_sha256": "f6bc3a8cf1506c62db710e35a044e3c8cd53def7fd23cfb68ab4b87c1f01201d",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "TR-C03",
+        "title_zh": "使用接受回调的实际局部实体",
+        "load_when_zh": "普通 Trader 消耗材料或接收物品并实现 onaccept 时",
+        "signatures": [
+          "Trader:AcceptGift(giver,item,count)",
+          "Trader:SetOnAccept(fn)"
+        ],
+        "args_units_zh": "count 经 count or 1 规范，单位件，是请求/默认量，未回填实际转移量。onaccept 的 item 为接受分支局部实体，部分堆为 Get 返回的新实体；它不是保证仍有效的原物品。",
+        "branches": [
+          "能力与意愿通过后：stacksize>count → item=Get(count)；否则 RemoveFromOwner(true)，返回未读取。",
+          "deleteitemonaccept 默认 true → item:Remove()；false 且目标有 inventory → 清 prevslot/prevcontainer 后 GiveItem(item,nil,giver 位置或 nil)，返回未读取；false 且无 inventory → 无额外接收步骤。",
+          "上述步骤正常返回 → onaccept → trade 事件 → true；意愿拒绝 → onrefuse → false。"
+        ],
+        "results_zh": "onaccept/onrefuse/RemoveFromOwner/GiveItem 的返回不决定该方法的正常接受 true；Get 内写堆量的 SetStackSize 使用 math.min(sz,MAXUINT)，不改 callback count。回调前无 item:IsValid/owner 或 GiveItem 结果核验，本方法无局部受保护异常恢复。trade payload 只有 giver,item。",
+        "callback_args": {
+          "onaccept": [
+            "inst",
+            "giver",
+            "item",
+            "count"
+          ],
+          "onrefuse": [
+            "inst",
+            "giver",
+            "item"
+          ],
+          "trade_event_payload": [
+            "giver",
+            "item"
+          ]
+        },
+        "decision_rule_zh": "Trader 已进行拆堆/删除或移交处理，回调不要再次按原堆扣材料。若回调需要操作活体物品，可选 deleteitemonaccept=false 并检查真实归属/合堆结果；pigman 仅提供一个此类具体消费者示例。直接调用需自行定义有效 count 与 inventoryitem 前提。",
+        "decision_rule_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "fact_ids": [
+          "TR-F04",
+          "TR-F05",
+          "TR-F06",
+          "TR-F11",
+          "TR-F13"
+        ],
+        "citation_ids": [
+          "TR-CTOR",
+          "TR-ACCEPT",
+          "PIG-ACCEPT",
+          "REUSE-GET",
+          "REUSE-STACKSIZE"
+        ],
+        "reuse_pointer_ids": [
+          "R-INV001-OWNER",
+          "R-INV002-GIVE0",
+          "R-INV002-GIVE1",
+          "R-INV002-REMOVE",
+          "R-MATERIAL007-GET",
+          "R-MATERIAL007-OWNER"
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "TR-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "TR-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "TR-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "TR-F11",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "TR-F13",
+          "pointer": "#/direct_facts/12"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "012",
+      "topic": "普通 GIVE 与 Trader 接受、消耗、拒绝与奖励",
+      "id": "TR-C04",
+      "source_artifact": "batch012/research/trader-consumption-research.json",
+      "artifact_sha256": "f6bc3a8cf1506c62db710e35a044e3c8cd53def7fd23cfb68ab4b87c1f01201d",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "TR-C04",
+        "title_zh": "GIVE 已处理结果与接受效果分开",
+        "load_when_zh": "读取 GIVE 的 action 返回或连接奖励效果时",
+        "signatures": [
+          "ACTIONS.GIVE.fn(act)",
+          "Trader:AbleToAccept(item,giver,count)",
+          "Trader:AcceptGift(giver,item,count)"
+        ],
+        "args_units_zh": "act.target/act.invobject/act.doer 分别是目标/候选物品/给物者；count 由 TR-C02 决定。",
+        "branches": [
+          "进入 trader 分支前要求目标存在、ShouldBlockGiving 未阻挡且前置特殊分支未命中。",
+          "整堆 count<=0 → false；首轮 AbleToAccept false → false,reason。",
+          "首轮 Able 通过 → AcceptGift 再跑 Able 和 Want；其正常返回（包括 false）被忽略 → GIVE true。"
+        ],
+        "results_zh": "GIVE true 是此分支完成处理的 action 返回，不能替代 AcceptGift 接受、onaccept 效果或最终入包证明。第二次能力拒绝和意愿拒绝仍可 action true。错误/非正常返回不保证达到 true。",
+        "callback_args": {
+          "precheck_AbleToAccept": [
+            "act.invobject",
+            "act.doer",
+            "count"
+          ],
+          "AcceptGift": [
+            "act.doer",
+            "act.invobject",
+            "count"
+          ]
+        },
+        "decision_rule_zh": "把具体奖励放在经审查的接受效果回调；避免以 GIVE true 另建第二奖励点。缓冲动作/预测阶段复用 N003-S04，不重写通用动作 core。",
+        "decision_rule_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "fact_ids": [
+          "TR-F03",
+          "TR-F06",
+          "TR-F08"
+        ],
+        "citation_ids": [
+          "GIVE-PRE",
+          "GIVE-TR",
+          "TR-ACCEPT"
+        ],
+        "reuse_pointer_ids": [
+          "R-N003-S04"
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "TR-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "TR-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "TR-F08",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "013",
+      "topic": "容器槽位、classified 容量与初始化",
+      "id": "SC-CODE01",
+      "source_artifact": "batch013/research/container-capacity-research.json",
+      "artifact_sha256": "bca0ce5ec07d91801485c87f2417642d3586dfbb8748a0b86e7ddf3e6f0965b8",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "SC-CODE01",
+        "question_zh": "静态容器的槽位数与显示位置怎么设？",
+        "signatures": [
+          "containers.widgetsetup(container, prefab, data)",
+          "component Container:WidgetSetup(prefab, data)",
+          "replica Container:WidgetSetup(prefab, data)",
+          "replica Container:GetNumSlots()"
+        ],
+        "params": {
+          "container": "component/replica；其widget配置必须可用",
+          "prefab": "可选注册key；为nil时按container.inst.prefab查找，显式data优先",
+          "data": "可选本地配置表；这里没有自动传Lua表到remote的步骤",
+          "widget.numslots": "存在时优先的容量数值，不是可见槽生成数",
+          "widget.slotpos": "推荐连续1..N的位置序列；省略numslots时它的长度决定逻辑数",
+          "widget.slotposfn": "可选fn(container,doer)；Open读取truthy返回序列，nil/false回退slotpos，空表生成0可见槽"
+        },
+        "units": {
+          "N": "推荐由Mod自行约束为非负整数的槽位数量；常规非空容器采用正整数，源码setter并无统一整数/clamp校验",
+          "position": "UI widget局部位置，经SetPosition消费；不能当世界距离或声明固定物理像素单位"
+        },
+        "order": [
+          "在两端可用的共享注册区建立params[key]",
+          "使固定N、稠密slotpos与可选slotposfn输出相容",
+          "在实例初始构造中调用component WidgetSetup(key)，replica走对应本地配置入口",
+          "让classified在listener注册前激活N个既有pool条目"
+        ],
+        "results": {
+          "return": "所列setup无显式成功值；replica GetNumSlots返回本地_numslots",
+          "callbacks": "slotposfn仅布局回调；返回值不会调整component/replica数或pool"
+        },
+        "fact_ids": [
+          "SC-F01",
+          "SC-F03",
+          "SC-F04",
+          "SC-F07"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "固定容量首选统一N与连续slotpos。numslots可与显示数不同，但那是需自证的隐藏/条件布局设计，不能靠numslots自动补UI。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "SC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "SC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "SC-F07",
+          "pointer": "#/direct_facts/6"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "013",
+      "topic": "容器槽位、classified 容量与初始化",
+      "id": "SC-CODE02",
+      "source_artifact": "batch013/research/container-capacity-research.json",
+      "artifact_sha256": "bca0ce5ec07d91801485c87f2417642d3586dfbb8748a0b86e7ddf3e6f0965b8",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "SC-CODE02",
+        "question_zh": "大容器注册怎样覆盖两端pool容量？",
+        "signatures": [
+          "require(\"containers\")",
+          "containers.params[key] = configuration",
+          "containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, N)"
+        ],
+        "params": {
+          "key": "Mod自有容器注册名，避免覆盖别人",
+          "configuration": "两端加载的同一确定性配置",
+          "N": "需要的活动payload槽数，若同时numslots与slotpos存在取numslots优先规则"
+        },
+        "units": {
+          "MAXITEMSLOTS": "未来每个container_classified实例在Lua构造时预建的net_entity条目数，不是已证明的native最大值或网络带宽预算"
+        },
+        "order": [
+          "在runtime共享modmain加载阶段require containers",
+          "写入自有params[key]",
+          "显式保持MAXITEMSLOTS至少N且不降低其他Mod所需值",
+          "上述注册不放在master-only early return之后，须在master/remote任一相关classified被构造之前完成"
+        ],
+        "results": {
+          "return": "字段写入不提供跨端一致/网络容量验收结果",
+          "callbacks": "无容量注册callback；模块尾部计算不会随params变更再跑"
+        },
+        "fact_ids": [
+          "SC-F01",
+          "SC-F04",
+          "SC-F05",
+          "SC-F09"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "使用双方加载的共享modmain并确保同一配置；注册必须早于实例构造。客户端实际加载、Mod版本/config一致以及多Mod不降低/晚改全局值还需具体Mod验证，不能凭该Lua赋值保证。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "SC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "SC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "SC-F09",
+          "pointer": "#/direct_facts/8"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "013",
+      "topic": "容器槽位、classified 容量与初始化",
+      "id": "SC-CODE03",
+      "source_artifact": "batch013/research/container-capacity-research.json",
+      "artifact_sha256": "bca0ce5ec07d91801485c87f2417642d3586dfbb8748a0b86e7ddf3e6f0965b8",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "SC-CODE03",
+        "question_zh": "可否对现有容器直接SetNumSlots/再次WidgetSetup？",
+        "signatures": [
+          "component Container:SetNumSlots(numslots)",
+          "replica Container:SetNumSlots(numslots)",
+          "classified:InitializeSlots(numslots)",
+          "component/replica Container:WidgetSetup(prefab, data)"
+        ],
+        "params": {
+          "numslots": "component不能小于当前值；readonly之后不同值另触发只读assert；replica仅本地赋值；classified需要_slottasks==nil并有既有pool条目"
+        },
+        "units": {
+          "numslots": "槽位数量；不能把数值写成功等同payload/显示/复制扩容成功"
+        },
+        "order": [
+          "分开检查component可写阶段和非减槽条件",
+          "分开检查replica本地数值",
+          "分开检查classified构造时pool容量与_slottasks门禁",
+          "分开检查显示槽重建与相关数据迁移"
+        ],
+        "results": {
+          "return": "无resize成功状态或事务回滚合同",
+          "exception_boundary": "readonly setter先写再assert；remote listener后InitializeSlots连相同值也assert",
+          "master_boundary": "vanilla master没有该remote注册所设guard，但这不是完整可用动态resize API"
+        },
+        "callbacks": {
+          "InitializeSlots": "无用户callback，无新netvar；listener集合不会由SetNumSlots重建"
+        },
+        "fact_ids": [
+          "SC-F02",
+          "SC-F03",
+          "SC-F05",
+          "SC-F06",
+          "SC-F07"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "本批只给静态创建注册方案。不要在活跃实例上尝试绕过assert/readonly来得到扩容；具体迁移、重建classified、重新附着、旧物品/存档处理和远端UI验收另列任务。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "SC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "SC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "SC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "SC-F07",
+          "pointer": "#/direct_facts/6"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "013",
+      "topic": "容器槽位、classified 容量与初始化",
+      "id": "SC-CODE04",
+      "source_artifact": "batch013/research/container-capacity-research.json",
+      "artifact_sha256": "bca0ce5ec07d91801485c87f2417642d3586dfbb8748a0b86e7ddf3e6f0965b8",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "SC-CODE04",
+        "question_zh": "怎么区分host观察与remote缺状态？",
+        "signatures": [
+          "replica Container:GetItemInSlot(slot)",
+          "replica Container:GetItems()",
+          "classified:GetItems()"
+        ],
+        "params": {
+          "slot": "1-based逻辑索引；UI也按位置序列i取同槽",
+          "branch": "真实判定是components.container是否存在，host/master是常见情形标签",
+          "remote_dependencies": "opener与classified须同时存在，否则nil/{}；classified可含本地preview"
+        },
+        "units": {
+          "result": "实体或nil，slot→实体表；不是容量协商结果"
+        },
+        "order": [
+          "识别是否具有本地component",
+          "remote先区分缺opener/classified与实际空槽",
+          "可见slot数量与replica数量、活动pool容量分别核对"
+        ],
+        "results": {
+          "master_or_host": "组件实体/slots",
+          "remote_optional": "classified实体/preview值，缺依赖为nil或新{}；非权威空箱证明"
+        },
+        "callbacks": {
+          "GetItems": "无callback；不能靠读取创建或扩容classified"
+        },
+        "fact_ids": [
+          "SC-F08",
+          "SC-F07"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "容量检查应明确记录host与remote读法。仅host能看见多槽不能证明remote payload/布局可用；remote空表也不能当服务器容量已清零。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "SC-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "SC-F07",
+          "pointer": "#/direct_facts/6"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "014",
+      "topic": "Class 构造、继承、属性 callback 与组件上下文",
+      "id": "CC-CODE01",
+      "source_artifact": "batch014/research/class-component-research.json",
+      "artifact_sha256": "4444658a956a9b3168f699d3cc8b6ef496f3a690ab4ec275125f6f79f635f95c",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "CC-CODE01",
+        "question_zh": "创建无继承/有继承的class，实参到底怎么放？",
+        "signatures": [
+          "Class(constructor)",
+          "Class(constructor,nil,props)",
+          "Class(nil,constructor,props)",
+          "Class(Base,constructor,props)",
+          "Class(Base)"
+        ],
+        "args": {
+          "Base": "已绑定的class table或nil；table触发浅拷贝，不保证constructor/props自动继承",
+          "constructor": "fn(self,...)；第二实参仅nil/false时function第一参才被提升",
+          "props": "第三实参：key→fn(instance,new_value,old_value)的表；空表亦开启每实例cache"
+        },
+        "branches": {
+          "Class(fn,props)": "常见错误：第二实参table成为_ctor，不是props；普通非callable table会在构造调用失败",
+          "Class(Base)": "Base成员复制，但_ctor随后变nil；不调用Base constructor",
+          "Class()": "普通class无constructor/props，实例为空起步"
+        },
+        "results": {
+          "Class": "返回可调用class table",
+          "C(...)": "返回新obj；constructor返回值被忽略；错误直接传播"
+        },
+        "fact_ids": [
+          "CC-F01",
+          "CC-F02",
+          "CC-F03"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "优先明确第三实参，勿套用其他Lua OOP库的重载规则；Class已有全局/Mod env绑定，勿local Class=require(\"class\")。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "CC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "CC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "CC-F03",
+          "pointer": "#/direct_facts/2"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "014",
+      "topic": "Class 构造、继承、属性 callback 与组件上下文",
+      "id": "CC-CODE02",
+      "source_artifact": "batch014/research/class-component-research.json",
+      "artifact_sha256": "4444658a956a9b3168f699d3cc8b6ef496f3a690ab4ec275125f6f79f635f95c",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "CC-CODE02",
+        "question_zh": "继承是否自动初始化base/属性？类字段和实例字段怎么分？",
+        "signatures": [
+          "Class(Base,function(self,...) ... end,props)",
+          "Base._ctor(self,...)",
+          "C.Method = fn",
+          "function C:Method(...)",
+          "self.field = value"
+        ],
+        "args": {
+          "Base._ctor": "显式选定的、确实可调用的constructor；传同一derived self，通常恰好一次，形状参考ContainerWidget",
+          "props": "子类所需属性完整map必须自行明确；{}只开启cache，不复制base属性callbacks"
+        },
+        "branches": {
+          "plain_class": "实例缺失raw字段时查C；Class内浅拷贝给子类class留副本",
+          "property_class": "cache先于class fallback；子类不带props时仍可能残留base __newindex，却无obj._",
+          "class_mutable_table": "class字段表及浅拷贝继承表会共享引用；constructor内self.table={}每次分配独立表"
+        },
+        "results": {
+          "class_method": "存于class table；obj:Method(...)通过class查找提供obj作为self",
+          "instance_fields": "constructor对self写入每个obj；property字段值在obj._，普通字段在raw obj",
+          "base_call": "没有自动多级constructor连锁或双重初始化保护"
+        },
+        "fact_ids": [
+          "CC-F02",
+          "CC-F03",
+          "CC-F04"
+        ],
+        "sample_ids": [
+          "CC-SAMPLE02",
+          "CC-SAMPLE03"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "Base为props class时显式传完整子类props并确认base constructor使用的key都已登记；不能只传nil或{}就假设继承。不要同时传Base._ctor又在同一constructor显式重复调用它。每实例可变状态放constructor，不放class默认表。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "CC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "CC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "CC-F04",
+          "pointer": "#/direct_facts/3"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "014",
+      "topic": "Class 构造、继承、属性 callback 与组件上下文",
+      "id": "CC-CODE03",
+      "source_artifact": "batch014/research/class-component-research.json",
+      "artifact_sha256": "4444658a956a9b3168f699d3cc8b6ef496f3a690ab4ec275125f6f79f635f95c",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "CC-CODE03",
+        "question_zh": "属性callback何时触发、会得到什么、能用return改值吗？",
+        "signatures": [
+          "Class(constructor,nil,{ field = OnField })",
+          "OnField(instance,new_value,old_value)",
+          "instance.field = new_value"
+        ],
+        "args": {
+          "instance": "组件对象self，不自动等于self.inst实体",
+          "new_value": "cache已经变成的值，允许nil/false/同值；callback没有额外过滤",
+          "old_value": "此前cache值，构造期首次赋值通常nil"
+        },
+        "branches": [
+          "在constructor前cache已经安装，所以constructor赋值也通知",
+          "同值、nil→nil、非nil→nil仍调用callback",
+          "普通字段或removesetter后的raw字段不走callback",
+          "property cache即便nil也遮住同名class默认值"
+        ],
+        "results": {
+          "return": "callback返回值被忽略，不能return sanitized_value做校正",
+          "error": "write先发生；异常不会回滚",
+          "reentrancy": "callback再次写同一property会再次触发，未见递归/循环guard"
+        },
+        "fact_ids": [
+          "CC-F03",
+          "CC-F04",
+          "CC-F06"
+        ],
+        "sample_ids": [
+          "CC-SAMPLE01"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "先初始化self.inst及callback用到的其他字段，最后赋受观察字段。需要过滤同值时callback明确if new==old then return end；需要类型检查/clamp时在专用SetX先做再赋值，别靠callback return或assert来撤销写入。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "CC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "CC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "CC-F06",
+          "pointer": "#/direct_facts/5"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "014",
+      "topic": "Class 构造、继承、属性 callback 与组件上下文",
+      "id": "CC-CODE04",
+      "source_artifact": "batch014/research/class-component-research.json",
+      "artifact_sha256": "4444658a956a9b3168f699d3cc8b6ef496f3a690ab4ec275125f6f79f635f95c",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "CC-CODE04",
+        "question_zh": "动态setter/readonly怎么安装和移除？",
+        "signatures": [
+          "addsetter(instance,key,fn)",
+          "removesetter(instance,key)",
+          "makereadonly(instance,key)"
+        ],
+        "args": {
+          "instance": "raw实例_已存在，常由Class(ctor,nil,props或{})提供；不是class定义table",
+          "key": "字段key；安装时读取当前instance[key]并去raw字段",
+          "fn": "fn(instance,new_value,old_value)，helper不统一校验callable"
+        },
+        "branches": {
+          "add_new": "转存当前值/清raw字段，无初始通知",
+          "add_existing": "替换callback，无叠加/初始通知",
+          "remove_existing": "值恢复raw字段并删cache",
+          "remove_missing": "无操作",
+          "readonly_existing": "替换callback为assert(new==old)；不保留原callback"
+        },
+        "results": {
+          "return": "无显式返回",
+          "mutated_cache": "callback前写入，不能把readonly/assert当事务",
+          "nil_value": "remove后nil值成为无raw key；若class有同名默认，后续读取可再次看到class默认"
+        },
+        "fact_ids": [
+          "CC-F05",
+          "CC-F06"
+        ],
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "在组件模块的已加载全局context使用helper；若确实在Mod env调用，使用GLOBAL.addsetter/GLOBAL.removesetter/GLOBAL.makereadonly，因为CreateEnvironment只直接导出Class而未列这三个helper。readonly防误写并不支持失败回滚。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "CC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "CC-F06",
+          "pointer": "#/direct_facts/5"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "014",
+      "topic": "Class 构造、继承、属性 callback 与组件上下文",
+      "id": "CC-CODE05",
+      "source_artifact": "batch014/research/class-component-research.json",
+      "artifact_sha256": "4444658a956a9b3168f699d3cc8b6ef496f3a690ab4ec275125f6f79f635f95c",
+      "source_pointer": "#/coding_projection/4",
+      "coding": {
+        "id": "CC-CODE05",
+        "question_zh": "自定义组件的Class样式怎么接入已存在AddComponent入口？",
+        "signatures": [
+          "scripts/components/example_counter.lua → return ExampleCounter",
+          "inst:AddComponent(\"example_counter\")",
+          "ExampleCounter:Method(...)"
+        ],
+        "args": {
+          "component_module": "正常runtime组件模块上下文；Class已经由main/entityscript副作用加载；不靠require(class)返回绑定",
+          "inst": "AddComponent传给constructor的所属实体",
+          "component_key": "自有小写模块名；实际项目需保证对应文件能由当前loader定位",
+          "hook_context": "AddPrefabPostInit等注册在Mod env；端/目标选择、复制与保存另按所需玩法验证"
+        },
+        "branches": [
+          "class方法安装一次；每次cmp(entity)生成组件obj",
+          "Class本身不自动添加replica、存档、events或所有组件依赖",
+          "旧AddComponent重复调用已有返回门禁，非重复初始化工具"
+        ],
+        "results": {
+          "module": "返回component class，不是已生成实例",
+          "AddComponent": "新对象存components[name]并返回；既有Hook/动作注册时序复用"
+        },
+        "fact_ids": [
+          "CC-F07",
+          "CC-F03",
+          "CC-F04"
+        ],
+        "original_illustration_id": "CC-EX01",
+        "advice": {
+          "classification": "EngineeringAdvice_not_runtime_verified",
+          "text_zh": "把受观察字段与专用setter连在最小组件中；玩法安装只放在实际合适端。不要把组件文件return/class骨架直接粘入modmain后指望注册。此样例不是完整可加载Mod。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "CC-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "CC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "CC-F04",
+          "pointer": "#/direct_facts/3"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "015",
+      "topic": "普通 EAT、Eater/Edible 数值与单件消费",
+      "id": "FC-P01",
+      "source_artifact": "batch015/research/food-consumption-research.json",
+      "artifact_sha256": "d7c557c86d691a6d3c9afd0606f97e5f4393cf6f5f5d445fbf90310a3b445810",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "FC-P01",
+        "title_zh": "区分可尝试类型与执行偏好",
+        "load_when_zh": "自定义diet、可见吃动作但执行拒食，或误用CanActuallyEat时",
+        "source_contract": [
+          "SetDiet(caneat,preferseating or caneat)；元素是type字符串或name/types组表",
+          "CanEat→TestFood(caneat)，true/nil；Eat→PrefersToEat→特定false或TestFood(preferseating) true/nil",
+          "不存在CanActuallyEat，实际执行不自动重新交集caneat",
+          "库存collector只读匹配标签，候选不是接受结果"
+        ],
+        "evidence_ids": [
+          "FC-F01",
+          "FC-F02",
+          "FC-F14"
+        ],
+        "reuse_ids": [
+          "R-COOKING",
+          "R-ACTION",
+          "R-PROPS"
+        ],
+        "recommendation_zh": "为项目明确可尝试与可真正食用的数组；若想完全一致就传同一diet而不要猜一个CanActuallyEat API。有意改diet且使用GetEdibleTags缓存的项目，检查当前cache或显式cacheedibletags=false；所读SetDiet不清其缓存。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "FC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "FC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "FC-F14",
+          "pointer": "#/direct_facts/13"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "015",
+      "topic": "普通 EAT、Eater/Edible 数值与单件消费",
+      "id": "FC-P02",
+      "source_artifact": "batch015/research/food-consumption-research.json",
+      "artifact_sha256": "d7c557c86d691a6d3c9afd0606f97e5f4393cf6f5f5d445fbf90310a3b445810",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "FC-P02",
+        "title_zh": "只让一条 stat 路径负责基础食用量",
+        "load_when_zh": "配置食物数值或需要按eater定制健康/理智/全部stat时",
+        "source_contract": [
+          "Edible三个getter均接eater实体；gethealthfn/getsanityfn(food,eater)，nil/false回退，0保留；没有gethungerfn setter",
+          "每stat getter*self foodmemory乘数*numeric absorption；custom_stats_mod_fn(eater,h,hg,s,food,feeder)返回h,hg,s，再乘stack_mult",
+          "health→hunger→sanity DoDelta；Health(delta,nil,food.prefab)；返回均丢弃",
+          "raw health/sanity field与DoFoodEffects先决定是否读取动态getter，不能只看getter输出符号"
+        ],
+        "evidence_ids": [
+          "FC-F04",
+          "FC-F05",
+          "FC-F06",
+          "FC-F07",
+          "FC-F08"
+        ],
+        "reuse_ids": [
+          "R-HEALTH",
+          "R-PERISH",
+          "R-CURRENT-HUNGER"
+        ],
+        "recommendation_zh": "基础健康/饥饿/理智用edible字段/getter或eater既有custom_stats_mod_fn同一流程；OnEaten若再次加同一基础量会形成第二效果。custom_stats_mod_fn明确返回三个数字，不给缺失组件制造非0；回调返回量不假装实际已写入的current差。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "FC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "FC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "FC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "FC-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "FC-F08",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "015",
+      "topic": "普通 EAT、Eater/Edible 数值与单件消费",
+      "id": "FC-P03",
+      "source_artifact": "batch015/research/food-consumption-research.json",
+      "artifact_sha256": "d7c557c86d691a6d3c9afd0606f97e5f4393cf6f5f5d445fbf90310a3b445810",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "FC-P03",
+        "title_zh": "OnEat/OnEaten 的上下文与普通单件消费",
+        "load_when_zh": "食物附加效果、回调计数或stack只应减少1件时",
+        "source_contract": [
+          "oneat eater事件→oneatfn(eater,food,feeder)→OnEaten的oneaten(food,eater)→food oneaten事件→HandleEatRemove→last-time/memory→true",
+          "普通默认Get():Remove()消费1；回调看到原food整堆，不是拆出单位",
+          "oneaten没有feeder/count；whole-stack不会逐件回放，stack_mult仅控制stat",
+          "自定义remove callback(food,eatwholestack)替代默认删除，返回忽略；OnEaten前后实体可能被移除"
+        ],
+        "evidence_ids": [
+          "FC-F09",
+          "FC-F10",
+          "FC-F11",
+          "FC-F12"
+        ],
+        "reuse_ids": [
+          "R-SPLIT",
+          "R-SPLIT-COPY",
+          "R-DILUTION",
+          "R-HOOK",
+          "R-GLOBAL",
+          "R-IMPORT"
+        ],
+        "recommendation_zh": "普通附加效果放进明确的一次OnEaten回调并保留准确(food,eater)角色；不要手工先拆单位再吃后又Remove。对回调改变/删除组件或实体的项目，按实际分支审查；保持现有回调时由项目显式保存并串接一次，不假装setter自动追加。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "FC-F09",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "FC-F10",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "FC-F11",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "FC-F12",
+          "pointer": "#/direct_facts/11"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "015",
+      "topic": "普通 EAT、Eater/Edible 数值与单件消费",
+      "id": "FC-P04",
+      "source_artifact": "batch015/research/food-consumption-research.json",
+      "artifact_sha256": "d7c557c86d691a6d3c9afd0606f97e5f4393cf6f5f5d445fbf90310a3b445810",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "FC-P04",
+        "title_zh": "EAT 正常返回不能替代实际stat/消费结果",
+        "load_when_zh": "使用ACTIONS.EAT.fn或Eater:Eat返回决定后续逻辑时",
+        "source_contract": [
+          "obj=target or invobject，ordinary edible→return eater:Eat(obj,doer)",
+          "正常尾部true，拒食nil，无reason/count/实体",
+          "没有EAT内部currentownerfallback、Inventory RemoveItem、stat delta返回聚合或默认消费再验证",
+          "自定义remove保留food也可正常到true；全stat=0或不存在也可到true"
+        ],
+        "evidence_ids": [
+          "FC-F08",
+          "FC-F11",
+          "FC-F13"
+        ],
+        "reuse_ids": [
+          "R-INV-OWNER",
+          "R-INV-REMOVE",
+          "R-ACTION",
+          "R-HEALTH"
+        ],
+        "recommendation_zh": "把普通true解释为此Lua控制流走到尾部；只在项目确实需要实际恢复量/减少件数时，从具体组件或自己的有界接口取得所需结果。不要强加ledger、ack或协议架构。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "FC-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "FC-F11",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "FC-F13",
+          "pointer": "#/direct_facts/12"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "016",
+      "topic": "普通 UPGRADE 的阶段、材料与 callback/load",
+      "id": "UC-P01",
+      "source_artifact": "batch016/research/upgrade-consumption-research.json",
+      "artifact_sha256": "7e79352fdbae57a40fe71b7f7e22535fd3b7800e2251a9cb52b6675c7a728813",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "UC-P01",
+        "title_zh": "正确配置字段和两层门禁",
+        "load_when_zh": "制作普通可升级建筑/材料，或动作出现但拒绝时",
+        "source_contract": [
+          "Upgradeable stage/count/threshold 实际字段；GetStage/SetStage，不猜 Need/GetNumUpgrades/setters",
+          "Upgrader type+doer 标签与目标 CanUpgrade 独立",
+          "SetCanUpgradeFn(fn(target)) 仅 target，无材料/doer参数；执行与标签属性都可读它",
+          "Upgrade 直接调用绕过上述门禁"
+        ],
+        "evidence_ids": [
+          "UC-F01",
+          "UC-F02",
+          "UC-F03",
+          "UC-F04",
+          "UC-F08",
+          "UC-F09"
+        ],
+        "reuse_ids": [
+          "R-PROPS",
+          "R-ACTION",
+          "R-COLLECTOR"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "先定义每件进度、阶段数与 threshold，再写真实字段。需要拒绝时用目标 canupgradefn 或项目明确的动作资格入口，保持 predicate 可重复调用且无消费。不要在效果 callback 中 return false 期待退料，也不假定配置 setter 自动刷新候选标签。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "UC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "UC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "UC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "UC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "UC-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "UC-F09",
+          "pointer": "#/direct_facts/8"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "016",
+      "topic": "普通 UPGRADE 的阶段、材料与 callback/load",
+      "id": "UC-P02",
+      "source_artifact": "batch016/research/upgrade-consumption-research.json",
+      "artifact_sha256": "7e79352fdbae57a40fe71b7f7e22535fd3b7800e2251a9cb52b6675c7a728813",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "UC-P02",
+        "title_zh": "消费单位与回调原材料身份分开",
+        "load_when_zh": "修复升级吞整堆、重复扣料或callback错误读已删除材料时",
+        "source_contract": [
+          "UPGRADE 原样传 act.invobject；组件进度+=upgradevalue 后 Get(1):Remove/obj:Remove",
+          "onupgradefn(target,performer,原obj)，删除已先发生，返回忽略",
+          "N>1回调通常看到原堆N-1；N=1通常是已删除原对象引用",
+          "组件没有预先 holder 移交或失败 GiveItem"
+        ],
+        "evidence_ids": [
+          "UC-F04",
+          "UC-F05",
+          "UC-F06"
+        ],
+        "reuse_ids": [
+          "R-SPLIT",
+          "R-SPLIT-OWNER",
+          "R-REMOVE",
+          "R-INV-RESULT",
+          "R-DEPLOY",
+          "R-GIVE",
+          "R-EAT"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "默认普通升级由 Upgrade 一处消费1件。不要先按 DEPLOY 拆件再补原库存消费，也不在 onupgradefn 再扣一件。需要材料数据时明确哪些已存储值/安全字段必需，并考虑原 obj 已删除或仍为残余堆；异步逻辑不要依赖其继续有效。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "UC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "UC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "UC-F06",
+          "pointer": "#/direct_facts/5"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "016",
+      "topic": "普通 UPGRADE 的阶段、材料与 callback/load",
+      "id": "UC-P03",
+      "source_artifact": "batch016/research/upgrade-consumption-research.json",
+      "artifact_sha256": "7e79352fdbae57a40fe71b7f7e22535fd3b7800e2251a9cb52b6675c7a728813",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "UC-P03",
+        "title_zh": "把每次升级效果和阶段完成效果放对槽",
+        "load_when_zh": "需要按进度更新、满阶段改变建筑或大value材料时",
+        "source_contract": [
+          "本层 onupgradefn 在阈值前，到达时调用一次，看到已增加 count",
+          "onstageadvancefn(target) 在 stage+1、stage属性回调正常返回、count0后调用；本层阈值分支只显式 AdvanceStage 一次，不保证 callback 重入的总次数",
+          "AdvanceStage callback return被Upgrade丢弃；SetStage不重放效果",
+          "单次非重入且无 callback/hook 改相关字段时，大value超阈值只+1且reset0；callback mutation影响后续判断"
+        ],
+        "evidence_ids": [
+          "UC-F01",
+          "UC-F06",
+          "UC-F07",
+          "UC-F08"
+        ],
+        "reuse_ids": [
+          "R-PROPS",
+          "R-ACTION"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "每件附加效果用 SetOnUpgradeFn；阶段完成效果显式赋 onstageadvancefn。若项目需要进度carry或一次跨多个stage，那是额外业务政策，应在项目自己的实现中明确，不把 vanilla 接口想成自动循环。判断最终 stage/count 应读当前字段，而不拿 true 当新增一整阶段的承诺。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "UC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "UC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "UC-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "UC-F08",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "016",
+      "topic": "普通 UPGRADE 的阶段、材料与 callback/load",
+      "id": "UC-P04",
+      "source_artifact": "batch016/research/upgrade-consumption-research.json",
+      "artifact_sha256": "7e79352fdbae57a40fe71b7f7e22535fd3b7800e2251a9cb52b6675c7a728813",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "UC-P04",
+        "title_zh": "载入恢复业务状态，避免重放消费",
+        "load_when_zh": "存档后进度恢复但建筑外观/配置未恢复时",
+        "source_contract": [
+          "OnSave仅count/stage；OnLoad先count后stage，不调效果callback或消费",
+          "stage属性可能重算CanUpgrade及tag；无 nil/upgradetype guard",
+          "既有 EntityScript 在所有组件OnLoad后调用 prefab OnLoad",
+          "treasurechest 用 prefab OnLoad→OnUpgrade(inst) 恢复业务效果，未调组件Upgrade"
+        ],
+        "evidence_ids": [
+          "UC-F08",
+          "UC-F10"
+        ],
+        "sample_ids": [
+          "UC-SAMPLE-CHEST"
+        ],
+        "reuse_ids": [
+          "R-PERSIST",
+          "R-PROPS",
+          "R-HOOK",
+          "R-CONTAINER"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "为自己的 prefab 设计无材料消费的状态应用函数，用已恢复的 stage/count驱动必要业务和视觉；若共用效果回调，允许 performer/obj 缺省并跳过仅 live-upgrade 特效。不要在 OnLoad 调 Upgrade 假装恢复，这会再次增count并消费；不要求所有项目都复制 chest 特殊的一次升级政策。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "UC-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "UC-F10",
+          "pointer": "#/direct_facts/9"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "016",
+      "topic": "普通 UPGRADE 的阶段、材料与 callback/load",
+      "id": "UC-P05",
+      "source_artifact": "batch016/research/upgrade-consumption-research.json",
+      "artifact_sha256": "7e79352fdbae57a40fe71b7f7e22535fd3b7800e2251a9cb52b6675c7a728813",
+      "source_pointer": "#/coding_projection/4",
+      "coding": {
+        "id": "UC-P05",
+        "title_zh": "按实际动作结果接入现有成功/失败链",
+        "load_when_zh": "需要升级成功反馈、拒绝reason或调查currentaction状态时",
+        "source_contract": [
+          "材料资格/外层不匹配→nil；目标拒绝→false,reason；正常Upgrade→true",
+          "callback false不能改变这个普通正常成功结果",
+          "结果由既有BufferedAction Do/Succeed/Fail消费；invobject已无效时不调OnUsedAsItem",
+          "UPGRADE.fn自身不写currentaction，也无新ack/ledger/result payload"
+        ],
+        "evidence_ids": [
+          "UC-F03",
+          "UC-F04",
+          "UC-F05",
+          "UC-F06",
+          "UC-F07"
+        ],
+        "reuse_ids": [
+          "R-ACTION"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "沿原权威效果入口接入 true/false/nil；有明确拒绝文本需求时让可拒绝predicate返回reason。单件材料被移除可让BufferedAction正常成功而不调用OnUsedAsItem，成功业务回调不要只依赖这个item通知。不要为普通升级补第二效果点、自动退款或协议框架。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "UC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "UC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "UC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "UC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "UC-F07",
+          "pointer": "#/direct_facts/6"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "017",
+      "topic": "普通 HEAL、Healer 数值与单件消费",
+      "id": "HC-P01",
+      "source_artifact": "batch017/research/healer-consumption-research.json",
+      "artifact_sha256": "c51a033bb044ec04d0c631719618bf7c692494311e441767212d76fa9c314370",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "HC-P01",
+        "title_zh": "区分候选CanHeal、ordinary HEAL与实际拒绝hook",
+        "load_when_zh": "治疗物品动作出现/缺失或需在执行前拒绝时",
+        "signatures": [
+          "ACTIONS.HEAL.fn(act)",
+          "target.replica.health:CanHeal()",
+          "Healer:SetCanHealFn(fn)",
+          "canhealfn(item,target,doer) -> valid,reason"
+        ],
+        "source_contract": [
+          "target=act.target or act.doer；invobject是物品，doer是施用者；普通Action检查health/dead/ghost并原样return Heal",
+          "replica CanHeal只是not cannotheal；两collector可由物品healerbuffs放行候选，不执行predicate/HP/消费",
+          "Healer无CanHeal方法；health存在后predicate false/nil才false,reason；直接Heal无dead/ghost/doer默认",
+          "捕获target health早于predicate，组件重绑不自动改本次使用对象"
+        ],
+        "evidence_ids": [
+          "HC-F01",
+          "HC-F02",
+          "HC-F03",
+          "HC-F04",
+          "HC-F05"
+        ],
+        "reuse_ids": [
+          "R-COLLECTOR",
+          "R-ACTION",
+          "R-PROPS",
+          "R-INV-OWNER"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "把项目拒绝条件放进准确的SetCanHealFn(item,target,doer) predicate并返回false,reason；保持可重复查询、无消费。不要用CanHeal候选当满血/HP保证，或在onheal return false期待取消。直接调用时显式提供有效target/doer及项目需保留的Action资格检查，不默认从物品owner猜施用者。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "HC-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "HC-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "HC-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "HC-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "HC-F05",
+          "pointer": "#/direct_facts/4"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "017",
+      "topic": "普通 HEAL、Healer 数值与单件消费",
+      "id": "HC-P02",
+      "source_artifact": "batch017/research/healer-consumption-research.json",
+      "artifact_sha256": "c51a033bb044ec04d0c631719618bf7c692494311e441767212d76fa9c314370",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "HC-P02",
+        "title_zh": "数值、onheal与一件消费同一条路径",
+        "load_when_zh": "配置治疗量/附加效果、堆叠消费或判断返回结果时",
+        "signatures": [
+          "Healer:SetHealthAmount(health)",
+          "Healer:SetOnHealFn(fn)",
+          "onhealfn(current_self_inst,target,doer)",
+          "Healer:Heal(target,doer)"
+        ],
+        "source_contract": [
+          "基础HP amount乘doer HEAL倍率；即使canheal=false仍先算delta；仅canheal真调用DoDelta(delta,false,item.prefab)，不传doer作afflicter",
+          "可选DoDelta→onheal(调用点self.inst,target,doer)→新读self.inst.components.stackable：IsStack ? Get():Remove() : self.inst:Remove()→正常尾部true；未重绑/改量普通上下文才是原未拆整堆",
+          "onheal返回忽略；HP gain=0、health.canheal=false、redirect/invincible早退/满血都可正常到消费与true",
+          "单件默认消费不乘HP或回放callback；Healer无EAT的IsValid/handleremovefn保护；重入/删除不获到尾部保证",
+          "health在predicate前捕获；self.inst与stackable在后续调用点新读。callback正常返回不保证原物品身份/原堆叠数量不变"
+        ],
+        "evidence_ids": [
+          "HC-F05",
+          "HC-F06",
+          "HC-F07",
+          "HC-F08"
+        ],
+        "reuse_ids": [
+          "R-HEALTH",
+          "R-HEALTH-GATES",
+          "R-HEALTH-CLAMP",
+          "R-HEALTH-EVENT",
+          "R-SPLIT",
+          "R-SPLIT-OWNER",
+          "R-REMOVE",
+          "R-EAT-REMOVE"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "基础回血只交给healer.health这一条普通路径，onheal只做明确附加效果，不再同量DoDelta/拆件/Remove。将true解释为正常执行到尾部；零HP增加不自动返还或补发原物。需要特殊取消/不消费政策时先设计项目的明确入口，不能靠效果callback返回或把EAT handler套过来。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "HC-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "HC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "HC-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "HC-F08",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "017",
+      "topic": "普通 HEAL、Healer 数值与单件消费",
+      "id": "HC-P03",
+      "source_artifact": "batch017/research/healer-consumption-research.json",
+      "artifact_sha256": "c51a033bb044ec04d0c631719618bf7c692494311e441767212d76fa9c314370",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "HC-P03",
+        "title_zh": "施用者HEAL增效使用正确接口和身份",
+        "load_when_zh": "为施用者添加/撤下治疗增效时",
+        "signatures": [
+          "doer.components.efficientuser:GetMultiplier(ACTIONS.HEAL)",
+          "doer.components.efficientuser:AddMultiplier(ACTIONS.HEAL,multiplier,source,key)",
+          "doer.components.efficientuser:RemoveMultiplier(ACTIONS.HEAL,source,key)"
+        ],
+        "source_contract": [
+          "action对象key必须是同一ACTIONS.HEAL身份；缺省1，SML基数1乘法；不是全部Health正DoDelta的通用增效",
+          "Add的参数顺序action,multiplier,source,key，Remove为action,source,key，不把SML的source-first顺序直套此wrapper",
+          "source/key稳定配对；省略Remove key按现有SML解除该action列表整个source",
+          "item基础amount和doer倍率不检查正数/数字，0不取消Heal消费，负量不被拒绝成普通false"
+        ],
+        "evidence_ids": [
+          "HC-F06",
+          "HC-F09"
+        ],
+        "reuse_ids": [
+          "R-SML",
+          "R-HEALTH"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "对已有有效efficientuser的施用者，用ACTIONS.HEAL对象和项目固定source/key成对Add/Remove；若多个功能共用source，明确key以免撤掉其他功能。治疗量与倍率的合法区间由项目决定并检查；不要改目标externalabsorbmodifiers/Eater absorption来冒充此施用者治疗加成。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "HC-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "HC-F09",
+          "pointer": "#/direct_facts/8"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "018",
+      "topic": "普通可燃 helper、燃烧任务/回调与 burnt 终态恢复",
+      "id": "BR-P01",
+      "source_artifact": "batch018/research/burnable-restore-research.json",
+      "artifact_sha256": "21a9c3c3663b3248d9814bc110c41e30ba1c9c3f4363437f4e3047e633b68fcf",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "BR-P01",
+        "title_zh": "ordinary helper的安装上下文与参数",
+        "load_when_zh": "安装普通item/structure可燃性及独立propagator时",
+        "question_ids": [
+          "FIRE-Q01"
+        ],
+        "signatures": [
+          "MakeSmallBurnable(inst,time,offset,structure,sym) -> burnable",
+          "MakeMediumBurnable(inst,time,offset,structure,sym) -> burnable",
+          "MakeLargeBurnable(inst,time,offset,structure,sym) -> burnable",
+          "MakeSmall/Medium/LargePropagator(inst) -> propagator"
+        ],
+        "arguments": {
+          "inst": "所属entity；实际factory/Hooks自己选择mastersim，helper无guard",
+          "time": "游戏scheduler delay；nil/false回退10/20/30；0有效，非即刻直接DoneBurning",
+          "offset": "有x/y/z的Vector3兼容对象；nil/false回退(0,0,0)",
+          "structure": "Lua真值选DefaultBurntStructureFn；不是tag或propagator自动安装",
+          "sym": "第五实参followsymbol；sym给AddBurnFX注册",
+          "source_context": "runtime prefab/component global context已由main加载Class/helper；Mod注册闭包用GLOBAL.Make*、GLOBAL.Vector3及callback-time GLOBAL.TheWorld"
+        },
+        "source_contract": [
+          "small/medium/large FXlevel2/3/4并return仅burnable；DefaultBurnFn、DefaultExtinguishFn与SetOnBurntFn包装接线",
+          "ordinary burnable helper不添加/替换propagator；Make*Propagator单独取/return组件，acceptsheat=true，flash callback=DefaultIgniteFn→StartWildfire，非直接Ignite",
+          "Make*Propagator遇既有propagator保留同一组件身份，但覆盖列出配置/callback；不在helper里重置currentheat/source/task",
+          "persist由tree/structure tag判；structure=true未加structure tag仍可在点燃时被设persists=false",
+          "AddComponent已有分支返回旧cmp；重复burnable helper仍会追加FXdata和重设callback/config，不把重复调用当幂等"
+        ],
+        "results": {
+          "callbacks": "setter只替换，普通onignite(inst,source,doer)、onextinguish(inst)、onburnt包装fn(inst)；默认函数可忽略多余实参",
+          "return": "helper返回组件，不是成功boolean、组件对或Class(require)新构造器"
+        },
+        "evidence_ids": [
+          "BR-F01",
+          "BR-F02",
+          "BR-F03"
+        ],
+        "reuse_ids": [
+          "OLD-COMPONENT-HOOK",
+          "N007-IMPORT-CONTEXT",
+          "N014-COMPONENT-CONTEXT",
+          "N014-PROPERTY-TAGS",
+          "OLD-WORLD-PERSISTS"
+        ],
+        "recommendation_zh": "把structure tag和helper第四实参分别明确，独立安装所需propagator。放在已选mastersim及正确factory/Hooks阶段，项目确实可能重复安装时守住自己的真实对象，别要求新registry或协议。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "runtime_tested": false,
+        "canonical": false,
+        "sourceSymbolAndBranch": [
+          [
+            {
+              "citation_id": "BR-C08",
+              "symbol": "MakeSmallBurnable",
+              "branch": "五参数/FXlevel2/time or10/default callbacks/return burnable"
+            },
+            {
+              "citation_id": "BR-C09",
+              "symbol": "MakeMediumBurnable",
+              "branch": "五参数/FXlevel3/time or20/default callbacks/return burnable"
+            },
+            {
+              "citation_id": "BR-C10",
+              "symbol": "MakeLargeBurnable",
+              "branch": "五参数/FXlevel4/time or30/default callbacks/return burnable"
+            },
+            {
+              "citation_id": "BR-C11",
+              "symbol": "MakeSmallPropagator",
+              "branch": "独立组件helper/acceptsheat/flash callback/configuration/return"
+            },
+            {
+              "citation_id": "BR-C12",
+              "symbol": "MakeMediumPropagator",
+              "branch": "独立组件helper/acceptsheat/flash callback/configuration/return"
+            },
+            {
+              "citation_id": "BR-C13",
+              "symbol": "MakeLargePropagator",
+              "branch": "独立组件helper/acceptsheat/flash callback/configuration/return"
+            },
+            {
+              "citation_id": "BR-C01",
+              "symbol": "DefaultIgniteFn",
+              "branch": "flashpoint callback检查burnable存在后StartWildfire，不是Ignite"
+            },
+            {
+              "citation_id": "BR-C16",
+              "symbol": "SetBurnTime/IsBurning/IsSmoldering/AddBurnFX",
+              "branch": "原值配置/查询；offset.x/y/z与sym注册，不立即SpawnFX"
+            },
+            {
+              "citation_id": "BR-C39",
+              "symbol": "runtime imports",
+              "branch": "class与standardcomponents为main副作用加载"
+            },
+            {
+              "citation_id": "BR-C40",
+              "symbol": "LoadComponent",
+              "branch": "require(components/name)结果为组件class；未额外赋OnSave/OnLoad"
+            },
+            {
+              "citation_id": "BR-C41",
+              "symbol": "AddComponent",
+              "branch": "既有组件返回；新组件cmp(self)→保存→postinit→return"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C02",
+              "symbol": "DefaultBurnFn",
+              "branch": "非tree且非structure tag时persists=false"
+            },
+            {
+              "citation_id": "BR-C04",
+              "symbol": "DefaultExtinguishFn",
+              "branch": "非tree且非structure tag时persists=true"
+            },
+            {
+              "citation_id": "BR-C03",
+              "symbol": "DefaultBurntFn",
+              "branch": "普通item默认burnt回调，ash world查询及最终Remove"
+            },
+            {
+              "citation_id": "BR-C08",
+              "symbol": "MakeSmallBurnable",
+              "branch": "五参数/FXlevel2/time or10/default callbacks/return burnable"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C14",
+              "symbol": "oncanlight/onburning/onsmoldering and Burnable constructor",
+              "branch": "property→tag映射；构造self/task/state/callback默认；base=nil"
+            },
+            {
+              "citation_id": "BR-C15",
+              "symbol": "SetOnIgniteFn/OnBurnt_Internal/SetOnBurntFn/SetOnExtinguishFn",
+              "branch": "setter替换与SetOnBurntFn正常返回后valid条件internal包装"
+            },
+            {
+              "citation_id": "BR-C16",
+              "symbol": "SetBurnTime/IsBurning/IsSmoldering/AddBurnFX",
+              "branch": "原值配置/查询；offset.x/y/z与sym注册，不立即SpawnFX"
+            }
+          ]
+        ],
+        "source_defaults": {
+          "kind": "PinnedSourceDefaultConfiguration_NotEngineeringRecommendation_NotNativeHeatUnits",
+          "shared": {
+            "acceptsheat": true,
+            "onflashpoint": "DefaultIgniteFn",
+            "decayrate": 0.5,
+            "damages": true
+          },
+          "small": {
+            "flashpoint": "5 + math.random()*5",
+            "propagaterange": "3 + math.random()*2",
+            "heatoutput": "3 + math.random()*2",
+            "damagerange": 2,
+            "citation_id": "BR-C11"
+          },
+          "medium": {
+            "flashpoint": "15 + math.random()*10",
+            "propagaterange": "5 + math.random()*2",
+            "heatoutput": "5 + math.random()*3.5",
+            "damagerange": 3,
+            "citation_id": "BR-C12"
+          },
+          "large": {
+            "flashpoint": "45 + math.random()*10",
+            "propagaterange": "6 + math.random()*2",
+            "heatoutput": "6 + math.random()*3.5",
+            "damagerange": 3,
+            "citation_id": "BR-C13"
+          },
+          "units_boundary_zh": "表达式仅记录helper给字段的值；不据此研究native热量、距离/伤害模拟、随机端点或安全阈值。propagator StopSpreading heatpct是重置乘数而非时间。",
+          "existing_component_branch_zh": "AddComponent既有分支返回原对象；这些字段和callback被重新配置，不生成第二个对象，也没有helper中的heat/source/task reset。"
+        }
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "BR-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "BR-F03",
+          "pointer": "#/direct_facts/2"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "018",
+      "topic": "普通可燃 helper、燃烧任务/回调与 burnt 终态恢复",
+      "id": "BR-P02",
+      "source_artifact": "batch018/research/burnable-restore-research.json",
+      "artifact_sha256": "21a9c3c3663b3248d9814bc110c41e30ba1c9c3f4363437f4e3047e633b68fcf",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "BR-P02",
+        "title_zh": "点燃、任务更新和离线粗略烧尽入口",
+        "load_when_zh": "调用Ignite或编写燃烧timer/LongUpdate逻辑时",
+        "question_ids": [
+          "FIRE-Q02"
+        ],
+        "signatures": [
+          "Burnable:Ignite(immediate,source,doer)",
+          "Burnable:ExtendBurning()",
+          "Burnable:LongUpdate(dt)",
+          "DoneBurning(inst,self) [local callback,非导出API]"
+        ],
+        "arguments": {
+          "immediate": "转交SpawnFX/当前FX SetLevel；不替代burntime或直接烧尽",
+          "source": "onignite event与callback参数，并传StartSpreading(source)",
+          "doer": "onignite event与callback参数；本ordinary约束无controlled_burner",
+          "dt": "LongUpdate形参未被读取；不是剩余burntime差量",
+          "self.task": "组件持有scheduler handle；OnKilled可替换其callback，不恒等DoneBurning",
+          "burntime": "非nil才DoTaskInTime；普通delay原值；nil不建任务"
+        },
+        "source_contract": [
+          "guard只not burning/not fireimmune，无canlight guard；写burning/fire tag不等于Ignite",
+          "StopSmoldering→state/death/FX→onignite事件→当前callback→fuel→propagator→ExtendBurning",
+          "正常event/callback return值被忽略；normal return仍可改组件/state，suffix无IsValid或burning复核",
+          "ExtendBurning Cancel旧task然后替换，自己无burning guard；LongUpdate仅burning+task时Cancel/nil→直接DoneBurning，忽略dt且不推进smolder"
+        ],
+        "results": {
+          "return": "Ignite/ExtendBurning/LongUpdate无显式success return；nil不表示失败",
+          "ownership": "entity callback首参inst；额外self是burnable组件；不保存或复用旧task handle到新entity",
+          "reentry": "guard的本次条件不是跨callback exactly-once；不承诺回调后最终仍burning"
+        },
+        "evidence_ids": [
+          "BR-F03",
+          "BR-F04",
+          "BR-F05"
+        ],
+        "reuse_ids": [
+          "OLD-TASK-CANCEL",
+          "N004-TIMER-RESTORE",
+          "N010-FUEL-CONSUME-LOAD"
+        ],
+        "recommendation_zh": "正常点燃用Ignite并读取确切当前状态或项目结果；只改tag无法执行其生命周期。不要给LongUpdate编造dt消耗模型；需要自己的持续时间保存就先设计项目逻辑值和恢复政策，实际ModQA另验证。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "runtime_tested": false,
+        "canonical": false,
+        "sourceSymbolAndBranch": [
+          [
+            {
+              "citation_id": "BR-C14",
+              "symbol": "oncanlight/onburning/onsmoldering and Burnable constructor",
+              "branch": "property→tag映射；构造self/task/state/callback默认；base=nil"
+            },
+            {
+              "citation_id": "BR-C15",
+              "symbol": "SetOnIgniteFn/OnBurnt_Internal/SetOnBurntFn/SetOnExtinguishFn",
+              "branch": "setter替换与SetOnBurntFn正常返回后valid条件internal包装"
+            },
+            {
+              "citation_id": "BR-C16",
+              "symbol": "SetBurnTime/IsBurning/IsSmoldering/AddBurnFX",
+              "branch": "原值配置/查询；offset.x/y/z与sym注册，不立即SpawnFX"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C21",
+              "symbol": "Ignite",
+              "branch": "ordinary非controlled_burner入口：actual guard、smolder/state/death/FX/event/callback/fuel/propagator/task顺序"
+            },
+            {
+              "citation_id": "BR-C24",
+              "symbol": "StopSmoldering",
+              "branch": "只在smoldering时清smoke/task/time并StopSpreading(true,heatpct)后callback"
+            },
+            {
+              "citation_id": "BR-C26",
+              "symbol": "SpawnFX selected ownership",
+              "branch": "KillFX旧引用→注册条目spawn→child或follower→persists=false→fxchildren登记"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C22",
+              "symbol": "ExtendBurning",
+              "branch": "先Cancel旧self.task，burntime非nil才DoTaskInTime，否则self.task=nil"
+            },
+            {
+              "citation_id": "BR-C23",
+              "symbol": "LongUpdate",
+              "branch": "dt未读；burning且task存在时Cancel/nil/直接DoneBurning"
+            },
+            {
+              "citation_id": "BR-C20",
+              "symbol": "OnKilled",
+              "branch": "health/nofadeout分支可替换同一个self.task；该handle不恒等DoneBurning"
+            },
+            {
+              "citation_id": "BR-C43",
+              "symbol": "DoPeriodicTask/DoTaskInTime",
+              "branch": "scheduler owner GUID/self及extra self参数；handle登记pendingtasks"
+            }
+          ]
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "BR-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "BR-F05",
+          "pointer": "#/direct_facts/4"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "018",
+      "topic": "普通可燃 helper、燃烧任务/回调与 burnt 终态恢复",
+      "id": "BR-P03",
+      "source_artifact": "batch018/research/burnable-restore-research.json",
+      "artifact_sha256": "21a9c3c3663b3248d9814bc110c41e30ba1c9c3f4363437f4e3047e633b68fcf",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "BR-P03",
+        "title_zh": "熄灭与spread/reset/task不是一个操作",
+        "load_when_zh": "熄灭、打断及拆组件时",
+        "question_ids": [
+          "FIRE-Q03"
+        ],
+        "signatures": [
+          "Burnable:StopSmoldering(heatpct)",
+          "Burnable:Extinguish(resetpropagator,heatpct,smotherer)",
+          "Propagator:StartSpreading(source)",
+          "Propagator:StopSpreading(reset,heatpct)",
+          "Propagator:StartUpdating()/StopUpdating()",
+          "Burnable:OnRemoveFromEntity()/OnRemoveEntity()"
+        ],
+        "arguments": {
+          "resetpropagator/reset": "Lua真值；burning路径真才重置heat/pause，smolder路径无条件true",
+          "heatpct": "非nil则乘随机比例*flashpoint；0有效、负数无此处clamp；不是时间",
+          "smotherer": "可选entity，Extinguish burning guard之前优先finiteuses.Use，否则stackable.Get.Remove",
+          "OnKilled": "same fn+implicit自身source death listener，由Extinguish RemoveEventCallback解除",
+          "task identities": "burnable.task、burnable.smolder_task、propagator.task、propagator.delay分别由实际持有者取消/清字段；非同一个timer"
+        },
+        "source_contract": [
+          "StopSmoldering仅smoldering分支清smoke/task/time→StopSpreading(true,heatpct)→onstopsmoldering",
+          "Extinguish始终先StopSmoldering/处理smotherer；仅burning时Cancel task/death listener/StopSpreading→statefalse/FX/fuel→onextinguish(inst)→onextinguish event",
+          "StopSpreading总清source/spreading；reset假保留heat/pause；不直接StopUpdating，非spread更新heat==0才停task",
+          "Burnable拆组件入口复用旧Extinguish/余task Cancel/tag清理；entity remove入口StopSmoldering/fastextinguish/KillFX，通用pendingtask取消责任复用OLD-ENTITY-REMOVE",
+          "FXchildren引用清空可能先于其pst动画删除，不把cleanup解释为所有FX立即消失"
+        ],
+        "results": {
+          "return": "这些生命周期API无success显式return；callback返回值不否决",
+          "callback": "onextinguish在event前；正常返回可重入或改state，无统一重入抑制",
+          "preserved_captured_self": "RemoveComponent先删索引后callback；不能用inst.components.burnable存在假设替代旧self"
+        },
+        "evidence_ids": [
+          "BR-F06",
+          "BR-F07",
+          "BR-F08"
+        ],
+        "reuse_ids": [
+          "OLD-BURNABLE-CLEANUP",
+          "OLD-REMOVE-COMPONENT",
+          "OLD-ENTITY-REMOVE",
+          "OLD-EVENT-REGISTRATION",
+          "OLD-TASK-CANCEL",
+          "N006-PRE-TEARDOWN",
+          "OLD-TORCH-FX",
+          "N005-PRE-FX-TOPOLOGY"
+        ],
+        "recommendation_zh": "先选是否只停止spread、熄灭burning还是停止smolder，并给reset/heatpct真实含义。保留source/callback/task身份，项目增量只清自己的东西；自定义callback不要依赖已被默认烧毁拆掉的component索引。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "runtime_tested": false,
+        "canonical": false,
+        "sourceSymbolAndBranch": [
+          [
+            {
+              "citation_id": "BR-C24",
+              "symbol": "StopSmoldering",
+              "branch": "只在smoldering时清smoke/task/time并StopSpreading(true,heatpct)后callback"
+            },
+            {
+              "citation_id": "BR-C25",
+              "symbol": "Extinguish",
+              "branch": "先StopSmoldering/可消费smotherer，再burning条件取消/death/propagator/reset/state/FX/fuel/callback/event"
+            },
+            {
+              "citation_id": "BR-C26",
+              "symbol": "SpawnFX selected ownership",
+              "branch": "KillFX旧引用→注册条目spawn→child或follower→persists=false→fxchildren登记"
+            },
+            {
+              "citation_id": "BR-C27",
+              "symbol": "KillFX",
+              "branch": "按fxchildren反向清引用；firefx Extinguish真时animover及fallback task，否则Remove"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C30",
+              "symbol": "StopUpdating/_OnUpdate/StartUpdating/StartSpreading/StopSpreading",
+              "branch": "periodic task和source/spreading/reset/heatpct/pauseheating分离"
+            },
+            {
+              "citation_id": "BR-C31",
+              "symbol": "OnUpdate nonspreading exit",
+              "branch": "非spreading分支仅currentheat==0时StopUpdating；停止spread不直接取消task"
+            },
+            {
+              "citation_id": "BR-C29",
+              "symbol": "Propagator constructor/OnRemoveFromEntity",
+              "branch": "组件默认、StopSpreading(true)→OnUpdate(0)→Cancel delay"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C05",
+              "symbol": "DefaultBurntStructureFn",
+              "branch": "burnt tag/canlight/animation/burntup/sound/minimap/workleft"
+            },
+            {
+              "citation_id": "BR-C06",
+              "symbol": "DefaultBurntStructureFn.container",
+              "branch": "container存在时DropEverything→Close→RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C07",
+              "symbol": "DefaultBurntStructureFn.exit",
+              "branch": "Light关闭；burnable存在时RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C42",
+              "symbol": "RemoveComponent",
+              "branch": "清components索引在OnRemoveFromEntity之前"
+            },
+            {
+              "citation_id": "BR-C28",
+              "symbol": "OnRemoveFromEntity",
+              "branch": "复核旧cleanup：Extinguish、余task Cancel/nil、三个tag清理"
+            }
+          ]
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "BR-F07",
+          "pointer": "#/direct_facts/6"
+        },
+        {
+          "id": "BR-F08",
+          "pointer": "#/direct_facts/7"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "018",
+      "topic": "普通可燃 helper、燃烧任务/回调与 burnt 终态恢复",
+      "id": "BR-P04",
+      "source_artifact": "batch018/research/burnable-restore-research.json",
+      "artifact_sha256": "21a9c3c3663b3248d9814bc110c41e30ba1c9c3f4363437f4e3047e633b68fcf",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "BR-P04",
+        "title_zh": "默认烧毁、wrapper与DoneBurning次序",
+        "load_when_zh": "替换onburnt或在烧尽事件后继续访问实体时",
+        "question_ids": [
+          "FIRE-Q04"
+        ],
+        "signatures": [
+          "Burnable:SetOnBurntFn(fn)",
+          "DefaultBurntFn(inst)",
+          "DefaultBurntStructureFn(inst)",
+          "DoneBurning(inst,self) [local callback]",
+          "burnable.onburnt(inst) [已安装字段callback]"
+        ],
+        "arguments": {
+          "fn": "SetOnBurntFn真值时包装fn(inst)，nil/false清；不自动组合旧callback",
+          "internal_self": "包装闭包捕获旧burnable self；inst有效时即使组件索引被删除仍可调用OnBurnt_Internal",
+          "structure_preconditions": "DefaultBurntStructureFn入口直接用burnable.canlight；不是已拆burnable实体的通用幂等函数",
+          "extinguishimmediately": "构造true，DoneBurning在callback正常返回且inst有效后重新读取"
+        },
+        "source_contract": [
+          "DoneBurning先捕获plant→onburnt event→当前callback→valid条件special branch/extinguish→先前plant条件worldevent",
+          "wrapper先项目fn，正常返回且inst有效后internal；直接字段赋值绕过wrapper",
+          "默认item最终Remove主体；默认structure加burnt/burntup、设置workleft1、删container/burnable并保留主体",
+          "DoneBurning入口不清burning/task；LongUpdate先Cancel/nil。拆组件Extinguish和DoneBurning末尾调用可先后出现，一次显式调用不约束callback重入次数"
+        ],
+        "results": {
+          "return": "setter/defaultcallbacks/DoneBurning无显式业务return；回调return不回滚、不否决后续",
+          "events": "onburnt event、onburnt字段callback、burnt tag与burntup各不同；direct callback不自动推DoneBurning event",
+          "validity": "只检查entity IsValid，不检查self仍挂components；field值/组件存在在callback后须重新核验"
+        },
+        "evidence_ids": [
+          "BR-F02",
+          "BR-F03",
+          "BR-F08",
+          "BR-F09"
+        ],
+        "reuse_ids": [
+          "OLD-REMOVE-COMPONENT",
+          "OLD-BURNABLE-CLEANUP",
+          "OLD-ENTITY-REMOVE",
+          "N008-WORKABLE-ORDER",
+          "N014-PROPERTY-TAGS"
+        ],
+        "recommendation_zh": "用SetOnBurntFn安装所选业务终态；明确是替换还是自己组合DefaultBurntStructureFn。执行默认删除后停止假定burnable/container存在，不将onburnt return false当阻止删除或熄灭的机制。额外奖励去重属于自己的项目合同，不声称Native exactly-once。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "runtime_tested": false,
+        "canonical": false,
+        "sourceSymbolAndBranch": [
+          [
+            {
+              "citation_id": "BR-C02",
+              "symbol": "DefaultBurnFn",
+              "branch": "非tree且非structure tag时persists=false"
+            },
+            {
+              "citation_id": "BR-C04",
+              "symbol": "DefaultExtinguishFn",
+              "branch": "非tree且非structure tag时persists=true"
+            },
+            {
+              "citation_id": "BR-C03",
+              "symbol": "DefaultBurntFn",
+              "branch": "普通item默认burnt回调，ash world查询及最终Remove"
+            },
+            {
+              "citation_id": "BR-C08",
+              "symbol": "MakeSmallBurnable",
+              "branch": "五参数/FXlevel2/time or10/default callbacks/return burnable"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C14",
+              "symbol": "oncanlight/onburning/onsmoldering and Burnable constructor",
+              "branch": "property→tag映射；构造self/task/state/callback默认；base=nil"
+            },
+            {
+              "citation_id": "BR-C15",
+              "symbol": "SetOnIgniteFn/OnBurnt_Internal/SetOnBurntFn/SetOnExtinguishFn",
+              "branch": "setter替换与SetOnBurntFn正常返回后valid条件internal包装"
+            },
+            {
+              "citation_id": "BR-C16",
+              "symbol": "SetBurnTime/IsBurning/IsSmoldering/AddBurnFX",
+              "branch": "原值配置/查询；offset.x/y/z与sym注册，不立即SpawnFX"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C05",
+              "symbol": "DefaultBurntStructureFn",
+              "branch": "burnt tag/canlight/animation/burntup/sound/minimap/workleft"
+            },
+            {
+              "citation_id": "BR-C06",
+              "symbol": "DefaultBurntStructureFn.container",
+              "branch": "container存在时DropEverything→Close→RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C07",
+              "symbol": "DefaultBurntStructureFn.exit",
+              "branch": "Light关闭；burnable存在时RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C42",
+              "symbol": "RemoveComponent",
+              "branch": "清components索引在OnRemoveFromEntity之前"
+            },
+            {
+              "citation_id": "BR-C28",
+              "symbol": "OnRemoveFromEntity",
+              "branch": "复核旧cleanup：Extinguish、余task Cancel/nil、三个tag清理"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C19",
+              "symbol": "DoneBurning",
+              "branch": "捕获plant→onburnt事件→当前onburnt callback→valid后条件extinguish；非直接callback等价"
+            },
+            {
+              "citation_id": "BR-C15",
+              "symbol": "SetOnIgniteFn/OnBurnt_Internal/SetOnBurntFn/SetOnExtinguishFn",
+              "branch": "setter替换与SetOnBurntFn正常返回后valid条件internal包装"
+            },
+            {
+              "citation_id": "BR-C03",
+              "symbol": "DefaultBurntFn",
+              "branch": "普通item默认burnt回调，ash world查询及最终Remove"
+            },
+            {
+              "citation_id": "BR-C07",
+              "symbol": "DefaultBurntStructureFn.exit",
+              "branch": "Light关闭；burnable存在时RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C28",
+              "symbol": "OnRemoveFromEntity",
+              "branch": "复核旧cleanup：Extinguish、余task Cancel/nil、三个tag清理"
+            },
+            {
+              "citation_id": "BR-C25",
+              "symbol": "Extinguish",
+              "branch": "先StopSmoldering/可消费smotherer，再burning条件取消/death/propagator/reset/state/FX/fuel/callback/event"
+            },
+            {
+              "citation_id": "BR-C23",
+              "symbol": "LongUpdate",
+              "branch": "dt未读；burning且task存在时Cancel/nil/直接DoneBurning"
+            }
+          ]
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "BR-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "BR-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "BR-F09",
+          "pointer": "#/direct_facts/8"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "018",
+      "topic": "普通可燃 helper、燃烧任务/回调与 burnt 终态恢复",
+      "id": "BR-P05",
+      "source_artifact": "batch018/research/burnable-restore-research.json",
+      "artifact_sha256": "21a9c3c3663b3248d9814bc110c41e30ba1c9c3f4363437f4e3047e633b68fcf",
+      "source_pointer": "#/coding_projection/4",
+      "coding": {
+        "id": "BR-P05",
+        "title_zh": "普通chest保存终态而不是恢复点燃过程",
+        "load_when_zh": "普通structure存档后恢复burnt或避免load重新起火时",
+        "question_ids": [
+          "FIRE-Q05"
+        ],
+        "signatures": [
+          "EntityScript:GetPersistData() -> data,refs [复用]",
+          "EntityScript:SetPersistData(data,newents) [复用]",
+          "treasurechest onsave(inst,data)",
+          "regular_OnLoad(inst,data,newents)",
+          "burnable.onburnt(inst)"
+        ],
+        "arguments": {
+          "data.burnt": "prefab顶层标志；Lua真值才应用终态，不是burnable component payload",
+          "regular_sample": "仅treasurechest，numupgrades=0，普通container.infinitestacksize假值且factory wire未被Mod改",
+          "inst.OnLoad": "实际regular_OnLoad，先count条件升级应用再base onload；本文count0跳过升级",
+          "installed callback": "regular master已SetOnBurntFn(regular_OnBurnt)；base onload不做onburnt非nil检测"
+        },
+        "source_contract": [
+          "固定source Burnable/Propagator全文无OnSave/OnLoad且无继承base；LoadComponent没有补fire持久化",
+          "entity OnSave写既有data；组件OnLoad在prefab OnLoad前，遍历不是组件稳定总序",
+          "onsave把burning或burnt折成data.burnt=true；不保存remaining/task/source/doer/smolder",
+          "regular count0→base onload条件→直接wrapper→regular_OnBurnt ordinary fallback→DefaultBurntStructureFn；删除container/burnable、保留burnt主体通常发生",
+          "direct onburnt load未调用Ignite/DoneBurning，不自动onignite/onburnt event；仍有wrapper internal及default burntup。正常fresh非burning入口通常无onextinguish event，callback改state则按实际分支"
+        ],
+        "results": {
+          "schema": "终态prefab标志而非自动组件timer序列化；不保证任何其他consumer同策略",
+          "scope": "N016升级restore继续复用；本批不改旧样本或扩collapse/overstack",
+          "durability": "只证Lua保存/恢复政策，不证game build/native spawn/transport/disk"
+        },
+        "evidence_ids": [
+          "BR-F10",
+          "BR-F11"
+        ],
+        "reuse_ids": [
+          "OLD-ENTITY-SAVE",
+          "OLD-ENTITY-LOAD",
+          "OLD-TIMER-SAVE",
+          "OLD-WORLD-PERSISTS",
+          "N006-SAVE-LOAD",
+          "N008-RESOURCE-RESTORE",
+          "N010-FUEL-CONSUME-LOAD",
+          "N016-CHEST-LOAD",
+          "N016-CHEST-SAMPLE",
+          "N016-CHEST-SCOPE"
+        ],
+        "recommendation_zh": "自己的prefab先决定是保存终态还是另存逻辑进度，然后在正确恢复阶段应用。默认ordinary chest可说明终态政策，但不应在OnLoad调用Ignite重演FX/fuel/spread或捏造Burnable:OnLoad。",
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "runtime_tested": false,
+        "canonical": false,
+        "sourceSymbolAndBranch": [
+          [
+            {
+              "citation_id": "BR-A01",
+              "symbol": "full Burnable method/declaration absence audit",
+              "branch": "全文方法声明及组件构造base=nil；无定义OnSave/OnLoad"
+            },
+            {
+              "citation_id": "BR-A02",
+              "symbol": "full Propagator method/declaration absence audit",
+              "branch": "全文方法声明及无base构造；无定义OnSave/OnLoad"
+            },
+            {
+              "citation_id": "BR-C14",
+              "symbol": "oncanlight/onburning/onsmoldering and Burnable constructor",
+              "branch": "property→tag映射；构造self/task/state/callback默认；base=nil"
+            },
+            {
+              "citation_id": "BR-C29",
+              "symbol": "Propagator constructor/OnRemoveFromEntity",
+              "branch": "组件默认、StopSpreading(true)→OnUpdate(0)→Cancel delay"
+            },
+            {
+              "citation_id": "BR-C40",
+              "symbol": "LoadComponent",
+              "branch": "require(components/name)结果为组件class；未额外赋OnSave/OnLoad"
+            },
+            {
+              "citation_id": "BR-C44",
+              "symbol": "GetPersistData",
+              "branch": "已有组件OnSave按方法存在性处理，然后实体OnSave写既有data"
+            },
+            {
+              "citation_id": "BR-C45",
+              "symbol": "SetPersistData",
+              "branch": "已有组件OnLoad之后实体OnLoad；data.burnt不是自动燃烧组件payload"
+            }
+          ],
+          [
+            {
+              "citation_id": "BR-C32",
+              "symbol": "onsave/onload",
+              "branch": "burning或burnt写data.burnt=true；load三条件后直接burnable.onburnt(inst)"
+            },
+            {
+              "citation_id": "BR-C33",
+              "symbol": "MakeChest.fn common/master split",
+              "branch": "structure tag在共同构造；SetPristine后非mastersim返回"
+            },
+            {
+              "citation_id": "BR-C34",
+              "symbol": "MakeChest.fn master wiring",
+              "branch": "ordinaryhelper独立propagator与baseOnSave/OnLoad；最后master_postinit"
+            },
+            {
+              "citation_id": "BR-C35",
+              "symbol": "regular_ShouldCollapse",
+              "branch": "本样本普通未升级container.infinitestacksize假值，跳过collapse计算返回false"
+            },
+            {
+              "citation_id": "BR-C36",
+              "symbol": "regular_OnBurnt/regular_OnLoad",
+              "branch": "清业务字段/DropEverything/普通fallback；count0不OnUpgrade后base onload"
+            },
+            {
+              "citation_id": "BR-C37",
+              "symbol": "regular_master_postinit",
+              "branch": "SetOnBurntFn(regular_OnBurnt)覆盖helper默认；OnLoad=regular_OnLoad"
+            },
+            {
+              "citation_id": "BR-C38",
+              "symbol": "treasurechest exported MakeChest consumer",
+              "branch": "只选regular treasurechest实例factory"
+            },
+            {
+              "citation_id": "BR-C15",
+              "symbol": "SetOnIgniteFn/OnBurnt_Internal/SetOnBurntFn/SetOnExtinguishFn",
+              "branch": "setter替换与SetOnBurntFn正常返回后valid条件internal包装"
+            },
+            {
+              "citation_id": "BR-C05",
+              "symbol": "DefaultBurntStructureFn",
+              "branch": "burnt tag/canlight/animation/burntup/sound/minimap/workleft"
+            },
+            {
+              "citation_id": "BR-C06",
+              "symbol": "DefaultBurntStructureFn.container",
+              "branch": "container存在时DropEverything→Close→RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C07",
+              "symbol": "DefaultBurntStructureFn.exit",
+              "branch": "Light关闭；burnable存在时RemoveComponent"
+            },
+            {
+              "citation_id": "BR-C25",
+              "symbol": "Extinguish",
+              "branch": "先StopSmoldering/可消费smotherer，再burning条件取消/death/propagator/reset/state/FX/fuel/callback/event"
+            }
+          ]
+        ]
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F10",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "BR-F11",
+          "pointer": "#/direct_facts/10"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "019",
+      "topic": "普通 REPAIR/REPAIR_LEAK 材料、回血/堵漏与临时修补恢复",
+      "id": "BTR-P01",
+      "source_artifact": "batch019/research/boat-repair-research.json",
+      "artifact_sha256": "505f6f3dc09a3d608d3180fba6d4a659fd3ff8dcbbc301d2f5f3682f777772ca",
+      "source_pointer": "#/coding_projection/0",
+      "coding": {
+        "id": "BTR-P01",
+        "title_zh": "用目标API并分清候选与两个拒绝hook",
+        "load_when_zh": "普通船修理动作缺失、材料不符或需要执行前拒绝时",
+        "signatures": [
+          "target.components.repairable:Repair(doer,item)",
+          "target.components.boatleak:Repair(doer,patch_item)",
+          "testvalidrepairfn(current_target,item)",
+          "checkmaterialfn(current_target,item) -> valid,reason",
+          "repairer.repairmaterial/healthrepairvalue/healthrepairpercent",
+          "repairable:SetHealthRepairable(value)"
+        ],
+        "source_contract": [
+          "ordinary REPAIR重物非骑乘取BODY，否则invobject；LEAK caller检查target boat_leak；metadata Repairer/BoatPatch没有Repair方法",
+          "collector只插候选；health_<material>、repairable_<material>和healthrepairable不证明执行接受",
+          "有testvalid hook且返回false/nil→Repair仅false；捕获repairer/材料等值后，有checkmaterial hook且返回false/nil→false,reason；两predicate都不接doer；随后才health分派",
+          "ordinary boat设WOOD且没有自己的testvalid/checkmaterial/onrepaired安装；Health max/current属性维护候选healthrepairable"
+        ],
+        "evidence_ids": [
+          "BR-F01",
+          "BR-F02",
+          "BR-F03",
+          "BR-F04",
+          "BR-F15"
+        ],
+        "reuse_ids": [
+          "BR-R04",
+          "BR-R14",
+          "BR-R19"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "配置实际字段与正确target API。需要执行拒绝时用准确predicate角色并保留原hook的返回reason；不要从collector/tag或虚构setter推消费结果。直接调用时显式提供项目所需有效实体/doer/资格。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F01",
+          "pointer": "#/direct_facts/0"
+        },
+        {
+          "id": "BR-F02",
+          "pointer": "#/direct_facts/1"
+        },
+        {
+          "id": "BR-F03",
+          "pointer": "#/direct_facts/2"
+        },
+        {
+          "id": "BR-F04",
+          "pointer": "#/direct_facts/3"
+        },
+        {
+          "id": "BR-F15",
+          "pointer": "#/direct_facts/14"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "019",
+      "topic": "普通 REPAIR/REPAIR_LEAK 材料、回血/堵漏与临时修补恢复",
+      "id": "BTR-P02",
+      "source_artifact": "batch019/research/boat-repair-research.json",
+      "artifact_sha256": "505f6f3dc09a3d608d3180fba6d4a659fd3ff8dcbbc301d2f5f3682f777772ca",
+      "source_pointer": "#/coding_projection/1",
+      "coding": {
+        "id": "BTR-P02",
+        "title_zh": "只在实际consumer扣一件，平台失败仍可堵漏",
+        "load_when_zh": "修理重复扣料、满血漏点补丁或callback读材料时",
+        "signatures": [
+          "Repairable:Repair(doer,item)",
+          "onrepaired(current_target,doer,original_item)",
+          "BoatLeak:Repair(doer,patch_item)"
+        ],
+        "source_contract": [
+          "health组件存在且捕获repairer的绝对/比例量至少一项>0时，health:GetPercent()>=1拒绝；否则该health分支两次DoDelta，返回被丢弃，第二percent*maxhealth在第一调用之后新读",
+          "Repairable效果→sound→当时stackable Get():Remove或原Remove→当时onrepaired→正常true；callback拿原引用，普通N>1为残余堆/N=1已删除",
+          "漏点平台Repair真跳过fallback；false/nil/无平台仍fallback消费，后读原patch boatpatch/type并请求0.4状态helper，正常true不等于HP gain或已完成堵漏",
+          "无预先holder移交、post-consume有效性guard或内建返还；hooks/事件可改变新读组件和字段，正常一次路径才通常消费1件"
+        ],
+        "evidence_ids": [
+          "BR-F05",
+          "BR-F06",
+          "BR-F07"
+        ],
+        "reuse_ids": [
+          "BR-R07",
+          "BR-R08",
+          "BR-R09",
+          "BR-R10",
+          "BR-R14",
+          "BR-R17",
+          "BR-R21",
+          "BR-R22",
+          "BR-R-HEALTH"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "由Repair/BoatLeak这一处普通consumer消费，不在onrepaired再Get/Remove或同量DoDelta。漏点请求true只按正常到尾部解释；平台修理失败不能直接退款/补发或二次扣料。需要材料数据时按原引用已消费后的身份前提设计，不能仿DEPLOY移交单件。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F05",
+          "pointer": "#/direct_facts/4"
+        },
+        {
+          "id": "BR-F06",
+          "pointer": "#/direct_facts/5"
+        },
+        {
+          "id": "BR-F07",
+          "pointer": "#/direct_facts/6"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "019",
+      "topic": "普通 REPAIR/REPAIR_LEAK 材料、回血/堵漏与临时修补恢复",
+      "id": "BTR-P03",
+      "source_artifact": "batch019/research/boat-repair-research.json",
+      "artifact_sha256": "505f6f3dc09a3d608d3180fba6d4a659fd3ff8dcbbc301d2f5f3682f777772ca",
+      "source_pointer": "#/coding_projection/2",
+      "coding": {
+        "id": "BTR-P03",
+        "title_zh": "HP与漏点状态分开接，后缀必须有真实分支",
+        "load_when_zh": "自定义补丁只动画、flags与扣血不一致或接onrepairedleak时",
+        "signatures": [
+          "boatpatch.patch_type = suffix_or_nil",
+          "BoatPatch:GetPatchType()",
+          "BoatLeak:SetState(state,skip_open)",
+          "BoatLeak:ChangeToRepaired(build,sndoverride)",
+          "onrepairedleak(leak)",
+          "onsprungleak(leak,requested_state)"
+        ],
+        "source_contract": [
+          "回血来自可选平台Repairable；ChangeToRepaired先改tag/has_leaks再callback，current_state由SetState尾句写",
+          "认可repaired/tape/treegrowth/kelp才调用ChangeToRepaired；任意未知后缀只可能取消存储timer与赋state，没有通用修补生命周期",
+          "真实boat_leak onrepairedleak仅局部交互/湿度bonus收尾；无HullHealth damage归零或回血hook",
+          "HullHealth按current_state而非has_leaks汇总；未知state可在此表贡献0但flags/tag仍保留，不能当已正确堵漏"
+        ],
+        "evidence_ids": [
+          "BR-F08",
+          "BR-F09",
+          "BR-F14"
+        ],
+        "reuse_ids": [
+          "BR-R02",
+          "BR-R03",
+          "BR-R04"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "需要标准kelp行为时使用已识别kelp后缀；项目新后缀需自己提供并验证真实state处理。保留callback角色和状态尾句顺序，不让修血/动画替代漏点生命周期，也不虚构原boat onrepaired→HullHealth连接。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F08",
+          "pointer": "#/direct_facts/7"
+        },
+        {
+          "id": "BR-F09",
+          "pointer": "#/direct_facts/8"
+        },
+        {
+          "id": "BR-F14",
+          "pointer": "#/direct_facts/13"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "batch": "019",
+      "topic": "普通 REPAIR/REPAIR_LEAK 材料、回血/堵漏与临时修补恢复",
+      "id": "BTR-P04",
+      "source_artifact": "batch019/research/boat-repair-research.json",
+      "artifact_sha256": "505f6f3dc09a3d608d3180fba6d4a659fd3ff8dcbbc301d2f5f3682f777772ca",
+      "source_pointer": "#/coding_projection/3",
+      "coding": {
+        "id": "BTR-P04",
+        "title_zh": "保存剩余time并区分普通到期、LongUpdate和两条load",
+        "load_when_zh": "临时kelp补丁超时、跳时或存档恢复时",
+        "signatures": [
+          "BoatLeak:SetRepairedTime(time)",
+          "BoatLeak:GetRemainingRepairedTime()",
+          "BoatLeak:LongUpdate(dt)",
+          "HullHealth:OnSave()/LoadPostPass(newents,data)",
+          "BoatLeak:OnSave(data)/OnLoad(data)"
+        ],
+        "source_contract": [
+          "kelp先Change/callback再读取当前current_state选MED/SMALL time，最后写repaired_kelp；同state早退不重置timer，换state只取消存储ref",
+          "正常到期ref=nil→动画后第二task→立即state=med用于save；第二helper恢复捕获state再SetState(med)，第二task未存储于timeout字段",
+          "LongUpdate用remaining-dt，Cancel后正数重排，非正数直接helper；不复制正常动画两阶段",
+          "collision保存exact state+damage并LoadPostPass先Refresh再saved state；dynamic保存unplugged state并0延时查组件/平台、SetBoat/SetState和dynamic表登记",
+          "两条load仅saved timeout~=nil时覆盖，0保留；nil时kelp SetState仍可能建立默认timer；load不Repair/扣料，动画第二task没有remaining序列化"
+        ],
+        "evidence_ids": [
+          "BR-F10",
+          "BR-F11",
+          "BR-F12",
+          "BR-F13"
+        ],
+        "reuse_ids": [
+          "BR-R03",
+          "BR-R04",
+          "BR-R11",
+          "BR-R12"
+        ],
+        "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+        "recommendation_zh": "恢复走对应state/remaining字段，不重放Repair消费。区别保存字段ref与另外两个延时task；项目主动取消/重复调用和任意hook变更应针对实际路径核验，不能用通用task cleanup推出全时钟/网络保证。"
+      },
+      "reviewer_expansion": [
+        {
+          "id": "BR-F10",
+          "pointer": "#/direct_facts/9"
+        },
+        {
+          "id": "BR-F11",
+          "pointer": "#/direct_facts/10"
+        },
+        {
+          "id": "BR-F12",
+          "pointer": "#/direct_facts/11"
+        },
+        {
+          "id": "BR-F13",
+          "pointer": "#/direct_facts/12"
+        }
+      ],
+      "reviewer_only_pointer": "#/direct_facts",
+      "canonical": false,
+      "runtime_tested": false
+    }
+  ]
+}

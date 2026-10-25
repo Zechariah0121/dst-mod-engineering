@@ -1,0 +1,3751 @@
+{
+  "records": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-01",
+        "candidate_name": "Player SaveRecord 不自动保存旧实体身份",
+        "classification": "NSF",
+        "statement": "EntityScript:GetSaveRecord 创建 prefab/位置/skin/age/data 等 record；该函数没有将 self.GUID 或 self.userid 自动写成 record 字段。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:GetSaveRecord"
+        ],
+        "side": "Shared helper；Player Session caller-dependent",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:GetSaveRecord",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:GetSaveRecord()",
+              "anchor_line": 248,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                248,
+                248
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "record 是选定状态的 envelope；不能当作整个 EntityScript 对象。",
+        "what_it_does_not_prove": "组件或 prefab 不会自行存身份字段；所有角色 payload 完全相同；引擎 GUID allocation 规则。",
+        "engine_boundary": [
+          "EB-0012-06"
+        ],
+        "runtime_needed": "可检查 R02 保存摘要与 R03 新实体，但不能从样本推导 GUID allocator。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-01"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-02",
+        "candidate_name": "ParseUserSessionData 的验证范围有限",
+        "classification": "NSF",
+        "statement": "ParseUserSessionData 用 RunInSandboxSafe 执行字符串；success 且 result 非 nil 时直接读取 result.prefab，没有全面 schema 或 prefab 存在性校验。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::ParseUserSessionData",
+          "util.lua::RunInSandboxSafe"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "ParseUserSessionData",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function ParseUserSessionData(data)",
+              "anchor_line": 2062,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2062,
+                2062
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "util.lua",
+            "symbol": "RunInSandboxSafe",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "d12a98de4fd1538151a2b4505e8b9dad192021a097c93252e6033f07eaef2d2b",
+            "supporting_locator": {
+              "anchor": "function RunInSandboxSafe(untrusted_code, error_handler)",
+              "anchor_line": 808,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                808,
+                808
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Lua 可见 parser 的 guard；sandbox 的 xpcall 保护代码执行。",
+        "what_it_does_not_prove": "任意非 table/恶意 payload 必可恢复；缺失 Mod character 自动替换；Engine 外层无保护。",
+        "engine_boundary": [
+          "EB-0012-09"
+        ],
+        "runtime_needed": "本轮不注入坏数据；未来仅隔离 fixture/获准的异常测试。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-02"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-03",
+        "candidate_name": "普通 Resume 消费已存在的 GUID",
+        "classification": "NSF",
+        "statement": "ResumeExistingUserSession 在 GetIsServer gate 内查 Ents[guid]；找不到玩家则不进入恢复。该 body 不创建 Player Entity。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::ResumeExistingUserSession"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "ResumeExistingUserSession",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function ResumeExistingUserSession(data, guid)",
+              "anchor_line": 2074,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2074,
+                2074
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "该函数的 entity precondition。",
+        "what_it_does_not_prove": "网络调度不创建新实体；userid 意味旧对象仍活着；普通连接 native 创建顺序。",
+        "engine_boundary": [
+          "EB-0012-05"
+        ],
+        "runtime_needed": "已有 Pass01 S04 的入口观察；创建调度本轮仍静态未闭合。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-03"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-04",
+        "candidate_name": "普通 Resume 不提供 world refs post-pass",
+        "classification": "NSF",
+        "statement": "ResumeExistingUserSession 调 SetPersistData(data.data or {})，未传 newents，也未在该 body 调用 LoadPostPass。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::ResumeExistingUserSession",
+          "entityscript.lua::EntityScript:SetPersistData"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "ResumeExistingUserSession",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function ResumeExistingUserSession(data, guid)",
+              "anchor_line": 2074,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2074,
+                2074
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:SetPersistData",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:SetPersistData(data, newents)",
+              "anchor_line": 1954,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1954,
+                1954
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "此调用点不提供通用 world mapping/post-pass。",
+        "what_it_does_not_prove": "所有嵌套组件无法保存；组件自己的重绑代码不存在；Engine 其他路径不会调用相关接口。",
+        "engine_boundary": [
+          "EB-0012-05"
+        ],
+        "runtime_needed": "R03 可记录 newents presence / load callback coverage；缺外部 target 测试另批。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-04"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-05",
+        "candidate_name": "保存平台缺失时回落 record 世界坐标",
+        "classification": "NSF",
+        "statement": "ResolveSaveRecordPosition 在 puid 找到平台时由 rx/ry/rz 转世界坐标；找不到平台则返回 record.x/y/z，各缺省为 0。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::ResolveSaveRecordPosition"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "ResolveSaveRecordPosition",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "local function ResolveSaveRecordPosition(data)",
+              "anchor_line": 424,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                424,
+                424
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "平台目标缺失的这个明确 fallback。",
+        "what_it_does_not_prove": "所有外部引用具有相同 fallback；落点永远安全；目标平台必恢复。",
+        "engine_boundary": [],
+        "runtime_needed": "R03 常规 placement；缺平台场景不列本轮核心强制项。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-05"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-06",
+        "candidate_name": "userid 由 Network 重新写入实体",
+        "classification": "NSF",
+        "statement": "OnSetOwner 先移除旧 player_userid tag，再从 inst.Network:GetUserID() 写 inst.userid，并按新值加 tag。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::OnSetOwner"
+        ],
+        "side": "Shared；master/local 分支另行执行",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnSetOwner",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "local function OnSetOwner(inst)",
+              "anchor_line": 1001,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1001,
+                1001
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "此 callback 中 identity field/tag 的 writer。",
+        "what_it_does_not_prove": "普通 setowner producer 时点；账号认证或跨 online/offline userid 稳定性；连接和实体寿命相同。",
+        "engine_boundary": [
+          "EB-0012-06"
+        ],
+        "runtime_needed": "R01/R03 观察 callback 后状态，生产者/认证仍 Engine Boundary。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-06"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-07",
+        "candidate_name": "playerspawner 的 userid 历史属于 World",
+        "classification": "NSF",
+        "statement": "playerspawner 的 _players_spawned 表由 SpawnAtLocation 写入 userid=true，OnSave/OnLoad 保存和恢复该表。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/playerspawner.lua::playerspawner:SpawnAtLocation",
+          "components/playerspawner.lua::playerspawner:OnSave",
+          "components/playerspawner.lua::playerspawner:OnLoad"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/playerspawner.lua",
+            "symbol": "playerspawner:SpawnAtLocation",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+            "supporting_locator": {
+              "anchor": "function self:SpawnAtLocation(inst, player, x, y, z, isloading)",
+              "anchor_line": 238,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                238,
+                238
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/playerspawner.lua",
+            "symbol": "playerspawner:OnSave",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+            "supporting_locator": {
+              "anchor": "function self:OnSave()",
+              "anchor_line": 313,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                313,
+                313
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/playerspawner.lua",
+            "symbol": "playerspawner:OnLoad",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+            "supporting_locator": {
+              "anchor": "function self:OnLoad(data)",
+              "anchor_line": 317,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                317,
+                317
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "有独立于当次 Player Entity 的 world-owned userid history；普通 PlayerRemove 不删该 key。",
+        "what_it_does_not_prove": "跨 shard 全局一致；账号永久历史；磁盘 commit/durability。",
+        "engine_boundary": [
+          "EB-0012-01",
+          "EB-0012-02"
+        ],
+        "runtime_needed": "R02/R03/R04 可对照 world history 与 entity incarnation。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-07"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-08",
+        "candidate_name": "HUD 在 local owner 分支构造",
+        "classification": "NSF",
+        "statement": "OnSetOwner 在 inst==ThePlayer 且 HUD 缺失时调用 ActivateHUD；ActivateHUD 创建 PlayerHud 并 SetMainCharacter。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::OnSetOwner",
+          "prefabs/player_common.lua::ActivateHUD"
+        ],
+        "side": "local client / Listen local",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnSetOwner",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "local function OnSetOwner(inst)",
+              "anchor_line": 1001,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1001,
+                1001
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "ActivateHUD",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "local function ActivateHUD(inst)",
+              "anchor_line": 740,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                740,
+                740
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "local HUD 的构造入口；不会从 Session record 反序列化 widget tree。",
+        "what_it_does_not_prove": "owner callback 与 Resume 的总顺序；HUD 已可输入；其他 readiness 同时成立。",
+        "engine_boundary": [
+          "EB-0012-06"
+        ],
+        "runtime_needed": "已有 Pass01 HUD/Controls 子观察；R03/R04 单独记录局部 readiness。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-08"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-09",
+        "candidate_name": "master player factory 创建 classified",
+        "classification": "NSF",
+        "statement": "MakePlayerCharacter 的 master 构造分支 SpawnPrefab(\"player_classified\") 并 SetParent 到当次 player.entity。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::MakePlayerCharacter.fn — classified creation"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "MakePlayerCharacter.fn — classified creation",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst.player_classified = SpawnPrefab(\"player_classified\")",
+              "anchor_line": 2657,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2657,
+                2657
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "该 factory 生成当前 classified 对象；非恢复旧 netvar 对象的调用。",
+        "what_it_does_not_prove": "普通 reconnect dispatcher 的创建全序；远端初始同步完成；GUID 必然递增。",
+        "engine_boundary": [
+          "EB-0012-05",
+          "EB-0012-06"
+        ],
+        "runtime_needed": "已有 Pass01 S04 同端新 classified GUID；R03/R04 检查当前 attach。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-09"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-10",
+        "candidate_name": "Snapshot 恢复具有显式 Deserialize 接口",
+        "classification": "NSF",
+        "statement": "RestoreSnapshotUserSession 显式 GetUserSessionFile 后调用 TheNet:DeserializeUserSession 并在成功 callback 中 SpawnPrefab；InitGame 用 savedata.snapshot.players 调该路径。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::RestoreSnapshotUserSession",
+          "gamelogic.lua::DoInitGame — snapshot restoration"
+        ],
+        "side": "Server",
+        "scope": "当前 snapshot 的普通 Player Session Lua 路径",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "RestoreSnapshotUserSession",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function RestoreSnapshotUserSession(sessionid, userid)",
+              "anchor_line": 2099,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2099,
+                2099
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "gamelogic.lua",
+            "symbol": "DoInitGame — snapshot restoration",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "e6965af1ac127dc4742f9affc896dd251e2ad40fb220f951e0641ca2e534c9b3",
+            "supporting_locator": {
+              "anchor": "RestoreSnapshotUserSession(savedata.meta.session_identifier, v)",
+              "anchor_line": 979,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                979,
+                979
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "显式 snapshot bridge 是单独 Lua 入口。",
+        "what_it_does_not_prove": "普通 reconnect 也由此函数执行；callback 固定同步；完整 rollback 一致性。",
+        "engine_boundary": [
+          "EB-0012-05",
+          "EB-0012-08"
+        ],
+        "runtime_needed": "R04 仅区分正常重启普通 resume 与临时 snapshot restore；rollback 不展开。",
+        "confidence": {
+          "level": "high",
+          "basis": "当前冻结 Lua body 静态检查；非运行确认"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "ROOT-10"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-11",
+        "candidate_name": "GetPersistData 只把组件 OnSave 返回的非空 table 放在对应 component key 下。",
+        "classification": "NSF",
+        "statement": "GetPersistData 只把组件 OnSave 返回的非空 table 放在对应 component key 下。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:GetPersistData"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:GetPersistData",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "local t, refs = v:OnSave()",
+              "anchor_line": 1908,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1903,
+                1922
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "GetPersistData 只把组件 OnSave 返回的非空 table 放在对应 component key 下。",
+        "what_it_does_not_prove": [
+          "This is not a whitelist for vanilla components.",
+          "Only actual entries in components are traversed; replica/HUD/arbitrary entity fields are not traversed by this loop.",
+          "OnSave truthiness is tested, not its function type."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F02"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-12",
+        "candidate_name": "GetPersistData 独立合并组件返回的 refs；组件 data 被筛掉也不阻止这个 refs 合并。",
+        "classification": "NSF",
+        "statement": "GetPersistData 独立合并组件返回的 refs；组件 data 被筛掉也不阻止这个 refs 合并。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:GetPersistData"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:GetPersistData",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "local refs = self.OnSave(self, data)",
+              "anchor_line": 1925,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1916,
+                1932
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "GetPersistData 独立合并组件返回的 refs；组件 data 被筛掉也不阻止这个 refs 合并。",
+        "what_it_does_not_prove": [
+          "refs is not type-checked before pairs.",
+          "Prefab OnSave receives the same root data after the component pass; it can change that data."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F03"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-13",
+        "candidate_name": "SetPersistData 按 add_component_if_missing 显式标志补缺组件，并保留旧格式的循环内补建分支。",
+        "classification": "NSF",
+        "statement": "SetPersistData 按 add_component_if_missing 显式标志补缺组件，并保留旧格式的循环内补建分支。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:SetPersistData",
+          "entityscript.lua::EntityScript:AddComponent"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:SetPersistData",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:SetPersistData(data, newents)",
+              "anchor_line": 1954,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1954,
+                1983
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:AddComponent",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "error(\"component \".. name .. \" does not exist!\")",
+              "anchor_line": 628,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                626,
+                640
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "SetPersistData 按 add_component_if_missing 显式标志补缺组件，并保留旧格式的循环内补建分支。",
+        "what_it_does_not_prove": [
+          "The flag requests AddComponent; it does not embed a deleted component module.",
+          "The compatibility path can add a component after OnPreLoad, unlike the root-flag path."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F05"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-14",
+        "candidate_name": "SetPersistData 的组件加载循环按保存数据的键派发；缺少某组件数据键时不会统一调用该组件 OnLoad(nil)。",
+        "classification": "NSF",
+        "statement": "SetPersistData 的组件加载循环按保存数据的键派发；缺少某组件数据键时不会统一调用该组件 OnLoad(nil)。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:SetPersistData"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:SetPersistData",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "cmp:OnLoad(v, newents)",
+              "anchor_line": 1981,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1963,
+                1988
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "SetPersistData 的组件加载循环按保存数据的键派发；缺少某组件数据键时不会统一调用该组件 OnLoad(nil)。",
+        "what_it_does_not_prove": [
+          "The component pass uses pairs; it supplies no fixed inter-component dependency order.",
+          "A missing component without its add flag is skipped.",
+          "Prefab callbacks can still be invoked with data=nil; their own nil handling is separate."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F06"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-15",
+        "candidate_name": "MakePlayerCharacter 在 master_postinit 后捕获角色 OnSave/OnPreLoad/OnLoad/OnNewSpawn 到 _On*，然后安装 common wrappers。",
+        "classification": "NSF",
+        "statement": "MakePlayerCharacter 在 master_postinit 后捕获角色 OnSave/OnPreLoad/OnLoad/OnNewSpawn 到 _On*，然后安装 common wrappers。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::MakePlayerCharacter / fn",
+          "prefabs/player_common.lua::MakePlayerCharacter / fn"
+        ],
+        "side": "master simulation",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "MakePlayerCharacter / fn",
+            "side": "master simulation",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst.persists = false --handled in a special way",
+              "anchor_line": 2634,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2625,
+                2634
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "MakePlayerCharacter / fn",
+            "side": "master simulation",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst._OnSave = inst.OnSave",
+              "anchor_line": 2944,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2936,
+                2953
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "MakePlayerCharacter 在 master_postinit 后捕获角色 OnSave/OnPreLoad/OnLoad/OnNewSpawn 到 _On*，然后安装 common wrappers。",
+        "what_it_does_not_prove": [
+          "Subsequent Mod hooks may replace or wrap fields; the statement applies to this constructor body."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F08"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-16",
+        "candidate_name": "player_common 的 OnSave 调角色 _OnSave(data)，但不转发其返回 refs。",
+        "classification": "NSF",
+        "statement": "player_common 的 OnSave 调角色 _OnSave(data)，但不转发其返回 refs。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::OnSave"
+        ],
+        "side": "master simulation",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnSave",
+            "side": "master simulation",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst:_OnSave(data)",
+              "anchor_line": 1251,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1213,
+                1253
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "player_common 的 OnSave 调角色 _OnSave(data)，但不转发其返回 refs。",
+        "what_it_does_not_prove": [
+          "Character _OnSave mutations of data remain; its returned refs do not reach GetPersistData through this wrapper.",
+          "Component OnSave refs are a different return path."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F09"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-17",
+        "candidate_name": "player_common 的 OnLoad 在数据恢复工作之前清空 OnNewSpawn、_OnNewSpawn 与 starting_inventory。",
+        "classification": "NSF",
+        "statement": "player_common 的 OnLoad 在数据恢复工作之前清空 OnNewSpawn、_OnNewSpawn 与 starting_inventory。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::OnPreLoad",
+          "prefabs/player_common.lua::OnLoad"
+        ],
+        "side": "master simulation",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnPreLoad",
+            "side": "master simulation",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst:_OnPreLoad(data)",
+              "anchor_line": 1261,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1255,
+                1263
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnLoad",
+            "side": "master simulation",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst:_OnLoad(data)",
+              "anchor_line": 1324,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1265,
+                1325
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "player_common 的 OnLoad 在数据恢复工作之前清空 OnNewSpawn、_OnNewSpawn 与 starting_inventory。",
+        "what_it_does_not_prove": [
+          "These character callbacks do not receive the component OnLoad(data,newents) signature from this wrapper.",
+          "Clearing new-spawn fields is not contingent on data being nonnil."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F10"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-18",
+        "candidate_name": "SerializeUserSession 只接收 GetSaveRecord 的 record，并明确丢弃 references 返回值。",
+        "classification": "NSF",
+        "statement": "SerializeUserSession 只接收 GetSaveRecord 的 record，并明确丢弃 references 返回值。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "networking.lua::SerializeUserSession"
+        ],
+        "side": "local player or server",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "networking.lua",
+            "symbol": "SerializeUserSession",
+            "side": "local player or server",
+            "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+            "supporting_locator": {
+              "anchor": "local playerinfo--[[, refs]] = player:GetSaveRecord()",
+              "anchor_line": 306,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                303,
+                319
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "SerializeUserSession 只接收 GetSaveRecord 的 record，并明确丢弃 references 返回值。",
+        "what_it_does_not_prove": [
+          "The function issues a native request; it does not prove durable disk completion.",
+          "The ignored refs is the second return, not the embedded data table."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F12"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-19",
+        "candidate_name": "SaveGame 返回引用列表不会强制纳入未保存的目标；目标不在 saved_ents 时打印 Missing reference。",
+        "classification": "NSF",
+        "statement": "SaveGame 返回引用列表不会强制纳入未保存的目标；目标不在 saved_ents 时打印 Missing reference。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::SaveGame",
+          "mainfunctions.lua::SaveGame"
+        ],
+        "side": "server",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveGame",
+            "side": "server",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "references[v.GUID] = v",
+              "anchor_line": 1093,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1087,
+                1099
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveGame",
+            "side": "server",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "saved_ents[k].id = k",
+              "anchor_line": 1183,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1181,
+                1187
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "SaveGame 返回引用列表不会强制纳入未保存的目标；目标不在 saved_ents 时打印 Missing reference。",
+        "what_it_does_not_prove": [
+          "saved_ents tracks the filtered top-level loop, not every arbitrary nested record.",
+          "An assigned id does not imply at least one actual external ref existed.",
+          "Missing target may be a filtered/nonpersistent/nested/player record; the print alone does not diagnose why."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F14"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-20",
+        "candidate_name": "SaveGame 对有效 userid 的 AllPlayers 单独 SerializeUserSession，随后才请求 SerializeWorldSession。",
+        "classification": "NSF",
+        "statement": "SaveGame 对有效 userid 的 AllPlayers 单独 SerializeUserSession，随后才请求 SerializeWorldSession。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::SaveGame",
+          "mainfunctions.lua::SaveGame"
+        ],
+        "side": "server",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveGame",
+            "side": "server",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "SerializeUserSession(player)",
+              "anchor_line": 1177,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1168,
+                1179
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveGame",
+            "side": "server",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "SerializeWorldSession(data, save.meta.session_identifier, callback, metadataStr)",
+              "anchor_line": 1273,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1273,
+                1274
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "SaveGame 对有效 userid 的 AllPlayers 单独 SerializeUserSession，随后才请求 SerializeWorldSession。",
+        "what_it_does_not_prove": [
+          "AllPlayers/session iteration is independent of the normal persists entity filter.",
+          "Lua request order is not a shared persistence commit point."
+        ],
+        "engine_boundary": [
+          "EB-0012-02",
+          "EB-0012-03"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F16"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-21",
+        "candidate_name": "Inventory 的 OnLoad 将收到的 newents 原样传给各嵌套 SpawnSaveRecord；普通 Player Resume 没有提供该映射。",
+        "classification": "NSF",
+        "statement": "Inventory 的 OnLoad 将收到的 newents 原样传给各嵌套 SpawnSaveRecord；普通 Player Resume 没有提供该映射。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/inventory.lua::Inventory:OnSave",
+          "components/inventory.lua::Inventory:OnLoad"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/inventory.lua",
+            "symbol": "Inventory:OnSave",
+            "side": "caller-dependent",
+            "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+            "supporting_locator": {
+              "anchor": "function Inventory:OnSave()",
+              "anchor_line": 192,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                192,
+                229
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/inventory.lua",
+            "symbol": "Inventory:OnLoad",
+            "side": "caller-dependent",
+            "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+            "supporting_locator": {
+              "anchor": "function Inventory:OnLoad(data, newents)",
+              "anchor_line": 293,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                293,
+                325
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Inventory 的 OnLoad 将收到的 newents 原样传给各嵌套 SpawnSaveRecord；普通 Player Resume 没有提供该映射。",
+        "what_it_does_not_prove": [
+          "Inventory OnLoad itself does not call child LoadPostPass.",
+          "With newents from world loading, nested records are registered for later PopulateWorld postpass; with player newents=nil they are not registered by this route.",
+          "Nested objects still need a saved.id for old-GUID indexing."
+        ],
+        "engine_boundary": [
+          "EB-0012-05"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F18"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-22",
+        "candidate_name": "Debuffable 的 OnLoad 明确 SpawnSaveRecord 并 RegisterDebuff/AttachTo 宿主，不依赖外部旧GUID post-pass来建立这条宿主关系。",
+        "classification": "NSF",
+        "statement": "Debuffable 的 OnLoad 明确 SpawnSaveRecord 并 RegisterDebuff/AttachTo 宿主，不依赖外部旧GUID post-pass来建立这条宿主关系。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/debuffable.lua::Debuffable:OnSave",
+          "components/debuffable.lua::Debuffable:OnLoad",
+          "components/debuffable.lua::RegisterDebuff"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/debuffable.lua",
+            "symbol": "Debuffable:OnSave",
+            "side": "caller-dependent",
+            "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+            "supporting_locator": {
+              "anchor": "local saved--[[, refs]] = v.inst:GetSaveRecord()",
+              "anchor_line": 133,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                126,
+                137
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/debuffable.lua",
+            "symbol": "Debuffable:OnLoad",
+            "side": "caller-dependent",
+            "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+            "supporting_locator": {
+              "anchor": "local ent = SpawnSaveRecord(v)",
+              "anchor_line": 143,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                139,
+                150
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/debuffable.lua",
+            "symbol": "RegisterDebuff",
+            "side": "caller-dependent",
+            "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+            "supporting_locator": {
+              "anchor": "ent.components.debuff:AttachTo(name, self.inst, self.followsymbol, self.followoffset, data, buffer)",
+              "anchor_line": 86,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                72,
+                93
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Debuffable 的 OnLoad 明确 SpawnSaveRecord 并 RegisterDebuff/AttachTo 宿主，不依赖外部旧GUID post-pass来建立这条宿主关系。",
+        "what_it_does_not_prove": [
+          "The restored host relationship is explicit AttachTo, not generic GUID refs recovery.",
+          "These functions do not explicitly call generic LoadPostPass."
+        ],
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F20"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-23",
+        "candidate_name": "所查持久化 dispatch bodies 直接调用组件/Prefab callback，没有逐组件 pcall 或 continue-on-error 隔离。",
+        "classification": "NSF",
+        "statement": "所查持久化 dispatch bodies 直接调用组件/Prefab callback，没有逐组件 pcall 或 continue-on-error 隔离。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:GetPersistData / SetPersistData / LoadPostPass",
+          "mainfunctions.lua::SaveGame"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:GetPersistData / SetPersistData / LoadPostPass",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "local t, refs = v:OnSave()",
+              "anchor_line": 1908,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1903,
+                1989
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveGame",
+            "side": "server",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "local record, new_references = v:GetSaveRecord()",
+              "anchor_line": 1089,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1068,
+                1274
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "所查持久化 dispatch bodies 直接调用组件/Prefab callback，没有逐组件 pcall 或 continue-on-error 隔离。",
+        "what_it_does_not_prove": [
+          "This is a local Lua-body property, not a claim that there is no outer runtime error handler.",
+          "Nil-return guards do not catch exceptions."
+        ],
+        "engine_boundary": [
+          "EB-0012-09"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F29"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-24",
+        "candidate_name": "DataDumper 对 userdata/thread 有 error 分支，同时对 Lua function 有 string.dump 分支。",
+        "classification": "NSF",
+        "statement": "DataDumper 对 userdata/thread 有 error 分支，同时对 Lua function 有 string.dump 分支。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "dumper.lua::DataDumper"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "dumper.lua",
+            "symbol": "DataDumper",
+            "side": "caller-dependent",
+            "file_sha256": "afa44c9652ee0acd41629b143bdc94526761552b9e89648a7988438270191da0",
+            "supporting_locator": {
+              "anchor": "thread = function() error(\"Cannot dump threads\") end,",
+              "anchor_line": 120,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                82,
+                121
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "DataDumper 对 userdata/thread 有 error 分支，同时对 Lua function 有 string.dump 分支。",
+        "what_it_does_not_prove": [
+          "This does not recommend persisting functions/runtime objects or promise their correct restoration.",
+          "Serializer mode and payload shape can still affect failure."
+        ],
+        "engine_boundary": [
+          "EB-0012-09"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F31"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-25",
+        "candidate_name": "PopulateWorld 有有限原版 prefab replace 表；普通 Player Session parser 没有提供通用 Mod prefab 改名映射。",
+        "classification": "NSF",
+        "statement": "PopulateWorld 有有限原版 prefab replace 表；普通 Player Session parser 没有提供通用 Mod prefab 改名映射。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "gamelogic.lua::replace / PopulateWorld",
+          "gamelogic.lua::PopulateWorld",
+          "mainfunctions.lua::SpawnSaveRecord",
+          "mainfunctions.lua::ParseUserSessionData"
+        ],
+        "side": "world loading",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "gamelogic.lua",
+            "symbol": "replace / PopulateWorld",
+            "side": "world loading",
+            "file_sha256": "e6965af1ac127dc4742f9affc896dd251e2ad40fb220f951e0641ca2e534c9b3",
+            "supporting_locator": {
+              "anchor": "[\"farmplot\"] = \"slow_farmplot\",",
+              "anchor_line": 359,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                357,
+                365
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "gamelogic.lua",
+            "symbol": "PopulateWorld",
+            "side": "world loading",
+            "file_sha256": "e6965af1ac127dc4742f9affc896dd251e2ad40fb220f951e0641ca2e534c9b3",
+            "supporting_locator": {
+              "anchor": "prefab = replace[prefab] or prefab",
+              "anchor_line": 625,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                623,
+                629
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SpawnSaveRecord",
+            "side": "caller-dependent",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "local inst = SpawnPrefab(saved.prefab, saved.skinname, saved.skin_id)",
+              "anchor_line": 440,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                438,
+                483
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "ParseUserSessionData",
+            "side": "caller-dependent",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "return playerdata, playerdata.prefab",
+              "anchor_line": 2068,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2062,
+                2071
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "PopulateWorld 有有限原版 prefab replace 表；普通 Player Session parser 没有提供通用 Mod prefab 改名映射。",
+        "what_it_does_not_prove": [
+          "An existing record.prefab overrides the fallback group name.",
+          "SpawnSaveRecord logs and returns nil when SpawnPrefab yields nil, but not when construction/load throws.",
+          "No generic Mod prefab alias or native missing-mod fallback is proved."
+        ],
+        "engine_boundary": [
+          "EB-0012-05",
+          "EB-0012-09"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-F32"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-26",
+        "candidate_name": "EntityScript:GetPersistData / SetPersistData — SV-E01",
+        "classification": "EI",
+        "statement": "A custom PlayerComponent can participate through the normal components loop if it exists on the serialized player and satisfies OnSave/OnLoad contracts; stable keys or legal add-if-missing/migration handling are still required.",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:GetPersistData / SetPersistData",
+          "networking.lua::SerializeUserSession"
+        ],
+        "side": "caller-dependent",
+        "scope": "当前快照的 component/session save Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:GetPersistData / SetPersistData",
+            "side": "caller-dependent",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "for k, v in pairs(self.components) do",
+              "anchor_line": 1906,
+              "occurrence_zero_based": 2,
+              "auxiliary_range": [
+                1903,
+                1989
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "networking.lua",
+            "symbol": "SerializeUserSession",
+            "side": "caller-dependent",
+            "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+            "supporting_locator": {
+              "anchor": "local playerinfo--[[, refs]] = player:GetSaveRecord()",
+              "anchor_line": 306,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                303,
+                319
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "A custom PlayerComponent can participate through the normal components loop if it exists on the serialized player and satisfies OnSave/OnLoad contracts; stable keys or legal add-if-missing/migration handling are still required.",
+        "what_it_does_not_prove": [
+          "No real-account save/reconnect experiment was performed.",
+          "No gameplay defaults, schema values or names are inferred."
+        ],
+        "engine_boundary": [
+          "EB-0012-01",
+          "EB-0012-02",
+          "EB-0012-05",
+          "EB-0012-09"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "medium",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "SV-E01"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-27",
+        "candidate_name": "savefn — DC-003",
+        "classification": "NSF",
+        "statement": "正常远端客户端的 savefn 分支先 SerializeUserSession(ThePlayer)，随后 postsavefn；它不调用玩家 OnDespawn。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::savefn"
+        ],
+        "side": "Remote client branch",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "savefn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "SerializeUserSession(ThePlayer)",
+              "anchor_line": 1730,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1730,
+                1731
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "TheWorld 非 nil 且非 ismastersim 时进入 else，顺序为会话序列化再 postsavefn。",
+        "what_it_does_not_prove": "只描述该 Lua 分支。序列化函数可因参数 guard 不满足而不提交；不证明远端服务端已保存。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-003"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-28",
+        "candidate_name": "OnPlayerLeave — DC-005",
+        "classification": "NSF",
+        "statement": "OnPlayerLeave 在 mastersim 与有效 Ents 玩家 guard 内依次发 ms_playerdisconnected 和 ms_playerdespawn。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::OnPlayerLeave",
+          "mainfunctions.lua::OnPlayerLeave"
+        ],
+        "side": "Server",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "OnPlayerLeave",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function OnPlayerLeave(player_guid, expected)",
+              "anchor_line": 1761,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1761,
+                1776
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "OnPlayerLeave",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "TheWorld:PushEvent(\"ms_playerdisconnected\"",
+              "anchor_line": 1773,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1773,
+                1774
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "player_guid 必须非 nil，Ents[player_guid] 必须命中；expected 只被包装成 wasExpected 传出，本函数未按它改变 despawn 分支。",
+        "what_it_does_not_prove": "TheWorld.ismastersim 访问依赖入口环境；未证明 native 通知时机、expected 取值或两个不同进程事件顺序。",
+        "engine_boundary": [
+          "EB-0012-07"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-005"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-29",
+        "candidate_name": "PlayerRemove 的普通非delete、非migration ready 分支在 OnDespawn 返回后调用 SerializeUserSession，再调用 player:Remove。",
+        "classification": "NSF",
+        "statement": "PlayerRemove 的普通非delete、非migration ready 分支在 OnDespawn 返回后调用 SerializeUserSession，再调用 player:Remove。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/playerspawner.lua::PlayerRemove",
+          "components/playerspawner.lua::PlayerRemove"
+        ],
+        "side": "Server",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/playerspawner.lua",
+            "symbol": "PlayerRemove",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+            "supporting_locator": {
+              "anchor": "local function PlayerRemove",
+              "anchor_line": 81,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                81,
+                104
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/playerspawner.lua",
+            "symbol": "PlayerRemove",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+            "supporting_locator": {
+              "anchor": "player:DoStaticTaskInTime(0, PlayerRemove, deletesession, migrationdata, true)",
+              "anchor_line": 102,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                102,
+                102
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "else 仅排 task；真分支调用 OnDespawn，deletesession 决定 DeleteUserSession 或设置 migration 并 SerializeUserSession，随后 player:Remove，migration 分支最后 StartMigration。",
+        "what_it_does_not_prove": "原版无独立名为 DespawnPlayer 的 Lua 符号；此处实际函数是 OnPlayerDespawn/PlayerRemove。player 提前被 Remove 会取消它登记的 static task。",
+        "engine_boundary": [
+          "EB-0012-02"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-007"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-30",
+        "candidate_name": "global initialization — DC-010",
+        "classification": "NSF",
+        "statement": "AllPlayers 是 Lua 全局实体列表，在玩家构造时插入，在玩家 prefab OnRemoveEntity 时移除。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "main.lua::global initialization",
+          "prefabs/player_common.lua::player constructor fn",
+          "prefabs/player_common.lua::OnRemoveEntity"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "main.lua",
+            "symbol": "global initialization",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "4bba31a5d2e36dbb95765fee379ec8310d34a9d98fbe7b422968bd9a8876ba46",
+            "supporting_locator": {
+              "anchor": "AllPlayers = {}",
+              "anchor_line": 334,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                334,
+                334
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "player constructor fn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "table.insert(AllPlayers, inst)",
+              "anchor_line": 2414,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2414,
+                2414
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnRemoveEntity",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "table.removearrayvalue(AllPlayers, inst)",
+              "anchor_line": 1186,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1186,
+                1186
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "三处定义、插入和移除直接可见；LookupPlayerInstByUserID 也遍历此列表。",
+        "what_it_does_not_prove": "它不是 native ClientTable、账号连接列表或跨端完全一致的列表；调试生成也走构造。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-010"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-31",
+        "candidate_name": "OnRemoveEntity comments — DC-012",
+        "classification": "NSF",
+        "statement": "客户端 playerexited 可以表示玩家离开当前 network view 并在本地移除，不能据此认定该账号从服务器断线。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/player_common.lua::OnRemoveEntity comments"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnRemoveEntity comments",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "-- \"playerexited\" is available on both server and client.",
+              "anchor_line": 1188,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1188,
+                1192
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "原版注释明确 clients 的 out-of-range network view；server 上该事件与 ms_playerleft 相同，因为玩家在断线前一直处于 server 网络视图范围。",
+        "what_it_does_not_prove": "注释与 Lua 触发定位是静态证据；不把每次 server Remove 外推为唯一正常断线原因。",
+        "engine_boundary": [
+          "EB-0012-07"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-012"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-32",
+        "candidate_name": "ClientDisconnected — DC-013",
+        "classification": "NSF",
+        "statement": "ClientDisconnected(userid) 只在有效世界上广播 ms_clientdisconnected，它不直接调用玩家 despawn、序列化或 Remove。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "networking.lua::ClientDisconnected"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "networking.lua",
+            "symbol": "ClientDisconnected",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+            "supporting_locator": {
+              "anchor": "function ClientDisconnected(userid)",
+              "anchor_line": 951,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                951,
+                955
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "函数体只有 TheWorld 非 nil/IsValid guard 与 PushEvent，payload 只有 userid。",
+        "what_it_does_not_prove": "当前 Lua 中的实际消费方是特殊游戏 lobby 的 OnLobbyClientDisconnected；不能把此函数串成 OnPlayerLeave 的 Lua caller。",
+        "engine_boundary": [
+          "EB-0012-07"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-013"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-33",
+        "candidate_name": "EntityScript:Remove — DC-017",
+        "classification": "NSF",
+        "statement": "全局 OnRemoveEntity(guid) 与 prefab inst.OnRemoveEntity 是不同函数；前者由 EntityScript:Remove 显式调用，做 registry/manager/thread 清理。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:Remove",
+          "mainfunctions.lua::OnRemoveEntity",
+          "entityscript.lua::EntityScript:Remove"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:Remove",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "OnRemoveEntity(self.GUID)",
+              "anchor_line": 1714,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1714,
+                1714
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "OnRemoveEntity",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function OnRemoveEntity(entityguid)",
+              "anchor_line": 501,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                501,
+                532
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:Remove",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "self:OnRemoveEntity()",
+              "anchor_line": 1768,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1768,
+                1768
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "global 函数清 PhysicsCollisionCallbacks，调用 BrainManager/SGManager、KillTasks，删 Ents 和更新集合；prefab hook 在后段另行调用。",
+        "what_it_does_not_prove": "不得把 global OnRemoveEntity 描述为只有 engine 会调用；不得把它等同完整 EntityScript:Remove。",
+        "engine_boundary": [
+          "EB-0012-11"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-017"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-34",
+        "candidate_name": "EntityScript:ListenForEvent — DC-019",
+        "classification": "NSF",
+        "statement": "ListenForEvent 同时维护 source.event_listeners 与 listener.event_listening 两端索引，source 默认 listener 自己。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:ListenForEvent"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:ListenForEvent",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:ListenForEvent(event, fn, source)",
+              "anchor_line": 1188,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1188,
+                1203
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "source.event_listeners[event][self] 与 self.event_listening[event][source] 各保存同 fn。RemoveEventCallback 用同 event/fn/source 删除两端。",
+        "what_it_does_not_prove": "closure 捕获的业务对象不决定 listener/source 所有权；全局输入或自建表不在此注册索引里。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-019"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-35",
+        "candidate_name": "EntityScript:RemoveAllEventCallbacks — DC-020",
+        "classification": "NSF",
+        "statement": "RemoveAllEventCallbacks 既清本实体向外监听的边，也清其他实体监听本实体的反向边。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:RemoveAllEventCallbacks"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:RemoveAllEventCallbacks",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:RemoveAllEventCallbacks()",
+              "anchor_line": 1232,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1232,
+                1262
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "event_listening 分支从 source.event_listeners 删 self；event_listeners 分支从 listener.event_listening 删 self；两张自身表设 nil。",
+        "what_it_does_not_prove": "只清 EntityScript 事件边；不 Remove 外部 listener/source 实体，不清它们其他监听、任务、closure/global cache 或任意字段。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-020"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-36",
+        "candidate_name": "EntityScript 的 DoTask/DoPeriodic 及 static helpers 把 task 登记在调用实体 pendingtasks；组件字段持有 handle 不改变这个 task owner。",
+        "classification": "NSF",
+        "statement": "EntityScript 的 DoTask/DoPeriodic 及 static helpers 把 task 登记在调用实体 pendingtasks；组件字段持有 handle 不改变这个 task owner。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript task helpers",
+          "entityscript.lua::task_finish"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript task helpers",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:DoStaticPeriodicTask",
+              "anchor_line": 1487,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1487,
+                1529
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "task_finish",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "local function task_finish(task, success, inst)",
+              "anchor_line": 1478,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1478,
+                1485
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "四种 helper 创建 scheduler Periodic、保存 pendingtasks[handle] 并挂 task_finish，finish/cancel 移除登记。",
+        "what_it_does_not_prove": "参数或 closure 内引用 player/component 不改变 owner；字段名也不决定 owner。literal componentref 在快照 *.lua 未命中，它仅是研究中的概念名。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-022"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-37",
+        "candidate_name": "EntityScript:RemoveComponent — DC-025",
+        "classification": "NSF",
+        "statement": "RemoveComponent 先清 components[name] 再通知旧组件 OnRemoveFromEntity；它不执行实体整体事件/task 清理，也不自动调 OnRemoveEntity。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "entityscript.lua::EntityScript:RemoveComponent",
+          "entityscript.lua::EntityScript:StopUpdatingComponent"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:RemoveComponent",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:RemoveComponent(name)",
+              "anchor_line": 648,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                648,
+                663
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:StopUpdatingComponent",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "function EntityScript:StopUpdatingComponent(cmp)",
+              "anchor_line": 475,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                475,
+                502
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "保留局部 cmp；停 regular/static 更新（deferred）与 wall 更新，删组件键和 lower shadow，调 cmp:OnRemoveFromEntity，之后 Unreplicate/UnregisterActions。",
+        "what_it_does_not_prove": "组件回调能自行取消资源；宿主仍在时由该宿主创建的 tasks/listeners 不会仅因组件字段被删而全清。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-025"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-38",
+        "candidate_name": "TheWorld 所有的 task 即使捕获或传入 player，也不会因此登记到 player.pendingtasks。",
+        "classification": "NSF",
+        "statement": "TheWorld 所有的 task 即使捕获或传入 player，也不会因此登记到 player.pendingtasks。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/shadowthrall_mouth.lua::ClearBiteTarget",
+          "entityscript.lua::EntityScript:DoTaskInTime"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/shadowthrall_mouth.lua",
+            "symbol": "ClearBiteTarget",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "943be550aa7b582de730182595f0e5733afac7220c7e855bcfe1677474dfe811",
+            "supporting_locator": {
+              "anchor": "TheWorld:DoTaskInTime(cooldown, OnBiteTargetCooldown, inst._bite_target)",
+              "anchor_line": 123,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                123,
+                123
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:DoTaskInTime",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "scheduler:ExecuteInTime(time, fn, self.GUID, self, ...)",
+              "anchor_line": 1524,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1524,
+                1524
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "示例把 bite_target 放参数/表键而 task helper 的 self 是 TheWorld；登记仍在世界 pendingtasks。",
+        "what_it_does_not_prove": "只能按真实 owner/显式业务清理判断何时取消；不承诺示例在玩家断线时会继续执行到期。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-027"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-39",
+        "candidate_name": "ModSafeStartup — DC-028",
+        "classification": "NSF",
+        "statement": "TheGlobalInstance:DoTaskInTime 是 GlobalInstance 实体拥有的 task，与直接 scheduler:ExecuteInTime/Periodic 不登记玩家 pendingtasks 的调用应区分。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "main.lua::ModSafeStartup",
+          "motdmanager.lua::MotdManager:DownloadMotdInfo callback",
+          "scheduler.lua::Scheduler:ExecutePeriodic",
+          "debugsounds.lua::module task registration"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "main.lua",
+            "symbol": "ModSafeStartup",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "4bba31a5d2e36dbb95765fee379ec8310d34a9d98fbe7b422968bd9a8876ba46",
+            "supporting_locator": {
+              "anchor": "TheGlobalInstance = CreateEntity(\"TheGlobalInstance\")",
+              "anchor_line": 441,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                441,
+                441
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "motdmanager.lua",
+            "symbol": "MotdManager:DownloadMotdInfo callback",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "4b36275362fa3a8e306e1f8f67963c11cd69ffb5ff1cfbb7632066a5b7b88ac3",
+            "supporting_locator": {
+              "anchor": "TheGlobalInstance:DoTaskInTime(1",
+              "anchor_line": 549,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                549,
+                549
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "scheduler.lua",
+            "symbol": "Scheduler:ExecutePeriodic",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+            "supporting_locator": {
+              "anchor": "function Scheduler:ExecutePeriodic",
+              "anchor_line": 295,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                295,
+                300
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "debugsounds.lua",
+            "symbol": "module task registration",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "9490e4af1f4fe3f9c163f958f879b0bafa34d49632b91cc73d2f61efc37f0b84",
+            "supporting_locator": {
+              "anchor": "scheduler:ExecutePeriodic(1, DoUpdate)",
+              "anchor_line": 183,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                183,
+                183
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "GlobalInstance 由 CreateEntity 创建，继承实体 helper；raw scheduler 创建 Periodic 保存 attime/list/id/arg，没有写玩家 pendingtasks。",
+        "what_it_does_not_prove": "GlobalInstance/世界/全局调度器整个进程 teardown 行为不从玩家 Remove 推导；raw scheduler 的 id 字段不让 KillTasksWithID 自动覆盖 attime。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-028"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-40",
+        "candidate_name": "EntityScript:Remove 的 CancelAllPendingTasks 发生在晚期 prefab hook 前；原版 hook 存在再次清理 teardown 中新建 task 的例子。",
+        "classification": "NSF",
+        "statement": "EntityScript:Remove 的 CancelAllPendingTasks 发生在晚期 prefab hook 前；原版 hook 存在再次清理 teardown 中新建 task 的例子。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/torch.lua::OnRemoveEntity",
+          "prefabs/abysspillar.lua::OnRemoveEntity",
+          "entityscript.lua::EntityScript:Remove"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/torch.lua",
+            "symbol": "OnRemoveEntity",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "e20aed0ba714e59c5edbe0c69547674a02eaee0c4c4f3cd5c93af2b7bfe2452e",
+            "supporting_locator": {
+              "anchor": "local function OnRemoveEntity(inst)",
+              "anchor_line": 65,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                65,
+                75
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/abysspillar.lua",
+            "symbol": "OnRemoveEntity",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "6bdddd7b0b40ca0de1f026f249d4855a265bac865882988160fba00522bd1591",
+            "supporting_locator": {
+              "anchor": "--V2C: If we had something on our platform at removal",
+              "anchor_line": 560,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                560,
+                564
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "entityscript.lua",
+            "symbol": "EntityScript:Remove",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+            "supporting_locator": {
+              "anchor": "self:CancelAllPendingTasks()",
+              "anchor_line": 1721,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1721,
+                1768
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "torch 注释指出 unequip 已过 CancelAllPendingTasks，并 Cancel ignitesound/extinguishsound；abysspillar 注释指出 OnRemovePlatformFollower 重建 task，末 hook 再 CancelAllPendingTasks。",
+        "what_it_does_not_prove": "不普遍宣称任意 late task 一定实际执行；IsValid/Retire 实际 native 效果仍需运行验证。工程上应清自身 late-created 资源。",
+        "engine_boundary": [
+          "EB-0012-11"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-029"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-41",
+        "candidate_name": "保存后退出的 server 分支先对 AllPlayers 调 OnDespawn；所查 body 没有逐个 player:Remove。",
+        "classification": "NSF",
+        "statement": "保存后退出的 server 分支先对 AllPlayers 调 OnDespawn；所查 body 没有逐个 player:Remove。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "mainfunctions.lua::savefn server branch",
+          "mainfunctions.lua::SaveAndShutdown",
+          "consolecommands.lua::c_shutdown save branch"
+        ],
+        "side": "Server",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "savefn server branch",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "elseif TheWorld.ismastersim then",
+              "anchor_line": 1721,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1721,
+                1728
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "mainfunctions.lua",
+            "symbol": "SaveAndShutdown",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+            "supporting_locator": {
+              "anchor": "function SaveAndShutdown()",
+              "anchor_line": 2425,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                2425,
+                2436
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "consolecommands.lua",
+            "symbol": "c_shutdown save branch",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "bbc1c1a723439b05740c572754ed1942498cc62f3eee446f0ebbe71969dc2d4a",
+            "supporting_locator": {
+              "anchor": "elseif TheWorld.ismastersim then",
+              "anchor_line": 188,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                188,
+                193
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "savefn callback 为 postsavefn；SaveAndShutdown/c_shutdown callback 为 Shutdown。只遍历 OnDespawn，交给 world save。",
+        "what_it_does_not_prove": "这是源码内保存退出路径，不是对所有 OS/server shutdown 的覆盖保证；不能据此保证各实体 Remove/ onremove/MS-playerleft 会逐个发生。",
+        "engine_boundary": [],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-031"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-42",
+        "candidate_name": "JOIN_SERVER branch — DC-035",
+        "classification": "NSF",
+        "statement": "OnNetworkDisconnect 并非只由 engine 调用，当前 Lua 有连接失败等直接调用方。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "gamelogic.lua::JOIN_SERVER branch"
+        ],
+        "side": "Shared helper / caller-dependent",
+        "scope": "当前快照的 disconnect/cleanup Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "gamelogic.lua",
+            "symbol": "JOIN_SERVER branch",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "e6965af1ac127dc4742f9affc896dd251e2ad40fb220f951e0641ca2e534c9b3",
+            "supporting_locator": {
+              "anchor": "local start_worked = TheNet:StartClient",
+              "anchor_line": 1207,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1207,
+                1210
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "StartClient 返回 false 后 Lua 调 OnNetworkDisconnect(ID_DST_USER_CONNECTION_FAILED,true)；全 source 还存在 mainscreen/servercreation 等 caller。",
+        "what_it_does_not_prove": "可作为 native ingress-facing handler，但不得标为无 Lua callers 的纯 engine callback。",
+        "engine_boundary": [
+          "EB-0012-07"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "DC-035"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-43",
+        "candidate_name": "Timer:OnSave — NSF-TIME-002",
+        "classification": "NSF",
+        "statement": "Timer:OnSave 输出每个 timer 的 timeleft、paused、initial_time。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/timer.lua::Timer:OnSave"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/timer.lua",
+            "symbol": "Timer:OnSave",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+            "supporting_locator": {
+              "anchor": "timeleft = self:GetTimeLeft(k),",
+              "anchor_line": 127,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                122,
+                133
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Timer:OnSave 输出每个 timer 的 timeleft、paused、initial_time。",
+        "what_it_does_not_prove": "这个 native 示例不制定所有 Player Buff/Cooldown 的保存或离线计时策略。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-002"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-44",
+        "candidate_name": "Timer:OnLoad 由保存的 timeleft 调用 StartTimer，新建 scheduler task，而不是恢复旧 task handle。",
+        "classification": "NSF",
+        "statement": "Timer:OnLoad 由保存的 timeleft 调用 StartTimer，新建 scheduler task，而不是恢复旧 task handle。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/timer.lua::Timer:OnLoad",
+          "components/timer.lua::Timer:StartTimer"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/timer.lua",
+            "symbol": "Timer:OnLoad",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+            "supporting_locator": {
+              "anchor": "self:StartTimer(k, v.timeleft, v.paused, v.initial_time)",
+              "anchor_line": 139,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                135,
+                142
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/timer.lua",
+            "symbol": "Timer:StartTimer",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+            "supporting_locator": {
+              "anchor": "timer = self.inst:DoTaskInTime(time, OnTimerDone, self, name),",
+              "anchor_line": 44,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                36,
+                54
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Timer:OnLoad 由保存的 timeleft 调用 StartTimer，新建 scheduler task，而不是恢复旧 task handle。",
+        "what_it_does_not_prove": "这个 native 示例不制定所有 Player Buff/Cooldown 的保存或离线计时策略。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-003"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-45",
+        "candidate_name": "Timer:LongUpdate — NSF-TIME-005",
+        "classification": "NSF",
+        "statement": "Timer:LongUpdate 对每个 timer 调用 SetTimeLeft(GetTimeLeft()-dt)，函数自身没有 paused gate；SetTimeLeft 在 paused 分支仍改写 timeleft 并钳制到 >=0。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/timer.lua::Timer:LongUpdate",
+          "components/timer.lua::Timer:SetTimeLeft"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/timer.lua",
+            "symbol": "Timer:LongUpdate",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+            "supporting_locator": {
+              "anchor": "self:SetTimeLeft(k, self:GetTimeLeft(k) - dt)",
+              "anchor_line": 146,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                144,
+                148
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/timer.lua",
+            "symbol": "Timer:SetTimeLeft",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+            "supporting_locator": {
+              "anchor": "self.timers[name].timeleft = math.max(0, time)",
+              "anchor_line": 108,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                104,
+                114
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "Timer:LongUpdate 对每个 timer 调用 SetTimeLeft(GetTimeLeft()-dt)，函数自身没有 paused gate；SetTimeLeft 在 paused 分支仍改写 timeleft 并钳制到 >=0。",
+        "what_it_does_not_prove": "只说明被调用时的行为；不证明普通玩家离线必调用 LongUpdate。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-005"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-46",
+        "candidate_name": "WorldSettingsTimer:OnSave — NSF-TIME-006",
+        "classification": "NSF",
+        "statement": "WorldSettingsTimer:OnSave 把剩余时间除以 maxtime 保存为 timeleft，另存 paused、blocklongupdate、initial_time。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/worldsettingstimer.lua::WorldSettingsTimer:OnSave"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/worldsettingstimer.lua",
+            "symbol": "WorldSettingsTimer:OnSave",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+            "supporting_locator": {
+              "anchor": "timeleft = v.maxtime ~= 0 and self:GetTimeLeft(k) / v.maxtime or 0,",
+              "anchor_line": 182,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                176,
+                190
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "WorldSettingsTimer:OnSave 把剩余时间除以 maxtime 保存为 timeleft，另存 paused、blocklongupdate、initial_time。",
+        "what_it_does_not_prove": "这个 native 示例不制定所有 Player Buff/Cooldown 的保存或离线计时策略。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-006"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-47",
+        "candidate_name": "WorldSettingsTimer 加载以保存比例乘当前 maxtime 恢复时长，尚未注册的 timer 延迟到 AddTimer 再消费数据。",
+        "classification": "NSF",
+        "statement": "WorldSettingsTimer 加载以保存比例乘当前 maxtime 恢复时长，尚未注册的 timer 延迟到 AddTimer 再消费数据。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "components/worldsettingstimer.lua::WorldSettingsTimer:OnLoad",
+          "components/worldsettingstimer.lua::WorldSettingsTimer:AddTimer"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/worldsettingstimer.lua",
+            "symbol": "WorldSettingsTimer:OnLoad",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+            "supporting_locator": {
+              "anchor": "self:StartTimer(name, v.timeleft * self:GetMaxTime(name), v.paused, v.initial_time, v.blocklongupdate)",
+              "anchor_line": 197,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                192,
+                203
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/worldsettingstimer.lua",
+            "symbol": "WorldSettingsTimer:AddTimer",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+            "supporting_locator": {
+              "anchor": "self:StartTimer(name, saved.timeleft * maxtime, saved.paused, saved.initial_time, saved.blocklongupdate)",
+              "anchor_line": 24,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                7,
+                27
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "WorldSettingsTimer 加载以保存比例乘当前 maxtime 恢复时长，尚未注册的 timer 延迟到 AddTimer 再消费数据。",
+        "what_it_does_not_prove": "这个 native 示例不制定所有 Player Buff/Cooldown 的保存或离线计时策略。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-007"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-48",
+        "candidate_name": "attack_attach / attack_detach — NSF-TIME-014",
+        "classification": "NSF",
+        "statement": "食物 attack Buff 的 attach/detach 以 buff inst 为 source 设置/移除 combat.externaldamagemultipliers modifier。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/foodbuffs.lua::attack_attach / attack_detach"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/foodbuffs.lua",
+            "symbol": "attack_attach / attack_detach",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+            "supporting_locator": {
+              "anchor": "target.components.combat.externaldamagemultipliers:SetModifier(inst, TUNING.BUFF_ATTACK_MULTIPLIER)",
+              "anchor_line": 19,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                17,
+                27
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "食物 attack Buff 的 attach/detach 以 buff inst 为 source 设置/移除 combat.externaldamagemultipliers modifier。",
+        "what_it_does_not_prove": "这个 native 示例不制定所有 Player Buff/Cooldown 的保存或离线计时策略。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-014"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-49",
+        "candidate_name": "MakeBuff.fn — NSF-TIME-015",
+        "classification": "NSF",
+        "statement": "foodbuffs 设置 debuff.keepondespawn=true；玩家 OnDespawn 调用 debuffable:RemoveOnDespawn；后者只移除未带 keepondespawn 的 debuff。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/foodbuffs.lua::MakeBuff.fn",
+          "prefabs/player_common.lua::OnDespawn",
+          "components/debuffable.lua::Debuffable:RemoveOnDespawn"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/foodbuffs.lua",
+            "symbol": "MakeBuff.fn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+            "supporting_locator": {
+              "anchor": "inst.components.debuff.keepondespawn = true",
+              "anchor_line": 204,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                200,
+                208
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/player_common.lua",
+            "symbol": "OnDespawn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+            "supporting_locator": {
+              "anchor": "inst.components.debuffable:RemoveOnDespawn()",
+              "anchor_line": 1434,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1417,
+                1435
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/debuffable.lua",
+            "symbol": "Debuffable:RemoveOnDespawn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+            "supporting_locator": {
+              "anchor": "if not (v.inst.components.debuff ~= nil and v.inst.components.debuff.keepondespawn) then",
+              "anchor_line": 42,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                39,
+                51
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "foodbuffs 设置 debuff.keepondespawn=true；玩家 OnDespawn 调用 debuffable:RemoveOnDespawn；后者只移除未带 keepondespawn 的 debuff。",
+        "what_it_does_not_prove": "keepondespawn 证明 despawn 清理例外，不等价于离线按 wall-clock 计时。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-015"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-50",
+        "candidate_name": "spellbookcooldown 的 pctdirty handler 从网络 _pct/180 更新客户端本地 pct。",
+        "classification": "NSF",
+        "statement": "spellbookcooldown 的 pctdirty handler 从网络 _pct/180 更新客户端本地 pct。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/spellbookcooldown.lua::fn",
+          "prefabs/spellbookcooldown.lua::OnPctDirty / OnWallUpdate"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/spellbookcooldown.lua",
+            "symbol": "fn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "bef8888796140d4c13bb0e991ee4d130d568158bf9e087d81e5b28e4f83b9df3",
+            "supporting_locator": {
+              "anchor": "inst._pct = net_byte(inst.GUID, \"spellbookcooldown._pct\", \"pctdirty\")",
+              "anchor_line": 91,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                85,
+                112
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/spellbookcooldown.lua",
+            "symbol": "OnPctDirty / OnWallUpdate",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "bef8888796140d4c13bb0e991ee4d130d568158bf9e087d81e5b28e4f83b9df3",
+            "supporting_locator": {
+              "anchor": "inst.pct = inst._pct:value() / 180",
+              "anchor_line": 49,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                48,
+                63
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "spellbookcooldown 的 pctdirty handler 从网络 _pct/180 更新客户端本地 pct。",
+        "what_it_does_not_prove": "运行中网络同步与本地预览；OnWallUpdate 这个名字不证明离线 wall-clock 回补。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-016"
+      }
+    },
+    {
+      "original_claim": {
+        "candidate_id": "NC-0012-51",
+        "candidate_name": "基础 SpellBookCooldowns 组件及 spellbookcooldown prefab 所示两个文件没有提供 OnSave/OnLoad 接口。",
+        "classification": "NSF",
+        "statement": "基础 SpellBookCooldowns 组件及 spellbookcooldown prefab 所示两个文件没有提供 OnSave/OnLoad 接口。",
+        "snapshot": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "source_symbol": [
+          "prefabs/spellbookcooldown.lua::fn",
+          "components/spellbookcooldowns.lua::SpellBookCooldowns constructor / full file"
+        ],
+        "side": "Server component / local projection branch as source declares",
+        "scope": "当前快照的 time/state Lua 路径；具体 guard 以所列 body 为准",
+        "evidence": [
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "prefabs/spellbookcooldown.lua",
+            "symbol": "fn",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "bef8888796140d4c13bb0e991ee4d130d568158bf9e087d81e5b28e4f83b9df3",
+            "supporting_locator": {
+              "anchor": "inst.persists = false",
+              "anchor_line": 120,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                113,
+                124
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          },
+          {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "file": "components/spellbookcooldowns.lua",
+            "symbol": "SpellBookCooldowns constructor / full file",
+            "side": "caller-dependent; exact branch in scope",
+            "file_sha256": "6fa7fc253d426c6b0937f36b8d701b2bdd28df334fadac61913b28c222d45568",
+            "supporting_locator": {
+              "anchor": "self.cooldowns = {}",
+              "anchor_line": 4,
+              "occurrence_zero_based": 0,
+              "auxiliary_range": [
+                1,
+                87
+              ],
+              "priority": "file + symbol + snapshot"
+            },
+            "evidence_mode": "static_source_inspection",
+            "runtime_verified": false
+          }
+        ],
+        "what_it_proves": "基础 SpellBookCooldowns 组件及 spellbookcooldown prefab 所示两个文件没有提供 OnSave/OnLoad 接口。",
+        "what_it_does_not_prove": "仅限这组原版接口，未断言所有角色自定义逻辑都不会另存相关信息。 这不排除角色另外显式保存相关业务字段，也不证明 native parent retirement 过程。",
+        "engine_boundary": [
+          "EB-0012-12"
+        ],
+        "runtime_needed": {
+          "test": "T-P0-02",
+          "execution_status": "NOT_RUN",
+          "purpose": "未来对实际调用/恢复样本取证；不把静态结论称为 RV。"
+        },
+        "confidence": {
+          "level": "high",
+          "basis": "fixed snapshot 静态证据；推论限制在已列条件"
+        },
+        "canonicalization_performed": false,
+        "runtime_verified": false,
+        "draft_origin_alias": "NSF-TIME-017"
+      }
+    }
+  ]
+}

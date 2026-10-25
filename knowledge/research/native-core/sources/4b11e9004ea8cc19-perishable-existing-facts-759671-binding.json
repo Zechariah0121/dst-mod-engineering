@@ -1,0 +1,207 @@
+{
+  "facts": [
+    {
+      "id": "W27-CLOSEOUT-PERISH-SETPERCENT",
+      "kind": "NSF",
+      "classification": "DirectLuaSourceFact",
+      "statement": "在759671/build26148036，Perishable:SetPercent(percent) 在 self.perishtime 为真值时将 percent clamp 到 [0,1]，把 self.perishremainingtime 设为 percent*self.perishtime，并以 self.inst.components.perishable:GetPercent() 为 percent 字段发送 perishchange。随后独立于前述 perishtime 条件，只有 self.updatetask 为真值才调用 self:StartPerishing()；没有活动 task 时不会由此启动计时。该方法体不直接调用 Perish，也没有显式 return。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 223,
+          "line_end": 233,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "11af57016a698ac28723ed69d6954aae6aadc775abb96faa85087af03fad80fe",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "0b9889bf835d8c98c1bfb367b4757987163d5aa48dabfa742853ad00372a5aac"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        }
+      ],
+      "conditions": [
+        "所述命名方法/分支采用759671冻结Lua默认实现；引用链正常返回，未被第三方覆盖改变。",
+        "所引用表达式和调用满足其输入要求并正常返回；本事实不证明异常路径或第三方覆盖后的行为。"
+      ],
+      "limits": [
+        "静态Lua证据；不证明native/C++、真实专服/远端客户端、实际输入可达性、Mod组合或游戏Runtime通过。",
+        "本fact只对应逐字statement与列明分支，不把比较旧引文作为当前行为证据。",
+        "knowledge/retrieval/coding状态不因新来源升级；Coding HOLD与Runtime未验证边界保留。"
+      ],
+      "does_not_prove": [
+        "静态Lua证据；不证明native/C++、真实专服/远端客户端、实际输入可达性、Mod组合或游戏Runtime通过。",
+        "本fact只对应逐字statement与列明分支，不把比较旧引文作为当前行为证据。",
+        "knowledge/retrieval/coding状态不因新来源升级；Coding HOLD与Runtime未验证边界保留。"
+      ],
+      "runtime_verified": false,
+      "lineage": [
+        {
+          "source_ref": {
+            "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+            "sha256": "d9195ba97a2c149b4b3f079646785e4dfe7c163f4474192cbb335f89e8366cf1",
+            "pointer": "/facts/3"
+          },
+          "source_id": "G03-PERISH-UNCHANGED-ADJACENT",
+          "source_kind": "NSF",
+          "source_classification": null,
+          "source_statement": "SetPercent still writes the clamped fraction, sends perishchange and restarts only an existing task; no direct Perish. StartPerishing cancels any old task then unconditionally schedules a new one and random start_dt; StopPerishing only cancels/nils the task. LongUpdate still calls Update only when a task exists.",
+          "relation": "Bind this named method branch already stated in the original NSF and fully present in its original citation; exact control flow is checked against that unchanged frozen range.",
+          "preserved_lineage_ref": {
+            "artifact_path": "research/native-core/sources/e5d1ce11f3fd2433-whole-claims-759671-declaration-enclosure.json",
+            "sha256": "c900131e6c73b28ca665e6261219220a1a15114c2c56b669ead175ce357a793b",
+            "pointer": "/facts/39/lineage/1"
+          }
+        }
+      ],
+      "upstream_citation_ref": {
+        "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+        "sha256": "d9195ba97a2c149b4b3f079646785e4dfe7c163f4474192cbb335f89e8366cf1",
+        "pointer": "/facts/3/citations/0"
+      },
+      "canonical_target": {
+        "record_id": "ID-C05",
+        "record_pointer": "/entries/70/claims/5"
+      }
+    },
+    {
+      "id": "W27-CLOSEOUT-PERISH-LONGUPDATE",
+      "kind": "NSF",
+      "classification": "DirectLuaSourceFact",
+      "statement": "在759671/build26148036，Perishable:LongUpdate(dt) 只有在 self.updatetask ~= nil 时才清空 self.start_dt、用 GetTaskRemaining(self.updatetask) 保存 remaining，并调用 Update(self.inst, dt or 0)。调用返回后，仅当 self.updatetask 仍为真值、self.start_dt == nil 且 remaining >= 0 时，才把 self.start_dt 还原为 remaining；没有 task 时不进入该分支，也不调用 Update。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 251,
+          "line_end": 271,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "b79fdbaee83040de425a754a7de6ef4ddd831cf639e5b7b05b01e76f29f2e2b9",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "5f2e619fb46555284e088f23a2288aa85773943f2201f7a6200dd9211337636b"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        }
+      ],
+      "conditions": [
+        "所述命名方法/分支采用759671冻结Lua默认实现；引用链正常返回，未被第三方覆盖改变。",
+        "所引用表达式和调用满足其输入要求并正常返回；本事实不证明异常路径或第三方覆盖后的行为。"
+      ],
+      "limits": [
+        "静态Lua证据；不证明native/C++、真实专服/远端客户端、实际输入可达性、Mod组合或游戏Runtime通过。",
+        "本fact只对应逐字statement与列明分支，不把比较旧引文作为当前行为证据。",
+        "knowledge/retrieval/coding状态不因新来源升级；Coding HOLD与Runtime未验证边界保留。"
+      ],
+      "does_not_prove": [
+        "静态Lua证据；不证明native/C++、真实专服/远端客户端、实际输入可达性、Mod组合或游戏Runtime通过。",
+        "本fact只对应逐字statement与列明分支，不把比较旧引文作为当前行为证据。",
+        "knowledge/retrieval/coding状态不因新来源升级；Coding HOLD与Runtime未验证边界保留。"
+      ],
+      "runtime_verified": false,
+      "lineage": [
+        {
+          "source_ref": {
+            "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+            "sha256": "d9195ba97a2c149b4b3f079646785e4dfe7c163f4474192cbb335f89e8366cf1",
+            "pointer": "/facts/3"
+          },
+          "source_id": "G03-PERISH-UNCHANGED-ADJACENT",
+          "source_kind": "NSF",
+          "source_classification": null,
+          "source_statement": "SetPercent still writes the clamped fraction, sends perishchange and restarts only an existing task; no direct Perish. StartPerishing cancels any old task then unconditionally schedules a new one and random start_dt; StopPerishing only cancels/nils the task. LongUpdate still calls Update only when a task exists.",
+          "relation": "Bind this named method branch already stated in the original NSF and fully present in its original citation; exact control flow is checked against that unchanged frozen range.",
+          "preserved_lineage_ref": {
+            "artifact_path": "research/native-core/sources/e5d1ce11f3fd2433-whole-claims-759671-declaration-enclosure.json",
+            "sha256": "c900131e6c73b28ca665e6261219220a1a15114c2c56b669ead175ce357a793b",
+            "pointer": "/facts/39/lineage/1"
+          }
+        }
+      ],
+      "upstream_citation_ref": {
+        "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+        "sha256": "d9195ba97a2c149b4b3f079646785e4dfe7c163f4474192cbb335f89e8366cf1",
+        "pointer": "/facts/3/citations/1"
+      },
+      "canonical_target": {
+        "record_id": "ID-C05",
+        "record_pointer": "/entries/70/claims/6"
+      }
+    }
+  ],
+  "source_scope": {
+    "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+    "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+    "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+    "source_commit": null,
+    "game_version_txt": "759671",
+    "steam_buildid": "26148036",
+    "steam_branch": "public",
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "comparison_baseline": {
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "game_version_txt": "756039",
+      "steam_buildid": "25643519",
+      "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+    },
+    "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+    "runtime_game_verified": false,
+    "not_proven": [
+      "native/C++ behavior",
+      "remote-client timing/visibility",
+      "input reachability for conditional risks",
+      "save migration success on real/custom saves",
+      "actual Mod compatibility"
+    ]
+  }
+}

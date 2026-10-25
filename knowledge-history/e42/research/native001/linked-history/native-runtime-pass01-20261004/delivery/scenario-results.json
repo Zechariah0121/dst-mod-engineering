@@ -1,0 +1,2216 @@
+{
+  "scenarios": [
+    {
+      "observational_subclaims": [
+        {
+          "subclaim_id": "SC-fresh",
+          "description": "Actual instrumented public entry observed: networking.lua:SpawnNewPlayerOnServerFromSim",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 43,
+              "source_symbol": "networking.lua:SpawnNewPlayerOnServerFromSim",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 43,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1547
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-disable_protection",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:DisableLoadingProtection",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 75,
+              "source_symbol": "prefabs/player_common.lua:DisableLoadingProtection",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 75,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1583
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-hud",
+          "description": "HUD and Controls present at SetMainCharacter return.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 39,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 39,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1543
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 40,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 40,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1544
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=0 argument=1 after=1; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 92,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 92,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1600
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 93,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 93,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1601
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=1 argument=2 after=2; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 98,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 98,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1606
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 101,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 101,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1609
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 106,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 106,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1614
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 110,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 110,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1618
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-client",
+          "description": "READY state accepted by the sampled native client handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 106,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 106,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1614
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 110,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 110,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1618
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=0 argument=1 after=1; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 94,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 94,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1602
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 97,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 97,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1605
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=1 argument=2 after=2; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 102,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 102,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1610
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 105,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 105,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1613
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 111,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 111,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1619
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 115,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 115,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1623
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-server",
+          "description": "READY state accepted by the sampled native server handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 111,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 111,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1619
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 115,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 115,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1623
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-player",
+          "description": "Producer dispatch observed: playeractivated on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 78,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 78,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1586
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-world",
+          "description": "Producer dispatch observed: playeractivated on world.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 81,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 81,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1589
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-client",
+          "description": "Producer dispatch observed: skilltreeinitialized_client on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 107,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 107,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1615
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-server",
+          "description": "Producer dispatch observed: ms_skilltreeinitialized on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 112,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 112,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1620
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-listen-client",
+          "description": "Public client handler observed in listen_host context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 92,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 92,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1600
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 98,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 98,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1606
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 106,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 106,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1614
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-listen-server",
+          "description": "Public server handler observed in listen_host context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 94,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 94,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1602
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 102,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 102,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1610
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S01",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:896e82017a3c6ba69d10ec73",
+              "shard_id": "0",
+              "local_sequence": 111,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 125096,
+              "classified_GUID": 125097,
+              "userid_key": "u:076a821575060b2e",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 111,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 1619
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        }
+      ]
+    },
+    null,
+    {
+      "observational_subclaims": [
+        {
+          "subclaim_id": "SC-fresh",
+          "description": "Actual instrumented public entry observed: networking.lua:SpawnNewPlayerOnServerFromSim",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 39,
+              "source_symbol": "networking.lua:SpawnNewPlayerOnServerFromSim",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 568,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 517
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-attach",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:AttachClassified",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 38,
+              "source_symbol": "prefabs/player_common.lua:AttachClassified",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 227,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2062
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-disable_protection",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:DisableLoadingProtection",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 77,
+              "source_symbol": "prefabs/player_common.lua:DisableLoadingProtection",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 606,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 557
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-remove",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:OnRemoveEntity",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 181,
+              "source_symbol": "prefabs/player_common.lua:OnRemoveEntity",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 710,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 667
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-hud",
+          "description": "HUD and Controls present at SetMainCharacter return.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 33,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": null,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 222,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2057
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 34,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": null,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 223,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2058
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=0 argument=1 after=1; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 59,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 248,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2084
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 60,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 249,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2085
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 258,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2095
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 262,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2099
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-client",
+          "description": "READY state accepted by the sampled native client handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 258,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2095
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 262,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2099
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=1 argument=2 after=3; rejected=False; nested forward call=True. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 67,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 256,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2093
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 75,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 264,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2101
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 258,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2095
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 262,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2099
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=1 argument=2 after=2; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 82,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 611,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 562
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 85,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 614,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 565
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=0 argument=1 after=2; rejected=False; nested forward call=True. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 80,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 609,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 560
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 87,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 616,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 567
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 82,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 611,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 562
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 85,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 614,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 565
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 88,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 617,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 568
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 92,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 621,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 572
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-server",
+          "description": "READY state accepted by the sampled native server handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 88,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 617,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 568
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 92,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 621,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 572
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-player",
+          "description": "Producer dispatch observed: playeractivated on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 52,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 241,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2077
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-world",
+          "description": "Producer dispatch observed: playeractivated on world.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 55,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 244,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2080
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-client",
+          "description": "Producer dispatch observed: skilltreeinitialized_client on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 70,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 259,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2096
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-server",
+          "description": "Producer dispatch observed: ms_skilltreeinitialized on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 89,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 618,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 569
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-remote-client",
+          "description": "Public client handler observed in remote_client context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 59,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 248,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2084
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 67,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 256,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2093
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:2c56dbdb52c33a2f3bd2f861",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 101920,
+              "classified_GUID": 101919,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 258,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2095
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-dedicated-server",
+          "description": "Public server handler observed in dedicated_server context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 80,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 609,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 560
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 82,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 611,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 562
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S03",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 88,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119358,
+              "classified_GUID": 119359,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 617,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 568
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        }
+      ]
+    },
+    {
+      "observational_subclaims": [
+        {
+          "subclaim_id": "SC-resume",
+          "description": "Actual instrumented public entry observed: mainfunctions.lua:ResumeExistingUserSession",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 222,
+              "source_symbol": "mainfunctions.lua:ResumeExistingUserSession",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 751,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 718
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-persist",
+          "description": "Actual instrumented public entry observed: entityscript.lua:SetPersistData",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 223,
+              "source_symbol": "entityscript.lua:SetPersistData",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 752,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 719
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-attach",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:AttachClassified",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 38,
+              "source_symbol": "prefabs/player_common.lua:AttachClassified",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 378,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2481
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-enable_protection",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:EnableLoadingProtection",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 229,
+              "source_symbol": "prefabs/player_common.lua:EnableLoadingProtection",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 758,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 725
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-disable_protection",
+          "description": "Actual instrumented public entry observed: prefabs/player_common.lua:DisableLoadingProtection",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 260,
+              "source_symbol": "prefabs/player_common.lua:DisableLoadingProtection",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 789,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 757
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-hud",
+          "description": "HUD and Controls present at SetMainCharacter return.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 33,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": null,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 373,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2476
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 34,
+              "source_symbol": "screens/playerhud.lua:PlayerHud:SetMainCharacter",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": null,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 374,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2477
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=0 argument=1 after=1; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 59,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 399,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2503
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 60,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 400,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2504
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 409,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2514
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 413,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2518
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-client",
+          "description": "READY state accepted by the sampled native client handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 409,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2514
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 413,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2518
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-client",
+          "description": "Observed handler state boundary: before=1 argument=2 after=3; rejected=False; nested forward call=True. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 67,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 407,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2512
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 75,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 415,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2520
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 409,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2514
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 73,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_exit",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 413,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2518
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=1 argument=2 after=2; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 265,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 794,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 762
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 268,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 797,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 765
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=0 argument=1 after=2; rejected=False; nested forward call=True. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 263,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 792,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 760
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 270,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 799,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 767
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 265,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 794,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 762
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 268,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 797,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 765
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-guard-server",
+          "description": "Observed handler state boundary: before=2 argument=3 after=3; rejected=False; nested forward call=False. No immediate-write ordering claim.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 271,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 800,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 768
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 275,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 804,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 772
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-ready-server",
+          "description": "READY state accepted by the sampled native server handler.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 271,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 800,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 768
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 275,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_exit",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 804,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 772
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-player",
+          "description": "Producer dispatch observed: playeractivated on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 52,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 392,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2496
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-activated-world",
+          "description": "Producer dispatch observed: playeractivated on world.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 55,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 395,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2499
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-client",
+          "description": "Producer dispatch observed: skilltreeinitialized_client on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 70,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 410,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2515
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-initialized-server",
+          "description": "Producer dispatch observed: ms_skilltreeinitialized on player.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 272,
+              "source_symbol": "entityscript.lua:PushEvent",
+              "event": "event_dispatch",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 801,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 769
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-remote-client",
+          "description": "Public client handler observed in remote_client context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 59,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 399,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2503
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 67,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 407,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2512
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "client-os-39576",
+              "process_epoch": "collector:182cd5f56b925ff64d6a5137",
+              "shard_id": "0",
+              "local_sequence": 69,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Client",
+              "event": "method_enter",
+              "player_GUID": 100155,
+              "classified_GUID": 100154,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 409,
+              "raw_file": "S04-final-03-client_log.log",
+              "raw_line": 2514
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        },
+        {
+          "subclaim_id": "SC-context-dedicated-server",
+          "description": "Public server handler observed in dedicated_server context; no scheduler/RPC transport assertion.",
+          "result": "CONFIRMED",
+          "evidence": [
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 263,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 792,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 760
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 265,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 794,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 762
+            },
+            {
+              "run_id": "n0011-p01-20261004-01",
+              "scenario_id": "S04",
+              "process_id": "dedicated-epoch01",
+              "process_epoch": "collector:120be39d832b17177cbe9a04",
+              "shard_id": "0",
+              "local_sequence": 271,
+              "source_symbol": "prefabs/player_common_extensions.lua:OnPostActivateHandshake_Server",
+              "event": "method_enter",
+              "player_GUID": 119396,
+              "classified_GUID": 119397,
+              "userid_key": "u:68ae0a9f24385743",
+              "file": "evidence\\normalized-events.jsonl",
+              "line": 800,
+              "raw_file": "S04-final-04-dedicated-stdout.log",
+              "raw_line": 768
+            }
+          ],
+          "scope": "This observed process/player/call only; no native implementation or global ordering claim."
+        }
+      ]
+    }
+  ]
+}

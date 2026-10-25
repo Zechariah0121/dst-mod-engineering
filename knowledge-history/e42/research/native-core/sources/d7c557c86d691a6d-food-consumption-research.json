@@ -1,0 +1,1157 @@
+{
+  "scope": {
+    "finite_questions": [
+      "CanEat与实际接受函数、custom diet输入",
+      "Eat三stat/倍率/custom_stats_mod_fn/事件/回调/消费/状态/正常返回",
+      "Edible三个getter与oneaten签名、eater上下文、callback次数",
+      "ACTIONS.EAT target/invobject与不存在currentowner fallback",
+      "仅一个fresh ordinary carrot food接线"
+    ],
+    "stopping_condition_zh": "实际语料缺口验证后，普通EAT→Eater→Edible→默认单件消费及一个food样本闭合即停止；scopedResearchReady仅指FC-P01..FC-P04四个所选静态合同；carrot只作辅助接线样本，独立接受证据放在外部review文件。",
+    "only_food_sample": "carrot (fresh normal item)",
+    "source_only_cloud_distillation": true,
+    "baseline_canonical_repo_old_artifact_writes": false,
+    "r2_dependency_or_file_changes": false,
+    "user_computer_remote_saved_environment_cloudtask_runtime_install_or_game_used": false,
+    "raw_vanilla_source_in_deliverables": false,
+    "outside_scope": [
+      "所有食物/特殊饮食目录",
+      "全部buff/烹饪/腐败/stack/owner重复核心",
+      "第二条完整EAT UI/SG/RPC/network链",
+      "native Spawn/transport/disk未知映射",
+      "runtime/game/install/native validation",
+      "forced ledger/ack/protocol架构"
+    ]
+  },
+  "citations": [
+    {
+      "id": "FC-C01",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "oncaneat and Eater constructor",
+      "line_start": 1,
+      "line_end": 46,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "36773194512fc0d0233615088f5889ee222ed1f70d2542f0fad1a074c3a553f3",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L1-L46"
+    },
+    {
+      "id": "FC-C02",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "SetDiet / SetAbsorptionModifiers",
+      "line_start": 52,
+      "line_end": 61,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "46b2a12a5d2ddbd0c60dab903916a9986451b2b01fb09413f527e62806472d93",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L52-L61"
+    },
+    {
+      "id": "FC-C03",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "SetPrefersEatingTag",
+      "line_start": 121,
+      "line_end": 127,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "ecbca2f389ca159ebddbdd239b4a7c7421df4ca0634bfdd892767e0ee58831cc",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L121-L127"
+    },
+    {
+      "id": "FC-C04",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "CanProcessSpoiledItem / SetOnEatFn / DoFoodEffects",
+      "line_start": 188,
+      "line_end": 206,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "f2ceb1ea81f4b2cc33edca57e77150b482ce6e2d6ed9da62114407328b086e74",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L188-L206"
+    },
+    null,
+    {
+      "id": "FC-C06",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "Eat gate/multipliers/per-stat getter inputs/custom stat callback",
+      "line_start": 230,
+      "line_end": 278,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "a86a36a14fe9b628b5eb061dc5898a136b8f25a8e3feb2fb931a891f8517aa62",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L230-L278"
+    },
+    {
+      "id": "FC-C07",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "Eat DoDelta calls / optional feeder events",
+      "line_start": 280,
+      "line_end": 300,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "206b4cafc7d46649928f25cc48b979718d30a863ba97c4a65b2dbabbd4c792e1",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L280-L300"
+    },
+    {
+      "id": "FC-C08",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "Eat callbacks/consumption/last-time/memory/normal result",
+      "line_start": 302,
+      "line_end": 318,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "dc2c2ab0c1104bd34f6c575eda65e79b455dfcb780b678489f6329a1b430f774",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L302-L318"
+    },
+    {
+      "id": "FC-C09",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/eater.lua",
+      "symbol": "TestFood / PrefersToEat / CanEat",
+      "line_start": 320,
+      "line_end": 354,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "range_sha256": "9cf2dd3d153ebd61584fc8a39a97b1b277e0534786e1e5abdcd1c13ecab2e98f",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/eater.lua#L320-L354"
+    },
+    null,
+    {
+      "id": "FC-C11",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "GetSanity(eater)",
+      "line_start": 72,
+      "line_end": 94,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "182f2eafad0660ae62a320d04de60151ccbb6f545102a45294989eb620fabfd3",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L72-L94"
+    },
+    {
+      "id": "FC-C12",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "GetHunger(eater)",
+      "line_start": 96,
+      "line_end": 119,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "577bbaec6da851289941c45468b1104b96a6debbcf703bed8f7d47a04e714b5b",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L96-L119"
+    },
+    {
+      "id": "FC-C13",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "GetHealth(eater)",
+      "line_start": 121,
+      "line_end": 143,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "9aa66e59d35bde3a940a88dad79fc3972b0b4565404859dbaab4485944d7e770",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L121-L143"
+    },
+    {
+      "id": "FC-C14",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "SetOnEatenFn / SetHandleRemoveFn / SetOverrideStackMultiplierFn",
+      "line_start": 149,
+      "line_end": 159,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "5cc9e9615fb123fb3c847b994dd620388f70c713beb318f21edf0f656e3dbe9e",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L149-L159"
+    },
+    {
+      "id": "FC-C15",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "SetGetHealthFn / SetGetSanityFn",
+      "line_start": 175,
+      "line_end": 181,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "64349ce057224585b28918d00c56f3d6a1b1a7ef9754f18dfa91926bb9cfd082",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L175-L181"
+    },
+    {
+      "id": "FC-C16",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "OnEaten(eater) callback/temperature/event/sound",
+      "line_start": 183,
+      "line_end": 214,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "367dd9d6982de2078bd0c74ed619b046829617fa1cffc947d4403369368fb94c",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L183-L214"
+    },
+    {
+      "id": "FC-C17",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "HandleEatRemove(eatwholestack)",
+      "line_start": 216,
+      "line_end": 226,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "25b6a8f8da9a11c6a14a6ad990c249f6d7604b0c4550a7d092ff473c7e7b0248",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L216-L226"
+    },
+    {
+      "id": "FC-C18",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/edible.lua",
+      "symbol": "GetStackMultiplier()",
+      "line_start": 228,
+      "line_end": 236,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "range_sha256": "72e60e66ee4ae4a36e9f0490a81e2b928b78b9cced439d647f9faf8542526c71",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/edible.lua#L228-L236"
+    },
+    {
+      "id": "FC-C19",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/actions.lua",
+      "symbol": "ACTIONS.EAT.fn",
+      "line_start": 793,
+      "line_end": 804,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "543bc2b26281bc7e846c47f4c8bbc64de7e91c4e3f910b2338113f052e328f80",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "new_interface_source",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L793-L804"
+    },
+    {
+      "id": "FC-C20",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "INVENTORY.edible candidate (self-EAT branch plus mount exclusion)",
+      "line_start": 2589,
+      "line_end": 2632,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "5029e8d381d0524dcf0a2727207d61474ed43c420fa308385bc94b23f25391a8",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "narrow_candidate_consumer",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L2589-L2632"
+    },
+    {
+      "id": "FC-C30",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "INVENTORY collector kind/signature",
+      "line_start": 2513,
+      "line_end": 2513,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "43e569d2c3ee61fae0db83144d598b693dd6f278af305f407ef21c3b034d8426",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "reuse_collector_kind",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L2513-L2513"
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "id": "FC-C28",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/stackable.lua",
+      "symbol": "Stackable:Get(num) default 1 and returned split/original entity",
+      "line_start": 109,
+      "line_end": 152,
+      "line_numbers": "inclusive 1-based",
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "range_sha256": "ca86b21ee968fdc7562d868aa4d13ac5c10067bbe203709798b2e8d06c4627ff",
+      "citation_scheme": "LF-joined-lines-no-trailing-newline",
+      "role": "reuse_split_not_new_core",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L109-L152"
+    }
+  ],
+  "sample_only": [
+    {
+      "id": "FC-SAMPLE-CARROT",
+      "claim_kind": "SingleOrdinaryFoodConsumer_SourceSampleOnly",
+      "only_food": "carrot (fresh normal item, non-quagmire, unmodified eating hooks)",
+      "statement_zh": "MakeVegStats映射health/hunger/sanity；carrot生食条目为health=TUNING.HEALING_TINY、hunger=TUNING.CALORIES_SMALL、sanity=0、perishtime=TUNING.PERISH_MED、secondary_foodtype=nil。fresh factory SetPristine之后非mastersim返回；server侧配置edible为VEGGIE与这些stat、perishable、stackable，后续inventoryitem存在。FOODGROUP.OMNI含VEGGIE，故正常默认Eater的类型匹配可接受此food。normal非quagmire且未有其他Mod改写时，所读carrot fresh factory未设置SetOnEatenFn/SetHandleRemoveFn/SetOverrideStackMultiplierFn，默认single consumption沿组件合同；quagmire条件会调用外部master_postinit，不把该特殊模式纳入此默认样本；此样本只证明脚本接线和静态条件，不声称已生成实体、当前状态、实际HP/hunger变化或所有食物相同。",
+      "citation_ids": [
+        "FC-C01",
+        "FC-C09",
+        "FC-C10",
+        "FC-C17",
+        "FC-C21",
+        "FC-C22",
+        "FC-C23",
+        "FC-C24",
+        "FC-C25",
+        "FC-C26",
+        "FC-C27",
+        "FC-C29"
+      ],
+      "reused_exporter": "R-FOOD-EXPORT",
+      "symbolic_values_not_new_constants_catalog": true,
+      "native_spawn_nil_minus1_exception_mapping_unchanged": true,
+      "runtime_tested": false,
+      "canonical": false
+    }
+  ],
+  "reviewer_only": {
+    "cached_diet_tags_zh": "GetEdibleTags默认缓存派生tags，已存在真值cache直接返回；SetDiet/oncaneat所读路径没有清cache。允许cacheedibletags=false禁缓存；这是按需边界，库存collector本身不用此方法。",
+    "cached_diet_citation_ids": [
+      "FC-C01",
+      "FC-C02",
+      "FC-C05"
+    ],
+    "getter_negative_guard_zh": "Eater外层health/sanity资格依据edible原始field>=0或DoFoodEffects，而getter可有动态结果，具体符号与stale/spoiled early return要分层。",
+    "optional_feeder_events_zh": "feeder不同eater时：eater有inventoryitem且grandowner为feeder或grandowner.container由feeder打开→feeder发feedincontainer；eater为rideable且feeder为当前rider→feeder发feedmount{food,eater}。没有这些分支就直接进入oneat。",
+    "optional_feeder_citation_ids": [
+      "FC-C07"
+    ],
+    "absence_audit": {
+      "Eater_CanActuallyEat": {
+        "searched_full_file": "scripts/components/eater.lua",
+        "verified_no_symbol": true,
+        "actual_name": "PrefersToEat"
+      },
+      "Edible_gethungerfn_SetGetHungerFn": {
+        "searched_full_file": "scripts/components/edible.lua",
+        "verified_no_symbol": true
+      },
+      "ACTIONS_EAT_currentowner": {
+        "searched_range": "scripts/actions.lua:793-804",
+        "verified_no_symbol_or_fallback": true
+      }
+    },
+    "source_acquisition_negative_result": {
+      "path": "scripts/prefabs/berries.lua",
+      "exact_ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "tool": "GitHub fetch_file",
+      "result": "404 NOT_FOUND",
+      "consequence_zh": "未将名称当现存文件或推测食品合同；改按snapshot已有veggies.lua选择单一carrot样本。",
+      "no_source_bytes_cached": true
+    }
+  },
+  "direct_facts": [
+    {
+      "id": "FC-F01",
+      "title_zh": "diet 数据与资格标签不同于偏好",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Eater 默认 caneat 与 preferseating 都是含 FOODGROUP.OMNI 的数组，eatwholestack=false，三个 absorption=1。SetDiet(caneat,preferseating) 原样保存两个数组，后者为 nil/false 时复用 caneat 同一表；没有复制/类型校验。caneat 属性回调移除旧类型或组的 <name>_eater 标签，再添加新的；table 元素使用 .name。SetPrefersEatingTag(tag) 追加到 preferseatingtags，后续 HasAnyTag 使用任意一个标签匹配。",
+      "citation_ids": [
+        "FC-C01",
+        "FC-C02",
+        "FC-C03"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Eater:SetDiet(caneat, preferseating)",
+        "Eater:SetPrefersEatingTag(tag)"
+      ],
+      "args": {
+        "caneat": "数组；元素为 FOODTYPE 字符串或含 name/types 的 FOODGROUP 表",
+        "preferseating": "同形数组；nil/false 取 caneat",
+        "tag": "加入 preferseatingtags 的实体标签"
+      },
+      "results": {
+        "setters": "无显式返回；不是是否食用成功"
+      },
+      "units": {
+        "types": "类别名，不是锅食数值 tags 权重"
+      }
+    },
+    {
+      "id": "FC-F02",
+      "title_zh": "CanEat 与真正执行门禁叫 PrefersToEat",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "TestFood(food,testvalues) 要求 food 非 nil 且 components.edible 非 nil；遍历数组，对组元素遍历 .types，再以 food:HasTag(\"edible_\"..type) 判断；任一匹配 true，其他路径无显式返回，普通赋值观察为 nil。CanEat(food) 仅以 self.caneat 调 TestFood。PrefersToEat(food) 对 player 的 winter_food4 返回 false；nospoiledfood 且 perishable:IsSpoiled() 返回 false；偏好标签存在却无任一匹配返回 false；剩余以 self.preferseating 调 TestFood。该 pinned Eater 全文没有 CanActuallyEat。Eat 实际调用 PrefersToEat，不调用 CanEat，故独立配置的偏好与可尝试列表可以不一致。",
+      "citation_ids": [
+        "FC-C09",
+        "FC-C06"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Eater:TestFood(food,testvalues)",
+        "Eater:CanEat(food)",
+        "Eater:PrefersToEat(food)"
+      ],
+      "args": {
+        "food": "实际 food 实体；CanEat(nil) 可落到 nil，PrefersToEat/Eat(nil) 首先读 food.prefab，不能视为 nil-safe API"
+      },
+      "branches": [
+        "类型匹配→true",
+        "TestFood 未命中/无 edible→nil",
+        "PrefersToEat 特定禁止→false",
+        "普通不匹配→nil"
+      ],
+      "results": {
+        "acceptance_predicates": "true / false / nil；没有 reason 字符串或 callback 接受测试槽"
+      }
+    },
+    null,
+    {
+      "id": "FC-F04",
+      "title_zh": "Health getter 回调含 food 与 eater 两个实体",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "SetGetHealthFn(fn) 保存 gethealthfn。GetHealth(eater) 先调用 fn(food_inst,eater)；返回 nil/false 时回退 healthvalue，数值0保留。若 eater.eater:CanProcessSpoiledItem(food) 真则把基值下限设0；否则允许退化且值非负、eater不忽略腐败时，stale/spoiled 使用 eater.eater 的 override 倍率或本 edible 倍率，spoil 分支还关闭 spice_source。仍存在的 spice HEALTH 对 multiplier 作加法，再返回 multiplier*healthvalue。这里未消费 fn 的第二返回值。",
+      "citation_ids": [
+        "FC-C13",
+        "FC-C15",
+        "FC-C04"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:SetGetHealthFn(fn)",
+        "Edible:GetHealth(eater)"
+      ],
+      "results": {
+        "GetHealth": "数值 stat delta；非实际HP差"
+      },
+      "callback_args": [
+        {
+          "slot": "gethealthfn",
+          "call": "fn(food_inst,eater)",
+          "returned_value_used": "第一个 truthy 值；nil/false回退base；0真值保留"
+        }
+      ],
+      "units": {
+        "multiplier": "无量纲倍率；spice加到倍率后乘基值"
+      }
+    },
+    {
+      "id": "FC-F05",
+      "title_zh": "Hunger getter 的 eater 上下文会改变结果",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "GetHunger(eater) 从 hungervalue 开始；spoiled processor 可把其下限设0；否则允许退化且值非负、eater不忽略腐败时，对 stale/spoiled 取 eater override 或 edible 倍率。随后若 eater.foodaffinity 存在，以 GetAffinity(food_inst) 的非 nil 返回值乘倍率。没有 gethungerfn/SetGetHungerFn 这两个槽/方法。返回 hungervalue*multiplier，不直接更改 eater hunger。",
+      "citation_ids": [
+        "FC-C12",
+        "FC-C04"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:GetHunger(eater)"
+      ],
+      "args": {
+        "eater": "可 nil；非nil实体的 eater 与 foodaffinity 组件被读取"
+      },
+      "results": {
+        "GetHunger": "数值 delta输入；无自行DoDelta"
+      },
+      "units": {
+        "hungervalue": "hunger量，非百分比",
+        "affinity": "无量纲倍率"
+      }
+    },
+    {
+      "id": "FC-F06",
+      "title_zh": "Sanity getter 退化分支可能提前返回",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "SetGetSanityFn(fn) 保存 getsanityfn；GetSanity(eater) 同样调用 fn(food_inst,eater)，nil/false 回退 sanityvalue，0保留。负值/degrades_with_spoilage=false/忽略腐败会跳过通常退化；spoiled processor 分支下限设0。其他允许退化且有 perishable 时，stale且值>0直接返回0，spoiled直接返回 -TUNING.SANITY_SMALL；这些 early return 不经过随后 spice SANITY 倍率。常规尾部为 sanityvalue*(1+适用spice SANITY)。",
+      "citation_ids": [
+        "FC-C11",
+        "FC-C15",
+        "FC-C04"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:SetGetSanityFn(fn)",
+        "Edible:GetSanity(eater)"
+      ],
+      "results": {
+        "getter": "数值delta输入；不是已改变的理智"
+      },
+      "callback_args": [
+        {
+          "slot": "getsanityfn",
+          "call": "fn(food_inst,eater)",
+          "returned_value_used": "第一个truthy值；nil/false回退；0保留"
+        }
+      ],
+      "units": {
+        "value": "sanity量，非比例"
+      }
+    },
+    {
+      "id": "FC-F07",
+      "title_zh": "Eat getter、倍率及 custom_stats_mod_fn 的精确输入",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Eat(food,feeder) 先 feeder=feeder or self.inst，仅 PrefersToEat(food) 真值进入主体。stack_mult 默认1，eatwholestack真才读 food.edible:GetStackMultiplier()；base_mult 为 foodmemory:GetFoodMultiplier(food.prefab) 或1。三个 delta 先设0。health/sanity 仅在对应组件存在且其 edible 原始 field>=0 或 DoFoodEffects(food)真时读 getter(self.inst)，hunger只要求组件存在。getter结果依次乘 base_mult 与相应 numeric absorption。DoFoodEffects 对 strongstomach+monstermeat、eatsrawmeat+rawmeat、foodaffinity:HasPrefabAffinity(food) 任一真返回false。随后存在 custom_stats_mod_fn 就一次调用并接收三个返回数值；这是字段，未读到专用 setter。注释中的 FunctionOrValue 吸收函数调用不是可执行路径，SetAbsorptionModifiers 保存的是直接被乘的数值。",
+      "citation_ids": [
+        "FC-C02",
+        "FC-C04",
+        "FC-C06"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Eater:Eat(food,feeder)",
+        "Eater:SetAbsorptionModifiers(health,hunger,sanity)"
+      ],
+      "args": {
+        "food": "此时是传入整件/整堆food实体；尚未拆出单件",
+        "feeder": "nil/false缺省 eater实体；ACTIONS.EAT 显式传doer",
+        "absorption": "三个数值，按 stat 顺序保存"
+      },
+      "callback_args": [
+        {
+          "slot": "custom_stats_mod_fn",
+          "call": "fn(eater_inst,health_delta,hunger_delta,sanity_delta,food,feeder)",
+          "returned_values_used": [
+            "health_delta",
+            "hunger_delta",
+            "sanity_delta"
+          ],
+          "phase": "已做getter/base_mult/absorption，尚未乘stack_mult或调用DoDelta"
+        }
+      ],
+      "units": {
+        "delta": "每次/每普通件对应stat量",
+        "base_mult/absorption/stack_mult": "无量纲乘数；whole-stack默认乘数来自件数"
+      }
+    },
+    {
+      "id": "FC-F08",
+      "title_zh": "Health→Hunger→Sanity 结算返回均被丢弃",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "custom_stats_mod_fn 之后，仅每个 delta~=0 时按 health、hunger、sanity 顺序调用组件 DoDelta。Health精确参数为 DoDelta(health_delta*stack_mult,nil,food.prefab)，Hunger/Sanity均仅传 delta*stack_mult。Eat 不读取这些 DoDelta 的任何返回；true 不是实际恢复了多少HP、满值前后的差、全部 stat 都有组件或食物实际被默认消费的独立证明。custom callback 不得给不存在的对应组件返回非0，因结算段无第二组件存在 guard；也不验证三个返回都为数字，nil会满足 ~=0 后参与乘法。",
+      "citation_ids": [
+        "FC-C06",
+        "FC-C07",
+        "FC-C08"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "results": {
+        "DoDelta_returns": "全部被忽略",
+        "Eat_tail": "正常到尾部才true；拒食无显式return，普通赋值nil"
+      },
+      "units": {
+        "DoDelta_argument": "stat amount；actual delta/clamp/gate 复用 R-HEALTH"
+      }
+    },
+    {
+      "id": "FC-F09",
+      "title_zh": "普通 Eat 的 event/callback/消费/状态顺序",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "三个DoDelta之后，在feeder不同于eater时可先发feedincontainer或feedmount。随后 eater:PushEvent(\"oneat\",{food=food,feeder=feeder})，再 oneatfn(eater_inst,food,feeder)；再 food.edible:OnEaten(eater_inst)，再 HandleEatRemove(eatwholestack)；再 lasteattime=GetTime()；有foodmemory且food不带potion标签时 RememberFood(food.prefab)；正常尾部return true。oneatfn返回被丢弃；food参数在回调时是原传入实体/整堆，不是默认Get拆出的消费单位。没有此函数内的pcall、回滚、整条网络ack或重复锁。",
+      "citation_ids": [
+        "FC-C04",
+        "FC-C07",
+        "FC-C08"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Eater:SetOnEatFn(fn)",
+        "Eater:Eat(food,feeder)"
+      ],
+      "results": {
+        "Eat": "正常尾部仅true；不返回拆件实体/count/reason",
+        "last_time": "消费处理后GetTime()时间戳；不推导现实UTC或额外延迟保证"
+      },
+      "callback_args": [
+        {
+          "slot": "oneatfn",
+          "call": "fn(eater_inst,food,feeder)",
+          "count": "每次进入并到达此处的成功执行一次；非逐堆件回放",
+          "return_used": false
+        },
+        {
+          "event": "oneat",
+          "source": "eater_inst",
+          "payload": {
+            "food": "原food实体",
+            "feeder": "解析后的feeder"
+          }
+        }
+      ]
+    },
+    {
+      "id": "FC-F10",
+      "title_zh": "Edible oneaten 的参数没有 feeder/count",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "OnEaten(eater) 先调用 oneaten(food_inst,eater)，其返回被丢弃。随后读取可能经callback改变的 spice/温度字段；在temperaturedelta、temperatureduration非0、chill<1且eater.temperature存在时调用 SetTemperatureInBelly(temperaturedelta*(1-chill)*delta_multiplier,temperatureduration*duration_multiplier)。然后 food:PushEvent(\"oneaten\",{eater=eater})；如果food.eatensound非nil且eater.SoundEmitter非nil则播放。SetOnEatenFn只保存fn，默认nil。单件/整堆都一次进入OnEaten，不传feeder/count，不按stack_mult回放callback或温度/事件。直接调用OnEaten不自动DoDelta或消费，且有eatensound时不能假定eater=nil安全。",
+      "citation_ids": [
+        "FC-C14",
+        "FC-C16",
+        "FC-C08"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:SetOnEatenFn(fn)",
+        "Edible:OnEaten(eater)"
+      ],
+      "results": {
+        "OnEaten": "无显式返回；不返回食物单位或消费量"
+      },
+      "callback_args": [
+        {
+          "slot": "oneaten",
+          "call": "fn(food_inst,eater)",
+          "count": "每次OnEaten调用至此一次；与堆叠件数无循环关系",
+          "return_used": false
+        },
+        {
+          "event": "oneaten",
+          "source": "food_inst",
+          "payload": {
+            "eater": "传入eater实体"
+          }
+        }
+      ]
+    },
+    {
+      "id": "FC-F11",
+      "title_zh": "普通默认消费恰好一件的连接点",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "HandleEatRemove(eatwholestack) 先检查food:IsValid()，允许先前OnEaten已移除它。有效且handleremovefn非nil时调用 handleremovefn(food_inst,eatwholestack)，返回丢弃且不再走默认删除；否则非整堆且stackable存在时调用 stackable:Get():Remove()，缺省Get()件数1；其他分支 food:Remove()。食物单位的返回只存在复用的Stackable:Get，Eat/HandleEatRemove没有向调用者返回此单位。自定义remove回调可以保留实体，所以没有独立校验实际减少1件；调用者不应再默认拆一件/Remove第二次。",
+      "citation_ids": [
+        "FC-C17",
+        "FC-C28",
+        "FC-C08"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:SetHandleRemoveFn(fn)",
+        "Edible:HandleEatRemove(eatwholestack)"
+      ],
+      "results": {
+        "ordinary_default": "有效、无自定义remove、非整堆，stackable默认消耗Get()得到的一件；无stackable则移除food",
+        "invalid_after_OnEaten": "此处不再次删除",
+        "custom": "callback owns removal，未证实消费count",
+        "method_return": "无显式返回"
+      },
+      "callback_args": [
+        {
+          "slot": "handleremovefn",
+          "call": "fn(food_inst,eatwholestack)",
+          "count": "有效food且自定义slot非nil时一次",
+          "return_used": false
+        }
+      ]
+    },
+    {
+      "id": "FC-F12",
+      "title_zh": "整堆乘数与删除政策是不同参数",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "GetStackMultiplier() 优先 override callback(food_inst) 的第一个truthy返回，否则1；0在Lua为真，保留0；没有override且stackable存在则StackSize()，否则1。它只在eatwholestack真时被Eat读取。whole-stack默认删除整food实体，但OnEaten/oneat callbacks仍各一次，custom removal可改写消费。override返回2并不要求实际删除2件，0也不能表示取消食用。",
+      "citation_ids": [
+        "FC-C14",
+        "FC-C18",
+        "FC-C17",
+        "FC-C06",
+        "FC-C08"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Edible:SetOverrideStackMultiplierFn(fn)",
+        "Edible:GetStackMultiplier()"
+      ],
+      "results": {
+        "not_equivalent": "stat multiplier ≠ 实际消费件数 ≠ callback次数"
+      },
+      "callback_args": [
+        {
+          "slot": "overridestackmultiplierfn",
+          "call": "fn(food_inst)",
+          "result": "truthy first return or1；nil/false→1；0保留"
+        }
+      ],
+      "units": {
+        "return": "用于stat量乘法的无量纲因子；缺省StackSize为堆叠件数"
+      }
+    },
+    {
+      "id": "FC-F13",
+      "title_zh": "ACTIONS.EAT 的普通分支原样返回 Eat",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "ACTIONS.EAT.fn(act) 以 act.target or act.invobject 选obj，非nil后优先 edible存在且doer.eater存在时return eater:Eat(obj,act.doer)。否则只尝试相邻的soul+souleater、或两方oceanfishable分支；均非本批普通food合同。obj nil或都不匹配时无显式返回。普通分支不预先RemoveItem/Get、不查inventoryitem owner/currentowner、不用currentowner作fallback、不补第二次DoDelta/Remove；target为真值会遮住invobject，即使target无edible或被拒食。act.doer本身在此无nil guard，调用前提复用已有Action路径。",
+      "citation_ids": [
+        "FC-C19"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "ACTIONS.EAT.fn(act)"
+      ],
+      "args": {
+        "act.target": "第一选择实体",
+        "act.invobject": "仅target为nil/false时使用",
+        "act.doer": "传给Eater作eater本身和feeder"
+      },
+      "results": {
+        "ordinary_edible": "原样转发Eat true/nil；无reason/count/entity附加结果",
+        "no_match": "普通赋值nil",
+        "currentowner_fallback": "本函数中不存在"
+      }
+    },
+    {
+      "id": "FC-F14",
+      "title_zh": "库存候选只用 edible/type-eater 标签",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "所读 INVENTORY.edible(inst,doer,actions,right) 是food=inst，不是USEITEM target。先读rider/mount与activeitem；适用mount条件可提前插入FEED并return。自食候选需(right或无equippable)且不为mount+activeitem；按FOODGROUP的<name>_eater与food edible_<type>，或FOODTYPE对应_eater匹配来插入EAT并return。这里不调用Eater:PrefersToEat，因此候选出现不能证明执行时接受；此结论只限这个库存collector。该范围没有currentowner输入或fallback。",
+      "citation_ids": [
+        "FC-C20",
+        "FC-C30"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "INVENTORY.edible(inst,doer,actions,right)"
+      ],
+      "args": {
+        "inst": "食物实体",
+        "doer": "候选执行者",
+        "actions": "添加候选的数组",
+        "right": "右键语境"
+      },
+      "results": {
+        "candidate": "table.insert(actions,ACTIONS.EAT) 后return；没有stat mutation",
+        "coverage_limit": "非全部交互、ground scene、SG/RPC/UI目录"
+      }
+    }
+  ],
+  "runtime_tested": false,
+  "source_reading_log": [
+    {
+      "path": "scripts/components/eater.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/eater.lua",
+      "bytes": 11787,
+      "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+      "git_blob_sha": "c69d637e5af408ee22ce87e1f3f95d5b6814c0c3",
+      "line_count": 371,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "exact-ref GitHub fetch_file(base64), matched exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 61
+        },
+        {
+          "line_start": 121,
+          "line_end": 127
+        },
+        {
+          "line_start": 129,
+          "line_end": 167
+        },
+        {
+          "line_start": 169,
+          "line_end": 228
+        },
+        {
+          "line_start": 230,
+          "line_end": 354
+        },
+        {
+          "line_start": 371,
+          "line_end": 371
+        }
+      ],
+      "read_scope_zh": "接受与 diet/倍率/回调/正常返回主体；完整文件只作名称缺失检查，未研究各种特殊食谱辅助与存档",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/edible.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/edible.lua",
+      "bytes": 9322,
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "git_blob_sha": "4d592cac1b409b0591617cb87553c2b898afdafc",
+      "line_count": 261,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "exact-ref GitHub fetch_file(base64), matched exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 54
+        },
+        {
+          "line_start": 72,
+          "line_end": 143
+        },
+        {
+          "line_start": 149,
+          "line_end": 236
+        },
+        {
+          "line_start": 261,
+          "line_end": 261
+        }
+      ],
+      "read_scope_zh": "分类标签、三 getter、callback 与食用消费；未扩展 chill 稀释/保存，已有堆叠合同复用",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/actions.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/actions.lua",
+      "bytes": 272267,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "line_count": 7092,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing authorized private cache, revalidated exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 793,
+          "line_end": 804
+        }
+      ],
+      "read_scope_zh": "只审 EAT.fn 实际对象选择、ordinary edible branch、返回及相邻备选分支；不读 all actions/SG/network/UI",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/componentactions.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/componentactions.lua",
+      "bytes": 137632,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "git_blob_sha": "d1a9663be9a41b3f8904e565898c9929464c7a5c",
+      "line_count": 3254,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "exact-ref GitHub fetch_file(base64), matched exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 2513,
+          "line_end": 2513
+        },
+        {
+          "line_start": 2589,
+          "line_end": 2632
+        }
+      ],
+      "read_scope_zh": "仅 INVENTORY.edible candidate 有关 self-EAT 的分支与 mount 前置排除；其他 FEED/玩家/生物/USEITEM 不作新合同",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/prefabs/veggies.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/veggies.lua",
+      "bytes": 38946,
+      "file_sha256": "3428e37d90c343de026f4e6f1f47d87302b29eb9237291dddc0943427d8ab26a",
+      "git_blob_sha": "bd5881d81592d69ab9f77e39dfb6fb233d46545c",
+      "line_count": 1110,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "exact-ref GitHub fetch_file(base64), matched exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 23
+        },
+        {
+          "line_start": 45,
+          "line_end": 51
+        },
+        {
+          "line_start": 391,
+          "line_end": 400
+        },
+        {
+          "line_start": 419,
+          "line_end": 425
+        },
+        {
+          "line_start": 539,
+          "line_end": 705
+        },
+        {
+          "line_start": 1084,
+          "line_end": 1110
+        }
+      ],
+      "read_scope_zh": "只沿 name=carrot 的 ordinary fresh constructor 到单个 prefab 接线；tail generic exporter 已有 FOOD-005 复用，不列所有食物/熟食/巨大/种子",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/constants.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/constants.lua",
+      "bytes": 80000,
+      "file_sha256": "4c7e9be82d569874218c080d5c50215811057128d127ec193b444682c6791fd2",
+      "git_blob_sha": "66e37055e18b9f73f1b1e82c71ff7ef13bd62124",
+      "line_count": 3041,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing authorized private cache, revalidated exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 2022,
+          "line_end": 2026
+        },
+        {
+          "line_start": 2045,
+          "line_end": 2059
+        }
+      ],
+      "read_scope_zh": "仅 FOODTYPE.VEGGIE 与默认 FOODGROUP.OMNI 能匹配 carrot 所需字段，不重造食物类别目录",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/stackable.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/stackable.lua",
+      "bytes": 6919,
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "git_blob_sha": "66a0b65534fccbf74ff67d9aa834cc66c4ee6d93",
+      "line_count": 214,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing authorized private cache, revalidated exact snapshot bytes/hash/blob",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 109,
+          "line_end": 152
+        }
+      ],
+      "read_scope_zh": "仅复核默认 Get(num or 1) 和返回实体连接；完整 split/owner/spawn/copy core 复用 MATERIAL-007/FOOD-006，不重新列新事实",
+      "full_file_verified_not_claimed_full_file_semantically_read": true,
+      "source_executed": false
+    }
+  ],
+  "coding_projection": [
+    {
+      "id": "FC-P01",
+      "title_zh": "区分可尝试类型与执行偏好",
+      "load_when_zh": "自定义diet、可见吃动作但执行拒食，或误用CanActuallyEat时",
+      "source_contract": [
+        "SetDiet(caneat,preferseating or caneat)；元素是type字符串或name/types组表",
+        "CanEat→TestFood(caneat)，true/nil；Eat→PrefersToEat→特定false或TestFood(preferseating) true/nil",
+        "不存在CanActuallyEat，实际执行不自动重新交集caneat",
+        "库存collector只读匹配标签，候选不是接受结果"
+      ],
+      "evidence_ids": [
+        "FC-F01",
+        "FC-F02",
+        "FC-F14"
+      ],
+      "reuse_ids": [
+        "R-COOKING",
+        "R-ACTION",
+        "R-PROPS"
+      ],
+      "recommendation_zh": "为项目明确可尝试与可真正食用的数组；若想完全一致就传同一diet而不要猜一个CanActuallyEat API。有意改diet且使用GetEdibleTags缓存的项目，检查当前cache或显式cacheedibletags=false；所读SetDiet不清其缓存。",
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+    },
+    {
+      "id": "FC-P02",
+      "title_zh": "只让一条 stat 路径负责基础食用量",
+      "load_when_zh": "配置食物数值或需要按eater定制健康/理智/全部stat时",
+      "source_contract": [
+        "Edible三个getter均接eater实体；gethealthfn/getsanityfn(food,eater)，nil/false回退，0保留；没有gethungerfn setter",
+        "每stat getter*self foodmemory乘数*numeric absorption；custom_stats_mod_fn(eater,h,hg,s,food,feeder)返回h,hg,s，再乘stack_mult",
+        "health→hunger→sanity DoDelta；Health(delta,nil,food.prefab)；返回均丢弃",
+        "raw health/sanity field与DoFoodEffects先决定是否读取动态getter，不能只看getter输出符号"
+      ],
+      "evidence_ids": [
+        "FC-F04",
+        "FC-F05",
+        "FC-F06",
+        "FC-F07",
+        "FC-F08"
+      ],
+      "reuse_ids": [
+        "R-HEALTH",
+        "R-PERISH",
+        "R-CURRENT-HUNGER"
+      ],
+      "recommendation_zh": "基础健康/饥饿/理智用edible字段/getter或eater既有custom_stats_mod_fn同一流程；OnEaten若再次加同一基础量会形成第二效果。custom_stats_mod_fn明确返回三个数字，不给缺失组件制造非0；回调返回量不假装实际已写入的current差。",
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+    },
+    {
+      "id": "FC-P03",
+      "title_zh": "OnEat/OnEaten 的上下文与普通单件消费",
+      "load_when_zh": "食物附加效果、回调计数或stack只应减少1件时",
+      "source_contract": [
+        "oneat eater事件→oneatfn(eater,food,feeder)→OnEaten的oneaten(food,eater)→food oneaten事件→HandleEatRemove→last-time/memory→true",
+        "普通默认Get():Remove()消费1；回调看到原food整堆，不是拆出单位",
+        "oneaten没有feeder/count；whole-stack不会逐件回放，stack_mult仅控制stat",
+        "自定义remove callback(food,eatwholestack)替代默认删除，返回忽略；OnEaten前后实体可能被移除"
+      ],
+      "evidence_ids": [
+        "FC-F09",
+        "FC-F10",
+        "FC-F11",
+        "FC-F12"
+      ],
+      "reuse_ids": [
+        "R-SPLIT",
+        "R-SPLIT-COPY",
+        "R-DILUTION",
+        "R-HOOK",
+        "R-GLOBAL",
+        "R-IMPORT"
+      ],
+      "recommendation_zh": "普通附加效果放进明确的一次OnEaten回调并保留准确(food,eater)角色；不要手工先拆单位再吃后又Remove。对回调改变/删除组件或实体的项目，按实际分支审查；保持现有回调时由项目显式保存并串接一次，不假装setter自动追加。",
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+    },
+    {
+      "id": "FC-P04",
+      "title_zh": "EAT 正常返回不能替代实际stat/消费结果",
+      "load_when_zh": "使用ACTIONS.EAT.fn或Eater:Eat返回决定后续逻辑时",
+      "source_contract": [
+        "obj=target or invobject，ordinary edible→return eater:Eat(obj,doer)",
+        "正常尾部true，拒食nil，无reason/count/实体",
+        "没有EAT内部currentownerfallback、Inventory RemoveItem、stat delta返回聚合或默认消费再验证",
+        "自定义remove保留food也可正常到true；全stat=0或不存在也可到true"
+      ],
+      "evidence_ids": [
+        "FC-F08",
+        "FC-F11",
+        "FC-F13"
+      ],
+      "reuse_ids": [
+        "R-INV-OWNER",
+        "R-INV-REMOVE",
+        "R-ACTION",
+        "R-HEALTH"
+      ],
+      "recommendation_zh": "把普通true解释为此Lua控制流走到尾部；只在项目确实需要实际恢复量/减少件数时，从具体组件或自己的有界接口取得所需结果。不要强加ledger、ack或协议架构。",
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated"
+    }
+  ],
+  "original_illustration": {
+    "claim_kind": "OriginalEngineeringIllustration_NotVanillaSource_NotRuntimeValidated",
+    "execution_contexts": {
+      "modmain_or_modimport": "用Mod env提供的AddPrefabPostInit，游戏全局通过GLOBAL.FOODTYPE/GLOBAL.TheWorld；world放在执行hook内查询，不在顶层缓存。",
+      "scripts/components/<project_component>.lua": "普通require加载的组件脚本在游戏global环境执行，使用已预加载的全局Class及TheWorld/FOODTYPE；不假定该模块中存在Mod env专属的GLOBAL或AddPrefabPostInit。require(\"class\")用于副作用安装全局Class，不导出Class构造函数，不能写local Class=require(\"class\")。",
+      "imports": "这里是步骤而非可直接执行代码；不需要新require。若另写component class，明确游戏已先副作用加载class模块、可用全局Class，并在组件文件return自己的组件class；require(\"class\")不是构造函数导出。不要把require(\"constants\")假设为返回FOODTYPE表。"
+    },
+    "placeholder_premises_zh": [
+      "example_food为项目已存在的可生成food prefab；它已正确配置common/pristine/master边界、资产、edible/stackable/inventoryitem，不由以下步骤凭空生成。",
+      "下面数值、10%倍率与example事件均为原始项目示意，非vanilla调参、游戏测试或强制框架。",
+      "若项目要保留已有SetOnEatenFn/custom_stats_mod_fn，需有意串接准确实参并返回数字；setter本身只赋一个slot，不自动合并。"
+    ],
+    "narrow_steps_zh": [
+      "在modmain的AddPrefabPostInit(\"example_food\",function(inst) ... end)执行时才取world=GLOBAL.TheWorld；world不存在、非ismastersim、edible不存在都退出。为已存在edible设置foodtype=GLOBAL.FOODTYPE.VEGGIE、healthvalue=6、hungervalue=9、sanityvalue=0。这是配置stat来源，不另调用DoDelta。",
+      "通过SetOnEatenFn安装(food,eater)回调；若eater不存在/无效则返回；只发送项目example_food_eaten事件或执行一个明确附加效果。不要再补同一基础HP/hunger/sanity或手工Get/Remove。事件名及payload为项目自定，不是原版ack。",
+      "若项目需要把当前hunger输入提高10%，在已存在Eater上有意设置custom_stats_mod_fn(eater,h,hg,s,food,feeder)，返回h,hg*1.1,s三个数字；保留不存在组件的0输入。普通require组件中访问游戏全局按组件/global上下文，food/feeder来自实参。",
+      "沿已有权威执行路径调用正常Eat并尊重true/nil；不同时在UI、preview、SG退出或其他callback第二次结算/消费。若需要实际stat差，只按项目必要字段读取实际current状态；本示意不建立ledger/ack系统。"
+    ],
+    "reuse_ids": [
+      "R-GLOBAL",
+      "R-IMPORT",
+      "R-HOOK",
+      "R-HEALTH",
+      "R-ACTION",
+      "R-PROPS"
+    ],
+    "source_fact_ids": [
+      "FC-F01",
+      "FC-F03",
+      "FC-F07",
+      "FC-F08",
+      "FC-F09",
+      "FC-F10",
+      "FC-F11"
+    ],
+    "source_code_redistributed": false
+  }
+}

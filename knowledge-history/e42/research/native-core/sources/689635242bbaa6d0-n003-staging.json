@@ -1,0 +1,3914 @@
+{
+  "entries": [
+    {
+      "id": "NC-N003-INT-01",
+      "role": "CORE",
+      "title": "候选收集保持只读并保留角色上下文",
+      "origin_candidate_ids": [
+        "N003-C01"
+      ],
+      "question": "collector/picker 如何生成候选 BufferedAction，候选阶段该承担什么？",
+      "coding_projection": {
+        "trigger": "新增场景、物品、装备、地面或背包动作；collector 中出现扣资源/发奖励。",
+        "generate": [
+          "分开 Action 注册、AddComponentAction eligibility、picker 包装和具体执行逻辑；按 actiontype 使用已核对的 collector 参数。",
+          "在候选层仅判断当前端可见资格；将 doer、target、invobject 和 inst 分别按真实调用链传递。"
+        ],
+        "avoid": [
+          "在共享 collector 调用 action.fn 或扣资源。",
+          "把 USEITEM 的 inst 当 target，或把 AddAction 当成 collector/SG 已完整接入。"
+        ]
+      },
+      "reviewer_conditions": [
+        "能指出 collector 的 actiontype、真实参数顺序和双端登记位置。",
+        "候选收集与排序没有业务效果；最终执行重新核对其需要的条件。",
+        "不给 tied priority 稳定顺序保证，不把 Action.rmb 当所有 collector 的通用右键门禁。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-006",
+            "source_fact_index": 1,
+            "statement": "modutil.AddAction 接受 Action 对象，或通过 id/str/fn 新建 Action；设置 action.mod_name = env.modname，并直接写入 ACTIONS[action.id] 与 STRINGS.ACTIONS[action.id]。",
+            "citations": [
+              {
+                "path": "scripts/modutil.lua",
+                "symbol": "AddAction",
+                "line_start": 442,
+                "line_end": 475,
+                "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+                "range_sha256": "96e85f12abd726953603252afde44e630e79233e5636b83459e3320a1b62788a",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/modutil.lua#L442-L475"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-001"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-006",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-006",
+            "source_fact_index": 2,
+            "statement": "同一个注册函数在 ACTION_MOD_IDS[action.mod_name] 按追加顺序保存 action.id，以列表长度给 action.code，再填入 MOD_ACTIONS_BY_ACTION_CODE[mod_name][code]。",
+            "citations": [
+              {
+                "path": "scripts/modutil.lua",
+                "symbol": "ACTION_MOD_IDS",
+                "line_start": 462,
+                "line_end": 471,
+                "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+                "range_sha256": "9d2b7c67349d766a073272e7b8559a0acad2499c5ed0b9fdb8ba099b97d4bb20",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/modutil.lua#L462-L471"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-002"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-006",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-006",
+            "source_fact_index": 4,
+            "statement": "Action 构造器默认 fn 返回 false、instant 为 false、priority 为 0；源码注明 rmb 实际只对 tools 的某些路径起作用，其他 componentactions 自行检查 right。构造器接受 table 参数，位置参数被标为弃用。",
+            "citations": [
+              {
+                "path": "scripts/actions.lua",
+                "symbol": "Action",
+                "line_start": 293,
+                "line_end": 320,
+                "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+                "range_sha256": "1a601d89a9af81cc736b829a7e687ec7c28460aad3a5a490af77347f6cc5a591",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L293-L320"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-005"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-006",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-006",
+            "source_fact_index": 5,
+            "statement": "playeractionpicker.SortActionList 按 action.priority 降序排序，经过 actionfilter 后把候选 Action 包成 BufferedAction。",
+            "citations": [
+              {
+                "path": "scripts/components/playeractionpicker.lua",
+                "symbol": "SortActionList",
+                "line_start": 78,
+                "line_end": 107,
+                "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+                "range_sha256": "6028aec86c09b2cbf7edd8bec17f3ccdeac2d380ffe9926aabbaa9c1bf835e3f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playeractionpicker.lua#L78-L107"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-006"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-006",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF05",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-007",
+            "source_fact_index": 1,
+            "statement": "modutil.AddComponentAction 把 env.modname 传给全局 AddComponentAction；全局实现按 modname/actiontype/component 保存回调，同时按追加顺序建立组件名称与数字 ID 的映射。",
+            "citations": [
+              {
+                "path": "scripts/modutil.lua",
+                "symbol": "AddComponentAction",
+                "line_start": 478,
+                "line_end": 481,
+                "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+                "range_sha256": "d296a2530b8167bae7c27ac22a6b11163aa1c764e55ae622053f0234c4ae5463",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/modutil.lua#L478-L481"
+              },
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "AddComponentAction",
+                "line_start": 3108,
+                "line_end": 3119,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "6a57fc29b2a0c14e44e42151bfd55df6272a32878343f29fcd95476179e2a811",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3108-L3119"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-007",
+            "N003-SRC-008"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-007",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF06",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-007",
+            "source_fact_index": 2,
+            "statement": "ModComponentWarning 明确提示 Mod component actions 不同步很可能因为 AddComponentAction 没有在客户端和服务端同时调用；CollectActions 使用实体 actioncomponents/modactioncomponents 中的索引选择 collector 并调用 collector(self, ...)。",
+            "citations": [
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "ModComponentWarning",
+                "line_start": 3090,
+                "line_end": 3106,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "e74d33e53d1c9e67ef8323fa4e24476defb0946c18b3bb31231ce11c52f29d0e",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3090-L3106"
+              },
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "CollectActions",
+                "line_start": 3174,
+                "line_end": 3201,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "b4700479e1063b6a78a74f08d7356cbe7372b6a97f217088a8387e1c16b2a0c7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3174-L3201"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-009",
+            "N003-SRC-010"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-007",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF07",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-007",
+            "source_fact_index": 4,
+            "statement": "PlayerActionPicker 的调用点给出参数顺序：SCENE 为 inst,doer,actions,right；USEITEM 与 EQUIPPED 为 inst,doer,target,actions,right；POINT 为 inst,doer,pos,actions,right,target；INVENTORY 为 inst,doer,actions,right。其中 inst 是调用 CollectActions 的 useitem，而 doer 是 picker 所属玩家。",
+            "citations": [
+              {
+                "path": "scripts/components/playeractionpicker.lua",
+                "symbol": "GetSceneActions",
+                "line_start": 109,
+                "line_end": 122,
+                "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+                "range_sha256": "d3ed5491a5cb35cda111e2d8a6a0c8eb87e499476049f3fbf8a765f333c79d00",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playeractionpicker.lua#L109-L122"
+              },
+              {
+                "path": "scripts/components/playeractionpicker.lua",
+                "symbol": "GetUseItemActions",
+                "line_start": 142,
+                "line_end": 148,
+                "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+                "range_sha256": "f936ead3fda761e2f3626c0e1fd991efc1f7f76d573d3d06f8db491a7973a1ff",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playeractionpicker.lua#L142-L148"
+              },
+              {
+                "path": "scripts/components/playeractionpicker.lua",
+                "symbol": "GetPointActions",
+                "line_start": 207,
+                "line_end": 211,
+                "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+                "range_sha256": "865e40fd6fbc9d1dc91bd2397923335690ec98501e762fe86cd0d1bc6236ad9d",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playeractionpicker.lua#L207-L211"
+              },
+              {
+                "path": "scripts/components/playeractionpicker.lua",
+                "symbol": "GetEquippedItemActions",
+                "line_start": 249,
+                "line_end": 277,
+                "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+                "range_sha256": "36dca7ccb1896a9288a36754e26cc80d21d561053138bf88ec95761e33f1a224",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playeractionpicker.lua#L249-L277"
+              },
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "CollectActions",
+                "line_start": 3174,
+                "line_end": 3197,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "daef377eeadac6c366527d1850dd553823277f6f1bc15aff490ce793dd48a132",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3174-L3197"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-014",
+            "N003-SRC-015",
+            "N003-SRC-016",
+            "N003-SRC-017",
+            "N003-SRC-018"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-007",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C01",
+          "original_atom": {
+            "atom_id": "N003-C01-NSF08",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-007",
+            "source_fact_index": 5,
+            "statement": "USEITEM 的 tool collector 通过工具标签、target:IsActionValid 及 equippable replica 做候选判断；IsActionValid 按实体动作组件中的 ISVALID validator 返回值判断，workable validator 使用 action.id..\"_workable\" 标签和 right 条件。",
+            "citations": [
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "tool",
+                "line_start": 1810,
+                "line_end": 1823,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "76856804052c36362233d4ab82803ab484d5e188ba42d2311584d04e118d5815",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L1810-L1823"
+              },
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "IsActionValid",
+                "line_start": 3203,
+                "line_end": 3230,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "ce3125651969512a23827d444401bb5c1ffbe86232417e0bad8d24f3650a69d6",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3203-L3230"
+              },
+              {
+                "path": "scripts/componentactions.lua",
+                "symbol": "workable",
+                "line_start": 3063,
+                "line_end": 3066,
+                "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+                "range_sha256": "95bf42d7d96418218f896917023f7823bda18ca6d7eca11e422614095bb117db",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L3063-L3066"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-019",
+            "N003-SRC-020",
+            "N003-SRC-021"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-007",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "候选可见与优先级排序只说明可以尝试的入口，不构成权威受理或业务完成。",
+          "basis_atom_ids": [
+            "N003-C01-NSF04",
+            "N003-C01-NSF06",
+            "N003-C01-NSF08"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "collector 保持只读；业务消耗放进已明确的执行路径，并保留实际端别与参数契约。",
+          "basis_atom_ids": [
+            "N003-C01-NSF05",
+            "N003-C01-NSF06",
+            "N003-C01-NSF07"
+          ]
+        }
+      ],
+      "UNK": [
+        "任意 Mod 组合的兼容性未测试。"
+      ],
+      "scope": "固定 commit 下的 AddAction/AddComponentAction/PlayerActionPicker 与所引 tool collector；可复用候选契约，不扩展全部输入入口。",
+      "does_not_mean": [
+        "候选生成等于执行。",
+        "AddAction 自动添加 SG/collector。",
+        "同优先级候选有稳定顺序。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-02",
+          "linkkind": "REUSE_SIDE_BOUNDARY",
+          "reason": "双端登记与实际组件存在性仍按端别处理。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-01",
+          "linkkind": "REUSE_WITH_CODING_FOCUS",
+          "reason": "已有 Action 意图链入口事实；本条聚焦 collector 只读和参数错位，注册事实不宣称为新增。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "USEITEM tool collector",
+          "basis_atom_ids": [
+            "N003-C01-NSF08"
+          ],
+          "limit": "只支持该 collector 的标签/replica/validator 调用，不能代替具体 action.fn 检查。"
+        }
+      ],
+      "unexecuted_tests": [],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C01",
+          "guards": [
+            "Collector visibility is not authority or completion.",
+            "AddAction alone does not create collector or SG state.",
+            "Do not infer stable order for tied priorities."
+          ],
+          "unknowns": [
+            "Compatibility with arbitrary other mods is not tested."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-02",
+      "role": "SUPPORTING",
+      "title": "请求分发与移动到执行的交接保留分支和所有权",
+      "origin_candidate_ids": [
+        "N003-C02",
+        "N003-C10"
+      ],
+      "question": "输入请求、DoAction 分发和 locomotor 到实体的转交如何与执行区别？",
+      "coding_projection": {
+        "trigger": "动作能走到目标却失败、预测关掉后失效、把 Stop 改为 Clear、预演回调直接执行业务。",
+        "generate": [
+          "按 self.ismastersim、locomotor 是否存在、CanLocomote 和 pre_action_cb/non_preview_cb 条件追踪实际分发。",
+          "区别 locomotor.bufferedaction 和实体 bufferedaction；交接后避免让旧 owner 再 Fail 已转交动作。",
+          "适用 LeftClick 请求保留 code 与 mod_name；远端服务器重新生成和匹配候选后才进入 DoAction。"
+        ],
+        "avoid": [
+          "假设所有本地 valid/busy 检查都在发请求之前。",
+          "把 DoAction、PreviewAction、preview_cb 或到达目标当 action.fn 已成功。",
+          "以 Clear 代替仅停止移动的 Stop。"
+        ]
+      },
+      "reviewer_conditions": [
+        "无 locomotor 且 non_preview_cb 存在、pre_action_cb 为 nil 时，承认该回调可早于此函数的后续检查；该前置分支无显式 self.ismastersim 条件。",
+        "有 pre_action_cb 的无 locomotor 后置请求分支只在通过早退后调用；缺 non_preview_cb 时此分支不代为调用 pre_action_cb。",
+        "DoAction 的重复比较仅含 action/target/pos；lastheldaction 的 IsValid 失败不等于这里统一停止分发。",
+        "分开到达、atdestfn、交接、Stop/Clear；不承诺必定等下一帧。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "N003-C02-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-008",
+            "source_fact_index": 1,
+            "statement": "OnLeftClick 在非 mastersim 且无 locomotor 时配置 non_preview_cb；有 locomotor 时，仅对非 WALKTO 且 CanLocomote() 的动作配置 preview_cb。这两个带动作请求的回调都传递 action.code 与 action.mod_name；函数中另有无参 RPC.LeftClick 调用，用于更新左键按下状态。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "preview_cb",
+                "line_start": 4833,
+                "line_end": 4875,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "9d96f78eb45a91601c5e92919ee57bc85f895f9b50f8001f7c5e1e4997ba320f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4833-L4875"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-022"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-008",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "N003-C02-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-008",
+            "source_fact_index": 3,
+            "statement": "OnRemoteLeftClick 只在 self.ismastersim、控制器启用且 handler 为 nil 时处理；它用 SetClientRequestedAction 标记请求，调用服务器 playeractionpicker:DoGetMouseActions 重新生成 lmb/rmb，再清该标记。涉及 spellbook 时还检查背包归属、spellbook 组件和 SelectSpell 返回值。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "OnRemoteLeftClick",
+                "line_start": 4890,
+                "line_end": 4924,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "4ec9e1d93640cc5c0663d860fea1d7661555b68fd3870f9765552653114c4156",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4890-L4924"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-025"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-008",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "N003-C02-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-008",
+            "source_fact_index": 4,
+            "statement": "此函数除明确的原版 LOOKAT/WALKTO 回退外，只接受重新生成的 lmb/rmb/double-click action 中 code 与 mod_name 同时匹配的候选；有候选后才调用 DoAction。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "DoAction",
+                "line_start": 4926,
+                "line_end": 4967,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "d5f3017189e9ab814471b1cbe01a63235def989188ae34a78a95203d79741cdb",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4926-L4967"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-026"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-008",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "N003-C02-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 4,
+            "statement": "EntityScript:PerformPreviewBufferedAction 通过 playercontroller:RemoteBufferedAction 发送预演请求并标记 ispreviewing；RemoteBufferedAction 在 classified 控制器启用时调用 buffered action 的 preview_cb。它与 PerformBufferedAction 调用 bufferedaction:Do 的路径不同。",
+            "citations": [
+              {
+                "path": "scripts/entityscript.lua",
+                "symbol": "PerformPreviewBufferedAction",
+                "line_start": 1600,
+                "line_end": 1607,
+                "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+                "range_sha256": "bc077dc3cbee6b70cb11d66e2f00c3b0121e40e68608353fdb3be86d8dd5a744",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1600-L1607"
+              },
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "RemoteBufferedAction",
+                "line_start": 5750,
+                "line_end": 5763,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "eb3f4c75de966b11be8c84820bfe1f123deeab7577fde1217fb1ef5352190449",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5750-L5763"
+              },
+              {
+                "path": "scripts/entityscript.lua",
+                "symbol": "PerformBufferedAction",
+                "line_start": 1654,
+                "line_end": 1686,
+                "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+                "range_sha256": "d029cc8fe242329285bc8c77d30a55dda5b777a308afb07e64801069dbcf0e10",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1654-L1686"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-035",
+            "N003-SRC-036",
+            "N003-SRC-037"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-01",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-01",
+            "classification": "NSF",
+            "statement": "DoAction 的 non_preview_cb 前置分支要求 buffaction 存在、有 non_preview_cb、action.pre_action_cb 为 nil、self.locomotor 为 nil；它在本函数的对象有效性、busy 与重复动作检查之前调用该回调。此分支本身没有显式 self.ismastersim 检查。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4542,
+                "line_end": 4552,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "47795a61a39bace3a8881c8ed1d2ff0631f16364d2b08d0b99c392392964fb55",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4542-L4552"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-138"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-02",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-02",
+            "classification": "NSF",
+            "statement": "DoAction 的初始 local valid 检查拒绝缺失 buffaction、失效 invobject/target/doer。busy 通常拒绝，但 CASTAOE 在所选 item 具有 aoetargeting、CanRepeatCast() 为真且玩家有 canrepeatcast 标签时可保留 valid；失败分支仅清 actionholdtime 后 return。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4558,
+                "line_end": 4584,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "7d658feb7d3d4572e0cdeff1a350f32e62eed49ac1731a83023fe82ae683ce42",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4558-L4584"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-139"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-03",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-03",
+            "classification": "NSF",
+            "statement": "DoAction 对当前 buffered action 按 action、target、pos 比较并可直接 return；例外要求当前动作正在 ispreviewing，且实体 idle 标签与 SG idle 状态标签同时存在。该重复检查没有比较 invobject、recipe 或整个 BufferedAction 对象。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4586,
+                "line_end": 4600,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "bcecabd7f3b2eed2d3ab149c9808891a30b09f4af8d772079f48b220b03b9b5a",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4586-L4600"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-140"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-04",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-04",
+            "classification": "NSF",
+            "statement": "到达分发前，DoAction 清 attack_buffer、调用 DoActionAutoEquip，并仅在动作非 instant、非 invalid_hold_action 且 buffaction:IsValid() 时把它记为 lastheldaction；否则清 actionholdtime。这里的 IsValid 为假并不会在此处 return，随后仍进入 mastersim/locomotor 分支。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4618,
+                "line_end": 4644,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "13aa633362287af9da927f5bf95c6fae60e2ad2244a5325a74feb803a320dbaf",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4618-L4644"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-141"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-05",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-05",
+            "classification": "NSF",
+            "statement": "DoAction 的主分发先判断 self.ismastersim：真时调用 self.locomotor:PushAction(buffaction, true)。非 master 且 self.locomotor 为 nil 时，仅在 non_preview_cb 与 action.pre_action_cb 同时存在时先调用 pre_action_cb(buffaction)，再调用 non_preview_cb()。非 master 且具有 locomotor 时，仅 CanLocomote() 为真才调用 PreviewAction(buffaction, true)。该分支段不直接调用 action.fn 或 BufferedAction:Do。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4629,
+                "line_end": 4644,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "26cad9a5496088dafab9d57b47dc5b348cf930254592ddea4a8ce5dd8c58ef1e",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4629-L4644"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-142"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C02",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q2-DISPATCH-06",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q2-DISPATCH",
+            "fact_id": "NATIVE003-Q2-DISPATCH-06",
+            "classification": "NSF",
+            "statement": "在 DoAction 的无 locomotor 后置分支中，缺少 non_preview_cb 时本函数不替它调用 pre_action_cb；源码注释说明这是兼容由别处手动触发 pre_action_cb 的旧行为。与前置路径相比，有 pre_action_cb 的 non_preview_cb 要等到本函数通过早退检查后才触发。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4542,
+                "line_end": 4552,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "47795a61a39bace3a8881c8ed1d2ff0631f16364d2b08d0b99c392392964fb55",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4542-L4552"
+              },
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PlayerController:DoAction",
+                "line_start": 4631,
+                "line_end": 4641,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "f1e8965826f7ec4525b3b2c4c847728ba430a4ada6da097cd296174aa54f46e2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4631-L4641"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-138",
+            "N003-SRC-143"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-004",
+            "source_fact_index": 1,
+            "statement": "PushAction 先通知玩家 controller 的 OnRemoteBufferedAction，再运行 pre_action_cb 与 TestForStart，失败发 actionfailed。PreviewAction 也运行 pre_action_cb，但所读入口直接 Clear 后按目标/位置分流。",
+            "citations": [
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "PushAction",
+                "line_start": 882,
+                "line_end": 913,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "73d80f57b421aba2ebd945a952cedbec416089afb92c90cc7313f06d60fe53d7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L882-L913"
+              },
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "PreviewAction",
+                "line_start": 782,
+                "line_end": 800,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "abcb624fe35671730f1e6c85625a289d165ebe282806fc288d60108f14295dcc",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L782-L800"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-040",
+            "N003-SRC-041"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-004",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-004",
+            "source_fact_index": 4,
+            "statement": "到达且非冷却时发 onreachdestination、调用 atdestfn；移交动作前先把 locomotor.bufferedaction 置 nil，再按 mastersim 调 PushBufferedAction 或 PreviewBufferedAction，最后 Stop/Clear。注释说明置 nil 用于避免已移交动作被 Clear 失败处理。",
+            "citations": [
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "onreachdestination",
+                "line_start": 1489,
+                "line_end": 1521,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "6986c0de14d810b1c75f979b912c7898d7ab42e7c459d167f128c8fb6de7922e",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L1489-L1521"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-045"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-004",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-004",
+            "source_fact_index": 5,
+            "statement": "GoToEntity/GoToPoint 在 SG 非 moving 时立即尝试 OnUpdate(0,true)，不保证等下一帧才发生到达检查。",
+            "citations": [
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "OnUpdate",
+                "line_start": 1029,
+                "line_end": 1037,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "2a7816fa8cfa1502c81d372edba9fd7194abc74697deb4c687617cdb28abac97",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L1029-L1037"
+              },
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "OnUpdate",
+                "line_start": 1068,
+                "line_end": 1076,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "5713136f8376e69fb931a4d491ef9ff0aeb6b6eaa6f292c88f86f4be7a9ee54c",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L1068-L1076"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-046",
+            "N003-SRC-047"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-004",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-005",
+            "source_fact_index": 1,
+            "statement": "LocoMotor:Clear 清目标、到达回调和移动意图，并 SetBufferedAction(nil)；SetBufferedAction 对旧动作调用 Fail。Stop 重置目标/路径、停止移动或交给 softstop SG、发 locomote 并停止更新，但清 bufferedaction 的语句被注释。",
+            "citations": [
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "Clear",
+                "line_start": 755,
+                "line_end": 763,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "984ffd34eebb5887cc0a7219ae92998db2bcfde2d788f3d911ad1ce60efc6dc7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L755-L763"
+              },
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "SetBufferedAction",
+                "line_start": 1078,
+                "line_end": 1114,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "c8ce1c3f375bde1ba4587eddc2700529a01503d3714b6aa66b065ad5b212c368",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L1078-L1114"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-048",
+            "N003-SRC-049"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-005",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF05",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-005",
+            "source_fact_index": 3,
+            "statement": "方向/拖拽输入松开分支仅在 CanLocomote() 且 controller_attack_override == nil 时 Stop locomotor 并捕获其 bufferedaction；清理移动标志后，只有确实捕获 buffaction 才按 mastersim 重新 PushAction 或 PreviewAction。注释说明此逻辑用于恢复与松移动键同时提交的动作。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "PushAction",
+                "line_start": 4382,
+                "line_end": 4415,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "8ae3d48dd7343f30b9bad0099af7f25abdfec4c505c24c941baffcc81e1c2f9f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4382-L4415"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-053"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-005",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF06",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-005",
+            "source_fact_index": 4,
+            "statement": "RemoteBufferedAction 只有在 classified 存在且 iscontrollerenabled 为真时，才会发送已有预测缓存对应的 GetWorldPosition（注释明确不是 GetPredictionPosition）并调用 preview_cb；缺少或禁用 classified 的分支只清缓存 tick。LocoMotor:PushAction 在存在 playercontroller 时调用其 OnRemoteBufferedAction。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "RemoteBufferedAction",
+                "line_start": 5750,
+                "line_end": 5763,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "eb3f4c75de966b11be8c84820bfe1f123deeab7577fde1217fb1ef5352190449",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5750-L5763"
+              },
+              {
+                "path": "scripts/components/locomotor.lua",
+                "symbol": "PushAction",
+                "line_start": 882,
+                "line_end": 887,
+                "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+                "range_sha256": "2d603787155d4f3e6af5d3919910bd6f9f3c5584c18e77974eaf4f9269936ca1",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L882-L887"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-036",
+            "N003-SRC-054"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-005",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C10",
+          "original_atom": {
+            "atom_id": "N003-C10-NSF07",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-005",
+            "source_fact_index": 5,
+            "statement": "服务器 OnRemoteBufferedAction 对残余预测点按条件对齐并把 remote_vector.y 设为 5；DoPredictWalking 遇到此模式且已持有/执行动作或非 idle/moving 状态时忽略预测移动，避免覆盖动作。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "OnRemoteBufferedAction",
+                "line_start": 5765,
+                "line_end": 5808,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "2b62e4e540ee4448318c54370c48776a215ba78e8c9ece922a365b966c10c5da",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5765-L5808"
+              },
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "DoPredictWalking",
+                "line_start": 4003,
+                "line_end": 4032,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "84e5b3080f08230dc65a8c550c8bcd6a47db41211424c60c3a50d1da080a1a87",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L4003-L4032"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-055",
+            "N003-SRC-056"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-005",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "请求回调已运行、locomotor/SG 已接手和 action.fn 已运行是不同观察；局部检查不能提升成统一请求门禁。",
+          "basis_atom_ids": [
+            "NATIVE003-Q2-DISPATCH-01",
+            "NATIVE003-Q2-DISPATCH-05",
+            "N003-C10-NSF02"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "日志与排错按请求、分发、移动 owner、实体 owner 分层；改变取消/清理代码前检查哪个对象仍持有动作。",
+          "basis_atom_ids": [
+            "N003-C02-NSF04",
+            "N003-C10-NSF02",
+            "N003-C10-NSF04"
+          ]
+        }
+      ],
+      "UNK": [
+        "DoActionAutoEquip 内部未研究。",
+        "其它输入设备入口、复杂输入竞态、完整 RPC 安全契约未在本轮研究。"
+      ],
+      "scope": "已引 LeftClick 与 DoAction 分支、locomotor 到达/清理、RemoteBufferedAction；不成为完整移动网络协议条目。",
+      "does_not_mean": [
+        "每种输入或 RPC 都走 LeftClick。",
+        "Stop 与 Clear 同义。",
+        "每次到达或转交都延后一帧。",
+        "这里给出通用恰好一次或安全受理保证。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-02",
+          "linkkind": "REUSE_SIDE_BOUNDARY",
+          "reason": "权威端与远端客户端的实际可用对象不同。"
+        },
+        {
+          "id": "AI-N001-09",
+          "linkkind": "COMPLEMENT_OWNER_SCOPE",
+          "reason": "复用真实 owner 概念；本条只补动作 buffer 的转交。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-01",
+          "linkkind": "REUSE_WITH_SUPPLEMENT",
+          "reason": "复用 LeftClick 服务器候选重建，补 DoAction 与移动转交分支。"
+        },
+        {
+          "id": "NC-N002-FINAL-03",
+          "linkkind": "REFINE_BRANCH_CONDITION",
+          "reason": "复用 Host/Remote 具体入口汇合；精化早发 non_preview_cb 和分发条件。"
+        },
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "REUSE_STAGE_BOUNDARY",
+          "reason": "复用预演、请求、结果不同阶段；本条不再建立同义 CORE。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "LeftClick",
+          "basis_atom_ids": [
+            "N003-C02-NSF01",
+            "N003-C02-NSF02",
+            "N003-C02-NSF03"
+          ],
+          "limit": "仅所引鼠标入口，code/mod_name 匹配不是所有输入协议。"
+        }
+      ],
+      "unexecuted_tests": [],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C02",
+          "guards": [
+            "The cited mouse path is LeftClick, not every input device or RPC.",
+            "Do not hardcode numeric action code."
+          ],
+          "unknowns": [
+            "Other device-specific dispatch paths are outside this overlay."
+          ]
+        },
+        {
+          "candidate_id": "N003-C10",
+          "guards": [
+            "No full networking/security treatment here.",
+            "Do not infer every action waits one frame before arrival."
+          ],
+          "unknowns": [
+            "Complex input races are not measured."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-03",
+      "role": "CORE",
+      "title": "SG 选态、客户端预演与权威效果分别接入",
+      "origin_candidate_ids": [
+        "N003-C03",
+        "N003-C04"
+      ],
+      "question": "哪个 graph handler 选择状态，客户端和权威端各自承担什么？",
+      "coding_projection": {
+        "trigger": "新增 ActionHandler/状态，或把服务端 timeline 复制到 wilson_client。",
+        "generate": [
+          "按实际 graph 名称、入口、condition 和 deststate 注册 handler；分别检查 PreviewAction 与 StartAction 的回退。",
+          "客户端状态只沿选定预演/确认路径工作；权威效果从已经明确的执行路径触发。",
+          "将选态、动画、preview 请求、效果调用和结果五个信号分别表达。"
+        ],
+        "avoid": [
+          "假设所有动作必须有两套 SG。",
+          "客户端复制服务端 PerformBufferedAction timeline。",
+          "把 handler 命中、目的状态或动画播放当成功。"
+        ]
+      },
+      "reviewer_conditions": [
+        "能说明此动作是否需要客户端/权威端 handler，理由来自实际入口与回退。",
+        "REPAIR 示例严格限定 repairshortaction -> doshortaction；未读的 dolongaction 分支不套用。",
+        "所选客户端 doshortaction 完整状态没有 timeline commit 或 PerformBufferedAction；matching 分支还要求 FlattenMovementPrediction 返回真才转 idle(noanim)。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C03",
+          "original_atom": {
+            "atom_id": "N003-C03-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 1,
+            "statement": "AddStategraphActionHandler 按传入 stategraph 名称保存 handler；StateGraph 构造器将 Mod 的 handler 按 action 对象写入 actionhandlers 表。ActionHandler 的 state 参数可为字符串或返回状态名的函数。",
+            "citations": [
+              {
+                "path": "scripts/modutil.lua",
+                "symbol": "AddStategraphActionHandler",
+                "line_start": 517,
+                "line_end": 524,
+                "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+                "range_sha256": "3653cf6be86d64b5fee9a53efe116f28251a4f20ba823aa9eb10a0119af5eaac",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/modutil.lua#L517-L524"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "ActionHandler",
+                "line_start": 159,
+                "line_end": 171,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "fa53b88eeac7dc25d319af4bab5d0b2e41b605dfe57663950eacd1c8c981b850",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L159-L171"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "StateGraph",
+                "line_start": 274,
+                "line_end": 294,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "563cf68c9ce4f666b96179588a48c799701b5027c94ea578ad857c34158dd3a7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L274-L294"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-027",
+            "N003-SRC-028",
+            "N003-SRC-029"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C03",
+          "original_atom": {
+            "atom_id": "N003-C03-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 2,
+            "statement": "StateGraphInstance:PreviewAction 有匹配 handler 时检查 condition/deststate；缺少 handler 且不是 instant 时进入 previewaction 回退，否则可直接 PerformPreviewBufferedAction。StartAction 则没有同样的缺失 handler 回退；匹配后进入状态，或在无 deststate 时 PerformBufferedAction。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "PreviewAction",
+                "line_start": 405,
+                "line_end": 461,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "150e8c0758c6a2ee0edff2090538bde9aebe436529de869ac8601ad0d46ac80b",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L405-L461"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-030"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C04",
+          "original_atom": {
+            "atom_id": "N003-C04-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 3,
+            "statement": "SGwilson_client 的 CHOP handler 按形态/模块选择客户端预演状态；常规 chop_start 在 onenter 调用 PerformPreviewBufferedAction，并含服务器状态匹配及超时清理逻辑。SGwilson 的 CHOP handler 在常规分支选择 chop_start/chop，特定形态或模块另有 gnaw、wx_spin 等分支，状态条件也可拒绝；其常规 chop timeline 在相应条件下调用 PerformBufferedAction。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ActionHandler",
+                "line_start": 247,
+                "line_end": 257,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "d4275a46441b8e483016362fa88a34377da82d75e83ed639627c0ed916db01eb",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L247-L257"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "PerformPreviewBufferedAction",
+                "line_start": 2165,
+                "line_end": 2200,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "2a0ad8922df9921ed45213b98b6ab114ab18932a36df96c424f0d6d0b5e5cb64",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L2165-L2200"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "ActionHandler",
+                "line_start": 850,
+                "line_end": 868,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "199e71e5344c0baafb0eb3ff94e149fc0437a61e1c06939b5711fdb8d26af317",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L850-L868"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "PerformBufferedAction",
+                "line_start": 4930,
+                "line_end": 4992,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "ab9108316556d78213b4fee95b4dcb78587e63f1a6d00108a6c17fb230ff6854",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L4930-L4992"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-031",
+            "N003-SRC-032",
+            "N003-SRC-033",
+            "N003-SRC-034"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C04",
+          "original_atom": {
+            "atom_id": "NSF-SG-001",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-001",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "For this single REPAIR sample, both SGwilson and SGwilson_client handlers select doshortaction exactly when action.target has repairshortaction; their other branch selects dolongaction, which was not inspected.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "ActionHandler(ACTIONS.REPAIR)",
+                "line_start": 978,
+                "line_end": 980,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "9364b03d592b9a98b5e3e8f3bfa6b0609d84ce439cf1daed5dae0984983e0556",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L978-L980"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ActionHandler(ACTIONS.REPAIR)",
+                "line_start": 342,
+                "line_end": 344,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "9364b03d592b9a98b5e3e8f3bfa6b0609d84ce439cf1daed5dae0984983e0556",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L342-L344"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-144",
+            "N003-SRC-145"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C04",
+          "original_atom": {
+            "atom_id": "NSF-SG-002",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-002",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "Authority doshortaction stops the locomotor, captures inst.bufferedaction in statemem.action, saves silent, and sets a 10*FRAMES timeout. Its 6*FRAMES timeline event removes busy and calls PerformBufferedAction; the silent branch surrounds that call with IgnoreAll/StopIgnoringAll(\"silentpickup\"). These are the state-local action execution call sites, not proof of action success.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.onenter",
+                "line_start": 7909,
+                "line_end": 7922,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "67e8b736fef491a96b90e3840845cfb722e7fb48647fd3cdd17236fecb361cb8",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7909-L7922"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.timeline.TimeEvent(6*FRAMES)",
+                "line_start": 7924,
+                "line_end": 7935,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "2a52a1f3f039ddec081f25dba7bdc1d76d629dcb76e4365b9683560dc9244bc8",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7924-L7935"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-146",
+            "N003-SRC-147"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C04",
+          "original_atom": {
+            "atom_id": "NSF-SG-003",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-003",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "Predicted doshortaction declares server_states={\"doshortaction\"}, stops the locomotor and calls PerformPreviewBufferedAction in onenter, then sets TIMEOUT, whose local value is 2. The complete client state declares no timeline commit callback and contains no PerformBufferedAction call.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "TIMEOUT",
+                "line_start": 7,
+                "line_end": 7,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "c50c8f751779e8af31af023ae20089c80de67e097b23fefa1831d270c1c55169",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L7-L7"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "State doshortaction",
+                "line_start": 3086,
+                "line_end": 3120,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "56b8b46f2becbebfff71bd814f9bdf605e39e207a73397304204d10b59564db2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L3086-L3120"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-148",
+            "N003-SRC-149"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C04",
+          "original_atom": {
+            "atom_id": "NSF-SG-004",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-004",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "In the selected predicted state, onupdate first checks ServerStateMatches. If true, it goes to idle(\"noanim\") only when FlattenMovementPrediction returns true; the nil-buffered-action alternative is an elseif, so it runs only when the server state does not match. That alternative plays pickup_pst and enters idle(true). A server-state match is not itself a success/result check in this state.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "doshortaction.onupdate",
+                "line_start": 3104,
+                "line_end": 3113,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "d67d772faf620981533536f138e1ff2af1d7a9f294ada1a7b727b0913b5911f1",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L3104-L3113"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-150"
+          ],
+          "runtime_verified": false
+        }
+      ],
+      "EI": [
+        {
+          "statement": "有对应状态不代表两端实现对称；选态与效果触发之间仍隔着状态的具体路径。",
+          "basis_atom_ids": [
+            "N003-C03-NSF02",
+            "N003-C04-NSF01",
+            "NSF-SG-001",
+            "NSF-SG-002",
+            "NSF-SG-003"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "根据该动作真实入口分别设计 preview 和权威效果；只把 CHOP/REPAIR 作为有名称、有分支范围的参考。",
+          "basis_atom_ids": [
+            "N003-C03-NSF01",
+            "N003-C03-NSF02",
+            "NSF-SG-003",
+            "NSF-SG-004"
+          ]
+        }
+      ],
+      "UNK": [
+        "未检查角色/能力所需的 graph 与其即时、引导、多阶段路径。",
+        "REPAIR dolongaction、具体 action.fn 和资源效果未读。",
+        "FlattenMovementPrediction 原生内部保持 UNKNOWN。"
+      ],
+      "scope": "graph handler 框架与既有 CHOP；新增单个 REPAIR repairshortaction 的配对 doshortaction 静态样例。",
+      "does_not_mean": [
+        "每个动作需要双 SG。",
+        "CHOP/REPAIR 状态可直接作全部动作模板。",
+        "服务端 6*FRAMES 是通用效果时点。",
+        "state match 或 FlattenMovementPrediction 的布尔返回证明业务成功。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-02",
+          "linkkind": "REUSE_SIDE_BOUNDARY",
+          "reason": "避免把本地输入、客户端表现与权威效果混为同端初始化。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-01",
+          "linkkind": "COMPLEMENT_SG_INTEGRATION",
+          "reason": "已有 handler/回退摘要；本条补配对状态职责和单样例分支。"
+        },
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "REUSE_STAGE_BOUNDARY",
+          "reason": "已有 preview/执行/匹配不同；本条聚焦 SG 代码生成。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "CHOP",
+          "basis_atom_ids": [
+            "N003-C04-NSF01"
+          ],
+          "limit": "既有 named sample；不同形态、模块和常规分支保持原范围。"
+        },
+        {
+          "sample": "REPAIR repairshortaction -> doshortaction",
+          "basis_atom_ids": [
+            "NSF-SG-001",
+            "NSF-SG-002",
+            "NSF-SG-003",
+            "NSF-SG-004"
+          ],
+          "limit": "authority 6*FRAMES 调用 PerformBufferedAction、10*FRAMES timeout；client onenter preview、TIMEOUT=2。均为样例数字，不设为新动作默认值；执行调用不证明结果。"
+        }
+      ],
+      "unexecuted_tests": [
+        {
+          "id": "N003-RT01",
+          "classification": "PROJECT_ACCEPTANCE_PATTERN",
+          "status": "UNEXECUTED",
+          "relevance": "未来真实 Mod 的两端接入验收。"
+        }
+      ],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C03",
+          "guards": [
+            "Not every action needs two SG handlers.",
+            "A handler match or deststate is not action success."
+          ],
+          "unknowns": [
+            "Graph choice for an unexamined custom character requires its own integration review."
+          ]
+        },
+        {
+          "candidate_id": "N003-C04",
+          "guards": [
+            "CHOP branches and frame timing are sample-only.",
+            "Neither CHOP nor the added short-action pair proves a universal commit frame."
+          ],
+          "unknowns": [
+            "Unexamined abilities may use different immediate, channel, or multi-stage paths."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-04",
+      "role": "CORE",
+      "title": "执行结果、回调生命周期与状态确认分开",
+      "origin_candidate_ids": [
+        "N003-C05",
+        "N003-C11"
+      ],
+      "question": "PerformBufferedAction/Do/action.fn/callback 与 ServerStateMatches 各能证明什么？",
+      "coding_projection": {
+        "trigger": "执行重复、失败反馈缺失、状态 match 被用作奖励依据、相信 Do 自带服务器保护。",
+        "generate": [
+          "沿实际权威路径抵达 PerformBufferedAction -> BufferedAction:Do -> action.fn；在需要处显式限定业务 mutation 的端别。",
+          "区别 IsValid 早退、action.fn 假值返回、action.fn 真值返回和回调正常完成。",
+          "业务成功依具体权威结果；server_states/currentstate 缓存仅按状态确认契约使用。"
+        ],
+        "avoid": [
+          "用客户端 preview/state match 调 Do 或发奖励。",
+          "把每次 Do 返回 false 当 onfail 已派发。",
+          "把 Succeed/Fail 清双表当退款、原子事务或网络 ACK。"
+        ]
+      },
+      "reviewer_conditions": [
+        "Do 的 invalid 早退不调用 action.fn/Fail/Succeed，不更新 reason 或清表；调用者可能另行 Fail，须跟踪。",
+        "action.fn 第一返回值真值时，仍有效 invobject 的 OnUsedAsItem 先于 Succeed；无有效 invobject 仍调用 Succeed。",
+        "Succeed/Fail 用 pairs 调无参回调；正常遍历结束后才替换两组表，不宣称固定顺序、异常或重入安全。",
+        "action.validfn 的 mastersim 条件只限制该 validator；Do/Succeed/Fail 没有总体权威或事务门禁。",
+        "ServerStateMatches 只是集合对 currentstate hash 的查询；重复尝试的旧缓存不作为新结果。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "N003-C05-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 5,
+            "statement": "BufferedAction:Do 先调用 IsValid，再调用 action.fn，并根据返回值执行成功或失败回调。IsValid 检查物品/执行者/目标有效性、所有权相关状态、平台和 self.validfn；action.validfn 额外只在 TheWorld.ismastersim 时评估。该 Do 函数自身没有总的 mastersim 门禁。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "Do",
+                "line_start": 22,
+                "line_end": 50,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L50"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-038",
+            "N003-SRC-158",
+            "N003-SRC-166"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "N003-C05-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-NETACT-009",
+            "source_fact_index": 6,
+            "statement": "EntityScript:PushBufferedAction 会做 TestForStart，instant 动作直接 Do；非 instant 动作有 SG 时调用 StartAction，若 StartAction 不成功则触发失败并清空 bufferedaction。",
+            "citations": [
+              {
+                "path": "scripts/entityscript.lua",
+                "symbol": "PushBufferedAction",
+                "line_start": 1609,
+                "line_end": 1652,
+                "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+                "range_sha256": "b29f053b6aac5bc7499ecb24e889268b44fbc35d97df49efc8f4c085e5e41e31",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1609-L1652"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-039"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-NETACT-009",
+            "fact_index_zero_based": 5,
+            "legacy_source_fact_index": 6,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-01",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-01",
+            "classification": "NSF",
+            "statement": "BufferedAction 构造器初始化 onsuccess 与 onfail 两个空表；AddSuccessAction 和 AddFailAction 分别用 table.insert 添加回调。构造器还保存 initialtargetowner 和创建时的 doerownsobject，用于后续 IsValid 检查。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction constructor",
+                "line_start": 2,
+                "line_end": 20,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "a89889231a6e51ca361c2c0161fc3ec7dc5653ac436f8b25b30b5d87df108328",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L2-L20"
+              },
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:AddFailAction; BufferedAction:AddSuccessAction",
+                "line_start": 74,
+                "line_end": 80,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "bcc387f079aa5429a2ad20af3c2cbebbd14e49983299c4588e2748eb19d5dab8",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L74-L80"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-151",
+            "N003-SRC-152"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-02",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-02",
+            "classification": "NSF",
+            "statement": "BufferedAction:Do 在 IsValid() 为假时直接 return false；这一早退没有调用 action.fn、Fail 或 Succeed，也未更新 self.reason 或清空成功/失败回调表。这只描述 Do 自身，不排除调用者另行执行 Fail。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Do",
+                "line_start": 22,
+                "line_end": 37,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "54bce4eccd8c3993e157cee24cb1961abad6328f20a2b0cc34101feccc379575",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L37"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-153"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-03",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-03",
+            "classification": "NSF",
+            "statement": "第一返回值 success 为真值时，若 invobject 仍存在且有效则先调用 OnUsedAsItem，随后无论有无有效 invobject 都调用 Succeed；仅第一返回值为假值时调用 Fail。函数先保存 reason，最后返回 success, reason。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Do",
+                "line_start": 22,
+                "line_end": 37,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "54bce4eccd8c3993e157cee24cb1961abad6328f20a2b0cc34101feccc379575",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L37"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-153"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-04",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-04",
+            "classification": "NSF",
+            "statement": "Succeed 用 pairs 遍历 onsuccess 并以 v()、无参数方式调用各回调；遍历正常完成后，把 onsuccess 与 onfail 都替换为空表。它没有在这个函数中调用 action.fn。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Succeed",
+                "line_start": 82,
+                "line_end": 88,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "cb13c72a30b0b32dec2d52ac1a23874eda11dbb4396cfa74d826ebd1a3f98116",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L82-L88"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-154"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-05",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-05",
+            "classification": "NSF",
+            "statement": "Fail 用 pairs 遍历 onfail 并以 v()、无参数方式调用各回调；遍历正常完成后同样把 onsuccess 与 onfail 都替换为空表。它没有在这个函数中调用 action.fn，也没有撤销 action.fn 已产生效果的逻辑。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Fail",
+                "line_start": 104,
+                "line_end": 110,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "5dd8244617dd8b82d27de63615841036d7bab1a7230fa1a2cb81891eafc0a95b",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L104-L110"
+              }
+            ],
+            "novelty": "new_gap_evidence",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-155"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-06",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-06",
+            "classification": "NSF",
+            "statement": "IsValid 检查 invobject、doer、target、位置平台以及物品持有关系；autoequipped 时要求 doer 的 active item 为 nil，target 的当前 inventoryitem.owner 要等于构造时保存的 initialtargetowner。self.validfn 在存在时参与检查，action.validfn 仅在 TheWorld.ismastersim 时参与；TestForStart 直接别名到 IsValid。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:IsValid; BufferedAction.TestForStart",
+                "line_start": 39,
+                "line_end": 50,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "28251625f7fa88438f978b7a17158407cc74078047c4de13c1e20f59ca043a43",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L39-L50"
+              },
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction constructor",
+                "line_start": 2,
+                "line_end": 8,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "0c0c241fb280c20b843320b931ccf1d4c0f188b56db63e9a3b25da59f8d514a7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L2-L8"
+              }
+            ],
+            "novelty": "baseline_fact_verified_and_precision_extended",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-156",
+            "N003-SRC-157"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C05",
+          "original_atom": {
+            "atom_id": "NATIVE003-Q5-CALLBACK-07",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+            "fact_id": "NATIVE003-Q5-CALLBACK-07",
+            "classification": "NSF",
+            "statement": "Do 的 action.fn 调用没有整体 mastersim 门禁；IsValid 中的 mastersim 条件只控制 action.validfn 是否被调用。Succeed/Fail 的源码也没有独立服务器权限、事务提交或网络确认检查。",
+            "citations": [
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Do; BufferedAction:IsValid",
+                "line_start": 22,
+                "line_end": 50,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L50"
+              },
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Succeed",
+                "line_start": 82,
+                "line_end": 88,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "cb13c72a30b0b32dec2d52ac1a23874eda11dbb4396cfa74d826ebd1a3f98116",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L82-L88"
+              },
+              {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Fail",
+                "line_start": 104,
+                "line_end": 110,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "5dd8244617dd8b82d27de63615841036d7bab1a7230fa1a2cb81891eafc0a95b",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L104-L110"
+              }
+            ],
+            "novelty": "baseline_authority_limit_verified_and_callback_scope_extended",
+            "evidence_level": "E3",
+            "runtime_tested": false
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-038",
+            "N003-SRC-158",
+            "N003-SRC-166",
+            "N003-SRC-154",
+            "N003-SRC-155"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C11",
+          "original_atom": {
+            "atom_id": "N003-C11-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 1,
+            "statement": "State 将 server_states 名称 hash 为集合并保存 forward_server_states；GoToState 的客户端分支按条件继承前态集合或使用新态集合。ServerStateMatches 用集合索引 classified.currentstate，源码刻意不检查 server_states 是否 nil。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "State",
+                "line_start": 213,
+                "line_end": 243,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "6ce5834f1e2fc65a4f9ab54b714d597c21b2201c77e78afa0023f76da761ee64",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L213-L243"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "server_states",
+                "line_start": 568,
+                "line_end": 577,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "e4009de59c5d17d50033b4c0a70f27562a3b13c5b574d544da263134a14e8318",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L568-L577"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "ServerStateMatches",
+                "line_start": 746,
+                "line_end": 752,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "987d5525702016a21c4c237b9a1a86e323c34c87bc39a752ac4b524b1f5aa818",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L746-L752"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-057",
+            "N003-SRC-058",
+            "N003-SRC-059"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C11",
+          "original_atom": {
+            "atom_id": "N003-C11-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 2,
+            "statement": "classified.currentstate 是 net_hash。服务器开启预测时监听 newstate；OnNewState 先 set_local(0) 再写当前实际 SG state，注释指出 onenter 链式 GoToState 可能使 newstate 事件顺序反转，故不使用 data.statename。",
+            "citations": [
+              {
+                "path": "scripts/prefabs/player_classified.lua",
+                "symbol": "currentstate",
+                "line_start": 1587,
+                "line_end": 1593,
+                "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+                "range_sha256": "757401b8d59ceb0b7a3953ab3394c5ea2c8f65a8ee0df9cf0eddf2794ae3402f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1587-L1593"
+              },
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "OnNewState",
+                "line_start": 5909,
+                "line_end": 5938,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "1c6a8fb4907cd51a596395230610d761ff8e528393f13ab40def7b792da87e15",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5909-L5938"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-060",
+            "N003-SRC-061"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C11",
+          "original_atom": {
+            "atom_id": "N003-C11-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 3,
+            "statement": "ClearCachedServerState 在客户端 set_local(0)，注释用于避免重复相同动作时将旧确认当新确认。idle(\"noanim\") 停止/清理 locomotor、清缓存，并用超时清仍在 previewing 的实体动作。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearCachedServerState",
+                "line_start": 228,
+                "line_end": 236,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "d6c8fe4104cd4467252faa813f532ace5ac4c2688c0d05f541d1985930e7d600",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L228-L236"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearCachedServerState",
+                "line_start": 1086,
+                "line_end": 1117,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "3eeedeaa12cea6268f5cd45347eac56e3306d41e50c108cd88d240cdef9fa29e",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1086-L1117"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ispreviewing",
+                "line_start": 1170,
+                "line_end": 1178,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "01868ffc3a5ee62c2e3e3da490efdff489b1f9699d5818d713fd86dc13b26f04",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1170-L1178"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-062",
+            "N003-SRC-063",
+            "N003-SRC-064"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C11",
+          "original_atom": {
+            "atom_id": "N003-C11-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 4,
+            "statement": "客户端通用 sg_cancelmovementprediction 进入 idle(\"cancel\")；该取消分支及 nopredict/pausepredict 条件会 Stop/Clear locomotor、ClearBufferedAction 后返回。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "EventHandler",
+                "line_start": 1009,
+                "line_end": 1013,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "17dd1c15f325ef254f0230577a74476345b16390e8825f0fabdba913fd0049a7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1009-L1013"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearBufferedAction",
+                "line_start": 1086,
+                "line_end": 1099,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "e29578c08f9bb85e3feb6895a0f50342bd5bf1e3a8190558a023a3bd8a7a8cf2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1086-L1099"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-065",
+            "N003-SRC-066"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C11",
+          "original_atom": {
+            "atom_id": "N003-C11-NSF05",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 5,
+            "statement": "SGTagsToEntTags 只列出选定标签，含 busy/moving/autopredict/nopredict/pausepredict。GoToState 仅在 mastersim 或无 Network 时按该表同步实体标签，不是任意自定义 SG tag 都在这里映射。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "SGTagsToEntTags",
+                "line_start": 500,
+                "line_end": 523,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "5a0c56f9adaa09984a57409c5fb6d453ff3d1becc95b318e44f178eaa5322104",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L500-L523"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 566,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "be24d8899925dde9360fcf2f376ce9f3a1db03c71710f260812c4873b6839332",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L566"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-067",
+            "N003-SRC-068"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "执行方法、fn 返回值、回调完成和预测状态确认是不同观察；任一信号不能自动证明所有后续阶段。",
+          "basis_atom_ids": [
+            "N003-C05-NSF01",
+            "NATIVE003-Q5-CALLBACK-02",
+            "NATIVE003-Q5-CALLBACK-03",
+            "NATIVE003-Q5-CALLBACK-04",
+            "N003-C11-NSF01",
+            "N003-C11-NSF03"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "每次尝试只布置其设计需要的权威效果调用点；失败路径按 invalid 和 fn-failure 分别审查，反馈读取具体业务结果。",
+          "basis_atom_ids": [
+            "N003-C05-NSF02",
+            "NATIVE003-Q5-CALLBACK-02",
+            "NATIVE003-Q5-CALLBACK-03",
+            "NATIVE003-Q5-CALLBACK-07"
+          ]
+        }
+      ],
+      "UNK": [
+        "具体 action.fn、OnUsedAsItem 和自定义回调如何扣除/返还资源未推广。",
+        "异常后清表、重入安全、回调顺序、全局恰好一次和原生 rollback 未证明。",
+        "currentstate 原生运输、包序与延迟机制未证明。"
+      ],
+      "scope": "BufferedAction 静态 Do/IsValid/TestForStart/注册/回调生命周期与所引 server-state hash/cache；NETACT-009 fact5 clarification 是补充，不修写基线。",
+      "does_not_mean": [
+        "Do 自带 universal mastersim gate。",
+        "instant 与非 instant 路径一样。",
+        "回调 success 或状态 match 是通用交易提交、磁盘保存、跨网 ACK。",
+        "Fail 撤销 action.fn 已发生的效果。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-02",
+          "linkkind": "REUSE_AUTHORITY_BOUNDARY",
+          "reason": "业务 mutation 端别仍由具体执行入口决定。"
+        },
+        {
+          "id": "AI-N001-10",
+          "linkkind": "COMPLEMENT_VIEW_SEMANTICS",
+          "reason": "字段可读与状态/业务结果语义分别判断，不能从载体存在推出新结果。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "REFINE_WITH_SUPPLEMENT",
+          "reason": "补充 invalid 早退、OnUsedAsItem 顺序及双回调表清理；保留原 F06 通过校验后的描述，不定性为旧错误。"
+        },
+        {
+          "id": "NC-N002-FINAL-02",
+          "linkkind": "REUSE_AUTHORITY_POLICY",
+          "reason": "请求资格和权威业务计算仍分层；本条不重新研究 RPC 校验。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "REPAIR client matching branch (cross-entry)",
+          "basis_atom_ids": [
+            "NSF-SG-004"
+          ],
+          "support_entry_id": "NC-N003-INT-03",
+          "limit": "match 为真时只检查 FlattenMovementPrediction；nil-bufferedaction 是 elseif，不能改述为独立成功分支。"
+        }
+      ],
+      "unexecuted_tests": [
+        {
+          "id": "N003-RT01",
+          "classification": "PROJECT_ACCEPTANCE_PATTERN",
+          "status": "UNEXECUTED",
+          "relevance": "按真实 Mod 设计计数权威 mutation；不是引擎 exactly-once 证明。"
+        }
+      ],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C05",
+          "guards": [
+            "Do itself is not a universal authority guard.",
+            "Instant and non-instant paths differ.",
+            "Callback success does not prove application-level atomic transaction or native rollback."
+          ],
+          "unknowns": [
+            "Action-specific resource refund semantics are not generalized."
+          ]
+        },
+        {
+          "candidate_id": "N003-C11",
+          "guards": [
+            "State hash match is not action.fn success.",
+            "Do not infer a rollback algorithm from Lua state matching."
+          ],
+          "unknowns": [
+            "Native matching transport, rollback internals and packet ordering remain UNKNOWN."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-05",
+      "role": "CORE",
+      "title": "效果时点、timeout、中断与资源清理有各自 owner",
+      "origin_candidate_ids": [
+        "N003-C06",
+        "N003-C08"
+      ],
+      "question": "timeline/timeout/onexit 如何调度，什么被重置、什么必须明确清理？",
+      "coding_projection": {
+        "trigger": "动画中断仍扣两次资源、退出态执行第二次效果、替换动作被误清、监听/任务残留。",
+        "generate": [
+          "选定这次动作设计需要的效果点，再分别审查到该点之前和之后的 timeout/中断。",
+          "GoToState 的 onexit 在旧 statemem 重建前；按原动作身份和拥有的资源清理，不覆盖替换动作或他人资源。",
+          "任务、监听和 modifier 各自记录 owner；SG-local reset 之外的资源有明确解绑/取消。"
+        ],
+        "avoid": [
+          "在 onexit 再调用一次 PerformBufferedAction 当清理。",
+          "给 timeout 和同时间 timeline 各放一份效果，假设 timeline 优先。",
+          "把 ClearBufferedAction、GoToState 或取消解释成退款。"
+        ]
+      },
+      "reviewer_conditions": [
+        "UpdateState 先 timeout，再 timeline，再 onupdate；timeout 换成不同状态对象会本轮 return。",
+        "timeline 前先推进 index；换状态对象或 timeinstate 变小会走额外 Update/return；不把同名状态重入当自动 no-op。",
+        "TimeEvent 同时间比较只有 a.time < b.time，不能依赖 tied 排序。",
+        "REPAIR authority onexit 仅清同一个捕获的当前 action，且排除 controller.lastheldaction 同对象；client 样例无本态 onexit，只证明显式 timeout 清理。",
+        "清 buffer 与已产生资源效果分开；实际退款政策还需具体 fn/组件与用户设计。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "N003-C06-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 2,
+            "statement": "GoToState 先查目标状态，不存在时打印信息并直接返回；存在时先执行当前状态 onexit(inst, 目标状态名)，然后替换 statemem、状态标签和当前状态，清空 timeout、重置 timeinstate 与 timelineindex，最后调用目标 onenter(inst, params)。这条路径没有跳过同名状态重入的判断。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 600,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L600"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-081"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "N003-C06-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 3,
+            "statement": "GoToState 每次把 statemem 设为新表，但该函数不重建 mem；onexit 位于 statemem 重建之前，onenter 位于重建之后。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 600,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L600"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-081"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "N003-C06-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-007",
+            "source_fact_index": 5,
+            "statement": "StartPreviewChannelCast 仅在 START/STOP 请求与当前 IsChannelCasting 状态不同的情况下设置临时倍率或其倒数；状态已经匹配或动作不属于这两类时，会调用 StopPreviewChannelCast 后返回。后续匹配状态由 performaction 监听检查，另有 TIMEOUT 任务触发清理，并非持续观察任意状态变化。StopPreviewChannelCast 在持有预测任务时取消任务、解除该监听并移除预测倍率。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "StopPreviewChannelCast",
+                "line_start": 78,
+                "line_end": 122,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "b13a953a56c9705eae96a6df32a1ebcdf09ccee18c847a6889c787f27a93d637",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L78-L122"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-077"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-007",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "N003-C06-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 4,
+            "statement": "客户端通用 sg_cancelmovementprediction 进入 idle(\"cancel\")；该取消分支及 nopredict/pausepredict 条件会 Stop/Clear locomotor、ClearBufferedAction 后返回。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "EventHandler",
+                "line_start": 1009,
+                "line_end": 1013,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "17dd1c15f325ef254f0230577a74476345b16390e8825f0fabdba913fd0049a7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1009-L1013"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearBufferedAction",
+                "line_start": 1086,
+                "line_end": 1099,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "e29578c08f9bb85e3feb6895a0f50342bd5bf1e3a8190558a023a3bd8a7a8cf2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1086-L1099"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-065",
+            "N003-SRC-066"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "NSF-SG-005",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-005",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "Authority doshortaction times out to idle(true). Its onexit calls ClearBufferedAction only if the current buffered action is the same object captured on entry and either no playercontroller exists or playercontroller.lastheldaction differs from that buffered action. Thus this callback does not indiscriminately clear a replacement action or the controller-held same action.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.onenter action capture",
+                "line_start": 7919,
+                "line_end": 7922,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "c00c94209fdcbe7d194a8109492f5aa4aeae7e860255bb8c7b45621fa6c7a671",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7919-L7922"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.ontimeout/onexit",
+                "line_start": 7939,
+                "line_end": 7950,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "0a46be1ff9bec0b1e68b0c10e2d1fb278ff5fc82002498910a439279e78975d2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7939-L7950"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-159",
+            "N003-SRC-160"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C06",
+          "original_atom": {
+            "atom_id": "NSF-SG-006",
+            "source_record_id": "SUPPLEMENT:NATIVE003-Q4-Q6",
+            "fact_id": "NSF-SG-006",
+            "classification": "NSF",
+            "evidence_level": "E3",
+            "runtime_tested": false,
+            "statement": "The selected predicted state has an explicit ontimeout that clears the buffered action, plays pickup_pst and enters idle(true), and has no state-local onexit callback. The selected authority state additionally calls TryResumePocketRummage at frame 8 and CheckPocketRummageMem on exit; only those call sites were read, not the helper implementations.",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "State doshortaction",
+                "line_start": 3086,
+                "line_end": 3120,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "56b8b46f2becbebfff71bd814f9bdf605e39e207a73397304204d10b59564db2",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L3086-L3120"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.timeline FrameEvent(8)",
+                "line_start": 7936,
+                "line_end": 7937,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "9d79ce2ad10119cbc95a65adfe5fa1b878c89d8ebbd8fe95dbbd1f88f656ee01",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7936-L7937"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson.lua",
+                "symbol": "doshortaction.onexit",
+                "line_start": 7944,
+                "line_end": 7950,
+                "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+                "range_sha256": "7492620b54044864824614fffc3126b8e1c8e1f04a3879c69d40e3d58d23dd4f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L7944-L7950"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-149",
+            "N003-SRC-161",
+            "N003-SRC-162"
+          ],
+          "runtime_verified": false
+        },
+        {
+          "candidate_id": "N003-C08",
+          "original_atom": {
+            "atom_id": "N003-C08-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-002",
+            "source_fact_index": 1,
+            "statement": "TimeEvent 要求数值时间与函数；FrameEvent 将帧数乘以 FRAMES。State 构造时收集 TimeEvent 并按 time 从小到大排序，比较器仅判断 a.time < b.time。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "TimeEvent",
+                "line_start": 183,
+                "line_end": 195,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "0983159025d63d72daea5a5a9222052e5f295bb449814dbc93d8471d9222a874",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L183-L195"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "Chronological",
+                "line_start": 209,
+                "line_end": 211,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "c330e6c55e44ffc04f2e4cbc9eaf3f1ee135f10d18bff5174bc9da0d0f02d738",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L209-L211"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "timeline",
+                "line_start": 253,
+                "line_end": 262,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "cce26b8d41b74df641e5635434826c5b1955d07e74600349d8057f43333ae7af",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L253-L262"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-086",
+            "N003-SRC-087",
+            "N003-SRC-088"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-002",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C08",
+          "original_atom": {
+            "atom_id": "N003-C08-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-002",
+            "source_fact_index": 2,
+            "statement": "UpdateState 先把 dt 加到 timeinstate，再处理 timeout；timeout 减去 dt 后小于 0.0001 时清空并执行 ontimeout。若该回调把 currentstate 换成不同状态对象，本轮立即返回，不继续旧状态的 timeline 与 onupdate。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "UpdateState",
+                "line_start": 646,
+                "line_end": 666,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "a89195510ee8f107ea25bf7d5b322471c0a119c3751d96116972612d06e6c05a",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L646-L666"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-089"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-002",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C08",
+          "original_atom": {
+            "atom_id": "N003-C08-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-002",
+            "source_fact_index": 3,
+            "statement": "timeout 处理之后，UpdateState 逐个执行时间不大于 timeinstate 的 timeline 事件；在调用事件前先推进 timelineindex。若事件改变状态对象或使 timeinstate 变小，代码转入额外 Update 调用并返回；没有触发该分支时才继续 timeline，之后调用 onupdate(inst, dt)。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "timelineindex",
+                "line_start": 668,
+                "line_end": 690,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "0b18db71db091fa9ab14182e18e69a024d498bf8a5dc522315ba36976b353028",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L668-L690"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-090"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-002",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C08",
+          "original_atom": {
+            "atom_id": "N003-C08-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-002",
+            "source_fact_index": 4,
+            "statement": "SetTimeout 通知 SGManager 将已登记实例送回 updaters，并保存 timeout。StateGraphInstance:Update 根据 GetTime 与 lastupdatetime 求 dt；存在 onupdate 就返回 0，否则返回下一 timeline 时间与 timeout 的较小等待量，都不存在时返回 nil。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "SetTimeout",
+                "line_start": 641,
+                "line_end": 644,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "d63e778b23a612f2883b687573f6247257f15f560526f706094c84a70bc330a7",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L641-L644"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "OnSetTimeout",
+                "line_start": 33,
+                "line_end": 37,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "a3ec247d411505bbc48fd29a7dbbc3eb4d5592e9e587f6cb8134a52ceff46a5c",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L33-L37"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "Update",
+                "line_start": 718,
+                "line_end": 744,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "bfd09f9b16e8025436e8c0b0a85e33802e747796985c4aa417f90dba4bbfc92c",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L718-L744"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-091",
+            "N003-SRC-092",
+            "N003-SRC-093"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-002",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "SG 清除 timeout/timeline/statemem 是状态调度；它不自动取消外部 task/listener，也不回滚已经应用的业务效果。",
+          "basis_atom_ids": [
+            "N003-C06-NSF01",
+            "N003-C06-NSF02",
+            "N003-C06-NSF03",
+            "N003-C08-NSF02",
+            "NSF-SG-005"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "cleanup 围绕自身持有的动作、任务、事件与 modifier；效果点和 cleanup 分开，并为替换/held-action 明确条件。",
+          "basis_atom_ids": [
+            "N003-C06-NSF03",
+            "NSF-SG-005",
+            "NSF-SG-006",
+            "N003-C08-NSF03"
+          ]
+        }
+      ],
+      "UNK": [
+        "任意动作的扣资源、预留、退款、rollback 未研究。",
+        "异常长 dt 的同态重入没有运行验证。",
+        "REPAIR pocket-rummage helper 内部及完整外部中断集合未读。"
+      ],
+      "scope": "状态切换、更新排序与明确 cleanup 调用；REPAIR 短分支和 channel-cast cleanup 各为单样例。",
+      "does_not_mean": [
+        "timeline 是 wall-clock 或 render-frame 精确保证。",
+        "每次退出清所有 buffered action。",
+        "SG 切换自动取消实体外部任务。",
+        "取消是自动退款。",
+        "每个动作在全局恰好一次执行。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-09",
+          "linkkind": "REUSE_LIFECYCLE_OWNER",
+          "reason": "复用 task/listener 真实 owner，N003 补 SG-local/action buffer 条件。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "COMPLEMENT_TIMING_CLEANUP",
+          "reason": "已有结果与预测区别；本条提供 timing/interrupt 代码检查。"
+        },
+        {
+          "id": "NC-N002-FINAL-08",
+          "linkkind": "RELATED_OWNER_BOUNDARY",
+          "reason": "只共享延期操作 owner 思路；网络队列/换玩家事实不迁移进此 SG 样例。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "REPAIR repairshortaction -> doshortaction",
+          "basis_atom_ids": [
+            "NSF-SG-005",
+            "NSF-SG-006"
+          ],
+          "limit": "authority 同对象/held-action 条件；client timeout 清动作且无本态 onexit。TryResumePocketRummage/CheckPocketRummageMem 只确认调用点。"
+        },
+        {
+          "sample": "StartPreviewChannelCast",
+          "basis_atom_ids": [
+            "N003-C06-NSF03"
+          ],
+          "limit": "只支持该临时预测 task/listener/modifier 清理形态；倍率与触发事件不能变为通用规则。"
+        }
+      ],
+      "unexecuted_tests": [
+        {
+          "id": "N003-RT01",
+          "classification": "PROJECT_ACCEPTANCE_PATTERN",
+          "status": "UNEXECUTED",
+          "relevance": "在真实自定义效果点前后中断，核对 owner 清理。"
+        }
+      ],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C06",
+          "guards": [
+            "GoToState resets SG-local state, not all entity tasks/listeners/resources.",
+            "Cancellation is not automatic resource refund."
+          ],
+          "unknowns": [
+            "Resource deduction/refund on arbitrary custom skills remains action-specific."
+          ]
+        },
+        {
+          "candidate_id": "N003-C08",
+          "guards": [
+            "Timeline timing is not wall-clock/render-frame precision.",
+            "SG transition does not cancel external scheduled tasks.",
+            "No claim that every buffered action globally executes exactly once."
+          ],
+          "unknowns": [
+            "Same-state reentry with unusually long dt is not runtime-tested."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-06",
+      "role": "CORE",
+      "title": "局部事件真值消费与全局回退分别检查",
+      "origin_candidate_ids": [
+        "N003-C07"
+      ],
+      "question": "同一 SG 事件什么时候还能运行同名全局 handler？",
+      "coding_projection": {
+        "trigger": "状态事件与全局事件均执行效果、GoToState 后同名事件仍触发、缓存事件跨态。",
+        "generate": [
+          "检查状态内 handler 的返回值及同名全局 handler；有意消费事件时返回真值。",
+          "检查入队 data.state 与处理时 currentstate；普通状态切换不当作事件消费。"
+        ],
+        "avoid": [
+          "本地处理器执行 mutation 后返回 nil，同时全局处理器再执行相同 mutation。",
+          "假设过期 state-bound 事件会全局丢弃。"
+        ]
+      },
+      "reviewer_conditions": [
+        "State:HandleEvent 只在 data 非 table、无 state 或等于此 State.name 时尝试本态 handler。",
+        "StateGraphInstance:HandleEvent 只有本態 handler 返回真值才跳过全局处理器。",
+        "SG PushEvent 会在传入 data 表写入当前 state；状态切换可使本态处理跳过而全局继续。",
+        "事件/状态按 name 的字典覆盖事实不被改述为自动链式组合。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C07",
+          "original_atom": {
+            "atom_id": "N003-C07-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-003",
+            "source_fact_index": 1,
+            "statement": "EventHandler 将声明的 name 转成小写。State 的 events 按事件名存为字典；StateGraph 的全局 events 也按事件名存储，随后加载的 Mod StategraphEvent 写入同一字典键。StateGraph 的 states 同样按 name 存储，Mod StategraphState 同名写入会替换该键。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "EventHandler",
+                "line_start": 173,
+                "line_end": 181,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "4c059e1db6fc8c991b547054ad07e4b18a4d72f1d33c7878409116485e791731",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L173-L181"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "events",
+                "line_start": 245,
+                "line_end": 251,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "78ced89dab31dddc4942064b22f7237d9606f9eb8c3e7c0bfd5e8e8a620ff4ee",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L245-L251"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "StategraphEvent",
+                "line_start": 296,
+                "line_end": 318,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "15b8e84467b2c694c12184b2eb58f255b98674c6a0d0eac49242877ad7a3a524",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L296-L318"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-097",
+            "N003-SRC-098",
+            "N003-SRC-099"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-003",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C07",
+          "original_atom": {
+            "atom_id": "N003-C07-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-003",
+            "source_fact_index": 2,
+            "statement": "State:HandleEvent 只在 data 非 table、data.state 为 nil 或 data.state 等于当前 State.name 时尝试状态内处理器，并直接返回该处理器的返回值；未命中时返回 false。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "HandleEvent",
+                "line_start": 264,
+                "line_end": 272,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "8ccc25b305e56c623694a80e2a4de51c6c8606b9f8a17190ed669bc6d7678375",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L264-L272"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-100"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-003",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C07",
+          "original_atom": {
+            "atom_id": "N003-C07-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-003",
+            "source_fact_index": 3,
+            "statement": "StateGraphInstance:HandleEvent 先调用当前状态 HandleEvent，只有其返回值为真值才跳过同名全局处理器。因此状态内处理器执行了逻辑但返回 nil，并不表示已经消费该事件。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "HandleEvent",
+                "line_start": 463,
+                "line_end": 471,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "b64df97909a23043de05438310c449e245b436e037f568ba1108b9e449692039",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L463-L471"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-101"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-003",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C07",
+          "original_atom": {
+            "atom_id": "N003-C07-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-003",
+            "source_fact_index": 4,
+            "statement": "StateGraphInstance:PushEvent 会在传入 data 表上写入 data.state = currentstate.name；没有 data 时新建带 state 的表，然后追加到 bufferedevents。HandleEvents 按 ipairs 依次处理缓存；若处理器更换了缓冲表则提前返回，正常结束时清空缓冲。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "PushEvent",
+                "line_start": 392,
+                "line_end": 399,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "b536142e3109d97384d1553f17666bdfe932abbf61b0f2fb49fa926817f4d477",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L392-L399"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "HandleEvents",
+                "line_start": 473,
+                "line_end": 494,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "f8a46a2fcec2cdf378a0bc62575ce655aaf529c15c00b6d6ba7f4b6bca26b57f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L473-L494"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-102",
+            "N003-SRC-103"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-003",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C07",
+          "original_atom": {
+            "atom_id": "N003-C07-NSF05",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-003",
+            "source_fact_index": 5,
+            "statement": "由于状态内事件要核对入队时的 data.state，而全局处理器不做相同状态名过滤，事件从入队到处理之间发生状态切换时，可能跳过当前状态处理器而继续到同名全局处理器。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "PushEvent",
+                "line_start": 392,
+                "line_end": 399,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "b536142e3109d97384d1553f17666bdfe932abbf61b0f2fb49fa926817f4d477",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L392-L399"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "HandleEvent",
+                "line_start": 264,
+                "line_end": 272,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "8ccc25b305e56c623694a80e2a4de51c6c8606b9f8a17190ed669bc6d7678375",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L264-L272"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "HandleEvent",
+                "line_start": 463,
+                "line_end": 471,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "b64df97909a23043de05438310c449e245b436e037f568ba1108b9e449692039",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L463-L471"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-102",
+            "N003-SRC-100",
+            "N003-SRC-101"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-003",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "本态执行过逻辑与事件已被消费不同；同名全局 handler 可能继续运行，形成第二个效果入口。",
+          "basis_atom_ids": [
+            "N003-C07-NSF02",
+            "N003-C07-NSF03",
+            "N003-C07-NSF05"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "有意消费时明确返回真值，并审查同名 local/global 的业务 mutation；用当前有效操作关联处理跨态事件。",
+          "basis_atom_ids": [
+            "N003-C07-NSF03",
+            "N003-C07-NSF04",
+            "N003-C07-NSF05"
+          ]
+        }
+      ],
+      "UNK": [
+        "SG 这些函数之外的实体 listener 排序未重研。"
+      ],
+      "scope": "State/StateGraphInstance 的 SG 内部事件缓存与局部/全局 dispatch；不覆盖所有实体事件系统。",
+      "does_not_mean": [
+        "GoToState 自动消费事件。",
+        "同名 handler 会自动合并。",
+        "旧态缓存事件总会丢弃。",
+        "普通 PushEvent 自动网络广播。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-09",
+          "linkkind": "RELATED_LIFECYCLE_DISTINCT_SCOPE",
+          "reason": "实体 listener owner 清理沿既有条目；SG dispatch 返回值是独立范围。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-05",
+          "linkkind": "RELATED_EVENT_DISTINCT_SCOPE",
+          "reason": "复用本地事件不自动网络广播边界；dirty/consumer 不能代替 SG 消费契约。"
+        }
+      ],
+      "sample_support": [],
+      "unexecuted_tests": [],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C07",
+          "guards": [
+            "Calling GoToState does not itself consume the event.",
+            "A stale state-bound event is not guaranteed to be globally discarded."
+          ],
+          "unknowns": [
+            "Entity listener ordering beyond these SG functions is not re-researched."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-07",
+      "role": "SUPPORTING",
+      "title": "共享定义、SG 实例与每次入态记忆分开",
+      "origin_candidate_ids": [
+        "N003-C09"
+      ],
+      "question": "状态定义、实例、statemem/mem 与 tags 应放什么？",
+      "coding_projection": {
+        "trigger": "多玩家共享执行标记、状态重入遗留标记、自定义 SG tag 被当网络标签。",
+        "generate": [
+          "每次入态 bookkeeping 放实例 statemem；刻意跨态的数据才放 mem，并另定义清理。",
+          "SG tag 用 SG API 检查；不要从任意自定义 tag 推断实体/网络同步。"
+        ],
+        "avoid": [
+          "把 per-player/attempt mutation 标记写在共享 State 定义。",
+          "把 sg.mem 当存档，或认为 onexit 后旧 statemem 仍是当前表。"
+        ]
+      },
+      "reviewer_conditions": [
+        "LoadStateGraph 缓存定义，SetStateGraph 为实体建独立 instance；runtime 标记没有泄入共享定义。",
+        "onexit 使用旧 statemem，onenter 使用新表；mem 不由 GoToState 重建。",
+        "只有 SGTagsToEntTags 白名单且所引端别条件才同步实体 tag；HasStateTag 查实例 tags。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C09",
+          "original_atom": {
+            "atom_id": "N003-C09-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 1,
+            "statement": "LoadStateGraph 按名称缓存 require 返回的 StateGraph 定义；SetStateGraph 则为实体新建 StateGraphInstance，并立即进入定义的 defaultstate。StateGraphInstance 保存独立的 tags、statemem 与 mem 表。",
+            "citations": [
+              {
+                "path": "scripts/entityscript.lua",
+                "symbol": "LoadStateGraph",
+                "line_start": 62,
+                "line_end": 73,
+                "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+                "range_sha256": "b8a0491ddbb2b271506ac0d05687f6da24246a6a2585f0c42c7dab11cb86220f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L62-L73"
+              },
+              {
+                "path": "scripts/entityscript.lua",
+                "symbol": "SetStateGraph",
+                "line_start": 1148,
+                "line_end": 1163,
+                "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+                "range_sha256": "bf2ff3d7b678f253dd30d732e59f6e8c7e6a7e76dc8a7e00f12104d9f5a5f418",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1148-L1163"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "StateGraphInstance",
+                "line_start": 332,
+                "line_end": 345,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "769fb95298b2f539b94801be9d3351532514528b4bfac8194da8e93f2242631c",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L332-L345"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-078",
+            "N003-SRC-079",
+            "N003-SRC-080"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C09",
+          "original_atom": {
+            "atom_id": "N003-C09-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 2,
+            "statement": "GoToState 先查目标状态，不存在时打印信息并直接返回；存在时先执行当前状态 onexit(inst, 目标状态名)，然后替换 statemem、状态标签和当前状态，清空 timeout、重置 timeinstate 与 timelineindex，最后调用目标 onenter(inst, params)。这条路径没有跳过同名状态重入的判断。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 600,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L600"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-081"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C09",
+          "original_atom": {
+            "atom_id": "N003-C09-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 3,
+            "statement": "GoToState 每次把 statemem 设为新表，但该函数不重建 mem；onexit 位于 statemem 重建之前，onenter 位于重建之后。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 600,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L600"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-081"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C09",
+          "original_atom": {
+            "atom_id": "N003-C09-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-AI-001",
+            "source_fact_index": 4,
+            "statement": "State 构造器将声明的 tags 转为集合；实例进入状态时复制到自己的 tags。只有 SGTagsToEntTags 白名单中的标签，且在 mastersim 或实体没有 Network 时，才在切换状态、AddStateTag 或 RemoveStateTag 中同步为实体标签；HasStateTag 仅读取实例 tags。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "State",
+                "line_start": 213,
+                "line_end": 230,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "7202bb0097bbcdc4ca3f89321f058ae20cb67e466cfe5a30cf3f8ad296036baf",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L213-L230"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "SGTagsToEntTags",
+                "line_start": 500,
+                "line_end": 523,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "5a0c56f9adaa09984a57409c5fb6d453ff3d1becc95b318e44f178eaa5322104",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L500-L523"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "GoToState",
+                "line_start": 529,
+                "line_end": 566,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "be24d8899925dde9360fcf2f376ce9f3a1db03c71710f260812c4873b6839332",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L529-L566"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "AddStateTag",
+                "line_start": 602,
+                "line_end": 618,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "0fb3e66689a1662d2e3ed26b9abff90ac380b07ed5f6f448937e504cbd21b0ed",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L602-L618"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-082",
+            "N003-SRC-067",
+            "N003-SRC-068",
+            "N003-SRC-083"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-AI-001",
+            "fact_index_zero_based": 3,
+            "legacy_source_fact_index": 4,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "定义缓存、实例数据和每次入态数据的寿命不同，状态切换不是持久化或所有数据清空。",
+          "basis_atom_ids": [
+            "N003-C09-NSF01",
+            "N003-C09-NSF02",
+            "N003-C09-NSF03"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "把 attempt 关联和 cleanup owner 留在实例内，决定跨态数据与持久化时使用单独契约。",
+          "basis_atom_ids": [
+            "N003-C09-NSF01",
+            "N003-C09-NSF03",
+            "N003-C09-NSF04"
+          ]
+        }
+      ],
+      "UNK": [
+        "任意递归状态切换的安全性未证明。"
+      ],
+      "scope": "共享 StateGraph 定义、实体 StateGraphInstance、GoToState 和 SG tag 映射。",
+      "does_not_mean": [
+        "sg.mem 保证持久化。",
+        "自定义 SG tag 自动成为实体/network tag。",
+        "同名状态重入是 no-op。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-06",
+          "linkkind": "REUSE_PERSISTENCE_BOUNDARY",
+          "reason": "保存数据必须跟真实序列化契约；运行 mem 不被自动认作存档。"
+        },
+        {
+          "id": "AI-N001-09",
+          "linkkind": "COMPLEMENT_INSTANCE_OWNER",
+          "reason": "本条仅细化 SG instance/entry 寿命。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-04",
+          "linkkind": "RELATED_REPLICATION_DISTINCT_SCOPE",
+          "reason": "复制字段有显式载体；SG tag 映射不是任意组件字段复制。"
+        }
+      ],
+      "sample_support": [],
+      "unexecuted_tests": [],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C09",
+          "guards": [
+            "sg.mem is not promised persistence.",
+            "Custom SG tag is not automatically entity/network tag."
+          ],
+          "unknowns": [
+            "Recursive arbitrary transitions are not proven safe."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-08",
+      "role": "CORE",
+      "title": "预测开关改变客户端拓扑并限定临时状态寿命",
+      "origin_candidate_ids": [
+        "N003-C12"
+      ],
+      "question": "预测开/关时哪些对象会改变，暂停/临时预测状态由谁清理？",
+      "coding_projection": {
+        "trigger": "只在 Host/预测开启时成功、客户端 locomotor/SG nil、预测倍率或 performaction 监听残留。",
+        "generate": [
+          "访问前核对当前端及预测拓扑；开启/关闭可添加/移除 locomotor/embarker、SG 和 controller.locomotor。",
+          "按实际 CanLocomote/IsBusy 条件处理动作；pause dirty 的事件和安排 task 分支分别判断。",
+          "临时 task/listener/modifier 有明确 owner 与停止函数，按实际分支清理。"
+        ],
+        "avoid": [
+          "假设每个远端客户端永久有 locomotor/SG。",
+          "把 pausepredict/busy 当通用取消或退款系统。",
+          "把 channel-cast 倍率/performaction cleanup 模板强制套到所有预测技能。"
+        ]
+      },
+      "reviewer_conditions": [
+        "EnableMovementPrediction 主体仅 USE_MOVEMENT_PREDICTION 且非 master；关闭清 controller.locomotor 并移除组件的路径被纳入。",
+        "服务器 Toggle 即使值未改变也会 Stop/Clear/ResetRemoteController；监听/currentstate 改动只在值改变分支。",
+        "pause dirty 在父玩家+HUD 条件下先取消旧任务，正 frames 才建新 task，但 frames<=0 仍发 cancelmovementprediction。",
+        "channel-cast 仅 START/STOP 与当前状态不同才设置临时倍率；匹配检查由 performaction 监听及 timeout 清理，非任意状态持续观察。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-001",
+            "source_fact_index": 1,
+            "statement": "EnableMovementPrediction 主体仅在 USE_MOVEMENT_PREDICTION 且非 mastersim 时执行。开启且 locomotor 缺失时，先添加 embarker、locomotor 并配置玩家/幽灵移动，再设置对应客户端 SG，同时更新 playercontroller.locomotor。",
+            "citations": [
+              {
+                "path": "scripts/prefabs/player_common.lua",
+                "symbol": "EnableMovementPrediction",
+                "line_start": 877,
+                "line_end": 907,
+                "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+                "range_sha256": "608c6308c14460165bbfd0128c554fa8174d2368e1760a17e78bf80b304e4be1",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L877-L907"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-104"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-001",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-001",
+            "source_fact_index": 2,
+            "statement": "开启路径调用 entity:EnableMovementPrediction(true)、设置 locomotor.is_prediction_enabled，并安排 DoTaskInTime(0) 发送开关 RPC；关闭路径解除取消预测监听、关闭预测、清动作/SG、清 controller.locomotor，移除 locomotor/embarker，随后安排 false RPC。",
+            "citations": [
+              {
+                "path": "scripts/prefabs/player_common.lua",
+                "symbol": "EnableMovementPrediction",
+                "line_start": 908,
+                "line_end": 944,
+                "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+                "range_sha256": "fb7e1ab4387f005ef140a7a5f78061387c89c79c92449c2ef6ca3e160838b57f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L908-L944"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-105"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-001",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-001",
+            "source_fact_index": 3,
+            "statement": "服务器 OnRemoteToggleMovementPrediction 设置 remote_predicting 后，即使值未改变也会 Stop/Clear locomotor、调整平台跳跃开关并 ResetRemoteController；只有值改变时才增删 newstate 监听与写 currentstate。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "OnRemoteToggleMovementPrediction",
+                "line_start": 5920,
+                "line_end": 5938,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "e4352eb33c4d8ec531cf2b78948e80d05c52e8a20090a3a9197d87d63876f5dc",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5920-L5938"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-106"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-001",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF04",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-006",
+            "source_fact_index": 1,
+            "statement": "CanLocomote 在 mastersim 直接返回真；客户端要求 locomotor、SG 非 busy、实体无 pausepredict、暂停预测帧非正并通过 entity:CanPredictMovement。IsBusy 服务器只读 SG busy，客户端还检查实体 busy 和暂停预测帧。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "CanLocomote",
+                "line_start": 760,
+                "line_end": 777,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "693d071a404341f61bd756ac4d78edf337cc20828e89a73077fe80e01f36ccda",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L760-L777"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-125"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-006",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF05",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-006",
+            "source_fact_index": 3,
+            "statement": "RemotePausePrediction 的 mastersim 分支写 classified 暂停预测帧。OnPausePredictionFramesDirty 在父玩家存在且有 HUD 时先取消旧暂停任务；只有 pausepredictionframes > 0 才安排 frames*FRAMES 后清本地值的新任务，但无论该值是否大于0都会发 cancelmovementprediction。player_common 将事件即时转交 SG 的 sg_cancelmovementprediction。",
+            "citations": [
+              {
+                "path": "scripts/components/playercontroller.lua",
+                "symbol": "RemotePausePrediction",
+                "line_start": 574,
+                "line_end": 578,
+                "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+                "range_sha256": "e1489ebbe46f4d93c3a090d63bbc2639c79faaa8db461ce58bdc3f4bb4998b03",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L574-L578"
+              },
+              {
+                "path": "scripts/prefabs/player_classified.lua",
+                "symbol": "PushPausePredictionFrames",
+                "line_start": 16,
+                "line_end": 25,
+                "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+                "range_sha256": "6d53968bae34274cca1133ae2902baa55b44c2f7b7817356b2587cac18599328",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L16-L25"
+              },
+              {
+                "path": "scripts/prefabs/player_classified.lua",
+                "symbol": "OnPausePredictionFramesDirty",
+                "line_start": 637,
+                "line_end": 653,
+                "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+                "range_sha256": "5d1cf7a474d884080a914bce93002f67e3c684c9a1a3d7876072a303786ecf5a",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L637-L653"
+              },
+              {
+                "path": "scripts/prefabs/player_common.lua",
+                "symbol": "OnCancelMovementPrediction",
+                "line_start": 870,
+                "line_end": 875,
+                "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+                "range_sha256": "2d88006a1359ad5cee1f94c77c908c098bc1209348c04bc0d32f804e30f72801",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L870-L875"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-129",
+            "N003-SRC-130",
+            "N003-SRC-131",
+            "N003-SRC-132"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-006",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C12",
+          "original_atom": {
+            "atom_id": "N003-C12-NSF06",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-007",
+            "source_fact_index": 5,
+            "statement": "StartPreviewChannelCast 仅在 START/STOP 请求与当前 IsChannelCasting 状态不同的情况下设置临时倍率或其倒数；状态已经匹配或动作不属于这两类时，会调用 StopPreviewChannelCast 后返回。后续匹配状态由 performaction 监听检查，另有 TIMEOUT 任务触发清理，并非持续观察任意状态变化。StopPreviewChannelCast 在持有预测任务时取消任务、解除该监听并移除预测倍率。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "StopPreviewChannelCast",
+                "line_start": 78,
+                "line_end": 122,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "b13a953a56c9705eae96a6df32a1ebcdf09ccee18c847a6889c787f27a93d637",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L78-L122"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-077"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-007",
+            "fact_index_zero_based": 4,
+            "legacy_source_fact_index": 5,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "预测开关不只是布尔偏好；它改变客户端可用对象和临时状态的 owner/lifetime。",
+          "basis_atom_ids": [
+            "N003-C12-NSF01",
+            "N003-C12-NSF02",
+            "N003-C12-NSF04",
+            "N003-C12-NSF06"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "自定义动作按实际开/关拓扑访问对象，并保证自身临时资源在匹配、timeout、停止或 owner 变化的需要路径清理。",
+          "basis_atom_ids": [
+            "N003-C12-NSF02",
+            "N003-C12-NSF05",
+            "N003-C12-NSF06"
+          ]
+        }
+      ],
+      "UNK": [
+        "原生移动模拟、延迟/包序机制保持 UNKNOWN。",
+        "任意自定义技能的开关兼容性和中断行为未运行。"
+      ],
+      "scope": "所引客户端预测开关、服务器 Toggle、CanLocomote/IsBusy、pause dirty 与单 channel-cast 临时机制；不扩展完整预测协议。",
+      "does_not_mean": [
+        "所有动作在所有端都有相同组件/SG。",
+        "pausepredict 或 busy 给出普遍取消政策。",
+        "channel-cast 数值与机制是通用原版推荐。",
+        "native 内部执行了已知 rollback。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-02",
+          "linkkind": "REFINE_CLIENT_TOPOLOGY",
+          "reason": "细化不同端对象存在性到预测开关可改变拓扑。"
+        },
+        {
+          "id": "AI-N001-03",
+          "linkkind": "REUSE_DEPENDENCY_PREDICATE",
+          "reason": "controller/locomotor/SG/暂停状态按具体依赖判断。"
+        },
+        {
+          "id": "AI-N001-09",
+          "linkkind": "REUSE_LIFECYCLE_OWNER",
+          "reason": "复用 task/listener 真实 owner，不创建同义 lifecycle CORE。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-03",
+          "linkkind": "COMPLEMENT_REMOTE_TOPOLOGY",
+          "reason": "已有特定无 locomotor 入口；本条补预测开关和临时资源。"
+        },
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "RELATED_PREDICTION_DISTINCT_SCOPE",
+          "reason": "已有结果边界，本条只补 topology/lifetime。"
+        }
+      ],
+      "sample_support": [
+        {
+          "sample": "StartPreviewChannelCast",
+          "basis_atom_ids": [
+            "N003-C12-NSF06"
+          ],
+          "limit": "临时倍率或倒数、performaction 匹配、TIMEOUT 清理都是该单机制，不作为所有动作默认政策。"
+        }
+      ],
+      "unexecuted_tests": [
+        {
+          "id": "N003-RT01",
+          "classification": "PROJECT_ACCEPTANCE_PATTERN",
+          "status": "UNEXECUTED",
+          "relevance": "未来实际动作 Host/Remote 与预测开/关的有限验收。"
+        }
+      ],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C12",
+          "guards": [
+            "Do not extrapolate pausepredict or busy to one universal cancellation system.",
+            "The channel-cast temporary-speed mechanism is sample-specific."
+          ],
+          "unknowns": [
+            "Native movement simulation and latency behavior remain UNKNOWN."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NC-N003-INT-09",
+      "role": "BOUNDARY_GUARDRAIL",
+      "title": "Lua 调用事实不能补写原生预测内部",
+      "origin_candidate_ids": [
+        "N003-C13"
+      ],
+      "question": "静态 Lua 证据不能建立哪些 prediction/rollback 承诺？",
+      "coding_projection": {
+        "trigger": "解释自动 rollback、网络顺序、延迟补偿、FlattenMovementPrediction 内部或统一退款。",
+        "generate": [
+          "只陈述已引 Lua 的状态集合、hash/cache、EnableMovementPrediction 调用与布尔返回分支。",
+          "原生机制明确 UNKNOWN；真实 Mod 验收只回答该实现的观察，不填引擎研究空白。"
+        ],
+        "avoid": [
+          "从方法名或 ServerStateMatches 反推出引擎事务/回滚算法。",
+          "为尚不存在的 Mod 建 native/packet/latency 大型 harness。",
+          "把 research-ready 或已有独立静态 PASS 当 canonical/评测/运行验收。"
+        ]
+      },
+      "reviewer_conditions": [
+        "所有 native rollback、包序、延迟补偿与 FlattenMovementPrediction 内部主张均为 UNKNOWN。",
+        "没有宣称新 DST/网络运行、canonical 写入或 solver/pilot 通过。",
+        "N003-RT01 只归 PROJECT_ACCEPTANCE_PATTERN；native_runtime_gap_count=0。"
+      ],
+      "native_atoms": [
+        {
+          "candidate_id": "N003-C13",
+          "original_atom": {
+            "atom_id": "N003-C13-NSF01",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 1,
+            "statement": "State 将 server_states 名称 hash 为集合并保存 forward_server_states；GoToState 的客户端分支按条件继承前态集合或使用新态集合。ServerStateMatches 用集合索引 classified.currentstate，源码刻意不检查 server_states 是否 nil。",
+            "citations": [
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "State",
+                "line_start": 213,
+                "line_end": 243,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "6ce5834f1e2fc65a4f9ab54b714d597c21b2201c77e78afa0023f76da761ee64",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L213-L243"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "server_states",
+                "line_start": 568,
+                "line_end": 577,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "e4009de59c5d17d50033b4c0a70f27562a3b13c5b574d544da263134a14e8318",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L568-L577"
+              },
+              {
+                "path": "scripts/stategraph.lua",
+                "symbol": "ServerStateMatches",
+                "line_start": 746,
+                "line_end": 752,
+                "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+                "range_sha256": "987d5525702016a21c4c237b9a1a86e323c34c87bc39a752ac4b524b1f5aa818",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraph.lua#L746-L752"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-057",
+            "N003-SRC-058",
+            "N003-SRC-059"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 0,
+            "legacy_source_fact_index": 1,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C13",
+          "original_atom": {
+            "atom_id": "N003-C13-NSF02",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-008",
+            "source_fact_index": 3,
+            "statement": "ClearCachedServerState 在客户端 set_local(0)，注释用于避免重复相同动作时将旧确认当新确认。idle(\"noanim\") 停止/清理 locomotor、清缓存，并用超时清仍在 previewing 的实体动作。",
+            "citations": [
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearCachedServerState",
+                "line_start": 228,
+                "line_end": 236,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "d6c8fe4104cd4467252faa813f532ace5ac4c2688c0d05f541d1985930e7d600",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L228-L236"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ClearCachedServerState",
+                "line_start": 1086,
+                "line_end": 1117,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "3eeedeaa12cea6268f5cd45347eac56e3306d41e50c108cd88d240cdef9fa29e",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1086-L1117"
+              },
+              {
+                "path": "scripts/stategraphs/SGwilson_client.lua",
+                "symbol": "ispreviewing",
+                "line_start": 1170,
+                "line_end": 1178,
+                "file_sha256": "0ee8cd91c7e4f29c9bb9bea21381e29f74103c6258ef734e8b4ad0d69337be53",
+                "range_sha256": "01868ffc3a5ee62c2e3e3da490efdff489b1f9699d5818d713fd86dc13b26f04",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson_client.lua#L1170-L1178"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-062",
+            "N003-SRC-063",
+            "N003-SRC-064"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-008",
+            "fact_index_zero_based": 2,
+            "legacy_source_fact_index": 3,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        },
+        {
+          "candidate_id": "N003-C13",
+          "original_atom": {
+            "atom_id": "N003-C13-NSF03",
+            "classification": "NSF",
+            "source_record_id": "VANILLA-PREDICT-001",
+            "source_fact_index": 2,
+            "statement": "开启路径调用 entity:EnableMovementPrediction(true)、设置 locomotor.is_prediction_enabled，并安排 DoTaskInTime(0) 发送开关 RPC；关闭路径解除取消预测监听、关闭预测、清动作/SG、清 controller.locomotor，移除 locomotor/embarker，随后安排 false RPC。",
+            "citations": [
+              {
+                "path": "scripts/prefabs/player_common.lua",
+                "symbol": "EnableMovementPrediction",
+                "line_start": 908,
+                "line_end": 944,
+                "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+                "range_sha256": "fb7e1ab4387f005ef140a7a5f78061387c89c79c92449c2ef6ca3e160838b57f",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L908-L944"
+              }
+            ]
+          },
+          "citation_manifest_ids": [
+            "N003-SRC-105"
+          ],
+          "runtime_verified": false,
+          "normalized_fact_locator": {
+            "record_id": "VANILLA-PREDICT-001",
+            "fact_index_zero_based": 1,
+            "legacy_source_fact_index": 2,
+            "index_base": 0,
+            "match_method": "statement equality"
+          }
+        }
+      ],
+      "EI": [
+        {
+          "statement": "调用与局部分支的 Lua 证据只支撑接入契约，不能证明 native 内部算法或业务原子性。",
+          "basis_atom_ids": [
+            "N003-C13-NSF01",
+            "N003-C13-NSF02",
+            "N003-C13-NSF03"
+          ]
+        }
+      ],
+      "REC": [
+        {
+          "statement": "保留 UNKNOWN，并按未来实际 Mod 的最小 mutation/cleanup 观察验收；无需推测引擎内部或扩大实验。",
+          "basis_atom_ids": [
+            "N003-C13-NSF01",
+            "N003-C13-NSF03"
+          ]
+        }
+      ],
+      "UNK": [
+        "native rollback implementation",
+        "packet ordering guarantees",
+        "latency compensation internals",
+        "FlattenMovementPrediction native behavior beyond observed Lua call/return branch"
+      ],
+      "scope": "原 N003-C13 的边界护栏，引用既有 NSF 而非新增 engine 事实；静态研究材料状态不自动升级。",
+      "does_not_mean": [
+        "自动回滚/退款已证明。",
+        "研究 ready 等于 canonical 或 evaluation accepted。",
+        "有限真实 Mod 日志观察能证明全引擎网络保证。"
+      ],
+      "related_N001": [
+        {
+          "id": "AI-N001-08",
+          "linkkind": "ANALOGOUS_ENGINE_BOUNDARY",
+          "reason": "同样坚持 Lua 可见层不证明原生原子提交；其存档事实不支持预测算法。"
+        }
+      ],
+      "related_N002": [
+        {
+          "id": "NC-N002-FINAL-06",
+          "linkkind": "REUSE_RESULT_BOUNDARY",
+          "reason": "复用无通用 ACK/交易/保存保证。"
+        },
+        {
+          "id": "NC-N002-FINAL-07",
+          "linkkind": "ANALOGOUS_ENGINE_BOUNDARY",
+          "reason": "队列名称不推出 native 保证；Shard 事实不迁移为预测证明。"
+        }
+      ],
+      "sample_support": [],
+      "unexecuted_tests": [],
+      "original_scope_guards": [
+        {
+          "candidate_id": "N003-C13",
+          "guards": [
+            "No native rollback algorithm verified.",
+            "No DST execution or network experiment performed.",
+            "Research-ready does not mean canonical or evaluation accepted."
+          ],
+          "unknowns": [
+            "Native rollback, packet ordering, latency compensation and engine internals."
+          ]
+        }
+      ]
+    }
+  ],
+  "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+  "index_convention": {
+    "original_atom_source_fact_index": "HISTORICAL_ONE_BASED_IN_N003_DOT_ATOMS_PRESERVED_UNCHANGED",
+    "dot_records_facts_array_index_base": 0,
+    "normalized_fact_locator_index_base": 0,
+    "normalized_fact_locator_usage": "Use normalized_fact_locator.fact_index_zero_based for records[].facts access; never use original_atom.source_fact_index as a zero-based array index.",
+    "dot_atom_occurrences": 55,
+    "supplementary_atom_occurrences": 19,
+    "supplementary_policy": "No normalized Dot fact locator is fabricated for the 19 SUPPLEMENT atoms; retain their own atom IDs and source citations.",
+    "resolution_method": "Unique statement equality within the specified record, then exact citation-value equality; assert legacy_source_fact_index equals normalized zero-based position plus one.",
+    "change_kind": "SOURCE_LOCATOR_ADAPTER_ONLY_NOT_NATIVE_FACT_CORRECTION",
+    "original_atom_mutated": false
+  }
+}

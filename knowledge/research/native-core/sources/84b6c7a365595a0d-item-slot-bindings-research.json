@@ -1,0 +1,455 @@
+{
+  "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+  "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+  "direct_facts": [
+    {
+      "id": "SLOT-F01",
+      "kind": "source_fact",
+      "statement": "ItemTile is constructed with one invitem object and stores exactly self.item=invitem. A missing invitem.replica.inventoryitem prints and returns early; the normal constructor ends with self:Refresh(). No SetItem, Kill, or OnRemove override is defined anywhere in this file. Identity rebinding belongs to consumer tile replacement, not a discovered SetItem API.",
+      "evidence_ids": [
+        "S01",
+        "S02",
+        "S03"
+      ]
+    },
+    {
+      "id": "SLOT-F02",
+      "kind": "source_fact",
+      "statement": "Refresh clears preview/ignore flags; only if movinganim==nil and replica.stackable exists, reads StackSize() into SetQuantity. Mastersim reads armor/perishable/finiteuses/fueled percent in that priority order, and rechargeable GetPercent()/GetRechargeTime() only when rechargeframe and the component exist. The remote branch calls self.item.replica.inventoryitem:DeserializeUsage(); this study proves the call, not the callee transport/initialization contract. Finally item.itemtile_Refresh is called with exactly (self.item,self.dragging), without a tile argument or a consumed return.",
+      "evidence_ids": [
+        "S02"
+      ]
+    },
+    {
+      "id": "SLOT-F03",
+      "kind": "source_fact",
+      "statement": "Item-bound state listeners are owned by self.inst, registered with invitem as explicit source. stacksizechange callback receives (invitem,data) and consumes data.stacksize when replica.stackable exists. percentusedchange consumes data.percent. If rechargeframe exists, rechargechange calls SetChargePercent(data.percent), rechargetimechange calls SetChargeTime(data.t). Recharge UI is initially created only for the rechargeable tag, with rechargepct=1 and rechargetime=math.huge. These are native stack/usage/recharge display contracts, not a custom three-use counter or Timer replica.",
+      "evidence_ids": [
+        "S04",
+        "S05",
+        "S06"
+      ]
+    },
+    {
+      "id": "SLOT-F04",
+      "kind": "source_fact",
+      "statement": "SetOnQuantityChangedFn(fn) stores one callback. SetQuantity(quantity) invokes it as a method, hence actual arguments (tile,quantity). A truthy return kills any existing quantity text and returns early; otherwise it displays its argument (over 999 becomes 999+). The inspected ordinary ItemTile Refresh/stacksizechange callers supply StackSize()/data.stacksize. The setter itself accepts a quantity argument and does not derive skill charges. The callback can replace native stack text, but neither setter nor callback supplies per-item skill charge state automatically.",
+      "evidence_ids": [
+        "S07",
+        "S02",
+        "S06"
+      ]
+    },
+    {
+      "id": "SLOT-F05",
+      "kind": "source_fact",
+      "statement": "SetChargeTime(t) stores a recharge duration scale, not remaining seconds, and independently starts/stops charge updates: math.huge stops; finite t with rechargepct<.9999 starts. OnUpdate(dt) returns while server paused, otherwise charge uses rechargepct+dt/rechargetime for positive duration, or .9999 for nonpositive duration. SetChargePercent always stores the passed percent, but animation/start/stop branches run only if self.recharge.shown. Within that gate the percent<1 branch stops at percent>=.9999, otherwise starts only if rechargetime<math.huge; the percent>=1 branch follows completion animation/hide and stops. There is no clamp preventing an update from overshooting into >=1. _StartUpdating/_StopUpdating share charge/shadow flags. These functions update UI state only and never invoke Timer or add gameplay charges. t must share the update delta time unit for the ratio; no wall-clock or custom remaining-seconds API is established here.",
+      "evidence_ids": [
+        "S08",
+        "S09"
+      ]
+    },
+    {
+      "id": "SLOT-F06",
+      "kind": "source_fact",
+      "statement": "The actual setter is ItemSlot:SetTile(tile), inherited by both InvSlot and EquipSlot. If self.tile~=tile, it kills the old nonnil tile first, sets self.tile=nil, adds nonnil tile as child and writes self.tile, raises existing label/readonly visuals, then invokes ontilechangedfn as method with (slot,tile), including nil. If the argument is the identical tile object, including nil/nil, the entire body is skipped: no Kill, add, refresh, or callback. There is no explicit return value (nil), including changed/nil/same branches. ItemSlot derives from Widget and has no Kill override; neither subclass overrides SetTile or Kill. EquipSlot installs a tile-changed callback that calls tile:SetIsEquip(true) only for nonnil tile; this decorates equipment without changing replacement cleanup.",
+      "evidence_ids": [
+        "S10",
+        "S11",
+        "S12",
+        "S24"
+      ]
+    },
+    {
+      "id": "SLOT-F07",
+      "kind": "source_fact_with_inherited_cleanup_composition",
+      "statement": "The setter calls old ItemTile:Kill, and ItemTile has no Kill override. Therefore replacement/clear reaches the already-established Widget:Kill path: stop updating, kill children, remove self.inst and its listeners/pending tasks. The cleanup owner is the tile widget entity and its killed child widget entities, not the referenced item. DoInspected visibly schedules its fallback on invitem itself; item-owned work is not covered by tile retirement.",
+      "evidence_ids": [
+        "S10",
+        "S03",
+        "S23"
+      ],
+      "inherited_refs": [
+        "baseline-v04:VANILLA-UI-002",
+        "baseline-v04:VANILLA-HOOK-005",
+        "baseline-v04:VANILLA-HOOK-006"
+      ]
+    },
+    {
+      "id": "SLOT-F08",
+      "kind": "source_fact",
+      "statement": "InventoryBar module returns class Inv. Constructor fixes self.owner=owner and registers itemget(data.item,self.inv[data.slot],data.src_pos,data.ignore_stacksize_anim), itemlose(self.inv[data.slot]), equip(data.item,data.eslot), unequip(data.item,data.eslot), refreshinventory→Refresh(true) listeners on bar self.inst with explicit source self.owner. Rebuild uses that owner.replica.inventory: ordinary inventory slots are InvSlot(k,...,self.owner,self.owner.replica.inventory), item from GetItemInSlot(k); equipment is EquipSlot(v.slot,...,self.owner), item from GetEquippedItem(v.slot). Both nonnil item paths pass the exact returned entity to ItemTile(item).",
+      "evidence_ids": [
+        "S13",
+        "S14",
+        "S15",
+        "S19"
+      ]
+    },
+    {
+      "id": "SLOT-F09",
+      "kind": "source_fact",
+      "statement": "Refresh obtains owner inventory:GetItems()/GetEquips()/GetActiveItem(). In both self.inv and self.equip, absent item clears an existing tile; missing tile or tile.item~=item creates ItemTile(item); identical item calls tile:Refresh(). Thus same item identity and same tile identity are separate predicates. OnItemGet and OnItemEquip always construct a new ItemTile on an existing valid slot, even if the item object repeats; OnItemLose clears a valid slot and OnItemUnequip clears a valid equipment slot. OnItemGet hides the new tile for its incoming animation, then shows it immediately or from the .3-duration animation callback; that Hide is not destruction.",
+      "evidence_ids": [
+        "S16",
+        "S17",
+        "S18"
+      ]
+    },
+    {
+      "id": "SLOT-F10",
+      "kind": "source_fact_with_inherited_cleanup_composition",
+      "statement": "Default-slot AddEquipSlot marks rebuild_pending. OnUpdate checks owner.HUD shown and active-screen identity, then Rebuild/Refresh. Rebuild kills the cursor, old toprow and bottomrow, creates new rows, resets inv/equip/backpackinv arrays, and rebuilds from the same owner inventory. It explicitly detaches/reuses toprow_inv before killing toprow; this is not an all-descendants-destroyed claim. Actual inventory/equipment slots created as row children reach inherited Widget child-Kill cleanup when those rows are killed: ItemSlot derives from Widget and it, InvSlot, EquipSlot all have no Kill override. Inv defines no Kill override and no owner rebinding beyond the constructor assignment. A killed bar likewise reaches inherited cleanup for listeners registered on its inst; no automatic owner setter or complete HUD teardown ordering is established by these consumer files. seamlessplayerswap stops bar updates only; finishseamlessplayerswap rebuilds/refreshes only when rebuild_pending. Stopping this parent update is not proof that child tile updates/listeners have been retired.",
+      "evidence_ids": [
+        "S14",
+        "S15",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S24",
+        "S11",
+        "S12"
+      ],
+      "inherited_refs": [
+        "baseline-v04:VANILLA-UI-002",
+        "baseline-v04:VANILLA-HOOK-005",
+        "baseline-v04:VANILLA-HOOK-006"
+      ]
+    }
+  ],
+  "new_evidence": {
+    "S01": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile constructor: item identity, inventoryitem guard",
+      "line_start": 77,
+      "line_end": 99,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "a5f4fb83641ead1a0194315e29e728785641286e4134a8cda1e5e05d0d417aa1",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L77-L99"
+    },
+    "S02": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile constructor: initial Refresh; ItemTile:Refresh",
+      "line_start": 381,
+      "line_end": 435,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "980631cd8e910267995deb322acf382a9b4dea1f53debdf817530583556c5de5",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L381-L435"
+    },
+    "S03": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile full-file method inventory: no SetItem/Kill/OnRemove override",
+      "line_start": 1,
+      "line_end": 976,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L1-L976"
+    },
+    "S04": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile rechargeable tag initialization",
+      "line_start": 129,
+      "line_end": 142,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "f6c9ae86165e4467f33dda6a4e06b07bb6989ca702b281641079857c4ce34a21",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L129-L142"
+    },
+    "S05": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile item-source percent/perish/recharge callbacks",
+      "line_start": 300,
+      "line_end": 324,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "f73cec2b935e1468307b9b156b6e30a224acd81500f769138e9dd41aa3044fd6",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L300-L324"
+    },
+    "S06": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile stacksizechange callback identity, data.stacksize and item source",
+      "line_start": 239,
+      "line_end": 281,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "7668457e30424be2e86cfaac4b88dcbe5c2e9fa0bbfe63b17e529ea2d676a473",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L239-L281"
+    },
+    "S07": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile:SetOnQuantityChangedFn/SetQuantity",
+      "line_start": 545,
+      "line_end": 567,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "d22471c62a5292a78beb09aee0bc04074777d5ccd90b70ceceff0af3588b3567",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L545-L567"
+    },
+    "S08": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile:SetChargePercent/SetChargeTime",
+      "line_start": 619,
+      "line_end": 668,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "cfa8252515548e403c9734c686078dad86fe891a63fc20f8f8a7cab5c5c8a20a",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L619-L668"
+    },
+    "S09": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "ItemTile updating flags/OnUpdate(dt)",
+      "line_start": 751,
+      "line_end": 795,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "ba15d204332e6386d230614bf0ebf4614bfe9812d61a9249d7bf6cd002763418",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L751-L795"
+    },
+    "S10": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemslot.lua",
+      "symbol": "ItemSlot:SetTile/SetOnTileChangedFn",
+      "line_start": 57,
+      "line_end": 80,
+      "file_sha256": "5153f3c914e6e5a6d186b3b382a2ce361f952f62de43b8de1d726a0a44b56cd5",
+      "range_sha256": "0254a9446a2c817dc9b47f543f1adad9c658784ce2468358499d5c351bee468e",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemslot.lua#L57-L80"
+    },
+    "S11": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/invslot.lua",
+      "symbol": "InvSlot full file: ItemSlot inheritance, no SetTile/Kill override",
+      "line_start": 1,
+      "line_end": 470,
+      "file_sha256": "4cbcad1e84c917ac37cc7fc03c73682de5ef860e00f74809a318ccbb0ef17018",
+      "range_sha256": "4afc180c6c28506ece8da05e4295d2ac2dcf5d4a47910f8301d56361ae71c6b1",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/invslot.lua#L1-L470"
+    },
+    "S12": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/equipslot.lua",
+      "symbol": "EquipSlot full file: inheritance; tile-changed callback; no SetTile/Kill override",
+      "line_start": 1,
+      "line_end": 73,
+      "file_sha256": "2dcd0923937fdbc99978348974b68487d5d16302e2e22227dc05ccd72cb14b4a",
+      "range_sha256": "2dcd0923937fdbc99978348974b68487d5d16302e2e22227dc05ccd72cb14b4a",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/equipslot.lua#L1-L73"
+    },
+    "S13": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv constructor owner assignment",
+      "line_start": 33,
+      "line_end": 49,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "d46ac00307070d94f07b2da2e4bed1c2824fbf2c641a6c9ce7c12e6a57383643",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L33-L49"
+    },
+    "S14": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv owner event registration and seamless-swap callbacks",
+      "line_start": 99,
+      "line_end": 129,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "eebbb2b7338b1eb54dac871c0a7b1904b47674a8621be6fe456343a2d43608b2",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L99-L129"
+    },
+    "S15": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "RebuildLayout inventory/equipment ItemTile(item) initial binding",
+      "line_start": 253,
+      "line_end": 282,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "8b50bc552447f41ab405693f23f8aacf85ade239cb5139ce2d3227a7530e7e2a",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L253-L282"
+    },
+    "S16": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:Refresh maininventory/equipment identity branches",
+      "line_start": 1357,
+      "line_end": 1396,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "1587469e2415d3496df2c5e1c70a49c397da1d185b039c47828b69e50fc1470a",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L1357-L1396"
+    },
+    "S17": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:OnItemLose",
+      "line_start": 1456,
+      "line_end": 1462,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "0bcc5b825f7ccb0f9cbf9c4cfc50eb44f8067e7117845faae80815208049faf8",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L1456-L1462"
+    },
+    "S18": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:OnItemGet plus OnItemEquip/OnItemUnequip",
+      "line_start": 1511,
+      "line_end": 1550,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "f7ba11f3b59b7d7558ced4ae86930d167ccf7d3e9dcb1a3e203682cde0f1b89b",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L1511-L1550"
+    },
+    "S19": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:Rebuild row destruction, slot arrays, owner getter and layout calls",
+      "line_start": 398,
+      "line_end": 445,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "5403ffa265f52286304a2abaafe72ee0d4d9c5f2a1a787c8d04c069a9e5d1f88",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L398-L445"
+    },
+    "S20": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:AddEquipSlot schedules rebuild",
+      "line_start": 150,
+      "line_end": 155,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "6fae235190c7dd5c3a9e4cfa465086c2b8d18ed3910562c6be628fda280c7cc8",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L150-L155"
+    },
+    "S21": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv:OnUpdate active-HUD guard and rebuild/refresh",
+      "line_start": 518,
+      "line_end": 525,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "95b91f90041e118a0e8d7201e1658e87b3f559d50ee8090af732f91f7e97c726",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L518-L525"
+    },
+    "S22": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/inventorybar.lua",
+      "symbol": "Inv full-file method inventory: no Kill/owner-rebinding override",
+      "line_start": 1,
+      "line_end": 1578,
+      "file_sha256": "0218e8d4f7e4ab3f5a84644ec43d4c9224f85e1c93dc910f1f3befc146cff27f",
+      "range_sha256": "941b7ad8e6f1b2d8058de0d0bd995332435a1eea02d4d6a5814e21342822d51b",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/inventorybar.lua#L1-L1578"
+    },
+    "S23": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemtile.lua",
+      "symbol": "DoInspected schedules on item, not tile",
+      "line_start": 7,
+      "line_end": 13,
+      "file_sha256": "ae895065e6209c2b1c30ea12e8ea81c6b7baea364276d881009d2a572809d18e",
+      "range_sha256": "80e37b3faed1f58f3a3b148bb6365074c67c771d614c661974818e358cd2424d",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemtile.lua#L7-L13"
+    },
+    "S24": {
+      "kind": "fresh_pinned_connector_source_range",
+      "path": "scripts/widgets/itemslot.lua",
+      "symbol": "ItemSlot full file: Widget inheritance, no Kill override",
+      "line_start": 1,
+      "line_end": 141,
+      "file_sha256": "5153f3c914e6e5a6d186b3b382a2ce361f952f62de43b8de1d726a0a44b56cd5",
+      "range_sha256": "2a0f15d81c9a52488a535f1143445e013b1fffbab10a82296d2d8e00098d2e57",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/itemslot.lua#L1-L141"
+    }
+  },
+  "source_repository": "Zechariah0121/dst-scripts",
+  "coding_projection": [
+    {
+      "id": "SLOT-CODE01",
+      "title": "Bind readonly display to ItemTile.item and refresh/read entry",
+      "fact_ids": [
+        "SLOT-F01",
+        "SLOT-F02",
+        "SLOT-F03",
+        "SLOT-F04",
+        "SLOT-F05"
+      ],
+      "implementation_delta": "Use the actual entity reference captured by the tile. Initial constructor and unchanged-item consumer refresh share ItemTile:Refresh. New custom count/time reads need a project-provided readonly per-item mirror; itemtile_Refresh(item,dragging) lacks tile context. Preserve native Refresh and OnUpdate behavior, including preview, charge/shadow update flags and pause guard.",
+      "source_contract": {
+        "constructor": "ItemTile(invitem) stores self.item=invitem, self.ismastersim=TheWorld.ismastersim; missing invitem.replica.inventoryitem prints/returns early; normal construction ends with self:Refresh(). No SetItem/Kill override.",
+        "read_refresh": "ItemTile:Refresh() reads this stored item; ordinary StackSize() is passed to SetQuantity only when movinganim==nil and replica.stackable exists. Mastersim uses the component branches; remote calls inventoryitem:DeserializeUsage(). At the end item.itemtile_Refresh(item,dragging) has exactly these two arguments, no tile argument and no consumed result. Refresh has no explicit return.",
+        "quantity_callback": "ItemTile:SetOnQuantityChangedFn(fn) stores fn. ItemTile:SetQuantity(quantity) calls fn as (tile,quantity); truthy skips/kills native quantity text and returns nil, otherwise renders the supplied number (999+ above 999), with no explicit return. Inspected ordinary callers provide stack quantity, not custom skill charges.",
+        "listener_and_update_identity": "State ListenForEvent registrations use tile.inst as listener and invitem as explicit source: rechargechange(invitem,data)→SetChargePercent(data.percent), rechargetimechange(invitem,data)→SetChargeTime(data.t), only if rechargeframe exists. OnUpdate(dt) mutates tile-local rechargepct via dt/duration; no Timer or count writer. Inherited Kill owns tile.inst/child cleanup, not item-owned DoInspected/Timer work.",
+        "native_charge_branches": "SetChargePercent assigns percent always; animation/start-stop occurs only if recharge.shown. Inside that gate percent<1 stops at >=.9999 or starts if duration<math.huge; >=1 animates/hides/stops, without clamp. SetChargeTime has independent math.huge/percent<.9999 start-stop conditions. Duration scale must match dt; no custom remaining-seconds API."
+      }
+    },
+    {
+      "id": "SLOT-CODE02",
+      "title": "Use inherited ItemSlot replacement/clear cleanup with exact callback identity",
+      "fact_ids": [
+        "SLOT-F06",
+        "SLOT-F07"
+      ],
+      "implementation_delta": "Attach custom item listener to tile.inst with explicit item source and local display tasks to tile.inst or killed children. Preserve inherited Kill. Different tile/nil tears down old display; same tile does nothing. EquipSlot already owns the sole ontilechangedfn callback, so an added callback must retain/chains its existing equipment decoration rather than overwrite it.",
+      "source_contract": {
+        "api": "ItemSlot:SetTile(tile), also inherited by InvSlot and EquipSlot; ItemSlot derives from Widget and all three classes retain inherited Kill.",
+        "different_object": "When self.tile~=tile: old nonnil tile:Kill(); self.tile=nil; nonnil incoming tile is AddChild and written to self.tile; label/readonly overlays move forward; then stored ontilechangedfn is invoked as (slot,tile), including nil.",
+        "same_or_nil": "Same tile object, including nil/nil, skips all operations and callback. Different nonnil→nil kills/clears old without adding a child. All branches have no explicit return (nil); same-object is not Refresh.",
+        "callback_and_cleanup": "SetOnTileChangedFn(fn) stores a sole callback, not a listener collection. EquipSlot callback(slot,tile) calls tile:SetIsEquip(true) when nonnil. Actual old ItemTile:Kill reaches inherited UI002 self.inst.Remove/listener+owned-task cleanup; item source is not removed and its authoritative Timer is not canceled."
+      }
+    },
+    {
+      "id": "SLOT-CODE03",
+      "title": "Share maininventory/equipment binding and bound current-owner cleanup",
+      "fact_ids": [
+        "SLOT-F08",
+        "SLOT-F09",
+        "SLOT-F10"
+      ],
+      "implementation_delta": "Use inventorybar existing owner events and exact item identity branches for both slot kinds. Re-read current mirror when a new tile is constructed after move/rebuild. Old-owner display stops when its concrete loss/unequip/absence replacement/row or bar Kill consumer runs; handoff timing still depends on project event/data flow. Do not infer cleanup from Hide or parent StopUpdating alone.",
+      "source_contract": {
+        "owner": "Inv(owner) stores self.owner once. Bar.inst owns owner-sourced itemget/itemlose/equip/unequip/refreshinventory listeners; no owner-rebind/Kill override appears in this file.",
+        "initial_and_rebuild": "Ordinary Rebuild uses owner.replica.inventory, constructs InvSlot(k,...,owner,owner.replica.inventory) and EquipSlot(eslot,...,owner), and passes GetItemInSlot(k)/GetEquippedItem(eslot) nonnil entity directly to ItemTile(item). Rows are widget parents of these slots.",
+        "refresh_identity": "Inv:Refresh(skipbackpack) reads GetItems()/GetEquips()/GetActiveItem(). Both ordinary and equipment branches: absent item clears existing tile; missing tile or tile.item~=item calls SetTile(ItemTile(item)); otherwise tile:Refresh(). No explicit return.",
+        "event_arguments_and_result": "Owner itemget passes (data.item,inv[data.slot],data.src_pos,data.ignore_stacksize_anim) to OnItemGet; equip passes (data.item,data.eslot) to OnItemEquip. A valid corresponding slot causes a fresh ItemTile even for repeated same item. itemlose passes inv[data.slot] to OnItemLose; unequip passes (data.item,data.eslot) to OnItemUnequip; guarded paths SetTile(nil). Handlers have no explicit return. refreshinventory calls Refresh(true).",
+        "cleanup_gates": "OnUpdate rebuild_pending work occurs after owner.HUD shown/active-screen guard. Rebuild kills old row widgets (except detached/reused toprow_inv), resets slot arrays and binds anew. Loss/unequip/Refresh absence/different-tile/row or bar Kill are actual retirement entries. Tile/bar listener/task cleanup follows the owning widget inst through UI002/Hook; parent seamlessplayerswap StopUpdating alone is not child retirement and does not prove event arrival/HUD handoff ordering."
+      }
+    }
+  ],
+  "conditional_implementation_handoff": {
+    "kind": "original_conditional_implementation_advice_not_native_API",
+    "sample_status": "conditional steps only; no runnable Lua/game/MicroEval executed",
+    "preconditions": [
+      "A project-supplied per-item readonly mirror exposes the authoritative charge count and, if desired, a mutually consistent active/remaining-game-seconds snapshot with item identity and update marker. No field/API names are asserted as vanilla.",
+      "Mirror initialization, late updates, pause/time scale, delivery, visibility and cross-player handoff are implemented and tested separately.",
+      "The per-item authoritative state/Timer choice remains the frozen IMQ-04 conditional choice; three uses and ten game seconds remain illustrative, not approved project constants."
+    ],
+    "steps": [
+      "When a normal ItemTile is constructed, bind the addon to tile.item and initialize dedicated child text from that item current readonly mirror. After the original tile Refresh, re-read that same mirror. Do not use prefab/icon/player/slot as the state key or use native StackSize as skill charges.",
+      "Register the addon dirty listener on tile.inst with the exact item as source, retaining the callback and source. For explicit unbinding or reattachment while a widget remains alive, use that original function plus original source under inherited HOOK005. If needed schedule the local countdown on tile.inst or a killed child widget, so the proven replacement/clear Kill path owns its cleanup.",
+      "If an extension replaces Refresh/OnUpdate/Kill or the single slot/quantity callback, preserve the original call and callback arguments/return meaning. Avoid setting the sole slot on-change callback blindly: EquipSlot uses it for SetIsEquip(true). A dedicated text child avoids conflating native stack presentation with charges.",
+      "On a consistent mirror snapshot record local reception time in a chosen game-time-compatible unit. Approximate remaining=max(0,received_remaining_game_seconds-local_elapsed_game_seconds), subject to the project pause/time-scale policy. Rebinding or refresh reads current mirror; it never resets to ten. A local zero means estimate exhausted/awaiting update, and never grants a charge or calls authoritative timer logic.",
+      "Allow the existing actual slot replacement/clear or row/bar Kill to retire the old addon display. Retiring tile-local work must not cancel item-owned authoritative recharge. If the project reuses a living widget or retargets an owner outside these native branches, explicitly unbind its original item/source and local task before attaching a new identity."
+    ],
+    "inherited_policy_limits": [
+      "Timer evidence P28/P29: owner is item inst; GetTimeLeft(name) is nil if absent, active end_time-GetTime() or saved paused timeleft. UI retirement is not Timer retirement. No audited automatic Timer replica/remaining-seconds API.",
+      "NETACT H09/H10: explicit replica registration and the hunger dirty→read→local event example do not copy arbitrary component fields or guarantee custom snapshot consistency, delivery or clock relation.",
+      "HOOK005/006 and UI002 are inherited exact evidence; this task adds only the actual consumer linkage to those paths."
+    ]
+  },
+  "remaining_project_and_runtime_boundaries": [
+    {
+      "kind": "project_or_network_runtime_boundary_not_more_consumer_source_gap",
+      "question": "Custom charge mirror transport, initialization/snapshot consistency, late-update handling, recipient visibility and handoff delivery",
+      "status": "not_implemented_or_verified; ItemTile remote DeserializeUsage callee semantics are not used as a custom transport guarantee"
+    },
+    {
+      "kind": "project_time_policy",
+      "question": "Approximate seconds precision and pause/time-scale behavior",
+      "status": "native recharge ratio interpolation is established; exact remaining-seconds mirror and compatible elapsed unit are project choices"
+    },
+    {
+      "kind": "project_integration_or_runtime_boundary",
+      "question": "Actual two-player/two-identical-item transfer and complete HUD replacement ordering",
+      "status": "static loss/unequip/Refresh/row/bar-Kill entry contracts are established; end-to-end event arrival and cleanup timing remain unrun QA"
+    }
+  ]
+}

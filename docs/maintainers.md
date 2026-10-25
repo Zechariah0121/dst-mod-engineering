@@ -1,32 +1,16 @@
-# 维护与贡献
+# 维护与构建
 
-本页供修改技能、知识库或打包器的贡献者使用。安装与使用见 [README](../README.md)。
-
-## 检查与构建
-
-在仓库根目录安装 `requirements.txt`，然后执行：
+安装与使用见根README。`knowledge/`是当前187条公开知识；旧`dst-engineering-kb/`仅保留早期公开参考数据。
+不要把`cache/`提交或打包：其中含用户本地恢复的游戏源码、准备凭据及派生索引。
 
 ```text
 python -B -m unittest discover -s tests -v
 python -B scripts/build_web_bundle.py
 python -B scripts/build_web_bundle.py --check
-python -B dst-engineering-kb/tools/validate.py
+python -B -m unittest discover -s dst-kb-service/tests -v
 ```
 
-进入 `dst-kb-service` 后运行 `python -B -m unittest discover -s tests -v`。CI 在 Windows/Linux 上执行这些检查，不运行 DST 游戏。
-
-修改文档后从源文件重新生成 `dist/web/`，不要手改生成文件。完整网页阅读包和技能 ZIP 只包含使用资料与开发辅助工具；维护记录、整合历史和发布脚本留在源码仓库。
-
-许可变更需同时核对根 `LICENSE`、README 徽章、Skill 入口及独立 KB／MCP 包内的 `LICENSE`。KB 导出器不会自动复制仓库根许可；独立导出后须按本次发布的权利范围补齐许可和说明，并更新发布溯源及 Manifest。保留第三方与历史有效授权，不把新的发布校验结果写进历史验收记录。
-
-## 发布输入
-
-只从审查过的仓库文件构建。`<!-- local-only -->` 是打包器的拒绝标记，不是自动脱敏器；发布前仍需检查文件与 ZIP 内容。不要提交凭证、存档或未经授权的第三方资源。
-
-知识库公开派生包由 `scripts/build_public_kb.py` 接收显式来源生成。它保留证据等级和纠错关系，更新包内来源哈希、发布溯源与 Manifest；非空输出默认拒绝覆盖，`--replace-generated` 仅接受清单和哈希完整的既有生成包。导出不能替代内容与授权审查。
-
-## 提交变更
-
-说明具体问题、适用范围与验证结果。知识修订遵循知识库的 Governance 和 Correction 流程；测试候选不能改写为已执行结果。版本相关事实注明核验范围。历史验证见 [验证记录](validation.md)。
-
-使用文档围绕读者的任务编写：保留安装步骤、接口契约、限制和来源；维护者机器的路径、版本差异、临时操作经过不写入使用教程。支撑技术结论的历史证据保留在验证记录，避免在各专题重复叙述。
+生成器按当前knowledge/PACKAGE-MANIFEST.json核对文件，将知识数据同时带入Skill和网页阅读ZIP；完整包另外带MCP与本地准备工具。
+修改知识或证据必须保留事实、Scope、角色和来源边界，使用明确公开的证据重新绑定真实哈希，不能只改摘要消除校验错误。
+源码槽必须由用户合法来源恢复；不为方便分发修改原validator或绕过HOLD。更新来源时另做版本差异维护。
+旧64条导出器仅用于旧格式，不用于重建当前Native合集。历史服务测试另存compatibility/v0.1，不冒称当前API保持旧字段。

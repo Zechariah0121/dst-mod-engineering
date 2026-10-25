@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "claims.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "0.1.1"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "historical_claim"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "superseded"
+            ]
+          },
+          "statement": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/source_ref"
+            }
+          },
+          "superseded_by": {
+            "type": "string"
+          },
+          "evidence_level": {
+            "type": "string"
+          },
+          "evidence_note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "statement",
+          "sources",
+          "superseded_by",
+          "evidence_level",
+          "evidence_note"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "claims"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "direct_evidence",
+            "interpretation",
+            "supplementary_interpretation",
+            "historical"
+          ]
+        },
+        "claim_id": {
+          "type": "string"
+        },
+        "locator_structured": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/locator"
+          }
+        }
+      },
+      "required": [
+        "source_id",
+        "locator",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "report_section"
+            },
+            "section": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "section"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "file"
+            },
+            "file": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "file"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "source_symbol"
+            },
+            "file": {
+              "type": "string"
+            },
+            "symbol": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "file",
+            "symbol"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "source_lines"
+            },
+            "file": {
+              "type": "string"
+            },
+            "start_line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "end_line": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "type",
+            "file",
+            "start_line"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

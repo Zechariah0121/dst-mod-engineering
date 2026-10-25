@@ -1,0 +1,891 @@
+{
+  "facts": [
+    {
+      "id": "W01-VRS-PERMISSION",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 IsTeleportingPermittedFromPointToPoint retains the WagPunk barrier membership rejection, then gets first matching room-set hashes for origin/destination. Same nonnil set requires IsPathClear_Internal with the registered tile-invalid callback; outside→outside passes this VRS check. Different sets independently test leaving permission (lobby prohibition or out prohibition) and joining (only permitted lobby). A non-vault destination no longer implies unconditional permission after the arena check.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/componentutil.lua",
+          "line_start": 1320,
+          "line_end": 1408,
+          "file_sha256": "8656ee201482418f3d2fb451dd28401d5420171e58a89b60cb82e7d30aa22249",
+          "range_sha256": "8a45f56c13fef35d637c88b81f1b51ffa2ffbb9bccac719c35bb60dafee5e069",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "967d806f8c3f05edd13aed48f615dc6695ca50b7347baf2dea1ca5211635478c"
+          },
+          "archive_member": "scripts/componentutil.lua"
+        },
+        {
+          "path": "scripts/componentutil.lua",
+          "line_start": 1186,
+          "line_end": 1206,
+          "file_sha256": "9bff1873580c9b568a5469ab44993c752457108bfe22c495eaa9701d9f67ddd9",
+          "range_sha256": "c915a54b3e4f12b1258eb0d9e0ebc7fa3f7452408c9e472ea80f08109db951dd",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "87f363c675b09fb801d7c69a46af1495abb2e2e61136c030f960afafd554ad99"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G01-GRANDOWNER",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 GetGrandOwner returns the recursive owner.inventoryitem:GetGrandOwner() result when truthy, otherwise the direct self.owner. A contained item in an ownerless inventoryitem container can therefore return that ground container; nonnil does not identify a player. RemoveFromOwner still dispatches to the direct owner inventory/container with the passed wholestack and keepoverstacked.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/inventoryitem.lua",
+          "line_start": 475,
+          "line_end": 506,
+          "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+          "range_sha256": "c8f165201b6f4a7ad3540b19b4c3466900ca140f33c16b91f89bb22b1268f38a",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "db03cc729fda8cb880360ce572affefdf779ac0f928cbd5f1e2891c8f211a98a"
+          },
+          "archive_member": "scripts/components/inventoryitem.lua"
+        },
+        {
+          "path": "scripts/components/inventoryitem.lua",
+          "line_start": 468,
+          "line_end": 502,
+          "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+          "range_sha256": "9e7506c7b790fdf5d5b97d8a3a472d196844f43ca135f7f0d3c6d38edf780bc4",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "c494d4dc1a500474c822e1090fbbac0f716562499cdc15dc7797880f0d790fba"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G03-ADDTIME",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 Perishable:AddTime has no updatetask guard: it sets remaining=min(time+remaining,perishtime) even while stopped and emits perishchange when floor(old*100) differs from floor(new*100). It neither starts the task nor calls Perish and has no explicit return.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 180,
+          "line_end": 186,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "c5d094cb4a8df3c1a59abe1facd6dcefdf0ed6885231315179b48b0554496930",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "6effa66e9ee14ff8f382013fc3bf3e6363403f83d289041f27143c87d7861821"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        },
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 180,
+          "line_end": 188,
+          "file_sha256": "de4343eec4542fddb44dce00bb33c061bed7c1d815d8d248a0286b2018018658",
+          "range_sha256": "cedc61e250884a896fbe94b4510427a3399b632b77200b5ad192695a31d91813",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "d633e64c9fb94e733d0cd4935684b48c2284f98bc77a69b1bf0ad9f7911f8745"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [
+        "perishremainingtime/perishtime and time must be valid arithmetic inputs; source adds no nil/type validation"
+      ],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G03-PERISH-UNCHANGED-ADJACENT",
+      "kind": "NSF",
+      "status": "verified_unchanged",
+      "statement": "SetPercent still writes the clamped fraction, sends perishchange and restarts only an existing task; no direct Perish. StartPerishing cancels any old task then unconditionally schedules a new one and random start_dt; StopPerishing only cancels/nils the task. LongUpdate still calls Update only when a task exists.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 223,
+          "line_end": 233,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "11af57016a698ac28723ed69d6954aae6aadc775abb96faa85087af03fad80fe",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "9587ceef80d45017e38737305b58e6482223f4049529ca5b4253af5ed44ce067"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        },
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 251,
+          "line_end": 271,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "b79fdbaee83040de425a754a7de6ef4ddd831cf639e5b7b05b01e76f29f2e2b9",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "31e04eb0649e0f107363885eef5b8d8ea198e13cac4221d4aeada96fdcca6002"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        },
+        {
+          "path": "scripts/components/perishable.lua",
+          "line_start": 322,
+          "line_end": 327,
+          "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+          "range_sha256": "a0ccae3970ac385f29af365f70086f6d03235ba090ce813e9b1f12417f3f8a02",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "0e1ca538e3f7cf87f784b2921e680b76532f47ec2bdeb3a1a406395a5435505b"
+          },
+          "archive_member": "scripts/components/perishable.lua"
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "W03-ACTION-OPTIONS",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 PreviewAction and PushAction retain their preceding WALKTO/LOOKAT/forced branches. At their subsequent instant/do_not_locomote branch, action.instant, action.do_not_locomote, options.instant OR options.do_not_locomote dispatch directly to the entity PreviewBufferedAction/PushBufferedAction, before later target/point movement branches. PreviewAction invokes pre_action_cb then Clear. PushAction for nonnil input first notifies the existing playercontroller OnRemoteBufferedAction, invokes pre_action_cb, runs TestForStart and sends actionfailed/returns on failure before Clear.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/locomotor.lua",
+          "line_start": 782,
+          "line_end": 880,
+          "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+          "range_sha256": "939299aa3e04fdc6dec14612be6848267c489f2e893b8554e28dfa0c4e12845b",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "f18acafe64493a4a8b27f2601af872fac244a7ddca77e5504c3386be4af3ccd4"
+          },
+          "archive_member": "scripts/components/locomotor.lua"
+        },
+        {
+          "path": "scripts/components/locomotor.lua",
+          "line_start": 882,
+          "line_end": 980,
+          "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+          "range_sha256": "b36ac018ea752e55f4d8949fb63e17cad0e9aa89bf6b4005ca4b39868f081608",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "9145f155d184de960888f8c985c744ebdc29ce79aca2e2e34fcdfdb214625835"
+          },
+          "archive_member": "scripts/components/locomotor.lua"
+        },
+        {
+          "path": "scripts/components/locomotor.lua",
+          "line_start": 841,
+          "line_end": 846,
+          "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+          "range_sha256": "7574fa94b7b884a16f432530760a80b83fde90758e5ad3d6735bf6efecc9e062",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "3c74b7729636ffd5b0e459c9c4b32bf4fe24a25ce76794136f96619edf2637a0"
+          },
+          "archive_member": null
+        },
+        {
+          "path": "scripts/components/locomotor.lua",
+          "line_start": 937,
+          "line_end": 947,
+          "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+          "range_sha256": "51dbb5d951d24d19cd71ce3176c7887bdb94c5d3e617e81f1a6be464ee4cdbe6",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "3ff5d4d90404607db2b9b35507ceaaecb896a88772b378a7a95b2ef30c7d5d38"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    null,
+    null,
+    {
+      "id": "W05-CLASSIFIED-SOUND",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 wormdigestionsound is a net_bool on player_classified, initialized false and listening there for wormdigestionsounddirty. Its dirty consumer acts only when _parent and parent.HUD exist, toggling the wormdigestionmuffle DSP if playerhearing exists and the named focal sound. Worm source code sets true only for devoured-tag SG entities with classified; devoured SG exit sets false only when classified exists. The older player_common declaration was inst._wormdigestionsound.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "line_start": 1088,
+          "line_end": 1104,
+          "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+          "range_sha256": "9f1da5641353c570ebd139f89ce08397fccc3610b681d677483206ed0c540d01",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "f9345fd304d00e8d7ad3e720325674551f55a46e41a15a79b848458ac0a2175b"
+          },
+          "archive_member": "scripts/prefabs/player_classified.lua"
+        },
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "line_start": 1270,
+          "line_end": 1275,
+          "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+          "range_sha256": "5d06b017ca2451b69e48818ea4ef157289f9ea1b08e105b3fc5eeaf56407a166",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "60b989194ae050ada093bebab0540b91317176f367dd5565dc0ee9872ff87dd3"
+          },
+          "archive_member": "scripts/prefabs/player_classified.lua"
+        },
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "line_start": 1649,
+          "line_end": 1651,
+          "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+          "range_sha256": "5c539063511ba844fa1384fbf8d8382bfbce6ffc28175efff0ce703a93cc0070",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "85e737becc7672326f52d43f9a0df6001056aeb2130d0fe9f7ce54f546398a16"
+          },
+          "archive_member": "scripts/prefabs/player_classified.lua"
+        },
+        {
+          "path": "scripts/prefabs/worm_boss_util.lua",
+          "line_start": 291,
+          "line_end": 296,
+          "file_sha256": "1ab754a581edfe122748eefd37b6f3b4239dbbab0b6b57869b2976c0a5442e66",
+          "range_sha256": "e47a0358178cb4eea3e1d87d6f007007616e7d1a0ec9ca7eec61c0a15c7c73fe",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "2ebe5bcc4a868819f8081d7aafa8df595280e25832c1c345e36fc88e7d478431"
+          },
+          "archive_member": "scripts/prefabs/worm_boss_util.lua"
+        },
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "line_start": 14809,
+          "line_end": 14817,
+          "file_sha256": "ac1b6053c81358c37d5dcffbce9b3dd177f57204e35e0270d1cfb8213ebcff8b",
+          "range_sha256": "74f7ae380817418f3dcc209496217e61cbf76cd8da54cb99dd9a1b8743116bcf",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "36fb0abeca593f572216a6876e4cf42fb559f04101d581f1f2b340a4a805dbc1"
+          },
+          "archive_member": "scripts/stategraphs/SGwilson.lua"
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "line_start": 2574,
+          "line_end": 2583,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "3f36f4bd217798ab6b202000e444a9ecd10474c3529af01e9890493b964a7583",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "4afe3c4a01485367ed3dc17d24668f8296812b4b8da4863a577e606aae4a5e95"
+          },
+          "archive_member": null
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "line_start": 1152,
+          "line_end": 1162,
+          "file_sha256": "db5b3aa5c46995d06977e2cc9736d0d397c401e3a12abaed1ad4183117f0b37a",
+          "range_sha256": "9129a4c9279d9b425caf7a4622d8fb7c46d26c8ec640de24f57c51106bbbc93c",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "485e998d7fc76d68fa13eba61013c002c8e1cb010e064cdd08c0f7bf8f9da6fd"
+          },
+          "archive_member": "scripts/prefabs/player_common.lua"
+        }
+      ],
+      "conditions": [
+        "Lua carrier/write/listener conditions only; no proof of remote native distribution or initial sound delivery"
+      ],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G02-CONSTRUCTION-IMMEDIATE",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 StopConstruction uses PushEventImmediate(stopconstruction). EntityScript PushEvent and PushEventImmediate both synchronously iterate copied ordinary callbacks; immediate selects sg:HandleEvent, while ordinary eligible SG delivery goes via sg:PushEvent. The constructing stop handler sets stoppedconstruction before changing state; onexit stops construction only when not constructing and not already stoppedconstruction.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/constructionbuilder.lua",
+          "line_start": 80,
+          "line_end": 108,
+          "file_sha256": "543d8b781a6c2c6c6d0cab897e37c31b2b488b1d03082a9e40b2fab7a33c2177",
+          "range_sha256": "b48f93881992b932dc33ed31e12d2a33e4ab1bfa3fb3e3b1af44006c9da45512",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "5bd52cc6b1d0f1531820b43af6a05e59bf14117f41d61dc6bec6cc287241b5eb"
+          },
+          "archive_member": "scripts/components/constructionbuilder.lua"
+        },
+        {
+          "path": "scripts/components/constructionbuilder.lua",
+          "line_start": 100,
+          "line_end": 108,
+          "file_sha256": "4e02ca2ca0182c711c22489a4d0dac284eb75f005ddec411a477e8a4cd44a727",
+          "range_sha256": "c650f0e7d97b0d82ebca7276d72bb587d83218b3e16b01ce92c55de3dbad3768",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "8f640bbd2d4bd60fec603c35fe4bf89b68bd3a69567e72563528bbf3da922145"
+          },
+          "archive_member": null
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "line_start": 1290,
+          "line_end": 1326,
+          "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+          "range_sha256": "6d9b0648ffd265e16e6fcbb055934dc829cb7875f28ac4e4e17e2f1a99b3c1f9",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "e094b0ce29a9903fbac00323380ec6e46454f61359237a526edd767f9bf8b312"
+          },
+          "archive_member": "scripts/entityscript.lua"
+        },
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "line_start": 19941,
+          "line_end": 19957,
+          "file_sha256": "ac1b6053c81358c37d5dcffbce9b3dd177f57204e35e0270d1cfb8213ebcff8b",
+          "range_sha256": "578a11b22073ce977cfca8dbbd7b84e9ad10455b9d3b39fc249944aeae9240ea",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "fa10ee025def320788ce140048aa045d5c4b1d35e67a6e846ee981b56a301679"
+          },
+          "archive_member": "scripts/stategraphs/SGwilson.lua"
+        }
+      ],
+      "conditions": [
+        "callbacks return normally; actual native scheduling/reentry and third-party overrides were not run"
+      ],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "W01-WORLD-POSTPASS-LAYOUT",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 world master construction sets OnLoadPostPass and adds worldstaticlayouts; that OnLoadPostPass calls PlaceLayouts. Cave master initialization registers the VAULT layout. RegisterLayout populates desiredlayouts/layoutorder before placement; PlaceLayouts records successes, asserts on failed required layouts, then clears desiredlayouts/layoutorder to nil so later registration is not supported.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/prefabs/world.lua",
+          "line_start": 399,
+          "line_end": 401,
+          "file_sha256": "c5f39346078b6d40b4dde59f6b919dfc0857c85ec639557bb27484cc40bb90d8",
+          "range_sha256": "d948db18856f6b9fc4ff88d367a0b7d9778f04ec1c8633d8f59924f4b566761c",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "0006a0b617c8b15baea9125e0f8963a81a3f68e7e5cca52d4fb617c371bf179c"
+          },
+          "archive_member": "scripts/prefabs/world.lua"
+        },
+        {
+          "path": "scripts/prefabs/world.lua",
+          "line_start": 568,
+          "line_end": 572,
+          "file_sha256": "c5f39346078b6d40b4dde59f6b919dfc0857c85ec639557bb27484cc40bb90d8",
+          "range_sha256": "a15e622754c098b03677264a3cf3cac98d0560d4916330e10a6139a595e9effc",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "d6871530450da2fbcd7872579c7e01c5d1ce864d88bd4fc073a05aa87ab3d3ee"
+          },
+          "archive_member": "scripts/prefabs/world.lua"
+        },
+        {
+          "path": "scripts/prefabs/world.lua",
+          "line_start": 596,
+          "line_end": 599,
+          "file_sha256": "c5f39346078b6d40b4dde59f6b919dfc0857c85ec639557bb27484cc40bb90d8",
+          "range_sha256": "378bf04fbf8993dc64c7f846587bb55752b46e454cba355e4be79cb95cd19c6b",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "d54168347cc79d8bed0ca9e8926af19547a2a1e7b5cf10873450344955f054f3"
+          },
+          "archive_member": "scripts/prefabs/world.lua"
+        },
+        {
+          "path": "scripts/prefabs/cave.lua",
+          "line_start": 552,
+          "line_end": 559,
+          "file_sha256": "3322c2df3bf584c3df81ccb55ed669c07bb6866b92b12bd1583693beea46fddb",
+          "range_sha256": "e691d6a30d4250cd0ddaf2336195de62e22da4475ffaab326c80adcbccef468e",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "e78935cc4249bcf15d927f26811146cda6371c8017a37e889d244633c09646db"
+          },
+          "archive_member": "scripts/prefabs/cave.lua"
+        },
+        {
+          "path": "scripts/components/worldstaticlayouts.lua",
+          "line_start": 11,
+          "line_end": 33,
+          "file_sha256": "135933d867f9e82c1800877c97ecb4dc086cc3d933b916ed063ad62f62e0df09",
+          "range_sha256": "e930fae2d484ea4a6b8d1f3b089534980038229b220dc7cb4744b33bc8bdccee",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "479bed650b0f4cfd369ae9abe0132bfdeddea27bb193a35aeadb61e51f091e5a"
+          },
+          "archive_member": "scripts/components/worldstaticlayouts.lua"
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    null,
+    {
+      "id": "G03-RECHARGE-LONGUPDATE",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "759671 Rechargeable.LongUpdate aliases Rechargeable.OnUpdate itself. OnUpdate computes effective time=chargetime*(1+chargetimemod:Get()), then SetCharge(current+dt*total/time,true) when positive or full total otherwise. This declaration does not establish who calls LongUpdate or how dt represents elapsed real/offline time.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "line_start": 54,
+          "line_end": 58,
+          "file_sha256": "e10f545e94be3806f563878e42181d5808bdbb8e40b1ff71ad291a066dbf5bed",
+          "range_sha256": "c6f027de5280d2136b43831d8c4ac259a44be16b7ede8af943d09f12448ee7d2",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "153db1a5e1a787ac97df2e2cd37d68a6a4ecb9309cda54c8e41c681e13399979"
+          },
+          "archive_member": "scripts/components/rechargeable.lua"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "line_start": 64,
+          "line_end": 72,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "322683bf74d7b8ea42399c72c78efd837c6fa5c72ac078954b06f2cf69a50599",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "322fbe3b292e92471a2788ab7f6e41b34242513ef6b1c356df571a94f806cf8d"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G03-RECHARGE-SAVE-UNCHANGED",
+      "kind": "NSF",
+      "status": "verified_unchanged",
+      "statement": "Current Rechargeable:OnSave still returns chargetime/current charge only when not charged; OnLoad still routes those fields through SetChargeTime/SetCharge. The visible save payload does not serialize the modifier source/key table or callbacks.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "line_start": 150,
+          "line_end": 164,
+          "file_sha256": "e10f545e94be3806f563878e42181d5808bdbb8e40b1ff71ad291a066dbf5bed",
+          "range_sha256": "2cfe14eba78b6762d01ee28df5cff6568729d48dd0da7a9d58cf8821090329f3",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "a727052d8ad0484d815b7868d89e8bd9e781bac8e6683a51a5435865507377e5"
+          },
+          "archive_member": "scripts/components/rechargeable.lua"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "line_start": 161,
+          "line_end": 175,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "2cfe14eba78b6762d01ee28df5cff6568729d48dd0da7a9d58cf8821090329f3",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "8de3e76a43a4dd8564f97732bddfa2aff8ccbd992ccecf42033ea049dd955618"
+          },
+          "archive_member": null
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    },
+    {
+      "id": "G04-DIET-CACHE",
+      "kind": "NSF",
+      "status": "changed",
+      "statement": "SetDiet body is unchanged and does not clear cached tags. Current GetEdibleTags returns truthy cache; otherwise rebuilds and writes it unless cacheedibletags==false. New ResetEdibleTagsCache unconditionally writes nil, so it also removes a deliberate false no-cache setting.",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+        "source_commit": null,
+        "game_version_txt": "759671",
+        "steam_buildid": "26148036",
+        "steam_branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "comparison_baseline": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "game_version_txt": "756039",
+          "steam_buildid": "25643519",
+          "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+        },
+        "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+        "runtime_game_verified": false,
+        "not_proven": [
+          "native/C++ behavior",
+          "remote-client timing/visibility",
+          "input reachability for conditional risks",
+          "save migration success on real/custom saves",
+          "actual Mod compatibility"
+        ]
+      },
+      "citations": [
+        {
+          "path": "scripts/components/eater.lua",
+          "line_start": 52,
+          "line_end": 55,
+          "file_sha256": "d8de9b5c73274deb42198f8cc937915ff6b1bbb42eb908d72a84cc24bde688b4",
+          "range_sha256": "2b3cc30b58e9ee8f6a69be48cc5e48eea34d4be78e7e44c8bebfed7361c03dc6",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "75d70cfbee17fb35d1c51ae9e956903ba976c41d06023ecf4423637e00a54054"
+          },
+          "archive_member": "scripts/components/eater.lua"
+        },
+        {
+          "path": "scripts/components/eater.lua",
+          "line_start": 52,
+          "line_end": 55,
+          "file_sha256": "a433d18a181dd28c103f34f398f9a167c0444f14307cfccb740f92958b16bcd0",
+          "range_sha256": "2b3cc30b58e9ee8f6a69be48cc5e48eea34d4be78e7e44c8bebfed7361c03dc6",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "excerpt": {
+            "$dst_source_payload_slot": "2c811e8819294cc5d1614ddf479d0aaac87834b482ecbc4e193ca8ed2f85ec37"
+          },
+          "archive_member": null
+        },
+        {
+          "path": "scripts/components/eater.lua",
+          "line_start": 172,
+          "line_end": 196,
+          "file_sha256": "d8de9b5c73274deb42198f8cc937915ff6b1bbb42eb908d72a84cc24bde688b4",
+          "range_sha256": "e0fe569a633d599a09f5e298d24da197fb5be5c50cdc2094dced4a10e644e54e",
+          "hash_convention": "raw source bytes; splitlines(keepends=True); inclusive 1-based whole lines",
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "excerpt": {
+            "$dst_source_payload_slot": "4c413e486fb2b7540ef48f4ba6cb3e503c7d05537b2048b074816fef44c1d4b5"
+          },
+          "archive_member": "scripts/components/eater.lua"
+        }
+      ],
+      "conditions": [],
+      "runtime_game_verified": false
+    }
+  ],
+  "source_scope": {
+    "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+    "main_targeted_snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+    "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+    "source_commit": null,
+    "game_version_txt": "759671",
+    "steam_buildid": "26148036",
+    "steam_branch": "public",
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "comparison_baseline": {
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "game_version_txt": "756039",
+      "steam_buildid": "25643519",
+      "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1"
+    },
+    "scope": "Cumulative frozen Lua source delta, not isolated release commit. No Git commit asserted.",
+    "runtime_game_verified": false,
+    "not_proven": [
+      "native/C++ behavior",
+      "remote-client timing/visibility",
+      "input reachability for conditional risks",
+      "save migration success on real/custom saves",
+      "actual Mod compatibility"
+    ]
+  }
+}

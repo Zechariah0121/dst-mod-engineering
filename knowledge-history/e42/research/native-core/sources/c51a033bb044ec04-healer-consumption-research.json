@@ -1,0 +1,1244 @@
+{
+  "scope": {
+    "finite_questions": [
+      {
+        "id": "HC-Q01",
+        "question_zh": "ordinary HEAL target/doer/invobject/return及两个collector的CanHeal候选边界？",
+        "coding_projection_id": "HC-P01"
+      },
+      {
+        "id": "HC-Q02",
+        "question_zh": "Healer真实API、predicate→HP→onheal→单件消费顺序、参数与正常返回？",
+        "coding_projection_id": "HC-P02"
+      },
+      {
+        "id": "HC-Q03",
+        "question_zh": "施用者HEAL倍率、EfficientUser精确参数次序和source/key解除？",
+        "coding_projection_id": "HC-P03"
+      }
+    ],
+    "readiness_scope_zh": "仅所选HC-P01..03三项静态合同获外部独立语义接受并为scopedResearchReady；bandage仅辅助source样本。canonical/runtime/whole-domain false；self-check不是独立接受依据。",
+    "stopping_condition_zh": "三个有限HEAL/Healer/HEAL倍率合同与唯一bandage旁证已完成精确tuple核验与外部独立语义接受，本批静态范围闭合；不按record/citation数量推进或扩大领域。",
+    "only_prefab_sample": "bandage",
+    "source_only_cloud_distillation": true,
+    "baseline_canonical_repo_old_artifact_writes": false,
+    "user_computer_remote_saved_environment_cloudtask_runtime_install_or_game_used": false,
+    "raw_vanilla_source_in_deliverables": false,
+    "outside_scope": [
+      "general Health/DoDelta research",
+      "maxhealer/regen/cadence APIs",
+      "all healing items/recipes/characters/perks/stats catalogue",
+      "whole SG/UI/RPC/network chain",
+      "generic owner/callback/transaction/ledger/registry framework",
+      "native Spawn/transport/disk/current build/N001 mapping",
+      "actual target Mod runtime/game/install/ModQA"
+    ]
+  },
+  "citations": [
+    {
+      "id": "HC-C01",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/healer.lua",
+      "symbol": "Healer constructor and SetHealthAmount/SetOnHealFn/SetCanHealFn",
+      "line_start": 1,
+      "line_end": 19,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "range_sha256": "2aee9fbc63f5dcacabe697d9e4bc6ceab0e176dfec6e95e7b10f0737f51ac2c2",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/healer.lua#L1-L19",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C02",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/healer.lua",
+      "symbol": "Healer:Heal health capture/predicate rejection",
+      "line_start": 21,
+      "line_end": 34,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "range_sha256": "e1e4f3f9eeec3c319bc39e0fe9d46a991987d4347d7207b73d54e971f5bfd466",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/healer.lua#L21-L34",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C03",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/healer.lua",
+      "symbol": "Healer:Heal delta and health.canheal/DoDelta",
+      "line_start": 36,
+      "line_end": 40,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "range_sha256": "3d294b94075ee3c33386fc3da6401e9fcb4e84d92c2570715beaae3c342321c2",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/healer.lua#L36-L40",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C04",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/healer.lua",
+      "symbol": "Healer:Heal onheal/default consumption/tail return",
+      "line_start": 42,
+      "line_end": 52,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "range_sha256": "17bd745887616799ca5992bd8b0175f1307a928d1ef3a342b1cec3accdb6eaa0",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/healer.lua#L42-L52",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C05",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/healer.lua",
+      "symbol": "Healer full finite API and absence check",
+      "line_start": 1,
+      "line_end": 55,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "range_sha256": "cec23de2d09256b24c32d4b8131b818561528fe5b1b71dd5f11979ba2c96264c",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/healer.lua#L1-L55",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C06",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/actions.lua",
+      "symbol": "ACTIONS.HEAL.fn ordinary healer route and adjacent maxhealer boundary",
+      "line_start": 3204,
+      "line_end": 3214,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "df5e48d6f79585ebc80ae6a60a4ab4017a3d45ea87912045c8c95699dd9834c5",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L3204-L3214",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C07",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "USEITEM.healer candidate collector",
+      "line_start": 1346,
+      "line_end": 1362,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "0a692ed670bb785aece4253ea5bb6a839801d9297fa6297af624f42cd8984ec4",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L1346-L1362",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C08",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "INVENTORY.healer candidate collector",
+      "line_start": 2679,
+      "line_end": 2683,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "ccf097b1b1888aad69d3f4c02f4dc116b4f2be142ab74b618a07715445f9d177",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L2679-L2683",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C09",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health_replica.lua",
+      "symbol": "Health replica SetCanHeal/CanHeal",
+      "line_start": 192,
+      "line_end": 202,
+      "file_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+      "range_sha256": "1e7b732ae9b4f78ccfecf3b8017776969ecba8bf69f26f711dbca283fc935228",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health_replica.lua#L192-L202",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C10",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health oncanheal property callback",
+      "line_start": 48,
+      "line_end": 50,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "45804582825c8d9672f18f3796a55ed4177407f0165bb9bc869c0fe42f2d6605",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L48-L50",
+      "evidence_role": "ExistingPropertyMechanism_SpecificHealerConnection"
+    },
+    {
+      "id": "HC-C11",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health constructor canheal=true and props map",
+      "line_start": 95,
+      "line_end": 114,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "2bf69300a8017b2b4149b31ad47ce0489401f38a9b0b39b97ed035608ad188f5",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L95-L114",
+      "evidence_role": "ExistingPropertyMechanism_SpecificHealerConnection"
+    },
+    {
+      "id": "HC-C12",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/efficientuser.lua",
+      "symbol": "EfficientUser constructor and GetMultiplier/AddMultiplier ordinary branch",
+      "line_start": 1,
+      "line_end": 23,
+      "file_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+      "range_sha256": "d8b888114dd96035f78997e83f513af950fc38a6c3c2d16e78dbaeb8c1234446",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/efficientuser.lua#L1-L23",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C13",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/efficientuser.lua",
+      "symbol": "EfficientUser RemoveMultiplier ordinary branch",
+      "line_start": 30,
+      "line_end": 33,
+      "file_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+      "range_sha256": "b0cd2d357a13d74c65377c848378f65548a1471078313e2bcfd27d67f1afaaf9",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/efficientuser.lua#L30-L33",
+      "evidence_role": "SelectedHEALContract"
+    },
+    {
+      "id": "HC-C14",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/efficientuser.lua",
+      "symbol": "EfficientUser full finite API/action-key absence check",
+      "line_start": 1,
+      "line_end": 48,
+      "file_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+      "range_sha256": "875b7086985213afd1b0e86be80de91839ced5ddb0b1b9ab97eda891cdd225d3",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/efficientuser.lua#L1-L48",
+      "evidence_role": "SelectedHEALContract"
+    },
+    null,
+    {
+      "id": "HC-C16",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health:DoDelta existing gates/modifier/event/return",
+      "line_start": 613,
+      "line_end": 648,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "cad6df32cb157372f52be0c92f70c1b4f48715dfad90a24b59d8de44bd0bc92b",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L613-L648",
+      "evidence_role": "ExistingHealthCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C17",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health:GetMaxWithPenalty",
+      "line_start": 524,
+      "line_end": 526,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "23434363159a540d6601af28263923d48f5a1f6380cce0a4503f5a98c95e13f4",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L524-L526",
+      "evidence_role": "ExistingHealthCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C18",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health:SetVal existing maximum/minimum clamps",
+      "line_start": 565,
+      "line_end": 581,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "02abd664a5866aa67f4a9ceb627b9c207c3abf929f71a79575643e2af2e03563",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L565-L581",
+      "evidence_role": "ExistingHealthCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C19",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/stackable.lua",
+      "symbol": "Stackable:IsStack and StackSize",
+      "line_start": 55,
+      "line_end": 61,
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "range_sha256": "97f3e62871900340e8c283b01c500f71ec4b7f94a292b614d7d2860a0a4263b7",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L55-L61",
+      "evidence_role": "ExistingStackCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C20",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/stackable.lua",
+      "symbol": "Stackable:Get default num=1 and split/returned-identity branches",
+      "line_start": 109,
+      "line_end": 153,
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "range_sha256": "91cbfafbef6b85862e8a72d3c055f7086413635d6e4fedb9856300706fb3c72c",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L109-L153",
+      "evidence_role": "ExistingStackCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C21",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/util/sourcemodifierlist.lua",
+      "symbol": "SourceModifierList constructor/multiply/Get",
+      "line_start": 8,
+      "line_end": 40,
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "range_sha256": "da29cf73169532239a8c8da9d886ae0a33ed2a1c10ab961bced27d0daa5aad3c",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L8-L40",
+      "evidence_role": "ExistingModifierCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C22",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/util/sourcemodifierlist.lua",
+      "symbol": "SourceModifierList:SetModifier",
+      "line_start": 64,
+      "line_end": 99,
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "range_sha256": "df3e024ae7f49f7393aba657de0f6921292650785a9fc16dd4116c34f8bb8a5a",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L64-L99",
+      "evidence_role": "ExistingModifierCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C23",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/util/sourcemodifierlist.lua",
+      "symbol": "SourceModifierList:RemoveModifier",
+      "line_start": 103,
+      "line_end": 122,
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "range_sha256": "76716d66cb1c68576c19a32ca18c170fc619f3a403d58851a83c56f902f4a6f8",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L103-L122",
+      "evidence_role": "ExistingModifierCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C24",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/components/inventoryitem.lua",
+      "symbol": "InventoryItem:OnRemoveEntity owner cleanup",
+      "line_start": 478,
+      "line_end": 492,
+      "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+      "range_sha256": "4184b9b8da2707a7296d900a88734126dd042820658b58d4f1f5b2ed15460507",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L478-L492",
+      "evidence_role": "ExistingOwnershipCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C25",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/entityscript.lua",
+      "symbol": "EntityScript:Remove Lua lifecycle callsites",
+      "line_start": 1705,
+      "line_end": 1772,
+      "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1705-L1772",
+      "evidence_role": "ExistingLifecycleCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C26",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/bufferedaction.lua",
+      "symbol": "BufferedAction:Do existing effect/return consumption",
+      "line_start": 22,
+      "line_end": 37,
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "range_sha256": "54bce4eccd8c3993e157cee24cb1961abad6328f20a2b0cc34101feccc379575",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L37",
+      "evidence_role": "ExistingActionCoreReuse_NotNewFact"
+    },
+    {
+      "id": "HC-C27",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "component action collector container USEITEM heading",
+      "line_start": 1038,
+      "line_end": 1039,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "d6d097e61f2da4f5247c142cb1dd062bd0fabd712346dd06d9b1a01040b23773",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L1038-L1039",
+      "evidence_role": "CollectorContainerIdentity_HeadingOnly"
+    },
+    {
+      "id": "HC-C28",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "path": "scripts/componentactions.lua",
+      "symbol": "component action collector container INVENTORY heading",
+      "line_start": 2513,
+      "line_end": 2514,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "2c4cd4ad15a88c77ebf89c2a43cef7b12c883653cd30d6cd75ff60a595596226",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L2513-L2514",
+      "evidence_role": "CollectorContainerIdentity_HeadingOnly"
+    }
+  ],
+  "sample_only": [
+    {
+      "id": "HC-SAMPLE-BANDAGE",
+      "claim_kind": "SingleOrdinaryHealingPrefab_SourceSampleOnly",
+      "only_prefab": "bandage",
+      "statement_zh": "唯一辅助样本bandage先建Transform/AnimState/Network、InventoryPhysics/Floatable；SetPristine后非mastersim返回。master侧添加stackable并maxsize=TUNING.STACK_SIZE_SMALLITEM，再inspectable、inventoryitem、healer，SetHealthAmount(TUNING.HEALING_MEDLARGE)，尾部MakeHauntableLaunch并return inst，模块return Prefab(\"bandage\",fn,assets)。所读完整factory没有设置SetCanHealFn/SetOnHealFn或healerbuffs。它锚定普通healer+stackable消费与server接线，不证明实际生成、资产存在、HP差/库存结果或全部治疗物品同样行为；TUNING保持符号值，未新建数值/配方目录。",
+      "citation_ids": [
+        "HC-C01",
+        "HC-C04",
+        "HC-C15"
+      ],
+      "reuse_ids": [
+        "R-SPLIT",
+        "R-REMOVE"
+      ],
+      "conditional_assumptions_zh": [
+        "固定commit普通bandage factory，未被其他Mod hook更改healer/stackable/callback",
+        "只证明源码接线与正常返回条件，未运行生成或游戏",
+        "TUNING symbolic amount/stack maximum不是当前游戏版本或完整balance表"
+      ],
+      "canonical": false,
+      "runtime_tested": false
+    }
+  ],
+  "reviewer_only": {
+    "purpose_zh": "独立核验callback角色/读取时点、false/true/nil、单位/身份和normal-return边界；详见direct_facts/citations/readlog，不要求Coding默认加载所有Health阶段。",
+    "failure_cases_zh": [
+      "Healer:CanHeal/GetHealthAmount/SetHealthPenalty/SetMultiplier凭空补API",
+      "把doer倍率误放target/item或参数交换为source-first",
+      "把canheal=false或0HP等同拒绝/无消费/退款",
+      "把onheal参数套成Eater/Edible或把false返回当取消",
+      "把EAT IsValid/remove handler、exactly-once/reentry锁或事务保证套到Healer",
+      "用一个显式callback语句证明总回调次数、删除后的native安全或全网络完成",
+      "样本遗漏Mod env GLOBAL、延迟world/普通module preloaded Class语境"
+    ]
+  },
+  "direct_facts": [
+    {
+      "id": "HC-F01",
+      "title_zh": "Healer实际字段、setter与不存在的同名资格API",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Healer构造保存inst并置health=TUNING.HEALING_SMALL。公开方法只有SetHealthAmount(health)、SetOnHealFn(fn)、SetCanHealFn(fn)、Heal(target,doer)，尾部return Healer class。三个setter都是单字段赋值、无显式返回、无类型/正数/上限或callback校验；设置fn替换单一slot，不追加。全55行没有Healer:CanHeal、GetHealthAmount、SetHealthPenalty/healthpenalty字段。canhealfn/onhealfn没有构造赋值，注释中的nil初始化不是执行步骤；默认未设字段读取为nil。Healer自己的health字段是基础amount，与目标components.health组件不同。",
+      "citation_ids": [
+        "HC-C01",
+        "HC-C05"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "Healer:SetHealthAmount(health)",
+        "Healer:SetCanHealFn(fn)",
+        "Healer:SetOnHealFn(fn)",
+        "Healer:Heal(target,doer)"
+      ],
+      "args": {
+        "health": "基础HP amount；应按项目传数字，代码不校验",
+        "fn": "实际可调用函数或nil；false字段不是禁用callback，因为执行处以~=nil检查",
+        "target": "本次受疗实体，需components表；不是item",
+        "doer": "本次施用者实体；不是自动取target/owner"
+      },
+      "units": {
+        "health": "HP amount，不是比例、秒、剩余寿命或消费件数"
+      },
+      "results": {
+        "setters": "无显式返回；不表示Heal接受",
+        "API_absence_scope": "仅固定commit完整Healer文件；不声称其他Mod/版本没有扩展方法"
+      }
+    },
+    {
+      "id": "HC-F02",
+      "title_zh": "ordinary HEAL角色、预检查与返回转发",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "ACTIONS.HEAL.fn(act)以target=act.target or act.doer选受疗者，要求target非nil、invobject非nil、target.components.health存在，并且Health:IsDead()为假且target无playerghost。invobject有healer时优先return healer:Heal(target,act.doer)；仅无healer且有maxhealer时走邻接maxhealer分支，本批不研究该组件。未命中时无显式return（普通结果nil）；普通分支原样转发Heal的true或false,reason。此函数不先拆堆/RemoveItem、不检查currentowner、不以item.owner代替doer；即使有显式target也没有act.doer非nil检查。现有BufferedAction:Do仍先执行自己的IsValid，才读success,reason=self.action.fn(self)，保存reason并按truthy success分Succeed/Fail；HEAL的尾部true不是预测状态、实际HP差或独立材料数量确认。",
+      "citation_ids": [
+        "HC-C06",
+        "HC-C26"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "ACTIONS.HEAL.fn(act)"
+      ],
+      "args": {
+        "act.invobject": "携带healer的施用物品实体",
+        "act.target": "优先受疗者；truthy时遮住act.doer",
+        "act.doer": "施用者；target不存在时同时作受疗者"
+      },
+      "results": {
+        "matching_healer": "原样return Heal(target,doer)，含拒绝reason",
+        "no_match": "无显式返回/nil",
+        "dead_or_ghost": "ordinary Action不进入Healer",
+        "maxhealer": "相邻优先级边界而非本批第二消费者"
+      },
+      "reuse_ids": [
+        "R-ACTION",
+        "R-INV-OWNER",
+        "R-INV-RESULT"
+      ]
+    },
+    {
+      "id": "HC-F03",
+      "title_zh": "两个healer collector仅添加候选",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "USEITEM.healer(inst,doer,target,actions)中inst是治疗物品；先要求target.replica.health存在且health:CanHeal()或inst有healerbuffs。非骑乘doer还要求target不骑乘；骑乘doer则要求target.replica.inventoryitem存在且IsGrandOwner(doer)真，才table.insert(actions,ACTIONS.HEAL)。INVENTORY.healer(inst,doer,actions)是物品自用候选，只要求doer.replica.health存在且CanHeal()或物品healerbuffs，再插入HEAL。这两个collector不调用Heal、不读取canhealfn、不DoDelta/消费；healerbuffs只能绕过这里的CanHeal候选条件，不能绕过执行函数的dead/ghost检查或Healer的自定义predicate。",
+      "citation_ids": [
+        "HC-C07",
+        "HC-C08",
+        "HC-C27",
+        "HC-C28"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "USEITEM.healer(inst,doer,target,actions)",
+        "INVENTORY.healer(inst,doer,actions)"
+      ],
+      "args": {
+        "inst": "物品实体，不是受疗者",
+        "actions": "候选Action对象数组",
+        "target": "仅USEITEM显式受疗者",
+        "doer": "施用者；INVENTORY自用的受疗者"
+      },
+      "results": {
+        "collector": "改候选数组，无治疗接受结果/返回reason"
+      },
+      "reuse_ids": [
+        "R-COLLECTOR"
+      ]
+    },
+    {
+      "id": "HC-F04",
+      "title_zh": "CanHeal是replica标签读取，health.canheal是执行字段",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "scripts/components/health_replica.lua内部class也名Health；其replica:SetCanHeal(canheal)在假值时添加cannotheal标签、真值时移除，replica:CanHeal()仅返回not inst:HasTag(\"cannotheal\")。这里没有满血、IsHurt、IsDead、playerghost、invincible、Health redirect或Healer predicate检查。目标server Health构造canheal=true并将其列为tracked props；oncanheal调用inst.replica.health:SetCanHeal(canheal)。这连接字段到脚本标签调用，不证明网络标签远端何时可见，也不把server组件虚构成Health:CanHeal方法。canheal不是一般Health:DoDelta的全局禁止开关；所读DoDelta不读取它，普通Healer在自己调用点才检查它。",
+      "citation_ids": [
+        "HC-C09",
+        "HC-C10",
+        "HC-C11",
+        "HC-C16"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "target.replica.health:SetCanHeal(canheal)",
+        "target.replica.health:CanHeal()"
+      ],
+      "args": {
+        "canheal": "truthy/falsy标签状态；Healer执行另读原捕获health.canheal"
+      },
+      "results": {
+        "replica_CanHeal": "boolean，仅cannotheal标签的取反",
+        "property_write": "已有Class属性机制触发replica setter；非Heal执行结果"
+      },
+      "reuse_ids": [
+        "R-PROPS",
+        "R-HEALTH"
+      ]
+    },
+    {
+      "id": "HC-F05",
+      "title_zh": "拒绝hook在数值结算前，接收当时物品与施用者",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Heal先local health=target.components.health；health=nil直接return false，无reason且未进入自定义predicate。有canhealfn字段（~=nil）时调用canhealfn(self.inst,target,doer)，只接收其前两个返回valid,reason；valid为nil/false才return false,reason，其余truthy值（包括Lua的0）通过，成功reason丢弃。predicate在delta计算前，且可以改变后续读取的self.health/doer.efficientuser/原health.canheal，也可重绑self.inst；但health局部对象已捕获，若predicate重绑target.components.health，后续不会自动读回新组件。直接Heal没有target nil guard、dead/ghost复检、doer默认或所有权校验；只有上述早退先发生时才可能尚未解引用doer，否则数值行必须能访问doer.components。",
+      "citation_ids": [
+        "HC-C02",
+        "HC-C03",
+        "HC-C05"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "canhealfn(item,target,doer) -> valid,reason",
+        "Healer:Heal(target,doer)"
+      ],
+      "callback_args": [
+        {
+          "slot": "canhealfn",
+          "call": "fn(self.inst_at_predicate_call,target,doer)",
+          "return_used": "前两个值valid,reason；valid假才拒绝并返回reason",
+          "count_boundary": "此外层控制流到达时一个显式调用点；callback内部重入/副作用不被限制"
+        }
+      ],
+      "results": {
+        "missing_health": "false，无reason",
+        "predicate_reject": "false,reason，无本方法的DoDelta/onheal/默认消费",
+        "predicate_allow": "继续，reason不被后续使用",
+        "direct_invalid_shapes": "不转false的统一安全入口；可能脚本错误，不能当普通拒绝"
+      }
+    },
+    {
+      "id": "HC-F06",
+      "title_zh": "施用者HEAL倍率与DoDelta三个实参",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "接受health/predicate后，Heal读取self.health并乘(doer.components.efficientuser存在且其GetMultiplier(ACTIONS.HEAL)返回truthy时的值，否则1)。其作用位置是施用者doer，不是target和item。delta在检查health.canheal之前计算，health.canheal假并不避免nil doer、非数值amount/倍率的错误。仅health.canheal真时调用原捕获health:DoDelta(delta,false,self.inst.prefab)；overtime明确false、cause为当次DoDelta调用点self.inst.prefab（普通未重绑时为治疗物品prefab）、ignore_invincible/afflicter/ignore_absorb均未传（nil），doer不是afflicter。delta=0也会调用DoDelta，不像EAT有delta~=0门禁。DoDelta返回完全丢弃。Healer不改变目标penalty/maxhealth，也不处理名为healthpenalty的物品参数；目标maxhealth*(1-penalty)、Health gate/deltamodifier/clamp与同步事件按既有Health合同继续作用。",
+      "citation_ids": [
+        "HC-C03",
+        "HC-C16",
+        "HC-C17",
+        "HC-C18"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "health:DoDelta(delta,false,item.prefab)",
+        "Health:DoDelta(amount,overtime,cause,ignore_invincible,afflicter,ignore_absorb)"
+      ],
+      "args": {
+        "delta": "基础item healer.health乘doer的ACTIONS.HEAL multiplier",
+        "overtime": "false",
+        "cause": "当次DoDelta调用点self.inst.prefab字符串；普通未重绑时是治疗物品prefab",
+        "afflicter": "nil，未传doer",
+        "ignore_invincible/ignore_absorb": "nil，不跳过这些门禁"
+      },
+      "units": {
+        "delta": "HP输入amount；不等于裁剪后的实际增加量",
+        "multiplier": "无量纲乘数；不与stack件数相乘",
+        "penalty": "既有目标最大HP惩罚比例，不是Healer新参数"
+      },
+      "results": {
+        "DoDelta": "返回amount/0被丢弃，不参与消费决策"
+      },
+      "reuse_ids": [
+        "R-HEALTH",
+        "R-HEALTH-GATES",
+        "R-HEALTH-MODIFIER",
+        "R-HEALTH-CLAMP",
+        "R-HEALTH-EVENT",
+        "R-EAT-DELTA"
+      ]
+    },
+    {
+      "id": "HC-F07",
+      "title_zh": "onheal顺序、原实体与可变字段读取",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "可选DoDelta正常返回（或canheal假跳过）后，Heal重新读self.onhealfn，非nil即调用onhealfn(self.inst,target,doer)；第一个实参是调用点当前self.inst，不传delta、reason、拆出的item或件数，callback返回包括false被忽略。仅在先前predicate/DoDelta及其回调未重绑self.inst、未改堆叠状态的普通上下文，它才仍是未由本方法拆分的原物品/原整堆；本方法此时尚未执行自己的默认消费，但正常返回不保证此前状态未被改变。DoDelta/其中同步回调可改变onhealfn/self.inst/堆叠状态；onheal本身又可改变随后新读的self.inst及其components.stackable、stacksize等。目标health与之不同：它在predicate前已被局部捕获，不自动改为新target.components.health；self.inst则在各调用点重新读。无旧组件/物品快照、IsValid检查或pcall/回滚。只保证此外层函数一个显式onheal调用点，不能限制callback自行递归Heal或其他事件路径的总次数，也不能保证callback删除物品/重绑组件后安全到消费和true。",
+      "citation_ids": [
+        "HC-C03",
+        "HC-C04"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "onhealfn(current_self_inst,target,doer)"
+      ],
+      "callback_args": [
+        {
+          "slot": "onhealfn",
+          "call": "fn(self.inst_at_onheal_call,target,doer)",
+          "return_used": false,
+          "phase": "可选DoDelta之后，单件默认删除之前",
+          "count_boundary": "一条显式调用语句，不是跨重入恰好一次保证",
+          "first_arg_identity_zh": "当前self.inst；仅普通未被先前callback重绑/改量时才为原未拆物品/原整堆"
+        }
+      ],
+      "results": {
+        "onheal_false": "不取消后续默认消费，前提后续操作正常返回",
+        "callback_mutation": "后续新读stackable/IsStack；不自动回滚已结算HP"
+      },
+      "reuse_ids": [
+        "R-EAT-CALLBACK",
+        "R-HEALTH-EVENT"
+      ]
+    },
+    {
+      "id": "HC-F08",
+      "title_zh": "普通消费一件与item存活分支",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "onheal之后，Heal新读self.inst.components.stackable；存在且IsStack()真（复用IsStack为stacksize>1）时再次读取该字段并Get():Remove()，Get未传num、已有默认num=1；否则新读self.inst并Remove()。这里物品/组件不是predicate之前的快照。仅在self.inst/组件/数量未被回调改写的普通堆叠，且Spawn/复制/ondestack/Remove均正常返回条件下，原堆n>1减少为n-1并Remove拆出一件、原item存活；n=1即使有stackable也直接Remove原item，无stackable同样如此。onheal第一实参是其调用点self.inst；普通未重绑/改量时为原未拆整堆，而非随后默认拆出的单位。任意先前callback重绑self.inst/改stacksize时不保证原身份、原数量或原物品被消费。Heal不返回单位/count，不按stacksize乘HP、不逐件回放onheal；没有EAT的food:IsValid()/handleremovefn，也不先RemoveFromOwner/Inventory:RemoveItem。最终EntityScript:Remove和InventoryItem:OnRemoveEntity的现有Lua生命周期/实际owner清理按既有合同执行，不另推native handle/失败可恢复性。末尾true仅在数值、回调、Get/Remove正常到达尾部时发生，正常返回不表示整个过程状态未变。",
+      "citation_ids": [
+        "HC-C04",
+        "HC-C19",
+        "HC-C20",
+        "HC-C24",
+        "HC-C25"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "results": {
+        "ordinary_stack_n_gt_1": "缺省取一件并删除该单位，原堆减少1（未改写、正常返回前提）",
+        "stack_n_eq_1_or_no_stack": "普通未改self.inst/组件/数量时删除原item；一般分支Remove的是调用点当前self.inst",
+        "Heal_return": "正常尾部仅true；前置分支为false或false,reason；不返回单件实体、数量或实际HP量"
+      },
+      "units": {
+        "Get_default": "1个堆叠单位；不影响Heal数值倍率"
+      },
+      "reuse_ids": [
+        "R-SPLIT",
+        "R-SPLIT-OWNER",
+        "R-REMOVE",
+        "R-EAT-REMOVE"
+      ]
+    },
+    {
+      "id": "HC-F09",
+      "title_zh": "EfficientUser精确参数次序和ACTIONS.HEAL对象身份",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "EfficientUser构造每实例actions={}。GetMultiplier(action)按action对象为table key读取，未有列表返回1，否则用该列表:Get()（nil/false仍由or回退1；0在Lua为真）。AddMultiplier(action,multiplier,source,key)在该action列表缺少时建SourceModifierList(self.inst)，再转SetModifier(source,multiplier,key)；RemoveMultiplier(action,source,key)仅列表存在时转RemoveModifier(source,key)。本批调用ACTIONS.HEAL对象，不是字符串\"HEAL\"、不是target Health吸收列表或Eater absorption。普通HEAL不会触发文件中只条件针对ACTIONS.MINE的转发，本批不扩该链。GetMultiplier为无量纲因子；Add/Remove没有显式返回接受结果、数值/正数校验，所读组件也没有SetMultiplier方法。底层基数1乘法、稳定source/key更新与解除、实体来源删除监听及无key解除整个source完全复用既有SML，不重建核心。",
+      "citation_ids": [
+        "HC-C12",
+        "HC-C13",
+        "HC-C14",
+        "HC-C21",
+        "HC-C22",
+        "HC-C23"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "EfficientUser:GetMultiplier(action)",
+        "EfficientUser:AddMultiplier(action,multiplier,source,key)",
+        "EfficientUser:RemoveMultiplier(action,source,key)"
+      ],
+      "args": {
+        "action": "实际ACTIONS.HEAL对象，存放/查询/解除用同一身份",
+        "multiplier": "第2实参，无量纲因子；不是source",
+        "source": "第3实参（Add）/第2实参（Remove），稳定来源对象或名称",
+        "key": "第4实参（Add）/第3实参（Remove），可选稳定功能键；省略解除影响该action列表整个source"
+      },
+      "results": {
+        "GetMultiplier": "数值/底层Get的truthy值或1，0保留",
+        "AddMultiplier/RemoveMultiplier": "无显式返回，不提供Heal执行成功"
+      },
+      "reuse_ids": [
+        "R-SML"
+      ]
+    }
+  ],
+  "runtime_tested": false,
+  "source_comments": [
+    {
+      "classification": "SourceComment_NotIndependentContract",
+      "citation_id": "HC-C03",
+      "statement_zh": "Healer的health.canheal旁注提到healerbuffs可使heal被调用且不希望给不可治疗目标加health；作为源码comment单列。真正门禁、onheal和消费事实由if/body的执行语句与collector本体建立，不由注释推设计意图或额外保证。"
+    },
+    {
+      "classification": "SourceComment_NotIndependentContract",
+      "citation_ids": [
+        "HC-C27",
+        "HC-C28"
+      ],
+      "statement_zh": "两个enclosing collector heading的args注释含right；本批healer函数的真实形参仍分别为(inst,doer,target,actions)与(inst,doer,actions)，不用注释增加其不存在的right逻辑。heading赋值只用于确认USEITEM/INVENTORY容器身份。"
+    }
+  ],
+  "source_reading_log": [
+    {
+      "path": "scripts/components/healer.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/healer.lua",
+      "bytes": 1362,
+      "file_sha256": "96e6f084f5eccffb6317b5ff63d91107dc819c272f3732ae377f1292bdf167c3",
+      "git_blob_sha": "be0e6d02c335b95ad5c432e0c22945f20cd1a219",
+      "line_count": 55,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "auditor retained exact-ref GitHub fetch_file(base64) bytes recovered into new private cache; this researcher independently reread and rehashed, no repeat fetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 55
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/efficientuser.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/efficientuser.lua",
+      "bytes": 1291,
+      "file_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+      "git_blob_sha": "93b86396db9ae5b056cd96f2f45ef6459acb6d19",
+      "line_count": 48,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "auditor retained exact-ref GitHub fetch_file(base64) bytes recovered into new private cache; this researcher independently reread and rehashed, no repeat fetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 48
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/prefabs/bandage.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/bandage.lua",
+      "bytes": 842,
+      "file_sha256": "b4cb150aa4c9117d8c979937e1a40ffebd5c5c9e8f3557737ae288554a34646b",
+      "git_blob_sha": "dbdecd08a6145ed83ddf5a1f483cadd2f3609ae7",
+      "line_count": 42,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "auditor retained exact-ref GitHub fetch_file(base64) bytes recovered into new private cache; this researcher independently reread and rehashed, no repeat fetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 42
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/health_replica.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/health_replica.lua",
+      "bytes": 5988,
+      "file_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+      "git_blob_sha": "28bc3253b5c40c2a3740c3ff43b1407bfed1dc33",
+      "line_count": 216,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "new necessary narrow-source acquisition: GitHub fetch_file(base64) fixed commit; independent full bytes/size/SHA256/git blob/line count snapshot matched",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 10
+        },
+        {
+          "line_start": 192,
+          "line_end": 202
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/actions.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/actions.lua",
+      "bytes": 272267,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "line_count": 7092,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 3204,
+          "line_end": 3214
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/componentactions.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/componentactions.lua",
+      "bytes": 137632,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "git_blob_sha": "d1a9663be9a41b3f8904e565898c9929464c7a5c",
+      "line_count": 3254,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1038,
+          "line_end": 1039
+        },
+        {
+          "line_start": 1346,
+          "line_end": 1362
+        },
+        {
+          "line_start": 2513,
+          "line_end": 2514
+        },
+        {
+          "line_start": 2679,
+          "line_end": 2683
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/health.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/components/health.lua",
+      "bytes": 22115,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "git_blob_sha": "815617eef9ec49ff97e478b03dc1ff07527fdea2",
+      "line_count": 665,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 114
+        },
+        {
+          "line_start": 524,
+          "line_end": 548
+        },
+        {
+          "line_start": 565,
+          "line_end": 648
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/stackable.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/stackable.lua",
+      "bytes": 6919,
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "git_blob_sha": "66a0b65534fccbf74ff67d9aa834cc66c4ee6d93",
+      "line_count": 214,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 153
+        },
+        {
+          "line_start": 155,
+          "line_end": 214
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/util/sourcemodifierlist.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/util/sourcemodifierlist.lua",
+      "bytes": 5586,
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "git_blob_sha": "fb0fbcfdc20a5a5fd0c1eb461323110f1e96fc53",
+      "line_count": 185,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 40
+        },
+        {
+          "line_start": 47,
+          "line_end": 136
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/inventoryitem.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/components/inventoryitem.lua",
+      "bytes": 18547,
+      "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+      "git_blob_sha": "fa4595320f7438fa392f03d40b7666d646380fb0",
+      "line_count": 571,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 478,
+          "line_end": 492
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/entityscript.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/entityscript.lua",
+      "bytes": 66639,
+      "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+      "git_blob_sha": "228a42b74bb436a8acc37f5b9f07fcfa4f85eef3",
+      "line_count": 2177,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1705,
+          "line_end": 1776
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/bufferedaction.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/bufferedaction.lua",
+      "bytes": 3980,
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "git_blob_sha": "981fea65c605c696a97476c1a5bad52f958d4583",
+      "line_count": 110,
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing private fixed-snapshot source cache independently rehashed; content reread only declared ranges",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 22,
+          "line_end": 47
+        }
+      ],
+      "full_file_bytes_verified_not_full_domain_semantically_read": true,
+      "read_scope_zh": "Healer和EfficientUser全文有限接口核验、bandage唯一factory旁证；其他范围仅具体collector/replica CanHeal及已有Health/Stack/SML/owner/Action支持，不声称其余全文件或整个领域读完。",
+      "source_executed": false
+    }
+  ],
+  "coding_projection": [
+    {
+      "id": "HC-P01",
+      "title_zh": "区分候选CanHeal、ordinary HEAL与实际拒绝hook",
+      "load_when_zh": "治疗物品动作出现/缺失或需在执行前拒绝时",
+      "signatures": [
+        "ACTIONS.HEAL.fn(act)",
+        "target.replica.health:CanHeal()",
+        "Healer:SetCanHealFn(fn)",
+        "canhealfn(item,target,doer) -> valid,reason"
+      ],
+      "source_contract": [
+        "target=act.target or act.doer；invobject是物品，doer是施用者；普通Action检查health/dead/ghost并原样return Heal",
+        "replica CanHeal只是not cannotheal；两collector可由物品healerbuffs放行候选，不执行predicate/HP/消费",
+        "Healer无CanHeal方法；health存在后predicate false/nil才false,reason；直接Heal无dead/ghost/doer默认",
+        "捕获target health早于predicate，组件重绑不自动改本次使用对象"
+      ],
+      "evidence_ids": [
+        "HC-F01",
+        "HC-F02",
+        "HC-F03",
+        "HC-F04",
+        "HC-F05"
+      ],
+      "reuse_ids": [
+        "R-COLLECTOR",
+        "R-ACTION",
+        "R-PROPS",
+        "R-INV-OWNER"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "把项目拒绝条件放进准确的SetCanHealFn(item,target,doer) predicate并返回false,reason；保持可重复查询、无消费。不要用CanHeal候选当满血/HP保证，或在onheal return false期待取消。直接调用时显式提供有效target/doer及项目需保留的Action资格检查，不默认从物品owner猜施用者。"
+    },
+    {
+      "id": "HC-P02",
+      "title_zh": "数值、onheal与一件消费同一条路径",
+      "load_when_zh": "配置治疗量/附加效果、堆叠消费或判断返回结果时",
+      "signatures": [
+        "Healer:SetHealthAmount(health)",
+        "Healer:SetOnHealFn(fn)",
+        "onhealfn(current_self_inst,target,doer)",
+        "Healer:Heal(target,doer)"
+      ],
+      "source_contract": [
+        "基础HP amount乘doer HEAL倍率；即使canheal=false仍先算delta；仅canheal真调用DoDelta(delta,false,item.prefab)，不传doer作afflicter",
+        "可选DoDelta→onheal(调用点self.inst,target,doer)→新读self.inst.components.stackable：IsStack ? Get():Remove() : self.inst:Remove()→正常尾部true；未重绑/改量普通上下文才是原未拆整堆",
+        "onheal返回忽略；HP gain=0、health.canheal=false、redirect/invincible早退/满血都可正常到消费与true",
+        "单件默认消费不乘HP或回放callback；Healer无EAT的IsValid/handleremovefn保护；重入/删除不获到尾部保证",
+        "health在predicate前捕获；self.inst与stackable在后续调用点新读。callback正常返回不保证原物品身份/原堆叠数量不变"
+      ],
+      "evidence_ids": [
+        "HC-F05",
+        "HC-F06",
+        "HC-F07",
+        "HC-F08"
+      ],
+      "reuse_ids": [
+        "R-HEALTH",
+        "R-HEALTH-GATES",
+        "R-HEALTH-CLAMP",
+        "R-HEALTH-EVENT",
+        "R-SPLIT",
+        "R-SPLIT-OWNER",
+        "R-REMOVE",
+        "R-EAT-REMOVE"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "基础回血只交给healer.health这一条普通路径，onheal只做明确附加效果，不再同量DoDelta/拆件/Remove。将true解释为正常执行到尾部；零HP增加不自动返还或补发原物。需要特殊取消/不消费政策时先设计项目的明确入口，不能靠效果callback返回或把EAT handler套过来。"
+    },
+    {
+      "id": "HC-P03",
+      "title_zh": "施用者HEAL增效使用正确接口和身份",
+      "load_when_zh": "为施用者添加/撤下治疗增效时",
+      "signatures": [
+        "doer.components.efficientuser:GetMultiplier(ACTIONS.HEAL)",
+        "doer.components.efficientuser:AddMultiplier(ACTIONS.HEAL,multiplier,source,key)",
+        "doer.components.efficientuser:RemoveMultiplier(ACTIONS.HEAL,source,key)"
+      ],
+      "source_contract": [
+        "action对象key必须是同一ACTIONS.HEAL身份；缺省1，SML基数1乘法；不是全部Health正DoDelta的通用增效",
+        "Add的参数顺序action,multiplier,source,key，Remove为action,source,key，不把SML的source-first顺序直套此wrapper",
+        "source/key稳定配对；省略Remove key按现有SML解除该action列表整个source",
+        "item基础amount和doer倍率不检查正数/数字，0不取消Heal消费，负量不被拒绝成普通false"
+      ],
+      "evidence_ids": [
+        "HC-F06",
+        "HC-F09"
+      ],
+      "reuse_ids": [
+        "R-SML",
+        "R-HEALTH"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "对已有有效efficientuser的施用者，用ACTIONS.HEAL对象和项目固定source/key成对Add/Remove；若多个功能共用source，明确key以免撤掉其他功能。治疗量与倍率的合法区间由项目决定并检查；不要改目标externalabsorbmodifiers/Eater absorption来冒充此施用者治疗加成。"
+    }
+  ],
+  "original_illustration": {
+    "claim_kind": "OriginalEngineeringIllustration_NotVanillaSource_NotRuntimeValidated",
+    "format": "nonloadable prose plan; no executable Lua sample",
+    "execution_contexts": {
+      "modmain_or_modimport": "Mod env的AddPrefabPostInit可用；游戏global显式GLOBAL.ACTIONS/GLOBAL.TheWorld；world仅在hook执行时读取，不在顶层缓存。",
+      "prefab_or_component_module": "普通scripts/prefabs/scripts/components模块依赖已预加载游戏global和Class；不能假设继承modmain词法GLOBAL/AddPrefabPostInit。",
+      "imports": "本示意无需新require；使用已有Class或Mod env提供的GLOBAL.Class，不写local Class=require(\"class\")，不假定require(\"constants\")返回ACTIONS/TUNING表。"
+    },
+    "placeholder_premises_zh": [
+      "example_healing_item与example_heal_doer为项目已存在、已完成资产/common/pristine/master/必要组件的实体，不凭该计划自动注册生成。",
+      "20 HP和1.5无量纲倍率、source=\"example_heal_feature\"、key=\"ordinary_heal\"为原创示意，非原版调参数值；项目自行检查数值合法区间。",
+      "需要保留原有canhealfn/onhealfn时明确保存和串接正确参数与拒绝reason；setter不自动追加。"
+    ],
+    "narrow_steps_zh": [
+      "在example_healing_item的prefab hook执行时取world=GLOBAL.TheWorld；world缺失/非master或healer缺少则退出；已有healer:SetHealthAmount(20)，不顶层缓存world。",
+      "SetCanHealFn设置fn(item,target,doer)纯查询项目当前许可；不满足时返回false与项目reason；不要在此DoDelta、Remove或递归Heal。",
+      "SetOnHealFn设置fn(item,target,doer)仅作项目明确附加效果；item是当次onheal调用点self.inst，仅普通先前未重绑/改量时为原未拆整堆。返回false不取消；不再同量DoDelta、Get、Remove，不依赖物品在callback后还有效，也不重绑self.inst或改变默认消费所需组件/数量。",
+      "仅对当前已存在efficientuser的example_heal_doer，在实际权威接入点调用AddMultiplier(GLOBAL.ACTIONS.HEAL,1.5,\"example_heal_feature\",\"ordinary_heal\")；解除用RemoveMultiplier(GLOBAL.ACTIONS.HEAL,\"example_heal_feature\",\"ordinary_heal\")。普通component/global模块相同计划使用已导出ACTIONS，不用modmain env假设。",
+      "把该物品/target/doer交给既有权威ordinary HEAL路径，不在collector/preview额外消费；接收true表示正常执行到尾部。项目如果需要拒绝满血或不消耗canheal=false物品，在前置predicate明确政策，不靠onheal返回或0HP补发。"
+    ],
+    "fact_ids": [
+      "HC-F01",
+      "HC-F02",
+      "HC-F05",
+      "HC-F06",
+      "HC-F07",
+      "HC-F08",
+      "HC-F09"
+    ],
+    "reuse_ids": [
+      "R-HOOK",
+      "R-GLOBAL",
+      "R-IMPORT",
+      "R-CLASS-GLOBAL",
+      "R-ACTION"
+    ],
+    "source_code_redistributed": false
+  }
+}

@@ -1,0 +1,1041 @@
+穹 Mod · 第六轮：两个真实业务中的架构组合验证
+日期：2026-09-28
+范围：Case A 种子系统；Case B 智能容器 / 全局制作。
+方法：只读源代码追踪、原版接口对照、关键文件语法解析、参考目录哈希复核。
+没有修改参考项目，没有执行 Mod，没有进行联机实测，没有编写最终 Architecture Knowledge Base。
+
+======================================================================
+0. 结论与证据口径
+======================================================================
+
+两个案例确实把前五轮的底层模式组合成了业务，但并非每层都出现在每个业务中。
+
+Case A：物理种子 → 服务端计数账本 → Shard 复制 → 玩家视图 → 客户端缓存 → UI。
+Case B：开关请求 → classified 标志 → 乐观制作 UI → 原版制作请求 → 服务端材料分配 → 原版扣除。
+
+最重要的五个结论：
+1. SeedDB 的“Truth”是各服务端分片实际使用的本地账本；本业务没有唯一 Master 写入权威。
+   Client 相对于 Server 无权写余额，不等于各 Server 之间已经建立了权威一致性。
+2. 服务端 seed ClientDB 是按玩家筛选的 MainDB View，客户端 seed ClientDB 才是复制缓存。
+3. 全局制作使用当前 Shard 的真实容器，不存在本案例经 MainDB 向另一个 Shard 取材的路径。
+4. 制作 UI 不持有远端智能箱库存汇总。它允许尝试，真正材料判断仍回到服务器。
+5. 已知来源重叠缺陷位于 Builder Adapter 合并原版与 Manager 材料来源的边界。
+   Manager 只返回实体分配表，原版 Builder / Inventory / Stackable 才执行消耗。
+
+标记口径：
+【源码确认】直接由当前函数体、调用方和被调用方确认。
+【静态推演】给出明确前提，推导代码结果；不是已实机复现。
+【待实机验证】涉及实际 RPC 到达顺序、玩家迁移时序、画面、其他 Mod 或引擎内部行为。
+
+前轮结论纠正：
+scripts/widgets/soraseed.lua:68 有 local DB = SoraAPI.SeedCDB，但全文没有使用此局部变量。
+实际读取由 soraseedcontainer:GetDB() 动态完成。因此不能把这行当成“提前捕获 nil 导致种子 UI 失败”的证据。
+本报告撤回该判断；不修改前轮文件以免覆盖历史记录。
+
+======================================================================
+1. 证据索引：报告内 M / V 编号对应下列绝对路径
+======================================================================
+
+Mod 源码：
+M01 case-study/CASE-001/modmain.lua
+M02 case-study/CASE-001/main/init.lua
+M03 case-study/CASE-001/main/soraenv.lua
+M04 case-study/CASE-001/main/api.lua
+M05 case-study/CASE-001/main/clientdb.lua
+M06 case-study/CASE-001/main/clientdbinit.lua
+M07 case-study/CASE-001/main/maindb.lua
+M08 case-study/CASE-001/main/maindbinit.lua
+M09 case-study/CASE-001/main/hook.lua
+M10 case-study/CASE-001/main/containers.lua
+M11 case-study/CASE-001/main/ui.lua
+M12 case-study/CASE-001/scripts/components/soraseedcontainer.lua
+M13 case-study/CASE-001/scripts/components/sorachestmanager.lua
+M14 case-study/CASE-001/scripts/widgets/soraseed.lua
+M15 case-study/CASE-001/scripts/widgets/sora2chestcontrol.lua
+M16 case-study/CASE-001/scripts/prefabs/sora2plant.lua
+M17 case-study/CASE-001/scripts/prefabs/sora2chest.lua
+
+当前原版源码：
+V01 vanilla-snapshot/scripts/networkclientrpc.lua
+V02 vanilla-snapshot/scripts/modutil.lua
+V03 vanilla-snapshot/scripts/entityscript.lua
+V04 vanilla-snapshot/scripts/mainfunctions.lua
+V05 vanilla-snapshot/scripts/gamelogic.lua
+V06 vanilla-snapshot/scripts/components/inventory.lua
+V07 vanilla-snapshot/scripts/components/container.lua
+V08 vanilla-snapshot/scripts/components/stackable.lua
+V09 vanilla-snapshot/scripts/components/inventoryitem.lua
+V10 vanilla-snapshot/scripts/components/builder.lua
+V11 vanilla-snapshot/scripts/components/builder_replica.lua
+V12 vanilla-snapshot/scripts/components/playercontroller.lua
+V13 vanilla-snapshot/scripts/widgets/widgetutil.lua
+V14 vanilla-snapshot/scripts/widgets/redux/craftingmenu_hud.lua
+V15 vanilla-snapshot/scripts/prefabs/player_classified.lua
+V16 vanilla-snapshot/scripts/widgets/widget.lua
+V17 vanilla-snapshot/scripts/components/spellbook.lua
+V18 vanilla-snapshot/scripts/actions.lua
+
+下面如“M12:157”表示上述文件的第 157 行附近；不是抽象接口名。
+
+======================================================================
+2. Layer Map：真实存在的层
+======================================================================
+
+层 | Case A 种子 | Case B 全局制作
+UI | 存在：soraseed Widget，点击收集/取出、展示数量，M14 | 存在：sora2chestcontrol 与原版制作栏，M15、V13/V14
+Client View | 存在：seedinfo 展示行与 SeedCDB 的数量，M12:132 | 存在：classified 开关/本地 enable 与制作 UI 派生结果；没有远端库存数量视图
+ClientDB | 存在：seed 业务通道、服务端 root binding、客户端缓存 | 存在：SoraRPC 传 GlobalBuild 意图；不是材料查询/制作传输通道
+Server Adapter | 存在：M06:75–234，userid→玩家→手持组件，以及 OwnerKey/View 映射 | 存在：M06:284–331 处理开关；M09:1510–1638 适配 Builder
+Component | 存在：soraseedcontainer，附于法杖和 UI 实体；原版 Inventory/Stackable | 存在：Builder、Inventory、Container、Stackable；Manager 本身也是世界 Component
+World Manager | 不存在于本次种子业务链；不能为了画图塞入 sorachestmanager | 存在：sorachestmanager，维护候选注册表并提供查询
+MainDB | 存在：SeedDB / SoraSeeds，复制种子账本 | 不存在于这条取材链；不是跨 Shard 共享箱业务
+Prefab | 存在：sora2plant 承载入口/组件；种子 Prefab 转为计数或由计数重建 | 存在：sora2chest 接入 Manager；配方 product 由原版生成
+DST Original System | 存在：Mod RPC、Shard RPC、实体/库存/堆叠、Widget、世界持久化 | 存在：普通制作 RPC、Builder/BufferedAction/ACTIONS.BUILD、容器/堆叠、classified
+Persistence | 存在：世界组件中的 SeedDB.data；实体种子另走原版保存 | 存在：真实容器/物品走原版保存；Registry 和候选缓存重新构建
+
+不要把 Component、World Manager 当成互斥的实现类型。
+“World Manager”描述职责，“Component”描述这个 Manager 接到 World 的方式。
+也不要把 Client View 当成项目里一个单独命名的类：这里是职责划分。
+
+======================================================================
+3. Case A：四份“种子数据”究竟是什么
+======================================================================
+
+3.1 真实结构
+
+当前 Shard 的 SeedDB（MainDB 实例，namespace 为 SoraSeeds）
+  data.seeds
+    普通共享模式： [seed_prefab] = count
+    个人模式：     ["S_" .. userid] = { [seed_prefab] = count }
+    队伍模式：     ["T_" .. team]   = { [seed_prefab] = count }
+         ↑ Get / Set / GetRoot 通过自定义函数访问
+服务端每玩家 seed ClientDB
+  rootbind.seeds = {Get=getfn, Set=setfn, GetRoot=getrootfn, Remove=...}
+  不把这个 root 当成独立余额副本
+         ↓ Set / SyncReply
+客户端 seed ClientDB / SeedCDB
+  data.seeds = { [当前可见 seed_prefab] = count }
+         ↓ soraseedcontainer:GetAllSeeds()
+模块局部 seedinfo 展示表
+  每行：图标/Prefab 等元数据 + num
+         ↓ soraseed:Refresh()
+Widget Text
+
+证据：M08:46–73；M06:98–175、227–239；M05:532、584–615；M12:31–138；M14:187–205。
+
+“Seed Truth”在本报告指服务端进行存取判断的账本，不意味着所有 Shard 合起来存在唯一权威副本。
+Server View 是函数映射；Client Cache 是经过复制得到的普通 Lua 表；Widget 只是格式化输出。
+
+3.2 谁选择共享域
+
+GetOwnerKey() 由服务端配置和玩家身份/队伍接口计算，不由客户端上传。
+M06:100–130：
+- 模式 0：空 OwnerKey，使用公共键。
+- 模式 1：S_userid。
+- 模式 2：FSAPI 可用且队伍有效时 T_team，否则公共域。
+- 模式 3：FSAPI 可用时，队伍有效→T_team，否则→S_userid；FSAPI 整体不可用时实际仍回落公共域。
+
+这意味着“个人/队伍隔离”属于 Server Adapter 的业务策略，不是 MainDB 自带的权限模型。
+模式 3 的无 FSAPI 行为必须按实际分支理解，不能用配置名称补出个人隔离。
+个人/队伍的 Set 修改桶中的单个种子，但向 MainDB 写的是整个用户/队伍桶。
+
+3.3 对象如何准备好
+
+M01:67 → M02:120–137
+  SoraEnv / SoraAPI 初始化
+  MainDB → maindbinit 创建 SeedDB、InitRoot("seeds", 1)
+  ClientDB → clientdbinit 注册 seed 模板（syntime=300，roottime=1）
+  World PostInit 将 SeedDB 挂进 world.components.SoraSeedDB
+  玩家认证 / link 请求 → 为 userid 创建服务端 seed ClientDB → 安装 root binding 和监听
+  非 Dedicated 的客户端初始化 → 创建 SeedCDB → link → 初始 Sync("seeds")
+
+地面和洞穴各有本地 SeedDB。一个在线玩家在所在服务器有自己的 seed View；并非每颗种子一个 DB。
+Host 同时存在服务器业务对象和本地客户端对象，不能根据“不是 Dedicated”就认定只有 Client。
+M05:43 的 ismaster 实际取 TheNet:IsDedicated()，不是 World.ismastersim；阅读时要拆开这些名称。
+
+======================================================================
+4. Case A：存入一颗种子的完整链
+======================================================================
+
+4.1 Remote Client 正常链
+
+玩家背包中的有效种子实体
+  ↓ UI 点击“收集”（M14:121）
+UI 实体上的 soraseedcontainer:CollectAllSeeds()（M12:139）
+  ↓ GetDB() 返回本地 SeedCDB
+ClientDB:PushEvent("CollectAllSeeds")（M05:659）
+  ↓ JSON 编码数据；cmd="event"；附 namespace
+ClientDB:Send → SendModRPCToServer（M05:219–223）
+  ↓ TheNet:SendModRPCToServer（V01:1881–1883）
+serverandclientrpchandle(userid, namespace, ...)（M05:50–79）
+  ↓ 查服务端 DB；核对 DB.userid == 引擎传入 userid
+ClientDB:Handle("event") → HandleEvent（M05:267、651）
+  ↓ 调用内部事件注册表中的 CollectAllSeeds Handler
+seed 模板 serverfn：UserToPlayer → HANDS 装备 → soraseedcontainer（M06:88–95）
+  ↓ HandleCollectAllSeeds(player)（M12:180）
+查实际 Inventory / 已打开 Container / 4 范围地面种子
+  ↓ 汇总 all[prefab]；移出并 Remove 物理实体
+soraseedcontainer:AddSeed(name, count)（M12:121）
+  ↓ GetDB() 返回当前玩家服务端 seed View
+View.getfn 读旧值 → View.setfn 写新值（M06:131–153）
+  ↓ 公共模式单种子数值；个人/队伍模式完整桶
+SeedDB:Set("seeds", key, complete_value)（M07:774）
+  ├→ 本 Shard data 改写 → MainDBSet → 本 Shard 玩家视图发客户端更新
+  └→ SendModRPCToShard(nil, namespace, "Set", root, key, encoded_value)
+       ↓ 其他在线 Shard 接收 → 写当地 SeedDB → 其玩家视图发客户端更新
+
+阶段 | Owner / 结构 | 写入者 | 执行侧
+实体在背包 | Inventory.itemslots / overflow；Item 的 inventoryitem.owner 与 stackable | 原版库存/物品逻辑 | S
+请求参数 | 只有事件意图，没有待入账的数量表 | Widget / 组件请求 API | C；Host 走下面的分支
+临时汇总 | HandleCollectAllSeeds 的局部 all[prefab]=数量 | 服务器遍历真实实体 | S
+余额 | SeedDB.data.seeds | 组件通过玩家 View 写入 | S
+共享传播 | 编码后的 key + 完整 value | MainDB:Set | Shard→Shard
+玩家缓存 | SeedCDB.data.seeds | ClientDB 接收 Set/SyncReply | C
+
+这里 C=客户端，S=当前 Shard 的服务器模拟。不是“只有主世界是 S”。
+
+4.2 一颗种子会去哪里
+
+假设有效 seed Prefab 当前余额为 10，玩家背包里有一颗，而且没有其他被收集的种子：
+服务器找到实体 → all[name]=1 → 从背包移除并销毁 → 读余额 10 → 写余额 11。
+之后保存的是 prefab→数量，不保留该实体 GUID、腐烂进度或其他实体附加状态。
+以后取出的种子是新的 SpawnPrefab 结果，不是原实体从某个隐藏容器中取出。
+
+实际按钮是批量操作：Inventory:FindItems 包含主背包、装备槽、鼠标物品和 overflow（V06:638–664）；
+随后还收集 opencontainers 与半径 4 地面实体。不能把它解释成只处理“UI 指定的一颗”。
+种子白名单来自 M12:33–104 的 AddSeed 与 allseeds；Prefab 存在性会影响元数据建立。
+
+4.3 Host 的差异
+
+Host UI → CollectAllSeeds()
+  → TheWorld.soraismastersim 为真
+  → 直接 HandleCollectAllSeeds(ThePlayer)
+  → GetDB 从 UI.inst.owner 找该玩家服务端 seed View
+  → 后面的账本/Shard 传播相同。
+
+因此 Host 省略 ClientDB 上行 RPC 和 M06 的手持组件路由检查。
+UI 每 0.1 秒检查 EquipHasTag("soraseedui")，不满足则关闭（M14:72–79）；
+这是 UI 生命周期控制，不等于 Host 和 Remote 的校验完全一致。
+
+4.4 不是事务
+
+物理实体先删除，之后才逐种子 AddSeed。没有统一提交、回滚、幂等操作号。
+若中途错误，前面已删除的实体不会由框架自动补回。
+这是源码能确认的失败边界；具体错误条件与物品损失需要实机或故障注入验证。
+
+======================================================================
+5. Case A：读取、取出与业务权威
+======================================================================
+
+5.1 打开 UI 和读取
+
+M16:1038 的“种”条目 onselect
+  → ThePlayer.HUD.controls.containerroot:AddChild(soraseed(ThePlayer))
+  → M14 构造 UI；给 UI.inst 添加 soraseedcontainer；设置 UI.inst.owner
+  → GetAllSeeds() → GetDB() → 对各 seed prefab 调用 db:Get("seeds", name, 0)
+  → 图标/文字显示。
+
+Remote：GetDB 返回 SoraAPI.SeedCDB，读取客户端复制缓存。
+Host：GetDB 返回 GetClientDB("seed", owner.userid, true)，读取服务端 View → 本 Shard SeedDB。
+如果服务端 owner/DB 尚不具备条件，GetDB 会回落直接 SeedDB（M12:109–119）。
+该回落绕过个人/队伍视图，不能假定它与正常玩家 View 等价；属于需要留意的初始化/调用边界。
+
+打开 Widget 本身没有“请求一次完整种子列表并等待”的专用流程。
+它依赖客户端 DB 的初始化同步、之后事件更新和周期校验。
+缓存尚未取得值时 Get 默认 0，UI 没有独立 loading/error 状态来区分“真的 0”与“尚未同步”。
+
+展示 seedinfo 表是模块共享、每次 GetAllSeeds() 更新 num；它不是独立的玩家账本。
+M14 的 local DB 变量未被调用，不能作为初始化故障依据。
+
+5.2 取出完整链
+
+点击种子图标（M14:106）
+  ↓ soraseedcontainer:GetSeeds(name)（M12:147）
+Remote：SeedCDB:PushEvent("GetSeeds", {name=name})
+Host：直接 HandleGetSeeds(ThePlayer, name)
+  ↓ Remote 经相同的 Mod RPC / userid 绑定
+M06:79–87：玩家存在 → 请求存在 name → 当前 HANDS 装备存在 soraseedcontainer
+  ↓ M12:157 HandleGetSeeds
+检查玩家非死亡/幽灵、name 是 string
+  ↓ 从服务端 View / 当前 Shard SeedDB 读取 num
+仅 num > 0 时 SpawnPrefab(name)
+  ↓ 堆叠种子最后实际使用 min(40, num)，非堆叠取 1
+View:Set("seeds", name, num - getnum)
+  ↓ MainDBSet / Shard Set / ClientDB 缓存通知
+player.components.inventory:GiveItem(new_item, nil, player:GetPosition())
+  ↓ 原版库存处理实体入包、堆叠等；原请求不等待完整业务 ACK
+
+顺序必须保留：先 SpawnPrefab，再扣数据库数量，再 GiveItem。
+M12:166 先算 min(maxsize,num)，167 紧接着覆盖成 min(40,num)，不能说最终同时受两个上限约束。
+
+客户端提交的是“取这个 name 的种子”的 Intent，不是“把我的余额改成 99”。
+M05 的服务端 Set/SyncReply 接收分支拒绝客户端直接写缓存协议到服务器；
+实际数量由服务端余额与代码限额确定。因此玩家→服务器这一层的数量决定权在服务器。
+
+但 Intent 也需要验证，不能因为有 ClientDB 就省略：
+- 已有：引擎 userid 与 DB 绑定、玩家查找、Remote 手持组件检查、取出时存活检查、字符串类型、正余额。
+- 不完整：取出没有再次检查 allseeds 白名单；SpawnPrefab 返回值未判空；没有完整数量 schema。
+- 入库只检查有 health 和不是 playerghost，未采用取出同样的死亡判定。
+- 没有事务回滚或对一次请求的去重。
+- Host 直接入口没有执行 Remote Adapter 的手持组件检查。
+
+“SelectBook”是打开种子界面的上游交互边界：M16:1055–1064 → M06:246–250。
+该 Handler 检查玩家、id、实体有效性和 spellbook，但没有完整的目标归属/距离/装备检查。
+它不直接设置种子余额；此处只确认 UI 入口权限边界，不展开其他法术业务。
+
+======================================================================
+6. Case A：另一个 Shard、另一个玩家的 UI 如何刷新
+======================================================================
+
+Shard A 的 SeedDB:Set
+  ↓ 改 A.data.seeds，发 EntityScript MainDBSet
+  ↓ 广播 Shard RPC：namespace=SoraSeeds, cmd=Set, root=seeds, key, value
+SendModRPCToShard → V01:1891 TheNet:SendModRPCToShard
+  ↓ 网络 / 接收队列（V01:1943）
+Shard B 的 AddShardModRPCHandler（M07:332）
+  ↓ 查 namespace 对应实例 → MainDB:Handle 的 Set 分支（M07:580）
+B.data.seeds[key] = decode(value)
+  ↓ MainDB:Notice("MainDBSet", {namespace,root,key,value})
+B.TheWorld:PushEvent
+  ↓ B 上每个 seed View 的 changefn（M06:188–225）
+按 OwnerKey 选择该玩家可见的数据
+  ├→ 公共种子键：ClientDB:Send("Set", "seeds", seed, encoded_count)
+  └→ 匹配个人/队伍桶：ClientDB:Send("SyncReply", "seeds", hash, encoded_bucket)
+       ↓ SendModRPCToClient → TheNet → 指定玩家客户端
+ClientDB:Handle("Set" / "SyncReply")
+  ↓ 修改 SeedCDB.data.seeds
+ClientDB:Notice("ClientDBSet" / "ClientDBRootSync")
+  ↓ 客户端 TheWorld EntityScript 事件
+soraseed Widget 的 Listener（M14:86、89）
+  ↓ Refresh() → GetAllSeeds() → 更新数量 Text
+
+这里的“另一个玩家”必须属于可见同一数据域的人。
+公共域可见的玩家会收到公共更新；另一个 userid 的个人域不会自然显示这份余额；同队伍可见队伍桶。
+
+层 | 传的/持有的到底是什么
+MainDB:Set | 一个 key 的完整 value；公共域是完整余额，个人/队伍域是完整桶；不是 +N/-N 增量
+Server seed View | Get/Set/GetRoot 函数映射，不是第二份真实余额
+ClientDB Set | 替换客户端某种种子的完整余额；“键级更新”不等于“数量 delta”
+ClientDB SyncReply | 当前玩家整个 seeds 视图快照
+MainDBSet / ClientDBSet | EntityScript 本地通知；本身不是网络传输
+CollectAllSeeds / GetSeeds | ClientDB 内部事件表中的业务事件；PushEvent 在这里会编码并发送
+Widget Refresh | 读取已有状态并更新 Text，没有再次产生存取请求
+
+Host 读取服务端 View，但 Widget 刷新触发仍监听 ClientDB 通知，而不是直接监听 MainDBSet。
+所以“Host 数据可直接读”不等于“Host 文字无需同步事件立刻刷新”。
+当前 Widget 不按 namespace/root 过滤 ClientDB 通知，其他 DB 的通知也可能触发无效重读。
+同理 seed View 的 changefn 只检查 root == "seeds"，未再核对 namespace；未来其他 DB 同名 root 会扩大耦合。
+
+======================================================================
+7. Case A：保存、加载以及一致性缺陷的业务后果
+======================================================================
+
+7.1 保存路径
+
+M08:49 World PostInit：world.components.SoraSeedDB = SeedDB；SeedDB.inst = world
+  ↓ V04:1068 SaveGame，在服务器执行
+  ↓ save.map.persistdata = TheWorld:GetPersistData()（V04:1129）
+  ↓ V03:1903 遍历 components，调用对象存在的 OnSave
+  ↓ SeedDB:OnSave()（M07:744）返回 self.data
+  ↓ 此 Shard 世界存档的 map.persistdata.SoraSeedDB
+
+原版这里按“对象是否提供 OnSave”调用，没有要求必须由 AddComponent 构造，因此手工挂入的对象会参与保存。
+保存不是放在客户端，不是由 soraseedcontainer 保存，也不是每玩家 View 独立保存余额。
+即使个人域以 userid 作键，它仍在世界 DB 中，不因这个键就变成 player 存档。
+
+物理种子若仍留在玩家或容器内，则走原版 Inventory/Container → 物品 GetSaveRecord → Stackable.OnSave。
+已入 SeedDB 的种子实体已销毁，不会再以同一个实体记录保存。
+
+7.2 重载路径
+
+新 World + 新 SeedDB + InitRoot("seeds",1)
+  ↓ 挂入 world.components.SoraSeedDB
+V05:588–589 world:SetPersistData(savedata.map.persistdata)
+  ↓ V03:1954–1980 根据 component key 找对象并 OnLoad
+SeedDB:OnLoad(data)（M07:748）恢复已注册 root
+  ↓ 玩家进入，重新建立服务端 seed View 的函数绑定
+  ↓ 客户端建立 SeedCDB 并 Sync("seeds")
+  ↓ 服务端 GetRoot 经 View 读取恢复后的本 Shard 账本
+  ↓ SyncReply → 本地 Client Cache → Widget Refresh
+
+没有 seed Component 的 OnLoadPostPass 负责这些数量；没有把客户端旧缓存当作恢复来源。
+M05:508 的 Load 会跳过已绑定 root，避免把绑定 root 当成普通独立数据恢复。
+
+7.3 跨 Shard 后果：这里不具备自动收敛承诺
+
+确认依据：
+- M07:774 任意本地 SeedDB:Set 都可写入并广播；接收 Set 直接赋值，不做版本/事务冲突处理。
+- M08:73 InitRoot("seeds",1)，排除该 root 的自动同步；但 Set 的 noSyn > 1 才阻止广播。
+- M07:947 `if not mid == sid then` 按 Lua 优先级解释为 `(not mid) == sid`，不是“不等于”。
+  在当前字符串 ID 用法下，自动同步任务不会按预期建立。
+- 即使只修正这条条件，seeds 的 noSyn=1 仍使它被连接同步/周期同步跳过。
+- 本次业务调用中没有找到主动 SeedDB:Sync 来弥补这条路径。
+
+因此不能把种子系统称为“最终一定一致”。它是可写本地副本 + 完整值广播 + 各自保存。
+
+具体业务推演（静态，不冒充复现）：
+
+情景一：公共种子数都为 10。
+  A 入库 5：A 写 15，已经销毁这 5 颗实体。
+  B 同时取出 4：B 写 6，已经生成这 4 颗实体。
+  若交叉接收对方旧基准的结果：A 最终 6，B 最终 15。
+正确的串行余额应为 11。当前实现既可能丢更新，也可能留下不同余额。
+
+情景二：两个 Shard 都从各自旧余额取出。
+  双方本地正余额检查都通过，实体已经生成；没有中心扣款防止合计超提。
+  之后复制余额不能自动回收已经给出的物品。
+
+情景三：个人/队伍模式。
+  两边即使修改不同种子名，也会写整个同一用户/队伍桶；彼此可以覆盖桶内另一项的新值。
+  所以冲突粒度比“相同 seed key”更粗。
+
+情景四：洞穴离线期间公共池发生变化，随后重新连接。
+  没有本业务的日志重放/自动快照修复；旧洞穴仍可能按旧账本执行存取。
+  后续客户端周期 Sync 只对齐“客户端与它连接的服务器”，不能修复两个服务器的账本分歧。
+
+情景五：分歧时各世界存档并重启。
+  地面保存地面值、洞穴保存洞穴值，分别 OnLoad；没有本业务的唯一权威覆盖规则。
+  UI 重建得很正确，也可能正确地显示该 Shard 的错误/陈旧账本。
+
+这些问题的边界是 SeedDB 共享状态与物理物品转换，不是 Widget 刷新算法。
+
+======================================================================
+8. Case B：开启全局制作与客户端显示
+======================================================================
+
+8.1 开关链
+
+sora2chest 容器 UI 的“控制”按钮（M10:508）
+  ↓ 创建 sora2chestcontrol()（M15；M10:513）
+点击“全局制作”
+  ↓ RPC:PushEvent("Sora2ChestControl", {cmd="GlobalBuild"})（M15:82–88）
+ClientDB 的 SoraRPC 通道 → JSON / Mod RPC → userid 绑定
+  ↓ M06:284 Server Handler 验证 data 是 table、cmd、玩家存在
+  ↓ GlobalBuild 分支 M06:318–329
+配置禁止则提示并返回；否则取该玩家 classified
+  ↓ soraglobalbuild:set(not soraglobalbuild:value())
+  ↓ Say 提示玩家 → 此分支 return
+net_bool 经原版 classified 同步到所属客户端
+  ↓ ingredientmoddirty + 本地 enable 计算 → 制作栏更新
+
+Manager 在“切换布尔值”这一步不参与。
+同一个 Handler 的 Show/Pause 等其他 cmd 会调用 Manager，不能把这些分支画进 GlobalBuild。
+控制 Widget 构造时还发送 Show；那是显示物流状态的另一路请求，不是开启制作的必要中间层。
+
+Host 的这个控制按钮同样调用 ClientDB:PushEvent，没有种子按钮那样的直接业务 Handler 分支。
+所以 Host 优化必须逐条业务确认，不能从 Case A 推广到 Case B。
+
+8.2 两个不同状态
+
+M09:1422–1437，在 player_classified PostInit 创建：
+  soraglobalbuild       = net_bool；服务器切换，表示用户开关。
+  soraglobalbuildenable = 普通 Lua bool；初始 false，表示当地计算的可用条件。
+
+每 1 秒：
+  开关为真，并且 10 范围内找到带 sorasmartchest tag 的实体
+  或者开关为真，并且玩家携带该 tag 的物品
+  → enable = true；值变化时本地 PushEvent("ingredientmoddirty")。
+
+该 PostInit 没有只限 Master Sim，所以客户端与服务器各自计算 enable。
+enable 本身不是从服务器复制过来的 netvar。位置、实体可见性和 1 秒更新相位可能造成短暂差异。
+net_bool 的 dirty event 和周期任务发出的本地事件名字相同，但触发来源不同。
+
+10 是启用检测范围；不是材料搜索范围。
+Manager 查询按 TUNING.SORACHESTRANGE 判断距离；配置值大于 2000 时跳过该距离限制。
+即使配置上允许整个当前世界，也不会因此搜索另一个 Shard。
+
+8.3 UI 链
+
+classified netvar dirty / 当地 enable 改变
+  ↓ V15:1251 监听 ingredientmoddirty
+  ↓ RefreshCrafting（V15:571）→ 玩家 PushEvent("refreshcrafting")
+  ↓ CraftingMenu HUD 的监听与 UpdateRecipes（V14:54、129、254）
+  ↓ OnUpdate 后 RebuildRecipes（V14:370 附近）
+  ↓ Mod 的 RebuildRecipes / SetRecipe / UpdateFilterButtons Hook（M09:1440、1488–1495）
+     若 enable：临时令 replica.inventory.Has 的布尔结果为 true；
+              临时令 replica.builder.HasIngredients 为 true。
+  ↓ 制作栏显示可尝试、点击路径可以往下走
+
+DoRecipeClick 也被同样包装（M09:1466），CanBuild 又有 enable 时返回 true 的包装（M09:1497）。
+M11:647 的 UI Rebuild 包装还可能与这些 Hook 叠加；这里确认组合边界，不展开另一套 UI 算法。
+
+客户端没有通过 MainDB/ClientDB 获得“所有智能箱中某材料总数”。
+Has 包装还保留原返回的数量项，因此视觉状态与材料数量文本不应被理解为服务器库存证明。
+普通打开箱子的物品复制是原版 Container 网络层；它不是全世界材料汇总缓存。
+
+结论：UI 提供尝试入口，服务器重新计算材料。这种分离确实成立，但 UI 采用了宽泛的乐观改写。
+
+======================================================================
+9. Case B：真正制作请求，Remote 与 Host 在哪里汇合
+======================================================================
+
+以下主链选择“非建筑放置、非 manufactured 的普通物品配方”。
+配方具体需要几件材料、产品是什么由原版 Recipe 决定，本报告不发明新的实际配方。
+
+Remote Client：
+制作栏点击
+  ↓ Mod 包装的 DoRecipeClick → 原版 DoRecipeClick（V13:54）
+  ↓ owner.replica.builder:MakeRecipeFromMenu(recipe, skin)
+  ↓ V11:424：本地没有服务端 builder component
+  ↓ playercontroller:RemoteMakeRecipeFromMenu（V12:5709）
+     无 locomotor 的路径直接发送；预测路径通过 BufferedAction.preview_cb 发送
+  ↓ SendRPCToServer(RPC.MakeRecipeFromMenu, recipe.rpc_id, skin_index)
+  ↓ V01:937 原版 RPC Handler 验证参数，按 rpc_id 查 AllRecipes，取玩家 builder
+  ↓ Server Builder:MakeRecipeFromMenu
+
+Host：
+同一制作 UI
+  ↓ builder_replica:MakeRecipeFromMenu
+  ↓ 发现 inst.components.builder，直接调用服务器 Builder:MakeRecipeFromMenu
+
+汇合后：
+M09 的 MakeRecipeFromMenu 包装
+  ↓ 原版 Builder:MakeRecipeFromMenu（V10:1041）
+     检查 Inventory 开启状态、配方知识/科技及 HasIngredients 等
+  ↓ Builder:MakeRecipe（V10:629；也被 Mod 标记 soramakerecipe）
+  ↓ BufferedAction(ACTIONS.BUILD) / locomotor:PushAction
+  ↓ 原版动作执行 → ACTIONS.BUILD.fn（V18:2609，经 M09:1620 包装）
+  ↓ 对普通配方调用 Builder:DoBuild（V10:657）
+  ↓ 执行时再次进行配方/材料等检查 → 分配材料 → 生成/扣除/交付
+
+真正制作不是 ClientDB 的 GetIngredients RPC，也不是 UI 给服务器提交任意材料实体清单。
+客户端主要提交配方标识及皮肤等原版参数；服务器自己查配方需求与可用来源。
+
+放置类补充边界：
+Builder:BufferBuild（V10:1131）会先检查、分配并消耗材料，再设置 buffered build；
+MakeRecipeAtPoint 由另一条原版 RPC 验证坐标、旋转等（V01:965）。
+不能把所有配方一概画成“点下去后同一时刻扣材料并出产物”。本报告不继续展开建筑系统。
+
+失败反馈也不是沉默的成功：
+M09:1577–1618 的包装在未进入实际 MakeRecipe / 未获得 buffered build 时，推入 sora_cantbuild 动作。
+M09:1620–1635 临时置 sorajusttest，调用 HasIngredients 收集欠缺列表，再 Say“制作失败，至少还缺”。
+sorajusttest 使检查继续收集多种材料，不是正常成功制作时无条件允许免费制造的证据。
+
+======================================================================
+10. Case B：Resource Allocation Graph 与真实材料所有权
+======================================================================
+
+10.1 容器怎么进入候选
+
+Prefab 模块加载：M17:186–193
+  require sorachestmanager → RegType("sora2chest", data)
+  data.containers = {{1..25}}；controls={26..30}；pri=50；overfull=1
+  ↓ 注册的是类型槽位/行为配置，不是场景实体
+
+World Master Sim：M09:57–60 → AddComponent("sorachestmanager")
+  ↓ M13:1070 构造世界 Manager
+
+箱子服务器 fn：M17:246–298
+  创建网络实体 → SetPristine → 客户端分支返回
+  服务器添加 Container、WidgetSetup、保存标记等
+  → Manager:RegByType(inst,"sora2chest")
+  ↓ M13:1317
+  allchest[type][entity] = 类型数据副本
+  entity.sorachestdata 指向这份元数据
+  task(0) ResetChestData；安装容器事件监听；加 sorasmartchest tag
+  包装 Container.GiveItem 以维护分类/槽位策略
+
+客户端没有对应 sorachestmanager Replica。客户端见到箱子网络实体/Tag/容器 Replica，不等于持有 Manager。
+这条制作查询不通过 FindEntities 扫世界寻找材料箱；它遍历已注册对象。
+启用条件的 FindEntity 是另一条、每玩家每秒的附近检测，不能说整个功能完全没有空间扫描。
+
+10.2 分配图
+
+Server Builder:HasIngredients / GetIngredients
+  ↓ Mod 的 Builder Adapter（M09:1510–1569）
+  ├─ 原版 Inventory 来源
+  │    Has：主槽/active/overflow/合规的打开容器计数
+  │    GetCraftingIngredient：合规打开容器优先，再主槽、overflow、active
+  │    → 原版分配表 { [item_entity] = amount }
+  │
+  └─ 原版数量不足时 → Manager 补缺口
+       GetCacheChest(item)
+         → allchest 的非 selfcontainer 类型实例
+         → data.c[group] == toprefab(item) 的分类组
+         → 候选缓存 {time, chest={{entity,group},...}}
+       GetItems(chest,group)
+         → data.containers[group] 中每个槽位
+         → container:GetItemInSlot(slot)
+       对每个组：距离有效；exact item.prefab 匹配；非 nocrafting
+         → 读取当前 Stackable.stacksize
+         → 匹配物品合计保留一件（keepone），剩余可用于补缺
+       HasItem → boolean, available_count
+       GetIngredients → { [item_entity] = allocated_amount }
+  ↓ Adapter 合并表，交还原版 Builder:GetIngredients
+  ↓ materials：按配方 ingredient 再组织的 Entity→数量表
+  ↓ Builder:RemoveIngredients 消耗
+
+证据：M13:1143–1236；V06:1507 Has、1697 GetCraftingIngredient；V10:500 附近 GetIngredients、546 RemoveIngredients。
+
+这里的“优先使用原版来源”不等于“优先玩家主背包”。
+GetCraftingIngredient 的原版实现优先查合规打开容器；Has 与分配函数的遍历顺序也并不完全一样。
+Manager 仅补原版缺口；Manager 内部没有在这里按 pri 明确排序选择材料，使用 pairs 遍历候选。
+类型 pri 出现在物流配置中，不能未经调用证明就把它套到全局制作优先级。
+
+10.3 Manager 缓存了什么、没缓存什么
+
+缓存：某材料可能出现的注册容器/分类组，TTL 10 秒；ResetCache 可提前清除。
+未缓存：世界总库存数量、每玩家保留材料、已扣款余额、跨 Shard 副本。
+查询时仍遍历候选组的槽位并读真实 Stack；即使候选表命中，也不是 O(1) 总量查询。
+GetItems 在距离判断之前执行，因此超距候选也有读取槽位的开销。
+
+HasItem/GetIngredients 没有制作锁、材料 reservation、版本校验或 commit 接口。
+GetIngredients 可能返回不足量的部分表；不会自己抛出“已经完整分配成功”的专用结果。
+Manager 的 Pause/IsStop 控制物流调度，当前这两个制作 Query 没有检查暂停状态。
+
+10.4 状态 Owner
+
+Container：槽位与物品归属关系。
+Item/Stackable：数量、物品附加状态；inventoryitem.owner 指向所属 Inventory/Container 实体。
+Manager：注册元数据、分类与候选缓存；不拥有一份独立可扣减库存。
+Builder：这一轮查询产生的临时材料分配表；不是持久的材料所有权。
+Player：当前制作请求、classified 开关和原版 builder 状态。
+
+因此它是“跨多个当前世界容器查询真实物品”的业务 Manager，不是第二套物品数据库。
+
+======================================================================
+11. Case B：消耗、产物、来源重叠与执行边界
+======================================================================
+
+11.1 实际消耗顺序
+
+普通库存物品产品，V10:712–755：
+GetIngredients → CheckIngredientsForMimic
+  ↓ SpawnPrefab(recipe.product, ...)             ← 先创建产物
+  ↓ 读取材料湿度、可能执行 prod.onPreBuilt
+  ↓ Builder:RemoveIngredients(materials,...)
+       → 每种材料、每个实体及数量逐件循环
+       → inventory:RemoveItem(entity,false,true)
+       → stack:Get() 或移出库存/容器
+       → 返回的一件 item:Remove()
+  ↓ builditem 事件 → 原版 Equip / GiveItem / 后续交付
+
+所以用户给出的“RemoveIngredients → Prefab Result”适合作业务目标示意，不能当作这里的逐语句顺序。
+manufactured 配方走另一分支（V10:717），先 RemoveIngredients 后由 prototyper 承担产品处理。
+
+Manager 在这条链上只 Query，没有直接 Remove 物品。
+它的其他物流功能会移动物品，但不能把那些 Mutation 误记成制作扣款实现。
+此路径原版叫 RemoveIngredients；不存在一个需要凭名称补出来的 ConsumeIngredients 中间层。
+
+11.2 为什么玩家能消耗未打开的远端箱子 Stack
+
+V06:1390 Inventory:RemoveItem 在常规所有权搜索之前，若目标是堆叠且不要求整堆，先调用 stackable:Get()。
+V08:109 Stackable:Get 分离出一件、调整原 Stack，保留原 Stack 所在容器关系。
+Builder 随后删除分离的一件；箱中原 Stack 数量下降，原版 stacksizechange 向 Owner 传播（V09:41）。
+因此“玩家 Inventory API 被用于消耗箱中堆叠物”在本机原版有可追踪的路径，不必捏造一次临时开箱。
+
+整体物品移除另有 inventoryitem:OnRemoveEntity 的 Owner 清理（V09:478–491），
+Container:RemoveItem / InternalRemoveItem 会处理槽位和 itemlose（V07:1009、1019）。
+这些底层行为仍不能替代业务对只读容器、权限、同一实体重复分配的检查。
+
+一个无重叠的静态示例：
+原版合规来源为 0；启用条件成立；配置范围内的已注册关闭智能箱中，匹配组某 Stack 有 10 件。
+某次实际配方缺口为 2 → Manager 可用量 9（保留 1）→ 分配该实体 2 → 原版拆出并删除两件 → 原 Stack 剩 8。
+这是演示分配机制的条件例子，不是另造一个项目配方或宣称已实测。
+
+11.3 已确认来源重叠缺陷放回完整业务
+
+边界位置：
+原版 Inventory:GetCraftingIngredient 的 Entity→amount
+           +
+Manager:GetIngredients 的 Entity→amount
+           ↓
+M09:1545–1557 Builder Adapter 以 finds[entity] = amount 合并
+           ↓
+原版 Builder 相信最终分配表并 RemoveIngredients
+
+原版打开容器来源与 Manager 注册容器来源可以指向同一实体。
+Adapter 没有把已分配实体/数量传给 Manager 作为排除或剩余预算；Manager 也没有接收该参数的接口。
+随后直接赋值覆盖旧数量，而不是执行可验证的去重分配。
+
+沿用第四轮已确认的最小条件：
+打开且注册的箱子内同一 Stack 为 4，配方需要 6，无其他材料。
+  原版 Has：只有 4；Manager 看到可用 3，足以补名义缺口 2 → 检查通过。
+  原版 GetCraftingIngredient：[E]=4。
+  Manager 补缺：[同一 E]=2。
+  Adapter 合并：[E] 被改成 2，但 need 仍按补了 2 计算完成。
+  RemoveIngredients 收到的实际表只要求扣 2。
+
+这是静态代码路径确认的错误分配，实际产品表现和其他 Mod 叠加需实机验证。
+既不是 ClientDB 缓存错，也不是 MainDB 一致性问题。
+主要缺陷归 Builder Adapter 的来源组合；Manager API 未表达排除集/剩余数量，是促成集成错误的契约缺口。
+不能只把它称为“Manager 的 HasItem 算错”，因为各自独立看见物品并不等于有权再次分配同一份物品。
+
+11.4 原子性与 TOCTOU 的准确边界
+
+原版在菜单阶段和实际 DoBuild 阶段重复检查，缩短旧 UI/旧请求导致的错误窗口。
+但检查→收集实体表→扣除没有本 Mod 的 reservation/rollback 事务。
+Lua 常规同步调用不会被另一个普通任务随意插入每一行；两玩家也不是两条并行 Lua 线程同时减同一个整数。
+仍然存在：动作排队期间物品变化；同步事件/回调重入；onPreBuilt 等回调修改材料；其他 Hook 改变来源等问题。
+不能把“有 TOCTOU 边界”写成“任意两人同帧制作必然复制物品”。
+静态已确认的是重叠分配缺陷和缺少事务契约；其余按场景实测。
+
+======================================================================
+12. Case A vs Case B
+======================================================================
+
+维度 | Case A 种子 | Case B 全局制作
+Authoritative State | 相对客户端：服务器 SeedDB 计数；跨 Shard 无单一写权威 | 当前 Shard 的 Container/Item/Stackable 真实实体
+Client Cache | SeedCDB 有数量缓存 | 无 Manager 库存总量缓存；有开关和原版局部实体复制
+Shard State | SeedDB 完整值广播，各地可写 | 此链不跨 Shard；每个世界独立 Registry
+World Manager | 不参与 | 维护候选，查询分类槽位，补充材料来源
+Component | soraseedcontainer 是行为入口，不保存数量 | Builder 发起，Container/Item 持有库存；Manager 是世界 Component
+Prefab | 法杖承载入口，种子实体与账本互换 | 箱子注册，产物按原版 Recipe 创建
+UI | 展示数量并发送取出/批量收集意图 | 开关控制 + 乐观放行制作 UI；缺料仍可到服务器失败
+RPC | ClientDB 业务 event + MainDB Shard Set + ClientDB 状态同步 | 开关用 ClientDB；制作用原版 RPC；Host 制作可直接调用 Builder
+NetVar | 种子数量本身不用 netvar 同步 | soraglobalbuild 为 net_bool；enable 是当地派生 bool
+Persistence | 世界组件 SeedDB.data；实体形态另走原版 | 容器内容和 Stack 原版保存；开关无此业务的显式持久化；Registry 重建
+Hook | World/Player/Sim 初始化、数据库与玩家视图绑定 | classified、制作 UI、Builder、Container API、BUILD action 多处适配
+Mutation | 删除实体再增加计数；取出生成实体并扣计数 | Manager 给实体计划，原版拆分/移除材料与交付产物
+主要边界风险 | 可写副本冲突与物理物品转换缺少事务 | 多来源实体别名、临时 Hook 恢复、查询到执行间状态变化
+
+======================================================================
+13. 四个既有 Pattern 的业务验证
+======================================================================
+
+Pattern 01 — Player Business Channel
+
+Case A：成立。一个 seed 模板生成每玩家服务端对象及客户端对象，统一身份路由、事件命令、缓存同步。
+它减少每个 Widget 独立声明 RPC 的重复，并允许服务端把个人/队伍视图与数据库存储分开。
+Case B：部分使用。SoraRPC 只承担开关/控制意图；材料制作保留原版网络链。
+不能因为某业务调用了 ClientDB，就说这个业务全部状态都归 ClientDB。
+
+泄漏：Host 绕过 seed Adapter；GetDB 回落直达 SeedDB；UI 与服务端共用一份行为组件；
+事件通知范围较宽；seed owner-key 周期任务生命周期没完全跟随玩家 DB。
+耦合：seed Server View 闭包直接持有 MainDB，并把 MainDB 通知翻译成 ClientDB 同步。
+
+Pattern 02 — Shard Service Bus
+
+Case A：成立，但只验证了其中“共享计数完整值传播”的使用。
+SeedDB 统一封装 namespace、Shard RPC、Get/Set 和世界保存，业务无需到处手写 Shard RPC。
+没有验证出该业务具备中心扣款、冲突合并或最终自动收敛。
+Case B：不参与；故不对它强行安排 Shard Service Bus 层。
+
+泄漏：业务把 local Get + complete Set 当作安全的跨世界计数变更；
+物理实体已经产生/销毁，传播层却没有等价的业务事务保证。
+
+Pattern 03 — World Manager
+
+Case A：不参与。seedinfo/SeedDB 不是 sorachestmanager。
+Case B：成立。箱子显式注册，Builder 面向一个世界服务查材料；真实物品留在原版容器。
+重载时由实体恢复后注册重建索引，不保存一堆旧运行时引用。
+
+泄漏：Builder Adapter 假设原版来源与 Manager 来源可直接相加；
+Manager Query 没表达已分配实体，且没有与原版一致的只读/排除来源约束。
+Manager 也参与 Container.GiveItem/卸载回调包装，超出“纯查询注册中心”。
+
+Pattern 04 — Mod Framework / Integration Layer
+
+两个案例都成立为“基础接入设施”，并非严格隔离层。
+M02 明确加载顺序；M03 SoraEnv 给模块访问共享环境；M04 将 env 暴露为 SoraAPI；
+World/Prefab/Component/Class PostInit 将业务挂到 DST 对象生命周期；
+M09 把新材料来源接入原版 Builder，保留原版结果生成与消耗。
+
+但 SoraAPI 实际是整个 env 的别名，不是按领域收窄的服务接口。
+业务能直接拿到 SeedDB、ClientDB、辅助方法；依赖较隐蔽。
+main/hook.lua 同时包含安装 Hook 的机制和具体制作业务；不是“框架完全不懂业务”。
+临时替换实例方法没有异常安全恢复；原调用抛错可能把 Has 等留在替换状态。
+
+本轮验证的是上述四种组合方式及边界，不另命名第五个底层 Pattern。
+
+======================================================================
+14. Dependency Flow 与逆向依赖
+======================================================================
+
+Case A（请求方向）
+
+sora2plant 的种子入口 → soraseed Widget
+  → UI 实体上的 soraseedcontainer
+  → Remote: SeedCDB event → ClientDB transport → seed Server Adapter
+  → Host: 同组件的 Handle 方法
+  → 服务器 soraseedcontainer 行为
+  → server seed View 的 Get/Set
+  → SeedDB / MainDB.data
+  → Shard transport / 世界保存
+
+Case A（状态通知方向）
+
+SeedDB 写入 → 本地 MainDBSet
+  → View Adapter → ClientDB Set/SyncReply
+  → Client Cache 写入 → ClientDB EntityScript 通知
+  → Widget 主动重读。
+
+通知从 Owner 向外发不等于逆向依赖：SeedDB 没有 require soraseed Widget，也不直接调用 Widget:Refresh。
+订阅方知道 Owner 的事件，Owner 不需要知道 Widget 实例，方向基本正确。
+
+可见的边界穿透：
+- Widget 不是只依赖一个狭窄 Client Service，而是创建含服务端 Handle 方法的同名 Component。
+- Component 的 GetDB 根据世界侧和 owner 状态切换客户端缓存、玩家 View、直接 MainDB。
+- Prefab 模块 M16:955 require Widget，并在 onselect 访问 ThePlayer.HUD，是 Prefab→表现层的直接耦合。
+- UI metadata 在 Component 模块里构建，游戏行为与图标/数量行共处。
+这不等于“MainDB 反向依赖 Widget”，两者必须区分。
+
+Case B
+
+容器 UI → control Widget → SoraRPC → Server Adapter → player_classified.net_bool
+  → 客户端 enable / 原版 dirty 事件 → 制作 UI Hook
+
+制作 UI → 原版 builder_replica / playercontroller / RPC
+  → Server Builder Adapter
+       ├→ 原版 Inventory Query
+       └→ sorachestmanager Query → 已注册 Container → Item/Stackable
+  → 原版 RemoveIngredients → Item/Container Mutation → 原版事件/复制
+  → 原版配方产物/库存交付
+
+Container Prefab → RegType / RegByType → Manager Registry。
+Manager 不需要拿到当前 CraftingMenu Widget；真实库存对象没有直接调用制作 Widget。
+本链主状态方向合理，但 Adapter 通过临时重写另一个对象的方法接入，存在时间上的耦合。
+Manager 包装 Container 方法形成双向协作：容器接入 Manager，Manager 又影响容器行为；不是单向纯数据查询库。
+
+======================================================================
+15. State Ownership Matrix
+======================================================================
+
+列说明：Replicated 表示网络复制；Cached 表示派生/副本；Persisted 表示本次找到保存路径；
+Rebuildable 指能否从其他保留状态重建，不是“丢掉后给个默认值也算恢复”。
+
+State | Owner | Writer | Reader | Replicated? | Cached? | Persisted? | Rebuildable?
+seed count | 每 Shard SeedDB.data.seeds | 服务端组件经 View；远端 Shard Set | 玩家 View/种子行为 | Shard 完整值；Client View 再复制 | 跨 Shard 是可写副本 | 是，当前世界 | 只能靠存档/可信副本；不能从已销毁实体恢复
+seed owner bucket | SeedDB.data.seeds[S_/T_] | View.setfn | View.getfn/getrootfn | 整桶 Shard 复制 | 非独立 View 拷贝 | 是 | 同上；不是从玩家当前背包重算
+owner key | 服务端 View 的计算/闭包 | GetOwnerKey 与队伍/配置 | View/3秒任务 | 间接体现为客户端快照 | 派生 | 未独立保存 | 是，userid/队伍/配置仍在时
+server seed View | 每 userid ClientDB.rootbind | seed 模板初始化 | GetDB 与同步 Handler | 自身不复制，结果复制 | 函数视图 | 绑定 root 不独立恢复余额 | 是，从玩家与 SeedDB 重绑
+client seed cache | 客户端 SeedCDB.data.seeds | ClientDB Set/SyncReply | UI 组件 | 来自服务器 | 是 | 否 | 是，从服务器 View Sync
+seed display rows | 模块 seedinfo 与 Widget Text | GetAllSeeds / Refresh | Widget | 否 | 是 | 否 | 是，从元数据+当前视图
+physical seed item | Inventory/Container 槽位及 Item | 原版库存、种子收集/取出 | Gameplay/原版 Replica | 原版实体/库存复制 | 否 | 实体形态按原版保存 | 依赖物品存档；入账后只能重造，不恢复原身份
+selected spell | 本地 spellbook.spell_id | SelectSpell / SelectBook 事件 | onselect、法术入口 | 此处靠选择事件，不是 SeedDB | 各侧运行时值 | 此路径未见保存 | 默认 SelectSpell(7) 可重建；不能据此恢复上次选择
+globalbuild flag | 玩家 player_classified.soraglobalbuild | GlobalBuild 服务端 Handler | enable 任务 | net_bool | 客户端为副本 | 未见该字段显式保存 | 能默认 false；无法恢复上次开关选择
+globalbuild enable | 各侧 player_classified 的普通字段 | 每秒附近/携带判定 | UI/Server Builder Hook | 自身不复制 | 派生 | 否 | 是，开关+当地实体条件
+container item slots | 服务端 Container | GiveItem/RemoveItem/原版加载 | Manager/原版库存查询 | 原版容器复制可见范围 | 否 | 是，Container.OnSave | 从存档恢复，非 Registry 推导
+stack quantity | Item.Stackable | 原版 Stackable/Get/合并 | Has/GetIngredients | 原版 Stackable Replica | 否 | 是，Stackable.OnSave | 从物品存档恢复
+manager type config | 模块 ChestData | Prefab 模块 RegType | RegByType | 否 | 静态配置 | 否 | 是，加载代码
+manager registry | allchest[type][entity] | RegByType/UnReg | 候选查询与物流 | 否 | 是，运行时注册 | 无 Manager OnSave | 是，Prefab 重建并注册
+classification c | chest.sorachestdata | ResetChestData/GiveItem 适配 | GetCacheChest | 否 | 派生 | Manager 不保存；部分 sign 由 Prefab 保存 | 按槽位/控制信息重建
+manager candidate cache | manager.chestcache[item] | GetCacheChest/ResetCache | HasItem/GetIngredients | 否 | 是，10秒候选缓存 | 否 | 是，Registry+分类
+allocation materials | 一次 Builder 执行的局部表 | 原版 GetIngredients + Adapter | RemoveIngredients 等 | 不作为客户端计划上传 | 临时结果 | 否 | 可重查，但结果可能因状态变化不同
+crafting availability | 制作 UI/Replica 调用结果 | UI Hook + 原版界面 | 玩家/点击入口 | 不是 Manager 总量 netvar | 派生且乐观 | 否 | 是，从当前开关和界面上下文
+failure accounting | builder.soramakerecipecount / sorajusttest | sora_cantbuild 分支 | 缺料提示 | 文本经原版表现 | 临时 | 否 | 可再查询；正常退出清除
+manager pause state | manager.stoptime | 控制 Handler/Manager API | 物流任务 | 本链不复制库存 | 否 | 没有 Manager OnSave | 重建默认值不等于恢复旧暂停选择；制作 Query 不使用它
+
+选中法术依据：V17:97 将 id 写入 spell_id，整个组件无 OnSave/OnLoad；M16:1142/1187 默认选择。
+这里列入是因为种子 UI 的实际入口依赖它，没有展开法术系统。
+
+======================================================================
+16. Lifecycle Matrix
+======================================================================
+
+事件 | Case A：创建/销毁/恢复 | Case B：创建/销毁/恢复
+Player Join | 认证/link 创建每玩家 server seed DB，绑定 View；Player PostInit 关联对象；Client 建 SeedCDB 初始 Sync | 原版玩家 Builder/Inventory、classified 创建；PostInit 安装开关和周期判定；进入世界已有 Manager 不为玩家重建
+Player Leave | M05 断线回调 UnInit，解除 root 绑定监听和 DB 注册；余额留在世界 | 玩家相关 classified/UI/Builder 随生命周期消失；世界容器和 Registry 保留，不为离线玩家保存材料 reservation
+Shard Join | 本地 SeedDB 可从自己的存档加载；当前自动修复路径不能保证拿到其他 Shard 最新种子 | 每 Shard 独立 World Manager；本业务无需连接另一个 Shard 的 Registry
+Shard Leave | 不撤销已写余额，不补偿未送达 Set，无 seed 操作日志；客户端离开另走玩家生命周期 | 无此案例的跨 Shard 材料锁/租约；其本地实体随该世界运行状态而定
+World Save | SeedDB.OnSave → map.persistdata.SoraSeedDB；物理实体另存 | Container 逐物品 GetSaveRecord；Stackable 保存数量；Registry/候选表不保存
+World Load | 新 DB root → 世界 OnLoad → 玩家 View 重绑 → Client 初始 Sync | World 新 Manager → 箱子 Prefab 重建并 RegByType → Container.OnLoad 恢复物品 → 延时 ResetChestData 重算分类/缓存
+Entity Spawn | 法杖加 seed Component；取出种子新建实体；组件不因此新建世界账本 | 箱子服务器 fn 主动注册；普通材料生成并不等于注册为箱子；物品由 Container 接纳后参与槽位查询
+Entity Remove | 入库销毁物理种子；法杖失去手持条件使 UI 自关；种子余额不会因法杖移除而清零 | onremove → UnReg → 清 Registry/候选缓存；Container 移除回调也接 UnReg；物品删除走原版 Owner 清理
+UI Open | 创建 Widget 与 UI seed Component，读已有 View/Cache，安装 World 通知监听及0.1秒手持检查 | 控制面板创建并发送 Show；Crafting UI 读取 enable，Hook 扩展显示/点击；不会下载所有智能箱库存
+UI Close | Widget:Kill 递归清理子 UI、移除 widget 实体，其 task/listener 随 EntityScript 清理；seed 缓存及服务端 View 继续存在 | 容器 SoraOnCloseFn 杀 tokill 中控件；开关/Manager 不因关界面而清空；Crafting UI 自身按原版生命周期
+
+关键生命周期证据：
+M05:151 UnInit、757 认证/断线、793 Player PostInit、857 Sim PostInit；
+M13:1070、1317、1357；M17:298；V07:979/996；V16:325；V03:1705。
+
+不能笼统说“所有生命周期都完全闭合”：
+1. seed View 的 UpdateOwnerKeyTask 是挂在 World 上的 3 秒任务（M06:178）。
+   bind.Remove 只解除两个 MainDB 监听，ClientDB:UnInit 未取消这个业务任务。
+   玩家退出后任务仍可持有旧闭包直到世界清理；DB 的 Inited 检查会阻止正常发送，但不等于任务已停止。
+2. 控制面板 AddButton 的 data.tokill 位于配置闭包，Close 杀控件但未清空列表（M10:45–105）。
+   重复开关可能保留已销毁 Widget 引用；实际长期规模需要实测。
+3. RegByType 对 Container.OnRemoveFromEntity 保存 oldfn 却未调用它（M13:1351）。
+   UnReg 恢复 GiveItem，但没有恢复这个卸载包装；重复注册与其他包装叠加不能视为天然安全。
+4. Manager 一般绑定 World 生命周期，正常整世界销毁会清实体任务/监听；
+   不能由此推导“运行中独立卸载 Manager Component”也完整清理了所有注册箱子包装。
+
+======================================================================
+17. Failure Boundary：谁发现、谁能恢复、谁无能为力
+======================================================================
+
+故障 | 发现层 | 当前恢复能力 | 无法保证的部分
+业务请求没有返回 / RPC timeout | 本案例的 GetSeeds/CollectAllSeeds/GlobalBuild 都用 event，没有逐请求超时检测 | 若服务器执行了，后续状态同步/提示可能让玩家看见结果 | 不能拿框架其他 RPC 方法的 Time Out 当成本案例 ACK；UI 无法按 request id 判断本次完成、失败或安全重试
+Shard 更新未到达/离线错过 | SeedDB 本业务无逐写入 ACK/操作日志/修订号 | 新 Set 到达可覆盖某 key；显式人工同步另当别论 | 当前 seeds 自动重连/周期修复不成立，不能保证自动收敛；已生成/销毁实体不能由缓存重刷修复
+Client seed cache stale | ClientDB Sync 的 key count/hash 对照 | 初始 Sync、正常通知、seed 模板约300秒同步轮次能重新取得所在服务器 View | 只修客户端副本；无法辨别服务器本地账本是否落后于其他 Shard，也不能证明某次请求已执行
+Container removed | onremove/Container 卸载 → Manager.UnReg；原版 Item Owner 清理 | 正常注销清 Registry、分类入口与候选缓存 | 漏注册/非正常移除/他 Mod 覆盖回调时，Query 中缺少完整 IsValid 防护；不保证所有异常路径安全
+UI stale | 种子 Listener；制作 ingredientmoddirty；1秒 enable 重算 | 正常事件或重开界面重读可恢复显示 | 开 UI 不等于强制 seed Sync；乐观 crafting 不保证材料足够；失效 Hook/通知拼写或 DB 生命周期错误不是 UI 能自修
+Manager cache stale | TTL 或 ResetCache；槽位查询读取实时实体 | 候选缓存10秒到期重新建，ResetChestData/UnReg 可提前失效 | 它不是数量缓存；若分类元数据本身尚未更新，重建候选仍可能错误，TTL 不是完整一致性协议
+Hook error | Lua 错误/日志；本段未统一捕获恢复 | 修正调用后重新创建对象/重载可重装方法 | M09 临时替换 Has/GetCraftingIngredient/HasIngredients 没有 finally 式恢复，old(...) 抛错可留下替换方法；失败记账临时标志也可能未清
+种子实体转换中途失败 | nil/业务错误发生在组件或底层库存 | 没有本业务自动回滚 | 已 Remove 的入库实体、已扣的计数、已 Spawn 的取出实体可能不再对应，需要针对性恢复
+原版材料源与 Manager 重叠 | 当前合并层没有发现 | 目前没有正确的去重/预算重建 | 后面的原版扣除相信材料表，不能替 Adapter 猜测它漏算/覆盖的需求
+
+“Shard message lost”在此指未被业务收到或应用的更新，包括离线错过与会话变化。
+不据此断言引擎底层每次在线 Shard RPC 都是不可靠传输；源码确认的是业务层没有补偿保证。
+同理网络没有回应与真正的网络超时不是同一概念；本案例无逐意图计时器。
+
+安全边界补充：
+- Player userid 绑定阻止直接选择别人的 seed DB；event 参数仍需业务校验。
+- GlobalBuild 是 toggle，不是 SetEnabled(true/false)。重复点击/重复意图执行两次会翻转回来，不能当成幂等设置。
+- Manager 的额外材料来源未复制原版打开容器查询中的所有 exclusion/readonly 条件。
+  这不是客户端上传任意材料 GUID，但仍是服务器扩大物品访问范围时的权限边界。
+- 本轮未启动服务器验证滥用或其他 Mod 兼容；不把静态缺口升级成已证明远程攻击结果。
+
+======================================================================
+18. 架构是否真正分离：逐项评价
+======================================================================
+
+UI 与状态：部分实现，核心方向正确。
+  正例：seed 数量不以 Text 为真；关 UI 不清余额；Client Cache 可 Sync 重建。
+  正例：制作 UI 不决定真实材料归属；真实扣除由服务器原版系统完成。
+  泄漏：Widget 上加含服务器行为的 seed Component；组件中混合展示元数据；
+        crafting UI 用临时改写 Replica API 的方式伪装可用性，而非显式表达“允许向服务器尝试”。
+
+Client 与 Server：有明确权威边界，但入口不完全统一。
+  正例：Remote 只发 seed name/收集意图；服务器读实体和账本；普通制作发配方 id，服务器选材料。
+  泄漏：Host seed 直调省略 Adapter 校验；GetDB 根据全局状态切换多种后端；
+        GlobalBuild enable 在两侧独立计算，UI 可用性与服务器最终判断存在暂时差别。
+
+World 与 Shard：接口分开，业务一致性没有完全解决。
+  正例：MainDB 包装跨世界数据；World Manager 服务当前世界的实体，Case B 未误用 Shard 通信。
+  泄漏：seed 每 Shard 可写完整余额，却承载共享稀缺物品计数；没有唯一 Authority 或可证明的冲突规则。
+        网络封装让调用变简单，但没有自动获得跨世界库存正确性。
+
+业务与 Framework：部分分离。
+  正例：ClientDB 的统一 transport 不需要知道某颗种子的 prefab；MainDB 不直接操作 Widget。
+  正例：Prefab 注册、原版 Builder 接入，让状态仍由合适的原版对象持有。
+  泄漏：SoraAPI 暴露整份 env；Hook 安装与业务代码同文件；
+        Adapter 依赖 Inventory 特定查询结果结构与 RemoveItem 的堆叠行为，当前原版变化会影响正确性。
+
+因此评价不是“架构完全解耦”或“全部只是封装”。
+它已经建立了有用的路由、视图和世界查询层；难点集中在状态转换、来源组合与异常生命周期的边界契约。
+
+======================================================================
+19. 为后续知识库准备的材料（不是最终知识库）
+======================================================================
+
+19.1 Confirmed Patterns
+
+1. Player Business Channel：seed 意图、userid 绑定、服务端 View 和客户端缓存形成真实闭环。
+2. Shard Service Bus：SeedDB 通过统一命令传播状态并接入世界存档；仅证明机制，不证明跨 Shard 一致性。
+3. World Manager：注册容器作为 Query 来源，Builder 不扫描全世界实体；真实物品保留在原版 Container。
+4. Mod Framework / Integration Layer：SoraEnv/SoraAPI 和 PostInit/Hook 把上述能力接到真实 Prefab、玩家及原版制作。
+
+19.2 Pattern Leaks
+
+1. Host seed API 绕过远程业务 Adapter，入口验证不对称。
+2. seed GetDB 的 fallback 直接访问 SeedDB，可能跳过个人/队伍 View。
+3. player View 生命周期短于挂 World 的 owner-key 任务，退出清理不完整。
+4. MainDB 的完整值复制被用于物理稀缺资源的增减，没有事务或独占写权威。
+5. ClientDBSet 通知没有在 Widget 收窄，View 的 MainDB 监听也仅检查 root。
+6. Builder Adapter 未把“实体相同”视为材料来源交集。
+7. UI/Builder Hook 临时改变其他实例方法，异常和重入影响恢复。
+8. Registry Query 越过原版打开容器来源限制，访问规则没有在接口中明确表达。
+9. 控制 Widget 与 Prefab 共享配置闭包、卸载包装，生命周期责任分散。
+
+19.3 Good Integration Examples
+
+A. seed View 用 BindRootFn 隔离物理存储布局和玩家看到的 key。
+   用户看到 {种子名=数量}，服务端可以映射公共、个人或队伍域；Widget 不需知道 S_/T_ 前缀。
+   适用价值是视图适配，不代表底层数据隔离策略没有分支问题。
+
+B. MainDB 本地通知 → Server View 翻译 → ClientDB 状态通知 → UI 重读。
+   DB 不需要引用具体 Widget，关 UI 不影响数据服务；这是值得保留的依赖方向。
+
+C. GlobalBuild 控制走自定义玩家通道，真正制作仍使用原版协议。
+   没有为已有配方执行另造一套产品生成 RPC；原版科技、动作、实体与库存机制可以继续生效。
+
+D. 容器实例主动 RegByType，制作只查注册来源。
+   Manager 缓存候选而非复制所有数量，物品变化仍通过原版实体反映。
+
+E. 原版持久化真实数据，运行时关联重建。
+   SeedDB 通过 OnSave 接入世界，箱子保存真实 Item；View、Registry、UI 从这些状态重新创建。
+
+19.4 Bad Integration Examples
+
+A. 把可写副本完整 Set 当作跨世界存取款：收到的数字看似同步，已经生成/删除的实体却没有统一结算。
+B. 两个来源都返回 Entity→count，就直接覆盖合并：相同 Entity 代表同一资源，不能按“来源不同”重复预算。
+C. 用假 HasIngredients 打开 UI 入口，却不为临时替换添加可靠恢复路径：界面便利建立在易泄漏的全局调用上下文上。
+D. 把业务任务挂到 World，却只在玩家 DB 卸载时移除 Listener：对象注销和任务注销不匹配。
+E. 保存 Container 卸载 oldfn 后不调用：以接入 Manager 为理由替掉已有清理，容易跨越组件责任边界。
+
+19.5 Architecture Rules（14 条，均来自这两条链）
+
+规则 1：UI 提交 Intent，数量/材料由服务器决定。
+  依据：M12 GetSeeds 只传 name，服务器读取余额；B 使用原版配方 RPC。
+  约束：Intent 名称正确不等于参数和权限已经验证。
+
+规则 2：写清楚“对谁权威”。
+  依据：seed 对 Client 是 Server Authority，但各 Shard 都可写。
+  约束：不能把客户端防篡改等同于跨 Shard 库存一致。
+
+规则 3：Server View、Client Cache、Widget Display 应分别标注 Owner。
+  依据：BindRootFn 不拥有独立余额，SeedCDB.data 才是复制表，Text 又是派生显示。
+
+规则 4：缓存可重建，不代表缓存来源正确。
+  依据：ClientDB Sync 能修复本地显示，不能修复 SeedDB 两分片分歧。
+
+规则 5：Host 与 Remote 应共享业务验证入口，允许只优化 transport。
+  依据：种子 Host 直调省略手持 Adapter；B 开关与原版制作各有不同 Host 路径。
+  这是从差异得出的约束，不宣称原项目已经全部做到。
+
+规则 6：实体↔计数转换需要明确提交与失败补偿边界。
+  依据：种子先删实体再入账；取出先 Spawn、再扣数、再交付，没有回滚。
+
+规则 7：跨 Shard 稀缺资源不能只依靠 read-modify-write 完整值广播。
+  依据：并行种子更新会覆盖；个人/队伍完整桶扩大冲突范围。
+  应先定义写入权威和冲突语义，再选择通信封装。
+
+规则 8：真实物品归 Container/Item，Manager 可以拥有候选关系。
+  依据：Manager GetItems 读取真实槽位；Stackable 保存数量；制作没有 Manager 库存账本。
+
+规则 9：Registry 与候选缓存按实体生命周期重建，别把运行时实体表当存档。
+  依据：Prefab RegByType、Container.OnLoad、UnReg；Manager 无自身 OnSave。
+
+规则 10：多材料来源必须按实体身份和剩余数量组合。
+  依据：打开容器来源与 Manager 同指一个 Stack，finds[entity]=iv 覆盖导致错扣。
+  不能只在最终总数上相加而不处理交集。
+
+规则 11：Query 返回分配建议，不自动等于已经预留或扣款。
+  依据：Manager GetIngredients 返回普通表，没有锁/提交；原版随后 RemoveIngredients。
+
+规则 12：乐观制作 UI 应与服务器可用性区分，不能把显示成功当成库存证明。
+  依据：客户端没收到远端总量，Has/CanBuild 仍被放行为真；服务器存在实际失败提示链。
+
+规则 13：Hook 恢复与 Task/Listener 清理属于接口契约。
+  依据：临时 Has 包装无异常恢复、owner-key 任务未随 UnInit 取消、Container oldfn 被遗漏。
+  正常路径跑通不足以证明接入安全。
+
+规则 14：先追原版的实际消费和保存边界，再设计 Adapter。
+  依据：普通产品先 Spawn 再扣料；Inventory.RemoveItem 先处理 Stack；World 保存按 components.OnSave 调用。
+  名称相似或示意图顺序都不能替代这些 API 的真实行为。
+
+======================================================================
+20. 验证记录、剩余实机边界与本轮停止点
+======================================================================
+
+已完成：
+- 沿两条业务追到真实 ClientDB/Shard Mod RPC 与原版 TheNet 边界。
+- 沿制作追到原版 RPC Handler、Builder、Inventory、Container、Stackable 与实体 Owner 清理。
+- 沿保存追到世界 map.persistdata、EntityScript 的 Component OnSave/OnLoad、容器内物品记录。
+- 17 个关键 Mod Lua 文件通过 luaparser 语法解析；这不代表运行时无错。
+- 18 个本报告引用的原版 Lua 文件，与本机已安装游戏 scripts.zip 内对应文件逐字节一致。
+
+原版校验包：
+vanilla-snapshot/scripts.zip
+这是本机已安装版本的校验，不宣称已经在线核实全球最新发行版本。
+
+只读基线：
+参考目录文件数：949
+Lua 文件数：186
+文件字节合计：68,623,081
+路径+文件内容 SHA256 聚合：
+52c1cbe65297d77ae006613c33955199f87b835a04fea9fe27427ac1c0361f71
+与分析前基线一致；报告写在工作区，不写入参考项目。
+
+仍需实机验证、当前未执行：
+1. 双 Shard 同时存取种子与离线/重连时实际消息顺序和物品后果。
+2. Host/Remote 的 seed View 初始化、队伍切换以及 fallback 是否在真实场景触发。
+3. 开关/enable 的客户端可见性延迟、UI 是否短暂显示与服务器不同的状态。
+4. 已确认材料分配重叠在实际配方、背包/打开箱子组合及其他 Mod 下的表现。
+5. onPreBuilt/库存事件重入、容器异常移除和 Hook 抛错后的恢复行为。
+6. 重复进出服、反复打开控制面板的任务/旧 Widget 引用规模。
+
+以上待验证不妨碍本轮源码结论，但不能用静态检查替代联机验收。
+本轮到此停止；不展开其他业务，不修改参考项目，不生成最终 Architecture Knowledge Base。
+[Public release note: this is a redacted derivative of the frozen local report. Original bytes and local filesystem paths are withheld; evidence conclusions and source line numbering above are retained.]

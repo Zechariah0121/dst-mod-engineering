@@ -1,0 +1,1097 @@
+{
+  "schema_version": "native-ai-1.0",
+  "track_id": "NATIVE-001",
+  "version": "1.0.0",
+  "canonical_status": "CANONICAL",
+  "default_projection_fields": [
+    "id",
+    "title",
+    "engineering_question",
+    "native_fact",
+    "scope",
+    "ai_coding_impact",
+    "common_ai_failure",
+    "recommended_reasoning",
+    "does_not_mean",
+    "evidence_strength"
+  ],
+  "default_core_cap": 5,
+  "evidence_class_contract": {
+    "NSF": "Snapshot-scoped native Lua source fact.",
+    "RV": "Only explicitly scoped historical runtime observation, never whole-entry promotion.",
+    "EI": "Engineering inference; separate from native fact.",
+    "REC": "Conditional recommendation, not Klei best practice.",
+    "UNK": "Unknown / engine boundary; no guessed engine mechanism.",
+    "KNOWLEDGE_PRODUCT_EVALUATION": "Pilot coding-product evaluation; never RV."
+  },
+  "entries": [
+    {
+      "id": "AI-N001-01",
+      "title": "账号、连接与运行实体分别建模",
+      "engineering_question": "跨重连玩家进度用什么标识？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "userid由Network/owner链写回实体；GUID/Ents索引当前runtime实体，AllPlayers是当前进程实例列表；ClientTable不是已加载实体列表，ThePlayer不是账号注册表。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "将长期进度键与当前实体引用分开；账号值尚未建立时先延后账号绑定。",
+          "重连后重新取得当前实体，不把旧GUID、classified GUID或table引用写作永久玩家ID。"
+        ]
+      },
+      "common_ai_failure": [
+        "用GUID作为永久玩家身份。",
+        "从ClientTable记录存在推断player已创建或已加载。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "先明确数据寿命，再选择已建立的账号关联或当次实体引用。",
+          "账号关联不是在线/认证/跨shard实体连续性的证明。"
+        ]
+      },
+      "does_not_mean": [
+        "userid保证同一Lua对象持续存在",
+        "GUID跨进程、跨shard稳定或永不复用"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "player progression",
+        "cross-session identity",
+        "reconnect bug"
+      ],
+      "retrieval_triggers": [
+        "userid",
+        "GUID",
+        "Ents",
+        "AllPlayers",
+        "ClientTable",
+        "玩家身份"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-08",
+        "AI-N001-12"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-08"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-12"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-01"
+      ]
+    },
+    {
+      "id": "AI-N001-02",
+      "title": "权威端、本地玩家与专服是三个判断",
+      "engineering_question": "游戏状态、客户端显示和本地输入应在哪个端初始化？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "MakePlayerCharacter共享构造在SetPristine后对remote返回；master尾部另行初始化。OnSetOwner按master或ThePlayer条件建立控制资源，HUD在本地玩家分支；原版握手对Host、Dedicated、Remote采用不同分派。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "把权威游戏组件/状态写入放在对应master/server路径；客户端使用已验证的复制接口。",
+          "仅在本地玩家上下文建立HUD/输入；分别审查authority、locality、dedicated，不以ismastershard代替这三个条件。"
+        ]
+      },
+      "common_ai_failure": [
+        "Remote Client直接访问server-only component。",
+        "将not dedicated当作本地玩家条件。",
+        "Host正常即宣布Remote正确。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "为每项读写列出owner、producer、consumer和端别。",
+          "Host同时拥有多个角色，不能掩盖remote缺少权威组件的分支。"
+        ]
+      },
+      "does_not_mean": [
+        "所有组件在所有端都存在",
+        "服务器只能用ThePlayer取得玩家",
+        "本轮重新验证了多人正确性"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "server/client player initialization",
+        "HUD depending on player data",
+        "Host works / Remote fails"
+      ],
+      "retrieval_triggers": [
+        "ismastersim",
+        "IsDedicated",
+        "ThePlayer",
+        "server-only",
+        "Host",
+        "Remote"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-03",
+        "AI-N001-04",
+        "AI-N001-10"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-03"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-04"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-10"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-02"
+      ]
+    },
+    {
+      "id": "AI-N001-03",
+      "title": "Readiness是具体依赖的谓词",
+      "engineering_question": "初始化可以依赖playeractivated或READY吗？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "玩家早期已经进入AllPlayers；local activation、entity/world playeractivated、Client READY、Server READY、控制器和loading protection具有不同条件。READY处理有技能树/设置协议的特定作用，不能推得全部Mod数据、复制值或输入可用。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "为具体工作检查所需实体、组件/复制视图、账号、HUD或加载数据；不维护一个万能PlayerReady旗标替代这些条件。",
+          "只在需要原版技能树协议时使用相应READY语义；事件payload按entity/world producer分别处理。"
+        ]
+      },
+      "common_ai_failure": [
+        "Entity Exists就开始读取全部组件。",
+        "READY后无条件操作所有HUD或认为控制器已启用。",
+        "将两个playeractivated事件都按相同player参数处理。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "从消费点反推最小依赖；静态延迟一帧不是数据已到达的证明。",
+          "初始化失败/移除时终止属于自己的等待，避免无限poll。"
+        ]
+      },
+      "does_not_mean": [
+        "存在一个适用于所有Mod的通用ready点",
+        "Client READY与Server READY或复制freshness等价"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "persistent player ability",
+        "server/client player initialization",
+        "HUD depending on player data"
+      ],
+      "retrieval_triggers": [
+        "playeractivated",
+        "READY",
+        "readiness",
+        "初始化时机",
+        "loading protection"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-02",
+        "AI-N001-10"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-02"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-10"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-03"
+      ]
+    },
+    {
+      "id": "AI-N001-04",
+      "title": "构造阶段与Mod PostInit时点分开",
+      "engineering_question": "在哪里安装角色逻辑和生命周期回调？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "common_postinit早于SetPristine与remote返回；master_postinit之后捕获角色OnSave/OnPreLoad/OnLoad/OnNewSpawn并装common wrappers。ms_playerspawn在构造内部发生，而外围Mod prefab postinit在prefab.fn返回后。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "在角色factory参数与Mod外部PostInit之间选择真实适用入口；不把ms_playerspawn当最终Mod初始化完成信号。",
+          "添加Player组件时遵守端别；覆盖既有生命周期字段前确认当前wrapper契约并保留原逻辑。"
+        ]
+      },
+      "common_ai_failure": [
+        "common_postinit里假定最终userid已经写入。",
+        "外部PostInit直接覆盖OnLoad，丢掉角色/common包装逻辑。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "先区分自己的角色factory与给其他玩家追加组件这两种任务。",
+          "组件承担独立状态时优先以自己的组件契约组织，而非不必要地替换玩家整体回调；这是REC。"
+        ]
+      },
+      "does_not_mean": [
+        "ms_playerspawn表示落点、读档和local HUD全部完成",
+        "原版wrapper细节就是普遍最佳实践"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "custom player component",
+        "server/client player initialization",
+        "persistent player ability"
+      ],
+      "retrieval_triggers": [
+        "MakePlayerCharacter",
+        "common_postinit",
+        "master_postinit",
+        "AddPlayerPostInit",
+        "ms_playerspawn"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-05"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-05"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-04"
+      ]
+    },
+    {
+      "id": "AI-N001-05",
+      "title": "NewSpawn与Resume执行不同初始化",
+      "engineering_question": "首次给予资源、构造默认值和读档恢复怎样分工？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "普通new-spawn入口选择Ents中的玩家并调用一次性OnNewSpawn；普通Resume消费已有索引实体、调用SetPersistData，并在common OnLoad清掉new-spawn相关字段。world userid历史是另一个范围，OnNewSpawn不等于账号首次加入。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "将runtime默认字段放在构造阶段，将持久值放在组件加载契约，将仅新生资源放在对应新生逻辑。",
+          "一次性账号奖励需要独立持久政策；不能单靠OnNewSpawn防重复。"
+        ]
+      },
+      "common_ai_failure": [
+        "重连时再次发起始资源。",
+        "只在OnNewSpawn建立读档也必需的runtime任务/状态。",
+        "把OnNewSpawn次数当账号加入次数。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "列出fresh与saved-data分支，各自建立运行所需资源。",
+          "不要由Mod人工调用Resume或玩家生命周期来模拟正常初始化。"
+        ]
+      },
+      "does_not_mean": [
+        "普通Resume在这个body里创建Player Entity",
+        "OnLoad执行了所有后续落点/表现任务"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "persistent player ability",
+        "player progression",
+        "reconnect bug"
+      ],
+      "retrieval_triggers": [
+        "OnNewSpawn",
+        "ResumeExistingUserSession",
+        "starting_inventory",
+        "重连奖励"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-04",
+        "AI-N001-07"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-04"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-07"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-05"
+      ]
+    },
+    {
+      "id": "AI-N001-06",
+      "title": "组件持久化是有范围的数据契约",
+      "engineering_question": "自定义Player Component该保存什么、怎样恢复引用？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "GetPersistData以组件key收集OnSave返回的非空table；SerializeUserSession只取GetSaveRecord的record而不传refs返回列表，普通Resume不提供world newents/postpass。DataDumper并不支持任意runtime对象安全恢复。 在既有快照的 World SaveGame 路径，refs不会强制未在saved_ents中的目标加入存档；SerializeUserSession明确丢弃references第二返回值。合法world refs/newents只按该实际caller契约使用。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "组件以稳定key输出可解释的必要数据；不把task handle、Entity对象、userdata或运行闭包当可恢复状态。",
+          "跨实体关系选择当前路径实际支持的保存/重绑定方式，不能给refs就假定world会替Player Session解析旧GUID。"
+        ]
+      },
+      "common_ai_failure": [
+        "OnSave返回nil或空table却期待OnLoad统一收到数据。",
+        "将旧Entity/GUID塞入存档后认为自动恢复关联。",
+        "依赖角色_OnSave返回refs但common wrapper不转发。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "从实际序列化caller核对record/data/refs，区分Player Session与World postpass。",
+          "嵌套实体恢复只按已研究inventory/debuffable具体链说明，不能泛化全部Mod refs。"
+        ]
+      },
+      "does_not_mean": [
+        "Lua function可dump就适合保存Mod运行逻辑",
+        "存档一定包含整个组件或全部玩家字段",
+        "refs声明不等于强制存档依赖，不能用它承诺独立世界实体或跨分片链接必定恢复。"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "custom player component",
+        "persistent player ability",
+        "player progression"
+      ],
+      "retrieval_triggers": [
+        "OnSave",
+        "GetPersistData",
+        "refs",
+        "newents",
+        "userdata",
+        "Player Component持久化"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-07",
+        "AI-N001-08"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-07"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-08"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-06"
+      ]
+    },
+    {
+      "id": "AI-N001-07",
+      "title": "加载缺键、顺序与派生状态显式处理",
+      "engineering_question": "OnLoad能承担所有初始化、跨组件依赖和cache恢复吗？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "SetPersistData先prefab OnPreLoad，再按pairs遍历保存键调用matching component OnLoad，最后prefab OnLoad；缺少组件数据键不会统一调用OnLoad(nil)。加载存在组件补建标志，但不是所有缺组件自动修复；callback没有逐组件pcall隔离。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "构造时给旧存档缺键建立可用默认状态；OnLoad有数据才覆盖。",
+          "跨组件重建依赖显式组织，不假定pairs固定顺序；派生modifier/cache/task按恢复的权威数据重建，避免双写。",
+          "旧格式和稳定组件key需要明确迁移，加载异常会影响整个dispatch，保持解析有界。"
+        ]
+      },
+      "common_ai_failure": [
+        "全部默认值只写在OnLoad，旧存档没有键就nil崩溃。",
+        "A组件OnLoad假定B已经加载。",
+        "同时保存derived cache和基础值并造成恢复后重复modifier。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "区分构造默认值、payload验证/版本兼容与依赖数据齐备后的重建。",
+          "仅将重建派生状态作为需求对应的REC，不宣称任意cache都绝不可存。"
+        ]
+      },
+      "does_not_mean": [
+        "所有组件OnLoad按固定顺序调用",
+        "一个DoTaskInTime(0)保证全部跨组件或复制数据已ready"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "custom player component",
+        "equipment/player modifier",
+        "persistent player ability"
+      ],
+      "retrieval_triggers": [
+        "OnLoad",
+        "缺键",
+        "pairs",
+        "cache",
+        "derived",
+        "add_component_if_missing",
+        "读档崩溃"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-06",
+        "AI-N001-09"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-06"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-09"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-07"
+      ]
+    },
+    {
+      "id": "AI-N001-08",
+      "title": "Player Session与World数据各有寿命",
+      "engineering_question": "玩家进度和world历史应该放哪里，save代表什么？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "Player record、userid-keyed User Session和World Save是不同通道；SaveGame分别请求玩家与world序列化。world playerspawner保存自己的userid历史。Lua序列化请求/返回和callback没有证明磁盘fsync或跨文件原子提交。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "根据状态寿命选择Player组件、world拥有状态或当次runtime/local view；不能把world table当自动随玩家迁移或清理的字段。",
+          "依赖原版正常保存契约；不因某wrapper返回就写“已经durable”，也不为普通Mod另造引擎存储事务。"
+        ]
+      },
+      "common_ai_failure": [
+        "session状态和world状态共用一个生命周期。",
+        "player实体销毁就删world历史。",
+        "保存函数返回就认为所有文件已经原子提交。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "将同账号恢复关系与世界内历史分别建模。",
+          "未知native I/O实现可以保留UNKNOWN，组件作者不必先逆向它才能写OnSave/OnLoad。"
+        ]
+      },
+      "does_not_mean": [
+        "World Save与User Session是一份事务",
+        "普通Mod必须查明native磁盘提交内部实现"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "player progression",
+        "persistent player ability",
+        "cross-session identity",
+        "未来 shard-sensitive player state"
+      ],
+      "retrieval_triggers": [
+        "UserSession",
+        "WorldSave",
+        "SaveGame",
+        "session state",
+        "world state",
+        "fsync"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-01",
+        "AI-N001-06"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-01"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-06"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-08"
+      ]
+    },
+    {
+      "id": "AI-N001-09",
+      "title": "Task、Listener、组件卸载各有真实Owner",
+      "engineering_question": "为什么player离开后资源还在执行？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "实体task helpers登记调用实体pendingtasks；TheWorld拥有的task捕获player也不会成为player-owned。ListenForEvent维护source与listener双索引；Entity Remove清理本实体任务/事件边，RemoveComponent仅执行自己的卸载路径而非整实体清理。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "列出每项task、listener、modifier、widget的创建owner和退场/卸载路径；为长寿命owner持有的短寿命引用保留handle并主动释放。",
+          "解绑时保留同一callback/source；组件被移除也要取消组件自己仍在宿主或world上的工作。",
+          "不要在teardown中新建未经管理的任务；取消与状态检查解决不同问题。"
+        ]
+      },
+      "common_ai_failure": [
+        "把World task捕获player视为player Remove会自动取消。",
+        "RemoveComponent后期望宿主全部pendingtasks/events自动清空。",
+        "用新匿名函数解绑旧listener。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "先按原注册owner和listener/source关系定位，再决定取消/解绑位置。",
+          "判定外部强引用仍存在与原实体仍有效是两回事；实际资源所有权决定清理，不靠万能退出event。"
+        ]
+      },
+      "does_not_mean": [
+        "每个World-sourced listener都会泄漏",
+        "原版Retire调用证明全部外部资源/C++内存马上回收"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "player cleanup leak",
+        "custom player component",
+        "equipment/player modifier"
+      ],
+      "retrieval_triggers": [
+        "pendingtasks",
+        "RemoveComponent",
+        "OnRemoveFromEntity",
+        "ListenForEvent",
+        "RemoveEventCallback",
+        "World task",
+        "cleanup leak"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-07",
+        "AI-N001-12"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-07"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-12"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-09"
+      ]
+    },
+    {
+      "id": "AI-N001-10",
+      "title": "Replica/Classified/HUD是分层可用视图",
+      "engineering_question": "HUD读取玩家数据需要哪些条件？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "raw replica存在、公有replica可见、classified创建/parent/target/attachment、具体netvar值应用、listener登记和HUD/Controls消费是不同条件。普通health显示先监听再主动读取初值；getter fallback不是权威值已抵达的证明。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "通过目标功能的公开复制接口读取；检查所需对象可用，对自己的初始数据明确缺值/初值策略。",
+          "为UI建立初读与后续更新路径，而非只等首次dirty；只对已研究consumer推广这条REC。",
+          "重新绑定本地玩家或classified时管理旧订阅，不能将raw replica._作为常规public API。"
+        ]
+      },
+      "common_ai_failure": [
+        "Replica对象非nil就认为全部权威netvars fresh。",
+        "只监听dirty导致首次HUD没有初始值。",
+        "health案例推广成全部Replica都来自player_classified。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "区分view存在、数据语义有效和consumer已更新。",
+          "未来自己的Mod字段可使用明确的字段协议；不要宣称原版有all-netvars-ready。"
+        ]
+      },
+      "does_not_mean": [
+        "所有Replica都由player_classified承载",
+        "本次实机证明任意netvar初值时序",
+        "HUD非nil等于Controls及显示初始化完成"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "HUD depending on player data",
+        "Host works / Remote fails",
+        "server/client player initialization"
+      ],
+      "retrieval_triggers": [
+        "replica",
+        "classified",
+        "pctdirty",
+        "HUD",
+        "initial value",
+        "dirty事件"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-02",
+        "AI-N001-03"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-02"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-03"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-10"
+      ]
+    },
+    {
+      "id": "AI-N001-11",
+      "title": "冷却保存值与离线政策分别决定",
+      "engineering_question": "冷却在重连/重启后怎么恢复？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "Timer保存剩余timeleft并在OnLoad重新StartTimer，不恢复旧handle。WorldSettingsTimer保存剩余比例并按当前maxtime恢复；LongUpdate有各自规则。所查基础SpellBookCooldowns与prefab没有OnSave/OnLoad，不能凭组件名称假定持久化。 既有Timer:OnSave字段为timeleft、paused、initial_time；Timer:OnLoad用保存timeleft重新StartTimer创建task。这不证明所有离线路径调用LongUpdate，也不替需求决定离线政策。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "先取得玩法政策：离线继续计时、暂停还是按配置比例恢复；未指定时提出选项，不擅自用wall clock或假定统一离线dt。",
+          "按所选需求保存可恢复值，读档新建runtime计时；不要序列化旧task。",
+          "选择原版组件时核对具体保存/加载/LongUpdate契约，而非只看名字。"
+        ]
+      },
+      "common_ai_failure": [
+        "把客户端显示pct当权威持久冷却。",
+        "保存绝对GetTime值并假定重启后时间基准连续。",
+        "OnLoad重新开timer同时重复施加modifier。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "原版计时案例证明机制不同，不替小c决定冷却数值和离线政策。",
+          "用当前任务的正常保存/恢复验收验证实际Mod功能，而非再研究native logger。"
+        ]
+      },
+      "does_not_mean": [
+        "所有玩家效果共享一种离线时间算法",
+        "当前Runtime验证了自定义cooldown跨重启",
+        "任何spellbookcooldown都永久不支持扩展保存"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "cooldown persistence",
+        "persistent player ability",
+        "equipment/player modifier"
+      ],
+      "retrieval_triggers": [
+        "Timer",
+        "WorldSettingsTimer",
+        "timeleft",
+        "LongUpdate",
+        "cooldown",
+        "离线计时"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-06",
+        "AI-N001-07"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-06"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-07"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-11"
+      ]
+    },
+    {
+      "id": "AI-N001-12",
+      "title": "普通离场和重连重建运行关联",
+      "engineering_question": "断线后应该保留什么，重连怎样重新关联？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "普通有效server OnPlayerLeave发disconnect/despawn事件；playerspawner普通非delete/nonmigration ready分支先OnDespawn，再请求SerializeUserSession，再Remove。ClientDisconnected只广播另一通知；client playerexited可能仅为离开network view。普通Resume在当次实体上加载选定数据。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "将持续数据与本次实体任务/监听/复制视图分开；恢复时重新建立运行关联。",
+          "只按事件真实端别/payload与含义处理，不以client view消失删除服务端永久进度。",
+          "退出存档状态在原保存/卸载契约中组织，不人工调用玩家Remove/OnDespawn或依赖跨端万能退出顺序。"
+        ]
+      },
+      "common_ai_failure": [
+        "reconnect后假定旧runtime task、HUD或classified仍活着。",
+        "client playerexited直接删除world userid进度。",
+        "把ClientDisconnected当OnPlayerLeave的Lua直接caller。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "静态公共链已能指导代码；没有完整离场/重连观察不等于无法使用组件保存加载契约。",
+          "引用真实Resume局部观察时保留单账号、单shard、同专服范围。"
+        ]
+      },
+      "does_not_mean": [
+        "每次重连GUID必然改变",
+        "Serialize请求完成才Remove意味着磁盘已经提交",
+        "自然disconnect的完整运行链已经验证"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "reconnect bug",
+        "player cleanup leak",
+        "player progression"
+      ],
+      "retrieval_triggers": [
+        "disconnect",
+        "playerexited",
+        "OnPlayerLeave",
+        "ClientDisconnected",
+        "despawn",
+        "reconnect"
+      ],
+      "knowledge_role": "CORE_AI_ENGINEERING",
+      "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+      "related_native_facts": [
+        "AI-N001-01",
+        "AI-N001-09"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-01"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-09"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-12"
+      ]
+    },
+    {
+      "id": "AI-N001-13",
+      "title": "迁移、死亡、换角与snapshot不能套普通重连",
+      "engineering_question": "未来跨shard或角色变化设计能复用哪些结论？",
+      "native_fact": {
+        "claim_type": "NSF",
+        "statement": "既有Recon区分迁移元数据/移除/请求/抵达、同实体ghost状态转换、reroll和seamless显式数据交接。普通Resume body消费已有实体、不调用SpawnPrefab，也不提供world newents/postpass；snapshot RestoreSnapshotUserSession另有显式Deserialize与SpawnPrefab链，不据此声称snapshot具有world postpass。"
+      },
+      "scope": {
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "version": "756039 / installed 2026-10-04, not rechecked this round",
+        "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+        "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+        "exclusions": [
+          "native内部总序/持久化保证",
+          "多shard全链",
+          "全部角色/插件",
+          "当前安装是否仍为该快照"
+        ]
+      },
+      "ai_coding_impact": {
+        "claim_type": "REC / EI",
+        "decisions": [
+          "为迁移/死亡/换角列清实际业务数据延续政策，不把userid相同等同runtime组件或world table连续。",
+          "普通Mod初始化/重连不调用snapshot/reroll专用入口；涉及跨shard时保持已知范围并对实际Mod需求另行验收。",
+          "需要完整特殊路径设计时显式检索Supporting Recon，不默认启动新Native研究。"
+        ]
+      },
+      "common_ai_failure": [
+        "把死亡当必定新建Player Entity，重复初始化能力。",
+        "surface world table自动在caves拥有同一实例。",
+        "用snapshot Deserialize证明普通重连native读盘内部。"
+      ],
+      "recommended_reasoning": {
+        "claim_type": "REC",
+        "steps": [
+          "普通运行契约与特殊入口分别推理。",
+          "本条只防止普通reconnect泛化；特殊生命周期仅有已查入口的桥接信息，未完成系统研究，不交付跨shard完整实现。"
+        ]
+      },
+      "does_not_mean": [
+        "已经完成特殊生命周期的系统研究或多shardRuntime",
+        "所有ghost/死亡/换角条件都同一行为"
+      ],
+      "evidence_strength": {
+        "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+        "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+        "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+      },
+      "typical_mod_tasks": [
+        "未来 shard-sensitive player state",
+        "cross-session identity",
+        "persistent player ability"
+      ],
+      "retrieval_triggers": [
+        "shard",
+        "caves",
+        "surface",
+        "migration",
+        "snapshot",
+        "ghost",
+        "reroll",
+        "seamless"
+      ],
+      "knowledge_role": "BOUNDARY_GUARDRAIL",
+      "coverage_status": "PARTIAL / BRIDGE_ONLY",
+      "related_native_facts": [
+        "AI-N001-01",
+        "AI-N001-08",
+        "AI-N001-12"
+      ],
+      "typed_relations": [
+        {
+          "type": "related",
+          "target": "AI-N001-01"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-08"
+        },
+        {
+          "type": "related",
+          "target": "AI-N001-12"
+        }
+      ],
+      "research_evidence_refs": [
+        "AI-N001-13"
+      ]
+    }
+  ]
+}

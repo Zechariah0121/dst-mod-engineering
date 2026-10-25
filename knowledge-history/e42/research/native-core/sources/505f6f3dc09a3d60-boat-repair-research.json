@@ -1,0 +1,1644 @@
+{
+  "scope": {
+    "single_engineering_question_zh": "在此固定源码版本，为船体/漏点接入普通修理或自定义补丁时，究竟由哪个实际API执行材料检查、一次消费、回血、漏点状态转换及临时修补超时？",
+    "exact_historic_question_pointer": "BR-R01",
+    "finite_questions": [
+      {
+        "id": "BR-Q01",
+        "question_zh": "普通REPAIR材料选择、实际field/tag候选与执行predicate签名是什么，boat的material/check/onrepaired实际配置怎样接入？",
+        "coding_projection_id": "BTR-P01"
+      },
+      {
+        "id": "BR-Q02",
+        "question_zh": "普通Repairable消费与onrepaired、漏点平台修理/失败fallback各自何时消费1件、传哪个引用、返回什么？",
+        "coding_projection_id": "BTR-P02"
+      },
+      {
+        "id": "BR-Q03",
+        "question_zh": "修补漏点、回血和has_leaks/current_state/onrepairedleak与HullHealth的连接是什么，哪些patch_type真有修补分支？",
+        "coding_projection_id": "BTR-P03"
+      },
+      {
+        "id": "BR-Q04",
+        "question_zh": "kelp临时修补的设置、取消、正常到期、LongUpdate及普通collision/dynamic保存恢复如何不同？",
+        "coding_projection_id": "BTR-P04"
+      }
+    ],
+    "readiness_scope_zh": "仅BTR-P01..04四项有限静态合同获外部独立exact-byte语义接受并为scopedResearchReady；ordinary boat与两patch旁证及原创prose不另成为readiness合同。canonical/runtime/whole-domain均false；最终稳定artifact字节绑定见外部independent-boat-repair-review.json。",
+    "stopping_condition_zh": "BOAT004此一个问题的四部分及唯一必要caller链已获外部精确字节语义接受，本批静态范围闭合；不因source/citation数量扩allboats/修理家族。",
+    "only_ancillary_source_prefab_examples": [
+      "boat (ordinary wood_fn)",
+      "boatpatch",
+      "boatpatch_kelp"
+    ],
+    "admitted_missing_caller_extension": "scripts/prefabs/boat_leak.lua only: actual assigned state callbacks; primary contract evidence, no extra prefab sample/readiness item",
+    "source_only_cloud_distillation": true,
+    "user_computer_remote_workbench_cloudtask_runtime_install_lua_dst_game_microeval_used": false,
+    "baseline_canonical_repo_old_artifact_writes": false,
+    "raw_vanilla_source_in_deliverables": false,
+    "outside_scope": [
+      "allboats/碰撞/航行/船体家族recatalog",
+      "combat/perishable/equip/food修理全域",
+      "ForgeRepairable/Sewing/其他专用修理家族",
+      "补丁拔除/挖出、配方/kelp recipe cost扩查，除非另有具体新问题",
+      "重复inventory/depletion/Class/authority/cleanup core",
+      "native SpawnPrefab error/nil/invalid mapping，transport/delivery/ack/rollback",
+      "network/tick/time guarantees或游戏版本/资产完整性推断",
+      "runtime DST/game/MicroEval、安装、运行Lua、外部写入或用户电脑/Workbench/remote操作"
+    ]
+  },
+  "citations": [
+    {
+      "id": "BR-ACT-REPAIR",
+      "path": "scripts/actions.lua",
+      "symbol": "ACTIONS.REPAIR.fn ordinary repairable branch",
+      "line_start": 978,
+      "line_end": 1001,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "e06209cb281a58b05e1a8a90855bd9c8e58ab0fbd42792ce6000e5eddf86a5bc",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L978-L1001",
+      "cache_path": "/workspace/shared/native004-005/source-cache/scripts/actions.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "ordinary repairable path, BODY selection versus invobject; adjacent forge excluded"
+    },
+    {
+      "id": "BR-ACT-LEAK",
+      "path": "scripts/actions.lua",
+      "symbol": "ACTIONS.REPAIR_LEAK.fn",
+      "line_start": 4897,
+      "line_end": 4901,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "3fac2c172e98df1c563b351a719b1d4d3ac241e775d4fa2d7a2f35dcb8589915",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L4897-L4901",
+      "cache_path": "/workspace/shared/native004-005/source-cache/scripts/actions.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "invobject/target/boatleak and boat_leak tag guard"
+    },
+    {
+      "id": "BR-COLLECTOR-REPAIR",
+      "path": "scripts/componentactions.lua",
+      "symbol": "USEITEM.repairer",
+      "line_start": 1679,
+      "line_end": 1700,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "c4e5cf8de7f6f5cb77faae482a094c9923d2134d26654741d039655cfc2694a7",
+      "git_blob_sha": "d1a9663be9a41b3f8904e565898c9929464c7a5c",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L1679-L1700",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/componentactions.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "USEITEM right/rider/owner/heavy and matched material tag candidate"
+    },
+    {
+      "id": "BR-COLLECTOR-LEAK",
+      "path": "scripts/componentactions.lua",
+      "symbol": "USEITEM.boatpatch",
+      "line_start": 1070,
+      "line_end": 1074,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "range_sha256": "a3f342c68825ffa0e11e66a4caa4ebeaa464bf8f110a2cef0336a73f12b5f52a",
+      "git_blob_sha": "d1a9663be9a41b3f8904e565898c9929464c7a5c",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/componentactions.lua#L1070-L1074",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/componentactions.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "USEITEM boat_patch and boat_leak tag candidate only"
+    },
+    {
+      "id": "BR-REPAIRER",
+      "path": "scripts/components/repairer.lua",
+      "symbol": "Repairer constructor/property callbacks/OnRemoveFromEntity",
+      "line_start": 1,
+      "line_end": 62,
+      "file_sha256": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+      "range_sha256": "d79b4a2e32589ef9eb8b039dae38fe2931be7b015930ee81293b91bb02eba6cb",
+      "git_blob_sha": "5c2002fbb9e38fbdb015ed1d21f0d58a2b8cec2d",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairer.lua#L1-L62",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairer.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "finite metadata fields and property-generated material tags; no Repair API"
+    },
+    {
+      "id": "BR-REPAIRABLE-TAGS",
+      "path": "scripts/components/repairable.lua",
+      "symbol": "Repairable properties and setters",
+      "line_start": 1,
+      "line_end": 88,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "range_sha256": "dded258c4f3fb0428f28cc53a0450369d377baf65a141b7bb6557b45e7f6714e",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairable.lua#L1-L88",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "constructor, setters, tracked material/repairability tags and removal"
+    },
+    {
+      "id": "BR-REPAIRABLE-GATES",
+      "path": "scripts/components/repairable.lua",
+      "symbol": "Repairable:Repair gates",
+      "line_start": 148,
+      "line_end": 166,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "range_sha256": "8b49d51889a7b9026c3f80addd5eca31d9a55aa7bf323005f9ec923693cdea52",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairable.lua#L148-L166",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "testvalid hook, captured repairer/material equality, checkmaterial hook, amount rejection"
+    },
+    {
+      "id": "BR-REPAIRABLE-HEALTH",
+      "path": "scripts/components/repairable.lua",
+      "symbol": "address_repair_amount health branch",
+      "line_start": 106,
+      "line_end": 115,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "range_sha256": "7aa2279a734cbc6383dd7d10b914740cbd3e0eb2527015ab5c6ecf5aaad3a188",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairable.lua#L106-L115",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "health exists and positive amount field; GetPercent full gate, two DoDelta calls"
+    },
+    {
+      "id": "BR-REPAIRABLE-CONSUME",
+      "path": "scripts/components/repairable.lua",
+      "symbol": "Repairable:Repair sound/consumption/onrepaired/return",
+      "line_start": 168,
+      "line_end": 183,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "range_sha256": "a88ed69353423b7f159b9bca0abfc15254d6c09758af4632bae952fbb04c78ba",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairable.lua#L168-L183",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "captured sound condition/fresh argument, current stackable removal, post-consume onrepaired"
+    },
+    {
+      "id": "BR-PATCH-TYPE",
+      "path": "scripts/components/boatpatch.lua",
+      "symbol": "BoatPatch constructor/GetPatchType/OnRemoveFromEntity",
+      "line_start": 1,
+      "line_end": 16,
+      "file_sha256": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
+      "range_sha256": "78373d14a109265ffa3df89114b3486ec5a41b57a05a6700287bd5c49f0dd1be",
+      "git_blob_sha": "db82024e45bf93313e313b1db6b336503c0931e8",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatpatch.lua#L1-L16",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatpatch.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "finite metadata patch_type/GetPatchType/tag lifecycle; no Repair API"
+    },
+    {
+      "id": "BR-LEAK-REPAIR",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:Repair",
+      "line_start": 62,
+      "line_end": 94,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "e8b7d46833a2a0eed605594bced8cb021d802a160862172a46370e0597b90fbe",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L62-L94",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "tag reject, platform Repair truthiness, fallback consume, post-consume type/state task"
+    },
+    {
+      "id": "BR-LEAK-REPAIRED",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:ChangeToRepaired",
+      "line_start": 96,
+      "line_end": 121,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "9987694ee6897360f0724d8d4df019ecd307fa0c5502275ee2b11bc61df1db41",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L96-L121",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "tags/animation/sound then has_leaks false and current onrepairedleak callback"
+    },
+    {
+      "id": "BR-LEAK-TIMER",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:SetRepairedTime/GetRemainingRepairedTime/SetState early gate",
+      "line_start": 123,
+      "line_end": 150,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "b25b082684ff0477a102b0e9a550aa994f1bc8b30d7017ac95a60e178d939c49",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L123-L150",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "stored timeout cancel/replace/GetTaskRemaining and same-state early gate"
+    },
+    {
+      "id": "BR-LEAK-KELP",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:SetState repaired branches",
+      "line_start": 234,
+      "line_end": 261,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "7845797179172fdb970176751332412f5acdc87828fca89a4a9ad7a6cdda82c9",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L234-L261",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "recognized repaired/tape/treegrowth/kelp branches and tail current_state write"
+    },
+    {
+      "id": "BR-LEAK-TIMEOUT",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "set_repair_timeout_state/start_repair_timeout",
+      "line_start": 33,
+      "line_end": 60,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "2a498d8dfa943670cd6fe71be86cc70d15eda25ce6da392e8c82506b4e67b1f3",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L33-L60",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "normal timeout clears stored ref, second animation task, save-state write and helper"
+    },
+    {
+      "id": "BR-LEAK-SAVELOAD",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:OnSave/on_load_delayed_callback/OnLoad",
+      "line_start": 287,
+      "line_end": 321,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "c32e25571739757b0c43128b25cba1d44098f37b34af842b4e5eb62cfd2e1473",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L287-L321",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "dynamic normalized save, component/platform delayed load and optional timeout override"
+    },
+    {
+      "id": "BR-LEAK-LONGUPDATE",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:LongUpdate",
+      "line_start": 323,
+      "line_end": 337,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "range_sha256": "f4e1b491985b2fb103c3653306f7d5a292f6c42572e88fe2efb1b639c7c57920",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L323-L337",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "classification": "DirectSourceFact",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "branch": "remaining minus dt; Cancel then positive reschedule or direct helper"
+    },
+    null,
+    null,
+    null,
+    {
+      "id": "BR-REPAIRABLE-DISPATCH",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/repairable.lua",
+      "symbol": "address_repair_amount",
+      "branch": "health-first and scoped nonhealth/justrunonrepaired exclusion boundary",
+      "line_start": 106,
+      "line_end": 146,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "range_sha256": "e614e848a37849e371634eca14b6c377cbaa425d48eee92d60e850242fd991be",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/repairable.lua#L106-L146",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-STATE-SMALL",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:SetState",
+      "branch": "same-state/cancel/small_leak flag and callback order",
+      "line_start": 144,
+      "line_end": 179,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "range_sha256": "c385827e47a7fdbe2552492c065110446f81597262fa5b26b6556d6db6462f11",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L144-L179",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-STATE-MED",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:SetState",
+      "branch": "med_leak has_leaks gate before onsprungleak",
+      "line_start": 193,
+      "line_end": 220,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "range_sha256": "58c9835c35c9fe4e063bf7e8ded08e519577d8b9c9205de1ea6a94a3130d971f",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L193-L220",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-SETBOAT",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak:SetBoat",
+      "branch": "stores boat and optional build configuration; not platform membership setter",
+      "line_start": 263,
+      "line_end": 273,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "range_sha256": "a999cfa40aeee38d04ab57f910abc5a901d81897ef58096346bf7252c9b05b2b",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L263-L273",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-DYNAMIC-PERSIST",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "BoatLeak constructor/onisdynamic/plug lookup",
+      "branch": "isdynamic writes persists; normalization lookup",
+      "line_start": 1,
+      "line_end": 25,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "range_sha256": "59df347c3d9e9d69023293e04d1e23fef3c8f9c5ad7d75792c021d4e44ac4b91",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L1-L25",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-BOAT-MASTER",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/prefabs/boat.lua",
+      "symbol": "create_master_pst relevant repairable/health installation",
+      "branch": "ordinary base repairable WOOD before health; no predicate/effect hook here",
+      "line_start": 571,
+      "line_end": 601,
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "git_blob_sha": "9af03fcd1875cf0826d7443170e73f3837d27061",
+      "range_sha256": "1332c18f53af68b40081837b491c66af47d957c2d45930d984134d0d68d2a2ef",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/boat.lua#L571-L601",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat.lua",
+      "evidence_role": "AncillaryOrdinaryBoatWiring"
+    },
+    {
+      "id": "BR-BOAT-WOOD",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/prefabs/boat.lua",
+      "symbol": "wood_fn",
+      "branch": "ordinary boat SetPristine/nonmaster return before create_master_pst; dynamic event registration",
+      "line_start": 751,
+      "line_end": 779,
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "git_blob_sha": "9af03fcd1875cf0826d7443170e73f3837d27061",
+      "range_sha256": "ed225bfbc3ffd5abb88f0bd34fb55afca29e7073394c6ab4f09bb44a34b30faa",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/boat.lua#L751-L779",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat.lua",
+      "evidence_role": "AncillaryOrdinaryBoatWiring"
+    },
+    null,
+    {
+      "id": "BR-HULL-STATE",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/hullhealth.lua",
+      "symbol": "HullHealth:UpdateHealth",
+      "branch": "state-derived table contribution and is_leaking; reuse damage core",
+      "line_start": 68,
+      "line_end": 95,
+      "file_sha256": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
+      "git_blob_sha": "e0064a578bc341dd67e700d1ed7beaa83ac2575a",
+      "range_sha256": "8923681a6d27fe3754ec013e3de0307711391f588c54c35678df84bcc03a8258",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hullhealth.lua#L68-L95",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/hullhealth.lua",
+      "evidence_role": "ExistingBOAT004_TargetedStateConnection"
+    },
+    {
+      "id": "BR-HULL-REFRESH",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/hullhealth.lua",
+      "symbol": "HullHealth:RefreshLeakIndicator",
+      "branch": "leakproof/threshold gate; SetBoat and state prerequisite for collision restore",
+      "line_start": 110,
+      "line_end": 134,
+      "file_sha256": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
+      "git_blob_sha": "e0064a578bc341dd67e700d1ed7beaa83ac2575a",
+      "range_sha256": "b36fd5c40dad3e22119dfcb8de5ff56a419218fe210cd55d9c63ac0fa3e8a19b",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hullhealth.lua#L110-L134",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/hullhealth.lua",
+      "evidence_role": "ExistingBOAT004_TargetedLoadConnection"
+    },
+    {
+      "id": "BR-HULL-SAVELOAD",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/hullhealth.lua",
+      "symbol": "HullHealth:OnSave/LoadPostPass",
+      "branch": "collision leak exact state and remaining timeout, restored only after Refresh succeeds",
+      "line_start": 256,
+      "line_end": 288,
+      "file_sha256": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
+      "git_blob_sha": "e0064a578bc341dd67e700d1ed7beaa83ac2575a",
+      "range_sha256": "5ee8966f372cee593a568802a7b55345f56eb8defd9b46d96ea4ba143b200296",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hullhealth.lua#L256-L288",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/hullhealth.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-PREFAB-SPRUNG",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/prefabs/boat_leak.lua",
+      "symbol": "onsprungleak",
+      "branch": "actual assigned callback: local interactable/updatelooper setup",
+      "line_start": 10,
+      "line_end": 24,
+      "file_sha256": "1d5e644d0d1085c5d991da671129ca3a722b2b5ab53c0ad8902302ed667934b3",
+      "git_blob_sha": "8fd6b6b8936e80ad84e412e66d8ff252ec02966b",
+      "range_sha256": "a4a3b42b31bb5459412d41aad67826bfc44bdb6361fbc7f6f462f8c4849d478a",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/boat_leak.lua#L10-L24",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat_leak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-PREFAB-REPAIRED",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/prefabs/boat_leak.lua",
+      "symbol": "onrepairedleak",
+      "branch": "actual assigned callback: local cleanup and NOCLICK/NOBLOCK",
+      "line_start": 26,
+      "line_end": 45,
+      "file_sha256": "1d5e644d0d1085c5d991da671129ca3a722b2b5ab53c0ad8902302ed667934b3",
+      "git_blob_sha": "8fd6b6b8936e80ad84e412e66d8ff252ec02966b",
+      "range_sha256": "441f9cea7f3c9d0372cbdae04fdcf3b891b86815cf3ce261820a11c82954911a",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/boat_leak.lua#L26-L45",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat_leak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-PREFAB-INSTALL",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/prefabs/boat_leak.lua",
+      "symbol": "fn",
+      "branch": "guarded actual caller installs boatleak callbacks; missing-chain evidence only",
+      "line_start": 212,
+      "line_end": 244,
+      "file_sha256": "1d5e644d0d1085c5d991da671129ca3a722b2b5ab53c0ad8902302ed667934b3",
+      "git_blob_sha": "8fd6b6b8936e80ad84e412e66d8ff252ec02966b",
+      "range_sha256": "282d4bcd3c7eae4601f44e003f9e15b254ed72b35a70c20a7c95cbdf27ec724e",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/boat_leak.lua#L212-L244",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat_leak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-HEALTH-REPAIR-TAG",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/health.lua",
+      "symbol": "onmaxhealth/oncurrenthealth",
+      "branch": "Health properties maintain repairable healthrepairable state",
+      "line_start": 9,
+      "line_end": 25,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "git_blob_sha": "815617eef9ec49ff97e478b03dc1ff07527fdea2",
+      "range_sha256": "d3720ac8019e167cea341f7fb79231473540c7261cd3ebe810a0a56490d65a9e",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L9-L25",
+      "cache_path": "/workspace/shared/native004-005/source-cache/scripts/components/health.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-HEALTH-PROPS",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/health.lua",
+      "symbol": "Health tracked property map",
+      "branch": "maxhealth/currenthealth callback binding; Class machinery reused",
+      "line_start": 102,
+      "line_end": 114,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "git_blob_sha": "815617eef9ec49ff97e478b03dc1ff07527fdea2",
+      "range_sha256": "bba29e5a49dcc07314bdf613231225ac2458440d688d839b2df8c3fe7e47590d",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L102-L114",
+      "cache_path": "/workspace/shared/native004-005/source-cache/scripts/components/health.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    },
+    {
+      "id": "BR-LEAK-STATE-HELPER",
+      "repository": "Zechariah0121/dst-scripts",
+      "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "path": "scripts/components/boatleak.lua",
+      "symbol": "set_repair_state",
+      "branch": "Repair 0.4 delayed callback reads current component; absent component no-op",
+      "line_start": 27,
+      "line_end": 31,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "range_sha256": "3231dda974e7f614352ec7767ad3e7c8a6174e2e38cfb6ea5d60b490b6f31fc2",
+      "range_hash_scheme": "LF-joined-lines-no-trailing-newline",
+      "line_number_scheme": "inclusive_1_based",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/boatleak.lua#L27-L31",
+      "cache_path": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "evidence_role": "SelectedBOAT004Contract"
+    }
+  ],
+  "sample_only": [
+    {
+      "id": "BR-SAMPLE-ORDINARY-BOAT",
+      "claim_kind": "SampleOnly_PinnedSource_NotRuntimeValidated",
+      "prefab": "boat (ordinary wood_fn only)",
+      "premises_zh": [
+        "只限固定commit ordinary wood_fn/base helper；其他material overrides不推广",
+        "通常未被Mod PostInit重写，既有health/hullhealth和当前平台关系已成立，原生创建行为仍unknown"
+      ],
+      "statement_zh": "木船guard后安装repairable WOOD再health，Health属性维护healthrepairable候选；wood_fn监听spawnnewboatleak，具体新漏点SetBoat/SetState并插dynamic表。该文件未安装testvalid/checkmaterial/onrepaired，不能把plan中的期望hook写成原版配置。",
+      "citation_ids": [
+        "BR-BOAT-MASTER",
+        "BR-BOAT-WOOD",
+        "BR-BOAT-DYNAMIC"
+      ],
+      "not_universal": true
+    },
+    {
+      "id": "BR-SAMPLE-WOOD-PATCH",
+      "claim_kind": "SampleOnly_PinnedSource_NotRuntimeValidated",
+      "prefab": "boatpatch",
+      "premises_zh": [
+        "只限fn_wood SetPristine后master侧repairer/boatpatch/stackable配置，未被项目重绑",
+        "普通BOAT004 Repair health路径与Get/Remove正常返回"
+      ],
+      "statement_zh": "boatpatch类型默认nil，repairer.material=WOOD、绝对回血=TUNING.REPAIR_LOGS_HEALTH*2并设boatrepairsound/stackable；nil后缀选择repaired。这里只是已读source样本，不承诺HP实际增加或补丁已生效。",
+      "citation_ids": [
+        "BR-SAMPLE-WOOD",
+        "BR-PATCH-TYPE"
+      ],
+      "not_universal": true
+    },
+    {
+      "id": "BR-SAMPLE-KELP-PATCH",
+      "claim_kind": "SampleOnly_PinnedSource_NotRuntimeValidated",
+      "prefab": "boatpatch_kelp",
+      "premises_zh": [
+        "fn_kelp复用fn_wood，master侧设置patch_type=kelp、材料KELP和基于缓存recipe成本的绝对回血字段",
+        "若普通木船repairmaterial仍WOOD且无override，KELP不等于WOOD；平台Repair拒绝后漏点fallback可仍消费并安排kelp状态",
+        "具体recipe成本/数值、burn/perish/edible均非本batch合同"
+      ],
+      "statement_zh": "kelp字段只作为repaired_kelp的实际配置旁证；对本ordinary WOOD boat通常走不回血的平台拒绝/fallback堵漏路径，不能说所有kelp补丁都回血或所有船都接受KELP。",
+      "citation_ids": [
+        "BR-SAMPLE-KELP",
+        "BR-LEAK-REPAIR",
+        "BR-REPAIRABLE-GATES",
+        "BR-BOAT-MASTER"
+      ],
+      "not_universal": true
+    }
+  ],
+  "reviewer_only": {
+    "failure_cases_zh": [
+      "把repairer/boatpatch当执行Repair API或虚构setter",
+      "把材料/healthrepairable候选tag当执行门禁、check hook加doer或onrepaired套参数",
+      "把两次DoDelta先冻结求和、忽视第一调用后可变percent/maxhealth或忽略sound捕获条件/新component实参差异",
+      "把平台false当漏点false/不消费/返还，或onrepaired重复扣材料",
+      "假造boat.lua onrepaired/checkmaterial、onrepairedleak→HullHealth damage清零/回血",
+      "未知patch_type宣称通用修补或必然继续漏血；忽视flags与current_state区别",
+      "kelp时间视为immutable old-state snapshot，忽视ChangeToRepaired callback先发生",
+      "把0.4修理task/正常timeout第二动画task当已存储可通过_repaired_timeout_task取消",
+      "把collision保存plugged归一或HullHealth加载API写成OnLoad",
+      "nil saved timeout当无timer，0当缺失，或LongUpdate当不读dt",
+      "以自检冒充外部接受、canonical/runtimeReady或N001精确映射"
+    ]
+  },
+  "direct_facts": [
+    {
+      "id": "BR-F01",
+      "title_zh": "两个执行API与ordinary Action材料选择",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "执行点为目标Repairable:Repair(doer,repair_item)和目标BoatLeak:Repair(doer,patch_item)。完整Repairer/BoatPatch文件无Repair方法。ACTIONS.REPAIR.fn(act)仅在target的repairable存在时走普通分支：doer有inventory、IsHeavyLifting真且未骑乘时取BODY槽，否则act.invobject；material有repairer才原样return目标Repair。guard未命中为隐式nil；不先RemoveItem，不把doer默认成owner。REPAIR_LEAK要求invobject/target/boatleak且target有boat_leak标签后原样return BoatLeak Repair；没有patch_type/material前置校验。邻接Forge分支不进入本批。",
+      "citation_ids": [
+        "BR-ACT-REPAIR",
+        "BR-ACT-LEAK",
+        "BR-REPAIRER",
+        "BR-PATCH-TYPE"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "ACTIONS.REPAIR.fn(act)",
+        "ACTIONS.REPAIR_LEAK.fn(act)",
+        "target.components.repairable:Repair(doer,repair_item)",
+        "target.components.boatleak:Repair(doer,patch_item)"
+      ],
+      "results": {
+        "ordinary_guard_miss": "implicit nil",
+        "component_returns": "actual component result; no action-layer refund"
+      },
+      "reuse_ids": [
+        "BR-R14"
+      ]
+    },
+    {
+      "id": "BR-F02",
+      "title_zh": "collector仅给候选，field/tag不等于执行保证",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "USEITEM.repairer(inst,doer,target,actions,right)只在right真时继续；骑乘者要求target.replica.inventoryitem:IsGrandOwner(doer)，非骑乘重物搬运者退出。遍历MATERIALS，遇target repairable_<material>后检查物品work/health/freshen/finiteuses材料tag和相应target tag，匹配插入REPAIR，随后return。普通boat相关分支是health_<material>与healthrepairable；其余候选分支仅作边界。USEITEM.boatpatch(inst,doer,target,actions)仅inst boat_patch且target boat_leak时插入REPAIR_LEAK，不要求right/repairer/HP。二者不调用执行predicate、不修血、不消费。",
+      "citation_ids": [
+        "BR-COLLECTOR-REPAIR",
+        "BR-COLLECTOR-LEAK"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "USEITEM.repairer(inst,doer,target,actions,right)",
+        "USEITEM.boatpatch(inst,doer,target,actions)"
+      ]
+    },
+    {
+      "id": "BR-F03",
+      "title_zh": "metadata实际字段、单位及repairable hook配置",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Repairer默认workrepairvalue/healthrepairvalue/healthrepairpercent/perishrepairpercent/finiteusesrepairvalue为0、repairmaterial=nil；对应property callback按正数生成work_/health_/freshen_/finiteuses_材料tag，材料替换先清旧tag。healthrepairvalue是绝对HP输入；healthrepairpercent是比例，执行处乘health.maxhealth，非0..100或消费件数。boatrepairsound由使用处读取，非构造默认字段。BoatPatch仅patch_type=nil、boat_patch标签生命周期、GetPatchType()原样返回字段。Repairable实际SetHealthRepairable(value)更新tracked字段/tag；repairmaterial也是tracked字段。testvalidrepairfn/checkmaterialfn为直接slot（构造nil），onrepaired在使用处读取；不存在本文件提供的SetRepairMaterial/SetOnRepairedFn/SetCheckMaterialFn。SetHealthRepairable的字段控制候选tag，不是Repair的执行资格检查。",
+      "citation_ids": [
+        "BR-REPAIRER",
+        "BR-PATCH-TYPE",
+        "BR-REPAIRABLE-TAGS"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "repairer.repairmaterial = material",
+        "repairer.healthrepairvalue = amount",
+        "repairer.healthrepairpercent = fraction",
+        "boatpatch.patch_type = suffix_or_nil",
+        "BoatPatch:GetPatchType()",
+        "Repairable:SetHealthRepairable(value)",
+        "repairable.testvalidrepairfn = fn",
+        "repairable.checkmaterialfn = fn",
+        "repairable.onrepaired = fn"
+      ],
+      "reuse_ids": [
+        "BR-R19"
+      ]
+    },
+    {
+      "id": "BR-F04",
+      "title_zh": "执行门禁及两个拒绝hook的精确角色",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "Repairable:Repair先在testvalidrepairfn字段真时调用fn(调用点self.inst,原repair_item)，false/nil仅返回false，第二返回reason不读取。之后捕获repair_item.components.repairer；缺组件或self.repairmaterial不等于捕获repairer.repairmaterial返回false（相等的nil也会过该等值判断）。checkmaterialfn字段真时调用fn(调用点self.inst,原repair_item)，假值返回false,reason；doer不传这两个predicate。然后address_repair_amount假值返回false。执行函数不检查healthrepairable/boat_patch标签、dead/canheal或owner；collector资格不可当执行结果。该方法在这些普通早退前未执行自身默认消费，但自定义hook可自行改变状态，不能称为全局零副作用。",
+      "citation_ids": [
+        "BR-REPAIRABLE-GATES",
+        "BR-REPAIRABLE-DISPATCH"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "callback_args": {
+        "testvalidrepairfn": [
+          "self.inst_at_call",
+          "repair_item"
+        ],
+        "checkmaterialfn": [
+          "self.inst_at_call",
+          "repair_item"
+        ]
+      },
+      "callback_returns": {
+        "testvalid": "truthiness only; reason discarded",
+        "checkmaterial": "truthiness and refusal reason"
+      },
+      "results": {
+        "reject": "false or false,reason before this method default consume"
+      },
+      "reuse_ids": [
+        "BR-R19"
+      ]
+    },
+    {
+      "id": "BR-F05",
+      "title_zh": "health分支两次DoDelta，捕获对象与可变读取顺序",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "address_repair_amount在checkmaterial后local health=self.inst.components.health；health存在且捕获repairer的绝对/比例量至少一项>0才进入health分支。GetPercent()>=1直接false；否则依次health:DoDelta(captured_repairer.healthrepairvalue)、health:DoDelta(captured_repairer.healthrepairpercent * captured_health.maxhealth)后true。两次返回均丢弃；量不乘stacksize，不由doer倍率修改，也不检查health.canheal。第二输入在第一DoDelta及其同步事件正常返回后才读取捕获repairer的percent和捕获health.maxhealth，非提前冻结求和；组件被替换不自动改为新health/repairer。一个量为正不保证另一个非负或实际HP增加。非health工作/腐败/finiteuses及最后justrunonrepaired分派存在，但不是本普通boat health合同的新增家族。",
+      "citation_ids": [
+        "BR-REPAIRABLE-HEALTH",
+        "BR-REPAIRABLE-DISPATCH"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "units": {
+        "healthrepairvalue": "absolute HP input",
+        "healthrepairpercent": "dimensionless fraction multiplied by current captured health.maxhealth",
+        "quantity": "not a HP multiplier"
+      },
+      "results": {
+        "return_from_amount": "true when these calls return normally, not actual gain",
+        "full_percent": "false before default consume"
+      },
+      "reuse_ids": [
+        "BR-R-HEALTH"
+      ]
+    },
+    {
+      "id": "BR-F06",
+      "title_zh": "Repairable音效、单件消费后才onrepaired",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "效果分派通过后，音效if使用前面捕获的repairer.boatrepairsound，但PlaySound实参重新读取repair_item.components.repairer.boatrepairsound。随后重新读原repair_item.components.stackable，存在则Get():Remove()，否则原item:Remove()；没有IsStack/IsValid前置guard。正常返回后重新读self.onrepaired，真时调用fn(调用点self.inst,doer,原repair_item)，返回忽略，尾部true。原repair_item参数引用没有换成Get返回对象：普通未被hook/events改量/重绑、Get/Remove正常返回且N>1时通常是N-1残余堆，N=1/非堆叠通常是已删除原引用。这里仅一处默认单件消费语句，不保证任意重入恰好一次；没有预先holder移交或GiveItem退款。",
+      "citation_ids": [
+        "BR-REPAIRABLE-CONSUME",
+        "BR-REPAIRABLE-GATES"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "callback_args": {
+        "onrepaired": [
+          "self.inst_at_call",
+          "doer",
+          "original_repair_item_reference"
+        ]
+      },
+      "normal_order": [
+        "testvalid hook",
+        "capture repairer/material check",
+        "checkmaterial hook",
+        "capture health and two DoDelta calls",
+        "sound condition captured repairer, argument fresh component",
+        "fresh stackable/Get():Remove or original Remove",
+        "fresh onrepaired slot/call",
+        "true"
+      ],
+      "reuse_ids": [
+        "BR-R07",
+        "BR-R08",
+        "BR-R09",
+        "BR-R10",
+        "BR-R17",
+        "BR-R21",
+        "BR-R22"
+      ]
+    },
+    {
+      "id": "BR-F07",
+      "title_zh": "漏点平台修理false仍fallback消费并安排状态",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "BoatLeak:Repair仅漏点inst无boat_leak标签时false；直接调用需有效patch_item/components。patch有repairer时从漏点inst:GetCurrentPlatform()读取平台repairable，调用其Repair(doer,原patch_item)，仅真值标consumed=true。无repairer/平台/repairable或平台Repair返回false/nil时，用当前原patch_item.stackable Get():Remove或原item:Remove fallback；平台reason不向上返回。之后才重读原patch_item.components.boatpatch/GetPatchType，nil得到repaired，否则字符串拼接repaired_<type>；动画后DoTaskInTime(0.4,set_repair_state,state)，正常尾部true。平台成功路径跳过fallback，通常总共消费1件；失败路径可能不回血仍消费并安排漏点状态。原patch引用在平台hook/消费之后读取，可能为残余堆或删除引用，无post-consume IsValid；任意删除/重入/改组件不保证能到尾部。此0.4任务返回未存入_repaired_timeout_task，helper运行时重新取inst.components.boatleak、存在才SetState。",
+      "citation_ids": [
+        "BR-LEAK-REPAIR",
+        "BR-LEAK-STATE-HELPER"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "BoatLeak:Repair(doer,patch_item)",
+        "set_repair_state(inst,repair_state)"
+      ],
+      "results": {
+        "tag_reject": "false",
+        "platform_false_reason": "not propagated; fallback attempted",
+        "normal_tail": "true after task request, not confirmation of state transition/HP gain"
+      },
+      "reuse_ids": [
+        "BR-R05",
+        "BR-R07",
+        "BR-R08",
+        "BR-R09",
+        "BR-R10",
+        "BR-R11",
+        "BR-R12",
+        "BR-R14"
+      ]
+    },
+    {
+      "id": "BR-F08",
+      "title_zh": "HP、has_leaks、current_state与repaired callback分开",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "ChangeToRepaired(build,sndoverride)依次移除boat_leak/添加boat_repaired_patch、动画/声音、has_leaks=false，再调用当前onrepairedleak(inst)，返回忽略；它自身不DoDelta、不把current_state写成repaired。SetState同值先return，非同值先取消并清存储timeout；small_leak分支has_leaks=true后调用onsprungleak(inst,state)，med_leak只在has_leaks原先假时置真并回调；最后才self.current_state=请求state。因此state callbacks看到的current_state尚未由本次尾句写成请求值，且可自行改变字段。Repair的回血来自先前可选平台Repairable，不由ChangeToRepaired或onrepairedleak固有提供。HullHealth既有UpdateHealth按表内漏点current_state识别small/med，非has_leaks检查；漏点repaired分支使下一次这种读取不选small/med，但不承诺周期/网络时点或一般免伤。",
+      "citation_ids": [
+        "BR-LEAK-REPAIRED",
+        "BR-LEAK-STATE-SMALL",
+        "BR-LEAK-STATE-MED",
+        "BR-HULL-STATE",
+        "BR-LEAK-KELP"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "callback_args": {
+        "onrepairedleak": [
+          "leak_inst"
+        ],
+        "onsprungleak": [
+          "leak_inst",
+          "requested_state"
+        ]
+      },
+      "reuse_ids": [
+        "BR-R02",
+        "BR-R03",
+        "BR-R-HEALTH"
+      ]
+    },
+    {
+      "id": "BR-F09",
+      "title_zh": "patch_type只生成后缀，SetState只有已识别修补分支",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "完整SetState中repaired、repaired_tape、repaired_treegrowth、repaired_kelp分支才执行各自ChangeToRepaired。treegrowth另安排自己的animover行为，在这里只确认已识别分支，不扩为新补丁样本/家族；kelp另设timeout。任意自定义repaired_<suffix>没有通用修补else：非同值时仍取消存储timeout并在尾部写current_state，但不会调用ChangeToRepaired/该次onrepairedleak，也不会由这些修补语句改变boat_leak/boat_repaired_patch/has_leaks。BoatPatch:GetPatchType不注册或校验state。结合HullHealth字面small/med比较，未知state在这两个表贡献0，即使flags/tag保留；不能把它称为完成已识别修补生命周期，也不能称为必然继续漏血。",
+      "citation_ids": [
+        "BR-PATCH-TYPE",
+        "BR-LEAK-KELP",
+        "BR-LEAK-STATE-SMALL",
+        "BR-HULL-STATE"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "results": {
+        "unknown_suffix": "current_state assignment alone; no recognized repair lifecycle",
+        "not_guaranteed": "universal custom patch support or arbitrary Mod/native safety"
+      },
+      "reuse_ids": [
+        "BR-R02"
+      ]
+    },
+    {
+      "id": "BR-F10",
+      "title_zh": "kelp设置与same-state/取消的具体任务字段",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "repaired_kelp分支先ChangeToRepaired（内含onrepairedleak），再写kelp动画，随后SetRepairedTime：表达式在此时读取当前self.current_state是否med_leak，选MED或SMALL TUNING时间；普通未被callback改状态时对应之前状态，但不是冻结的进入前快照。最后才current_state=repaired_kelp。SetRepairedTime(time)取消原_repaired_timeout_task（若有），把DoTaskInTime(time,start_repair_timeout)返回保存进同字段；无本地类型/正数clamp。GetRemainingRepairedTime只对有存储ref调用GetTaskRemaining，否则nil。SetState同值早退发生在取消之前，重复同状态不刷新或清定时；非同状态的取消只作用于这个字段，不取消Repair的0.4任务或正常timeout第二个动画任务。",
+      "citation_ids": [
+        "BR-LEAK-KELP",
+        "BR-LEAK-TIMER",
+        "BR-LEAK-STATE-SMALL"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "BoatLeak:SetRepairedTime(time)",
+        "BoatLeak:GetRemainingRepairedTime()",
+        "BoatLeak:SetState(state,skip_open)"
+      ],
+      "units": {
+        "time": "scheduler delay/time units as passed; no local sign/type normalization"
+      },
+      "reuse_ids": [
+        "BR-R11",
+        "BR-R12"
+      ]
+    },
+    {
+      "id": "BR-F11",
+      "title_zh": "普通到期两阶段与保存窗口",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "start_repair_timeout(inst)先取运行时组件，缺boatleak返回；存在则_repaired_timeout_task=nil，播放pre_timeout，另DoTaskInTime(当前动画length+2*FRAMES,set_repair_timeout_state,调用点current_state,med_leak)，返回未存储，然后立即current_state=med_leak用于save/load。这时has_leaks/tag尚未由后续SetState恢复。第二helper缺组件返回；尝试SpawnPrefab(captured_current_state.._timeout_fx)，非nil才定位；之后重新取当前组件写current_state=捕获值，再SetState(med_leak)，从而在普通kelp路径绕过同值早退执行重新漏水分支。只证明Lua调用/字段顺序；没有原生FX成功/有效性、准确animation duration、tick或网络保证。第二阶段等待时GetRemainingRepairedTime已nil，保存读到med_leak，无该动画task的remaining字段；HullHealth若此时读取state，能选med分支，不保证一次实际tick已发生。",
+      "citation_ids": [
+        "BR-LEAK-TIMEOUT",
+        "BR-LEAK-TIMER",
+        "BR-LEAK-STATE-MED",
+        "BR-HULL-STATE"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "normal_order": [
+        "stored timeout ref=nil",
+        "pre_timeout animation call",
+        "second delayed task with current state argument",
+        "current_state=med_leak for save",
+        "helper component guard",
+        "optional FX positioning",
+        "current component current_state=captured state",
+        "SetState(med_leak)"
+      ],
+      "reuse_ids": [
+        "BR-R11",
+        "BR-R12"
+      ]
+    },
+    {
+      "id": "BR-F12",
+      "title_zh": "LongUpdate减dt，正余量重排或直接helper",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "LongUpdate(dt)仅存储_repaired_timeout_task非nil时继续：remaining=GetTaskRemaining(ref)-dt，Cancel该ref。remaining>0调用SetRepairedTime(remaining)（该方法还会对仍存储旧ref再次Cancel再替换）；否则直接set_repair_timeout_state(inst,调用点self.current_state,med_leak)，跳过正常pre_timeout/动画等待和提前state=med的两阶段步骤。LongUpdate本身Cancel后未先把字段置nil；普通kelp→med helper的非同值SetState才清该存储字段，不能推广任意自定义同状态/移除组件情况下都已清ref。这里只是delta时间算式，非恢复时刻、调度或视觉等价保证。",
+      "citation_ids": [
+        "BR-LEAK-LONGUPDATE",
+        "BR-LEAK-TIMER",
+        "BR-LEAK-TIMEOUT",
+        "BR-LEAK-STATE-SMALL"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "BoatLeak:LongUpdate(dt)"
+      ],
+      "units": {
+        "dt": "subtracted from GetTaskRemaining result; no local clamp"
+      },
+      "reuse_ids": [
+        "BR-R11",
+        "BR-R12"
+      ]
+    },
+    {
+      "id": "BR-F13",
+      "title_zh": "collision与dynamic保存恢复是两条实际链",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "HullHealth:OnSave只遍历collision leak_indicators内当前有效引用，保存leak_point、leak_damage、原样current_state和GetRemainingRepairedTime；非空返回boat_leaks否则nil，不包含dynamic表。实际加载API是LoadPostPass(newents,data)，不是HullHealth:OnLoad：每项先还原damage，再RefreshLeakIndicator，只有其成功后从登记表取漏点、SetState(saved exact state)、saved timeout~=nil时SetRepairedTime。Refresh仍受leakproof/threshold门禁并先创建/绑定和设置small/med基础state。dynamic由BoatLeak:OnSave在current_state非nil且isdynamic真时返回lookup去plugged的state与remaining；OnLoad有saved state才isdynamic=true（property令persists同值），请求0延时helper。helper运行时boatleak缺少返回，平台缺少Remove，否则SetBoat(platform)、SetState(saved normalized state)、插入平台HullHealth dynamic表、saved timeout~=nil时SetRepairedTime；不额外验证hullhealth或去重表。SetBoat只存boat和可选build，不设置当前平台归属。两条恢复均未调用Repair或扣材料；0 timeout也通过~=nil，负值/类型未本地clamp。",
+      "citation_ids": [
+        "BR-HULL-SAVELOAD",
+        "BR-HULL-REFRESH",
+        "BR-LEAK-SAVELOAD",
+        "BR-LEAK-DYNAMIC-PERSIST",
+        "BR-LEAK-SETBOAT"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "signatures": [
+        "HullHealth:OnSave()",
+        "HullHealth:LoadPostPass(newents,data)",
+        "BoatLeak:OnSave(data)",
+        "BoatLeak:OnLoad(data)"
+      ],
+      "results": {
+        "collision_state": "exact current_state including plugged state",
+        "dynamic_state": "UNPLUG lookup normalization",
+        "timeout": "if saved value ~=nil overrides SetState-initialized timer; 0 retained",
+        "nil_timeout": "no override; repaired_kelp SetState can still initialize default timeout",
+        "save_transition": "normal second task waiting serializes med_leak and nil stored timer"
+      },
+      "reuse_ids": [
+        "BR-R03",
+        "BR-R04",
+        "BR-R11",
+        "BR-R12"
+      ]
+    },
+    {
+      "id": "BR-F14",
+      "title_zh": "真实漏点callback是局部收尾，HullHealth只读取state",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "唯一必要missing caller scripts/prefabs/boat_leak.lua在SetPristine/nonmaster return后安装boatleak、onsprungleak和onrepairedleak。onsprungleak首次inspectable缺少时建立inspectable/hauntable、_wettargets、updatelooper FindLeakBlocker更新并去NOCLICK/NOBLOCK；onrepairedleak有inspectable时移除inspectable/hauntable及该update fn，遍历_wettargets对有moisture的target RemoveRateBonus(inst)，置_wettargets=nil，最后加NOCLICK/NOBLOCK。该实际callback不回血，不重置HullHealth leak_damage，不从HullHealth表删除漏点。boat.lua普通配置只安装repairable/WOOD；目标文件symbol扫描无testvalidrepairfn/checkmaterialfn/onrepaired赋值，HullHealth目标文件无onrepairedleak安装。实际联系是已登记漏点SetBoat/状态及HullHealth按current_state汇总，不虚构boat onrepaired→damage清零连接。项目/其他模块override仍需项目核验。",
+      "citation_ids": [
+        "BR-LEAK-PREFAB-SPRUNG",
+        "BR-LEAK-PREFAB-REPAIRED",
+        "BR-LEAK-PREFAB-INSTALL",
+        "BR-BOAT-MASTER",
+        "BR-HULL-STATE",
+        "BR-HULL-REFRESH"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "scope_extension": {
+        "reason": "missing actual ordinary boat_leak callback caller only",
+        "no_additional_prefab_example_or_contract": true
+      },
+      "reuse_ids": [
+        "BR-R02",
+        "BR-R03",
+        "BR-R05",
+        "BR-R13",
+        "BR-R04"
+      ]
+    },
+    {
+      "id": "BR-F15",
+      "title_zh": "ordinary boat的候选health tag由Health属性维护",
+      "claim_kind": "DirectSourceFact",
+      "statement_zh": "ordinary wood_fn在SetPristine/nonmaster guard后调用create_master_pst，后者先AddComponent(repairable)、repairmaterial=WOOD，之后才AddComponent(health)和SetMaxHealth；未在这一步额外安装修理predicate/onrepaired。Repairable构造时若health尚不存在就不会由自己的构造health检查设tag；Health tracked maxhealth/currenthealth callbacks则在属性写入时调用现有repairable:SetHealthRepairable((currenthealth or maxhealth)<maxhealth / currenthealth<self.maxhealth)，由其field callback更新healthrepairable。这是Lua字段到候选tag的具体接线；不保证客户端何时看到tag，也不把field当Repair执行gate。",
+      "citation_ids": [
+        "BR-BOAT-MASTER",
+        "BR-BOAT-WOOD",
+        "BR-HEALTH-REPAIR-TAG",
+        "BR-HEALTH-PROPS",
+        "BR-REPAIRABLE-TAGS"
+      ],
+      "canonical": false,
+      "runtime_tested": false,
+      "reuse_ids": [
+        "BR-R04",
+        "BR-R19"
+      ]
+    }
+  ],
+  "runtime_tested": false,
+  "source_comments": [
+    {
+      "claim_kind": "CommentOnly_NotGeneralContract",
+      "statement_zh": "BoatLeak OnSave前注释描述dynamic/collision分别保存及不保存plugged；实际dynamic lookup归一与collision exact state保存不同，不能把注释推广到HullHealth。",
+      "citation_ids": [
+        "BR-SAVE-COMMENT"
+      ]
+    }
+  ],
+  "source_reading_log": [
+    {
+      "path": "scripts/actions.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/actions.lua",
+      "bytes": 272267,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "line_count": 7092,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 978,
+          "line_end": 1001
+        },
+        {
+          "line_start": 4897,
+          "line_end": 4901
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "ordinary repairable caller and REPAIR_LEAK only; adjacent forge branch read as exclusion",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/componentactions.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/componentactions.lua",
+      "bytes": 137632,
+      "file_sha256": "84cad45e6d57ff74015d58593d4e5ca0b4c74fa9ea644e642a99c95aaef8d190",
+      "git_blob_sha": "d1a9663be9a41b3f8904e565898c9929464c7a5c",
+      "line_count": 3254,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1070,
+          "line_end": 1074
+        },
+        {
+          "line_start": 1679,
+          "line_end": 1700
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "two exact USEITEM collectors only",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/repairer.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairer.lua",
+      "bytes": 1829,
+      "file_sha256": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+      "git_blob_sha": "5c2002fbb9e38fbdb015ed1d21f0d58a2b8cec2d",
+      "line_count": 62,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 62
+        }
+      ],
+      "whole_file_semantically_read": true,
+      "read_scope": "finite metadata API and property/tag mapping",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/repairable.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/repairable.lua",
+      "bytes": 6234,
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "git_blob_sha": "e33e540840352f7c7cc6c2b9e565a9c85d8421d7",
+      "line_count": 185,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 185
+        }
+      ],
+      "whole_file_semantically_read": true,
+      "read_scope": "finite ordinary health repair consumer; other dispatch and NeedsRepairs read to bound exclusions only",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/boatpatch.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatpatch.lua",
+      "bytes": 311,
+      "file_sha256": "b99c2b97a985a39ffd92b63ff86a031eb0aed4217edb66d7587ce4f9513cd68d",
+      "git_blob_sha": "db82024e45bf93313e313b1db6b336503c0931e8",
+      "line_count": 16,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 16
+        }
+      ],
+      "whole_file_semantically_read": true,
+      "read_scope": "finite metadata API and absence of Repair method",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/boatleak.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/boatleak.lua",
+      "bytes": 10857,
+      "file_sha256": "8db1d28720a273d77e3c2a840d930e80d91a1b25832b5a0603fd8c7385dff316",
+      "git_blob_sha": "14f7f9b4672ff0bc9017ad2d9f0d1eff66f302ad",
+      "line_count": 339,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 339
+        }
+      ],
+      "whole_file_semantically_read": true,
+      "read_scope": "finite repair/state/time/save methods; plugged/treegrowth recognized only, no new family scope",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/prefabs/boatpatch.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boatpatch.lua",
+      "bytes": 3809,
+      "file_sha256": "cd4f1f77f42922e52c7c22e98f6bd7b7f1ab3c087b8d72ae7ec2ed1b7d65202d",
+      "git_blob_sha": "99e3543bb8db75406da6c6ae2e20cc06ce8f1f04",
+      "line_count": 136,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 136
+        }
+      ],
+      "whole_file_semantically_read": true,
+      "read_scope": "exact two source patch examples; recipe/burn/perish/food read as incidental exclusion, not distilled as contracts",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/prefabs/boat.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat.lua",
+      "bytes": 53278,
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "git_blob_sha": "9af03fcd1875cf0826d7443170e73f3837d27061",
+      "line_count": 1666,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "new pinned GitHub fetch_file(base64), exact snapshot identity verified",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 166,
+          "line_end": 200
+        },
+        {
+          "line_start": 519,
+          "line_end": 620
+        },
+        {
+          "line_start": 751,
+          "line_end": 803
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "ordinary boat repair component/material, guarded wood construction and dynamic table registration; unrelated surrounding physics/sink context not a new claim",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/hullhealth.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/components/hullhealth.lua",
+      "bytes": 9890,
+      "file_sha256": "e677e2af25649508c3824f0675d63ffb37a24b54eba94a56fc0f1d87bf0b2aeb",
+      "git_blob_sha": "e0064a578bc341dd67e700d1ed7beaa83ac2575a",
+      "line_count": 290,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "new pinned GitHub fetch_file(base64), exact snapshot identity verified",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 68,
+          "line_end": 95
+        },
+        {
+          "line_start": 110,
+          "line_end": 134
+        },
+        {
+          "line_start": 256,
+          "line_end": 290
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "reuse current_state damage connection, Refresh prerequisite, missing collision save/LoadPostPass",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/prefabs/boat_leak.lua",
+      "private_cache": "/workspace/shared/native-campaign/private-source-cache/scripts/prefabs/boat_leak.lua",
+      "bytes": 7720,
+      "file_sha256": "1d5e644d0d1085c5d991da671129ca3a722b2b5ab53c0ad8902302ed667934b3",
+      "git_blob_sha": "8fd6b6b8936e80ad84e412e66d8ff252ec02966b",
+      "line_count": 246,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "new pinned GitHub fetch_file(base64), exact snapshot identity verified",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 10,
+          "line_end": 45
+        },
+        {
+          "line_start": 212,
+          "line_end": 244
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "single admitted missing actual caller extension: callback installation/cleanup only; not an ancillary extra prefab example",
+      "source_executed": false
+    },
+    {
+      "path": "scripts/components/health.lua",
+      "private_cache": "/workspace/shared/native004-005/source-cache/scripts/components/health.lua",
+      "bytes": 22115,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "git_blob_sha": "815617eef9ec49ff97e478b03dc1ff07527fdea2",
+      "line_count": 665,
+      "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+      "snapshot_match": {
+        "bytes": true,
+        "file_sha256": true,
+        "git_blob_sha": true,
+        "line_count": true
+      },
+      "acquisition": "pre-existing fixed-snapshot cache rehashed; no external refetch",
+      "semantically_read_inclusive_1based": [
+        {
+          "line_start": 1,
+          "line_end": 28
+        },
+        {
+          "line_start": 102,
+          "line_end": 114
+        }
+      ],
+      "whole_file_semantically_read": false,
+      "read_scope": "existing cache: exact onmaxhealth/oncurrenthealth repairability-tag callbacks and props binding only",
+      "source_executed": false
+    }
+  ],
+  "coding_projection": [
+    {
+      "id": "BTR-P01",
+      "title_zh": "用目标API并分清候选与两个拒绝hook",
+      "load_when_zh": "普通船修理动作缺失、材料不符或需要执行前拒绝时",
+      "signatures": [
+        "target.components.repairable:Repair(doer,item)",
+        "target.components.boatleak:Repair(doer,patch_item)",
+        "testvalidrepairfn(current_target,item)",
+        "checkmaterialfn(current_target,item) -> valid,reason",
+        "repairer.repairmaterial/healthrepairvalue/healthrepairpercent",
+        "repairable:SetHealthRepairable(value)"
+      ],
+      "source_contract": [
+        "ordinary REPAIR重物非骑乘取BODY，否则invobject；LEAK caller检查target boat_leak；metadata Repairer/BoatPatch没有Repair方法",
+        "collector只插候选；health_<material>、repairable_<material>和healthrepairable不证明执行接受",
+        "有testvalid hook且返回false/nil→Repair仅false；捕获repairer/材料等值后，有checkmaterial hook且返回false/nil→false,reason；两predicate都不接doer；随后才health分派",
+        "ordinary boat设WOOD且没有自己的testvalid/checkmaterial/onrepaired安装；Health max/current属性维护候选healthrepairable"
+      ],
+      "evidence_ids": [
+        "BR-F01",
+        "BR-F02",
+        "BR-F03",
+        "BR-F04",
+        "BR-F15"
+      ],
+      "reuse_ids": [
+        "BR-R04",
+        "BR-R14",
+        "BR-R19"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "配置实际字段与正确target API。需要执行拒绝时用准确predicate角色并保留原hook的返回reason；不要从collector/tag或虚构setter推消费结果。直接调用时显式提供项目所需有效实体/doer/资格。"
+    },
+    {
+      "id": "BTR-P02",
+      "title_zh": "只在实际consumer扣一件，平台失败仍可堵漏",
+      "load_when_zh": "修理重复扣料、满血漏点补丁或callback读材料时",
+      "signatures": [
+        "Repairable:Repair(doer,item)",
+        "onrepaired(current_target,doer,original_item)",
+        "BoatLeak:Repair(doer,patch_item)"
+      ],
+      "source_contract": [
+        "health组件存在且捕获repairer的绝对/比例量至少一项>0时，health:GetPercent()>=1拒绝；否则该health分支两次DoDelta，返回被丢弃，第二percent*maxhealth在第一调用之后新读",
+        "Repairable效果→sound→当时stackable Get():Remove或原Remove→当时onrepaired→正常true；callback拿原引用，普通N>1为残余堆/N=1已删除",
+        "漏点平台Repair真跳过fallback；false/nil/无平台仍fallback消费，后读原patch boatpatch/type并请求0.4状态helper，正常true不等于HP gain或已完成堵漏",
+        "无预先holder移交、post-consume有效性guard或内建返还；hooks/事件可改变新读组件和字段，正常一次路径才通常消费1件"
+      ],
+      "evidence_ids": [
+        "BR-F05",
+        "BR-F06",
+        "BR-F07"
+      ],
+      "reuse_ids": [
+        "BR-R07",
+        "BR-R08",
+        "BR-R09",
+        "BR-R10",
+        "BR-R14",
+        "BR-R17",
+        "BR-R21",
+        "BR-R22",
+        "BR-R-HEALTH"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "由Repair/BoatLeak这一处普通consumer消费，不在onrepaired再Get/Remove或同量DoDelta。漏点请求true只按正常到尾部解释；平台修理失败不能直接退款/补发或二次扣料。需要材料数据时按原引用已消费后的身份前提设计，不能仿DEPLOY移交单件。"
+    },
+    {
+      "id": "BTR-P03",
+      "title_zh": "HP与漏点状态分开接，后缀必须有真实分支",
+      "load_when_zh": "自定义补丁只动画、flags与扣血不一致或接onrepairedleak时",
+      "signatures": [
+        "boatpatch.patch_type = suffix_or_nil",
+        "BoatPatch:GetPatchType()",
+        "BoatLeak:SetState(state,skip_open)",
+        "BoatLeak:ChangeToRepaired(build,sndoverride)",
+        "onrepairedleak(leak)",
+        "onsprungleak(leak,requested_state)"
+      ],
+      "source_contract": [
+        "回血来自可选平台Repairable；ChangeToRepaired先改tag/has_leaks再callback，current_state由SetState尾句写",
+        "认可repaired/tape/treegrowth/kelp才调用ChangeToRepaired；任意未知后缀只可能取消存储timer与赋state，没有通用修补生命周期",
+        "真实boat_leak onrepairedleak仅局部交互/湿度bonus收尾；无HullHealth damage归零或回血hook",
+        "HullHealth按current_state而非has_leaks汇总；未知state可在此表贡献0但flags/tag仍保留，不能当已正确堵漏"
+      ],
+      "evidence_ids": [
+        "BR-F08",
+        "BR-F09",
+        "BR-F14"
+      ],
+      "reuse_ids": [
+        "BR-R02",
+        "BR-R03",
+        "BR-R04"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "需要标准kelp行为时使用已识别kelp后缀；项目新后缀需自己提供并验证真实state处理。保留callback角色和状态尾句顺序，不让修血/动画替代漏点生命周期，也不虚构原boat onrepaired→HullHealth连接。"
+    },
+    {
+      "id": "BTR-P04",
+      "title_zh": "保存剩余time并区分普通到期、LongUpdate和两条load",
+      "load_when_zh": "临时kelp补丁超时、跳时或存档恢复时",
+      "signatures": [
+        "BoatLeak:SetRepairedTime(time)",
+        "BoatLeak:GetRemainingRepairedTime()",
+        "BoatLeak:LongUpdate(dt)",
+        "HullHealth:OnSave()/LoadPostPass(newents,data)",
+        "BoatLeak:OnSave(data)/OnLoad(data)"
+      ],
+      "source_contract": [
+        "kelp先Change/callback再读取当前current_state选MED/SMALL time，最后写repaired_kelp；同state早退不重置timer，换state只取消存储ref",
+        "正常到期ref=nil→动画后第二task→立即state=med用于save；第二helper恢复捕获state再SetState(med)，第二task未存储于timeout字段",
+        "LongUpdate用remaining-dt，Cancel后正数重排，非正数直接helper；不复制正常动画两阶段",
+        "collision保存exact state+damage并LoadPostPass先Refresh再saved state；dynamic保存unplugged state并0延时查组件/平台、SetBoat/SetState和dynamic表登记",
+        "两条load仅saved timeout~=nil时覆盖，0保留；nil时kelp SetState仍可能建立默认timer；load不Repair/扣料，动画第二task没有remaining序列化"
+      ],
+      "evidence_ids": [
+        "BR-F10",
+        "BR-F11",
+        "BR-F12",
+        "BR-F13"
+      ],
+      "reuse_ids": [
+        "BR-R03",
+        "BR-R04",
+        "BR-R11",
+        "BR-R12"
+      ],
+      "recommendation_kind": "EngineeringRecommendation_NotRuntimeValidated",
+      "recommendation_zh": "恢复走对应state/remaining字段，不重放Repair消费。区别保存字段ref与另外两个延时task；项目主动取消/重复调用和任意hook变更应针对实际路径核验，不能用通用task cleanup推出全时钟/网络保证。"
+    }
+  ],
+  "original_illustration": {
+    "claim_kind": "OriginalEngineeringIllustration_NotVanillaSource_NotRuntimeValidated",
+    "format": "nonloadable prose plan; no executable Lua",
+    "premises_zh": [
+      "这是一份项目接入思路，不是可加载Mod，不注册/生成prefab，不保证运行；只以上述ordinary boat及两patch为源样本",
+      "已存在的目标/补丁实体具有项目需要的common/pristine/master/组件/平台关系，primitive正常返回；不靠此计划获取原生保证",
+      "20 HP、0.05比例仅原创示意，可按项目二选一或明确两者并用；不是原版调参数值"
+    ],
+    "execution_contexts": {
+      "modmain_or_modimport": "Mod env的AddPrefabPostInit可用；游戏global显式GLOBAL.TheWorld/GLOBAL.MATERIALS，在hook执行时读取world，不顶层冻结。",
+      "prefab_or_component_module": "普通Lua模块用已预加载游戏global/Class，不假设modmain词法GLOBAL/AddPrefabPostInit；不写Class=require(\"class\")或require(\"constants\")返回MATERIALS表。"
+    },
+    "narrow_steps_zh": [
+      "在项目已存在的ordinary boat/patch接入点先查当前world/master和所需组件；设置实际repairer.repairmaterial与healthrepairvalue/healthrepairpercent字段，确保目标repairable.repairmaterial匹配。需要普通kelp无回血fallback时保留KELP与WOOD差异，不额外补同量DoDelta。",
+      "项目predicate用testvalidrepairfn(target,item)或checkmaterialfn(target,item)纯查询；保留现有hook时由项目显式保存并串接正确返回/reason，slot赋值不自动追加。",
+      "附加普通修理效果放onrepaired(target,doer,原item)，此时默认消费已发生。保留原callback引用并仅串接一次，不再扣料/同量回血；把可能删除的原材料引用当异步前提核验。",
+      "自定义漏点补丁先用已识别nil/kelp后缀验证状态；若项目创造新后缀，必须实现具体state分支后再宣布已修补，不能只给boatpatch.patch_type起名。",
+      "超时/恢复按该漏点对应的存储timeout与collision/dynamic load链，不重放Repair；保留当前callback可变字段读取与SetState尾句顺序。"
+    ],
+    "evidence_ids": [
+      "BR-F03",
+      "BR-F04",
+      "BR-F05",
+      "BR-F06",
+      "BR-F07",
+      "BR-F09",
+      "BR-F10",
+      "BR-F13",
+      "BR-F14"
+    ],
+    "source_code_redistributed": false,
+    "reuse_ids": [
+      "BR-R-HOOK",
+      "BR-R-GLOBAL",
+      "BR-R-IMPORT",
+      "BR-R-CLASS-GLOBAL",
+      "BR-R14"
+    ]
+  }
+}

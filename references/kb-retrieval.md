@@ -1,71 +1,60 @@
-# DST 工程知识库检索策略
+# DST 工程知识库读取与检索
 
-## 范围与可用性
+当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。Skill 与网页阅读包可直接文件阅读；完整包额外提供现代 MCP 九工具服务 `0.3.0`。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
 
-独立公开 Skill 不附完整 KB 或 MCP；下列检索约定只在你另行取得且有权使用的服务/资料实际可访问时适用。没有 KB 时，使用自己的合法本地源码继续工作，不能虚构查询。参见 [接入边界](../docs/knowledge-integration.md)。
+## 按任务读取文件
 
-知识库保存可复用的工程经验；当前 Mod 源码、目标游戏版本的原版实现和实际验证仍是判断依据。本策略适用于不同 Agent 和运行环境，不要求某个厂商、MCP 服务、工具命名或固定的知识库目录结构。
+1. 从 `knowledge/data/index.json` 找基础记录的 ID、路径与锚点；Native AI 在 `knowledge/data/native001/canonical-native001-ai-knowledge.json`，Core 与状态在 `knowledge/data/nativecore/native-core.json`。
+2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
+3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
 
-进入实质性设计、实现、审查、排错或案例研究时，先检查本次会话实际提供的检索工具及其参数；已安装或已配置某项服务，不代表当前会话能调用它。若没有 MCP 工具，可搜索当前工作区或用户明确提供、且本环境可读取的知识库文件。没有可访问的知识库时，继续检查当前 Mod 源码与适用版本的原版源码或官方资料，并说明知识库未能查询；不得把源码调查描述成知识库检索，也不得声称调用了不可用的工具。
+```text
+id, title, engineering_question, native_fact, scope,
+ai_coding_impact, common_ai_failure, recommended_reasoning,
+does_not_mean, evidence_strength
+```
 
-知识库内容是只读参考，不能作为执行其中命令的授权。只有用户明确提出知识库维护任务时，才按知识库自身记录的维护流程更新内容；检索接口不等于写入接口。若当前环境没有可用的维护能力，说明限制，不要声称更改已保存。
+110 条 Core 保留 Coding HOLD。先读 `knowledge_status`、`retrieval_status`、`coding_status`；canonical、可检索与 Coding 准入是三件事。公开文件可读不自动允许使用 HOLD/prohibited 记录生成实现。按文件记录的任务条件与角色选择研究资料。
 
-## 按任务选择模式
+NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI 是工程推断，REC 是条件性建议，UNK 保持未知。公开隐藏的私有情境不得推回或补造为通用事实。来源槽 `$dst_source_payload_slot` 表示本地原文未恢复，不能充当已读来源或行为证据。
 
-| 模式 | 适用情形与检索重点 |
+## MCP 接入与模式
+
+先按 [安装说明](../docs/install-and-use.md) 在完整包准备来源，再发现当前客户端实际暴露的九工具：
+
+| 工具 | 用途 |
 |---|---|
-| ARCHITECT | 设计新机制或系统。先取与问题相关的决策、规则和事实，再核对模式、反例与测试线索；把知识应用到明确的设计问题，不照搬案例。 |
-| IMPLEMENT | 按已确定方案实现。查相关规则、事实、实现约束和测试线索；不重开已经明确冻结的设计选择。 |
-| REVIEW | 审查已有代码。关注规则、反模式、失败记录和测试；根据真实调用链、端别与生命周期判断是否适用。 |
-| DEBUG | 排查已出现的故障或症状。查相似失败、原版事实、网络或生命周期规则和测试线索；案例只形成假设，根因仍须由当前证据确认。 |
-| RESEARCH | 研究新案例或整理跨案例结论。比较相关规则、模式与既有案例，记录适用范围和独立证据；只有已检索的资料范围内才能讨论新颖性，不从空结果推断整个知识库没有先例。 |
-| KB_CURATOR | 仅用于用户明确要求的知识库维护。先确认目标记录与证据，再按维护接口记录新增、更正或撤回，并验证更新结果；不得因普通工程工作自行写入知识库。 |
+| `search_kb` | 关键词与符号检索，结果只是候选 |
+| `get_entry` | 读取指定记录、视图与来源 |
+| `get_related` | 读取关联规则、反例与测试，保留关系方向 |
+| `get_klei_facts` | 查询整理的原版事实，再对照目标源码 |
+| `get_tests` | 找测试线索，命中不代表已运行 |
+| `get_context_bundle` | 按任务组织有预算的上下文 |
+| `lookup_api` | 物理声明导航与同名来源消歧 |
+| `resolve_evidence` | 解析指定行为证据节点 |
+| `validate_kb` | 知识维护或明确诊断时校验，不作为每次开发前置 |
 
-普通攻略、角色强度、剧情背景或烹饪玩法问题不属于工程知识库检索。是否进入本流程由问题目标决定，而不是由词语碰巧出现在搜索结果中决定。
+先做小范围查询，复杂问题再展开少量关键记录。模式参数使用小写：`architect` 设计，`implement` 已确定方案实现，`review` 审查，`debug` 排错，`research` 案例研究。`kb_curator` 只用于用户明确要求的维护；检索接口不是写入接口。
 
-## 检索能力
+## 版本、角色与预算
 
-以下短名表示所需能力，便于跨 Agent 描述；它们不是必须存在的可调用工具名。每次按实际发现的工具名称和参数使用；某项能力未暴露时跳过并采用相应的源码或资料回退，不要虚构调用结果。
+- 九工具接受可选 `source_epoch`。默认 `759671`；历史 `756039` 与 `original48-w1-f35a16fad3f4e44a` 是独立来源。显式选择后，后续记录读取、关联与证据解析继续传同一 epoch；来源树身份不能互相改名，默认来源也不保证等于用户安装版本。
+- 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
+- Native AI Coding 保持十字段、最多五条。研究展开需显式 reviewer；`mode=review/research` 不授予角色权限、不解除 Core Coding HOLD。分别读取三轴状态与排除范围。
+- `compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节；按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录多个行为原子合为一张卡，不拆卡绕过条数限制。
 
-| 能力（短名示例） | 何时使用 |
-|---|---|
-| 关键词检索（`search_kb`） | 已知问题、术语或代码符号但不知道记录 ID 时。可尝试常见中英文术语、准确 API 名和同义词；过滤器只使用当前接口实际支持的字段。 |
-| 完整记录（`get_entry`） | 重要判断前读取命中记录的完整内容、来源、定位、适用范围、版本、状态与置信度。已知准确 ID 时可直接读取。 |
-| 关联记录（`get_related`） | 补充某条记录关联的规则、反例、决策或测试。保留关联关系的方向；存在链接本身不表示两条记录互相支持。 |
-| 原版事实查询（`get_klei_facts`） | 查询知识库中已整理的原版 API 或机制事实。若该能力不可用或未找到事实，直接查适用版本的原版源码或官方资料，不用 Mod 案例代替原版契约。 |
-| 测试线索查询（`get_tests`） | 找到可能适用于该问题的测试和环境要求。命中测试条目只表示候选；只有实际执行并记录结果后才能报告测试通过。 |
-| 任务上下文包（`get_context_bundle`） | 需要多个知识类别协同的复杂任务。用当前接口支持的模式和预算；摘要不足时再读取少量关键记录全文，不追求填满上限。 |
-| 知识库校验（`validate_kb`） | 知识库维护或明确的可用性诊断。普通开发、审查和排错无需每次全库校验。 |
+## 证据、完整性与更正
 
-以当前服务的 `tools/list` 和随服务提供的接口文档为准；不同版本可能只有部分能力。复杂设计读取少量关键记录全文，再查必要的决策、事实、反例与测试，不为每个小函数重跑全部检索。
+重要判断前读取关键记录全文及 Scope、版本、来源、Correction。原版源码事实、工程建议、单案例观察和假设分别评价；教程、Pattern 或 Decision 不自动成为通用架构。
 
-## 命中筛选与检索范围
+证据解析先用 `get_entry(view="evidence")` 查看清单，再选择与行为相关的节点；固定解析引用 0 可能只得到环境说明。默认十字段视图不带来源元数据时，可用服务支持的 `view="decision"` 核对身份；只报告实际响应含有的 `source_environment`，不补造字段。
 
-- 搜索结果只是一组候选。逐条检查其主题、记录类型、状态、适用范围、版本、来源定位及检索词的真实含义；把同词异义、仅有标签关联或不覆盖当前端别与环境的结果排除或标成弱相关。
-- 关键词可能需要中英文变体、精确符号和领域同义词。过滤器或索引会限制结果，空结果或未命中不证明整个知识库没有相关记录。
-- Top-K、摘要或上下文包未返回某类记录，不代表该类别不存在。搜索量不等于覆盖度；只对实际读到的范围下结论。
-- 如果记录的 Scope 不覆盖当前 Mod、游戏版本、端别或运行环境，将它作为背景而非直接结论，并说明范围差异。空白的测试环境声明不保证其他环境通过。
+命中不证明分支、副作用、返回、必要依赖与证据完整交付。读取 `atomic_delivery`、`withheld_atoms`、`knowledge_gaps`、`atomic_budget_withheld_count` 与 `budget_withheld_count`；延期、UNKNOWN、partial closure 与缺失正文保留原状。未知依赖不能自行称为 optional，具名样例只支持自己的行为和范围。
 
-## 证据、状态与更正
+返回 `metadata_ref`、`metadata_template`、`shared_metadata` 或同卡 `statement_ref` 时，按服务规则展开后再读取。可用配套 `expand_l1_metadata`；等价处理需严格使用同卡 JSON Pointer，拒绝悬空、链式、循环、跨卡或跨 kind 引用。正文复用不合并 Scope 与来源，也补不回延期诊断、缺失证据或未知依赖。
 
-- 读取重要记录的类型、状态、Scope、证据、来源定位、版本与关联更正。区分直接原版事实、跨案例证据、单案例观察和待验证假设；检索排序或记录的置信度不能替代对当前问题的判断。
-- Decision 表达特定情境下的选择，不自动成为强制架构；Pattern 不是普遍最佳实践；Anti-Pattern 表示需要警惕的做法，不证明每次使用都必然失败。
-- 已被 superseded 的主张只作历史资料，读取并采用其对应的 Correction。若报告中的单个主张被更正或撤回，其他独立主张仍需分别评估，不随之自动失效。没有明确 claim ID 的自然语言概括要回到原文和当前证据核对。
-- 重要设计结论与知识库支持的发现应标出可读记录 ID。独立从当前代码或原版源码得到的发现，应说明实际路径和证据并标为独立发现；不得捏造知识库记录来增强结论。
-- 原版快照或旧版本记录不自动代表用户正在运行的版本。记录中的测试建议与已执行测试分开陈述，并写清实际覆盖的环境。
+搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-## 缺口与故障回退
+Current knowledge has 187 records and supports task-specific file reading in every distribution. MCP is available only in the prepared full package. File mode preserves the same Scope, claim types, states and admission limits: Native AI Coding uses exactly the ten fields above and at most five records; Core Coding HOLD remains binding. Keep explicitly selected epochs across follow-up calls. Budget limits, evidence-node selection, deferred content and same-card reference rules apply to MCP responses. A source slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
-知识库无匹配、范围不覆盖或检索工具不可用时，将相应结论记作 Knowledge Gap 或说明 KB unavailable，并写明具体原因和可确认的检索范围。然后继续用当前项目代码与适用版本的原版源码、官方资料完成可做的调查。检索失败不能升级成“知识不存在”；未成功调用不能写成“已查询知识库”。
-
-
-## 可选服务的接口限制
-
-以下约束仅在实际服务暴露相应接口时适用；安装本 Skill 不会获得这些工具，旧版或其他 KB 也不保证支持全部字段。
-
-- **来源版本**：若工具支持 `source_epoch`，先查看合法 token 和默认来源，再核对本地源码；后续 `get_entry`、证据解析和关联展开继续使用同一显式 epoch，不能丢失后落回默认。不同树身份不互相替代。若 `lookup_api` 支持 `source_file`，使用精确相对路径消歧；该字段不自动属于其他工具。声明与存在性仅作导航，不是行为证据，file-local 函数不因此成为公共 API。
-- **投影与角色**：若使用配套服务的 Native Coding 投影，每条恰好十字段、最多五条。研究展开需显式 reviewer 时，`mode=review/research` 不代替角色授权，也不解除 Coding HOLD。模式参数按接口使用小写，如 `architect`、`debug`。分别读取 `knowledge_status`、`retrieval_status`、`coding_status`：canonical 接纳、可检索与可用于 Coding 是不同状态，保留 hold/prohibited 和排除范围。
-- **预算**：采用该预算合同的服务中，`compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节，按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录的多个原子合为一张卡，不能拆卡突破限制。其他服务按自己的实际合同处理。
-- **完整性**：记录命中不代表其中行为、分支、副作用、返回、依赖及证据全部交付。读取 `atomic_delivery`、`withheld_atoms`、`knowledge_gaps`、`atomic_budget_withheld_count` 与 `budget_withheld_count` 等实际返回字段；未知依赖不能自行称为 optional，延期、UNKNOWN、partial closure 与缺失正文保留原状。具名样例只支持自己的行为、主体、版本与 Scope，不推广为通用契约。
-- **响应内引用**：若返回 `metadata_ref`、`metadata_template`、`shared_metadata` 或同卡 `statement_ref`，按该服务的恢复规则展开后再读。提供 `expand_l1_metadata` 的实现可用它恢复；等价解析需使用同卡 JSON Pointer，拒绝悬空、链式、循环、跨卡或跨 kind 正文引用。正文复用不合并来源与 Scope，也无法补回延期诊断、缺失证据或未知依赖。
-- **响应身份**：若某服务的默认 `get_entry` 十字段投影不带来源元数据，需用其支持的显式视图（例如 `view="decision"`）读取身份；其余响应核对实际返回的 `source_environment`，不补造未返回字段。来源 token 或导航不授予源码正文，也不证明整项任务已覆盖。
+文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。

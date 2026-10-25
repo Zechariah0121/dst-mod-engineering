@@ -1,49 +1,36 @@
 # DST Mod Engineering
 
-An AI engineering skill for Don't Starve Together mod development: inspect the current source, then design, implement, review and validate. It covers characters, items, spells, assets, networking, persistence and compatibility. [中文 README](README.md)
+An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
 
-The standalone Skill includes engineering guidance, topic references and three helper scripts. **It does not include the complete engineering KB, an MCP server, game source or private mod projects.** It can work with your legally obtained local source without an additional KB.
+The current KB is in `knowledge/`: **187 records comprising 64 foundation records, 13 Native AI records and 110 Native Core records**. All three downloads include the public knowledge data. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
 
-## Downloads
+## Download
 
-[Public Beta 1 release](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25).
+Release: [v2026.10.25.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.1). Start with the full package for local use.
 
-| Asset | Use |
+| File | Contents |
 |---|---|
-| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Install the Skill, references and three developer helpers |
-| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | Topic-based reading for web chat or offline use |
-| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | Full public repository, including the earlier 64-entry reference KB and its read-only MCP service |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering-full.zip) | Skill, 187 public records, development helpers, source preparation and the nine-tool MCP service `0.3.0` |
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering.skill.zip) | Installable Skill, references, 187 public records and three development helpers; no MCP service or source preparation tools |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip) | Web/offline reading material and 187 public records; no MCP service or source preparation tools |
 
-Verify downloads with the release's `SHA256SUMS.txt`. The public snapshot excludes the separate private full KB and private research.
+Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
 
-## Install and use
+## Start
 
-1. Download the standalone Skill attachment from the [repository releases](https://github.com/Zechariah0121/dst-mod-engineering/releases) and fully extract it. Locate the `dst-mod-engineering/` directory that directly contains `SKILL.md`.
-2. Copy the complete directory to a skill location supported by your agent, such as `.agents/skills/dst-mod-engineering/` in a Codex project or `.claude/skills/dst-mod-engineering/` in a Claude Code project. Preserve existing customizations. See [installation](docs/install-and-use.md) for personal locations and other agents.
-3. Invoke `dst-mod-engineering` and provide your task, mod directory, actual DST version and local `scripts.zip` location. Confirm that the Skill and relevant references are readable. If discovery is unavailable, explicitly provide the path to `SKILL.md`.
+Extract the package completely and install the directory containing `SKILL.md` in a supported agent skill location. Invoke `dst-mod-engineering` with your task, mod directory, actual game version and authorized local source. Without MCP, read a small relevant subset from the knowledge files. See [installation](docs/install-and-use.md) and [KB integration](docs/knowledge-integration.md).
 
-For web chat, use attachments or a supported native skill-import feature as described in the [web guide](references/web-chat.md). Most detailed references are in Chinese.
+For MCP, run from the full package root with Python 3.10+ and SQLite FTS5:
 
-## Entry points
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<authorized retained 756039 scripts.zip or source directory>"
+python -B -X utf8 run_kb.py mcp-config
+```
 
-| Task | Where to start |
-|---|---|
-| Characters, spells, items, recipes, UI or assets | Topic index in [SKILL.md](SKILL.md) |
-| Source investigation, crashes, networking or save issues | Definitions, callers, execution side, initialization, cleanup and persistence |
-| Syntax, API declarations or isolated server checks | [Testing and delivery](references/testing-release.md) |
-| An existing KB | [Optional KB integration](docs/knowledge-integration.md); inspect the actual service and version |
+The current `759671` ZIP alone still lacks 13 historical ranges across 9 older Lua files. Without those sources, file reading remains available, but the complete MCP runtime is not ready. Apply the printed configuration in your client; its server command is `python -B -X utf8 run_kb.py serve`. Printed configuration does not prove a successful connection or query.
 
-The scripts need Python 3.10+. Syntax checks additionally need `luaparser` from `requirements.txt`. The server test helper supports Windows only. Reading the Skill needs no script execution. Install asset tools only as needed; see [tool sources and validation](references/tool-bootstrap.md).
+Prepared `cache/runtime/` contains locally restored game source excerpts and must stay local. A `$dst_source_payload_slot` in public JSON is a missing local-source slot, not source already read or behavioral evidence. Public evidence consists of reviewed excerpts, not complete original research; withheld private context remains `UNK`.
 
-Versioned notes and examples have bounded scope. They do not guarantee compatibility with the latest game or every mod. Report static, server, real remote-client, visual and audio validation separately. See [capabilities and limits](docs/public-limits.md).
+Use [SKILL.md](SKILL.md) for topic routing, [retrieval rules](references/kb-retrieval.md) for Scope and admission, and [testing](references/testing-release.md) for validation. Real game, remote-client, visual, audio and cross-version behavior need separate evidence; see [limits](docs/public-limits.md).
 
-## Optional public reference KB
-
-The full public repository retains the earlier **v0.1.1, 64-entry** reference KB and its read-only service.
-See the [KB entrypoint](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) and [MCP setup](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md).
-The standalone Skill ZIP excludes both. This is a bounded historical reference set, not a complete or current-game knowledge claim.
-Read each entry's status, source version, evidence and unexecuted test candidates.
-
-## License
-
-Project-owned material uses the [custom non-commercial LICENSE](LICENSE), not MIT or an OSI open-source license. Commercial use requires separate written permission. Valid historical MIT grants and third-party rights remain in force. See [licensing](docs/licensing.md).
+Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission. Valid historical MIT grants and third-party terms remain in force; see [licensing](docs/licensing.md).

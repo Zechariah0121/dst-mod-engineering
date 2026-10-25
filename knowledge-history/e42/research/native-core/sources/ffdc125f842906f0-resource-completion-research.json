@@ -1,0 +1,1190 @@
+{
+  "scope": {
+    "finite_questions": [
+      {
+        "id": "RC-Q01",
+        "question": "工作资格、action匹配和直接入口在哪里？",
+        "coding_entry_ids": [
+          "RC-C01",
+          "RC-C06"
+        ],
+        "status": "ResearchReady_scoped_static"
+      },
+      {
+        "id": "RC-Q02",
+        "question": "扣work、callback mutation与完成通知如何排序？",
+        "coding_entry_ids": [
+          "RC-C01",
+          "RC-C02"
+        ],
+        "status": "ResearchReady_scoped_static"
+      },
+      {
+        "id": "RC-Q03",
+        "question": "产品的nil picker、数量、ground drop与inventory交付如何分支？",
+        "coding_entry_ids": [
+          "RC-C03"
+        ],
+        "status": "ResearchReady_scoped_static"
+      },
+      {
+        "id": "RC-Q04",
+        "question": "消费cycles到empty、regrow与callbacks的局部链是什么？",
+        "coding_entry_ids": [
+          "RC-C04"
+        ],
+        "status": "ResearchReady_scoped_static"
+      },
+      {
+        "id": "RC-Q05",
+        "question": "保存load与external timer恢复会不会回放产物？",
+        "coding_entry_ids": [
+          "RC-C05"
+        ],
+        "status": "ResearchReady_scoped_static"
+      },
+      {
+        "id": "RC-Q06",
+        "question": "rocks/berrybush实际consumer会怎样改变generic completion建议？",
+        "coding_entry_ids": [
+          "RC-C02",
+          "RC-C04",
+          "RC-C05"
+        ],
+        "status": "ResearchReady_scoped_static"
+      }
+    ],
+    "stopping_condition": "闭合六个有限Coding问题的component/action及所选prefab consumer静态链；非全资源领域完成",
+    "baseline_or_repo_writes": false,
+    "user_computer_remote_cloud_task_or_game_used": false,
+    "raw_lua_in_user_artifact": false,
+    "new_engine_gap_claims": 0,
+    "outside_scope": [
+      "所有prefab消费者覆盖",
+      "目标Mod联机或runtime验收",
+      "random balance numeric tuning",
+      "full scheduler/native frame-order guarantees"
+    ]
+  },
+  "reading_log": [
+    {
+      "path": "scripts/components/workable.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 5805,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "git_blob_sha": "4df507bb42c17ddceccd4be7b249cceef49f06b3",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          1,
+          25
+        ],
+        [
+          27,
+          46
+        ],
+        [
+          65,
+          104
+        ],
+        [
+          106,
+          121
+        ],
+        [
+          123,
+          128
+        ],
+        [
+          130,
+          144
+        ],
+        [
+          145,
+          171
+        ],
+        [
+          173,
+          183
+        ],
+        [
+          189,
+          206
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/components/pickable.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 18199,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "git_blob_sha": "6b817c5d7139e92640697add4781ed1b80a96aa3",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          1,
+          15
+        ],
+        [
+          33,
+          81
+        ],
+        [
+          95,
+          123
+        ],
+        [
+          129,
+          145
+        ],
+        [
+          147,
+          194
+        ],
+        [
+          222,
+          249
+        ],
+        [
+          295,
+          325
+        ],
+        [
+          327,
+          376
+        ],
+        [
+          378,
+          384
+        ],
+        [
+          386,
+          416
+        ],
+        [
+          426,
+          448
+        ],
+        [
+          450,
+          470
+        ],
+        [
+          471,
+          491
+        ],
+        [
+          492,
+          518
+        ],
+        [
+          520,
+          533
+        ],
+        [
+          535,
+          583
+        ],
+        [
+          585,
+          601
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/prefabs/rocks.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 14192,
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "git_blob_sha": "77087737f0a1aa4f167be03c22c924036a240a62",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          168,
+          200
+        ],
+        [
+          202,
+          241
+        ],
+        [
+          291,
+          296
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/prefabs/berrybush.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 12734,
+      "file_sha256": "ff28314089805a20a79386cfe3a97fc76c500db6d16bca073778cdbe0de73a45",
+      "git_blob_sha": "272934c75af8fa8cb2089483b06abd81f6665c9c",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          87,
+          108
+        ],
+        [
+          110,
+          134
+        ],
+        [
+          136,
+          155
+        ],
+        [
+          158,
+          204
+        ],
+        [
+          286,
+          308
+        ],
+        [
+          342,
+          366
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/components/lootdropper.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 15265,
+      "file_sha256": "b2ceaacbadb5e25eee49962e3b3e6b54c8f293df21108784fe87017674803168",
+      "git_blob_sha": "da3e9374e84f4353c82e38623e1c20167e1631ea",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          186,
+          257
+        ],
+        [
+          372,
+          402
+        ],
+        [
+          405,
+          435
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/util.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 55662,
+      "file_sha256": "d12a98de4fd1538151a2b4505e8b9dad192021a097c93252e6033f07eaef2d2b",
+      "git_blob_sha": "1e559fdd64c1d946de1c8def8de27a5bc8155791",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [],
+      "negative_search": "SpringGrowthMod not found; no facts attributed to this file"
+    },
+    {
+      "path": "scripts/simutil.lua",
+      "source": "shared_campaign_verified_cache",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 34171,
+      "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+      "git_blob_sha": "e1109b401f477ea5ab31bc67947996208f5592d5",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          558,
+          560
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/worldsettingsutil.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 12912,
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "git_blob_sha": "7f739849d20d7a1ccba568a3a8e8ff1cca428178",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          15,
+          20
+        ],
+        [
+          218,
+          272
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/components/worldsettingstimer.lua",
+      "source": "github.fetch_file_base64_exact_commit",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 7062,
+      "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+      "git_blob_sha": "b287626bb2b1ba3a826a6e5928c5683872da4879",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          53,
+          60
+        ],
+        [
+          176,
+          203
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/actions.lua",
+      "source": "existing_prior_verified_cache",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 272267,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "git_blob_sha": "cfab02f31a583f5eed3dbd13b36fd0c6912263b9",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          1687,
+          1740
+        ],
+        [
+          1742,
+          1798
+        ],
+        [
+          1927,
+          1947
+        ]
+      ],
+      "negative_search": null
+    },
+    {
+      "path": "scripts/entityscript.lua",
+      "source": "existing_prior_verified_cache",
+      "ref": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "bytes": 66639,
+      "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+      "git_blob_sha": "228a42b74bb436a8acc37f5b9f07fcfa4f85eef3",
+      "full_byte_hash_matches_snapshot": true,
+      "normalization": "none; base64 bytes matched original snapshot directly",
+      "ranges_read": [
+        [
+          1290,
+          1319
+        ],
+        [
+          1522,
+          1529
+        ]
+      ],
+      "negative_search": null
+    }
+  ],
+  "reviewer_only": {
+    "sample_numbers_not_default_contract": {
+      "berrybush_juicy": {
+        "product": "berries_juicy",
+        "sample_quantity": 3,
+        "sample_dropheight": 3.5,
+        "citation_ids": [
+          "B-samples"
+        ],
+        "classification": "representative_prefab_configuration_not_universal_API_requirement"
+      },
+      "rock_visual_stage": {
+        "thresholds": "TUNING.ROCKS_MINE / 3 and *2/3",
+        "citation_ids": [
+          "R-onwork"
+        ],
+        "classification": "sample_visual_balance_detail_not_workable_contract"
+      }
+    },
+    "component_anatomy_on_demand": [
+      "tag field setters",
+      "deprecated Pickable setters and outdated comment history",
+      "protected cycle bookkeeping",
+      "selected external adapter names"
+    ],
+    "ancillary_timer_paths": {
+      "citation_ids": [
+        "P-long",
+        "P-pause",
+        "P-grow"
+      ],
+      "source_fact": "Pause/Resume保持本地或external分支；local Resume只在paused为真才继续，external Resume总置paused=false并可读/调整剩余时长。LongUpdate最外层要求not paused、targettime非nil、非withered；external Pick通常不写targettime，因此不能承诺external Pickable:LongUpdate本身一定减剩余时间。实际worldsettingstimer LongUpdate行为复用既有record。",
+      "default_coding_admission": "仅问题明确涉及pause/skip-time/finish controls时展开"
+    }
+  },
+  "direct_facts": [
+    {
+      "fact_id": "RC-W01",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "CanBeWorked只检查workable为真且workleft>0；不检查传入动作、worker或tool。GetWorkAction返回action；实际DoToolWork另外比较目标action与本次workaction并检查受限equippable。SetWorkLeft重新启用workable，把nil输入视为10，将work至少限为1，maxwork>0时再限到maxwork；SetMaxWork至少1，但不立即重夹现有workleft。Destroy仅在CanBeWorked为真时调用WorkedBy(destroyer,workleft)，仍经过recoil及乘数；它不直接Remove或保证finish。",
+      "citation_ids": [
+        "W-gates",
+        "A-work"
+      ],
+      "result_stage": "eligibility_vs_direct_mutation"
+    },
+    {
+      "fact_id": "RC-W02",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "WorkedBy(worker,numworks)读取worker当前HANDS装备，先ShouldRecoil，再调用WorkedBy_Internal；无nil-worker防护，也不再检查CanBeWorked或动作。ShouldRecoil自定义回调收到(inst,worker,tool,numworks)：非nil recoil决定分支，真值时remainingworks缺省0，假值时缺省numworks；否则tough且worker和tool都无强工作能力时返回true,0，其余false,numworks。WorkedBy及Internal没有显式成功返回值。",
+      "citation_ids": [
+        "W-wrapper",
+        "W-recoil",
+        "W-decrement",
+        "W-events"
+      ],
+      "result_stage": "direct_component_call"
+    },
+    {
+      "fact_id": "RC-W03",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "Internal把nil/false numworks缺省为1；workmultiplierfn(inst,worker,numworks)的结果或1再乘numworks；Lua中0是真值，所以零乘数确实得到零work。只有最终numworks>0才扣work：原workleft<=1直接归零，否则减numworks并将结果<0.01归零。即使numworks<=0仍设置lastworktime/lastworker，并推working与worked、调用onwork；函数没有以workable或CanBeWorked保护这条路径。",
+      "citation_ids": [
+        "W-decrement",
+        "W-events"
+      ],
+      "result_stage": "work_units_and_zero_work"
+    },
+    {
+      "fact_id": "RC-W04",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "Internal顺序为更新workleft及lastwork字段→worker working(target)→目标worked(worker,workleft)→onwork(inst,worker,当前workleft,最终numworks)→重新读取self.workleft判断<=0。普通事件listener在PushEvent内直接调用，因此事件处理器以及onwork均可改变后续读取的值；worked payload的workleft是构造该事件时读取的数值。onwork返回值不参与完成判断。若完成，先在onfinish之前记录plant/burnt/diseaseable条件与位置，再onfinish(inst,worker)，随后workfinished、worker finishedwork(target,action=self.action)，最后满足原先plant条件时plantkilled(doer,pos,workaction=self.action)；这些通知不等于实体必须已移除。 以上完成顺序以调用与回调正常返回为前提。",
+      "citation_ids": [
+        "W-events",
+        "E-events"
+      ],
+      "result_stage": "callback_mutation_then_completion"
+    },
+    {
+      "fact_id": "RC-W05",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "DoToolWork先做组件/CanBeWorked/action/受限工具检查；物品拟态路径可返回false,ITEMMIMIC；通过后按工具effectiveness优先、worker effectiveness次之、缺省1，再乘workmultiplier，调用ShouldRecoil与可选ResolveSpecialWorkAmount后调用Internal并返回true。CHOP/MINE/HAMMER/DIG外层只有work_success为假且fail_reason非nil才返回false,reason，其余返回true，所以普通eligibility失败的false会被外层转成true；validfn另做资格检查。CHOP成功时的spooked副作用另要求目标仍有效。",
+      "citation_ids": [
+        "A-work",
+        "A-wrappers"
+      ],
+      "result_stage": "action_return_is_not_work_completion"
+    },
+    {
+      "fact_id": "RC-W06",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "Workable默认savestate=false；OnSave在false时返回空表，在true时只保存maxwork/workleft。OnLoad要求data表，先直接赋data.workleft或现值，再maxwork或现值，最后调用onloadfn(inst,data)；零值在Lua为真，可恢复0，它不经过SetWorkLeft夹值，不保存workable/action/回调，也不自动回放onwork/onfinish。",
+      "citation_ids": [
+        "W-ctor",
+        "W-save"
+      ],
+      "result_stage": "restore_not_finish_replay"
+    },
+    {
+      "fact_id": "RC-P01",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "SetUp(product,regen,number)设置canbepicked=true、product、base/当前regentime和number或1；0在Lua为真，不会缺省为1。CanBePicked只返回canbepicked；实际Pick还要求caninteractwith且not stuck。IsBarren仅cycles_left==0。SetStuck保存所传值，而IsStuck只比较==true；Pick使用truthiness，非boolean truthy stuck可令Pick拒绝但IsStuck为假。",
+      "citation_ids": [
+        "P-setup",
+        "P-ready",
+        "P-pick",
+        "P-cycles"
+      ],
+      "result_stage": "readiness_vs_execution_guard"
+    },
+    {
+      "fact_id": "RC-P02",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "SpawnProductLoot入口条件是(picker非nil且product非nil)或use_lootdropper_for_product。因此普通product加nil picker不产物，但lootdropper模式可在nil picker时产物，且不要求product字段。droppicked且有lootdropper时提高pt.y by dropheight或0：lootdropper模式调用DropLoot(pt)，否则按numtoharvest或1逐次SpawnLootPrefab(product,pt)。该分支loot局部值仍为nil，无picksomething或GiveItem，即使已经掉落也返回nil。缺lootdropper时droppicked并不强制走掉落分支；use_lootdropper_for_product路径仍直接访问所需组件。",
+      "citation_ids": [
+        "P-product-drop"
+      ],
+      "result_stage": "spawn_gate_and_ground_drop"
+    },
+    {
+      "fact_id": "RC-P03",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "非droppicked路径的lootdropper模式先GenerateLoot获取prefab列表并逐个SpawnLootPrefab转换为entity列表；非空且picker有inventory才发picksomething(object,loot=列表)，随后逐物品：有inventory且inventoryitem则GiveItem(item,nil,pt)，否则设置目标位置。返回的是这份列表，未收集GiveItem返回值；SpawnLootPrefab可返回nil，转换过程对nil结果没有清理或独立错误恢复。",
+      "citation_ids": [
+        "P-product-table",
+        "L-generate",
+        "L-spawn"
+      ],
+      "result_stage": "generated_table_and_delivery_attempt"
+    },
+    {
+      "fact_id": "RC-P04",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "普通非droppicked模式只SpawnPrefab一次；成功时inventoryitem继承目标世界湿度，numtoharvest>1且有stackable时SetStackSize(numtoharvest)，否则仍只这一实体。有inventory先发picksomething(object,loot=实体)，再有inventoryitem时GiveItem(loot,nil,pt)，否则落在目标坐标；Spawn失败则loot为nil。numtoharvest=0/负数不会让此单实体分支变成零产量，也不会为非stackable产品循环生成多件；droppicked的数值for循环语义不同。",
+      "citation_ids": [
+        "P-product-single",
+        "P-product-drop"
+      ],
+      "result_stage": "single_entity_vs_stack_quantity"
+    },
+    {
+      "fact_id": "RC-P05",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "成功Pick的普通顺序为：若transplanted且cycles_left非nil，减1并下限0；protected_cycles减1，到<=0清nil并可启用witherable；SpawnProductLoot；onpickedfn(inst,picker,原loot)；canbepicked=false；只有baseregentime非nil且不paused、不barren、不withered才求getregentimefn(inst)或baseline，过SpringGrowthMod并安排本地任务或stop/start外部timer；推picked(picker,loot,plant)；可选remove_when_picked再Remove；返回true以及若EntityScript.is_instance(loot)则单元素表、否则原loot。拒绝guard时无显式返回。callback返回值不控制接受或产物，callback所见loot及picked事件loot未经过返回值的实体转表。 以上为每一步及回调正常返回的控制流；这些回调抛错误的回滚不由本函数实现。",
+      "citation_ids": [
+        "P-pick",
+        "S-spring"
+      ],
+      "result_stage": "consume_spawn_callback_empty_regrow_event_return"
+    },
+    {
+      "fact_id": "RC-P06",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "Regen先canbepicked=true，再onregenfn(inst)，再makefullfn(inst)，最后清targettime/task；无barren/withered/paused guard。MakeEmpty先取消本地task，再makeemptyfn(inst)，然后canbepicked=false；有baseregentime且不paused就安排regrowth，不检查barren/withered。MakeBarren先cycles_left=0，记录旧empty状态，再canbepicked=false并取消本地任务或stop外部timer，最后makebarrenfn(inst,wasempty)。Pick不会自动调用makeemptyfn或makebarrenfn。",
+      "citation_ids": [
+        "P-regen",
+        "P-empty",
+        "P-pick"
+      ],
+      "result_stage": "named_methods_are_not_interchangeable"
+    },
+    {
+      "fact_id": "RC-P07",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "OnSave保存picked(非ready)、transplanted、paused、原值protected_cycles、truthy stuck；caninteractwith只保存允许保存且真值。仅cycles_left不等max_cycles时写两字段。本地timer时仅保存正pause_time；targettime未来时time=floor(targettime-GetTime())，可能写0。外部timer不写pause_time/time；product、数量、callbacks、regen配置不由这个save写出。",
+      "citation_ids": [
+        "P-save"
+      ],
+      "result_stage": "component_save_schema"
+    },
+    {
+      "fact_id": "RC-P08",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "OnLoad先恢复transplanted/cycles_left/max_cycles/stuck，再由picked或time非nil选择empty/barren可视回调，否则makefullfn；这些回调都在后续canbepicked=false/true之前运行。随后仅truthy data.caninteractwith才赋值，保存false不能恢复关闭状态。非external时paused分支恢复pause_time并取消task，否则time非nil以所存时长直接安排OnRegen，不重乘SpringGrowthMod；末尾兼容makealwaysbarren及正protected_cycles/witherable。OnLoad没有调用onpickedfn/onregenfn，也不重复发picked或产物。",
+      "citation_ids": [
+        "P-load",
+        "P-save"
+      ],
+      "result_stage": "restore_callbacks_before_ready_assignment"
+    },
+    {
+      "fact_id": "RC-P09",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "ACTIONS.PICK.fn先要求target并有pickable，IsStuck()==true时返回false,STUCK；否则调用Pick(doer)后直接返回true，忽略其是否通过guard及第二返回loot。PICK.validfn的pickable分支仅CanBePicked，没有caninteractwith/stuck检查；searchable是另一个分支。",
+      "citation_ids": [
+        "A-pick",
+        "P-pick"
+      ],
+      "result_stage": "action_return_is_not_harvest_delivery"
+    },
+    {
+      "fact_id": "RC-P10",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "ConsumeCycles(cycles)仅在transplanted且有cycles_left时减cycles下限0，并将非nil protected_cycles减cycles下限0；不清零保护值为nil，不调用witherable Enable，也不自动MakeBarren/停止任务。FinishGrowing只在本地task或外部active timer存在、未ready且非withered时停止timer并Regen返回true，否则false；它不额外检查paused/barren。",
+      "citation_ids": [
+        "P-cycles",
+        "P-grow"
+      ],
+      "result_stage": "manual_cycle_and_finish_controls"
+    },
+    {
+      "fact_id": "RC-P11",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "WorldSettings_Pickable_RegenTime(inst,regentime,enabled)安装useexternaltimer及start/stop/pause/resume/get/set/exists适配器，确保worldsettingstimer存在，并AddTimer(Pickable_RegenTime,regentime,enabled,回调Regen)。start适配器本身先StopTimer再StartTimer；完成回调在pickable组件还存在时Regen。PreLoad迁移只在旧pickable有pause_time或time且没有worldsettingstimer保存数据时创建timeleft=min(旧时长,maxregentime)/maxregentime与paused。外部timer的比例保存/恢复与先停止后回调复用既有VANILLA-INV-009；不是Pickable保存秒数的无差别别名。",
+      "citation_ids": [
+        "U-start",
+        "U-picktimer",
+        "T-done",
+        "T-restore"
+      ],
+      "result_stage": "external_timer_adapter_and_restore_handoff"
+    },
+    {
+      "fact_id": "RC-P12",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "普通莓丛直接配置onpickedfn/makeemptyfn/makebarrenfn/makefullfn/ontransplantfn。onpickedfn读取已经扣减的IsBarren决定动画，否则picked→idle；不自己生成berries。juicy的onwork只在workleft>0、所需组件存在、droppicked且CanBePicked时Pick(worker)，finish dig_up_common仅在仍CanBePicked且非withered/barren时手动SpawnLootPrefab berries，再生成dug prefab并Remove；withered/barren分支掉twigs。由此partial work harvest与final dig不是同一次统一finish产物。",
+      "citation_ids": [
+        "B-bind",
+        "B-onpicked",
+        "B-workdig",
+        "B-samples"
+      ],
+      "result_stage": "representative_consumer_callback_chain"
+    },
+    {
+      "fact_id": "RC-W07",
+      "classification": "DirectPinnedSourceFact",
+      "statement": "rocks的OnWork在workleft<=0时生成break FX、DropLoot(pt)，按doNotRemoveOnWorkDone决定Remove；并非在统一onfinish中产物。baserock配置MINE和OnWork。petrified tree prefab自身onload按保存treeSize调用setPetrifiedTreeSize，重设workleft；源码明确提示若启用workable.savestate必须改变这一行为。这里只证明该consumer会重设，不推定所有prefab load callback与组件载入的全局顺序。",
+      "citation_ids": [
+        "R-onwork",
+        "R-bind",
+        "R-load"
+      ],
+      "result_stage": "prefab_consumers_can_finish_or_reset_in_other_callbacks"
+    }
+  ],
+  "runtime_tested": false,
+  "citations": {
+    "A-pick": {
+      "path": "scripts/actions.lua",
+      "symbol": "ACTIONS.PICK.fn/validfn",
+      "line_start": 1927,
+      "line_end": 1947,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "e13e54544244098e89b4209a540211350da0cd820b0489b910b964f731248d74",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L1927-L1947"
+    },
+    "A-work": {
+      "path": "scripts/actions.lua",
+      "symbol": "DoToolWork/ValidToolWork",
+      "line_start": 1687,
+      "line_end": 1740,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "38017ecfd279394c3b4ff15df410e5ff6f45d5eacb4a51204e33e8a832c91dd4",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L1687-L1740"
+    },
+    "B-bind": {
+      "path": "scripts/prefabs/berrybush.lua",
+      "symbol": "createbush component callback configuration",
+      "line_start": 286,
+      "line_end": 308,
+      "file_sha256": "ff28314089805a20a79386cfe3a97fc76c500db6d16bca073778cdbe0de73a45",
+      "range_sha256": "44f8fe3473469148139b3d4ca76e63430806580b0e4197a6ea0ab4bb7f5e228c",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/berrybush.lua#L286-L308"
+    },
+    "P-grow": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:FinishGrowing",
+      "line_start": 129,
+      "line_end": 145,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "6ff10fa2c81f357161a1cfb1dac9b9ae7f49123e897a7cf28d352bb3b6696d3c",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L129-L145"
+    },
+    "P-load": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:OnLoad",
+      "line_start": 327,
+      "line_end": 376,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "2162d9a0fdf78631546c31b7431abec6a99b90bf4ab43235d626f144aa2958af",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L327-L376"
+    },
+    "P-pick": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:Pick",
+      "line_start": 535,
+      "line_end": 583,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "c94793daf25c53f65d8f2e332b9719426848d4ea75d34388c21a1bf37fb43561",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L535-L583"
+    },
+    "P-save": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:OnSave",
+      "line_start": 295,
+      "line_end": 325,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "03e198b532e02090f6ed3b4e9a27c51afb93ffbcabb8876a59c100fde19cfaed",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L295-L325"
+    },
+    "R-bind": {
+      "path": "scripts/prefabs/rocks.lua",
+      "symbol": "baserock_fn workable configuration",
+      "line_start": 291,
+      "line_end": 296,
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "range_sha256": "bf949aa528ee96844c42b6734da04279be1bfc2ad190c80de35eab3925c2ddfe",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/rocks.lua#L291-L296"
+    },
+    "R-load": {
+      "path": "scripts/prefabs/rocks.lua",
+      "symbol": "setPetrifiedTreeSize/onsave/onload",
+      "line_start": 202,
+      "line_end": 241,
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "range_sha256": "ca8b53492be77caa39dadd405f607922d219ec3bf6db6953d16b7e13f14229eb",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/rocks.lua#L202-L241"
+    },
+    "T-done": {
+      "path": "scripts/components/worldsettingstimer.lua",
+      "symbol": "OnTimerDone",
+      "line_start": 53,
+      "line_end": 60,
+      "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+      "range_sha256": "3806258c19bed3ae1c74c6e81f3b36a4d6301b0aa2c6d78b8f8e9a0cb39125c8",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L53-L60"
+    },
+    "W-ctor": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable constructor",
+      "line_start": 27,
+      "line_end": 46,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "12f6ff380ae0faf500b9d87485121a61d74a6457f35ab3e2fdb762a4bc8a7ef1",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L27-L46"
+    },
+    "W-save": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable:OnSave/OnLoad",
+      "line_start": 106,
+      "line_end": 121,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "456f7494d34aeb6a8de436a89ac7b71549c350221e65395046807af40bd60544",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L106-L121"
+    },
+    "L-spawn": {
+      "path": "scripts/components/lootdropper.lua",
+      "symbol": "LootDropper:SpawnLootPrefab",
+      "line_start": 372,
+      "line_end": 402,
+      "file_sha256": "b2ceaacbadb5e25eee49962e3b3e6b54c8f293df21108784fe87017674803168",
+      "range_sha256": "e3708f2cd6b31329241a95be007eb511340994f95486fca4f276c34a8aa86b4b",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/lootdropper.lua#L372-L402"
+    },
+    "P-empty": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:MakeEmpty",
+      "line_start": 426,
+      "line_end": 448,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "73df2ab9e830e8cb78cb2e3b870dcb494fddef23333db5909d6d6e4f94809d66",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L426-L448"
+    },
+    "P-ready": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:IsBarren/CanBePicked",
+      "line_start": 378,
+      "line_end": 384,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "16035f29228870f5d4e4f21da6f025778fc3684994bc77419656d9ee3e69a899",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L378-L384"
+    },
+    "P-regen": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:Regen/MakeBarren",
+      "line_start": 386,
+      "line_end": 416,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "35b784d28fd46decbbb25bd435d9b6769269cb8c0572d7ce58be75bfd991646a",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L386-L416"
+    },
+    "P-setup": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:SetUp/compatibility setters",
+      "line_start": 222,
+      "line_end": 249,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "815c37c818c487462e532a47319b01301820ceb05b74b43cf4a24d59b12fd550",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L222-L249"
+    },
+    "U-start": {
+      "path": "scripts/worldsettingsutil.lua",
+      "symbol": "MakeStartTimerFunction",
+      "line_start": 15,
+      "line_end": 20,
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "range_sha256": "00d27c3143a8f9b68f60be9dc65d4b1d63b86d65c776d43b9978f3db3dab61d2",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/worldsettingsutil.lua#L15-L20"
+    },
+    "W-gates": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "SetWorkAction/Destroy/SetWorkLeft/CanBeWorked",
+      "line_start": 65,
+      "line_end": 104,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "f074b26eb26e730bc77f0e95df60bb1f7e74e4cd26a5773081f390f8e866335c",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L65-L104"
+    },
+    "E-events": {
+      "path": "scripts/entityscript.lua",
+      "symbol": "EntityScript:PushEvent_Internal/PushEvent",
+      "line_start": 1290,
+      "line_end": 1319,
+      "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+      "range_sha256": "8b1efe3402257816fde2a23fd2cd025f9e3465c66499185c94008a6480f85484",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1290-L1319"
+    },
+    "P-cycles": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:ConsumeCycles/SetStuck/IsStuck",
+      "line_start": 585,
+      "line_end": 601,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "b797a96e37b68f1b9dc236381af289ca1ac75871d18a337e5de33fbf6950bb40",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L585-L601"
+    },
+    "R-onwork": {
+      "path": "scripts/prefabs/rocks.lua",
+      "symbol": "OnWork",
+      "line_start": 168,
+      "line_end": 200,
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "range_sha256": "82bbb9f8d39deefc56932215060e99446305e90a2aa1604766d2bbfbfa1c3f33",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/rocks.lua#L168-L200"
+    },
+    "S-spring": {
+      "path": "scripts/simutil.lua",
+      "symbol": "SpringGrowthMod",
+      "line_start": 558,
+      "line_end": 560,
+      "file_sha256": "635b7d2ef90905a6633d10e6e324a4d90aaa48fd179881a8a9e2758ec4079c7c",
+      "range_sha256": "1e02b7b13edbce3c6424a3433da573baa1e3c21606a4307c5da32a5c2a6fe7d7",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/simutil.lua#L558-L560"
+    },
+    "W-events": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable:WorkedBy_Internal callback/completion",
+      "line_start": 145,
+      "line_end": 171,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "48abb5315f2fa2d37db25f3858f298624988d69c58a6a09f54f0046bf149045e",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L145-L171"
+    },
+    "W-recoil": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable:ShouldRecoil",
+      "line_start": 189,
+      "line_end": 206,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "a44c779ad6b93ebd99a5b2886dc1ff1ab47046aaaa171d7b0914c0f9b73d4695",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L189-L206"
+    },
+    "B-samples": {
+      "path": "scripts/prefabs/berrybush.lua",
+      "symbol": "normal_postinit/juicy_postinit",
+      "line_start": 342,
+      "line_end": 366,
+      "file_sha256": "ff28314089805a20a79386cfe3a97fc76c500db6d16bca073778cdbe0de73a45",
+      "range_sha256": "0ffdc8dd1523677ab638166a0db9a5d000036d9ee72f975b26555e0cbd8337a7",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/berrybush.lua#L342-L366"
+    },
+    "B-workdig": {
+      "path": "scripts/prefabs/berrybush.lua",
+      "symbol": "onworked_juicy/dig_up_common",
+      "line_start": 158,
+      "line_end": 204,
+      "file_sha256": "ff28314089805a20a79386cfe3a97fc76c500db6d16bca073778cdbe0de73a45",
+      "range_sha256": "fb98cabd763c7457acdce9dd055cc8003d67bcdee24c790698059c68ef590a77",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/berrybush.lua#L158-L204"
+    },
+    "T-restore": {
+      "path": "scripts/components/worldsettingstimer.lua",
+      "symbol": "WorldSettingsTimer:OnSave/OnLoad",
+      "line_start": 176,
+      "line_end": 203,
+      "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+      "range_sha256": "c150ce49327481be7685656257a2bc759d5167bb5fc5d56c127c0ac316539990",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L176-L203"
+    },
+    "W-wrapper": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable:WorkedBy",
+      "line_start": 123,
+      "line_end": 128,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "8483584223c3d5f03c2b17c0b81b125ad2c318ac372e77f93da242c41932a064",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L123-L128"
+    },
+    "A-wrappers": {
+      "path": "scripts/actions.lua",
+      "symbol": "CHOP/MINE/HAMMER/DIG fn and validfn",
+      "line_start": 1742,
+      "line_end": 1798,
+      "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+      "range_sha256": "f27411e2a14ee81e0ee764407857b89830a6e383ed7f1f6b67b5c22fb5e570c1",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L1742-L1798"
+    },
+    "B-onpicked": {
+      "path": "scripts/prefabs/berrybush.lua",
+      "symbol": "onpickedfn",
+      "line_start": 87,
+      "line_end": 108,
+      "file_sha256": "ff28314089805a20a79386cfe3a97fc76c500db6d16bca073778cdbe0de73a45",
+      "range_sha256": "c32837da2537003671b6ab9f3bcecf67a103c314b35825220b145bc87775604c",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/berrybush.lua#L87-L108"
+    },
+    "L-generate": {
+      "path": "scripts/components/lootdropper.lua",
+      "symbol": "LootDropper:GenerateLoot",
+      "line_start": 186,
+      "line_end": 257,
+      "file_sha256": "b2ceaacbadb5e25eee49962e3b3e6b54c8f293df21108784fe87017674803168",
+      "range_sha256": "6aa59bac2abb6c5f3075d30c0e3bbbb60c74e9baf6cb05d72e196ff145ce00b0",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/lootdropper.lua#L186-L257"
+    },
+    "U-picktimer": {
+      "path": "scripts/worldsettingsutil.lua",
+      "symbol": "WorldSettings_Pickable_PreLoad/RegenTime",
+      "line_start": 218,
+      "line_end": 272,
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "range_sha256": "de849515ed700f045f04249032b83c302825982e224579b12f74dba53e28d180",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/worldsettingsutil.lua#L218-L272"
+    },
+    "W-decrement": {
+      "path": "scripts/components/workable.lua",
+      "symbol": "Workable:WorkedBy_Internal decrement",
+      "line_start": 130,
+      "line_end": 144,
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "range_sha256": "43a6368abc603a66746dfc14b61c5ddeddb1c25e8fa34d028b3422f82b086290",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/workable.lua#L130-L144"
+    },
+    "P-product-drop": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:SpawnProductLoot entry/drop path",
+      "line_start": 450,
+      "line_end": 470,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "bb027a59e03cc3adcfb706b45afbf99a7539fd577de2b004ce8e3e3f00f767ec",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L450-L470"
+    },
+    "P-product-table": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:SpawnProductLoot generated-loot path",
+      "line_start": 471,
+      "line_end": 491,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "31e2aaf415716c9f8d5e5e135bec04ecbe6fa9ba0bc36ccb23e14618fc96fe43",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L471-L491"
+    },
+    "P-product-single": {
+      "path": "scripts/components/pickable.lua",
+      "symbol": "Pickable:SpawnProductLoot single-product path",
+      "line_start": 492,
+      "line_end": 518,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "80626c68a2e4744a7974f6c5b0832ea99122855f9972f5a7dfdc6ac9cdb5da02",
+      "range_digest_scheme": "sha256_utf8_LF_joined_selected_lines_no_trailing_LF",
+      "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/pickable.lua#L492-L518"
+    }
+  },
+  "coding_projection": [
+    {
+      "id": "RC-C01",
+      "question": "怎样配置可工作对象并识别资格、扣work与完成？",
+      "signatures": [
+        "CanBeWorked()",
+        "GetWorkAction()",
+        "SetWorkAction(act)",
+        "SetWorkLeft(work)",
+        "SetMaxWork(work)",
+        "WorkedBy(worker,numworks)",
+        "Destroy(destroyer)"
+      ],
+      "units": {
+        "work": "work units, not click count or seconds",
+        "worker": "non-nil entity for direct WorkedBy",
+        "act": "action object; action equality checked by DoToolWork"
+      },
+      "source_contract": "CanBeWorked只ready；SetWorkLeft重新启用且至少1。直接WorkedBy不再检查ready/action，先当前HANDS recoil再Internal。numworks默认1，乘数后>0才扣；workleft<=1时任意正work即归零，否则减量并清<0.01。Destroy仍受这些转换，不保证finish。",
+      "fact_ids": [
+        "RC-W01",
+        "RC-W02",
+        "RC-W03"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "调用直接入口前自行核验资格及非nil worker；不要通过SetWorkLeft(0)表达完成。判断扣减/完成用实际state与完成回调，不能把组件nil返回或动作true当证据。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "id": "RC-C02",
+      "question": "onwork与onfinish能否改变本次完成，参数在哪一阶段读？",
+      "signatures": [
+        "onwork(inst,worker,workleft,numworks)",
+        "onfinish(inst,worker)",
+        "SetWorkMultiplierFn(fn)"
+      ],
+      "units": {
+        "workleft,numworks": "post-decrement current work units and final multiplied amount",
+        "callback_return": "ignored"
+      },
+      "source_contract": "扣减→working→worked→onwork→重新读workleft<=0→捕获plant条件/位置→onfinish→workfinished→finishedwork→plantkilled。普通event listener及onwork可改后续state；worked数据在该event构造时读；onfinish返回值不控制完成通知。",
+      "fact_ids": [
+        "RC-W03",
+        "RC-W04",
+        "RC-W05",
+        "RC-W07"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "实现阶段重置时明确在onwork中重设workleft会阻止本次完成；增加已有rocks产物回调前先查它的OnWork，避免重复掉落。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "id": "RC-C03",
+      "question": "采摘的数量、掉落、交付与loot返回有什么分支？",
+      "signatures": [
+        "SetUp(product,regen,number)",
+        "SpawnProductLoot(picker)",
+        "Pick(picker)"
+      ],
+      "units": {
+        "product": "prefab name or nil when deliberately using lootdropper product mode",
+        "number": "quantity; ordinary single branch stacks only when >1 and stackable; drop branch numeric loop",
+        "dropheight": "world y-coordinate offset",
+        "regen": "duration in game scheduling time units, conventionally seconds; not work units or saved external ratio"
+      },
+      "source_contract": "普通product要求非nil picker；lootdropper模式例外允许nil picker。droppicked+lootdropper走ground drop并返回nil。其余lootdropper返回生成entity列表；普通product只生一实体，可堆数量>1。inventory时先picksomething再尝试GiveItem；不读取GiveItem结果。Pick接受可返回true,nil；loot实体在最终Pick返回时转成单元素表，callback/event仍收到原形状。",
+      "fact_ids": [
+        "RC-P02",
+        "RC-P03",
+        "RC-P04",
+        "RC-P05"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "不要在onpickedfn再发同一基础产物；预置有效lootdropper与可生成prefab。若需证明物品已入包，复用GiveItem完整接收/销毁/掉落合同，别根据Pick第二返回值或picksomething判断。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "id": "RC-C04",
+      "question": "采摘到恢复的callback和cycle消费顺序是什么？",
+      "signatures": [
+        "Pick(picker)",
+        "onpickedfn(inst,picker,loot)",
+        "Regen()",
+        "onregenfn(inst)",
+        "makefullfn(inst)",
+        "MakeEmpty()",
+        "MakeBarren()"
+      ],
+      "units": {
+        "cycles": "harvest-cycle count; nil cycles_left is not zero/barren",
+        "time": "regrow duration transformed by SpringGrowthMod only at specified paths"
+      },
+      "source_contract": "Pick实际guard=ready&&interactable&&!truthy stuck；先减transplanted cycles与保护周期→产物→onpickedfn→ready=false→条件regrow→picked→可选Remove→返回。onpickedfn不回放makeemptyfn，且执行时ready尚未被本函数清掉。Regen无资格guard，ready=true→onregenfn→makefullfn→清task/targettime。MakeEmpty callback在ready=false前，且不检查barren/withered；MakeBarren停止计时并把旧empty状态交callback。",
+      "fact_ids": [
+        "RC-P01",
+        "RC-P05",
+        "RC-P06",
+        "RC-P10",
+        "RC-P12"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "onpickedfn依据扣减后cycles做自己的视觉变化；避免在自己的onpickedfn或picksomething listener中递归Pick，源码没有先置ready=false的重入锁。需要仅消耗周期或提前长成时保留各方法不同的副作用。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "id": "RC-C05",
+      "question": "保存恢复会回放采摘/完成吗，false和time=0怎样处理？",
+      "signatures": [
+        "Workable:OnSave()/OnLoad(data)",
+        "Pickable:OnSave()/OnLoad(data)"
+      ],
+      "units": {
+        "data": "non-nil table for these component OnLoad methods",
+        "workleft/maxwork": "work units, restored raw; zero is valid truthy Lua value",
+        "pickable.time": "floor(remaining duration), may be zero; local timer only",
+        "external.timeleft": "ratio, via WorldSettingsTimer rather than Pickable.time"
+      },
+      "source_contract": "Workable只在savestate=true保存两个数，OnLoad原值赋→onloadfn；不回放work/finish。Pickable保存schema见RC-P07：可视empty/barren/full callback先执行，随后才assign ready；不回放onpicked/onregen、产物或picked。false interactable未保存/未加载。local paused优先于time，time非nil含0均安排task；external时间交已安装timer，复用比例保存合同。",
+      "fact_ids": [
+        "RC-W06",
+        "RC-P07",
+        "RC-P08",
+        "RC-P11",
+        "RC-W07"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "在prefab构造重新建立product、callback及timer adapter；恢复可视状态callback不要假设CanBePicked已经是目标状态。需要持久保存关闭interactable时显式设计额外字段，不把默认schema当完整布尔序列化。petrified树启用savestate时核验其自有onload重设。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    },
+    {
+      "id": "RC-C06",
+      "question": "动作success是否能证明工作完成或拿到产物？",
+      "signatures": [
+        "ACTIONS.CHOP/MINE/HAMMER/DIG.fn(act)",
+        "ACTIONS.PICK.fn(act)",
+        "相关validfn"
+      ],
+      "units": {
+        "act.target/doer/invobject": "target entity / actor entity / offered tool",
+        "action result": "wrapper acceptance convention, not final completion/ownership"
+      },
+      "source_contract": "工作wrapper普通DoToolWork guard false会返回true，只有false+non-nil reason回false,reason；PICK stuck==true回false,STUCK，否则调用Pick后直接true，未传播guard拒绝及loot。validfn separate；CanBePicked与IsStuck不共同覆盖actual Pick guard。",
+      "fact_ids": [
+        "RC-W05",
+        "RC-P01",
+        "RC-P09"
+      ],
+      "local_advice": {
+        "classification": "EngineeringAdvice_not_runtime_verified",
+        "text": "行为实际mutation与ready guard各自核验；保留已有dispatch/SG回调解释，避免新建success=完成/产物送达的统一core。"
+      },
+      "status": "ResearchReady_scoped_static",
+      "canonical": false,
+      "runtime_tested": false
+    }
+  ]
+}

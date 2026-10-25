@@ -23,6 +23,7 @@ DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'scripts'
 MAINTAINER_ONLY = frozenset({
     'docs/maintainers.md', 'docs/consolidation.md', 'docs/validation.md',
     'scripts/build_web_bundle.py', 'scripts/build_public_kb.py',
+    'scripts/source_payload.py', 'scripts/public_rebind.py',
 })
 COMMON = ('SKILL.md', 'references/web-chat.md', 'references/environment-tools.md',
           'references/testing-release.md')
@@ -89,6 +90,24 @@ def source_files(root):
         if name in MAINTAINER_ONLY:
             continue
         inputs[name] = data
+    # Include the current public knowledge in every downloadable user artifact.
+    knowledge = regular_path(root / 'knowledge')
+    manifest = regular_path(knowledge / 'PACKAGE-MANIFEST.json')
+    if knowledge.exists() and not manifest.is_file():
+        raise ValueError('Knowledge publication manifest is required')
+    if manifest.is_file():
+        package = json.loads(manifest.read_text(encoding='utf-8'))
+        knowledge_names = ['PACKAGE-MANIFEST.json'] + [row['path'] for row in package['files']]
+        for name in knowledge_names:
+            path = regular_path(knowledge / name)
+            if not path.is_relative_to(knowledge.resolve()) or not path.is_file():
+                raise ValueError('Invalid knowledge publication input: ' + name)
+            data = path.read_bytes()
+            if name != 'PACKAGE-MANIFEST.json':
+                row = next(row for row in package['files'] if row['path'] == name)
+                if row['sha256'] != sha(data) or row.get('bytes', len(data)) != len(data):
+                    raise ValueError('Knowledge publication commitment changed: ' + name)
+            inputs['knowledge/' + name] = data
     required = set(COMMON) | {'templates/local-validation.md'}
     required.update(f'references/{name}.md' for names in PROFILE_EXTRA.values() for name in names)
     missing = required - inputs.keys()
@@ -176,6 +195,7 @@ def make_outputs(root):
     reading = {name: data for name, data in outputs.items()}
     reading['local-validation.md'] = inputs['templates/local-validation.md']
     reading['LICENSE'] = inputs['LICENSE']
+    reading.update({name: data for name, data in inputs.items() if name.startswith('knowledge/')})
     reading['reading-index.json'] = json_bytes({
         'generator': GENERATOR, 'source_fingerprint': fingerprint, 'inputs': hashes,
         'profiles': profiles, 'outputs': {name: metadata(data) for name, data in reading.items()}})

@@ -1,0 +1,48 @@
+{
+  "changes": [
+    {
+      "id": "HC-R01",
+      "requester": "external independent reviewer review_healer_consumption_contracts",
+      "scope": "N017 only",
+      "before_main_sha256": "1d8ce36f4972adf9aafb780d942584bbdb4dfd040d63ce4f23a47a564efe7bc6",
+      "after_main_sha256": "7000357785ddd3cbbb33fa4eb90df54642c4488890f28b3ddf3b01ff47d5087e",
+      "changes_zh": [
+        "HC-F08 results.Heal_return明确只有正常尾部true，保留前置false和false,reason，无单位/count/HP量返回。",
+        "实际读componentactions.lua L1038–1039/L2513–2514 enclosing heading，添加HC-C27/28、F03引用及准确source reading log；args注释单列，未把right制造为healer新逻辑。"
+      ],
+      "semantic_contracts_expanded": false,
+      "callback_normalreturn_and_canheal_false_boundaries_unchanged": true
+    },
+    {
+      "id": "HC-R02",
+      "requester": "external independent reviewer review_healer_consumption_contracts",
+      "scope": "N017 final acceptance metadata only",
+      "before_main_sha256": "7000357785ddd3cbbb33fa4eb90df54642c4488890f28b3ddf3b01ff47d5087e",
+      "after_main_sha256": "6a16888fcb133cc03e19d9ef165ede0e1da60d3e6839909f5b98450ff459bcbc",
+      "before_summary_sha256": "7ec8999f4825fdf758875b7f4ff5bfd2ceb0bbe6e90cf101155bb77eeca9b2bb",
+      "after_summary_sha256": "56f1a88639f9f3c4f6e5595fad3cce0abbd10aacc16b422f3e7023a4af28f5ac",
+      "changes_zh": [
+        "两项要求的返回形状/collector heading修正已实际验证，reviewer明确这些修正完成语义接受条件。",
+        "status=scopedResearchReady、scopedResearchReady=true仅HC-P01..03；bandage仍辅助样本，external review路径已确认，main/summary改为外部接受事实。",
+        "不嵌入external report hash避免hashcycle；canonical/runtime/whole-domain false与所有source normalreturn/unknown边界保留。"
+      ],
+      "semantic_contracts_expanded": false
+    },
+    {
+      "id": "HC-R03",
+      "requester": "external independent reviewer review_healer_consumption_contracts; coordinator confirmed",
+      "scope": "N017 same-source callback state timing precision",
+      "before_main_sha256": "6a16888fcb133cc03e19d9ef165ede0e1da60d3e6839909f5b98450ff459bcbc",
+      "after_main_sha256": "c51a033bb044ec04d0c631719618bf7c692494311e441767212d76fa9c314370",
+      "before_summary_sha256": "56f1a88639f9f3c4f6e5595fad3cce0abbd10aacc16b422f3e7023a4af28f5ac",
+      "after_summary_sha256": "848a9d0c224622c7f7717cb42c6978a484dfe55daa871a81f39440af4832932f",
+      "changes_zh": [
+        "onheal第一实参明确调用点当前self.inst；原未拆物品/原整堆仅普通先前未重绑/改量前提。",
+        "HC-F05/06/07/08、HC-P02、原创示意、去重说明与静态对抗例同步限定；区分早先捕获health与新读self.inst/stackable。",
+        "正常返回不等于状态未变；不保证原item/原数量在callback变更后仍存在或被默认消费。"
+      ],
+      "new_source_or_scope_expansion": false,
+      "existing_normalreturn_gate_unknown_boundaries_preserved": true
+    }
+  ]
+}

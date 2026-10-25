@@ -1,16 +1,19 @@
-# 能力与版本限制 / Capabilities and limits
+# 能力与限制 / Capabilities and limits
 
-独立公开 Skill 提供工程工作方法、专题参考和三个 Python 辅助脚本；不提供完整 KB/MCP、游戏源码或第三方工具。可选 KB 以实际接入服务的版本、工具与记录范围为准，见 [接入说明](knowledge-integration.md)。
+当前公开版带 187 条知识及 Skill；这表示可读取的知识范围，不是 187 条全部已获 Coding 准入、源码证据全部随包或全部功能已实测。
 
 | 项目 | 实际边界 |
 |---|---|
-| 游戏版本 | 专题中标注的 `756039`、`759671` 等是保存源码快照。只适用于注明的函数、链路与条件；行号可能随更新变化，不代表全部专题已按同一版本复核 |
-| Agent | 安装路径参考各产品官方文档；没有逐一完成所有产品、账户和云端环境的端到端安装测试 |
-| 源码读取 | 需使用者提供合法可读的本地源码或必要片段；缺少材料时只能给出条件性判断 |
-| 静态检查 | `check_api.py` 检查语法和部分直接方法声明，不能证明签名、时序、端别或运行结果 |
-| 游戏测试 | `dst_modtest.py` 仅支持 Windows 离线单分片；不替代真实远端客户端、洞穴/跨分片、Mod 组合、UI/预测、视觉或音频验收 |
-| 动画与音频 | 工具接口按安装版本确认；导出成功或无头专服通过不代表引擎解码与实际效果通过 |
+| 分发 | 三种附件都含当前知识文件；只有完整包包含现代 MCP 和来源准备工具 |
+| 公开材料 | 仅提供经审原创知识及必要证据片段；3 项项目政策与 1 项 EI 的私有情境公开隐藏为 `UNK`，不补造泛化事实，其他 NSF 原值、ID 与 Scope 保留 |
+| Coding 准入 | 13 条 Native AI 默认十字段、任务子集最多 5 条；110 条 Core 保留 Coding HOLD。文件可读、canonical 或可检索不解除限制 |
+| 游戏源码 | 不附游戏 Lua 原文；`$dst_source_payload_slot` 不是已读源码。MCP 需从合法本地来源恢复缺失载荷 |
+| 来源依赖 | 当前 `759671` ZIP 单独缺 13 种历史范围、9 个旧文件；没有这些来源仍可文件阅读，但完整 MCP 不可用 |
+| 版本 | `759671`、`756039` 与独立历史树是不同来源；记录与专题只覆盖注明的函数、端别和条件，不保证当前在线版本或全部 Mod 兼容 |
+| 客户端接入 | 打印配置、生成缓存或服务校验不等于客户端连接与实际查询成功；没有逐一完成所有 Agent/账户/云端环境自动加载测试 |
+| 验证 | 静态检查、受控合约、专服行为、真实远端、视觉与音频分别报告；未执行项保留未测 |
+| 开发辅助脚本 | `check_api.py` 只检查语法和部分直接方法声明；`dst_modtest.py` 仅支持 Windows 离线单分片，不替代洞穴/跨分片、Mod 组合或客户端效果 |
 
-具体 Mod 应分别记录实际源码版本、检查范围、测试环境与未测项。游戏更新后重新核对相关定义与调用链；历史样例、方法存在或单处调用不能直接推广为通用契约。验证方法见 [测试与交付](../references/testing-release.md)。
+来源准备生成的 `cache/runtime/` 含本地游戏源码片段，不能随公开包上传。知识检索仍受角色、预算、Scope、缺失/延期和 HOLD 约束，见 [接入说明](knowledge-integration.md) 与 [检索策略](../references/kb-retrieval.md)。具体工程验收见 [测试与交付](../references/testing-release.md)。
 
-The standalone Skill provides guidance, references and three Python helpers. It does not supply the full KB/MCP, game source or third-party tools. Versioned notes describe bounded source snapshots, not blanket compatibility with the latest game. Agent installation paths follow official documentation; not every product, account or cloud environment has been tested end to end. Static declaration checks do not prove runtime behavior. The server helper is Windows-only and single-shard; real remote-client, cross-shard, UI, prediction, visual and audio behavior needs separate validation for each mod. Record the actual version, environment, evidence and untested scope.
+The public release includes 187 knowledge records, not unrestricted Coding admission or complete original evidence. Three project policies and one EI retain private context as `UNK`; no replacement general facts are invented. Other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five task-relevant records; 110 Core records retain Coding HOLD. Game Lua is excluded. Source slots need authorized local restoration, including historical ranges absent from a single current ZIP. All packages support file reading; only the full package provides MCP and preparation. Printed configuration, cache creation or validation does not prove client connection or real queries. Version, environment, remote-client, visual and audio limits require separate evidence. Restored source caches must stay local.

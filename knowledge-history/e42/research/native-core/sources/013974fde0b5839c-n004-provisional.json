@@ -1,0 +1,3233 @@
+{
+  "entries": [
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-001",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Combat:CanAttack 检查有效目标、canattack、冷却、状态图 busy/hit 与攻击距离；TryAttack 通过 CanAttack 后只推送 doattack。DoAttack 自身使用 CanHitTarget，没有再调用 CanAttack 或 InCooldown。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "CanAttack",
+              "line_start": 755,
+              "line_end": 770,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "71b3edcbdcff97a5e94e638295275e794417a0b01ff73417b6ce6e4a65597189",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L755-L770"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "TryAttack",
+              "line_start": 804,
+              "line_end": 818,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "6e074abde398e1f1e737076f065c6dbf8bc6cc551e44f2d13cd0724f3afdb662",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L804-L818"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "DoAttack",
+              "line_start": 1095,
+              "line_end": 1217,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "08b3ba34c9dc39c87da5807aa87928b52dcef1e8219f222754e4afd3a7f07589",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1095-L1217"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-001",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "CanHitTarget 先要求攻击者和目标有效、目标不在 limbo，并通过可灭火、可点燃或目标 combat:CanBeAttacked 分支；ignorehitrange 只在此前提成立后跳过距离/角度判断。普通距离使用三维距离与目标半径，投掷武器还有从 projectile 所在位置进行的后备距离检查。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "CanHitTarget",
+              "line_start": 1034,
+              "line_end": 1088,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "c7450860fa135a9fb3371de187dc2f7e5b5e739b5450812270c2b8550a02db7e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1034-L1088"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-001",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "直接结算分支先 CalcDamage、将普通 dmg 乘 instancemult，再调用目标 GetAttacked；仅 projectile 为 nil 时预先收集反伤。随后执行武器 OnAttack 与可选范围攻击；反伤在本次攻击主体结束后且攻击者仍有生命并未死亡时才施加。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "CalcDamage",
+              "line_start": 1187,
+              "line_end": 1216,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "2ebcab4c9d5e9b66770a71c01a91c1c736463343327ad52d7adc33522c62b98a",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1187-L1216"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-002",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Weapon:GetDamage 以 FunctionOrValue(self.damage, weapon, attacker, target) 求普通伤害，收集武器特殊伤害；若武器有 damagetypebonus，再同时乘到普通和特殊伤害。",
+          "citations": [
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "GetDamage",
+              "line_start": 94,
+              "line_end": 103,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "b971d3d82768b9783fa675dad9c950ee7d5f9a85ae2c5128cfe8cf1fbb832e12",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L94-L103"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-002",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "CalcDamage 的普通伤害表达式依次乘基础倍率、externaldamagemultipliers、类型倍率、传入 multiplier、玩家/PVP 倍率和 customdamagemultfn，再加 damagebonus；特殊伤害分支只再乘这里的类型倍率、PVP 倍率及 customspdamagemultfn，未复用全部普通倍率。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "externaldamagemultipliers",
+              "line_start": 913,
+              "line_end": 938,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "bc4dfd4d1fd010eb4cb7b7ae1a0a294a62f952ce218c7f8b65c2e19e2bb451c5",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L913-L938"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-002",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "SpDamageUtil 把 planar 注册为一个特殊类型，通过 planardamage:GetDamage 和 planardefense:GetDefense 获取数值；这两个组件分别返回基础值乘 externalmultipliers 再加 externalbonuses。CollectSpDamage 只收集大于零的各类型值。ApplyMult、MergeSpDamage 和 ApplySpDefense 会改传入表的条目。",
+          "citations": [
+            {
+              "path": "scripts/components/spdamageutil.lua",
+              "symbol": "DefineSpType",
+              "line_start": 22,
+              "line_end": 29,
+              "file_sha256": "e4f07769309562b8ee9ca775674ee7cd079a5dbcb772c305f9eaf1b86d641a3c",
+              "range_sha256": "95bbf93dd460f0b52d663f8a854515e450411ef0f9c734366cb584018af77c7d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/spdamageutil.lua#L22-L29"
+            },
+            {
+              "path": "scripts/components/planardamage.lua",
+              "symbol": "GetDamage",
+              "line_start": 18,
+              "line_end": 20,
+              "file_sha256": "d4460ceec8d0951171cb2ba4567709f6daf0b5c21159e83b29f605320c5f035c",
+              "range_sha256": "cd0d1e23a7bea0d819c0c156377883fc5adcad6620b75bc30db46e862b42e583",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/planardamage.lua#L18-L20"
+            },
+            {
+              "path": "scripts/components/planardefense.lua",
+              "symbol": "GetDefense",
+              "line_start": 18,
+              "line_end": 20,
+              "file_sha256": "ce1136a734d94897c73a3b2d89ccafacbe87662d3b37d9bbf568fe7a68fc4dee",
+              "range_sha256": "4c74f96823c2b4dd6ee010c11b40a769a954a475c055440e4e3d4454cbee7867",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/planardefense.lua#L18-L20"
+            },
+            {
+              "path": "scripts/components/spdamageutil.lua",
+              "symbol": "CollectSpDamage",
+              "line_start": 52,
+              "line_end": 71,
+              "file_sha256": "e4f07769309562b8ee9ca775674ee7cd079a5dbcb772c305f9eaf1b86d641a3c",
+              "range_sha256": "6be9a7f37e7a77fd6f546c958157633ec8a2e9b4447075fbc2d3d3358afeb789",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/spdamageutil.lua#L52-L71"
+            },
+            {
+              "path": "scripts/components/spdamageutil.lua",
+              "symbol": "ApplyMult",
+              "line_start": 83,
+              "line_end": 115,
+              "file_sha256": "e4f07769309562b8ee9ca775674ee7cd079a5dbcb772c305f9eaf1b86d641a3c",
+              "range_sha256": "b707392f4a56de3e39f1b5fff8c51474708ecbf170372278fadaace089717cca",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/spdamageutil.lua#L83-L115"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-003",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Combat:GetAttacked 对已经死亡的 health 直接返回 true。正常路径先求 redirectdamagefn，再记录攻击者和刺激类型、调用 ShouldRecoil；仅有 health、damage 非 nil 且没有重定向目标时才进入本体伤害计算。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "GetAttacked",
+              "line_start": 568,
+              "line_end": 606,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "0c7b88e34c278265b367817f50152bceac126bf97ca6c5c0885da76047f1d282",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L568-L606"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-003",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "存在正普通伤害或特殊伤害且 health 非无敌时，普通伤害可追加攻击者 bonusdamagefn 并经 planarentity 处理；特殊伤害经目标 ApplySpDefense 后计入总量，最后调用 health:DoDelta。否则该分支将 blocked 设为 true。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "bonusdamagefn",
+              "line_start": 634,
+              "line_end": 665,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "5485401042e1330d04af39e90273a927e9eaf37f080f954d9faedc3d4f58e0b4",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L634-L665"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-003",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "GetAttacked 的 damageresolved 是 Health:DoDelta 返回值的取负；若该返回值为 nil 则回退为 damage。Health:DoDelta 在吸收、重定向、单次上限等处理后返回 amount，而 Health:SetVal 另行限制生命上下界，故该字段并不保证等于调用前后的 currenthealth 差值。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "damageresolved",
+              "line_start": 651,
+              "line_end": 655,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "758e81e53ca7308edc506ef4026cda942c564af4b412bbafafa533fbf1486d03",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L651-L655"
+            },
+            {
+              "path": "scripts/components/health.lua",
+              "symbol": "DoDelta",
+              "line_start": 613,
+              "line_end": 649,
+              "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+              "range_sha256": "971919fbbd826dc4263f7b19886f54b1c5bcc817d54e2194a85d7f43bc52201b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L613-L649"
+            },
+            {
+              "path": "scripts/components/health.lua",
+              "symbol": "SetVal",
+              "line_start": 565,
+              "line_end": 581,
+              "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+              "range_sha256": "02abd664a5866aa67f4a9ceb627b9c207c3abf929f71a79575643e2af2e03563",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/health.lua#L565-L581"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-003",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "若 redirectdamagefn 返回带 combat 的实体，GetAttacked 递归转交该实体，并临时设置 redirected_from；本体 damageresolved 不接收递归返回结果。最终未 blocked 才推送 attacked、调用受击 onhitfn、推送攻击者 onhitother 并调用 onhitotherfn；blocked 路径仅推送 blocked，函数返回 not blocked。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "redirected_from",
+              "line_start": 668,
+              "line_end": 674,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "10d4319ecdaae100ac5cdba4de054e8af37923a21b7b13f455b7e9fc2613baa0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L668-L674"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "onhitotherfn",
+              "line_start": 690,
+              "line_end": 713,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "27014533701fbcfc8dbb4aed3dea83da3ee33963236e1b17e8cee4393f8d440c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L690-L713"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-001",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "DoAttack 在 CanHitTarget 失败或 AOEarc 为真时推送 onmissother，若启用范围攻击仍调用 DoAreaAttack，然后清理临时位置/范围并返回。通过该检查后推送 onattackother；当 projectile 参数为 nil 时，可走投掷武器、complexprojectile 或 Weapon:LaunchProjectile 发射分支并提前返回，不在该次调用中直接结算目标伤害。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "DoAttack",
+              "line_start": 1095,
+              "line_end": 1165,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "4cec06a381689738aa72bb90abddf00c6444a44d227aaab1d6d12d00a916c4e3",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1095-L1165"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-001",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "DoAreaAttack 的普通搜索分支排除中心 target 和攻击者，并检查 IsValidTarget 与可选 validfn；onlyontarget 分支只处理指定目标。hitcount 在调用 GetAttacked 后递增，没有检查其返回值；这个函数没有为每个目标调用 Weapon:OnAttack。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "DoAreaAttack",
+              "line_start": 1286,
+              "line_end": 1315,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "d93adb75acedd0d0540eb3e75df471eabc04eeec315da820818ed212ad533470",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1286-L1315"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-004",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Weapon:SetOnAttack 只赋值 self.onattack；Weapon:OnAttack 先调用 onattack(weapon, attacker, target)，再推送 weapononattack。它虽接受 projectile 参数，却不把这个参数传给 onattack 回调。",
+          "citations": [
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "SetOnAttack",
+              "line_start": 53,
+              "line_end": 55,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "ecb690d38833ae3301350b9552126751e7a96b45fc4ed93be8db41613afcedb2",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L53-L55"
+            },
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "OnAttack",
+              "line_start": 105,
+              "line_end": 110,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "f62547c38a68faff85aaafdab09b3b24d49cc2674095ce7784633dd260cf16fe",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L105-L110"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-004",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Combat:DoAttack 的直接结算路径调用目标 GetAttacked 后，不检查其返回值就执行 Weapon:OnAttack；因此该武器回调可在目标 blocked 的情况下执行。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "GetAttacked",
+              "line_start": 1187,
+              "line_end": 1200,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "21a7f6b0d7a4a07c9e06daa527754206263ed06d0ace95f4c415a761f682da42",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1187-L1200"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-004",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Weapon:OnAttack 在回调和事件之后处理 finiteuses：忽略战斗耐久损耗，或传入的普通 projectile 标记 IsBounced 时跳过；否则消耗 (attackwear or 1) 乘 attackwearmultipliers，并可再乘攻击者 efficientuser 的 ATTACK 倍率。",
+          "citations": [
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "OnAttack",
+              "line_start": 105,
+              "line_end": 121,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "e2b25e2aeda9b8f880e820921bbf717a9ebf00e57672f11dfd8e67546943288e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L105-L121"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-005",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Hit 接着调用 onprehit；只有解析出的 attacker 非 nil 且有 combat 才调用 DoAttack(target, weapon, projectile, stimuli)，临时把 ignorehitrange 设为 true 后恢复。无论该 DoAttack 是否执行、是否通过命中检查，之后只要有 onhit 就调用 onhit(projectile, attacker, target)。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Hit",
+              "line_start": 225,
+              "line_end": 252,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "1099563567324d9f93fb33231693ac5201e2653af8cd8fb36ba324be6acd7546",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L225-L252"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-007",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "OnUpdate 先调用 onupdatefn(inst)，若返回真则跳过默认 motor velocity、重力累积和落地检查；默认在向下运动且 y<=0.05 时调用 Hit()，没有目标实参。Hit 只 Cancel 并调用 onhitfn(inst, self.attacker, target)，没有自动调用 Combat:DoAttack 或 GetAttacked。",
+          "citations": [
+            {
+              "path": "scripts/components/complexprojectile.lua",
+              "symbol": "Hit",
+              "line_start": 172,
+              "line_end": 200,
+              "file_sha256": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
+              "range_sha256": "e88b3d42ec60ebf2a9dc9e8b5b15eceec4d1cfc10994a80045580aeb43c4a74c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/complexprojectile.lua#L172-L200"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-007",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "bomb_lunarplant 在主模拟端设置 complexprojectile 的发射/命中回调；其 OnHit 自行添加 planardamage 和 explosive、设置攻击归属并调用 explosive:OnBurnt。具体伤害由该 prefab 的回调安排，而非 complexprojectile:Hit 自动安排。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/bomb_lunarplant.lua",
+              "symbol": "fn",
+              "line_start": 168,
+              "line_end": 237,
+              "file_sha256": "71687a662fcf0fb7e23b402e09aca0895ee2d2161abc8e9402e565be265bac7b",
+              "range_sha256": "1489b94595633b30fa58f6fa03d29accf9f6c6fd27962c679f8085ffd5a984c9",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/bomb_lunarplant.lua#L168-L237"
+            },
+            {
+              "path": "scripts/prefabs/bomb_lunarplant.lua",
+              "symbol": "OnHit",
+              "line_start": 15,
+              "line_end": 38,
+              "file_sha256": "71687a662fcf0fb7e23b402e09aca0895ee2d2161abc8e9402e565be265bac7b",
+              "range_sha256": "5d97d7401da539094cad7bb7ee669fc16dc6ad33996032c65acf04c9ffd2751b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/bomb_lunarplant.lua#L15-L38"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-006",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "PureBrilliance_OnOwnerAttacked 对 data=nil、redirected、攻击者带 attacktriggereddebuff 标签、攻击者就是 buff 自身分别提前返回；通过后还检查 owner 有效、未死且可被攻击，才用 buff 实体作攻击者再次 GetAttacked。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/slingshotammo_debuffs.lua",
+              "symbol": "PureBrilliance_OnOwnerAttacked",
+              "line_start": 140,
+              "line_end": 180,
+              "file_sha256": "1607ee7bd493a9399112aedb51ae7738acd635431e63369a10f84782b0cd0c93",
+              "range_sha256": "5835302a5e93c0e7bce270f61de353ce0ef9ca7447bf1332d29595157b9a7864",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/slingshotammo_debuffs.lua#L140-L180"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-006",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "该 buff 构造时自带 attacktriggereddebuff 标签，Attach 缓存 _owner、建立到期任务并监听目标 attacked。Extend 只刷新到期任务，不再次安装 attacked 监听或再建立 _fx。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/slingshotammo_debuffs.lua",
+              "symbol": "PureBrilliance_OnAttached",
+              "line_start": 182,
+              "line_end": 223,
+              "file_sha256": "1607ee7bd493a9399112aedb51ae7738acd635431e63369a10f84782b0cd0c93",
+              "range_sha256": "316fc0e9acb8ce9fb45de493b01e27cf0d7e69b4336c550539b0774210afce23",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/slingshotammo_debuffs.lua#L182-L223"
+            },
+            {
+              "path": "scripts/prefabs/slingshotammo_debuffs.lua",
+              "symbol": "PureBrillianceMarkFn",
+              "line_start": 227,
+              "line_end": 260,
+              "file_sha256": "1607ee7bd493a9399112aedb51ae7738acd635431e63369a10f84782b0cd0c93",
+              "range_sha256": "45f9cc5ad72c336b293e8f0df287f921b8f95b932a0850067b7202259664ab3d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/slingshotammo_debuffs.lua#L227-L260"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-004",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "仅在 self.projectile ~= nil 时，Weapon:LaunchProjectile 先调用 onprojectilelaunch，再 SpawnPrefab；普通 projectile 用 Throw(weapon, target, attacker)，复杂弹体用 Launch(target position, attacker, weapon)。最后 onprojectilelaunched 收到第四参 proj，即使 SpawnPrefab 失败也可为 nil。",
+          "citations": [
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "LaunchProjectile",
+              "line_start": 123,
+              "line_end": 155,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "0b12f62f9fdef1640b87dc91462cd15283fbb657597d2fbe433f165ee6646f1c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L123-L155"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-005",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Projectile:Throw(owner, target, attacker) 保存 self.owner 与 self.target，并用 owner 或覆盖位置作为 start；第三参 attacker 用于发射偏移、hostileprojectile 事件和 onthrown 回调，本函数没有把它写为 self.attacker。Weapon:LaunchProjectile 对普通弹体传入的是发射武器作 owner、使用者作 attacker。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Throw",
+              "line_start": 149,
+              "line_end": 180,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "d9d78cbb6f47250cde11a0a6f80cfce1459c8f1c56f15348c3bc62ea042eac28",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L149-L180"
+            },
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "Throw",
+              "line_start": 123,
+              "line_end": 145,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "5846bba2eba10bbdd3c79150a41c0c6dd56c7c556e3d764c0f0d6d4a463d4c21",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L123-L145"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-005",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Projectile:Hit 首先缓存 owner 为 attacker、默认弹体自身为 weapon，然后 Stop 清空 self.owner/self.target 并停止物理。若原 owner 没 combat，但有 weapon 和 inventoryitem，则攻击者改取该武器当前 inventoryitem.owner；has_damage_set 且弹体有 weapon 时保留弹体作伤害武器，否则使用发射武器。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Stop",
+              "line_start": 206,
+              "line_end": 235,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "4e49e7d998cf68ac41af9789fffcb559f87ae039c1dfee2a349e9319ed445470",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L206-L235"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-005",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "普通弹体命中链进入 Combat:DoAttack 后再次调用 CalcDamage；其普通武器分支再调用 Weapon:GetDamage(attacker, target)。因此此默认链取用命中时这些对象的当前伤害计算状态。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "DoAttack",
+              "line_start": 237,
+              "line_end": 250,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "0ec6ab75d1b0d9be68225f3a4d0980a01aae2fb9cf850f5dd80d3e17c684ae89",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L237-L250"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "CalcDamage",
+              "line_start": 1187,
+              "line_end": 1193,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "00636cf23fccfb29bdeb216c2a23b000a4beda2ff60640c143cc72702c27d3ea",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1187-L1193"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "GetDamage",
+              "line_start": 864,
+              "line_end": 874,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "9e7a5cd0ae43dc5b8c865dd4ba28a0ba52b1a6d0e884e7d27b755dd8450812f5",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L864-L874"
+            },
+            {
+              "path": "scripts/components/weapon.lua",
+              "symbol": "GetDamage",
+              "line_start": 94,
+              "line_end": 103,
+              "file_sha256": "cc24bef87e58e7df066bc1fb5fc196825da1c76e243ad20c5dd138a574da5267",
+              "range_sha256": "b971d3d82768b9783fa675dad9c950ee7d5f9a85ae2c5128cfe8cf1fbb832e12",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/weapon.lua#L94-L103"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-006",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Projectile 默认 homing=true、hitdist=1。Throw 清除 COLLISION.LIMITS 碰撞位、设置 motor velocity、启动更新并加入 activeprojectile；这并不是搜索附近所有敌人的碰撞伤害循环。DoUpdate 的检测对象是传入的当前 target。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Projectile",
+              "line_start": 11,
+              "line_end": 28,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "058389b4e9f1a8b02e6c50e83f0e3641b9418f05fe26e170de2b4e12758317be",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L11-L28"
+            },
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Throw",
+              "line_start": 149,
+              "line_end": 179,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "d6b298109dbbd860c15eb863bdbd01f415dbb7de125274e4aeca8cec5845b9b3",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L149-L179"
+            },
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "DoUpdate",
+              "line_start": 353,
+              "line_end": 445,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "e373b7862b1b17ce1bdc11b0aaab8b83a4e70684aab227991ec49e5b8c025ead",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L353-L445"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-006",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Projectile:Miss 解析可用攻击者后 Stop 并调用 onmiss；Stop 清除 target/owner、更新和 activeprojectile，但没有调用 Physics:Stop 或 Remove。Hit 与 Catch 则额外停止物理；blowdart 示例以 SetOnMissFn(inst.Remove) 和 onhit 中 Remove 明确负责销毁。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Miss",
+              "line_start": 183,
+              "line_end": 223,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "ca85551fe234b3f39014671a724affb62996991723a6c28b7936b1d0f0dc596f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L183-L223"
+            },
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Hit",
+              "line_start": 225,
+              "line_end": 230,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "5666d65f80e960d5695f11a8609e3af59ccdb98d2ad16edf27009aa7ff4aa894",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L225-L230"
+            },
+            {
+              "path": "scripts/prefabs/blowdart.lua",
+              "symbol": "onhit",
+              "line_start": 31,
+              "line_end": 41,
+              "file_sha256": "3250c3ba48eda04f6f0770eced85e6590ebaf8000441e436d15bfa841d8e9d1f",
+              "range_sha256": "c265d3c15f64fcff68906a17bb857408abbda9bdec3508c0b03ef1efcee6ac63",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/blowdart.lua#L31-L41"
+            },
+            {
+              "path": "scripts/prefabs/blowdart.lua",
+              "symbol": "SetOnMissFn",
+              "line_start": 89,
+              "line_end": 97,
+              "file_sha256": "3250c3ba48eda04f6f0770eced85e6590ebaf8000441e436d15bfa841d8e9d1f",
+              "range_sha256": "fe55224be72dd697d9087f8974ec72af71f349504fb3989925a352b1ba3d1f1e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/blowdart.lua#L89-L97"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-006",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "在有 target 时，Projectile:OnEntitySleep 启动 DOZE_OFF_TIME=2 的延迟 Miss；OnEntityWake 取消该任务。Throw 遇到已睡眠实体也启动这条路径。",
+          "citations": [
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "DOZE_OFF_TIME",
+              "line_start": 1,
+              "line_end": 1,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "6d6c139400ff5df648ff7f8c6fa34f6eaa0e221c39b4f02f301c592fce720e04",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L1-L1"
+            },
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "Throw",
+              "line_start": 149,
+              "line_end": 156,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "6eba6389ab158791fe5370d543a626e5e31b6c744fd57690f1935b3d4b04a909",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L149-L156"
+            },
+            {
+              "path": "scripts/components/projectile.lua",
+              "symbol": "DozeOff",
+              "line_start": 254,
+              "line_end": 277,
+              "file_sha256": "3f61815d251df6d8a3f4b84a72bf06605ab8575ddad97410a195d7a5bf88a0fc",
+              "range_sha256": "b87f215af8078fafcd58f18924249dd9064383951e94aaba03479a064dd7757b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/projectile.lua#L254-L277"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-007",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "ComplexProjectile:Launch 保存 attacker，owningweapon 默认是弹体自身；它面向传入 targetPos，随后直接将 targetPos.y 改为 targetoffset.y 或 0，再计算轨迹。该参数是坐标而不是自动追踪的目标实体。",
+          "citations": [
+            {
+              "path": "scripts/components/complexprojectile.lua",
+              "symbol": "Launch",
+              "line_start": 123,
+              "line_end": 148,
+              "file_sha256": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
+              "range_sha256": "2f85a08e8320412db35875ffb682f9597a265c2c15494c29bb92e91264491bcc",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/complexprojectile.lua#L123-L148"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-007",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Cancel 清除 activeprojectile、停止组件更新和物理，并把 velocity 清零，但不删除实体，也不清除 attacker/owningweapon。构造器中 onmissfn 虽初始化为 nil，本文件所读完整实现没有调用它的路径。",
+          "citations": [
+            {
+              "path": "scripts/components/complexprojectile.lua",
+              "symbol": "ComplexProjectile",
+              "line_start": 1,
+              "line_end": 28,
+              "file_sha256": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
+              "range_sha256": "0cd331f01ab48a5e5046d5cb721eec1353f6bc1e8652933d65d3f70c60118cb0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/complexprojectile.lua#L1-L28"
+            },
+            {
+              "path": "scripts/components/complexprojectile.lua",
+              "symbol": "Cancel",
+              "line_start": 172,
+              "line_end": 202,
+              "file_sha256": "84e27724c3ed38d65a99746467da19580e866f78fbd70df1cebbae0ef8c65afd",
+              "range_sha256": "d5520fc42cc74809b650ca8001858a8ef73bcb39d0218809ff41ce49c282c3b1",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/complexprojectile.lua#L172-L202"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-003",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:Equip 校验 equippable、实体有效性、加载状态对应的限制检查和重物条件，并拒绝替换 ShouldPreventUnequipping 为真的旧装备。它随后处理原持有者、拆堆及旧物品去向。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "Equip",
+              "line_start": 1266,
+              "line_end": 1362,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "03f3f3db5599e93c8249165f1dbbca9e5c6531d3768ed7146d259291f66632fe",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1266-L1362"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-003",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:Equip 对新物品依次调用 inventoryitem:OnPutInInventory、equippable:Equip，再写入 equipslots[eslot]，之后向拥有者推送 equip；Equippable:Equip 先令 isequipped=true，再执行 onequipfn 和物品端 equipped 事件。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "Equip",
+              "line_start": 1364,
+              "line_end": 1377,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "d6dc9117bdb3e1d1d0175901f6fc175838bdccd5747a399f17d17579d9dc7f6e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1364-L1377"
+            },
+            {
+              "path": "scripts/components/equippable.lua",
+              "symbol": "Equip",
+              "line_start": 92,
+              "line_end": 107,
+              "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+              "range_sha256": "10f01e99ec4c18aaf882f8eb680e2754f512ad051948fdad516c411ba1d8c6c2",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/equippable.lua#L92-L107"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-003",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:Unequip 先检查防卸下条件并调用物品 equippable:Unequip，然后才清空 equipslots 并向拥有者推送 unequip；Equippable:Unequip 先令 isequipped=false，再执行 onunequipfn 与物品端 unequipped 事件。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "Unequip",
+              "line_start": 1219,
+              "line_end": 1247,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "25af7c7d2f7ca06f5d89391146a35315efb37a6cda02529def19ad7544aec649",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1219-L1247"
+            },
+            {
+              "path": "scripts/components/equippable.lua",
+              "symbol": "Unequip",
+              "line_start": 115,
+              "line_end": 123,
+              "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+              "range_sha256": "e79bbc950f8f6f976ff334f94de6b62db3c49cc9ab74cb20324e1dde163d90ee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/equippable.lua#L115-L123"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-003",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Equippable:ToPocket 仅转发 onpocketfn(inst, owner)，而 Inventory:GiveItem 的常规入袋路径调用 ToPocket() 没有传 owner；回调不能假定第二个参数必有值。",
+          "citations": [
+            {
+              "path": "scripts/components/equippable.lua",
+              "symbol": "ToPocket",
+              "line_start": 109,
+              "line_end": 113,
+              "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+              "range_sha256": "4de5b44ac5c101de9d142ce05e2834312459a1013a597dfa6832e980aa288c38",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/equippable.lua#L109-L113"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "ToPocket",
+              "line_start": 1148,
+              "line_end": 1156,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "1aed746a118f9eadc9901aee296c0c061f8393c33fde1fef0836bf9105ea891e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1148-L1156"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-003",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "防卸下检查不是所有移除路径的绝对禁止：Inventory:RemoveItem 找到装备后调用 Unequip(k, nil, true) 强制卸下。IsRestricted_FromLoad 也对特定技能树标签提供与普通 IsRestricted 不同的加载路径。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "Unequip",
+              "line_start": 1424,
+              "line_end": 1430,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "dc6ca8ebce9ec5e7112c7fa089ffc7b894fb17838297f129676d1b3841bb2a40",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1424-L1430"
+            },
+            {
+              "path": "scripts/components/equippable.lua",
+              "symbol": "IsRestricted_FromLoad",
+              "line_start": 164,
+              "line_end": 174,
+              "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+              "range_sha256": "e8da6d8718f7e3ebc1854bd291f1a73ab9c3ad8a831a76ff2e82baf84f7748ee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/equippable.lua#L164-L174"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-005",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:OnLoad 设置 isloading=true，依次 SpawnSaveRecord 并 GiveItem 恢复普通格子、Equip 恢复装备；保存的 activeitem 使用 GiveItem 恢复，并非调用 SetActiveItem。最后清除 isloading。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "OnLoad",
+              "line_start": 293,
+              "line_end": 325,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "22fbb47ac95caa49c6afe5fcebdf544ef23b03897478d251de8f077b1fc6ea80",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L293-L325"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-008",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "SourceModifierList 默认基数为 1 并相乘；SetModifier 的 source 可对应多个 key，省略 key 时使用固定字符串 key。相同 source/key 被更新；实体来源会注册 onremove 自动清除，字符串来源没有该实体监听。RemoveModifier 不传 key 时移除整个来源。",
+          "citations": [
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "SourceModifierList",
+              "line_start": 8,
+              "line_end": 27,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "073fe91ef88bb26b894e35e3d3346b368372a1284dad0a69e8abaa9a2e118250",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L8-L27"
+            },
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "SetModifier",
+              "line_start": 61,
+              "line_end": 99,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "dd1f4ceb540f263b04b9613658995e8986ee4939837cd7cd8a0757c768501330",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L61-L99"
+            },
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "RemoveModifier",
+              "line_start": 101,
+              "line_end": 122,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "5eb200e5be4348c651deffd7d3aab1b9ae4883ea96f29d2c7589e724d7a44316",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L101-L122"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-PLAYER-008",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Wilson 的 wilson_allegiance_shadow 激活时添加阵营标签，并以 inst 加技能专用 key 注册抗性/伤害加成；撤销回调使用同一 source/key 移除对应抗性/加成及标签。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/skilltree_wilson.lua",
+              "symbol": "wilson_allegiance_shadow",
+              "line_start": 379,
+              "line_end": 410,
+              "file_sha256": "f02ee8c0312914641e359c6b4e32480011b3d9be1af97da708309405333abaa1",
+              "range_sha256": "dfde1c50493e444b7130a39a33240b10fb8783633532aaff4f8c6ed5706fef9f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/skilltree_wilson.lua#L379-L410"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-001",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "InventoryItem:OnPutInInventory 先 SetOwner、AddChild、RemoveFromScene、设置本地坐标并休眠，再调用 onputininventoryfn(inst, owner) 和推送 onputininventory；若物品本身有 container，还向内装物品推送 onownerputininventory。",
+          "citations": [
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "OnPutInInventory",
+              "line_start": 344,
+              "line_end": 363,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "9f5aaaee5f2d7c9d7cc5289133b9a565e995e69697811f6fce3770870b518ada",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L344-L363"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-001",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "InventoryItem:OnRemoved 会解除父子关系、ClearOwner、ReturnToScene 并唤醒；OnDropped 在有效性检查后调用 OnRemoved、掉落物理、ondropfn、ondropped，以及内装物品的 onownerdropped。单独 OnRemoved 不执行掉落回调。",
+          "citations": [
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "OnRemoved",
+              "line_start": 365,
+              "line_end": 399,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "56332619e3d7669fadcfe9f3281c8716376bf5a403a2565b2b8468254d8dd56f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L365-L399"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-001",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "RemoveFromScene 将实体置于 INLIMBO，暂停动画和状态图、关闭物理并推送 enterlimbo；它没有走 EntityScript:Remove 的退休与任务清理路径。",
+          "citations": [
+            {
+              "path": "scripts/entityscript.lua",
+              "symbol": "RemoveFromScene",
+              "line_start": 348,
+              "line_end": 376,
+              "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+              "range_sha256": "3aeaf8805c2d410db07d5c281bab5b2c32a0ce18e829a24282ad0df0b69be081",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L348-L376"
+            },
+            {
+              "path": "scripts/entityscript.lua",
+              "symbol": "Remove",
+              "line_start": 1705,
+              "line_end": 1727,
+              "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+              "range_sha256": "51668de9aa8ac040c278e84513ada6f574d061bdda8a6ed8f3bd922cd479c37a",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1705-L1727"
+            },
+            {
+              "path": "scripts/entityscript.lua",
+              "symbol": "Retire",
+              "line_start": 1767,
+              "line_end": 1772,
+              "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+              "range_sha256": "67127d6c2b10bf5433a881261d1b81831a1295623a58cea227ba4001973fb355",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1767-L1772"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-001",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "InventoryItem:GetGrandOwner 递归沿 owner 的 inventoryitem 找到最外层拥有者；RemoveFromOwner 则调用直接 owner 的 inventory:RemoveItem 或 container:RemoveItem。",
+          "citations": [
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "RemoveFromOwner",
+              "line_start": 468,
+              "line_end": 475,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "0d9f4aa8e11746c82c7b23fc8fa05fd7e54a10bb86f486a5075e0e02ecda10cc",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L468-L475"
+            },
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "GetGrandOwner",
+              "line_start": 494,
+              "line_end": 502,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "91af53c78a2e2cd6724da351de6099127cb79a049fe94b8e8fe76bf53a1d84c4",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L494-L502"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-002",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GiveItem 接受有效 inventoryitem，必要时先从旧 owner 移除，然后调用 OnPickup；OnPickup 返回真时直接退出。InventoryItem:OnPickup 会先推送 onpickup 再返回 onpickupfn 的结果，源码约定真值表示物品已自毁。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GiveItem",
+              "line_start": 1029,
+              "line_end": 1058,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "09d6409fc9520ff26340f4f6137348f554e5805ce41cccdb339def8006171b26",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1029-L1058"
+            },
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "OnPickup",
+              "line_start": 432,
+              "line_end": 453,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "d31146442e11975e9467557e46730714efa378c8139c4ef2852251f65c141fb0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L432-L453"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-002",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GiveItem 的成功路径可返回槽位或 true；无可用常规槽位时还可能放到 activeitem、并入活动堆叠、调用剩余物品处理函数或掉落。ignorefull 分支返回 false。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GiveItem",
+              "line_start": 1159,
+              "line_end": 1217,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "78b44c8ce48c3848ce77ad4fd2ea5dc59813bd2c9cb7b40fbbb3f6ff527cd292",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1159-L1217"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GiveItem",
+              "line_start": 1066,
+              "line_end": 1078,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "9a3039a9743526e27affc695b0cd349bc6cf1808dde7c902fb818d2cbfcb87e3",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1066-L1078"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-002",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Container:GiveItem 会先尝试堆叠；向不接受堆叠的容器强塞多件堆叠时，可拆出一件放入 slots、调用 OnPutInInventory 并发送 itemget，随后返回 false。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GiveItem",
+              "line_start": 447,
+              "line_end": 518,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "6f518beae99a1cfd89727239a9615b07d5dbf2faffb0e28a6df8c56f098f0107",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L447-L518"
+            },
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "OnPutInInventory",
+              "line_start": 532,
+              "line_end": 539,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "22d6581fc39579bba2233b21ffacea67fb9f169a10166d19810be56a4f722cc4",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L532-L539"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-002",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "当 Container:GiveItem 控制流到达函数末尾的失败兜底时，只有 drop_on_fail ~= false 才执行 DropOverstackedExcess、坐标更新和 OnDropped；提前返回 false 的路径不会执行这段兜底。禁止兜底掉落也不撤销前面已发生的堆叠或部分接收。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GiveItem",
+              "line_start": 447,
+              "line_end": 567,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "b9f5773cfa835932b0eaf4b488a2b7b8031585be266a1ea03ec3d62fb8d407c4",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L447-L567"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-002",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Container:RemoveItem 的 checkallcontainers 参数未实现，未找到槽位时返回原 item。Inventory:RemoveItem 若从溢出容器得到非 nil 返回值（包括未找到时原样返回 item），便立即返回，未必继续检查打开的容器；遍历仍未匹配时也返回原 item。因此返回物品本身不能独立证明它刚被从指定容器移走。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "RemoveItem",
+              "line_start": 1007,
+              "line_end": 1017,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "67bfc17afde361ed0f30712bc92a79424da7ffe7beaac5ab9bde33d3f6b90c37",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L1007-L1017"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "RemoveItem",
+              "line_start": 1390,
+              "line_end": 1454,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "bb0484fc26f6775af0147e3eb1b0cb2ddb8d801189aab319cbb1e3d290872dee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1390-L1454"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-005",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:OnSave 分别保存 itemslots 与 equipslots 中 persists 为真的物品，并合并每个 GetSaveRecord 返回的 references；activeitem 仅在 persists 为真且未与装备槽同一物品重复时额外保存。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "OnSave",
+              "line_start": 192,
+              "line_end": 229,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "5bb1c18742ac7cb2053fc7f12886485b89facf652a1bc5bfcb41b86c93001e65",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L192-L229"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-005",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:OnLoad 设置 isloading=true，依次 SpawnSaveRecord 并 GiveItem 恢复普通格子、Equip 恢复装备；保存的 activeitem 使用 GiveItem 恢复，并非调用 SetActiveItem。最后清除 isloading。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "OnLoad",
+              "line_start": 293,
+              "line_end": 325,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "22fbb47ac95caa49c6afe5fcebdf544ef23b03897478d251de8f077b1fc6ea80",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L293-L325"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-007",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Stackable:Put 合并时会按实际加入数量稀释 perishable、湿度、温度及 edible 冷却相关状态；全部装下则删除传入实体，装不下则保留并修改剩余堆叠。",
+          "citations": [
+            {
+              "path": "scripts/components/stackable.lua",
+              "symbol": "Put",
+              "line_start": 159,
+              "line_end": 204,
+              "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+              "range_sha256": "8cf58e0330684a8aea50c75db8819f935929bdd026942386edf212af15d529ee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L159-L204"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-001",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Debuffable:AddDebuff 在 enable 为真时按 name 查表：缺少该名字才 SpawnPrefab 并注册；名字已经存在时只调用现有实例 debuff:Extend，并返回现有实例，不比较新 prefab。Debuff:Extend 只转发已设置的 onextendedfn。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "AddDebuff",
+              "line_start": 95,
+              "line_end": 108,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "7413cd97b4e06123cf0f53fc8bddccc9e3e18b93fb0e48c060d8a978f2c6290e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L95-L108"
+            },
+            {
+              "path": "scripts/components/debuff.lua",
+              "symbol": "Extend",
+              "line_start": 53,
+              "line_end": 57,
+              "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+              "range_sha256": "a98ed30bdbf5d9710d5c8d00ccf6a0bbceb4fdb971ddd1a7c0f95f640db36fe0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuff.lua#L53-L57"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-001",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "RegisterDebuff 只接受带 debuff 组件的实体，登记 onremove 回调、令 persists=false，再 AttachTo；AttachTo 先写入 name/target，再调用 onattachedfn，注册方随后调用 ondebuffadded。无 debuff 组件的新实体会被 Remove。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RegisterDebuff",
+              "line_start": 72,
+              "line_end": 93,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "cf699713153045edb4a2c49b65414ccf55d82318d1972ef2c773a4d92aba62d0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L72-L93"
+            },
+            {
+              "path": "scripts/components/debuff.lua",
+              "symbol": "AttachTo",
+              "line_start": 35,
+              "line_end": 41,
+              "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+              "range_sha256": "7d1980ccee6db332c584d679a8c29790240032690e48f30d0ffb18b6fb30efd5",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuff.lua#L35-L41"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-001",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "EntityScript:AddDebuff 会按需添加 debuffable，默认检查 DebuffsEnabled 与非死亡/幽灵，然后可调用 pre_buff_fn，再调用组件 AddDebuff，并返回 true；它不返回 buff 实体，也不检查组件是否真正生成实例。skip_test 只跳过外层条件，组件自身的 enable 判断仍在。",
+          "citations": [
+            {
+              "path": "scripts/entityscript.lua",
+              "symbol": "AddDebuff",
+              "line_start": 2101,
+              "line_end": 2129,
+              "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+              "range_sha256": "8593e80a7673a0a005da67edf996921c4add31c2aee6b95cd96faadb66d803d4",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L2101-L2129"
+            },
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "AddDebuff",
+              "line_start": 95,
+              "line_end": 108,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "7413cd97b4e06123cf0f53fc8bddccc9e3e18b93fb0e48c060d8a978f2c6290e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L95-L108"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-001",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "原版 DoApplyElixir 将药剂分成 elixir_buff 与 super_elixir_buff 两个逻辑名字；pre_buff_fn 检查同名现有 buff.prefab，不同于即将使用的 prefab 时先 RemoveDebuff，然后外层添加流程继续。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/ghostly_elixirs.lua",
+              "symbol": "DoApplyElixir",
+              "line_start": 348,
+              "line_end": 367,
+              "file_sha256": "d605e3a49d732bc81fe0107949837dd7ea51c0f7d443d494a7a6e850a42f7877",
+              "range_sha256": "57e55ed8c1fe2c04970f8c99b01d3c8cff8fda5f9ab8a0983fb4d1465e010126",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/ghostly_elixirs.lua#L348-L367"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-002",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Debuff:Stop 仅在 target 存在时调用 target:RemoveDebuff(name)。Debuffable:RemoveDebuff 先清表并移除 buff 的 onremove 监听，调用 ondebuffremoved，然后有 debuff 组件时调用 OnDetach；只有没有组件的分支直接 Remove 实体。",
+          "citations": [
+            {
+              "path": "scripts/components/debuff.lua",
+              "symbol": "Stop",
+              "line_start": 28,
+              "line_end": 32,
+              "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+              "range_sha256": "dfc506c32576ac7ffaadeabf2e7788df1ebb6bf0a49af5abda15a03adb3b0765",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuff.lua#L28-L32"
+            },
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RemoveDebuff",
+              "line_start": 110,
+              "line_end": 124,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "fb4367e0a4efdbfd3c45a68cec715aea68d0f40d3578e08327d4db644aa848db",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L110-L124"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-002",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Debuff:OnDetach 先缓存 target，再把自身 name/target 清为 nil，然后调用 ondetachedfn(buff, 原 target)。该函数本身没有删除实体；脱离后是否消失由 prefab 的 detached 回调负责。",
+          "citations": [
+            {
+              "path": "scripts/components/debuff.lua",
+              "symbol": "OnDetach",
+              "line_start": 44,
+              "line_end": 51,
+              "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+              "range_sha256": "8422f1ace9f0e5bdd469608ac2bd689ec61bd5f6fa837737e2ec3af8b6c0b971",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuff.lua#L44-L51"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-002",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "注册给 buff 的 onremove 监听只清理 debuffable 中对应名字并调用 ondebuffremoved，没有调用 Debuff:OnDetach。因而直接 buff:Remove 与正常 RemoveDebuff 的回调路径不同。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RegisterDebuff",
+              "line_start": 72,
+              "line_end": 89,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "8a82cb232b91c72ee0bde9d1d614fca1d0d0fba270e182f08809323408aaa19e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L72-L89"
+            },
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RemoveDebuff",
+              "line_start": 110,
+              "line_end": 124,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "fb4367e0a4efdbfd3c45a68cec715aea68d0f40d3578e08327d4db644aa848db",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L110-L124"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-002",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "foodbuffs 的 OnAttached 把实体设为目标子实体，并监听目标 death 以 Stop；OnDetached 先调用效果自己的撤销函数，再推送 foodbuffdetached 并删除 buff。hungerregenbuff 则还让目标监听 buff 的 onremove，清除 hungerregenbuff 标签。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "OnAttached",
+              "line_start": 150,
+              "line_end": 180,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "6c6062db1528f0d267696868b7f89d52cdc94faa8fc163da06cc0a7d71606d42",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L150-L180"
+            },
+            {
+              "path": "scripts/prefabs/hungerregenbuff.lua",
+              "symbol": "OnAttached",
+              "line_start": 17,
+              "line_end": 27,
+              "file_sha256": "892deb3f1eebb4b1e756bf6b3b1c8423da83a909f131eb034bc88032829fbf51",
+              "range_sha256": "a96d402d725ca3ef2574c50e188868d2d25b49b9f363eef48a21c4755c396c1c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/hungerregenbuff.lua#L17-L27"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-002",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Debuffable:Enable(false) 遍历当前名字并通过 RemoveDebuff 清除；Debuff 核心 AttachTo/Extend/OnDetach 只存状态和转发回调，没有在这些方法中自动注册目标 death 或 onremove 清理。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "Enable",
+              "line_start": 28,
+              "line_end": 37,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "06e9a73439e8f80770cd37f02b245b1a3f23af2428319d2a630cae15454bd19d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L28-L37"
+            },
+            {
+              "path": "scripts/components/debuff.lua",
+              "symbol": "AttachTo",
+              "line_start": 35,
+              "line_end": 64,
+              "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+              "range_sha256": "6af6ee700be62812c41537c3950b4fa05843d998f2a057afa9b0f6fbb2f7b735",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuff.lua#L35-L64"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-007",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Timer:StartTimer 若同名 timer 已存在则打印并返回，不替换；正常开始时登记任务、timeleft、end_time、initial_time 和 paused。OnTimerDone 先 StopTimer 删除记录，再推送 timerdone，事件数据包含 name。",
+          "citations": [
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "StartTimer",
+              "line_start": 27,
+              "line_end": 54,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "525674d6e6c22df7857205635e7cdafd3123f9ecf7db7397b69aaf1a51f507f0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L27-L54"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-007",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "StopTimer 取消任务并删除名字；PauseTimer 更新剩余时间、标记 paused 并取消任务，但保留记录；ResumeTimer 按保存的 timeleft 重新安排任务。StopTimer 本身不推送 timerdone。",
+          "citations": [
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "StopTimer",
+              "line_start": 56,
+              "line_end": 93,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "a7d4f41b5fc161aa2343a015c4ec0fc683b7f311f5919aefc08ca7c48780ebf8",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L56-L93"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-007",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Timer:OnSave 保存剩余时间、暂停状态和 initial_time；OnLoad 对保存的同名记录先 StopTimer 再 StartTimer。TransferComponent 对目标 timer 调用 StartTimer，却没有在此函数中停止来源记录或预先清除目标同名记录。",
+          "citations": [
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "OnSave",
+              "line_start": 122,
+              "line_end": 142,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "9e86e55826707b694a9074e7254f0cfc62b6bb7d68dabe18d17b53fb44d41f6d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L122-L142"
+            },
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "TransferComponent",
+              "line_start": 150,
+              "line_end": 157,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "47357690e9ccdf1069b195051507b1aa2ef81de10b5b6cedce327078ec74a274",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L150-L157"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-007",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "普通 Timer:LongUpdate 对所有已登记名字执行 SetTimeLeft(GetTimeLeft(name)-dt)，没有跳过 paused；SetTimeLeft 对暂停计时器直接改剩余时间并下限钳制为 0，对运行中计时器则暂停、改值、恢复。",
+          "citations": [
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "SetTimeLeft",
+              "line_start": 95,
+              "line_end": 114,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "565fd70ba3957f6a7f75db23826927a5e12dfbc0da0ff762619f415605eac5ee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L95-L114"
+            },
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "LongUpdate",
+              "line_start": 144,
+              "line_end": 148,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "dd8b8abb8b0d1bb84a519706aaed64b957678a2e64605910548f3f0347f7534d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L144-L148"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-009",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "WorldSettingsTimer:AddTimer 登记 maxtime、enabled、callback 与 externallongupdate；已有名字直接返回。StartTimer 要求先登记且没有活动计时；TimerExists 检查登记表存在，ActiveTimerExists 还要求 timeleft 存在。",
+          "citations": [
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "AddTimer",
+              "line_start": 7,
+              "line_end": 27,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "3afa2d0a8f38462c78685e69dee16f3becc0bd6cfa778420a11034c0b8e5f112",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L7-L27"
+            },
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "TimerExists",
+              "line_start": 45,
+              "line_end": 80,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "cb6cbf353c11018b2f7d94d30669d14dd7f1cd380c43206caed9f74e467fef25",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L45-L80"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-009",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "WorldSettingsTimer:StopTimer 清除 timeleft 等活动字段并取消任务，但保留已登记的名字与配置；完成时先 StopTimer，存在 callback 则调用 callback(inst)，否则推送 timerdone。",
+          "citations": [
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "OnTimerDone",
+              "line_start": 53,
+              "line_end": 60,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "3806258c19bed3ae1c74c6e81f3b36a4d6301b0aa2c6d78b8f8e9a0cb39125c8",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L53-L60"
+            },
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "StopTimer",
+              "line_start": 82,
+              "line_end": 96,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "2e4f2c83e708673fec7183637bfb2fdf222918bfdac8078f980f18350d952202",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L82-L96"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-009",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "WorldSettingsTimer:OnSave 的 timeleft 是剩余时间除以 maxtime 的比例，maxtime 为 0 时保存 0；OnLoad 用当前 GetMaxTime 乘回。若尚未登记名字则暂存 saved_timers，稍后 AddTimer 同样按新的 maxtime 乘回。",
+          "citations": [
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "OnSave",
+              "line_start": 176,
+              "line_end": 203,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "c150ce49327481be7685656257a2bc759d5167bb5fc5d56c127c0ac316539990",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L176-L203"
+            },
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "AddTimer",
+              "line_start": 7,
+              "line_end": 27,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "3afa2d0a8f38462c78685e69dee16f3becc0bd6cfa778420a11034c0b8e5f112",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L7-L27"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-009",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "IsPaused 将未 enabled 也视为暂停；LongUpdate 跳过 externallongupdate、paused 或 blocklongupdate 的记录，SetTimeLeft 又拒绝未 enabled 的记录。它和普通 Timer:LongUpdate 的暂停处理并不相同。",
+          "citations": [
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "IsPaused",
+              "line_start": 98,
+              "line_end": 115,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "fa4f7fff80bd30f6b61454bedd5a126f5db75dda97d3753e43cdc6bd95cf3352",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L98-L115"
+            },
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "SetTimeLeft",
+              "line_start": 141,
+              "line_end": 151,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "675142aec6c8bf11279b3de5de00adab5d977a6c4818ee31739a7e8f54982f3d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L141-L151"
+            },
+            {
+              "path": "scripts/components/worldsettingstimer.lua",
+              "symbol": "LongUpdate",
+              "line_start": 205,
+              "line_end": 214,
+              "file_sha256": "f839757dc98da28181b75dbf116d5787de3567c6bfba44a8d5dfc52cc0bdee4a",
+              "range_sha256": "84c685c84a3ca969fb5dff3f10f24eb0d332181ccfd79ebbf30510579a5e4e66",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldsettingstimer.lua#L205-L214"
+            },
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "LongUpdate",
+              "line_start": 144,
+              "line_end": 148,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "dd8b8abb8b0d1bb84a519706aaed64b957678a2e64605910548f3f0347f7534d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L144-L148"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-003",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Debuffable 注册时将 buff.persists=false，但 OnSave 仍逐个主动调用 buff:GetSaveRecord 并保存到 debuffs，返回 add_component_if_missing=true；它没有传播 GetSaveRecord 的第二返回值 refs。OnLoad 对缺少的名字 SpawnSaveRecord(v) 后重新 RegisterDebuff，未传入 newents。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RegisterDebuff",
+              "line_start": 72,
+              "line_end": 86,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "8b5b9a7f3c7f7870468ae292f14673919031f08a31c06b55f72eaada965fcf4e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L72-L86"
+            },
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "OnSave",
+              "line_start": 126,
+              "line_end": 150,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "07ae368e7f852d18f79369b8abf12061f640bdbc34e8bbb5f9ee696cb697568c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L126-L150"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-003",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "RemoveOnDespawn 只移除没有 debuff.keepondespawn 的实例；player_common 的 OnDespawn 明确调用它。foodbuffs 和 healthregenbuff 均设置 keepondespawn=true，这个标志控制该清理入口，而不是直接实现所有保存逻辑。",
+          "citations": [
+            {
+              "path": "scripts/components/debuffable.lua",
+              "symbol": "RemoveOnDespawn",
+              "line_start": 39,
+              "line_end": 49,
+              "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+              "range_sha256": "734d8245c04f8a433e8dea251338d3b95274a18d5972eace5b9bdcf2e975af24",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L39-L49"
+            },
+            {
+              "path": "scripts/prefabs/player_common.lua",
+              "symbol": "OnDespawn",
+              "line_start": 1415,
+              "line_end": 1435,
+              "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+              "range_sha256": "135ceb47302353abe81064a9add379cb15aab699d192d62661dcbc7458b3f08c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1415-L1435"
+            },
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "keepondespawn",
+              "line_start": 200,
+              "line_end": 208,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "b220b9913a1312a66679a501750459b8e409a67ad8f89b0605ac4da960613916",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L200-L208"
+            },
+            {
+              "path": "scripts/prefabs/healthregenbuff.lua",
+              "symbol": "keepondespawn",
+              "line_start": 52,
+              "line_end": 60,
+              "file_sha256": "e2dd9948459a4801932e50248d6789a13b0c5dd941e5b60bf99b24b1eec1326f",
+              "range_sha256": "f2ee78c8b92ad3c597870200962e988112f203c793dac4c15479e23bdff4558c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/healthregenbuff.lua#L52-L60"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-003",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "foodbuffs 的 OnExtended 将 buffover 停掉并重开为完整 duration，然后发送 foodbuffattached 并调用可选扩展回调；OnAttached 安装效果与死亡监听，但没有执行这段刷新计时。timerdone 只在名字为 buffover 时 Stop。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "OnTimerDone",
+              "line_start": 134,
+              "line_end": 138,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "445d9fb4f66de5d0497dcbc8b10d955502443a2678c7d6e2be3c690102776995",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L134-L138"
+            },
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "OnAttached",
+              "line_start": 150,
+              "line_end": 171,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "1b71ba64badd55aaa14562985479fb12731cdec66decec353ea5b445aee74401",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L150-L171"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-003",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "healthregenbuff 的 OnExtended 不仅把 regenover 重置为完整 JELLYBEAN_DURATION，还取消并重建周期回血任务；OnAttached 也新建周期任务。OnTick 只有目标有 health、未死且非幽灵才回血，否则 Stop。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/healthregenbuff.lua",
+              "symbol": "OnTick",
+              "line_start": 1,
+              "line_end": 31,
+              "file_sha256": "e2dd9948459a4801932e50248d6789a13b0c5dd941e5b60bf99b24b1eec1326f",
+              "range_sha256": "45dda4832f7c464b230c017d1dce838b5a3d0896769612e9caaf739a2a9fd5db",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/healthregenbuff.lua#L1-L31"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-008",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "EntityScript:RemoveComponent 停止组件更新并先将 self.components[name] 清空，再调用旧组件的 OnRemoveFromEntity，然后撤销 replica 与组件动作；这条路径没有调用实体的 CancelAllPendingTasks。",
+          "citations": [
+            {
+              "path": "scripts/entityscript.lua",
+              "symbol": "RemoveComponent",
+              "line_start": 648,
+              "line_end": 663,
+              "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+              "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L648-L663"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-INV-008",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Timer:OnRemoveFromEntity 显式遍历并取消自己的任务；InventoryItem:OnRemoveFromEntity 显式关闭湿度/温度并移除它注册的三个事件回调。这些是组件单独移除时的清理实例。",
+          "citations": [
+            {
+              "path": "scripts/components/timer.lua",
+              "symbol": "OnRemoveFromEntity",
+              "line_start": 6,
+              "line_end": 12,
+              "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+              "range_sha256": "f83e7eb89551a1562d05bd01d4daf050bd8aff4ecaa3e82501e187076d5e9eb0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L6-L12"
+            },
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "OnRemoveFromEntity",
+              "line_start": 106,
+              "line_end": 112,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "3774980173cf5996ea84f4ef3c11f04f3730294be6bd7935b8b4848936607196",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L106-L112"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-008",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "SourceModifierList 默认基数为 1 并相乘；SetModifier 的 source 可对应多个 key，省略 key 时使用固定字符串 key。相同 source/key 被更新；实体来源会注册 onremove 自动清除，字符串来源没有该实体监听。RemoveModifier 不传 key 时移除整个来源。",
+          "citations": [
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "SourceModifierList",
+              "line_start": 8,
+              "line_end": 27,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "073fe91ef88bb26b894e35e3d3346b368372a1284dad0a69e8abaa9a2e118250",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L8-L27"
+            },
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "SetModifier",
+              "line_start": 61,
+              "line_end": 99,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "dd1f4ceb540f263b04b9613658995e8986ee4939837cd7cd8a0757c768501330",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L61-L99"
+            },
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "RemoveModifier",
+              "line_start": 101,
+              "line_end": 122,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "5eb200e5be4348c651deffd7d3aab1b9ae4883ea96f29d2c7589e724d7a44316",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L101-L122"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-COMBAT-008",
+          "fact_index": 5,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Combat 构造器将外部输出倍率与外部受伤倍率分别设为 SourceModifierList；原版 foodbuffs 的 attack_attach/attack_detach 用 buff 实体作为来源对 externaldamagemultipliers 成对 SetModifier/RemoveModifier。Armor 的 conditionlossmultipliers 独立存在且只在 TakeDamage 中用于耐久量。",
+          "citations": [
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "externaldamagemultipliers",
+              "line_start": 65,
+              "line_end": 67,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "5e61c5fca04bce7295f7880585dd3c715b0258c06582c5d6f8caa848910e9a17",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L65-L67"
+            },
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "attack_attach",
+              "line_start": 17,
+              "line_end": 27,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "b22edeb027a20bf5777204137570c8cbe025edd4ed392b195934cbecdf83126d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L17-L27"
+            },
+            {
+              "path": "scripts/components/armor.lua",
+              "symbol": "conditionlossmultipliers",
+              "line_start": 17,
+              "line_end": 29,
+              "file_sha256": "b971904ace836fba10b647a56bc30101e34d6aa5331cc0198675bcbf358df22e",
+              "range_sha256": "5e09d9a5d41de7e3d71a56e1fcfdeef5fb004f9954ffc6ee1051ff56899c7e37",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/armor.lua#L17-L29"
+            },
+            {
+              "path": "scripts/components/armor.lua",
+              "symbol": "TakeDamage",
+              "line_start": 156,
+              "line_end": 164,
+              "file_sha256": "b971904ace836fba10b647a56bc30101e34d6aa5331cc0198675bcbf358df22e",
+              "range_sha256": "6cac673f4f2237effd8a35f8cac7b6a85fb3b5d813c3376ee32c5b90070a9f58",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/armor.lua#L156-L164"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-004",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "foodbuffs 的 electric_attach 按需添加 electricattacks 并 AddSource(buff)，只安装一次攻击事件监听；electric_extend 只刷新 electricchargedfx；electric_detach RemoveSource(buff)，再移除这份攻击监听。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "electric_attach",
+              "line_start": 61,
+              "line_end": 104,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "ba48ca0e07f4a94af50749ea014bcd5387e886681a51602614c334461b62f9e9",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L61-L104"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-004",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "ElectricAttacks 以布尔来源表管理来源；RemoveSource 删除指定来源后，只有合并结果为假才 RemoveComponent(\"electricattacks\")。Combat 的电击刺激补充条件却直接检查 electricattacks 组件是否存在。",
+          "citations": [
+            {
+              "path": "scripts/components/electricattacks.lua",
+              "symbol": "ElectricAttacks",
+              "line_start": 1,
+              "line_end": 19,
+              "file_sha256": "a9e09b1c689954a04e6ad8f7fcb041d8d1d1b70ae5fb3f6d54b2b03083fa251d",
+              "range_sha256": "269b55e3bf3878d273919b1bb5ffeb73de2b070138cba8cb5db3f250a116f9a7",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/electricattacks.lua#L1-L19"
+            },
+            {
+              "path": "scripts/components/combat.lua",
+              "symbol": "electricattacks",
+              "line_start": 1108,
+              "line_end": 1120,
+              "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+              "range_sha256": "67f8f50cb226aef3c44e18c1d5be6a1082a30f46e1f7422298e3fd469395fc86",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/combat.lua#L1108-L1120"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-004",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "MoistureImmunity 添加第一个来源时加 moistureimmunity 标签，并对该来源调用 moisture:ForceDry(true, src)；非自身来源还监听 onremove。RemoveSource 先撤销该来源 ForceDry/监听，再从来源集合移除；集合为空才删除组件。",
+          "citations": [
+            {
+              "path": "scripts/components/moistureimmunity.lua",
+              "symbol": "MoistureImmunity",
+              "line_start": 1,
+              "line_end": 57,
+              "file_sha256": "6dbb583c9469f86c431816b898ff6e3c64475bb10eeaab3ac668c62766535b6d",
+              "range_sha256": "b434521a3a35f0391995ce46b119b8417e4bec219d48a201131cfc84f84e53ad",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/moistureimmunity.lua#L1-L57"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-004",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "foodbuffs 的 moisture_attach 遇到已带 wet 标签的目标直接返回，否则按需添加 moistureimmunity 并 AddSource；detach 只在组件仍存在时 RemoveSource。由此这个 buff 的添加事件与真正安装湿度能力可能是两回事。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "moisture_attach",
+              "line_start": 46,
+              "line_end": 59,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "7312cfbe30bb2428094369ae0a2474be8e7e82b6486baf95fa0242afa4c50d2c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L46-L59"
+            },
+            {
+              "path": "scripts/prefabs/foodbuffs.lua",
+              "symbol": "OnAttached",
+              "line_start": 150,
+              "line_end": 160,
+              "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+              "range_sha256": "5287f3c483f4d24e52c18364ad0d44a6512fd1e03e25fec81fcad8c5b8f084b0",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L150-L160"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-BUFF-004",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "ElectricAttacks 使用的来源表在来源实体删除时会清除该来源并重新计算，但这条底层 onremove 回调没有调用 ElectricAttacks:RemoveSource；后者的“空来源后删组件”是独立步骤。MoistureImmunity 则在自身 _onremovesource 中显式检查空集合并删组件。",
+          "citations": [
+            {
+              "path": "scripts/util/sourcemodifierlist.lua",
+              "symbol": "SetModifier",
+              "line_start": 64,
+              "line_end": 94,
+              "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+              "range_sha256": "e6adcb513129006e52ad44364f3e86e6e77cbac77813d9838aaf46e20a91917c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L64-L94"
+            },
+            {
+              "path": "scripts/components/electricattacks.lua",
+              "symbol": "RemoveSource",
+              "line_start": 12,
+              "line_end": 17,
+              "file_sha256": "a9e09b1c689954a04e6ad8f7fcb041d8d1d1b70ae5fb3f6d54b2b03083fa251d",
+              "range_sha256": "871f8950de3562407fa9a994a15b003340b7e30fbd57928c13d4547d0f1997c8",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/electricattacks.lua#L12-L17"
+            },
+            {
+              "path": "scripts/components/moistureimmunity.lua",
+              "symbol": "_onremovesource",
+              "line_start": 1,
+              "line_end": 11,
+              "file_sha256": "6dbb583c9469f86c431816b898ff6e3c64475bb10eeaab3ac668c62766535b6d",
+              "range_sha256": "79103905c00f5f37c4f8c67fea18f8982e88bb85a178de9cd00d0cd4d387b4f1",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/moistureimmunity.lua#L1-L11"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-PLAYER-008",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Wolfgang 的 wolfgang_normal_speed 在 onactivate 和 ondeactivate 都调用 RecalculateMightySpeed；该角色方法每次查询技能激活和当前 mightiness 状态，然后按固定键设置或移除 playerspeedmult，而 mightychange 也会调用同一方法。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/skilltree_wolfgang.lua",
+              "symbol": "wolfgang_normal_speed",
+              "line_start": 93,
+              "line_end": 104,
+              "file_sha256": "f433463d988f0a7aba3a5323f2f906e2b61da734c1554495fea0d67598b42db5",
+              "range_sha256": "aa849c1195624cbcbcf0cc677d01f1d13ebfd9ae15163d610faead2da42b1bc5",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/skilltree_wolfgang.lua#L93-L104"
+            },
+            {
+              "path": "scripts/prefabs/wolfgang.lua",
+              "symbol": "RecalculateMightySpeed",
+              "line_start": 164,
+              "line_end": 179,
+              "file_sha256": "cfc027b6d4c03e37962a3011da4928fcde8e1df77391f5df589e130dd005bd5e",
+              "range_sha256": "8830e9a6ff867bec2143470437b3089d351afeb57bcb1e14f374ec75a77eccf6",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/wolfgang.lua#L164-L179"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-PLAYER-008",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Wilson 的 wilson_allegiance_shadow 激活时添加阵营标签，并以 inst 加技能专用 key 注册抗性/伤害加成；撤销回调使用同一 source/key 移除对应抗性/加成及标签。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/skilltree_wilson.lua",
+              "symbol": "wilson_allegiance_shadow",
+              "line_start": 379,
+              "line_end": 410,
+              "file_sha256": "f02ee8c0312914641e359c6b4e32480011b3d9be1af97da708309405333abaa1",
+              "range_sha256": "dfde1c50493e444b7130a39a33240b10fb8783633532aaff4f8c6ed5706fef9f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/skilltree_wilson.lua#L379-L410"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-PLAYER-008",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "DamageTypeBonus:AddBonus 与 DamageTypeResist:AddResist 将效果交给 SourceModifierList:SetModifier(src, pct, key)；相应移除函数以同一 src/key 调用 RemoveModifier，并在列表为空时移除标签槽。",
+          "citations": [
+            {
+              "path": "scripts/components/damagetypebonus.lua",
+              "symbol": "AddBonus",
+              "line_start": 10,
+              "line_end": 27,
+              "file_sha256": "140555b3eb2dee41ec1b5eb091835d28b6bf91877241c57873b8a20c8f7019ec",
+              "range_sha256": "0e01c44af7368b9f8d5344e440bc7209fb8eda017e94423875c8bb4a3c47c8bb",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/damagetypebonus.lua#L10-L27"
+            },
+            {
+              "path": "scripts/components/damagetyperesist.lua",
+              "symbol": "AddResist",
+              "line_start": 8,
+              "line_end": 25,
+              "file_sha256": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+              "range_sha256": "f4285b2ae36fad5975255dee76dcce443c944a18a9ebc3cd3bedbe9411898fe2",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/damagetyperesist.lua#L8-L25"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-PLAYER-008",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Wormwood 的 wormwood_allegiance_lunar_plant_gear_1 在激活和撤销共享阵营效果时，会先检查另一项 wormwood_allegiance_lunar_mutations_1 是否仍激活；只有未激活才操作共享标签与同一组 source/key 修饰。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/skilltree_wormwood.lua",
+              "symbol": "wormwood_allegiance_lunar_plant_gear_1",
+              "line_start": 174,
+              "line_end": 202,
+              "file_sha256": "8ad746e8eef1cdc90c3b5434e9e696f625c83523463a4f727fd654c347437d47",
+              "range_sha256": "699cbbbfb987a819d01a451f650c84f513b7b920fb0352bf4adfc1395602a3ca",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/skilltree_wormwood.lua#L174-L202"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-003",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:CanLearn 先要求 GetValidRecipe 返回配方，再检查 builder_tag、no_builder_tag、builder_skill、no_builder_skill；它不在这个方法内检查材料或科技等级。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "CanLearn",
+              "line_start": 954,
+              "line_end": 970,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "9ebd4448e7a0bd7fee8d447ea5c385c96ab8999066d454f7578c950c2450ae21",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L954-L970"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-003",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:KnowsRecipe 有 freebuild 和皮肤等提前分支；常规路径先检查角色标签/技能，再接受 station_recipes 或已保存配方，否则遍历 AVAILABLE_TECH，将需求与永久/临时科技奖励比较。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "KnowsRecipe",
+              "line_start": 841,
+              "line_end": 880,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "6d8acd966264b7d41c02c75e9f34ee19c9704cdf251dfe95a5f6551be685382d",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L841-L880"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "station_recipes",
+              "line_start": 883,
+              "line_end": 915,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "c6d4dcf15e932972f3abf7388b86c4ccc4c9f96b7e9b76a07a9319f9fe7d88d2",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L883-L915"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-003",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "MakeRecipeFromMenu 先检查 inventory:IsOpenedBy(self.inst)，未通过则直接返回；通过后，非建筑配方路径检查材料，再依据 KnowsRecipe 或 CanLearn 与 CanPrototypeRecipe 的组合进入 MakeRecipe；成功回调可能激活研究机器、解锁配方、记录已知配方或消耗临时科技奖励。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "MakeRecipeFromMenu",
+              "line_start": 1041,
+              "line_end": 1089,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "4a9ea67dd579faf60bd3005dfeb47755fc3b6410ef8a868ccf0a2222af04145f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L1041-L1089"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-004",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:HasIngredients 支持配方对象或名称，freebuild 可提前通过；正常情况下会检查 getlimitedrecipecount、折算后的普通库存原料、角色原料及科技原料。旧 CanBuild 仅包装 GetValidRecipe 与 HasIngredients。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "HasIngredients",
+              "line_start": 918,
+              "line_end": 948,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "e18b3fefb2f6784941ad24fa9636684cf322eb4c3418e257f718fe1a27b12968",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L918-L948"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "CanBuild",
+              "line_start": 950,
+              "line_end": 952,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "aea4a13eb916fc74d001aaa5dd37e573a23191987215047cbe4c47a4f54cf0db",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L950-L952"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-004",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:DoBuild 要求有效配方及缓冲建造或材料满足，并检查皮肤限制；随后有骑乘建筑、宠物、制造站和皮肤解锁等拒绝条件。recipe.canbuild 以 (recipe, inst, pt, rotation, current_prototyper, skin) 调用，false 结果可带失败消息返回。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "DoBuild",
+              "line_start": 657,
+              "line_end": 688,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "3c087a0ad17ad281679f2cccf3438a652be5c6fd73e00b593a9a116e81316a5a",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L657-L688"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-004",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "DoBuild 的 canbuild 检查位于清除 buffered_builds、取材料、RemoveIngredients 和 SpawnPrefab 之前；manufactured 路径移除材料后返回 true，普通路径才调用 SpawnPrefab(recipe.product, ...)。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "canbuild",
+              "line_start": 683,
+              "line_end": 723,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "d836763d1b5b6078850afad5e90edd0a2a075e4266a76867e35f4c17a9d56dd6",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L683-L723"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-RWG-004",
+          "fact_index": 5,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Recipe 将 testfn 保存为自定义放置测试，将 canbuild 保存为自定义制作测试；MakeRecipeAtPoint 还检查 placer、缓冲状态及 TheWorld.Map:CanDeployRecipeAtPoint。",
+          "citations": [
+            {
+              "path": "scripts/recipe.lua",
+              "symbol": "testfn",
+              "line_start": 120,
+              "line_end": 122,
+              "file_sha256": "d9b152b694a6e095bd3d53988350001e7b2fdc6ed90d0501735eace4739d4b72",
+              "range_sha256": "0acd077f9b77ad766a305d89ff93040efd0db02d2870b7f069fa4146e3813048",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/recipe.lua#L120-L122"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "MakeRecipeAtPoint",
+              "line_start": 1113,
+              "line_end": 1123,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "a0816b3c95c6206f47324f3e57b50e7ac50cd4133cc5c28437066bfd62c90145",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L1113-L1123"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-001",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "普通库存产品的 DoBuild 分支在 RemoveIngredients 之前调用 prod:onPreBuilt(builder, materials, recipe)。原版 pocketwatch_portal 的 onPreBuilt 从 materials.pocketwatch_recall 取源实体，复制 recallmark 与未完成的 rechargeable 状态。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "onPreBuilt",
+              "line_start": 723,
+              "line_end": 738,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "c6ac09f47d638cb781c88ddacde4409ad222b37b67947fe30710f2e9e2f1e427",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L723-L738"
+            },
+            {
+              "path": "scripts/prefabs/pocketwatch_portal.lua",
+              "symbol": "onPreBuilt",
+              "line_start": 97,
+              "line_end": 109,
+              "file_sha256": "3f30d84808b8a258aeec0ff0a654e833bcccaeb0c06f7fe72747c47d9d8f56aa",
+              "range_sha256": "b0a6f9b1ae3fc33d055fdaff7506d755ff19fc544f359178f913aa3e81803cae",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/pocketwatch_portal.lua#L97-L109"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-008",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Prototyper:Activate 若带 craftingstation，先调用 RecipeCrafted(doers, recipe.name)，再调用 onactivate(inst, doer, recipe)。RecipeCrafted 对有限次数减一，归零时 ForgetRecipe，并让登记 doers 中的 builder 重新 EvaluateTechTrees。",
+          "citations": [
+            {
+              "path": "scripts/components/prototyper.lua",
+              "symbol": "Activate",
+              "line_start": 80,
+              "line_end": 87,
+              "file_sha256": "ebacb715632e3049a748460f248f64ed99dc7fbf8e123912bbdeb6ef07c0ff0f",
+              "range_sha256": "461594f731e1d95b2ab9300df92e89be57eda637a0e108782cc5d868f1437959",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/prototyper.lua#L80-L87"
+            },
+            {
+              "path": "scripts/components/craftingstation.lua",
+              "symbol": "RecipeCrafted",
+              "line_start": 40,
+              "line_end": 55,
+              "file_sha256": "942de708696fa5736a4a8e5adcdeb8ae04e5f34f75fb58a4f1ccfa6f46a5e952",
+              "range_sha256": "0c971e9071a9f78b32ac444e563fe7d35bce927cffdb5c4c5e930635ddd6095b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/craftingstation.lua#L40-L55"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-008",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "manufactured 分支在收集并移除普通材料后返回 true，源码要求 prototyper 的 onactivate 负责生成产品；菜单构造成功回调在相应路径调用 ActivateCurrentResearchMachine，后者调用当前站 Prototyper:Activate。材料扣除和站点产出是分开的职责。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "GetIngredients",
+              "line_start": 712,
+              "line_end": 721,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "6e1fc1e786521ed33518255d42909ce6d05d8cc0b6dfbf8ad2ea2c3c60a607d7",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L712-L721"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "ActivateCurrentResearchMachine",
+              "line_start": 68,
+              "line_end": 74,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "a18b5483949dc0227e6d9c3eb504d38843a537f4c58283d666525abf9b605b0b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L68-L74"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "ActivateCurrentResearchMachine",
+              "line_start": 1053,
+              "line_end": 1087,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "fe7be6ff2938fd384af1f9d02f738455fd5548b096a90e49783794cbace05dee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L1053-L1087"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ],
+      "additional_targeted_evidence": {
+        "facts": [
+          {
+            "id": "B01",
+            "statement": "MakeRecipe检查SG标签及资源/buffer条件，建立BUILD BufferedAction并PushAction；return true描述请求建立，不等于DoBuild产物完成。",
+            "lines": [
+              629,
+              643
+            ]
+          },
+          {
+            "id": "B02",
+            "statement": "DoBuild早期检查recipe、buffer/材料、skin、mounted、pet、manufactured prototyper、unlocks skin及canbuild。随后会清buffer标记、执行hungrybuilder局部副作用并refreshcrafting，再GetIngredients和mimic检测。后续false/nil不能概述为此前零副作用。",
+            "lines": [
+              657,
+              715
+            ]
+          },
+          {
+            "id": "B03",
+            "statement": "manufactured分支RemoveIngredients后return true，函数注释将onactivate与产品生成责任交给prototyper；本局部没有SpawnPrefab调用。",
+            "lines": [
+              717,
+              721
+            ]
+          },
+          {
+            "id": "B04",
+            "statement": "普通分支先SpawnPrefab再按inventoryitem分类；prod nil时跳过该block，本函数未RemoveIngredients并隐式返回nil；这不撤销早期buffer/hungry等变化，也不排除其它callback副作用。",
+            "lines": [
+              723,
+              839
+            ]
+          },
+          {
+            "id": "B05",
+            "statement": "inventory产物且builder有inventory时，moisture、onPreBuilt在RemoveIngredients之前；随后builditem通知、Equip或GiveOrDropItem、多产物处理、onBuild及prod:OnBuilt后return true。局部没有以GiveItem返回作为最后成功条件。",
+            "lines": [
+              727,
+              793
+            ]
+          },
+          {
+            "id": "B06",
+            "statement": "inventory产物但builder缺inventory时prod:Remove并设nil，本函数不消费材料，最终隐式nil；不推Remove内部机制。",
+            "lines": [
+              794,
+              797
+            ]
+          },
+          {
+            "id": "B07",
+            "statement": "非inventory产物仅非buffered build在此RemoveIngredients，然后定位/转向、buildstructure和onbuilt事件、onBuild及prod:OnBuilt后return true。",
+            "lines": [
+              798,
+              835
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "native_facts": [
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-001",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:GetIngredients 对每个正 amount 的普通 ingredient 计算 max(1, RoundBiasedUp(amount*ingredientmod))，调用 inventory:GetCraftingIngredient，并赋值 ingredients[type]=items；第二返回值 discounted 记录至少一项折算量少于原量。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "GetIngredients",
+              "line_start": 500,
+              "line_end": 517,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "51fea93d8fad6f6e7dc4fefad6d6c0e37bc195a406fc2cb418fcfbb17b5d6e21",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L500-L517"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-001",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GetCraftingIngredient 与 Container:GetCraftingIngredient 返回的 items 是“实体对象→所取数量”的表，不是槽位数组或 prefab→总数。Builder:GetIngredientWetness 与 RemoveIngredients 都按外层类型、内层实体及数量遍历该结构。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1697,
+              "line_end": 1754,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "d4ebca4de8408575b380e437c607c511e30e83dcdbe5497ce521df0376d7d865",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1697-L1754"
+            },
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 920,
+              "line_end": 946,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "baf5e55144c82040743cd63b28256e7f40bfa58b1a3ff4c29753327373390599",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L920-L946"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "GetIngredientWetness",
+              "line_start": 475,
+              "line_end": 498,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "ea60570468ffa355c93a58e018eef875e4d6825a2633af3916011da89e20133e",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L475-L498"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "RemoveIngredients",
+              "line_start": 546,
+              "line_end": 565,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "aa40d8a54c6b45ec9b6a375794f881cf8023ee028083e6b1e440a77b21e17952",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L546-L565"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-001",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "对重复 type 的普通配方项，GetIngredients 使用同一个 ingredients[type] 赋值位置；HasIngredients 又逐项独立调用 inventory:Has，没有在这段循环中累加同 type 的需求或扣减临时计数。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "GetIngredients",
+              "line_start": 500,
+              "line_end": 517,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "51fea93d8fad6f6e7dc4fefad6d6c0e37bc195a406fc2cb418fcfbb17b5d6e21",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L500-L517"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "HasIngredients",
+              "line_start": 918,
+              "line_end": 933,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "320a3d513b8e7e8ccea26746aa0987c1bb25f87a6fb4bae1080deddca75262fa",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L918-L933"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-002",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:Has 在 checkallcontainers=true 时把它也作为 iscrafting；统计口袋、activeitem、BODY overflow 与打开的额外容器，过滤 nocrafting。额外容器还排除 overflow 本身、excludefromcrafting 和 readonlycontainer。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "Has",
+              "line_start": 1506,
+              "line_end": 1549,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "7258fe062cdd4338578812c7ea979816b4878f69c272ff0ecac806ea2131d478",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1506-L1549"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-002",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GetCraftingIngredient 先遍历符合条件的 opencontainers 并给子容器传 reverse_search_order=true，再取玩家口袋小堆，之后 overflow，最后 activeitem；达到数量即返回。多个打开容器用 pairs 遍历，源码没有为这些容器整体排序。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1697,
+              "line_end": 1754,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "d4ebca4de8408575b380e437c607c511e30e83dcdbe5497ce521df0376d7d865",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1697-L1754"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-003",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "真实 Container:Open 将 self.inst 放入 inventory.opencontainers，而 proxy 自己进入单独的 opencontainerproxies；Inventory:GetCraftingIngredient 遍历的是 opencontainers 中实体的 container 或 inventory，没有直接枚举 container_proxy。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "Open",
+              "line_start": 617,
+              "line_end": 634,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "ae118df2f3e826e665a2de6deb061e41571c193879e5e874804f7d4c396aceee",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L617-L634"
+            },
+            {
+              "path": "scripts/components/container_proxy.lua",
+              "symbol": "opencontainerproxies",
+              "line_start": 123,
+              "line_end": 128,
+              "file_sha256": "eb9273270e54a68933606922d72f6fb4d9d1c6e2a355ccbccb1b75b014fa4262",
+              "range_sha256": "f18c7e1a8dd3d888aadbc3e2e931ece1038c5f900efc621772d8bd335843742b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container_proxy.lua#L123-L128"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1697,
+              "line_end": 1713,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "6b3676568142531d3883df7040d9f82b9dcce62e564e176aeed9814819803602",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1697-L1713"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-003",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GetOpenContainerProxyFor(master) 通过各代理 GetMaster 查匹配入口。InventoryItem:GetSlotNum 却沿物品直接 owner 的 container/inventory 查槽，Container:GetItemSlot 按实体身份匹配；槽位不以代理实体为拥有者。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetOpenContainerProxyFor",
+              "line_start": 2747,
+              "line_end": 2753,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "07ab1e53be918984ffe3faafa6d2a8078f183d25dcad255b657def9fd96eaf48",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L2747-L2753"
+            },
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "GetSlotNum",
+              "line_start": 315,
+              "line_end": 325,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "1415e6c9ef03a5b12f9acc9be0565f46cfd0cfb295eed7e7d2eb8276874576b9",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L315-L325"
+            },
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GetItemSlot",
+              "line_start": 598,
+              "line_end": 604,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "d0cc231b9f09e6404263a4c5f848b300fae52866c04436e1e0f0ffe26ba09062",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L598-L604"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-004",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:GetCraftingIngredient 合并每个打开容器结果时执行 crafting_items[entity]=quantity，同时 total_num_found 增加 quantity；overflow 合并也使用赋值与加计数。这段合并没有对已出现的实体键单独检查。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1697,
+              "line_end": 1713,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "6b3676568142531d3883df7040d9f82b9dcce62e564e176aeed9814819803602",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1697-L1713"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1736,
+              "line_end": 1754,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "ba25abbabd90d65f605c03d812e7d36048ac56026b20019237b94528d69670e7",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1736-L1754"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-004",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Container:GetCraftingIngredient 最多取当前槽中符合 prefab 且非 nocrafting 的数量，来源不足时仍返回所找到的实体数量表；Inventory:GetCraftingIngredient 最后也直接返回累计表，不附带 success 或 shortage 返回值。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 920,
+              "line_end": 946,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "baf5e55144c82040743cd63b28256e7f40bfa58b1a3ff4c29753327373390599",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L920-L946"
+            },
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "GetCraftingIngredient",
+              "line_start": 1736,
+              "line_end": 1754,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "ba25abbabd90d65f605c03d812e7d36048ac56026b20019237b94528d69670e7",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1736-L1754"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-004",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:RemoveIngredients 仅遍历传入内表的数量逐件删除，未在该函数内重新合计是否等于配方普通材料需求；常规 GetIngredients 输出也只包含每类型的实体表与外层 discounted 返回值。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "GetIngredients",
+              "line_start": 500,
+              "line_end": 517,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "51fea93d8fad6f6e7dc4fefad6d6c0e37bc195a406fc2cb418fcfbb17b5d6e21",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L500-L517"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "RemoveIngredients",
+              "line_start": 546,
+              "line_end": 565,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "aa40d8a54c6b45ec9b6a375794f881cf8023ee028083e6b1e440a77b21e17952",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L546-L565"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-004",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "客户端 inventory_classified 的 Has 使用 replica、活动物品和可能的 _itemspreview，再统计 replica overflow/opencontainers；非预览口袋分支还显式排除与 _activeitem 相同的实体。这不是服务端真实材料表的返回接口。",
+          "citations": [
+            {
+              "path": "scripts/prefabs/inventory_classified.lua",
+              "symbol": "Has",
+              "line_start": 294,
+              "line_end": 342,
+              "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+              "range_sha256": "d2288321388e5cbf350aab171c04b13501d7d2eedab04bf37a58874ba720c96f",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/inventory_classified.lua#L294-L342"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-005",
+          "fact_index": 0,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Builder:RemoveIngredients 对每个材料实体及数量循环，调用玩家 inventory:RemoveItem(entity,false,true)；返回物品若带 container，先 DropEverything 到制作者位置，然后 Remove 该物品。freebuildmode 则在函数入口直接返回。",
+          "citations": [
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "RemoveIngredients",
+              "line_start": 546,
+              "line_end": 565,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "aa40d8a54c6b45ec9b6a375794f881cf8023ee028083e6b1e440a77b21e17952",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L546-L565"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-005",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Inventory:RemoveItem 的拆单件堆叠分支出现在查找玩家 itemslots、activeitem、equipslots 或其他容器之前；它从所传实体 stackable:Get 拆出单件并 OnRemoved。因此该分支依赖已选实体本身，而非再次按 provider/槽位寻找原料。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "RemoveItem",
+              "line_start": 1390,
+              "line_end": 1432,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "e1c58bc5143aea07db229d97c2ff8007ccb995ee5b03dc286e6ff64a19fa1222",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1390-L1432"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-005",
+          "fact_index": 2,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "非拆堆路径会尝试 overflow 和可选 opencontainers，但 Container:RemoveItem 未找到自己槽位时也返回原 item，Inventory 在最终未找到时同样返回原 item。Builder 随后仍对返回实体执行 Remove。",
+          "citations": [
+            {
+              "path": "scripts/components/inventory.lua",
+              "symbol": "RemoveItem",
+              "line_start": 1434,
+              "line_end": 1454,
+              "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+              "range_sha256": "f0b7f8464389ecbb006fae177ffc2ada05b3aee6fda8c4a741860dfe1daba371",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventory.lua#L1434-L1454"
+            },
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "RemoveItem",
+              "line_start": 1007,
+              "line_end": 1017,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "67bfc17afde361ed0f30712bc92a79424da7ffe7beaac5ab9bde33d3f6b90c37",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L1007-L1017"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "RemoveItem",
+              "line_start": 551,
+              "line_end": 563,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "ef5c969445902798da8096f13e7bf506ba9ea9f5083801ca6d3d17043f536b0b",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L551-L563"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-005",
+          "fact_index": 3,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "InventoryItem:OnRemoveEntity 检查物品当前 owner，并向该 owner 的 inventory 或 container 发起整件移除；容器分支临时打开 ignoreoverstacked。这是最终物品实体被删除时，实际 owner 槽位清理的路径。",
+          "citations": [
+            {
+              "path": "scripts/components/inventoryitem.lua",
+              "symbol": "OnRemoveEntity",
+              "line_start": 478,
+              "line_end": 492,
+              "file_sha256": "6a38df2e0876977f935fa712338b9476c941f7e5ae09a4a0ea9ed29591ad3403",
+              "range_sha256": "4184b9b8da2707a7296d900a88734126dd042820658b58d4f1f5b2ed15460507",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/inventoryitem.lua#L478-L492"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-007",
+          "fact_index": 1,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Stackable:Get 在拆出部分数量时用同 prefab、skinname、skin_id SpawnPrefab，然后减少原堆、设置新堆数量，再调用源组件的 ondestack(newinstance, sourceinstance)。它不是调用源实体的 GetSaveRecord 来克隆全部组件数据。",
+          "citations": [
+            {
+              "path": "scripts/components/stackable.lua",
+              "symbol": "Get",
+              "line_start": 109,
+              "line_end": 120,
+              "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+              "range_sha256": "1735e8925975fb7de4b7c6f75164c977298c082cd7c5437a81d9a6b44df2832c",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L109-L120"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        },
+        {
+          "claim_type": "NSF",
+          "origin_lane": "DOT_V04_EXISTING_EVIDENCE",
+          "record_id": "VANILLA-MATERIAL-007",
+          "fact_index": 4,
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "statement": "Container:GetItemSlot 按实体对象而不是 prefab 或皮肤找到槽位；Builder 材料内表同样以具体实体为键，所以合并/拆分后原实体身份可能不再适合继续作为旧材料计划使用。",
+          "citations": [
+            {
+              "path": "scripts/components/container.lua",
+              "symbol": "GetItemSlot",
+              "line_start": 598,
+              "line_end": 604,
+              "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+              "range_sha256": "d0cc231b9f09e6404263a4c5f848b300fae52866c04436e1e0f0ffe26ba09062",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/container.lua#L598-L604"
+            },
+            {
+              "path": "scripts/components/builder.lua",
+              "symbol": "RemoveItem",
+              "line_start": 551,
+              "line_end": 565,
+              "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "range_sha256": "751202d2d0a21bdbe6644c95f363a392a72ce14d6fd07f1a89f356d065863f46",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/builder.lua#L551-L565"
+            },
+            {
+              "path": "scripts/components/stackable.lua",
+              "symbol": "stacksize",
+              "line_start": 188,
+              "line_end": 203,
+              "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+              "range_sha256": "eb703ce2124d46ae71d4296d053299270e2d0c0a144da781afe314736486e8f5",
+              "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/stackable.lua#L188-L203"
+            }
+          ],
+          "record_evidence_level": "E3",
+          "runtime_tested": false
+        }
+      ]
+    }
+  ]
+}

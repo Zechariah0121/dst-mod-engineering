@@ -1,0 +1,715 @@
+{
+  "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+  "repository": "Zechariah0121/dst-scripts",
+  "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+  "new_reviewer_facts": [
+    {
+      "id": "N006-WR-001",
+      "title": "world 的寿命、权威标志和 state 别名",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFactWithExplicitBoundedInference",
+      "statement": "MakeWorld 在 TheWorld 已存在时打印并返回 nil；否则设置 TheWorld，令 ismastersim 来自 TheNet:GetIsMasterSimulation()，令 ismastershard = ismastersim and not TheShard:IsSecondary()。world 被标为非网络实体并设置 persists=false；添加 worldstate 后直接令 inst.state = inst.components.worldstate.data。它不是每个客户端/分片共享的一张 Lua 表。最后一句是由本地实例构造位置得出的范围推论，非原生网络实现证明。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/world.lua",
+          "symbol": "MakeWorld.fn",
+          "line_start": 414,
+          "line_end": 441,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "089d49a83c0dc65643ddc59614e37606ed934a81c3e2fa09b49dcb467b6f128c",
+          "range_sha256": "fb2e55fc57d72c2a2cf8e78d5cd500128b36669f946ebbeee8a8d4fecd93a750",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "9d2cbce48fe5f8cf6b3b68657722e226c17ae62ea2cee93797b9024b05cf63e4",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/world.lua#L414-L441",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/world.lua",
+          "symbol": "worldstate alias",
+          "line_start": 525,
+          "line_end": 529,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "089d49a83c0dc65643ddc59614e37606ed934a81c3e2fa09b49dcb467b6f128c",
+          "range_sha256": "e531596d5226ed02e95850ab2d73d6a50060e053cc697e9ebf7295ba052e7987",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "1ecbccd765053b2dc43f4384c7cad2ae9043226324627b0f4569d62e1400dc0d",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/world.lua#L525-L529",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "补充已有 WORLD-001 特殊保存路径和 N002-C09：直接给出 world 自身的 persists 标志、authority/shard 标志来源及 state alias。",
+      "limits": [
+        "本地一世界构造约束不证明跨进程单例、全服一致性或 Mod 管理器只能采用一个实现。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-002",
+      "title": "WorldState 是默认值和事件投影，直接赋值没有通知入口",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "worldstate 要求 inst == TheWorld，构造 self.data 和私有 watcher 表；初始化为时钟/季节/天气默认值，并订阅对应 world 事件。事件处理器调用局部 SetVariable；此函数只在 val 非 nil 且值变化时赋值，并通知普通或 start/stop watcher。公共接口为 GetWorldAge/AddWatcher/RemoveWatcher/OnSave/OnLoad/Dump；已读整个文件没有公开通用 SetVariable 方法。直接写 TheWorld.state[key] 只是写别名表，未经过这个通知函数。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/worldstate.lua",
+          "symbol": "constructor/SetVariable",
+          "line_start": 5,
+          "line_end": 48,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+          "range_sha256": "b3ada57583301a7ce8d25f781d01502bc8e8d59ca72b20c0298a0b732ac86bec",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "342938b077e4aba736bf446617acac56ffa54c8acb35991f5f13ad3e535e40f7",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldstate.lua#L5-L48",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/worldstate.lua",
+          "symbol": "world event projections",
+          "line_start": 54,
+          "line_end": 158,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+          "range_sha256": "f9be500220c3b843d8784bd6b9c2288aa383d48f23700a1d585ac0f7171a470d",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "5a91616803fcc2d59656a40c893e9df6596a4e93b55fe82251816774b7740bc1",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldstate.lua#L54-L158",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/worldstate.lua",
+          "symbol": "default values and listeners",
+          "line_start": 177,
+          "line_end": 271,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+          "range_sha256": "2803996bb924008c1ce5c577b8720ac2c8d5708a04150f5e29e2973eec85687a",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "461ad0e06eb980f4ade45201cd00d0b3d75b9e482eeae479a0f442fdb5f76902",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldstate.lua#L177-L271",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/worldstate.lua",
+          "symbol": "public/save/debug members",
+          "line_start": 277,
+          "line_end": 366,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+          "range_sha256": "0cb1361255b0020a95bb2205f607cce0c282f2493a323efe2d9b1294281f04de",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "ddcb750a5de422869ec1c3426370b24b239d11c496d218411a54e9fec1240e57",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldstate.lua#L277-L366",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "HOOK-008 已覆盖 watcher 注册与通知；本条新增事件投影/默认值定位和没有公共通用 setter 的代码边界。",
+      "limits": [
+        "“没有公开方法”限定本文件导出的组件接口；不声称其他 Mod 不能自行扩展它。直接表赋值无该函数通知，是 Lua 可见路径事实。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-003",
+      "title": "WorldState 保存全部键，但加载只接受当前已有键",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFactWithExplicitBoundedInference",
+      "statement": "worldstate:OnSave 创建新表并以 pairs 浅拷贝 self.data 的全部键值。OnLoad 遍历输入，仅在 self.data[k] ~= nil 时直接赋值，并打印；没有调用 SetVariable 或遍历 watcher。故构造/读档前不存在的额外 Mod 键，即使曾随该 OnSave 写出，也不会由此 OnLoad 创建；若 Mod 在加载前显式建立非 nil 键，这个条件允许它恢复，但仍没有这里的 watcher 回放或自动跨 shard 同步。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/worldstate.lua",
+          "symbol": "OnSave/OnLoad",
+          "line_start": 331,
+          "line_end": 347,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+          "range_sha256": "00843621a0147af59dabab54745abb85c8d57804913d523fdf4ba188df669002",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "fcca42cfb93eaa05c6a16fd83e10c34ee52383f393b4b4e28e2bcfc107ebc1bc",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/worldstate.lua#L331-L347",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "实质新增：现有 HOOK-008 未覆盖 WorldState 的保存/已知键恢复边界。",
+      "limits": [
+        "浅拷贝不证明任意值都能被外层序列化。跨 shard 无自动同步是结合所读独立 shard 通道后的有界否定，非所有扩展代码的排除。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-004",
+      "title": "一次 SaveGame 会分别处理 world 与 user session",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "SaveGame 独立采集 map.persistdata、world_network.persistdata 和可选 shard_network.persistdata；非 shutdown 且 AllPlayers 非空时建立 snapshot.players。随后循环 AllPlayers，仅对 userid 非空者记录 snapshot 玩家 ID 并调用 SerializeUserSession(player)。世界序列化由之后的 SerializeWorldSession(data, session_identifier, callback, metadataStr) 发起；其 callback 再推进 snapshot、世界 overrides、ShardGameIndex 保存及 time file，最终 EndWorldSave/cb。这是 Lua 编排顺序，未展示用户会话和世界文件之间的原子提交。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/mainfunctions.lua",
+          "symbol": "SaveGame world/session boundaries",
+          "line_start": 1116,
+          "line_end": 1179,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "range_sha256": "b10ff6f6a7fc3f7923dc59fa575324c538b98e5d57c57e3f51af8ef1b3c39d8d",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "24a3bf8be87f8643686c401e7df312f6dc9372f4b890421ce70f17dc39d83eb5",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/mainfunctions.lua#L1116-L1179",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/mainfunctions.lua",
+          "symbol": "SaveGame callback/SerializeWorldSession",
+          "line_start": 1241,
+          "line_end": 1273,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "range_sha256": "0146fe472a998d41458dd18e89fe6356e9cc99424a9235ae16cb48ecc50a78a3",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "9339b44fcb382ab87cac92cd51fde1ffe22404586d09dd6fff1324a624a4be78",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/mainfunctions.lua#L1241-L1273",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "WORLD-001 已覆盖 world/network 保存与 callback；新增 AllPlayers user-session bridge，明确不把玩家会话当 world 组件。",
+      "limits": [
+        "用户 SerializeUserSession 条件与返回边界继续引用 SHARD-003，不重做 Player 持久化研究。磁盘原子性、fsync、崩溃恢复未知。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-005",
+      "title": "一个 world 管理器可以同时拥有业务真值和派生索引",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "farming_manager 只允许 mastersim；它持有 nutrientgrid、moisturegrid、drinkersgrid、overlaygrid。InitializeDataGrids 在 nutrientgrid 已存在时提前返回，否则按 map 尺寸建立四个网格并启动组件任务。OnSave 显式保存营养/湿度网格、剩余杂草任务、果蝇队列标记和版本，未保存 drinkersgrid/overlaygrid；OnLoad 解码并根据版本恢复营养/湿度，遍历 FARMING_SOIL 地块执行 OnTerraform，重新建立相应展示/地块运行逻辑。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/farming_manager.lua",
+          "symbol": "ownership and grids",
+          "line_start": 25,
+          "line_end": 60,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+          "range_sha256": "851704af65aeb6686828dc22f26d99b44a038dd92436c05df81d5df279528287",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "9073384098d1a3f22083b447f896333748f6daae7214c3a35b99accd1bb071ad",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/farming_manager.lua#L25-L60",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/farming_manager.lua",
+          "symbol": "InitializeDataGrids",
+          "line_start": 127,
+          "line_end": 138,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+          "range_sha256": "bf2091f900080cb4e5e8c9c80b15ce4f11b8bb46361c429012d1f2a9c3bf246e",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "f7024bb0312e92a6b4e9df96f406586c5fef4e988e816713e1fa8c02570bc377",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/farming_manager.lua#L127-L138",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/farming_manager.lua",
+          "symbol": "OnSave/versioned OnLoad",
+          "line_start": 480,
+          "line_end": 555,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+          "range_sha256": "aa70424ec3f45a5e522bc7a9083ea74f173f6ea3742d7b08476b9ef0a74e545a",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "e2ff138ce88e388893fa3fab9e4c594038f3a3e8e740fbaa69a6195d6d4f6c79",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/farming_manager.lua#L480-L555",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/farming_manager.lua",
+          "symbol": "OnTerraform rebuilds nutrients_overlay",
+          "line_start": 144,
+          "line_end": 180,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+          "range_sha256": "21af3ab1e62a7b49c94cf98a3021d243fdee07cef0fb30589532b8984a400376",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "c98ffcc8d5b0d226bf5061eca6e557f9df6275464096b9d9abd437cdbbc64fd9",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/farming_manager.lua#L144-L180",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "新管理器样本支撑“真值与可重建索引分别设计”，不是新增一份通用 OnSave 合同。",
+      "limits": [
+        "这里只审查选定网格/保存段，不把整个 farming 系统列为已研究；压缩/底层网格编码或原生保证未证明。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-006",
+      "title": "物品身份持久化与玩家实例查找由不同持有者负责",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "linkeditem:OnSave 返回非空 owner userid/name 数据，不保存 owner_inst；OnLoad 设置 userid/name，并在 userid 非空时向 TheWorld 重新发 ms_registerlinkeditem。LinkToOwnerUserID 对同 userid 提前返回，换 owner 时先 unregister 旧 owner 再 register 新 owner。linkeditemmanager 只允许 mastersim，建立 linkeditems 和 players 表，先处理 AllPlayers，再监听 world 的 joined/left/register/unregister；OnPlayerJoined/Left 忽略 is_snapshot_user_session，进入时按 userid 绑定当前 player，离开时把物品 owner_inst 清空并移除 players[userid]。manager 该文件没有 OnSave/OnLoad。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/linkeditem.lua",
+          "symbol": "LinkToOwnerUserID",
+          "line_start": 61,
+          "line_end": 76,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "276b16be1504daacc7ec337232c1e7ab6b0348cc1af48c7f5500b5a9c9572ce9",
+          "range_sha256": "e7135fdf913fd2f2c3c6cbbbae78a2638a3eb895f4d8ded2de8193e1b9a9496d",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "3583c2bb68e2b3070d15c1bff0098b8e1480d3d8cd28b48158043e6b5e02bbb1",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/linkeditem.lua#L61-L76",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/linkeditem.lua",
+          "symbol": "SetOwnerInst/OnSave/OnLoad",
+          "line_start": 94,
+          "line_end": 144,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "276b16be1504daacc7ec337232c1e7ab6b0348cc1af48c7f5500b5a9c9572ce9",
+          "range_sha256": "f23a1446d3d15c4fa6fe7fd8e62a19d1be1bb4d44a581b5bbec688d5964d6d48",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "9ca8c5e43c6a4ae42fb24f72ced7e19ebda80f87bd4999b15f17c3f39d26b118",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/linkeditem.lua#L94-L144",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/linkeditemmanager.lua",
+          "symbol": "constructor events",
+          "line_start": 5,
+          "line_end": 33,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "fcceb2fc2e9a3e98eb6882a9b83dd0c955b387c0ae2f49b17f9a6fb22dcb6493",
+          "range_sha256": "e0624de88617bcf0c4f8edf44ea417da57a1a2383343c1c166629c5afa4ba238",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "e55be13e4c05a148f436b42cc6a1aba02b899953fbb2783bea780380961d53f7",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/linkeditemmanager.lua#L5-L33",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/linkeditemmanager.lua",
+          "symbol": "current player/item indexes",
+          "line_start": 55,
+          "line_end": 129,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "fcceb2fc2e9a3e98eb6882a9b83dd0c955b387c0ae2f49b17f9a6fb22dcb6493",
+          "range_sha256": "77ad3bc394eed47f11bd96b18f09b1ae8c2d16719edc9fb88c1548f09dd14469",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "771492a0d41cae71fc0d640b1c1dc5da3b812c912ad75831dd39d8819e0a0ac1",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/linkeditemmanager.lua#L55-L129",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "新样本把 entity 的耐久业务 ID 与 world manager 的运行期 player/entity 引用拆开；不重做玩家会话字段。",
+      "limits": [
+        "不把 net_string 编码或跨 shard 分发当成已证明；manager 的没有保存入口限定整个所读文件。稳定 userid 在本样本用于查找，不能泛化为所有 Mod 身份键的充分性。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-007",
+      "title": "world 上 registry 的去重和移除清理由具体代码实现",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "forest 的 master_postinit 明确添加 townportalregistry 和 linkeditemmanager。townportalregistry 的注册事件扫描已有 portal，命中同实例就返回；正常登记保存实例并监听它的 onremove。移除时删除表项/链接并按同 callback、source 撤销事件。其完整文件 Save/Load 段为空，没有 OnSave/OnLoad。此处 townportal 是同 world 注册器样本，不能等同为 worldmigrator/shard portal 协议。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/forest.lua",
+          "symbol": "master_postinit managers",
+          "line_start": 638,
+          "line_end": 672,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "ead58ea263ac72f889f1c78acb83f9d61d03427fc46543b30f7397efaf02fc71",
+          "range_sha256": "e6219180ac1af577e348dec4ce032d39a273bb81e4c117f5265ed418b49642d7",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "adb5d55a8a5ee0e12bee3a4f95e8ac142be7f949ecb0303cc0e355890733acef",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/forest.lua#L638-L672",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/townportalregistry.lua",
+          "symbol": "OnRemove/OnRegisterTownPortal",
+          "line_start": 64,
+          "line_end": 97,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "f630829188ba1c9221b90d445be95574334a23eba6f6c514cd0266f6de74ca25",
+          "range_sha256": "c8d034af8899c428772b39dc978f38d1973e1157e0d30c49f9eb4633af762385",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "9e319757d6a1e0b4029c9fa03a2bf0b17ff3fbae561ea821a9ae3d8938dda6ae",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/townportalregistry.lua#L64-L97",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/townportalregistry.lua",
+          "symbol": "event installation/no SaveLoad methods",
+          "line_start": 158,
+          "line_end": 202,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "f630829188ba1c9221b90d445be95574334a23eba6f6c514cd0266f6de74ca25",
+          "range_sha256": "f075f39a0b853e0891e220827a8bfed7a3b383c76be5b0899d78a1a2fde98d59",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "1e1782e0ed517d781128e855f1cbcab27e06b3de04562422267b7a39cf58fafa",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/townportalregistry.lua#L158-L202",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "新增具体去重/cleanup/derived registry 样本；通用事件 Hook 合同仍复用 HOOK-005/007。",
+      "limits": [
+        "管理器附着 world 不自动赋予跨 shard singleton。去重仅按同运行实例判定，不是跨加载身份去重。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-008",
+      "title": "world 与具体世界名字可同时触发专属 Prefab Hook",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFactWithExplicitBoundedInference",
+      "statement": "MakeWorld.fn 在完成 common_postinit 后将实例 prefab 设置为 world；MakeWorld 的 master_postinit 位于非 mastersim 返回之后。SpawnPrefabFromSim 先构造，再运行实际实例 prefab 名专属 Hook；实际名与请求名不同则继续运行请求名专属 Hook。由此请求 forest 而实例名 world 的路径可分别运行 world 与 forest 回调；将相同安装器注册于两处会产生两个安装机会。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/world.lua",
+          "symbol": "world name/common and client return",
+          "line_start": 547,
+          "line_end": 565,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "089d49a83c0dc65643ddc59614e37606ed934a81c3e2fa09b49dcb467b6f128c",
+          "range_sha256": "8e1ca54369b1cee526c1dc6fa8dcb9f032d970d5c10f4c49399baee28d55ebce",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "d4d5ff5b96e4c7807656389942787f0936a850895d431aa6550968cee64fdb43",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/world.lua#L547-L565",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/world.lua",
+          "symbol": "master_postinit",
+          "line_start": 583,
+          "line_end": 595,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "089d49a83c0dc65643ddc59614e37606ed934a81c3e2fa09b49dcb467b6f128c",
+          "range_sha256": "137431921ae6e3eae7d2afdb9ac5b9af15a85c9ab0a3f91d3190c5a57b8dad00",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "59e42234677003026cc29ab17012189b4dd60d48db280222023e4b8d471428ab",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/world.lua#L583-L595",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/mainfunctions.lua",
+          "symbol": "actual/requested PrefabPostInit dispatch",
+          "line_start": 361,
+          "line_end": 385,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "range_sha256": "7dab0cdc705c0a6dc958eef3561f7e034ddba82c9f10df9d91cff4337daf25ee",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "5bc49dc1dbd01d3128fb2a62b10842948def9cc96639e2f238c6a198dfff9a69",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/mainfunctions.lua#L361-L385",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "仅作为已有 HOOK-002 的具体 world 应用案例，禁止另立同义底层合同。",
+      "limits": [
+        "两处同函数不自动去重是工程推论；实际 Mod 是否双注册取决于 Mod 代码。PrefabPostInit 此时并非完成地图、LoadPostPass 或 World:PostInit。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-009",
+      "title": "shard_network 的初始化不是 world PostInit 的同一入口",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFact",
+      "statement": "shard_network 构造要求 TheWorld 存在、TheWorld.shard 为空且 world.ismastersim；它设置 TheWorld.shard、persists=false、AddShardNetwork，并安装 shard_* 组件；末尾以 inst:DoTaskInTime(0, PostInit) 安排初始化。该 PostInit 先 LongUpdate(0)、FlushLocalDirtyNetVars，再以 pairs 调组件 OnPostInit。world.PostInit 直接调用的是 inst.net:PostInit，再 world:LongUpdate(0) 与 world 组件 OnPostInit，未直接调用 inst.shard:PostInit。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/shard_network.lua",
+          "symbol": "PostInit/fn",
+          "line_start": 1,
+          "line_end": 49,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "7e6949257b0fb22137273febad70a48d6eed40633fd32e3401b9a216bfe0a612",
+          "range_sha256": "c8fe1a6e21466b0962a41e62b6d0b77587c2c8c3c3fb1945a1b8f85f823eeb04",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "2ff1da6f3197c511316d4ce045b611c53962b3dccfbb06d90e14e9ac6be46601",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/shard_network.lua#L1-L49",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/world.lua",
+          "symbol": "world PostInit",
+          "line_start": 335,
+          "line_end": 355,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "089d49a83c0dc65643ddc59614e37606ed934a81c3e2fa09b49dcb467b6f128c",
+          "range_sha256": "ee92d8e2afcf3a8dcd20dc68f6649cad6aa5ad692605b08e290ea9382e34d516",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "10990882a040b56632abb6567da1d03698908d728a5fde8f863fbf2182b3ab4a",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/world.lua#L335-L355",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "扩展已有 SHARD-006/WORLD-002，新增 shard 初始化独立任务与 dirty flush 的 Lua 可见阶段。",
+      "limits": [
+        "零延时非当前调用栈执行复用 HOOK-006。pairs 不建立组件总序。FlushLocalDirtyNetVars 不证明远端已收到或 durable。"
+      ],
+      "runtime_tested": false
+    },
+    {
+      "id": "N006-WR-010",
+      "title": "mirror 的本地保存入口不等于多 writer",
+      "layer": "Reviewer",
+      "claim_kind": "DirectSourceFactWithExplicitBoundedInference",
+      "statement": "clock 与 seasons 的 OnSave/OnLoad 都以 _ismastersim 为定义条件，并未限定 _ismastershard；clock/seasons 的次 shard 接收函数则明确以 _ismastersim and not _ismastershard 为条件，消费 secondary_*update 并写本地 netvars。结合主 shard producer/次 shard mirror 通道，次 shard 的本地持久入口可以存在，不能据此把它提升为全服状态 writer。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/clock.lua",
+          "symbol": "OnClockUpdate secondary",
+          "line_start": 259,
+          "line_end": 270,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "e15702779a31cd7d3ef23cd7e761079bf44032c2f5c04b349fdb457ed9343925",
+          "range_sha256": "d4516bc8834afe3cc05cfad9f21708d37d8fe61869794bc305fa12e91c99272d",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "cfb48c713875173caf1992c389836543ab418bc46527b49a61c274d75b820acc",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/clock.lua#L259-L270",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/clock.lua",
+          "symbol": "mastersim OnSave/OnLoad",
+          "line_start": 449,
+          "line_end": 478,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "e15702779a31cd7d3ef23cd7e761079bf44032c2f5c04b349fdb457ed9343925",
+          "range_sha256": "10e933078c578c25944e200ee624a013b29af12b21b71ae4130b6456944559d8",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "c94fad0d108939a0fa303124f4518c5b17bd6eaa568421667eb35b3fc7a12433",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/clock.lua#L449-L478",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/seasons.lua",
+          "symbol": "OnSeasonsUpdate secondary",
+          "line_start": 423,
+          "line_end": 432,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "3a00c4c9e11928f5c16bde8a0df48cafe5814bc9e29311922166310bac548e4b",
+          "range_sha256": "d3133ce250b8f44985d6b7457570124c5819cafb1ccfcad6e38e1115f3085a61",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "31013b921e3848ca3e35d99c9ce832d7b37c2f3f672c9fe72a893f3433731a08",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/seasons.lua#L423-L432",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/seasons.lua",
+          "symbol": "mastersim OnSave/OnLoad",
+          "line_start": 484,
+          "line_end": 539,
+          "line_numbers": "inclusive 1-based",
+          "file_sha256": "3a00c4c9e11928f5c16bde8a0df48cafe5814bc9e29311922166310bac548e4b",
+          "range_sha256": "8ef6c5840df972bde82423d2ed3b4d885092a07de849b6a337ebfaaac8416db0",
+          "range_hash_convention": "sha256(UTF-8 decoded with optional BOM removed; splitlines(); inclusive 1-based line slice joined with LF; no terminal LF). Same normalized range convention as v04 INTEGRATION.md. file_sha256 hashes exact snapshot bytes, preserving original line endings.",
+          "exact_byte_range_sha256": "b0989549d3c60921a641fe5864c49433f0d94b6eb09e6c9e9977c9f92425450e",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/seasons.lua#L484-L539",
+          "citation_scheme": "LF_joined_lines_no_trailing_newline"
+        }
+      ],
+      "newness_vs_reuse": "N002-C09 已覆盖 writer/mirror；新补点是本地 Save/Load 的 mastersim-only 条件与 writer 条件并不相同。",
+      "limits": [
+        "主 writer 的完整时钟/季节算法不重做；同步、保存、跨 shard recovery 不具同一语义。"
+      ],
+      "runtime_tested": false
+    }
+  ],
+  "compact_coding_candidates": [
+    {
+      "id": "N006-WC-01",
+      "title": "先选真值持有者，再选保存和查找结构",
+      "question_ids": [
+        "W01",
+        "W03",
+        "W07"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "按谁的寿命、迁移范围和写权限划分：角色个人随行状态放在明确 player/entity 保存入口；单世界规则与地块真值可由 world 组件负责；跨 shard 状态先指定 writer 和同步协议；lookup/cache 与真值分离，可重建时不另存第二份。",
+      "reviewer_fact_ids": [
+        "N006-WR-001",
+        "N006-WR-004",
+        "N006-WR-005",
+        "N006-WR-006"
+      ],
+      "reuse_ids": [
+        "VANILLA-INV-006",
+        "VANILLA-WORLD-001",
+        "VANILLA-SHARD-003"
+      ],
+      "code_critical": "组件 OnSave 返回非空 table，实体 OnSave(self, data) 对现有 data 写字段且返回 refs；OnLoad 与 LoadPostPass 阶段不同。",
+      "avoid": "用普通 Lua 字段、TheWorld.state 额外键或管理器内 entity 引用假装已经持久化/跟随迁移。"
+    },
+    {
+      "id": "N006-WC-02",
+      "title": "WorldState 作为观察入口，初始化当前值另做",
+      "question_ids": [
+        "W02"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "使用 WatchWorldState(var, fn) 观察已有生产者；按 hook/load 阶段读取当前 TheWorld.state[var] 并初始化一次，保留同一 fn identity 以 StopWatchingWorldState(var, fn) 清理。Mod 自己的真值优先写到有显式 OnSave/OnLoad 的组件，并另设计通知与跨 shard mirror。",
+      "reviewer_fact_ids": [
+        "N006-WR-002",
+        "N006-WR-003"
+      ],
+      "reuse_ids": [
+        "VANILLA-HOOK-008"
+      ],
+      "code_critical": "entity watcher 回调 target 是 entity；component watcher target 是 component。普通 fn(target, val)，start/stop fn(target)。注册不会立即回调；OnLoad 直接赋值也不回放 watcher。",
+      "avoid": "给 state[key] 赋值就期待 watcher、netvar 或跨 shard 自动通知；说所有额外键都绝对无法恢复。"
+    },
+    {
+      "id": "N006-WC-03",
+      "title": "安装器幂等与 teardown 按真实生命周期写",
+      "question_ids": [
+        "W06"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "先按所需实例/组件/class 阶段选 Hook，再把安装 guard 放到实际持有对象上；同一实例多个安装机会用明确 guard，记录 listener/world watcher/task identity，组件移除与实体移除各写匹配的清理入口。包装方法必须保存旧方法、保留原参数/返回值，选择真实运行入口而非假设某个 Hook 等于该方法执行。",
+      "reviewer_fact_ids": [
+        "N006-WR-007",
+        "N006-WR-008"
+      ],
+      "reuse_ids": [
+        "VANILLA-HOOK-001",
+        "VANILLA-HOOK-002",
+        "VANILLA-HOOK-003",
+        "VANILLA-HOOK-004",
+        "VANILLA-HOOK-005",
+        "VANILLA-HOOK-006",
+        "VANILLA-HOOK-007"
+      ],
+      "code_critical": "AddPrefabPostInit(prefab, fn); AddComponentPostInit(component, fn) 执行 fn(loadedcmp, inst); AddPlayerPostInit(fn) 仅 player tag；AddClassPostConstruct(package, postfn) 先旧 ctor 后 postfn。RemoveComponent→OnRemoveFromEntity，Entity Remove→组件 OnRemoveEntity，不是同名入口。",
+      "avoid": "重复注册依赖框架去重；world 与 forest 同安装器无 guard；ClassPostConstruct 假装修改已有实例或包裹未来任意方法调用。"
+    },
+    {
+      "id": "N006-WC-04",
+      "title": "把 world 构造、恢复与完成初始化分开",
+      "question_ids": [
+        "W03",
+        "W06"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "PrefabPostInit 用于实例构造后的接入；需要 map 尺寸/已恢复 entity refs/其他组件状态时使用目标 world/component 明确阶段，不假设构造 hook 已经 LoadPostPass/World:PostInit。依赖顺序用显式协议，而非 pairs 总序；shard_network 有独立零延时 PostInit 任务。",
+      "reviewer_fact_ids": [
+        "N006-WR-008",
+        "N006-WR-009"
+      ],
+      "reuse_ids": [
+        "VANILLA-WORLD-002",
+        "VANILLA-HOOK-006"
+      ],
+      "code_critical": "OnLoad 不是 LoadPostPass；World 组件 OnPostInit 按 pairs 调用。DoTaskInTime(0, fn) 在后续 tick，不是同步 fn。",
+      "avoid": "把晚安装 AddPrefabPostInit 当现有 world 扫描/补初始化。"
+    },
+    {
+      "id": "N006-WC-05",
+      "title": "每个 shard 是服务端，writer 仍需唯一指定",
+      "question_ids": [
+        "W04"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "本 shard 业务写入按 ismastersim；全服共享字段按需求指定 ismastershard 或明确 writer，并采用具体同步路径，次 shard 镜像消费预期来源。ShardRPC sender 是 shard ID；namespace 不是目标 shard。普通项目到此即可按明确需求实现；只有兼容、去重、过期消息或恢复是实际需求时，再增加相应字段和机制，不能因为原生保证 UNKNOWN 就强制引入通用协议框架。",
+      "reviewer_fact_ids": [
+        "N006-WR-001",
+        "N006-WR-010"
+      ],
+      "reuse_ids": [
+        "VANILLA-SHARD-001",
+        "VANILLA-SHARD-006",
+        "N002-C09",
+        "N002-C10"
+      ],
+      "code_critical": "ismastershard = ismastersim and not TheShard:IsSecondary()；不要以本地 OnSave 存在或 dirty event 判断自己是全服 writer。",
+      "avoid": "Send/dirty/FINALIZED 等于可靠交付、strict ordering、写盘或跨 shard exactly-once。"
+    },
+    {
+      "id": "N006-WC-06",
+      "title": "迁移和回档只承诺明确的 Lua 保存边界",
+      "question_ids": [
+        "W05",
+        "W08"
+      ],
+      "kind": "EngineeringRecommendation",
+      "recommendation": "随 player 迁移的状态接入其明确保存/恢复路径，源 world 的 registry 保持可清理可重建。对 restart/rollback 只说已观察的 Lua 序列化/恢复时序；disk durability、跨 shard recovery 保持未知。具体 Mod 的联机、迁移、断线、重连、重启和 rollback 验收归 ProjectAcceptanceModQA。",
+      "reviewer_fact_ids": [
+        "N006-WR-003",
+        "N006-WR-004",
+        "N006-WR-006"
+      ],
+      "reuse_ids": [
+        "VANILLA-SHARD-003",
+        "VANILLA-SHARD-004",
+        "VANILLA-WORLD-001",
+        "VANILLA-WORLD-004",
+        "N002-C10"
+      ],
+      "code_critical": "migration.worldid 是来源，StartMigration 参数是目标；Lua SerializeUserSession 包装未返回写盘成功供 PlayerRemove 检查。",
+      "avoid": "在本静态前研究中启动 runtime harness，或将未来 Mod QA 宣称为 N006 Native gap。"
+    }
+  ]
+}

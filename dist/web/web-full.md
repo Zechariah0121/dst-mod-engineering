@@ -1,6 +1,6 @@
 # dst-mod-engineering / web-full
 
-生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`bbd944fee74aa95f678952a1105421607531650046e362cd5c390dc5f63ca799`。
+生成器：`dst-mod-engineering/web-bundle-v1`；源码指纹：`22955607c9f2d3fe965b1ef02e01525e61c8fcebc765e386eeabe0f38ff7f3b6`。
 
 这是从仓库原文生成的阅读包；正文只改写 Markdown 链接目标。段落 SHA-256 对应原始文件字节，不是改写后的正文。未包含的文件、未实际访问的链接及未展开的附件不能算作已读；上传阅读包不等于安装本地工具，也不证明游戏验证通过。公开链接指向 main，可能晚于本包快照。
 
@@ -15,6 +15,38 @@
 - `docs/knowledge-integration.md`
 - `docs/licensing.md`
 - `docs/public-limits.md`
+- `knowledge/CASE-002-AGENDA.md`
+- `knowledge/CHANGELOG.md`
+- `knowledge/GOVERNANCE.md`
+- `knowledge/INDEX.md`
+- `knowledge/KB-v0.1.1-Migration-Report.md`
+- `knowledge/README.md`
+- `knowledge/RELATIONS.md`
+- `knowledge/SOURCES.md`
+- `knowledge/VALIDATION.md`
+- `knowledge/anti-patterns/case001.md`
+- `knowledge/cases/CASE-001-sora/README.md`
+- `knowledge/corrections/CASE-001.md`
+- `knowledge/corrections/claims.md`
+- `knowledge/decisions/candidates.md`
+- `knowledge/facts/klei-lua.md`
+- `knowledge/failures/case001.md`
+- `knowledge/patterns/PATTERN-FRAMEWORK-001.md`
+- `knowledge/patterns/PATTERN-NET-001.md`
+- `knowledge/patterns/PATTERN-SHARD-001.md`
+- `knowledge/patterns/PATTERN-WORLD-001.md`
+- `knowledge/playbooks/ARP-DST-001.md`
+- `knowledge/research/native001/linked-history/native-runtime-pass01-20261004/delivery/NATIVE-001.1-Runtime-Pass01.md`
+- `knowledge/rules/framework.md`
+- `knowledge/rules/hook.md`
+- `knowledge/rules/life.md`
+- `knowledge/rules/net.md`
+- `knowledge/rules/persist.md`
+- `knowledge/rules/resource.md`
+- `knowledge/rules/shard.md`
+- `knowledge/rules/state.md`
+- `knowledge/rules/world.md`
+- `knowledge/tests/candidates.md`
 - `references/agent-setup.md`
 - `references/animation-recipes.md`
 - `references/assets-animation.md`
@@ -43,7 +75,7 @@
 
 ## 来源：`SKILL.md`
 
-原始 SHA-256：`ace4f20dd038cee5b733740e46478bb00e8f4338cef56fb4c471d1ce8a0d3380`
+原始 SHA-256：`4db58ae73fc5bf3abf59db27aadb77d27e6d54aca7eb15316377f1b16af7bcd4`
 
 ---
 name: dst-mod-engineering
@@ -52,7 +84,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-面向 DST 开发、审查与排错的独立 Skill，可配合合法本地源码使用。完整 KB/MCP 不在本包；可选接入见 [知识库说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。安装见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)；English entry: [README.en.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)。
+面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 当前 187 条公开知识（64 基础 + 13 Native AI + 110 Core）。完整包另含 MCP 九工具服务与本地来源准备；独立 Skill 和网页阅读包可直接按文件读库。安装与接入见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) 和 [知识库说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)；English entry: [README.en.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)。
 
 当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
 
@@ -75,7 +107,11 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 工程知识库检索
 
-进入实质性的设计、实现、审查、排错或案例研究时，知识库可用则按任务主动检索，不等待用户提醒；简单机械编辑无需重复查询。模式选择、工具发现、证据边界和不可用时的处理见[知识库检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。知识库默认只读，只有用户明确要求维护时才进入知识更新流程。检索能力取决于当前 Agent 实际可用的工具或可读取资料，不要求特定 MCP 服务。
+实质性设计、实现、审查、排错和研究按任务查库；简单机械编辑无需重复检索。优先使用当前会话实际接通的现代 MCP；没有服务时，定向读取 `knowledge/data/index.json` 及相关的 `knowledge/data/native001/canonical-native001-ai-knowledge.json`、`knowledge/data/nativecore/native-core.json`，报告实际记录 ID 与“文件读取”，不默认注入全库。
+
+13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
+
+完整包 MCP 需先从合法当前与历史源码运行来源准备；单份当前 ZIP 仍缺历史范围时，继续文件阅读，不声称完整 MCP 可用。模式、九工具、epoch 连续、角色、预算与证据恢复见 [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
 
 ## 按问题读取
 
@@ -85,7 +121,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 | 当前任务 | 参考文件 |
 |---|---|
-| 工程知识库检索、模式选择、证据边界与维护 | [kb-retrieval.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md) |
+| 187 条知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) |
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md) |
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md) |
@@ -126,6 +162,8 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 - `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
 
 能力、版本与未覆盖范围见 [公开限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
+
+文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 
 
 ---
@@ -335,109 +373,96 @@ PNG/SCML 改动需重编译对应产物，Lua 改动本身不要求重编译美�
 
 ## 来源：`README.en.md`
 
-原始 SHA-256：`3ae51d99ce2ee317a07bb28b24ffed7869a0fa3af4f1fa92cf1459ff46fd0433`
+原始 SHA-256：`d1ad65638cf1025fece6ad65d6925263502deb4877eb41845c94606092c84a78`
 
 # DST Mod Engineering
 
-An AI engineering skill for Don't Starve Together mod development: inspect the current source, then design, implement, review and validate. It covers characters, items, spells, assets, networking, persistence and compatibility. [中文 README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.md)
+An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.md)
 
-The standalone Skill includes engineering guidance, topic references and three helper scripts. **It does not include the complete engineering KB, an MCP server, game source or private mod projects.** It can work with your legally obtained local source without an additional KB.
+The current KB is in `knowledge/`: **187 records comprising 64 foundation records, 13 Native AI records and 110 Native Core records**. All three downloads include the public knowledge data. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
 
-## Downloads
+## Download
 
-[Public Beta 1 release](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25).
+Release: [v2026.10.25.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.1). Start with the full package for local use.
 
-| Asset | Use |
+| File | Contents |
 |---|---|
-| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Install the Skill, references and three developer helpers |
-| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | Topic-based reading for web chat or offline use |
-| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | Full public repository, including the earlier 64-entry reference KB and its read-only MCP service |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering-full.zip) | Skill, 187 public records, development helpers, source preparation and the nine-tool MCP service `0.3.0` |
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering.skill.zip) | Installable Skill, references, 187 public records and three development helpers; no MCP service or source preparation tools |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip) | Web/offline reading material and 187 public records; no MCP service or source preparation tools |
 
-Verify downloads with the release's `SHA256SUMS.txt`. The public snapshot excludes the separate private full KB and private research.
+Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
 
-## Install and use
+## Start
 
-1. Download the standalone Skill attachment from the [repository releases](https://github.com/Zechariah0121/dst-mod-engineering/releases) and fully extract it. Locate the `dst-mod-engineering/` directory that directly contains `SKILL.md`.
-2. Copy the complete directory to a skill location supported by your agent, such as `.agents/skills/dst-mod-engineering/` in a Codex project or `.claude/skills/dst-mod-engineering/` in a Claude Code project. Preserve existing customizations. See [installation](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) for personal locations and other agents.
-3. Invoke `dst-mod-engineering` and provide your task, mod directory, actual DST version and local `scripts.zip` location. Confirm that the Skill and relevant references are readable. If discovery is unavailable, explicitly provide the path to `SKILL.md`.
+Extract the package completely and install the directory containing `SKILL.md` in a supported agent skill location. Invoke `dst-mod-engineering` with your task, mod directory, actual game version and authorized local source. Without MCP, read a small relevant subset from the knowledge files. See [installation](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) and [KB integration](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md).
 
-For web chat, use attachments or a supported native skill-import feature as described in the [web guide](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md). Most detailed references are in Chinese.
+For MCP, run from the full package root with Python 3.10+ and SQLite FTS5:
 
-## Entry points
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<authorized retained 756039 scripts.zip or source directory>"
+python -B -X utf8 run_kb.py mcp-config
+```
 
-| Task | Where to start |
-|---|---|
-| Characters, spells, items, recipes, UI or assets | Topic index in [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) |
-| Source investigation, crashes, networking or save issues | Definitions, callers, execution side, initialization, cleanup and persistence |
-| Syntax, API declarations or isolated server checks | [Testing and delivery](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) |
-| An existing KB | [Optional KB integration](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md); inspect the actual service and version |
+The current `759671` ZIP alone still lacks 13 historical ranges across 9 older Lua files. Without those sources, file reading remains available, but the complete MCP runtime is not ready. Apply the printed configuration in your client; its server command is `python -B -X utf8 run_kb.py serve`. Printed configuration does not prove a successful connection or query.
 
-The scripts need Python 3.10+. Syntax checks additionally need `luaparser` from `requirements.txt`. The server test helper supports Windows only. Reading the Skill needs no script execution. Install asset tools only as needed; see [tool sources and validation](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md).
+Prepared `cache/runtime/` contains locally restored game source excerpts and must stay local. A `$dst_source_payload_slot` in public JSON is a missing local-source slot, not source already read or behavioral evidence. Public evidence consists of reviewed excerpts, not complete original research; withheld private context remains `UNK`.
 
-Versioned notes and examples have bounded scope. They do not guarantee compatibility with the latest game or every mod. Report static, server, real remote-client, visual and audio validation separately. See [capabilities and limits](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md).
+Use [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) for topic routing, [retrieval rules](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md) for Scope and admission, and [testing](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) for validation. Real game, remote-client, visual, audio and cross-version behavior need separate evidence; see [limits](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md).
 
-## Optional public reference KB
-
-The full public repository retains the earlier **v0.1.1, 64-entry** reference KB and its read-only service.
-See the [KB entrypoint](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) and [MCP setup](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md).
-The standalone Skill ZIP excludes both. This is a bounded historical reference set, not a complete or current-game knowledge claim.
-Read each entry's status, source version, evidence and unexecuted test candidates.
-
-## License
-
-Project-owned material uses the [custom non-commercial LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE), not MIT or an OSI open-source license. Commercial use requires separate written permission. Valid historical MIT grants and third-party rights remain in force. See [licensing](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md).
+Project-owned material uses the [custom non-commercial LICENSE](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE). Commercial use requires separate written permission. Valid historical MIT grants and third-party terms remain in force; see [licensing](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/licensing.md).
 
 
 ---
 
 ## 来源：`README.md`
 
-原始 SHA-256：`7b298062bf7a585823c79ee18b37331e8c44246ad3f1abac613ac7855a4dfefb`
+原始 SHA-256：`c62296da6a9cc92fafae1d6629e6ec7d57b7754dbfe0486cb8e7680f6766ad76`
 
 # DST Mod Engineering
 
-面向《饥荒联机版》Mod 开发的 AI 工程 Skill：核对当前源码，再设计、实现、审查和验证。适合借助 AI 制作角色、物品、法术和资源，也适合排查联机、存档与兼容问题。[English README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)
+面向《饥荒联机版》Mod 开发的工程 Skill 与知识库：按任务读取知识、核对当前源码，再设计、实现、审查和验证。[English README](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/README.en.md)
 
-本独立 Skill 包含工作方法、专题参考和三个辅助脚本，**不附完整工程知识库、MCP 服务、游戏源码或私人 Mod 工程**。没有额外 KB 时，仍可配合你合法取得的本地源码工作。
+当前公开知识库位于 `knowledge/`，包含 **187 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识**。Skill、独立技能包和网页阅读包均携带这些知识数据；完整包另含现代只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
 
 ## 下载
 
-本版：[Public Beta 1 发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25)。
+本版：[v2026.10.25.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.1)。首次使用建议下载完整包。
 
-| 附件 | 适用方式 |
+| 附件 | 包含内容与用途 |
 |---|---|
-| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering.skill.zip) | Agent 安装；完整 Skill、专题与三个开发辅助脚本 |
-| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/web-reading.zip) | 网页 AI 或离线阅读；按任务选择专题 |
-| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25/dst-mod-engineering-full.zip) | 完整公开仓库；另含64条早期参考知识及其只读 MCP 服务 |
+| [dst-mod-engineering-full.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering-full.zip) | Skill、187 条公开知识、开发辅助脚本、来源准备工具和九工具 MCP 服务 `0.3.0`；适合本地完整接入 |
+| [dst-mod-engineering.skill.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering.skill.zip) | 可安装 Skill、专题、187 条公开知识与三个开发辅助脚本；不含 MCP 服务与来源准备工具 |
+| [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip) | 网页与离线阅读材料、187 条公开知识；不含 MCP 服务与来源准备工具 |
 
-下载校验见发行页的 `SHA256SUMS.txt`。完整公开仓库不包含另行私用的完整版知识库或私人研究材料。
+下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
 
-## 安装与开始使用
+## 开始使用
 
-1. 从 [仓库发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载独立 Skill 附件并完整解压，找到直接含 `SKILL.md` 的 `dst-mod-engineering/` 文件夹。
-2. 把完整目录放入 Agent 支持的技能目录。例如项目内的 `.agents/skills/dst-mod-engineering/`（Codex），或 `.claude/skills/dst-mod-engineering/`（Claude Code）。其他产品与个人安装位置见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)。已有同名目录时先保留定制内容。
-3. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和本地 `scripts.zip` 位置。确认 Agent 能读取 `SKILL.md` 及相关专题；没有自动发现能力时，直接指定该文件的实际路径。
+1. 完整解压，找到直接包含 `SKILL.md` 的目录。把该目录完整放入 Agent 支持的技能位置，例如 Codex 的 `.agents/skills/dst-mod-engineering/`；其他安装位置见 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)。
+2. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和合法本地 `scripts.zip` 位置。没有 MCP 也可按 [知识库接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 读取少量相关知识文件，不默认加载全库。
+3. 使用完整包的 MCP 时，先在包根目录准备合法来源，再生成客户端配置：
 
-网页聊天使用附件或平台支持的技能导入，见 [网页使用指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md)。大部分专题为中文；英文 README 不代表全部内容已翻译。
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<合法保留的756039 scripts.zip或源码目录>"
+python -B -X utf8 run_kb.py mcp-config
+```
+
+需要 Python 3.10+ 与 SQLite FTS5。当前 `759671` ZIP 单独仍缺 13 种历史范围，涉及 9 个旧 Lua 文件；缺少历史来源时仍可文件阅读 187 条知识，但完整 MCP 尚未备妥。将打印配置按客户端要求接入后，入口为 `python -B -X utf8 run_kb.py serve`。配置打印不代表连接或查询成功，详见 [安装与验证](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md)。
+
+准备生成的 `cache/runtime/` 含本地恢复的游戏源码片段，留在本地，不随公开包上传。JSON 中的 `$dst_source_payload_slot` 是待恢复的本地原文槽，不是已读源码或行为证据。
 
 ## 按任务使用
 
-| 目标 | 起点 |
+| 任务 | 入口 |
 |---|---|
-| 实现角色、法术、装备、配方、UI 或资源 | [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) 的专题索引；提供期望效果与触发条件 |
-| 源码研究、崩溃、联机与存档故障 | 追踪定义、调用方、端别、初始化、退出和保存链路 |
-| 语法、API 声明或隔离专服检查 | [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) |
-| 接入已有 KB | [可选知识库](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)，以实际可用服务及其版本为准 |
+| 角色、法术、装备、料理、UI 与资源 | [SKILL.md](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/SKILL.md) 的专题索引 |
+| 知识文件读取、MCP 查询、Scope 与准入 | [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md) |
+| 联机、生命周期、存档、崩溃与兼容 | 核对实际定义、调用方、端别、初始化、退出和保存链路 |
+| Lua 语法、部分 API 声明与隔离专服检查 | [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md) |
+| 网页附件与云端交接 | [网页指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) |
 
-脚本需 Python 3.10+；语法检查另需 `requirements.txt` 中的 `luaparser`。随附专服测试器仅支持 Windows。读取 Skill 无需运行脚本，动画和音频工具按任务另行准备，来源与首次验证见 [工具安装](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/tool-bootstrap.md)。
-
-专题中的版本、样例与源码定位有各自适用范围，不保证当前在线版本或所有 Mod 兼容。静态检查、专服行为、真实远端客户端、视觉与音频分别验证，见 [能力与版本限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
-
-## 可选公开参考知识库
-
-完整公开仓库保留 **v0.1.1、64条**参考知识和只读检索服务，内容范围与该版本的来源说明保持不变。
-需要时阅读 [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-engineering-kb/README.md) 和 [MCP 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25/dst-kb-service/README.md)；独立 Skill ZIP 未携带它们。
-这是可选参考资料，不是最新全量游戏知识；具体条目的状态、版本、证据与未执行测试仍须分别读取。
+公开知识由经审材料生成必要的事实与证据片段，不包含原始研究档案。部分原有私有情境被明确隐藏为 `UNK`，不补写成通用结论。真实游戏、远端客户端、视觉、音频与全版本兼容均需单独验证，见 [能力与限制](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/public-limits.md)。
 
 ## 许可
 
@@ -448,39 +473,76 @@ Project-owned material uses the [custom non-commercial LICENSE](https://github.c
 
 ## 来源：`docs/install-and-use.md`
 
-原始 SHA-256：`87ed14a7ac42ae3050af2560b9218e3c13a0c02780074469a95b16486741edb6`
+原始 SHA-256：`ace08f561b3c29306cc583a842e9ad955219717c0bd489feed5ff1ca1bc6818d`
 
 # 安装与使用 / Installation and use
 
-## 安装独立 Skill
+## 选择下载
 
-从 [发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载 `dst-mod-engineering.skill.zip` 并完整解压。目录应为 `dst-mod-engineering/SKILL.md`，同时保留 `references/`、`docs/`、`scripts/`、`templates/`、`requirements.txt` 与 `LICENSE`。`web-reading.zip` 只提供阅读材料，不是可安装的 Skill。不要只复制 `SKILL.md`。
+首次本地使用建议下载 [完整包](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering-full.zip)：包含 Skill、187 条公开知识、开发辅助脚本、来源准备工具与现代 MCP。只需文件阅读时，可用 [独立 Skill ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering.skill.zip)；网页使用 [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip)。三者都带当前知识，后两者没有 MCP 服务与来源准备工具。
 
-选一个安装位置，每种产品的目标路径中都包含 `dst-mod-engineering/`：
+对照同版 `SHA256SUMS.txt` 后完整解压。找到直接包含 `SKILL.md` 的目录，保留其 `knowledge/`、`references/`、`docs/`、`scripts/`、`templates/`、`requirements.txt` 和 `LICENSE`。网页阅读 ZIP 用于资料阅读，不直接当作技能安装包。
 
-| Agent | 项目安装位置 | 个人安装位置 | 调用 |
+## 安装 Skill
+
+选一个位置放入完整 `dst-mod-engineering/` 目录：
+
+| Agent | 项目位置 | 个人位置 | 调用 |
 |---|---|---|---|
 | Codex | `.agents/skills/dst-mod-engineering/` | `~/.agents/skills/dst-mod-engineering/` | `$dst-mod-engineering` 或技能选择器 |
 | Claude Code | `.claude/skills/dst-mod-engineering/` | `~/.claude/skills/dst-mod-engineering/` | `/dst-mod-engineering` |
-| Cursor | `.cursor/skills/dst-mod-engineering/` 或 `.agents/skills/dst-mod-engineering/` | `~/.cursor/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | Agent 聊天中输入 `/` 并选择技能 |
-| GitHub Copilot | `.github/skills/dst-mod-engineering/`；也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | 按所用界面选择或明确命名技能 |
+| Cursor | `.cursor/skills/dst-mod-engineering/` 或 `.agents/skills/dst-mod-engineering/` | `~/.cursor/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | Agent 聊天的 `/` 菜单 |
+| GitHub Copilot | `.github/skills/dst-mod-engineering/`；也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | 所用界面的技能入口 |
 
-`~` 是运行 Agent 的主机的用户目录。Windows 可用用户目录下的对应文件夹。以上位置来自各产品官方文档；官方来源、云端差异与能力要求见 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。
+`~` 属于运行 Agent 的主机。刷新技能列表或重启会话后，确认实际读取的 `SKILL.md`、相关专题和 `knowledge/`。不能自动发现时直接读取其绝对路径。官方来源及云端差异见 [Agent 接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/agent-setup.md)。更新前保存定制版，避免同名副本混淆。
 
-安装后刷新技能列表或重新开始会话，确认实际读取的 `SKILL.md` 路径和相关专题。未自动发现时，直接让 Agent 读取该文件的绝对路径。更新前比较同名目录，保存定制版；回退时恢复旧目录，并确认加载路径。
+提供任务、Mod 根目录、实际 DST 版本与合法本地 `data/databundles/scripts.zip`。没有 MCP 时按 [知识文件入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 选少量相关条目，报告文件读取，不需要安装或启动服务。
 
-Download and fully extract the standalone Skill. Copy the complete `dst-mod-engineering/` directory to one supported project or personal location above. `~` means the home directory on the agent's host. Preserve custom copies, refresh discovery, and verify the loaded file and relevant references. Explicit file reading works when automatic discovery is unavailable.
+## 完整包：准备来源并接入 MCP
 
-## 提供 Mod 与当前源码
+需要 Python 3.10+，且其 SQLite 含 FTS5；MCP 与来源准备使用标准库，无需安装 `luaparser`。在完整包根目录运行，替换为自己合法持有的来源：
 
-给 Agent 提供任务、Mod 根目录、实际游戏版本，以及自己合法安装的 DST 中的 `data/databundles/scripts.zip`。在 Skill 根目录运行：
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<合法保留的756039 scripts.zip或源码目录>"
+```
+
+`--source` 可重复，可传 ZIP 或以 `scripts/` 为根、或直接包含 Lua 相对目录的源码文件夹。当前 `759671` ZIP 单独仍缺 13 种历史范围，涉及 9 个旧 Lua 文件；缺项时程序列出所需文件、哈希与行范围。不要用不匹配的当前片段替代历史证据。没有历史来源仍可读取公开知识，但不能启动完整 MCP。
+
+准备读取显式来源，只写 `cache/runtime/`，不改游戏、分发模板或客户端配置。恢复的范围按哈希和长度核对；缓存含游戏 Lua 原文，留在本地，不公开上传。更新包后重新准备。
+
+准备完成后：
+
+```text
+python -B -X utf8 run_kb.py status
+python -B -X utf8 run_kb.py mcp-config
+```
+
+`mcp-config` 是位置子命令，打印当前 Python 与入口路径，不修改客户端配置。把输出按客户端支持格式接入；服务启动命令是：
+
+```text
+python -B -X utf8 run_kb.py serve
+```
+
+这是等待 MCP 输入的 stdio 服务，不提供网页或监听端口。在客户端确认实际 `tools/list` 有九工具，再执行一次任务相关查询并检查响应与来源身份；打印配置或 `validate` 成功不能代替这一步。
+
+命令行查询使用 `call`；只有它接受 `--tool`、`--arguments-file` 与 `--source-epoch`：
+
+```text
+python -B -X utf8 run_kb.py call --tool get_context_bundle --arguments-file examples/review.json
+```
+
+其他位置子命令为 `status`、`validate`、`reindex`。工具参数、三套 epoch 与实际准入见 [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。
+
+## 开发辅助脚本
+
+在含 `scripts/` 的 Skill 或完整包根目录，用 Python 3.10+ 读取本地源码：
 
 ```text
 python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" info
 python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" show scripts/components/combat.lua --start 1 --count 80
 ```
 
-这两条命令只需 Python 3.10+ 标准库，不修改游戏。若要检查 Mod 的 Lua 语法和部分直接 API 调用，在自己的虚拟环境安装依赖后运行：
+检查 Mod 语法与部分 API 声明另需 `luaparser`，可用虚拟环境：
 
 ```text
 python -m venv .venv
@@ -488,76 +550,65 @@ python -m venv .venv
 .venv/Scripts/python -B scripts/check_api.py "<Mod目录>" --zip "<scripts.zip>"
 ```
 
-上例为 Windows；macOS/Linux 使用 `.venv/bin/python`。用实际路径替换占位符。`DECLARED` 只是查到声明，`NEEDS_REVIEW` 需要追踪源码；均不是运行正确性证明。隔离专服检查的 Windows 环境、参数与限制见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
+上例为 Windows；macOS/Linux 用 `.venv/bin/python`。`DECLARED` 只说明找到声明，`NEEDS_REVIEW` 需追踪源码，都不证明运行正确。隔离专服辅助程序仅支持 Windows，见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
-Provide your task, mod root, actual game version and authorized `data/databundles/scripts.zip`. Run the first commands from the Skill root with Python 3.10+. The checker additionally needs `luaparser`; use a virtual environment and replace `.venv/Scripts/python` with `.venv/bin/python` on macOS/Linux. Declaration matches do not prove runtime correctness.
-
-## 可选 KB 与故障排查
-
-本独立 Skill 不包含完整 KB/MCP。已有服务时，按 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 检查其实际工具、版本和一次查询结果；没有时说明 `KB unavailable`，继续本地源码工作。
+## 常见问题
 
 | 现象 | 处理 |
 |---|---|
-| 找不到 Skill | 检查目录层级、发现位置和会话刷新；用绝对路径显式读取 |
-| 只能读 README | 保留完整目录，读取 `SKILL.md` 及相关专题 |
-| 找不到源码或组件 | 检查路径、实际游戏版本和 ZIP 成员，不静默换用旧源码 |
-| 缺少 Python / luaparser | 确认实际解释器与所需依赖；准备方法见上文 |
-| 网页 AI 无本地权限 | 按 [网页指南](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/web-chat.md) 提供有权共享的必要材料 |
-| MCP 已配置却无响应 | 在服务主机检查启动命令、解释器、路径、stderr 和客户端连接 |
+| 找不到 Skill 或知识文件 | 检查目录层级、完整解压和实际加载路径；不要只复制 `SKILL.md` |
+| 找不到 `prepare_sources.py` / `run_kb.py` | 使用完整包；Skill/阅读 ZIP 只有知识文件，无服务 |
+| 来源准备缺少旧范围 | 按输出提供合法保留来源；可先文件阅读，不把部分缓存当完整服务 |
+| MCP 已配置但无工具或查询失败 | 核对当前 Python、包路径、准备状态、stderr 与客户端会话，不沿用旧七工具连接 |
+| 网页 AI 无本地权限 | 提供必要材料；云端不能直接读取用户电脑的游戏和缓存 |
 
-This standalone Skill has no complete KB/MCP. Connect an existing authorized service only after checking its real tools, version and a query result. Otherwise report `KB unavailable` and continue source-based work.
+All three downloads include the current 187 public records. The full package adds MCP and source preparation. Install the complete Skill directory in a supported location above. File reading needs no service. MCP requires Python 3.10+, SQLite FTS5 and authorized current plus historical sources; run the preparation command before configuring `run_kb.py serve`. One current ZIP is insufficient for all historical ranges. `mcp-config` only prints configuration; verify nine tools and a real query in your client. Restored Lua stays in local cache. Development syntax checks separately require `luaparser`, and the game-server helper supports Windows only.
 
 
 ---
 
 ## 来源：`docs/knowledge-integration.md`
 
-原始 SHA-256：`15fc3a3c5b0ac0c6d2e9ffb897cc243d1176e6091e312284065208a480fbc31b`
+原始 SHA-256：`b1c1d46b6534c4e1227749a02eeb8fab22556fabfd89c5b9793ae2cd5db613d9`
 
-# Skill、知识库与检索服务
+# Skill 与知识库接入 / Skill and KB integration
 
-> 本页介绍完整公开仓库保留的 **v0.1.1、64条参考知识** 及其可选只读服务。独立 Skill ZIP 不包含这些数据和服务；该公开参考集不代表其他配套 KB 的内容或版本。
+本版将 Skill 与当前 **187 条公开知识**串联分发，默认知识目录为 `knowledge/`。完整包、独立 Skill ZIP 与网页阅读 ZIP 都带知识文件；完整包另含来源准备工具与现代 MCP 九工具服务 `0.3.0`。仓库中的旧版兼容目录不作为当前 KB 入口。
 
-三个目录职责不同：根目录 `SKILL.md` 与 `references/` 保存工作策略；`dst-engineering-kb/` 保存知识；`dst-kb-service/` 只读检索，SQLite 索引位于知识库以外。知识条目不是代码模板，也不是让 Agent 无条件执行的指令。
+## 不运行 MCP：按文件读取
 
-参考案例为“小穹”v13.80，既有元数据记录作者为 FL。保留案例名称与符号用于研究归属和定位，不代表原作者背书本知识库。本仓库自行编写的工具与文档适用 [非商业使用许可](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/LICENSE)，历史有效 MIT 授权不追溯撤销；不对第三方 Mod 或 Klei 游戏源码重新授予许可，本包不包含这些原始源码与素材。
+先读 `knowledge/data/index.json` 的基础记录索引，再按任务定位：
 
-## 从任务到证据
+| 知识范围 | 文件入口 | 读取方式 |
+|---|---|---|
+| 64 条基础知识 | `knowledge/data/index.json` | 按索引的 `path`、`anchor` 读取指定条目及相关更正 |
+| 13 条 Native AI 知识 | `knowledge/data/native001/canonical-native001-ai-knowledge.json` | 按问题选择最多 5 条，Coding 默认只投影文件声明的十字段 |
+| 110 条 Native Core 知识及状态 | `knowledge/data/nativecore/native-core.json` | 先核对三轴状态与 Scope；保留 Core Coding HOLD，不当作可直接实现的通用契约 |
 
-| 实际制作问题 | 模式 | 可作为起点的条目 | 仍要确认 |
-|---|---|---|---|
-| 按钮消耗资源释放技能 | architect | `DECISION-NET-001`、`RULE-NET-001` | 原版 Action 是否足够、Host/远端共同校验 |
-| 重连后效果重复或残留 | debug | `RULE-LIFE-001`、`ANTI-LIFE-001` | 实际任务和监听归属；相似案例不直接证明根因 |
-| 自动收纳与箱子制作供料 | architect | `PATTERN-WORLD-001`、`FACT-DST-003` | 真实物品归属、查询与扣除边界、注册/注销 |
-| 地面洞穴共享仓库 | architect | `RULE-SHARD-001`、`PATTERN-SHARD-001` | 写入权威、重复请求、断线恢复 |
-| 自定义数值存档与 HUD | implement | `FACT-DST-001`、`DECISION-PERSIST-001` | 真实状态保存、显示重建、首次同步 |
-| 两个 Mod 包装同一函数 | review | `RULE-HOOK-002`、`TEST-HOOK-002` | 加载顺序、异常恢复、撤销时不覆盖别人 |
+用 JSON 解析或定向读取提取所需记录，报告“知识文件读取”及实际记录 ID，不把它写成 MCP 查询。不要把完整 JSON 或全库加入默认提示词。原条目的 NSF、RV、EI、REC、UNK 类型分别读取；公开隐藏的私有情境仍为 `UNK`，不能由标题或关联推回正文。
 
-以上 ID 可在 [索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) 查询。重要决策读取完整条目，再沿明确关系找到反例与测试；不要仅凭摘要或相关性排名作结论。
+公开证据只保留必要、经审的片段，并绑定公开路径与新哈希；不表示原始研究全部公开。`$dst_source_payload_slot` 是原版 Lua 的本地恢复槽，遇到它应记录来源缺口，继续用自己合法持有的当前源码核对，不能称为已解析证据。
 
-例如自动收纳任务：检索候选模式 → 读取适用/不适用条件 → 决定状态 Owner → 查当前 Container/Builder 原版链路 → 实现注册与查询 → 执行本任务能覆盖的验证。World Manager 不替代单体 Component，也不能由“减少扫描”推断所有查询都是常数复杂度。
+## 运行 MCP：先准备来源
 
-## 覆盖与回退
+按 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) 在完整包根目录运行 `prepare_sources.py`，提供合法持有的 `759671` 及所需历史源码。当前单份 `759671 scripts.zip` 仍缺 13 种旧范围，涉及 9 个文件。缺少必需来源时不启动部分库，也不放松原准入；此时仍可按上述方法阅读公开知识。
 
-当前知识集中在状态归属、联机、分片、生命周期、存档、Hook 和世界协调。Skill 的制作专题覆盖更广；动画、音效等问题应继续读取相应专题和工具契约。检索使用词语匹配，非空结果可能不相关；无匹配也不能证明整个领域不存在知识。
+准备只写 `cache/runtime/`；其中恢复的游戏 Lua 片段不属于公开再分发内容。完成准备后，用 `run_kb.py mcp-config` 生成客户端配置，在实际客户端验证工具发现与一次任务查询。九工具、版本与预算见 [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。
 
-检测到实际 MCP 工具后主动按需使用，不把配置存在当成已连接。没有 MCP 但能读文件时，读取 `data/index.json`、相关文档或 `data/entries.json` 中指定条目，说明使用了文件读取。没有任何可访问知识时，说明 `KB unavailable` 并继续能做的源码工作。不得虚报查询或测试成功。
+## 证据与维护
 
-普通开发不会自动修改知识库。发现新证据或知识缺口时在任务报告记录，只有明确维护请求才进入知识更新与 Correction 流程。来源事实、单案例观察和建议分别看待；历史撤回 Claim 只能作为历史。
+当前 Mod 与目标游戏源码仍是工程判断依据。保留来源 epoch、Scope、版本、Correction、缺失/延期与 Coding HOLD；检索命中、声明存在或文件可读都不等于完整行为已交付。仅在用户明确要求维护知识库时写库，检索服务本身是只读接口。
 
-## 获取与验收
+All three distributions include the current 187 public records in `knowledge/`; only the full package adds source preparation and the modern nine-tool MCP service. File mode reads a task-specific subset from the three entries above and reports record IDs as file access. Native AI Coding uses the declared ten-field projection and at most five records; Native Core Coding HOLD remains in force. Public evidence is limited to reviewed excerpts. Source slots are missing local Lua payloads, not evidence already read. MCP requires authorized current and historical sources first; one current ZIP is insufficient. Restored source stays in `cache/runtime/` and must not be publicly redistributed. Preserve Scope, claim types, versions, corrections, gaps and admission limits in either mode.
 
-- 完整仓库包含三层；网页技能 ZIP 只包含技能与辅助资料，不包含知识库和服务。
-- [服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 使用 Python 3.10+，不需要第三方 Python 包或 API Key。
-- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明条目的来源、证据等级和版本范围。
-- 数据校验、服务回归、Agent 真正按任务自动检索、DST 实机验证是四种不同验收。
+文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 
 
 ---
 
 ## 来源：`docs/licensing.md`
 
-原始 SHA-256：`7056d3ebc39e88ef1005a12fb66c0a6e2c4726b0e1507f95cd90d5b395118d79`
+原始 SHA-256：`568dd5a7facaaece58a5577f50ef08ecefa4ba23c8b5e73d97e8dcca4ae91938`
 
 # 使用许可与常见情形
 
@@ -592,33 +643,6665 @@ Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或�
 
 ## 分发范围 / Distribution scope
 
-独立 Skill 不附游戏源码、完整 KB/MCP 或私人项目。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
+独立 Skill 与阅读包附当前187条公开知识，完整包另含MCP；游戏源码、私人项目与原始私人研究不随包分发。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
 
-Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. The standalone Skill contains no game source, complete KB/MCP or private projects. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.
+Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. Skill and reading packages include the current 187 public records; the full package also includes MCP. Game source, private projects and original private research are excluded. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.
 
 
 ---
 
 ## 来源：`docs/public-limits.md`
 
-原始 SHA-256：`4086c8bc9e2451c63a6ab4c5aa92c71c8b628e5654ad56d36d7c2c1602169633`
+原始 SHA-256：`ff823488912fca969c7b5860eeb2f39f61d278492c44b95adb35649abed21e7f`
 
-# 能力与版本限制 / Capabilities and limits
+# 能力与限制 / Capabilities and limits
 
-独立公开 Skill 提供工程工作方法、专题参考和三个 Python 辅助脚本；不提供完整 KB/MCP、游戏源码或第三方工具。可选 KB 以实际接入服务的版本、工具与记录范围为准，见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
+当前公开版带 187 条知识及 Skill；这表示可读取的知识范围，不是 187 条全部已获 Coding 准入、源码证据全部随包或全部功能已实测。
 
 | 项目 | 实际边界 |
 |---|---|
-| 游戏版本 | 专题中标注的 `756039`、`759671` 等是保存源码快照。只适用于注明的函数、链路与条件；行号可能随更新变化，不代表全部专题已按同一版本复核 |
-| Agent | 安装路径参考各产品官方文档；没有逐一完成所有产品、账户和云端环境的端到端安装测试 |
-| 源码读取 | 需使用者提供合法可读的本地源码或必要片段；缺少材料时只能给出条件性判断 |
-| 静态检查 | `check_api.py` 检查语法和部分直接方法声明，不能证明签名、时序、端别或运行结果 |
-| 游戏测试 | `dst_modtest.py` 仅支持 Windows 离线单分片；不替代真实远端客户端、洞穴/跨分片、Mod 组合、UI/预测、视觉或音频验收 |
-| 动画与音频 | 工具接口按安装版本确认；导出成功或无头专服通过不代表引擎解码与实际效果通过 |
+| 分发 | 三种附件都含当前知识文件；只有完整包包含现代 MCP 和来源准备工具 |
+| 公开材料 | 仅提供经审原创知识及必要证据片段；3 项项目政策与 1 项 EI 的私有情境公开隐藏为 `UNK`，不补造泛化事实，其他 NSF 原值、ID 与 Scope 保留 |
+| Coding 准入 | 13 条 Native AI 默认十字段、任务子集最多 5 条；110 条 Core 保留 Coding HOLD。文件可读、canonical 或可检索不解除限制 |
+| 游戏源码 | 不附游戏 Lua 原文；`$dst_source_payload_slot` 不是已读源码。MCP 需从合法本地来源恢复缺失载荷 |
+| 来源依赖 | 当前 `759671` ZIP 单独缺 13 种历史范围、9 个旧文件；没有这些来源仍可文件阅读，但完整 MCP 不可用 |
+| 版本 | `759671`、`756039` 与独立历史树是不同来源；记录与专题只覆盖注明的函数、端别和条件，不保证当前在线版本或全部 Mod 兼容 |
+| 客户端接入 | 打印配置、生成缓存或服务校验不等于客户端连接与实际查询成功；没有逐一完成所有 Agent/账户/云端环境自动加载测试 |
+| 验证 | 静态检查、受控合约、专服行为、真实远端、视觉与音频分别报告；未执行项保留未测 |
+| 开发辅助脚本 | `check_api.py` 只检查语法和部分直接方法声明；`dst_modtest.py` 仅支持 Windows 离线单分片，不替代洞穴/跨分片、Mod 组合或客户端效果 |
 
-具体 Mod 应分别记录实际源码版本、检查范围、测试环境与未测项。游戏更新后重新核对相关定义与调用链；历史样例、方法存在或单处调用不能直接推广为通用契约。验证方法见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
+来源准备生成的 `cache/runtime/` 含本地游戏源码片段，不能随公开包上传。知识检索仍受角色、预算、Scope、缺失/延期和 HOLD 约束，见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md) 与 [检索策略](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/kb-retrieval.md)。具体工程验收见 [测试与交付](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/references/testing-release.md)。
 
-The standalone Skill provides guidance, references and three Python helpers. It does not supply the full KB/MCP, game source or third-party tools. Versioned notes describe bounded source snapshots, not blanket compatibility with the latest game. Agent installation paths follow official documentation; not every product, account or cloud environment has been tested end to end. Static declaration checks do not prove runtime behavior. The server helper is Windows-only and single-shard; real remote-client, cross-shard, UI, prediction, visual and audio behavior needs separate validation for each mod. Record the actual version, environment, evidence and untested scope.
+The public release includes 187 knowledge records, not unrestricted Coding admission or complete original evidence. Three project policies and one EI retain private context as `UNK`; no replacement general facts are invented. Other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five task-relevant records; 110 Core records retain Coding HOLD. Game Lua is excluded. Source slots need authorized local restoration, including historical ranges absent from a single current ZIP. All packages support file reading; only the full package provides MCP and preparation. Printed configuration, cache creation or validation does not prove client connection or real queries. Version, environment, remote-client, visual and audio limits require separate evidence. Restored source caches must stay local.
+
+
+---
+
+## 来源：`knowledge/CASE-002-AGENDA.md`
+
+原始 SHA-256：`49762634f4c93d3f6c972a0509fd424b3dbfb2f7f543917ae0c6573053fa136c`
+
+# What Case 002 Should Teach Us
+
+下一份样本应提高覆盖面，也应有机会反驳 CASE-001 候选，不指定具体 Mod。
+
+## 优先补足
+
+| 知识缺口 | 优先寻找的样本特征 | 希望得到的输出 |
+|---|---|---|
+| 单实体 Component / Replica 边界 | 有真实自定义 Replica 和客户端读取，而非全部走业务 DB | State Owner→同步字段→Replica API→UI/预测链 |
+| 技能、战斗和 StateGraph | 主客 StateGraph、打断/取消、动作执行、冷却/资源消耗均能追踪 | Intent→预测→服务器执行→取消/回滚生命周期 |
+| 数据驱动技能 | 增加数据条目确实能影响注册、效果、UI，但允许显式例外 | 数据驱动边界与复杂技能逃生口，避免只见配置表就认定全自动 |
+| 召唤物 / Boss AI | Brain、行为树、StateGraph 与目标/Owner 清理配合 | 哪些协调集中、哪些状态保留在实体；检验 World Manager 的不适用面 |
+| FX 与音画生命周期 | 跟随/父子、远端可见性、自动销毁和玩家离开处理 | Gameplay与纯表现状态划分、客户端验证矩阵 |
+| UI / 网络交互 | 可区分精准Replica显示与乐观请求，并有错误反馈 | 对照 Player Business Channel 是否真的必要 |
+| 性能与保存 | 提供可重复负载、长期任务统计、跨版本保存或迁移场景 | 复杂度估计对运行测量；恢复语义与schema升级 |
+
+## 优先级与选择条件
+
+1. 第一优先：角色技能 + Component/Replica + Host/Remote 状态预测/取消，补足当前案例偏数据服务的盲区。
+2. 第二优先：同一机制有可复现 Dedicated 场景、失败日志或测试步骤，使知识库有机会获得第一批 E4。
+3. 加分项：有真实保存升级、长期运行或负载计数，可验证“重建 Registry”和“Active Set 有收益”的前提。
+4. 跨 Shard 成功恢复案例也重要，但不必让 CASE-002 同时覆盖所有领域；可留给 CASE-003。
+
+入选前检查：源码可读、版本可定位、使用方式可理解、与 CASE-001 实现不存在直接复制/同依赖伪独立。
+复杂或流行不等于优质；能解释权威、生命周期、失败恢复，比单纯功能多更有研究价值。
+最好包含至少一个“无需世界 Manager / 无需自建业务 RPC”的成功设计，作为反证样本。
+
+## 最需要继续验证的候选
+
+- PATTERN-NET-001：什么时候它优于原版 Replica/Action，什么时候只是重复封装？
+- PATTERN-WORLD-001：什么规模/协作条件下集中管理有净收益？何时应保留多个实体 Component？
+- PATTERN-FRAMEWORK-001：显式模块出口是否降低兼容成本？热加载/多 Mod 包装的可行边界是什么？
+- PATTERN-SHARD-001：有实际成功重连/冲突处理的数据，而不仅是网络命令封装。
+- ANTI-WORLD-001：从依赖变化和失败面判断 God Manager，不能只凭行数升级 E0。
+
+## Case 002 不承担的目标
+
+不要求一次解决全部知识缺口；不因出现相似函数名就把规则升到 E2。
+不把一个成功运行场景升级为全部Host/Remote/Dedicated均通过。
+最终选择依据是“新增哪些可核验知识、能反证哪些旧候选”，而不是再找一个功能更多的模组。
+
+
+---
+
+## 来源：`knowledge/CHANGELOG.md`
+
+原始 SHA-256：`8d2d528d83b98b5e3bd7d8fa8ece4848815d1d7e0bb7574f327819f252f8da60`
+
+# CHANGELOG
+
+## v0.1.1 — 2026-09-28
+
+- First-class Klei provenance：加入 `KLEI-LOCAL-20260928`；10 条 FACT 直接引用原版快照，报告保留为补充解释。
+- Portable artifact paths：打包的报告同时保留 original_path 与 artifact_path；外部源码 artifact_path 为 null。
+- Typed relation support：新增九种关系；保留 related，不强行精确化不确定关系。
+- Failure-case semantic cleanup：CASE 输出改为 static_failure_paths；四个 Failure 均保留 runtime_reproduced=false。
+- Structured scope/locator support：增加结构化检索范围和定位，保留旧文本。
+- Portable CASE-001 metadata：既有证据提取，未重新查版本、未重新分析源码。
+- 保留历史 Claim，并连接 CORRECTION-CASE001-001 的 corrects / supersedes；增加显式被撤回证据检查。
+- Schema、索引、关系图、校验器和可移植 Review ZIP 一起更新。
+
+兼容性：新版 entries Schema 可读 0.1 和 0.1.1；related、scope、locator 继续存在。**存在局部破坏性写入变化**：CASE 的 confirmed_failure_cases 改名为 static_failure_paths；旧版严格 Schema/消费者不能保证读取新版新字段。原版 canonical 数据及 Schema 保存在 history/v0.1，旧消费者可用旧快照过渡。未承诺双向兼容。
+
+## v0.1 — 初始验收版本
+
+- CASE-001 initial extraction。
+- 64 canonical entries；E3=10、E1=53、E0=1。
+- 单案例模式候选；静态证据、原版源码事实与建议分层。
+- Correction 保留后轮推翻前轮判断；测试候选未执行。
+
+
+---
+
+## 来源：`knowledge/GOVERNANCE.md`
+
+原始 SHA-256：`9cb65dcbc62120aba12201e5e7560e34ab7a0c176842e91a768d8c8b25e7cd3b`
+
+# 证据、状态与维护政策 v0.1
+
+## 五类信息不可互相冒充
+
+| knowledge_kind | 可以陈述什么 | 不能据此推出什么 |
+|---|---|---|
+| Klei Fact | 在指定源码快照、函数和分支中确认的 API 行为 | 官方推荐该架构、跨版本永久不变 |
+| Case Observation | CASE-001 实际结构、调用路径、代码条件 | 所有 DST Mod 都必须如此 |
+| Engineering Pattern Candidate | 从一个案例提取的条件性结构方案 | 已由多个独立项目验证 |
+| Engineering Rule Candidate | 有 Why/Applies When/Does Not Mean 的规则候选 | 无例外的普遍铁律 |
+| Recommendation | 决策方向、较安全替代、测试候选及推理流程 | Klei 官方事实或已执行结果 |
+
+Anti-Pattern 是风险识别建议；其中 Case Evidence 才是案例观察。God Manager 只有风险候选。
+Rule/Pattern 的 `sources` 可同时指向案例及相关 E3 Fact，但自身不会因引用 Fact 自动升级为 E3。
+Case 条目中的 observations 单独标记 E1。失败路径的静态机制与实机后果分开记录。
+
+## Evidence Level
+
+| 级别 | 定义 | 升级所需证据 |
+|---|---|---|
+| E0 — Hypothesis | 推测/待验证风险 | 不能宣称实际发生；找直接代码/运行证据 |
+| E1 — Single Mod Evidence | 在一个案例中有直接代码支持 | 同一项目的多轮报告仍只算一个案例 |
+| E2 — Multiple Independent Mods | 多个互不依赖项目独立验证 | 确认没有复制同一实现、共享同一依赖导致假独立 |
+| E3 — Klei Source Supported | 原版源码直接支持限定行为 | 保留文件、函数、分支、快照指纹与版本上下文 |
+| E4 — Runtime Validated | 在明确记录的运行环境中验证 | 日志/步骤/版本/实际结果；只对已测环境成立 |
+| E5 — Repeated Runtime Validation | 多环境、多项目长期反复运行验证 | 多次结果、差异、失败记录与复查周期 |
+
+等级不是“E3 自动包含 E2/E4”的单一质量分数。来源广度、官方源码支持与实机验证是不同维度。
+E4 若只测试一个 Dedicated 场景，不可写成 Host/Remote/所有专服均通过。
+本版本只有 E0、E1、E3；所有运行测试候选均 `not_run`。
+
+## Recommendation Confidence
+
+| 等级 | 本库解释 |
+|---|---|
+| Experimental | 主要用于探索，连适用边界都尚不清楚 |
+| Low | 有问题线索，但正反证不足或尚未证实 |
+| Medium | 单案例支持且有合理适用边界，跨项目仍待验证 |
+| High | 在明确条件下因果/失败机制清楚；不是“适合所有项目” |
+| Very High | 限定快照内的直接 API 事实或明确的纠错证据；仍保留版本边界 |
+
+Confidence 是对该条限定陈述/建议的把握，不是自动推荐在任何 Mod 采用的概率。
+不对 Evidence 做数值平均；反例和不适用条件不能被支持来源数量淹没。
+
+## Knowledge Status
+
+允许：`candidate`、`validated_single_case`、`supported_by_klei`、`needs_runtime_validation`、`superseded`、`corrected`、`deprecated`。
+不用 `universal` 或 `best_practice`。
+
+- candidate：进入知识库供选择、讨论、反证；并不表示没有直接证据。
+- validated_single_case：确认案例索引/观察，不代表运行通过。
+- supported_by_klei：限定原版行为可定位；不表示推荐使用方式被 Klei 背书。
+- needs_runtime_validation：明确静态失败机制或其它需实测条目。
+- corrected：记录旧主张被什么证据纠正；旧主张在 Correction 中标记 superseded。
+- superseded：保留历史，但检索默认先给替代结论。
+- deprecated：适用条件/版本已过期，附退出或迁移说明；不是抹去来源。
+
+## 冲突和 Correction 流程
+
+1. 比较是否在讨论同一个版本、前提、分支；不同条件可以同时成立。
+2. 对同一主张，本次以第六轮更完整调用证据优先；不是以后永远“日期较新就正确”。
+3. 创建 Correction，定位旧报告章节/旧主张、后续证据、替代结论和影响范围。
+4. 不修改原报告。当前 canonical 条目采用修正结论，并链接 Correction。
+5. 检索到旧报告时，先返回关联 Correction；不要在向量库里只更新新块却让旧错误无标记继续命中。
+
+本版本的 `CORRECTION-CASE001-001` 撤回的是未使用 local 的运行时因果和硬时序依赖；不是否认那行赋值存在。
+因此旧报告关于环境共享的其他证据仍可使用；不能因为一处纠错就整体删除报告。
+
+## 版本与来源缺口
+
+`version` 是知识条目版本，`mod_version` 是样本版本，`schema_version` 是机器结构版本，三者不同。
+原版发行 build 未记录则使用 null；以本机快照日期/文件指纹定位，不填猜测版本。
+第1–3轮独立报告未找到，标为 missing source；第4–6轮可以支持其已复核内容，但不能补造丢失报告原话。
+准确审读文件总数未知；项目文件总数、语法检查数、审读数分栏记录。
+
+## RAG / Agent 使用契约
+
+建议检索顺序：Case/版本上下文 → Fact → Pattern → Related Rule + Anti-Pattern → Decision → Test。
+每个块必须携带 id、version、knowledge_kind、evidence_level、confidence、status、sources、scope。
+按 ID 联接图，不把文件名或自然语言标题当稳定主键。
+遇到 E0 或 `needs_more_cases` 时，在输出中保留未知项；未执行测试不得写“已验证”。
+若需要新 API 事实，进入新的查证任务；本轮抽取不借机继续横向 Deep Dive。
+
+## 新 Case 接入最低要求
+
+独立来源与版本、快照、研究范围、端别、实际运行记录、正例/反例、Correction、与旧条目的关系。
+先记录观察，再考虑是否支持/反驳既有候选；不要为了填满模板制造不存在的系统。
+只有独立实现证据才考虑 E2；实际运行结果按场景记录后才能考虑 E4。
+
+
+---
+
+## 来源：`knowledge/INDEX.md`
+
+原始 SHA-256：`18a5a6ae1383f61740595f05e310d4214fa140bd5ddfccfc99b9e57f9256359e`
+
+# 全部知识条目
+
+- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001) — EntityScript 组件持久化遍历
+- [FACT-DST-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-002) — Container 的物品存档
+- [FACT-DST-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-003) — Builder 查询与消耗边界
+- [FACT-DST-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-004) — InventoryItem 的 Owner 清理
+- [FACT-DST-005](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-005) — Stackable 拆分
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006) — Mod RPC / Shard RPC 的 Lua 边界
+- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007) — Prefab / Component / Class PostInit 时机
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008) — 实体删除与组件单独卸载不同
+- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009) — 原版制作 Host / Remote 汇合
+- [FACT-DST-010](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-010) — 原版材料来源与堆叠移除
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001) — Player Business Channel
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001) — Shard Service Bus
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001) — World Manager
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001) — Mod Framework / Integration Layer
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001) — Client 提交 Intent，服务端决定权威数量/材料。
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001) — 每个状态写清“相对于谁权威”。
+- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002) — 分别记录 Owner、Server View、Client Cache 和 Display。
+- [RULE-STATE-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-003) — 缓存可重建只说明恢复来源，不说明来源正确。
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002) — Host 快路径应保留与 Remote 相同的业务验证。
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004) — 实体与账本互换必须定义提交及失败补偿边界。
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001) — 跨 Shard 稀缺资源应先定义写入权威和冲突语义。
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001) — 真实物品留给 Container/Item；Manager 可持有成员和候选。
+- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001) — 可从真实实体重建的 Registry/Cache 通常不独立持久化。
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001) — 多个资源 Provider 必须按实体身份和剩余预算组合。
+- [RULE-RESOURCE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-002) — Query/分配建议不等于 reservation 或扣款。
+- [RULE-NET-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-003) — 乐观 UI 应与服务端最终可用性区分。
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001) — Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。
+- [RULE-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-001) — 先确认原版消费、保存和卸载契约，再扩展接口。
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002) — 临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。
+- [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003) — 选择最小足够作用域的接入点，并保存原契约。
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002) — 注册与失效管理先正确，再按测量选择 Active Set/索引。
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001) — 共享 API 应有可追溯的有限出口和初始化条件。
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001) — Client / Host Divergent Validation
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001) — Writable Replica Read-Modify-Write
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002) — Broadcast Final Value Without Authority
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001) — Duplicate Resource Provider Allocation
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001) — Unsafe Temporary Monkey Patch
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002) — Hook Without Ownership
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001) — Lifecycle Owner Mismatch
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001) — God Manager — risk candidate
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001) — Unlimited Ambient Dependency / Shared Namespace Growth
+- [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001) — Seed cross-shard lost update
+- [FAIL-CASE001-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-002) — Duplicate Material Provider Allocation
+- [FAIL-CASE001-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-003) — Unsafe temporary patch remains after error
+- [FAIL-CASE001-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-004) — ClientDB owner task lifetime exceeds DB lifetime
+- [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001) — 撤回未使用 SeedCDB 顶层 local 的初始化故障判断
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001) — Prefab / Component / World Manager 如何选择？
+- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001) — netvar / Replica / RPC / 原版 Action / Client View 如何判断？
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001) — 什么时候需要跨 Shard Service？
+- [DECISION-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-persist-001) — 哪些状态保存，哪些重建？
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001) — PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？
+- [TEST-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-001) — Host vs Remote Client parity
+- [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002) — Dedicated Server request flow
+- [TEST-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-001) — Ground/Cave simultaneous modification
+- [TEST-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-001) — Player reconnect
+- [TEST-LIFE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-002) — World save/load
+- [TEST-LIFE-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-003) — Entity removed during query
+- [TEST-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-001) — Wrapped function throws error
+- [TEST-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-002) — Two Mods wrap same function
+- [TEST-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-resource-001) — Same Entity exposed by two resource providers
+- [TEST-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-002) — Shard disconnect / reconnect recovery
+- [TEST-NET-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-003) — Stale cache and optimistic UI
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001) — DST Architecture Reasoning Process v0.1
+- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001) — 小穹 v13.80
+
+
+---
+
+## 来源：`knowledge/KB-v0.1.1-Migration-Report.md`
+
+原始 SHA-256：`7632c50f0cd6c1cbbcdc0fd33622846c50331656359cbab83336bd58ff1ca20b`
+
+# KB v0.1.1 Migration Report
+
+本轮仅进行数据结构与可移植性修订。64 条 canonical knowledge 保持原有语义；未重新分析小穹源码，未重写历史报告，未进行任何 DST runtime validation，未继续 Case Study 002。
+
+## Changed
+
+| 修订项 | 结果 |
+|---|---|
+| Klei 一等 Source | KLEI-LOCAL-20260928 登记为 vanilla_source_snapshot；10 条 FACT 直接引用，报告保留补充解释角色 |
+| 快照上下文 | available_in_package=false；Steam build、发行版本、整包 ZIP 哈希未知，为 null；保留已有文件指纹 |
+| 可移植路径 | 3 份第 4–6 轮报告在冻结版原样放入；公开版提供脱敏派生副本于 review-support/reports；公开版仅保留包内路径和逻辑来源 ID；新元数据独立注册 |
+| Typed relations | 9 种类型的 Schema 与目标检查；原 related 不变；图含 Source、Claim、知识三类节点，共 351 条边 |
+| Failure 语义 | CASE 使用 static_failure_paths；4 个 Failure 明确 static_path_confirmed=true、runtime_reproduced=false、runtime_validation_status=not_runtime_reproduced |
+| Scope | 保留原 scope，添加 scope_text 与 6 维 scope_structured；范围标签不构成运行证据 |
+| Locator | 保留文本，并支持 report_section、source_lines、source_symbol、file；精度不超过既有证据 |
+| CASE portable metadata | name/version/author/date/count/hash/测试状态从既有 CASE 提取，没有联网补查 |
+| Correction | 保留 CORRECTION-CASE001-001；增加独立历史 CLAIM-CASE001-001，corrects / supersedes 精确指向旧判断 |
+| 版本记录 | 新增 CHANGELOG、原 v0.1 数据与 Schema 归档；原 Review ZIP 保留 |
+| Validator | Schema、跨文件关系、显式撤回证据、独立语义对比、指纹、包清单和反例回归一起检查 |
+
+旧 Claim 的 E1 仅说明它来自单案例观察；status=superseded 明确撤回，不作为有效当前证据。REPORT-R5 整份报告未被撤回。
+
+## Unchanged
+
+- Canonical IDs、顺序、正文语义、旧来源记录、证据等级、置信度保持不变；校验器重新对照 history/v0.1，剔除允许的结构字段变化后比较，未只接受迁移脚本自报结果。
+- 64 条：10 Fact、1 Case、4 Pattern、18 Rule、9 Anti-Pattern、5 Decision、4 Failure、1 Correction、11 Test、1 ARP。
+- E3=10、E1=53、E0=1；无 E2/E4/E5。单案例 Pattern 不升级，E0 God Manager 风险不升级为既成故障。
+- 四条 Failure 未实机复现；11 条业务 Test Candidates 保持 not_run；本轮 runtime 执行数为 0。
+- 第 4–6 轮报告在冻结版按原字节复制；公开版为脱敏派生副本；第 1–3 轮独立报告仍缺失，未重建。旧错误判断保留在历史报告及独立 Claim。
+- 参考项目与原版文件仅做已有指纹比对，未重新读取业务逻辑进行分析；参考项目不修改，原版/Mod 源码不打包。
+
+## Backward Compatibility
+
+新版 entries Schema 接受历史 v0.1 数据；scope、related、locator 保留。存在明确的局部 breaking change：0.1.1 的 CASE 输出字段改名为 static_failure_paths，旧严格消费者还可能拒绝新增字段。不能宣称旧程序无修改可读取新包。
+
+新读取器可同时读取两版；旧消费者可继续使用 history/v0.1 下的原数据与 Schema，修改字段读取后再迁移。新 canonical 不保留容易误解的 confirmed_failure_cases，历史归档保留其原名。
+
+## Verification
+
+| 检查 | 验证方法与结果 |
+|---|---|
+| Schema validation | 当前 5 类 Schema + 旧 0.1 entries 输入，包内标准库检查器通过 |
+| ID uniqueness | 知识、Source、Claim 分别唯一且命名空间不冲突 |
+| Index consistency | ID、顺序、类型计数、检索字段、文档锚点一致 |
+| Source integrity | 4 个包内来源的 SHA256；本机原报告、Mod 项目指纹及已有原版文件指纹比对通过 |
+| Internal links | 包内链接和锚点全部可达；活动 Markdown 无本机绝对路径链接，原路径作为 provenance 保留 |
+| Typed relation target existence | 351 条图边的类型与目标有效，原 related 及明确 typed edges 均已导出 |
+| Correction target existence | corrects / supersedes 指向存在的历史 Claim；显式唯一撤回证据反例被拒绝 |
+| Manifest SHA256 | 封包清单按文件名集合、字节数、SHA256 复核；清单自身不自引用 |
+| Evidence level sanity | 分布保持 10/53/1；E2 单案例与无实测 E4 反例被拒绝 |
+| Runtime validation sanity | Failure 不冒充实测；Test 不冒充已执行；反例均被拒绝 |
+| 迁移语义 | 独立对比旧正文及旧来源记录，允许结构变化以外差异为 0 |
+| 反例回归 | 12/12 检出；它们是知识库校验测试，不是 DST 业务测试 |
+| 可移植性 | ZIP 在另一目录解压后，以默认模式重跑校验，不访问 original_path |
+
+data/validation.json 为封包前检查快照，manifest=not_present 表示当时尚未生成清单。封包后以及搬迁后的实际结果输出到 ZIP 旁的 validation.json；包内内容不为写回最终结果而再次修改。实际链接数、清单文件数和 ZIP SHA256 见该最终记录。可执行 `python -B tools/validate.py` 自行复核。
+
+## Remaining Limitations
+
+1. Correction 防护针对显式 claim_id / historical 引用；自然语言改写或遗漏 claim_id 的隐含沿用不能自动识别。当前检查不冒充完整语义审核。
+2. 外部 Klei / Mod 原源码未随包。可移植检查能核对登记和包内报告，不能独立重做源码验证；快照 Steam build 未知，不宣称最新版本适用。
+3. 本机指纹比对是材料完整性检查，不是重新确认源码行为，也不升级 E1/E3 为 E4。
+4. 标准库 Schema 检查器只支持当前使用的约束；没有运行第三方通用 Draft 2020-12 引擎。扩展 Schema 时应同步更新或接入通用实现。
+5. Typed relations 只精确化语义明确部分，其余保留 related；六维 scope 是保守检索标签，未覆盖所有未来领域本体。
+6. 搬迁验证在 Windows 不同目录进行；未宣称 Linux/macOS 或 DST Host/Client/Dedicated 的运行验证。
+7. 历史第 1–3 轮独立报告缺失；未来补齐应登记真实来源，不能由现有摘要倒造原报告。
+
+本轮交付止于 v0.1.1 的结构迁移与验证。
+
+[公开发布注：以上迁移结论记录冻结版本地历史。此公开副本已经脱敏，报告与历史文件不再与冻结版逐字节相同；没有重新修订知识结论。]
+
+
+---
+
+## 来源：`knowledge/README.md`
+
+原始 SHA-256：`451614d6c6561fb20558905b815c5b408cc1f7b65314da8fcf3cfb2aa59ec1c1`
+
+# DST 工程知识库
+
+本目录包含187条公开知识：64条基础知识、13条 Native AI、110条 NativeCore。
+按 [完整目录](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/CATALOG.json) 的 file/pointer 定向读取条目；`data/index.json`只索引基础64条。
+不要整库注入默认提示词。条目三轴状态、NSF/RV/EI/REC/UNK分类、版本、Scope和Correction分别判断，Core Coding HOLD保留。
+
+公开证据为经审片段与新哈希，不等于全部原始研究公开。4项依赖私有情境的政策/推断公开隐去并保留UNK。
+JSON中的 `$dst_source_payload_slot` 是待本地恢复的游戏源码片段，不是已读原文；文件阅读不能把该槽当成证据。
+MCP使用完整包根目录的 `prepare_sources.py` 与 `run_kb.py`，见 [接入说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/v2026.10.25.1/docs/knowledge-integration.md)。
+不同知识环境保留原来源范围，不能因默认环境759671就推断所有条目均适配该版本；历史环境不代表当前运行版本。
+项目自有内容采用随包LICENSE，游戏源码和私人原始资料不随包分发。
+
+
+---
+
+## 来源：`knowledge/RELATIONS.md`
+
+原始 SHA-256：`d4ef858250bc343c8a609408e36b1c073b7ea98b000afb8fd856b943b13d773d`
+
+# 知识关系图 v0.1.1
+
+这些箭头表示检索/关联方向，不表示“下一个条目证明上一个条目为真”。完整机器边在 `data/relations.json`。
+
+```mermaid
+flowchart TD
+  C[CASE-001] --> N[PATTERN-NET-001]
+  C --> S[PATTERN-SHARD-001]
+  C --> W[PATTERN-WORLD-001]
+  C --> H[PATTERN-FRAMEWORK-001]
+  N --> NR[RULE-NET-001 / 002]
+  NR --> NA[ANTI-NET-001]
+  NA --> ND[DECISION-NET-001]
+  ND --> NT[TEST-NET-001 / 002]
+  W --> WR[RULE-WORLD-001 / RULE-RESOURCE-001]
+  WR --> WA[ANTI-RESOURCE-001]
+  WA --> WF[FAIL-CASE001-002]
+  WF --> WT[TEST-RESOURCE-001 / TEST-LIFE-003]
+  W --> WD[DECISION-STATE-OWNER-001]
+  S --> SR[RULE-SHARD-001]
+  SR --> SA[ANTI-SHARD-001 / 002]
+  SA --> SF[FAIL-CASE001-001]
+  SF --> ST[TEST-SHARD-001 / 002]
+  S --> SD[DECISION-SHARD-001]
+  H --> HR[RULE-HOOK-002 / 003]
+  HR --> HA[ANTI-HOOK-001 / 002]
+  HA --> HF[FAIL-CASE001-003]
+  HF --> HT[TEST-HOOK-001 / 002]
+  H --> HD[DECISION-HOOK-001]
+  C --> FIX[CORRECTION-CASE001-001]
+  FIX -->|corrects / supersedes| OLD[CLAIM-CASE001-001 superseded]
+  F[FACT-DST-001 至 010] --> ARP[ARP-DST-001]
+  WD --> ARP
+  ND --> ARP
+  SD --> ARP
+  HD --> ARP
+```
+
+## 最小检索包
+
+| 入口 | 必须一起读取 |
+|---|---|
+| Player Business Channel | Host/Remote规则、生命周期反模式、NET决策、NET测试候选 |
+| Shard Service Bus | Authority规则、两种可写副本反模式、静态种子失败、离线恢复测试 |
+| World Manager | Registry与真实状态边界、资源Provider交集、所有者决策、实体移除测试 |
+| Framework | Hook作用域/ownership、异常恢复失败、Hook决策、双Mod包装测试、Correction |
+
+机器图采用九种 typed relation；已有 related 边保持不变。下图是部分明确关系的方向，其他检索关联不自动变成证明：
+
+```mermaid
+flowchart LR
+ K[KLEI-LOCAL-20260928] -->|supports| F[FACT-DST-*]
+ P[Pattern] -->|derived_from| C[CASE-001]
+ R[Rule] -->|mitigates| A[Anti-Pattern]
+ X[Failure] -->|illustrates| A
+ T[Test candidate] -->|tests| P
+ FIX[CORRECTION-CASE001-001] -->|corrects / supersedes| OLD[CLAIM-CASE001-001]
+```
+
+tests 只表示测试目标，未执行；illustrates 不表示实机复现；derived_from 单一 Case 不意味着普适。Source、Claim 和知识条目采用分离节点集合。Agent 应继续读取 Case Evidence / Counter Evidence / Does Not Mean，并把 Correction 和历史 Claim 一起检索。
+
+
+---
+
+## 来源：`knowledge/SOURCES.md`
+
+原始 SHA-256：`917dce6b7e9a2ab53cc068b835ab7bfb9562987a17f0d152d748c25a87cc694f`
+
+# Source Registry v0.1.1 (public derivative)
+
+外部源码不随包；original_path 已隐藏。报告是脱敏派生副本，原始与公开哈希见 [PUBLICATION-PROVENANCE.json](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/PUBLICATION-PROVENANCE.json)。
+
+## REPORT-R4
+
+Type: prior_analysis_report
+
+既有分析报告（解释性/二手证据）
+
+original_path: withheld; logical_locator: `source-id:REPORT-R4`
+
+artifact_path: [review-support/reports/sorachestmanager_DeepDive_20260928.txt](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>)
+
+## REPORT-R5
+
+Type: prior_analysis_report
+
+既有分析报告（解释性/二手证据）
+
+original_path: withheld; logical_locator: `source-id:REPORT-R5`
+
+artifact_path: [review-support/reports/SoraFramework_DeepDive_20260928.txt](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>)
+
+## REPORT-R6
+
+Type: prior_analysis_report
+
+既有分析报告（解释性/二手证据）
+
+original_path: withheld; logical_locator: `source-id:REPORT-R6`
+
+artifact_path: [review-support/reports/SoraBusinessIntegration_20260928.txt](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>)
+
+## META-MODINFO
+
+Type: case_metadata
+
+原Mod元数据来源；源码不随包提供。
+
+original_path: withheld; logical_locator: `source-id:META-MODINFO`
+
+artifact_path: null; available_in_package: false
+
+## KLEI-LOCAL-20260928
+
+Type: vanilla_source_snapshot
+
+CASE-001既有研究直接对照的本机DST原版Lua快照；不以AI报告替代源文件身份。
+
+original_path: withheld; logical_locator: `source-id:KLEI-LOCAL-20260928`
+
+artifact_path: null; available_in_package: false
+
+## CASE-001-PORTABLE-METADATA
+
+Type: derived_case_metadata
+
+由既有CASE-001证据提取的可移植元数据，不冒充原Mod源码。
+
+original_path: withheld; logical_locator: `source-id:CASE-001-PORTABLE-METADATA`
+
+artifact_path: [review-support/case-metadata.json](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/case-metadata.json>)
+
+
+---
+
+## 来源：`knowledge/VALIDATION.md`
+
+原始 SHA-256：`37696f23404f9a9cbbaff2cf51be541d89aac8cf960f9bd63352b6f926638a05`
+
+# v0.1.1 验证边界与复核
+
+执行 `python -B tools/validate.py`：检查 Schema、ID 唯一性、Index 一致性、Source 文件哈希、内部链接、typed relation 目标、Correction 目标、Manifest SHA256、Evidence 等级及 Runtime 状态。额外对比归档 v0.1 的正文与旧 SourceRef，去除允许的结构变化后应完全相同。
+
+本公开副本只运行包内校验：`python -B tools/validate.py`。外部源码与原始报告均未随包，`--check-external` 不适用。冻结版历史校验结果保留为已脱敏的历史记录。
+
+## 12 项反例回归
+
+缺失字段、非法 status、无实机记录却标 E4、typed target 不存在、非法关系类型、Correction 目标缺失、推荐仅使用已撤回 Claim、Failure 虚标 runtime、Test 虚标执行成功、反向行号、FACT 缺直接 Klei 来源、单案例冒充 E2：均应被拒绝。
+
+## 没有验证的事项
+
+- 未运行 DST、Host/Client/Dedicated 测试；业务 Test Candidates 保持 not_run。
+- 未重新分析参考 Mod；本机外部材料只做文件指纹比对。
+- 未验证未附包的源码在其他机器上的内容、最新 Steam build 或跨版本 API。
+- 未自动理解所有自然语言的隐含旧 Claim；显式 claim_id 以外仍需人工审核。
+- 不宣称 Linux/macOS 实测；不同目录解压复核验证的是包内相对路径和无原路径依赖。
+- 第三方通用 JSON Schema 验证器未运行；本包标准库检查器覆盖当前使用的约束。
+
+原 v0.1 的 624 个链接与 8 项反例结果保存在 history/v0.1/data/validation.json。新版本因来源、Claim、typed relations 和文档增加，链接数会变化；应以本版实际执行输出核对，不能沿用旧数字。
+
+
+---
+
+## 来源：`knowledge/anti-patterns/case001.md`
+
+原始 SHA-256：`3e5ac2692d06e5be7f9e96e6ff100d8e5ae18f4a0356107b1bb7615b36a355fd`
+
+# anti_pattern · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="anti-net-001"></a>
+
+## ANTI-NET-001 — Client / Host Divergent Validation
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+Host 直接调用业务方法，Remote 先经过校验 Adapter。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Client / Host Divergent Validation
+
+### Symptoms
+
+Host 直接调用业务方法，Remote 先经过校验 Adapter。
+
+### Why It Happens
+
+把本地 transport 优化与验证入口一起绕过。
+
+### Why It Is Dangerous
+
+同一功能出现不同条件或权限；只测试 Host 容易漏远端错误。
+
+### When It Is Actually Acceptable
+
+两条路径最终共享同一校验，或差异仅涉及本地视觉且明确设计时。
+
+### Failure Modes
+
+- Host 成功而 Remote 失败
+- 校验遗漏
+
+### Detection
+
+比较两条调用链进入 State Owner 前的检查集合。
+
+### Safer Alternatives
+
+- 共用服务器业务验证入口，仅省略传输
+- 以端别对照测试确认预期差异
+
+### Case Evidence
+
+REPORT-R6 §4.3、5.2：种子 Host 直调 Handle 方法，Remote 经过手持组件 Adapter。
+
+### Klei Basis
+
+- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+
+### Related Rule
+
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002)
+
+### Related Pattern
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Assessment
+
+observed_structure
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.3；5.2
+
+### related
+
+- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002)
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001)
+
+<a id="anti-shard-001"></a>
+
+## ANTI-SHARD-001 — Writable Replica Read-Modify-Write
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+多个副本基于旧余额各自计算新余额。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Writable Replica Read-Modify-Write
+
+### Symptoms
+
+多个副本基于旧余额各自计算新余额。
+
+### Why It Happens
+
+本地 Get/Set 接口掩盖了分布式写入。
+
+### Why It Is Dangerous
+
+各自操作合理，但合并不守恒。
+
+### When It Is Actually Acceptable
+
+状态独立分区、不要求合并，或已有可证明的冲突处理协议。
+
+### Failure Modes
+
+- 丢更新
+- 旧副本覆写
+- 超提
+
+### Detection
+
+查同一 key 是否多写者，值是操作还是读旧值后的结果。
+
+### Safer Alternatives
+
+- 单写 authority 接受操作意图
+- 有需求时设计带版本的条件提交与补偿
+
+### Case Evidence
+
+REPORT-R6 §7.3：SeedDB 两 Shard 基于同一个旧数值写回完整值。
+
+### Klei Basis
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+
+### Related Rule
+
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+
+### Related Pattern
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Assessment
+
+observed_structure
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3
+
+### related
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+- [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001)
+
+<a id="anti-shard-002"></a>
+
+## ANTI-SHARD-002 — Broadcast Final Value Without Authority
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+广播完整最终值，却未声明谁能写、过期写如何判断。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Broadcast Final Value Without Authority
+
+### Symptoms
+
+广播完整最终值，却未声明谁能写、过期写如何判断。
+
+### Why It Happens
+
+把复制机制当作一致性策略。
+
+### Why It Is Dangerous
+
+到达顺序替代业务顺序；重连和重启不知向谁恢复。
+
+### When It Is Actually Acceptable
+
+唯一写者的配置/展示值广播，或明确允许最后到达覆盖的非关键状态。
+
+### Failure Modes
+
+- 副本分歧
+- 重连恢复错误
+
+### Detection
+
+记录 writer、revision 和恢复源；不要仅检查是否用了 Shard RPC。
+
+### Safer Alternatives
+
+- 在协议前声明 authority
+- 只为必要场景增加 revision/epoch/重新同步
+
+### Case Evidence
+
+REPORT-R6 §6–7：种子任意 Shard Set 广播，且 noSyn=1 使本业务缺少自动恢复。
+
+### Klei Basis
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+
+### Related Rule
+
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+
+### Related Pattern
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Assessment
+
+observed_structure
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 6–7
+
+### related
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+- [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001)
+
+<a id="anti-resource-001"></a>
+
+## ANTI-RESOURCE-001 — Duplicate Resource Provider Allocation
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+不同 Provider 返回同一 Item 实体，合并时当成独立数量或直接覆盖。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Duplicate Resource Provider Allocation
+
+### Symptoms
+
+不同 Provider 返回同一 Item 实体，合并时当成独立数量或直接覆盖。
+
+### Why It Happens
+
+按来源名区分资源，却未按实体身份计算交集。
+
+### Why It Is Dangerous
+
+Has 通过但计划不足，或同一 Stack 被重复预算。
+
+### When It Is Actually Acceptable
+
+来源集合已证明互斥，或合并器按剩余预算统一分配。
+
+### Failure Modes
+
+- 少扣材料
+- 重复扣同一资源
+- 虚假充足判断
+
+### Detection
+
+构造一个同时出现在两个来源中的实体，检查最终每实体数量和总需求。
+
+### Safer Alternatives
+
+- 统一资源身份与排除/剩余预算
+- 提交前验证计划总量与各实体可用量
+
+### Case Evidence
+
+REPORT-R6 §11.3：原版打开容器与 Manager 同指 E，finds[E]=2 覆盖原版的 4。
+
+### Klei Basis
+
+- [FACT-DST-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-003)
+- [FACT-DST-010](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-010)
+
+### Related Rule
+
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+- [RULE-RESOURCE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-002)
+
+### Related Pattern
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Assessment
+
+observed_failure_path
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - resources
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### related
+
+- [FACT-DST-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-003)
+- [FACT-DST-010](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-010)
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+- [RULE-RESOURCE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-002)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+- [FAIL-CASE001-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-002)
+
+<a id="anti-hook-001"></a>
+
+## ANTI-HOOK-001 — Unsafe Temporary Monkey Patch
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+保存旧方法 → 临时替换 → 调用 → 正常返回后恢复，缺少异常恢复。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Unsafe Temporary Monkey Patch
+
+### Symptoms
+
+保存旧方法 → 临时替换 → 调用 → 正常返回后恢复，缺少异常恢复。
+
+### Why It Happens
+
+只为正常调用设计 around 包装。
+
+### Why It Is Dangerous
+
+异常使后续调用读到临时状态；恢复也可能覆盖回调期间的新赋值。
+
+### When It Is Actually Acceptable
+
+可靠限定无异常/无重入的内部范围，或有异常安全且有所有权检查的恢复；须给出依据。
+
+### Failure Modes
+
+- 临时函数残留
+- 状态 flag 泄漏
+- 返回值契约丢失
+
+### Detection
+
+检查 error、嵌套调用、允许 yield 的边界和替换期间第三方赋值。
+
+### Safer Alternatives
+
+- 显式上下文参数优先
+- 确需替换时保留错误与完整返回值，并执行受 ownership 保护的清理
+
+### Case Evidence
+
+REPORT-R5 §13；REPORT-R6 §17：inventory.Has/GetCraftingIngredient 临时替换后仅正常路径恢复。
+
+### Klei Basis
+
+- [FACT-DST-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-003)
+
+### Related Rule
+
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+
+### Related Pattern
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Assessment
+
+observed_failure_path
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 13
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 17
+
+### related
+
+- [FACT-DST-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-003)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+- [FAIL-CASE001-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-003)
+
+<a id="anti-hook-002"></a>
+
+## ANTI-HOOK-002 — Hook Without Ownership
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+卸载直接写回旧指针，或替换清理回调却未保留原职责。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Hook Without Ownership
+
+### Symptoms
+
+卸载直接写回旧指针，或替换清理回调却未保留原职责。
+
+### Why It Happens
+
+把函数槽当作自己独占的字段。
+
+### Why It Is Dangerous
+
+覆盖别的 Mod 后来安装的包装，或截断原版清理。
+
+### When It Is Actually Acceptable
+
+显式独占、不可卸载的会话级替换；仍需承认对其他 Mod 的影响。
+
+### Failure Modes
+
+- 卸载别人包装
+- 漏 Close/cleanup
+- 重装叠加
+
+### Detection
+
+记录目标、前驱、自己 wrapper；退出前确认当前字段归属。
+
+### Safer Alternatives
+
+- 明确 wrapper ownership
+- 保持原回调契约
+- 限制到必要实例并提供诊断
+
+### Case Evidence
+
+REPORT-R5 §12–13：恢复无 ownership 检查；REPORT-R4 §13：Container 卸载 oldfn 保存后未调用。
+
+### Klei Basis
+
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+
+### Related Rule
+
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+
+### Related Pattern
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Assessment
+
+observed_structure
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 12–13
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 13
+
+### related
+
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+
+<a id="anti-life-001"></a>
+
+## ANTI-LIFE-001 — Lifecycle Owner Mismatch
+
+类型：Recommendation · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+短命 DB/UI 关闭，挂在长命 World 的 Task/Listener 仍持有它。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Lifecycle Owner Mismatch
+
+### Symptoms
+
+短命 DB/UI 关闭，挂在长命 World 的 Task/Listener 仍持有它。
+
+### Why It Happens
+
+用调度宿主代替业务所有者，注销只删注册表。
+
+### Why It Is Dangerous
+
+旧对象保活、重复任务或对旧身份继续计算。
+
+### When It Is Actually Acceptable
+
+任务确实服务整世界，并不捕获已退出用户上下文。
+
+### Failure Modes
+
+- Task 残留
+- Listener 残留
+- 重连后旧闭包并存
+
+### Detection
+
+比较创建者、scheduler owner 和应该终止它的业务事件。
+
+### Safer Alternatives
+
+- 绑定清理句柄到业务生命周期
+- 在注销入口统一取消自己的任务与监听
+
+### Case Evidence
+
+REPORT-R6 §16：UpdateOwnerKeyTask 挂 World，ClientDB UnInit 未取消。
+
+### Klei Basis
+
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+
+### Related Rule
+
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+
+### Related Pattern
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Assessment
+
+observed_failure_path
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16
+
+### related
+
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [DECISION-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-persist-001)
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+- [FAIL-CASE001-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-004)
+
+<a id="anti-world-001"></a>
+
+## ANTI-WORLD-001 — God Manager — risk candidate
+
+类型：Recommendation · Evidence：E0 · Confidence：Low · Status：candidate · Version：0.1.1
+
+候选征兆：查询、调度、资源真相、UI、联网及保存策略逐步集中进同一 Manager。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+God Manager — risk candidate
+
+### Symptoms
+
+候选征兆：查询、调度、资源真相、UI、联网及保存策略逐步集中进同一 Manager。
+
+### Why It Happens
+
+把集中协调误解成集中所有实体行为。
+
+### Why It Is Dangerous
+
+跨领域耦合和测试面增长，局部变更需要理解全部系统。
+
+### When It Is Actually Acceptable
+
+职责相邻、规模受控的领域 Manager 可同时协调查询和物流；行数多不直接证明 God Object。
+
+### Failure Modes
+
+- 潜在改动扩散
+- 潜在共享故障面
+
+### Detection
+
+检查职责变化原因、依赖方向及是否拥有本该归实体的状态；不能只数函数。
+
+### Safer Alternatives
+
+- 先观察变化耦合和性能再拆分
+- 让单体状态留在 Component
+
+### Case Evidence
+
+REPORT-R4 §17–20 证明多职责领域 Manager；不足以断言已经达到 God Object。仅登记待验证风险。
+
+### Klei Basis
+
+无 / 未建立
+
+### Related Rule
+
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+
+### Related Pattern
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Assessment
+
+risk_candidate_not_established
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - lifecycle
+- **evidence_modes**：- hypothesis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 17–20
+
+### related
+
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+
+<a id="anti-framework-001"></a>
+
+## ANTI-FRAMEWORK-001 — Unlimited Ambient Dependency / Shared Namespace Growth
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+整个可写环境作为公共 API，模块裸符号依赖难从 require 图看出。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Unlimited Ambient Dependency / Shared Namespace Growth
+
+### Symptoms
+
+整个可写环境作为公共 API，模块裸符号依赖难从 require 图看出。
+
+### Why It Happens
+
+便捷访问不断扩展到工具、业务对象和临时状态。
+
+### Why It Is Dangerous
+
+初始化顺序、覆盖和跨模块写入变成隐含契约。
+
+### When It Is Actually Acceptable
+
+少量稳定公共能力、命名和写入责任明确、依赖可追溯时可采用共享表。
+
+### Failure Modes
+
+- 错误时序
+- 命名冲突风险
+- API 面不可控
+
+### Detection
+
+为消费符号追定义、首次可用时点和全部写者；不能仅统计 require。
+
+### Safer Alternatives
+
+- 有限服务出口
+- 显式模块返回值
+- 记录启动阶段和可选能力
+
+### Case Evidence
+
+REPORT-R5 §2–5、14：SoraAPI 为 env 别名，soraenv 共享查找；未证明所有潜在冲突已实际发生。
+
+### Klei Basis
+
+- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+
+### Related Rule
+
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001)
+
+### Related Pattern
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Assessment
+
+observed_structure
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- framework
+  - hooks
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 2–5；14
+
+### related
+
+- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+
+
+---
+
+## 来源：`knowledge/cases/CASE-001-sora/README.md`
+
+原始 SHA-256：`baca0a62cbb7f0cce54eaed0cbbc7704c1437d8cc0463b0c3e77d31b02585f29`
+
+# CASE-001 — 小穹 v13.80
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="case-001"></a>
+
+## CASE-001 — 小穹 v13.80
+
+类型：Case Observation · Evidence：E1 · Confidence：High · Status：validated_single_case · Version：0.1.1
+
+以玩家业务通道、分片共享状态、世界容器 Manager 和接入框架为主要研究面的一份静态案例。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Case Id
+
+[CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+
+### Name
+
+小穹
+
+### Mod Version
+
+13.80
+
+### Author
+
+- **declared**：FL
+- **source**：modinfo.lua author 字段；本轮仅核对元数据，未执行文件。
+
+### Analysis Date
+
+2026-09-28（本地第4–6轮报告日期；前3轮独立时间未恢复）
+
+### Project Size
+
+- **files**：949
+- **lua_files**：186
+- **bytes**：68623081
+
+### Domains
+
+- 玩家业务通信/客户端视图
+- 分片共享数据
+- 容器注册/物流/制作整合
+- 环境/Hook/模块接入
+
+### Research Rounds
+
+1. **round**：1
+   - **topic**：Architecture Recon
+   - **availability**：completed_per_user; standalone_report_not_located
+
+2. **round**：2
+   - **topic**：ClientDB
+   - **availability**：completed_per_user; standalone_report_not_located
+
+3. **round**：3
+   - **topic**：MainDB
+   - **availability**：completed_per_user; standalone_report_not_located
+
+4. **round**：4
+   - **topic**：sorachestmanager
+   - **availability**：available_report
+
+5. **round**：5
+   - **topic**：SoraEnv + SoraAPI + Hook Framework
+   - **availability**：available_report
+
+6. **round**：6
+   - **topic**：种子/全局制作端到端组合验证
+   - **availability**：available_report
+
+### Analysis File Count
+
+- **unique_mod_total**：未记录 / null
+- **confirmed_mod_lower_bound**：17
+- **count_note**：第6轮17个关键Mod文件有审读与语法记录；第5轮10个关键文件另有语法记录。不能相加视为六轮去重阅读总量。
+- **project_lua_count_is_not_analysis_count**：是
+
+### Runtime Tested
+
+否
+
+### Dedicated Tested
+
+否
+
+### Vanilla Context
+
+- **source_context_id**：KLEI-LOCAL-20260928
+- **release_build**：未记录 / null
+- **note**：第6轮18份、第5轮13份原版文件分别对照本机游戏 scripts.zip；未在线确认最新发行版；不把两批相加当去重总数。
+
+### Project Hash
+
+52c1cbe65297d77ae006613c33955199f87b835a04fea9fe27427ac1c0361f71
+
+### Hash Algorithm
+
+对按完整路径排序的文件：依次 hash.update(relative_posix_path.encode(UTF8)); hash.update(SHA256(file_bytes).digest())。
+
+### Architecture Summary
+
+- 玩家通道把业务意图、服务器View和客户端Cache组织起来。
+- 共享种子计数在各Shard本地可写并传播完整值；没有自动获得唯一权威。
+- 世界Manager持有实体注册/候选；真实物品仍在Container/Stackable。
+- 框架提供启动顺序、共享环境与多类Hook；并非统一可卸载的通用框架产品。
+
+### Observations
+
+1. **claim**：种子服务器 ClientDB 为 View，客户端 SeedCDB 为缓存。
+   - **knowledge_kind**：Case Observation
+   - **evidence_level**：E1
+   - **source**：[REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3–6
+
+2. **claim**：全局制作使用当前Shard的注册容器，不经MainDB跨世界取材。
+   - **knowledge_kind**：Case Observation
+   - **evidence_level**：E1
+   - **source**：[REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 8–11
+
+3. **claim**：Manager有候选缓存和活动集合，但不是数量总账，也未消除全部扫描。
+   - **knowledge_kind**：Case Observation
+   - **evidence_level**：E1
+   - **source**：[REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 6；8；15
+
+4. **claim**：SoraAPI 为 env 别名，共享环境隐藏部分依赖。
+   - **knowledge_kind**：Case Observation
+   - **evidence_level**：E1
+   - **source**：[REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 2–5
+
+### Identified Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Identified Anti Patterns
+
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### Unverified
+
+- 所有Host/Remote/Dedicated运行结论
+- 跨Shard并发/离线恢复实际时序
+- 多Mod兼容与异常注入
+- 大规模性能/长期泄漏测量
+- 六轮准确去重审读文件总数及原版发行build
+
+### Corrections
+
+- [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001)
+
+### Exclusions
+
+1. **topic**：Persisting / Treating Derived Runtime State As Truth
+   - **reason**：本案例有Registry/Cache重建正例；没有足够证据将错误保存派生状态登记为已发生反模式。可作未来检索问题。
+
+2. **topic**：God Manager
+   - **reason**：已建 E0 风险候选，未宣称案例达到 God Object。
+
+### Availability Limit
+
+前三轮独立报告未在工作区发现；本次采用第4–6轮已保留的交叉证据，不补造前三轮原文或发现。
+
+### Static Failure Paths
+
+- [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001)
+- [FAIL-CASE001-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-002)
+- [FAIL-CASE001-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-003)
+- [FAIL-CASE001-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-004)
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - shard
+  - world
+  - UI
+  - lifecycle
+  - framework
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- META-MODINFO（外部来源未随包） · interpretation · author/version/name 字段
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 全文索引
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 全文索引
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 全文索引
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001)
+
+
+---
+
+## 来源：`knowledge/corrections/CASE-001.md`
+
+原始 SHA-256：`c5565f2814c61bed428b4d184aa530f40b84f5f741a5dc51e7c9eeb4851fb1b2`
+
+# correction · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="correction-case001-001"></a>
+
+## CORRECTION-CASE001-001 — 撤回未使用 SeedCDB 顶层 local 的初始化故障判断
+
+类型：Case Observation · Evidence：E1 · Confidence：Very High · Status：corrected · Version：0.1.1
+
+旧变量确实在顶层捕获，但未被使用；不能据此建立 UI 的运行时初始化依赖。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Previous Claim
+
+soraseed.lua 顶层捕获 SeedCDB，因此 clientfn 必须在首次 require 前创建它，否则导致 UI 初始化 nil 问题。
+
+### Target Claims
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · historical · §1.3：clientfn→soraseed 首次 require；§3：soraseed 隐式依赖行
+
+### Subsequent Evidence
+
+REPORT-R6：local DB 全文未被使用；实际数量读取经过 soraseedcontainer:GetDB 动态选择后端。
+
+### Result
+
+撤回“该 local 导致初始化故障”以及“该 local 必须有值”的硬依赖结论。
+
+### Replacement
+
+分析符号的真实使用点，而非仅发现一次赋值；其他实际依赖仍分别验证。
+
+### Superseded Claim Status
+
+superseded
+
+### Correction Scope
+
+只替换该因果判断，不否认赋值存在，也不宣布种子全部初始化路径无风险。
+
+### History Policy
+
+保留原报告，不改写历史；检索旧报告该结论时必须附本 Correction。
+
+### Target Claim Ids
+
+- [CLAIM-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/claims.md#claim-case001-001)
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：corrects
+   - **target**：[CLAIM-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/claims.md#claim-case001-001)
+
+2. **type**：supersedes
+   - **target**：[CLAIM-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/claims.md#claim-case001-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · historical · 1.3；3
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 0；5.1
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001)
+
+
+---
+
+## 来源：`knowledge/corrections/claims.md`
+
+原始 SHA-256：`0ece2f9d3d311c9c48bb2b89b45856e213290bfd2674f39f404acaefe3c26cff`
+
+# 历史 Claim 节点
+
+本页保留被撤回的历史判断，不是有效推荐。Claim不计入64条知识条目。
+
+<a id="claim-case001-001"></a>
+
+## CLAIM-CASE001-001
+
+Status: superseded
+
+soraseed.lua 顶层捕获 SeedCDB，因此 clientfn 必须在首次 require 前创建它，否则导致 UI 初始化 nil 问题。
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · historical · §1.3；§3，SeedCDB local 的运行时因果/硬时序判断 · 保留原判断，不作为有效支持。
+
+Superseded by: [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001)
+
+
+---
+
+## 来源：`knowledge/decisions/candidates.md`
+
+原始 SHA-256：`951041b044c413e6f4e5dad3db48bcebd64d7a79353e85286f437581b63fa899`
+
+# decision · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="decision-state-owner-001"></a>
+
+## DECISION-STATE-OWNER-001 — Prefab / Component / World Manager 如何选择？
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+按状态范围和协作需求分配，不按代码行数分层。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Question
+
+Prefab / Component / World Manager 如何选择？
+
+### Branches
+
+1. **condition**：只是实体创建、资源和初始组件组装
+   - **recommended_direction**：Prefab 构造承担；避免把长期协调逻辑塞进构造。
+   - **evidence**：- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+     - [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+2. **condition**：状态随单个实体生灭，行为基本自足
+   - **recommended_direction**：实体 Component 持有状态和 API。
+   - **evidence**：- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+3. **condition**：多个实体共享成员查询、配额或调度
+   - **recommended_direction**：World Manager 持有 Registry/协调；实体保留单体真相。
+   - **evidence**：- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+4. **condition**：状态跨 World
+   - **recommended_direction**：转交 Shard 决策树，不把单 World Manager 当跨世界服务。
+   - **evidence**：- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+### Recommended Direction
+
+按状态范围和协作需求分配，不按代码行数分层。
+
+### Exceptions
+
+小业务可在 Prefab 上保持少量状态；没有强迫新增 Component。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 2；10；15
+
+### Unknowns
+
+尚未由独立技能/Boss/Buff 项目验证；World Manager 是否值得增加需看规模。
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 2；10；15
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+- [TEST-LIFE-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-003)
+- [TEST-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-resource-001)
+
+<a id="decision-net-001"></a>
+
+## DECISION-NET-001 — netvar / Replica / RPC / 原版 Action / Client View 如何判断？
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+先问要传意图还是状态，再考虑接口层和已有原版链。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Question
+
+netvar / Replica / RPC / 原版 Action / Client View 如何判断？
+
+### Branches
+
+1. **condition**：原版 Action/Builder 已有对应权威请求链
+   - **recommended_direction**：优先扩展原版链，不另造同义 RPC。
+   - **evidence**：- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+     - [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+2. **condition**：需要服务器向客户端展示小型持续状态
+   - **recommended_direction**：考虑 netvar；按现有组件模型通过 Replica 提供读取 API。
+   - **evidence**：- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+     - [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+   - **exceptions**：Replica 是客户端接口/组织方式，不是与 netvar 互斥的传输协议。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+3. **condition**：额外一次性业务意图/返回结果
+   - **recommended_direction**：考虑 Mod RPC；按需要设计关联ID、校验与错误结果。
+   - **evidence**：- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+     - [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+4. **condition**：每玩家裁剪的较复杂数据视图
+   - **recommended_direction**：考虑 Server View + Client Cache；需要明确初始同步和失效。
+   - **evidence**：- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+     - [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+5. **condition**：纯本地视觉/输入状态
+   - **recommended_direction**：可保留本地；不得冒充服务器 gameplay 决策。
+   - **evidence**：- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+### Recommended Direction
+
+先问要传意图还是状态，再考虑接口层和已有原版链。
+
+### Exceptions
+
+所有路径均需检查端别；不能把可写客户端缓存当服务端 API。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3–9
+
+### Unknowns
+
+案例没有系统验证自定义 Replica 架构、预测回滚与高频流量阈值。
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3–9
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002)
+- [RULE-NET-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-003)
+- [TEST-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-001)
+- [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002)
+- [TEST-NET-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-003)
+
+<a id="decision-shard-001"></a>
+
+## DECISION-SHARD-001 — 什么时候需要跨 Shard Service？
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+需求必须跨世界，且有明确的数据所有权，才引入服务。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Question
+
+什么时候需要跨 Shard Service？
+
+### Branches
+
+1. **condition**：状态仅服务当前 World 的实体
+   - **recommended_direction**：保留 World 服务，不加 Shard 层。
+   - **evidence**：- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+2. **condition**：玩家迁移且原版已有适合的保存/迁移机制
+   - **recommended_direction**：先确认原版契约，避免再复制一份状态。
+   - **evidence**：- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+   - **exceptions**：本案例没有完整迁移事实条目；此分支为待验证建议。
+   - **evidence_level**：E0
+   - **needs_more_cases**：是
+
+3. **condition**：多个 Shard 必须共享同一稀缺资源
+   - **recommended_direction**：先定义 authority、不变量与故障恢复，再选择服务协议。
+   - **evidence**：- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+     - [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+4. **condition**：只需非关键的显示广播
+   - **recommended_direction**：可以允许明确的陈旧/覆盖，不无条件加入事务。
+   - **evidence**：- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+### Recommended Direction
+
+需求必须跨世界，且有明确的数据所有权，才引入服务。
+
+### Exceptions
+
+单写、分区、多写都有适用边界；当前证据不证明一种机制普适。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；12
+
+### Unknowns
+
+缺少成功运行的多 Shard 一致性独立案例和延迟/重连测量。
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；12
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [TEST-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-001)
+- [TEST-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-002)
+
+<a id="decision-persist-001"></a>
+
+## DECISION-PERSIST-001 — 哪些状态保存，哪些重建？
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+用“能否等价恢复”判定，不用字段是否容易序列化判定。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Question
+
+哪些状态保存，哪些重建？
+
+### Branches
+
+1. **condition**：丢失会破坏资源/用户进度，且无法等价重算
+   - **recommended_direction**：存真实 Owner 状态，给出 schema 和迁移/版本策略。
+   - **evidence**：- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+     - [FACT-DST-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-002)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+2. **condition**：可从加载后的实体完整恢复的 Registry/Index
+   - **recommended_direction**：按生命周期重建，标注重建完成前的查询窗口。
+   - **evidence**：- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+     - [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+3. **condition**：Client View/Widget 显示副本
+   - **recommended_direction**：初始同步或重读，不由它恢复服务器真相。
+   - **evidence**：- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+     - [RULE-STATE-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-003)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+4. **condition**：暂停、选项、计时器、临时锁是否算用户意图不明确
+   - **recommended_direction**：列出保存/重置后果交给项目决策，不套缓存口诀。
+   - **evidence**：- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+### Recommended Direction
+
+用“能否等价恢复”判定，不用字段是否容易序列化判定。
+
+### Exceptions
+
+某些缓存可为启动性能做可丢弃检查点，但不可反客为主。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### Unknowns
+
+schema 升级、跨版本读档和分片独立回档尚未验证。
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- persistence
+  - lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### related
+
+- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+- [TEST-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-001)
+- [TEST-LIFE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-002)
+
+<a id="decision-hook-001"></a>
+
+## DECISION-HOOK-001 — PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+最小足够作用域，不把方案列表当固定强制优先级。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Question
+
+PostInit / Instance Wrap / Class Patch / Upvalue Patch 如何选择？
+
+### Branches
+
+1. **condition**：已有公开事件、回调或组件配置能完成需求
+   - **recommended_direction**：使用既有扩展点；仍核对生命周期/端别。
+   - **evidence**：- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+2. **condition**：仅新建特定实体/组件需要附加行为
+   - **recommended_direction**：相应 PostInit；实例包装只影响目标实例。
+   - **evidence**：- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+     - [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+3. **condition**：确需共享类方法覆盖多实例
+   - **recommended_direction**：明确实例自有方法遮蔽和已有引用，保留契约及兼容诊断。
+   - **evidence**：- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+     - [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+4. **condition**：只能通过私有闭包/upvalue 接入
+   - **recommended_direction**：隔离为版本敏感适配，能力检测、来源定位、失败降级和更新复核。
+   - **evidence**：- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+     - [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+5. **condition**：打算调用前临时换函数再恢复
+   - **recommended_direction**：优先考虑参数/上下文；若不可替代则加入异常/ownership 保护。
+   - **evidence**：- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+     - [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+   - **exceptions**：需按本项目约束复核。
+   - **evidence_level**：E1
+   - **needs_more_cases**：是
+
+### Recommended Direction
+
+最小足够作用域，不把方案列表当固定强制优先级。
+
+### Exceptions
+
+会话级受控类扩展可合理；不因看到 monkey patch 就认定有错。
+
+### Evidence
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 7–9；12–13
+
+### Unknowns
+
+尚无多 Mod 加载顺序与私有 API 升级的运行验收。
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 7–9；12–13
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [RULE-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-001)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [TEST-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-001)
+- [TEST-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-002)
+
+
+---
+
+## 来源：`knowledge/facts/klei-lua.md`
+
+原始 SHA-256：`6978552d93abacc049ecb90613abb0b636109e013127072b602c5577614fc58c`
+
+# source_fact · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="fact-dst-001"></a>
+
+## FACT-DST-001 — EntityScript 组件持久化遍历
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+保存遍历 components 中提供 OnSave 的对象；加载按组件键寻找当前对象并调用 OnLoad。对象不必因由 AddComponent 创建才获调用。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+EntityScript 组件持久化遍历
+
+### Observed Behaviour
+
+保存遍历 components 中提供 OnSave 的对象；加载按组件键寻找当前对象并调用 OnLoad。对象不必因由 AddComponent 创建才获调用。
+
+### Source File
+
+- `vanilla-snapshot/scripts/entityscript.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+GetPersistData / SetPersistData
+
+### Source Locator
+
+1903–1980
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+手工挂入的服务对象可参与世界保存，但应遵守这些函数契约。
+
+### Do Not Infer
+
+不能推出组件加载有任意依赖顺序、任意对象都适合伪装成组件，或自动完成引用修复。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- persistence
+  - lifecycle
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 1903–1980；GetPersistData / SetPersistData · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 7.1–7.2
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-002"></a>
+
+## FACT-DST-002 — Container 的物品存档
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+有效且可持久化的槽位物品以 GetSaveRecord 记录；加载通过 SpawnSaveRecord 重建并 GiveItem 到槽位。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+Container 的物品存档
+
+### Observed Behaviour
+
+有效且可持久化的槽位物品以 GetSaveRecord 记录；加载通过 SpawnSaveRecord 重建并 GiveItem 到槽位。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/container.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+OnSave / OnLoad
+
+### Source Locator
+
+979–1007
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+真实物品可沿原版容器保存，注册表不必重复保存同一批物品。
+
+### Do Not Infer
+
+不能推出所有 runtime metadata、暂停/进度或玩家选择都自动保存。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- persistence
+  - resources
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 979–1007；OnSave / OnLoad · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 16
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-003"></a>
+
+## FACT-DST-003 — Builder 查询与消耗边界
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+检查、形成材料实体分配表、消耗分别在不同函数中；普通库存产品分支先 SpawnPrefab，后 RemoveIngredients，再交付，manufactured 分支不同。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+Builder 查询与消耗边界
+
+### Observed Behaviour
+
+检查、形成材料实体分配表、消耗分别在不同函数中；普通库存产品分支先 SpawnPrefab，后 RemoveIngredients，再交付，manufactured 分支不同。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/builder.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+HasIngredients / GetIngredients / RemoveIngredients / DoBuild
+
+### Source Locator
+
+500–583；657–755
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+新增材料来源必须匹配原版分配表及真实执行顺序。
+
+### Do Not Infer
+
+不能推出查询即预留、整个过程是事务，或所有配方都先生成产物。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- resources
+  - world
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 500–583；657–755；HasIngredients / GetIngredients / RemoveIngredients / DoBuild · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 9–11
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-004"></a>
+
+## FACT-DST-004 — InventoryItem 的 Owner 清理
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+物品销毁时，若仍有 owner，按其 Inventory 或 Container 移除该物品，并发送世界 forgetinventoryitem 事件。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+InventoryItem 的 Owner 清理
+
+### Observed Behaviour
+
+物品销毁时，若仍有 owner，按其 Inventory 或 Container 移除该物品，并发送世界 forgetinventoryitem 事件。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/inventoryitem.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+OnRemoveEntity
+
+### Source Locator
+
+478–491
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+物品所有权清理与管理器索引清理是两项不同职责。
+
+### Do Not Infer
+
+不能推出失效引用会被任意业务缓存自动删除。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 478–491；OnRemoveEntity · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 11.2
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-005"></a>
+
+## FACT-DST-005 — Stackable 拆分
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+堆叠拆分会产生分离物品并调整原堆叠数量；数量可由 Stackable 自身保存/恢复。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+Stackable 拆分
+
+### Observed Behaviour
+
+堆叠拆分会产生分离物品并调整原堆叠数量；数量可由 Stackable 自身保存/恢复。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/stackable.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+Get / SetStackSize / OnSave / OnLoad
+
+### Source Locator
+
+88–109 起
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+查询者引用一个 Stack 不代表获得独占权；消耗者须对照拆分行为。
+
+### Do Not Infer
+
+不能推出跨容器/跨玩家分配自动去重，也不能认为拆分是一项跨系统事务。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- resources
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 88–109 起；Get / SetStackSize / OnSave / OnLoad · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 11.2
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-006"></a>
+
+## FACT-DST-006 — Mod RPC / Shard RPC 的 Lua 边界
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+Lua 包装校验已注册的 namespace/id，并把参数交给 TheNet；Shard 接收回调被放入 RPC_Shard_Queue。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+Mod RPC / Shard RPC 的 Lua 边界
+
+### Observed Behaviour
+
+Lua 包装校验已注册的 namespace/id，并把参数交给 TheNet；Shard 接收回调被放入 RPC_Shard_Queue。
+
+### Source File
+
+- `vanilla-snapshot/scripts/networkclientrpc.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+SendModRPCToServer / SendModRPCToClient / SendModRPCToShard / HandleShardModRPC
+
+### Source Locator
+
+1881–1893；1943–1953
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+可把业务编码/路由与传输边界分开记录。
+
+### Do Not Infer
+
+不能从这些 Lua 包装推出可靠投递、恰好一次、业务 ACK、事务或自动补偿。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - shard
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 1881–1893；1943–1953；SendModRPCToServer / SendModRPCToClient / SendModRPCToShard / HandleShardModRPC · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 4.1；6
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-007"></a>
+
+## FACT-DST-007 — Prefab / Component / Class PostInit 时机
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+Prefab PostInit 在构造后应用；Component PostInit 在组件构造并挂入后应用；Class PostConstruct 包装构造器影响后续实例。不是注册时遍历回补旧实例。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+Prefab / Component / Class PostInit 时机
+
+### Observed Behaviour
+
+Prefab PostInit 在构造后应用；Component PostInit 在组件构造并挂入后应用；Class PostConstruct 包装构造器影响后续实例。不是注册时遍历回补旧实例。
+
+### Source File
+
+- `vanilla-snapshot/scripts/modutil.lua`（original provenance；不作为包内链接）
+- `vanilla-snapshot/scripts/entityscript.lua`（original provenance；不作为包内链接）
+- `vanilla-snapshot/scripts/mainfunctions.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+AddPrefabPostInit / AddComponentPostInit / AddClassPostConstruct / AddComponent / SpawnPrefab
+
+### Source Locator
+
+modutil:153–175,566–599；entityscript:610–645；mainfunctions:347–391
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+需区分模块加载、注册回调、实体产生三个时点。
+
+### Do Not Infer
+
+不能推出回调自动只在 Server 运行、任意回调顺序稳定，或存在通用自动卸载接口。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+  - hooks
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · modutil:153–175,566–599；entityscript:610–645；mainfunctions:347–391；AddPrefabPostInit / AddComponentPostInit / AddClassPostConstruct / AddComponent / SpawnPrefab · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · supplementary_interpretation · 7 Hook Mechanism Table；原版定位列表
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-008"></a>
+
+## FACT-DST-008 — 实体删除与组件单独卸载不同
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+实体删除与组件单独卸载不同
+
+### Observed Behaviour
+
+Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。
+
+### Source File
+
+- `vanilla-snapshot/scripts/entityscript.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+Remove / RemoveComponent
+
+### Source Locator
+
+648 起；1705–1726
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+卸载回调应使用自身引用，不能假定 inst.components[name] 仍在；长命 Owner 的任务不会随短命业务对象自动取消。
+
+### Do Not Infer
+
+不能把完整世界销毁的清理外推为任意独立服务注销均安全。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 648 起；1705–1726；Remove / RemoveComponent · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · supplementary_interpretation · 13 注销、重复注册与清理
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-009"></a>
+
+## FACT-DST-009 — 原版制作 Host / Remote 汇合
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+有服务端 builder 的本地对象可直接调用；远程端经 PlayerController 和原版 RPC 到服务端 Builder，预测路径还涉及 BufferedAction。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+原版制作 Host / Remote 汇合
+
+### Observed Behaviour
+
+有服务端 builder 的本地对象可直接调用；远程端经 PlayerController 和原版 RPC 到服务端 Builder，预测路径还涉及 BufferedAction。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/builder_replica.lua`（original provenance；不作为包内链接）
+- `vanilla-snapshot/scripts/components/playercontroller.lua`（original provenance；不作为包内链接）
+- `vanilla-snapshot/scripts/networkclientrpc.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+MakeRecipeFromMenu / RemoteMakeRecipeFromMenu / RPC.MakeRecipeFromMenu
+
+### Source Locator
+
+builder_replica:424；playercontroller:5709；networkclientrpc:937
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+有现成原版业务协议时，可以扩展它而不另造 Mod RPC。
+
+### Do Not Infer
+
+不能把该分支外推为所有 Host 业务都会绕开 RPC。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · builder_replica:424；playercontroller:5709；networkclientrpc:937；MakeRecipeFromMenu / RemoteMakeRecipeFromMenu / RPC.MakeRecipeFromMenu · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 9
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+<a id="fact-dst-010"></a>
+
+## FACT-DST-010 — 原版材料来源与堆叠移除
+
+类型：Klei Fact · Evidence：E3 · Confidence：Very High · Status：supported_by_klei · Version：0.1.1
+
+GetCraftingIngredient 先查合规打开容器，再主槽、overflow、active；RemoveItem 对部分堆叠请求可先走 Stackable:Get，再进行常规来源搜索。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Api Mechanism
+
+原版材料来源与堆叠移除
+
+### Observed Behaviour
+
+GetCraftingIngredient 先查合规打开容器，再主槽、overflow、active；RemoveItem 对部分堆叠请求可先走 Stackable:Get，再进行常规来源搜索。
+
+### Source File
+
+- `vanilla-snapshot/scripts/components/inventory.lua`（original provenance；不作为包内链接）
+
+### Relevant Function
+
+GetCraftingIngredient / RemoveItem
+
+### Source Locator
+
+1697 起；1390 起
+
+### Version Context
+
+KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。
+
+### Implication
+
+扩展来源时必须按实体身份去重，并审查原版与新来源的访问规则。
+
+### Do Not Infer
+
+不能推出 Inventory API 自动验证额外 Provider 的所有权或与它合并资源预算。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- resources
+- **evidence_modes**：- vanilla_source
+  - static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- KLEI-LOCAL-20260928（外部来源未随包） · direct_evidence · 1697 起；1390 起；GetCraftingIngredient / RemoveItem · 源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · supplementary_interpretation · 10–11
+
+### related
+
+- [ARP-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/playbooks/ARP-DST-001.md#arp-dst-001)
+
+
+---
+
+## 来源：`knowledge/failures/case001.md`
+
+原始 SHA-256：`403c48ad54108cdfc28876915574c52eab2da397d7cc5a37215ecb08df8a05f9`
+
+# failure_case · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="fail-case001-001"></a>
+
+## FAIL-CASE001-001 — Seed cross-shard lost update
+
+类型：Case Observation · Evidence：E1 · Confidence：High · Status：needs_runtime_validation · Version：0.1.1
+
+A 可为6，B可为15；任一合法串行存取后的余额应为11。实体转换已经发生。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Preconditions
+
+- A/B 属于同一公共种子域，初始余额均为10
+- 两边在接收对方更新前分别以旧值计算
+- 采用已确认的完整值 Set 广播路径
+
+### Steps
+
+- A 存入5，删除实体后写15
+- B 取出4，生成实体后写6
+- 两条消息交叉到达，各副本用对方最终值覆盖本地值
+
+### Result
+
+A 可为6，B可为15；任一合法串行存取后的余额应为11。实体转换已经发生。
+
+### Expected Correctness
+
+若业务声明共享且守恒：最终可用余额应与合法操作总和一致，且不能通过旧副本合计超提。
+
+### Evidence
+
+M07 main/maindb.lua:774–786；M06 main/clientdbinit.lua:143–153；M12 soraseedcontainer.lua:121、157–218（REPORT-R6 编号）
+
+### Verification Status
+
+- Static Confirmed Path
+- Not Runtime Reproduced
+
+### Runtime Reproduced
+
+否
+
+### Limits
+
+REPORT-R6 §7.3 的静态交错；是否出现这个到达顺序及玩家影响尚未实测。
+
+### Static Path Confirmed
+
+是
+
+### Runtime Validation Status
+
+not_runtime_reproduced
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：illustrates
+   - **target**：[ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+2. **type**：illustrates
+   - **target**：[ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4–7
+
+### related
+
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [TEST-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-001)
+
+<a id="fail-case001-002"></a>
+
+## FAIL-CASE001-002 — Duplicate Material Provider Allocation
+
+类型：Case Observation · Evidence：E1 · Confidence：High · Status：needs_runtime_validation · Version：0.1.1
+
+最终材料计划只有 E=2，检查/分配层未保证总需求6。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Preconditions
+
+- 同一已打开且注册的容器 Stack E=4
+- 实际配方需要6，其他来源为空
+- 全局制作已启用且 Manager 分类、距离条件成立
+
+### Steps
+
+- 原版查询返回 E=4
+- Manager 按同一实体保留1后可用3，足以补名义缺口2
+- 返回 E=2，Adapter 用 finds[E]=2 覆盖4
+- need 按补齐计算完成，原版消耗接收到的表
+
+### Result
+
+最终材料计划只有 E=2，检查/分配层未保证总需求6。
+
+### Expected Correctness
+
+来源重叠不应制造额外资源；总可用4时应拒绝需要6的制作，且最终计划不应静默覆盖。
+
+### Evidence
+
+main/hook.lua:1510–1566；sorachestmanager.lua:1182–1236；原版 Inventory:GetCraftingIngredient 和 Builder:RemoveIngredients。
+
+### Verification Status
+
+- Static Confirmed Path
+- Not Runtime Reproduced
+
+### Runtime Reproduced
+
+否
+
+### Limits
+
+REPORT-R4 §9 已确认，REPORT-R6 §11.3 将其定位为 Provider/Builder Adapter 集成边界；非缓存故障。
+
+### Static Path Confirmed
+
+是
+
+### Runtime Validation Status
+
+not_runtime_reproduced
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：illustrates
+   - **target**：[ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### related
+
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+- [TEST-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-resource-001)
+
+<a id="fail-case001-003"></a>
+
+## FAIL-CASE001-003 — Unsafe temporary patch remains after error
+
+类型：Case Observation · Evidence：E1 · Confidence：High · Status：needs_runtime_validation · Version：0.1.1
+
+恢复路径未执行；若会话继续且对象仍在，字段可保留临时 wrapper。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Preconditions
+
+- 进入 Builder/UI 的临时方法替换分支
+- 被包装的 old 调用抛出 Lua error
+- 若讨论会话后续污染，还需外层捕获错误并继续运行
+
+### Steps
+
+- 保存 oldhas
+- 安装临时 Has
+- 调用 old 期间抛错
+- 控制流跳过 restore 赋值
+
+### Result
+
+恢复路径未执行；若会话继续且对象仍在，字段可保留临时 wrapper。
+
+### Expected Correctness
+
+操作无论成功或失败，都应按所有权规则恢复临时修改，并保留原错误。
+
+### Evidence
+
+main/hook.lua:1446–1458、1516–1535、1544–1566。
+
+### Verification Status
+
+- Static Confirmed Path
+- Not Runtime Reproduced
+
+### Runtime Reproduced
+
+否
+
+### Limits
+
+静态确认异常分支缺少恢复保证；未注入异常，未声称正常游玩已发生持续污染。
+
+### Static Path Confirmed
+
+是
+
+### Runtime Validation Status
+
+not_runtime_reproduced
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：illustrates
+   - **target**：[ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 13
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 17
+
+### related
+
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [TEST-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-001)
+
+<a id="fail-case001-004"></a>
+
+## FAIL-CASE001-004 — ClientDB owner task lifetime exceeds DB lifetime
+
+类型：Case Observation · Evidence：E1 · Confidence：High · Status：needs_runtime_validation · Version：0.1.1
+
+任务与闭包仍可存活到 World 清理；Send 的 Inited 检查阻止正常发包，但不是取消任务。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Preconditions
+
+- 为玩家创建 seed 服务端 View，World 上建立 UpdateOwnerKeyTask
+- 该玩家断开触发 ClientDB:UnInit
+- World 仍继续运行
+
+### Steps
+
+- 模板 serverfn 创建每3秒任务，闭包捕获 DB/玩家上下文
+- UnInit 调 bind.Remove，只解除两个 MainDB 监听
+- 移除 DB 注册并设置 Inited=false
+- 没有取消对应 World Task
+
+### Result
+
+任务与闭包仍可存活到 World 清理；Send 的 Inited 检查阻止正常发包，但不是取消任务。
+
+### Expected Correctness
+
+与该玩家 DB 同生命周期的任务应在 DB 注销时终止；世界级任务若继续须不保留过期玩家绑定。
+
+### Evidence
+
+main/clientdbinit.lua:178–186、227–230；main/clientdb.lua:151–175、184–187。
+
+### Verification Status
+
+- Static Confirmed Path
+- Not Runtime Reproduced
+
+### Runtime Reproduced
+
+否
+
+### Limits
+
+源码路径确认；未做重复重连的内存/任务数量测量。
+
+### Static Path Confirmed
+
+是
+
+### Runtime Validation Status
+
+not_runtime_reproduced
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：illustrates
+   - **target**：[ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16
+
+### related
+
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+- [TEST-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-001)
+
+
+---
+
+## 来源：`knowledge/patterns/PATTERN-FRAMEWORK-001.md`
+
+原始 SHA-256：`56ba519b62f203014e88fd44b9c0c1fb914eec4ebc536b103aef60ec5fcb6003`
+
+# pattern · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="pattern-framework-001"></a>
+
+## PATTERN-FRAMEWORK-001 — Mod Framework / Integration Layer
+
+类型：Engineering Pattern Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+用显式启动阶段、有限服务出口和可追踪适配器连接业务与原版。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Mod Framework / Integration Layer
+
+### Category
+
+framework
+
+### Problem
+
+大型 Mod 多模块需要接入原版生命周期与共享能力，隐式顺序和补丁叠加容易失控。
+
+### Context
+
+模块数量和接入点已经使显式组织有收益；不意味着要另建通用框架产品。
+
+### Forces
+
+- 加载期与运行期分离
+- 接口可追溯
+- 最窄 Hook 作用域
+- 多 Mod 共存
+
+### Core Idea
+
+用显式启动阶段、有限服务出口和可追踪适配器连接业务与原版。
+
+### Structure
+
+Bootstrap → Services → Registration；Vanilla Lifecycle → Adapter → Business → State Owner
+
+### State Ownership
+
+业务状态归业务 Owner；框架只拥有注册信息、适配上下文和自身生命周期。
+
+### Authority
+
+框架不能代替业务做资源/身份决策；Hook 作用域需明确实例或共享类。
+
+### Lifecycle
+
+区分注册与执行；设计重入、重复初始化、卸载和错误恢复。
+
+### Networking
+
+复用原版 Action/Replica/传输；仅对真实缺口建立适配。
+
+### Persistence
+
+不自动保存环境表或函数；持久化由业务数据 schema 决定。
+
+### Performance
+
+检查全实体 PostInit 成本、每实例闭包、共享 hook 链和频繁运行的包装。
+
+### Benefits
+
+- 接入位置集中
+- 依赖可定位
+- 复用原版行为
+
+### Costs
+
+- 包装链复杂
+- 环境隐式依赖
+- 版本敏感私有接口
+
+### Failure Modes
+
+- 临时补丁未恢复
+- 覆盖别人的 Hook
+- 共享命名冲突
+- 过期私有 upvalue
+
+### Use When
+
+多模块、多原版接入点，需要清晰启动和兼容边界。
+
+### Avoid When
+
+少量自足 Prefab；无需引入共享可写环境才能完成的普通模块。
+
+### Implementation Notes
+
+显式模块导出优先；共享服务应有限且可查；私有 Patch 需能力检测和失败降级。
+
+### Dst Klei Basis
+
+- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+
+### Case Evidence
+
+REPORT-R5 §1–14、20–24：SoraEnv/SoraAPI/多种 Hook；REPORT-R6 §13–14 展示两业务组合。
+
+### Counter Evidence
+
+案例不是统一注册/卸载框架；局部 Hook helper 的能力不能推成全项目通用保证。
+
+### Related Rules
+
+- [RULE-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-001)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001)
+
+### Related Anti Patterns
+
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### Related Decision Trees
+
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- framework
+  - hooks
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：derived_from
+   - **target**：[CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 1–14；20–24
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 13–14
+
+### related
+
+- [FACT-DST-007](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-007)
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [RULE-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-001)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [RULE-HOOK-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-003)
+- [RULE-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/framework.md#rule-framework-001)
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+- [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002)
+- [TEST-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-001)
+- [TEST-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-hook-002)
+
+
+---
+
+## 来源：`knowledge/patterns/PATTERN-NET-001.md`
+
+原始 SHA-256：`c212615dbde122b9b142511342af721d13b76f211ac1b902825db9d8eb0d039d`
+
+# pattern · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="pattern-net-001"></a>
+
+## PATTERN-NET-001 — Player Business Channel
+
+类型：Engineering Pattern Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+用玩家绑定的业务通道集中路由意图；服务端生成 View，客户端保存可重建 Cache。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Player Business Channel
+
+### Category
+
+network
+
+### Problem
+
+多个玩家 UI 各自重复定义 RPC、身份路由和缓存更新，容易混淆请求与权威结果。
+
+### Context
+
+多个相关业务需要玩家级命令和定向视图；原版 Action/Replica 不能完整承载额外视图。
+
+### Forces
+
+- Host 快路径与远程验证一致
+- 请求意图与状态同步不同
+- 每玩家隔离与广播成本
+- 断线时资源释放
+
+### Core Idea
+
+用玩家绑定的业务通道集中路由意图；服务端生成 View，客户端保存可重建 Cache。
+
+### Structure
+
+Widget → Client Service → Transport → Identity/Business Adapter → State Owner；Owner notification → View → Cache → Widget
+
+### State Ownership
+
+Owner 保存真实业务状态；View 可是函数映射；Client Cache 和展示均为派生。
+
+### Authority
+
+引擎玩家身份进入 Handler；业务仍校验参数、权限和当前状态。
+
+### Lifecycle
+
+认证/连接创建绑定，玩家生成关联，退出解除监听并取消属于绑定的任务。
+
+### Networking
+
+可用统一 RPC 分发业务命令；netvar/原版 Action 不应因引入通道而全部替换。
+
+### Persistence
+
+保存业务 Owner；视图与客户端缓存通常由登录同步重建。
+
+### Performance
+
+按业务/玩家裁剪更新；完整快照与键级更新需分别计算成本。
+
+### Benefits
+
+- 身份与路由复用
+- 同一视图供多个界面使用
+
+### Costs
+
+- 通道成为额外协议
+- 初始化和生命周期责任增加
+
+### Failure Modes
+
+- Host 验证旁路
+- 缓存误当权威
+- 无 ACK 却按已完成反馈
+- 长命任务泄漏
+
+### Use When
+
+多个 UI/业务确有玩家视图与统一路由需求。
+
+### Avoid When
+
+一个已有原版 Action 已完整解决的按钮；纯本地视觉。
+
+### Implementation Notes
+
+命令与通知分开命名；业务 Handler 返回可解释结果；只在需要时加入请求关联与超时。
+
+### Dst Klei Basis
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+
+### Case Evidence
+
+REPORT-R6 §3–6：ClientDB 的 seed 模板、BindRootFn、GetSeeds/CollectAllSeeds；Host 直调与 Remote 路由并存。
+
+### Counter Evidence
+
+同一案例的全局制作只用统一业务通道传开关，真正制作走原版 RPC；不是所有交互都需要通道。
+
+### Related Rules
+
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002)
+- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+
+### Related Anti Patterns
+
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### Related Decision Trees
+
+- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001)
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：derived_from
+   - **target**：[CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3–6；8–9
+
+### related
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [FACT-DST-009](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-009)
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+- [RULE-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-002)
+- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001)
+- [TEST-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-001)
+- [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002)
+- [TEST-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-001)
+- [TEST-NET-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-003)
+
+
+---
+
+## 来源：`knowledge/patterns/PATTERN-SHARD-001.md`
+
+原始 SHA-256：`0fea36d2e9be9cb424518463837886c8b5d0989fc018aaa2bc9daa540c10a5bb`
+
+# pattern · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="pattern-shard-001"></a>
+
+## PATTERN-SHARD-001 — Shard Service Bus
+
+类型：Engineering Pattern Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+把 Shard transport、服务路由和业务协议聚合；将 authority、复制与恢复作为显式契约。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+Shard Service Bus
+
+### Category
+
+shard
+
+### Problem
+
+多个世界要交流共享业务状态或请求，散落的 Shard RPC 缺少统一路由和恢复语义。
+
+### Context
+
+共享状态确实超出单世界；必须先决定其唯一/多写权威。
+
+### Forces
+
+- 离线与重连
+- 完整值与操作命令
+- 消息顺序
+- 共享稀缺资源正确性
+
+### Core Idea
+
+把 Shard transport、服务路由和业务协议聚合；将 authority、复制与恢复作为显式契约。
+
+### Structure
+
+Local Business → Shard Service → Transport → Remote Service → Authority/Replica；Persistence 跟随 Owner
+
+### State Ownership
+
+区分真实权威、可写副本、只读缓存；不要仅凭 DB 名称决定。
+
+### Authority
+
+由业务明确指定；总线本身不自动产生唯一权威。
+
+### Lifecycle
+
+世界创建服务；连接完成恢复协商；断开处理未完成工作；世界退出释放任务/引用。
+
+### Networking
+
+Shard RPC 可承载命令、事件或快照；每种有各自版本、幂等和恢复需求。
+
+### Persistence
+
+明确每 Shard 保存什么，以及副本重载后向谁收敛。
+
+### Performance
+
+按变化同步与按需快照；大桶完整复制可能扩大流量和冲突域。
+
+### Benefits
+
+- 收敛通信入口
+- 统一诊断和协议边界
+
+### Costs
+
+- 协议与恢复复杂度
+- 需要跨 Shard 测试
+
+### Failure Modes
+
+- 覆盖更新
+- 失联后旧副本继续写
+- 没有恢复来源
+- 实体转换与账本不同步
+
+### Use When
+
+业务真的需要跨世界共享/协调。
+
+### Avoid When
+
+当前世界注册表或本地容器查询；原版已满足的迁移数据。
+
+### Implementation Notes
+
+先列不变量，再选择单写命令或其他一致性方案；revision/epoch 不是无条件必加清单。
+
+### Dst Klei Basis
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+
+### Case Evidence
+
+REPORT-R6 §6–7：SeedDB/MainDB 的 Set 完整值广播、世界持久化、noSyn=1 与任务条件缺陷。
+
+### Counter Evidence
+
+该案例证明总线存在，也证明它不自动保证库存一致性；Case B 全局制作不需要该层。
+
+### Related Rules
+
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+
+### Related Anti Patterns
+
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### Related Decision Trees
+
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+1. **type**：derived_from
+   - **target**：[CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 6–7
+
+### related
+
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+- [RULE-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/shard.md#rule-shard-001)
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+- [TEST-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-001)
+- [TEST-LIFE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-002)
+- [TEST-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-shard-002)
+
+
+---
+
+## 来源：`knowledge/patterns/PATTERN-WORLD-001.md`
+
+原始 SHA-256：`8dab76430ef4c27cd8827ab5f7f996546299ce80317199675e029eb757669eba`
+
+# pattern · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="pattern-world-001"></a>
+
+## PATTERN-WORLD-001 — World Manager
+
+类型：Engineering Pattern Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+集中维护成员关系与跨实体协调，保留实体自身的真实状态和生命周期。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Name
+
+World Manager
+
+### Category
+
+world
+
+### Problem
+
+多个实体需要共享查询、预算或调度，逐实体扫描造成重复工作和分散生命周期。
+
+### Context
+
+协作范围是一个 World，实体仍有各自 Component 状态。
+
+### Forces
+
+- 注册与实体存在期一致
+- 查询实时性与索引成本
+- 局部行为与集中调度边界
+
+### Core Idea
+
+集中维护成员关系与跨实体协调，保留实体自身的真实状态和生命周期。
+
+### Structure
+
+Prefab/Component → Registry；Consumer → Query → registered entities；Events/Tasks → Coordination
+
+### State Ownership
+
+Registry/派生索引归 Manager；真实物品、生命、单体计时等仍归相应实体组件。
+
+### Authority
+
+需要权威 gameplay 的 Manager 放服务器世界；客户端只复制必要结果。
+
+### Lifecycle
+
+World 创建 → 类型/实例注册 → 事件/调度 → 注销；重复注册和独立卸载需明确。
+
+### Networking
+
+不必有 Replica；只在客户端确需 Manager 状态时定义最小视图。
+
+### Persistence
+
+实体真实数据保存；能从重建实体恢复的 Registry 通常不独立保存。
+
+### Performance
+
+候选缓存不等于数量索引；活跃集合/分批处理须以实际工作量选择。
+
+### Benefits
+
+- 减少重复发现
+- 集中查询契约
+- 跨实体工作可统一计量
+
+### Costs
+
+- 注册和失效管理
+- 集中层可能增长过度
+
+### Failure Modes
+
+- 失效引用
+- 重复注册
+- 遗漏 cleanup
+- Query 与资源占用混为一谈
+
+### Use When
+
+确有跨实体配额、查询或协同调度。
+
+### Avoid When
+
+单体自足行为；为整齐把所有实体逻辑移进一个巨型对象。
+
+### Implementation Notes
+
+优先显式注册、有效性检查和可观测计数；有性能证据再升级索引/任务队列。
+
+### Dst Klei Basis
+
+- [FACT-DST-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-002)
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [FACT-DST-010](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-010)
+
+### Case Evidence
+
+REPORT-R4 §3–8、12–15；REPORT-R6 §10–11：sorachestmanager 的 RegType/RegByType、候选缓存、HasItem/GetIngredients。
+
+### Counter Evidence
+
+案例仍有注册表全遍历和空间检测；未测 10/100/1000 箱性能；不能称为恒定时间或证明 God Object 已发生。
+
+### Related Rules
+
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+
+### Related Anti Patterns
+
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+### Related Decision Trees
+
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：derived_from
+   - **target**：[CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+
+### sources
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 3–8；12–15
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 10–11
+
+### related
+
+- [FACT-DST-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-002)
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [FACT-DST-010](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-010)
+- [RULE-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-001)
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+- [RULE-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/persist.md#rule-persist-001)
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+- [TEST-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-001)
+- [TEST-LIFE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-002)
+- [TEST-LIFE-003](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-life-003)
+- [TEST-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-resource-001)
+
+
+---
+
+## 来源：`knowledge/playbooks/ARP-DST-001.md`
+
+原始 SHA-256：`7bfb7af711cbfd2c559dad8c32726d56a9ba78a238cb9cb3b48262253f36fe8d`
+
+# playbook · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="arp-dst-001"></a>
+
+## ARP-DST-001 — DST Architecture Reasoning Process v0.1
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+按需求、状态、权威与生命周期逐步选择结构，检索事实/反例后再决定模式。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Process Version
+
+0.1
+
+### Steps
+
+1. **order**：1
+   - **name**：Requirement Decomposition
+   - **ai_should_ask**：哪些玩家行为必须发生，什么不变量不能破坏？
+   - **expected_output**：需求/非目标/验收场景列表。
+   - **common_errors**：从一个案例直接选架构，不先确认需求。
+   - **retrieve_entry_types**：- case
+     - rule
+     - failure_case
+   - **entry_ids**：- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+     - [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+
+2. **order**：2
+   - **name**：State Inventory
+   - **ai_should_ask**：每个数字、实体关联、开关、视图和缓存是什么？
+   - **expected_output**：状态清单，区分真实/派生/短时上下文。
+   - **common_errors**：只列组件名，不列状态。
+   - **retrieve_entry_types**：- case
+     - source_fact
+   - **entry_ids**：- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+
+3. **order**：3
+   - **name**：State Ownership
+   - **ai_should_ask**：谁持有、写入和读取每项状态？
+   - **expected_output**：State | Owner | Writer | Reader | Replicated | Persisted | Rebuildable 矩阵。
+   - **common_errors**：把 View、Cache、Widget 都当 Owner。
+   - **retrieve_entry_types**：- rule
+     - decision
+   - **entry_ids**：- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+     - [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+
+4. **order**：4
+   - **name**：Scope
+   - **ai_should_ask**：状态属于单实体、玩家、World 还是多个 Shard？
+   - **expected_output**：范围及依赖图，列出不存在的层。
+   - **common_errors**：为了图完整加 Manager/Shard 层。
+   - **retrieve_entry_types**：- pattern
+     - decision
+   - **entry_ids**：- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+     - [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+
+5. **order**：5
+   - **name**：Authority
+   - **ai_should_ask**：对客户端、其他玩家、其他 Shard 分别谁能决定结果？
+   - **expected_output**：写入权威表及冲突/恢复语义。
+   - **common_errors**：使用 Server 一词掩盖多 Server 可写。
+   - **retrieve_entry_types**：- rule
+     - anti_pattern
+     - failure_case
+   - **entry_ids**：- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+     - [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001)
+
+6. **order**：6
+   - **name**：Lifecycle
+   - **ai_should_ask**：对象何时建、绑定、暂停、注销？任务实际挂谁？
+   - **expected_output**：创建/加入/退出/移除/重载矩阵及 cleanup owner。
+   - **common_errors**：以世界销毁会清理代替玩家注销清理。
+   - **retrieve_entry_types**：- rule
+     - failure_case
+     - source_fact
+   - **entry_ids**：- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+     - [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+
+7. **order**：7
+   - **name**：Networking
+   - **ai_should_ask**：传 Intent 还是 State？原版是否已有链？
+   - **expected_output**：Host/Remote/Dedicated 请求和返回图，校验、超时/重试语义。
+   - **common_errors**：所有请求套自定义 RPC；把缓存更新当逐请求 ACK。
+   - **retrieve_entry_types**：- decision
+     - pattern
+     - source_fact
+   - **entry_ids**：- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001)
+     - [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+
+8. **order**：8
+   - **name**：Persistence
+   - **ai_should_ask**：重启后哪些信息无法等价重算？
+   - **expected_output**：保存 schema、重建来源、初始化完成条件和升级/回档问题。
+   - **common_errors**：把能序列化等同应该保存。
+   - **retrieve_entry_types**：- decision
+     - source_fact
+   - **entry_ids**：- [DECISION-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-persist-001)
+     - [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+
+9. **order**：9
+   - **name**：Coordination
+   - **ai_should_ask**：多实体/来源有交集吗？Query 到执行之间会变化吗？
+   - **expected_output**：资源分配图、预算/提交边界及失败补偿。
+   - **common_errors**：单线程就没有逻辑竞争；相同实体按来源重复预算。
+   - **retrieve_entry_types**：- rule
+     - anti_pattern
+     - failure_case
+   - **entry_ids**：- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+     - [RULE-RESOURCE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-002)
+
+10. **order**：10
+   - **name**：Performance
+   - **ai_should_ask**：多少任务/监听/扫描？空闲也扫描吗？
+   - **expected_output**：复杂度估计、规模变量、测量计划；先不捏造 benchmark。
+   - **common_errors**：Manager 等于高性能；提前引入重型索引。
+   - **retrieve_entry_types**：- pattern
+     - rule
+     - test_case
+   - **entry_ids**：- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+
+11. **order**：11
+   - **name**：Hook / Compatibility
+   - **ai_should_ask**：改实例、类还是闭包？异常/重装会怎样？
+   - **expected_output**：Hook 目标表、owner、前驱、恢复和私有接口版本边界。
+   - **common_errors**：仅正常返回保留 oldfn 就称兼容安全。
+   - **retrieve_entry_types**：- decision
+     - anti_pattern
+     - source_fact
+   - **entry_ids**：- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+     - [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+
+12. **order**：12
+   - **name**：Validation Matrix
+   - **ai_should_ask**：每条主张需要哪种证据？哪些测试实际执行？
+   - **expected_output**：需求→代码事实→测试候选→执行环境→结果矩阵；明确待验证。
+   - **common_errors**：语法通过就升级 E4；测试候选写成执行记录。
+   - **retrieve_entry_types**：- test_case
+     - source_fact
+     - correction
+   - **entry_ids**：- [TEST-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-001)
+     - [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002)
+     - [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001)
+
+### Retrieval Policy
+
+- 先读取 status 和 Corrections；过期/撤回主张不可直接用于建议。
+- 读取 Pattern 时同时取 Related Rule/Anti-Pattern/Decision/Test；不要只取支持它的正例。
+- 给建议标注适用条件、证据等级、置信度和未测项；同一案例的多报告不是 E2。
+- E3 事实引用快照与函数；Recommendation 不因引用 E3 而自动变成 Klei Fact。
+
+### Stop Conditions
+
+不明确的玩法/数值/用户意图列出选项；只在有证据的工程边界自主选择。
+
+### Revision Policy
+
+CASE-002+ 提供独立证据后修订；保留旧 version 与 Correction/Deprecated 状态。
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- architecture
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+无 / 未建立
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 2；12–19
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 7–15
+
+### related
+
+- [RULE-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/net.md#rule-net-001)
+- [RULE-STATE-004](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-004)
+- [RULE-STATE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-002)
+- [DECISION-STATE-OWNER-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-state-owner-001)
+- [DECISION-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-shard-001)
+- [RULE-STATE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/state.md#rule-state-001)
+- [FAIL-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/failures/case001.md#fail-case001-001)
+- [RULE-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/life.md#rule-life-001)
+- [FACT-DST-008](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-008)
+- [DECISION-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-net-001)
+- [FACT-DST-006](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-006)
+- [DECISION-PERSIST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-persist-001)
+- [FACT-DST-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/facts/klei-lua.md#fact-dst-001)
+- [RULE-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-001)
+- [RULE-RESOURCE-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/resource.md#rule-resource-002)
+- [RULE-WORLD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/world.md#rule-world-002)
+- [DECISION-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/decisions/candidates.md#decision-hook-001)
+- [RULE-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/rules/hook.md#rule-hook-002)
+- [TEST-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-001)
+- [TEST-NET-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/tests/candidates.md#test-net-002)
+- [CORRECTION-CASE001-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/corrections/CASE-001.md#correction-case001-001)
+
+
+---
+
+## 来源：`knowledge/research/native001/linked-history/native-runtime-pass01-20261004/delivery/NATIVE-001.1-Runtime-Pass01.md`
+
+原始 SHA-256：`6821faf20a1ef2509b2f779d9ca9d45f56496559e0ab7f3afab78601984ffe37`
+
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+1. **HUD、activated、READY、控制标志是独立观察点。** S01 `SetMainCharacter` return seq40 已有 HUD/Controls；seq78/81 为玩家/世界 activation producer。C/S READY 返回 seq110/115 时 `controller_enabled_net=false`，`Enable(true)` return seq121 才变 true。HUD return 时标志为true，出生链随后关闭该标志，所以这不是一个始终单向递增的“ready阶梯”。这只证明本样本网络控制标志的关系，不等于 Physics、渲染或实际输入内部实现。见 `raw-logs/S01-final-03-client_log.log` 行1544、1586/1589、1618/1623、1629。
+2. **Listen local 与 Dedicated/Remote 公开 handler 上下文不同。** S01 同进程记录两侧 handler；S03 专服玩家 `is_theplayer=false`、无 HUD，Remote 本地玩家有 HUD/Controls并接收 Client handler。两端只各自确认 READY，不建立 RPC 跨端因果。
+3. **S04 真实 Resume 被捕获。** Dedicated 第二加载 seq222–239：`ResumeExistingUserSession → SetPersistData → OnPreLoad / OnLoad → EnableLoadingProtection → SpawnAtLocation(isloading=true)`。原生日志 `raw-logs/S04-final-04-dedicated-stdout.log` 行718–736，可按 function+snapshot 对照源码。保护开启、后续公共释放调用可观测；引擎释放触发者仍未知。
+4. **账号键稳定不等于实体连续。** S03 / S04 匿名 userid_key相同：服务端 player GUID 119358 → 119396、classified 119359 → 119397；客户端 player 101920 → 100155、classified 101919 → 100154。S03 旧服务端实例有 Remove 返回，S04 有新实例快照。结论仅限本进程样本，不断言 GUID 必然变化、分配规则或全局唯一性。
+5. **跨进程 GUID 不能直接用于这次实体关联。** S03 同账号的 Server GUID119358与Client GUID101920不同。匿名账号与操作上下文用于关联本次场景，不能替代 native network object id / packet correlation。
+6. **握手存在可观测同步嵌套。** Remote Client输入2时外层返回state3；Dedicated Server输入1时外层返回state2，均有内层方法对。静态源码有相应 `PostActivateHandshake` 同步分支；这不是状态 guard 的反例，也不能由外层 entry/return推断原 task身份。
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+[UNREFERENCED_HISTORICAL_REPORT_LINE_WITHHELD]
+
+
+---
+
+## 来源：`knowledge/rules/framework.md`
+
+原始 SHA-256：`ccfb08a5aadaec0ebe2be5fc3f875f02b36d6df3eaff16b286ce607afe10dbad`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-framework-001"></a>
+
+## RULE-FRAMEWORK-001 — 共享 API 应有可追溯的有限出口和初始化条件。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+共享 API 应有可追溯的有限出口和初始化条件。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+共享 API 应有可追溯的有限出口和初始化条件。
+
+### Why
+
+整个可写环境作为 API 会隐藏依赖与覆盖。
+
+### Applies When
+
+模块增多或多人维护。
+
+### Does Not Mean
+
+不是禁止共享工具表或要求引入依赖注入容器。
+
+### Evidence
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 2–5；14–15
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：少量稳定、只读式公共工具可简单共享。
+
+### Failure If Violated
+
+顺序依赖、同名覆盖、接口面无控制增长。
+
+### Detection Questions
+
+- 符号在哪里定义，何时可用，谁能写？
+
+### Related Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Related Anti Patterns
+
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### Origin Round6 Rule
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- framework
+  - hooks
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 2–5；14–15
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+
+---
+
+## 来源：`knowledge/rules/hook.md`
+
+原始 SHA-256：`2fb988c3a696334f0624b9407f973d8c88f8d45ed217079fd8cd3ed2fed18d63`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-hook-001"></a>
+
+## RULE-HOOK-001 — 先确认原版消费、保存和卸载契约，再扩展接口。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+先确认原版消费、保存和卸载契约，再扩展接口。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+先确认原版消费、保存和卸载契约，再扩展接口。
+
+### Why
+
+名称与示意图不能代表真实顺序。
+
+### Applies When
+
+接入已有 API。
+
+### Does Not Mean
+
+不是永远禁止自定义实现。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 9–11；16
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：原版确实缺少机制时应写明缺口。
+
+### Failure If Violated
+
+依赖错序、访问已清空组件、材料计划不兼容。
+
+### Detection Questions
+
+- 被调用方如何处理参数/所有权/返回值？
+
+### Related Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Related Anti Patterns
+
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+### Origin Round6 Rule
+
+14
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 9–11；16
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+<a id="rule-hook-002"></a>
+
+## RULE-HOOK-002 — 临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+临时替换必须在异常退出时恢复，并避免覆盖后来的拥有者。
+
+### Why
+
+old(...) 抛错会跳过普通赋值恢复。
+
+### Applies When
+
+绕现有调用临时改方法/上下文。
+
+### Does Not Mean
+
+不是每个一次性启动赋值都要可热卸载。
+
+### Evidence
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 12–13
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：会话级固定替换可显式声明不可卸载，并仍审查异常。
+
+### Failure If Violated
+
+替换残留、其他 Mod 包装被抹掉。
+
+### Detection Questions
+
+- 恢复时目标仍等于自己装的 wrapper 吗？
+
+### Related Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Related Anti Patterns
+
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+### Origin Round6 Rule
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 12–13
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [ANTI-HOOK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-001)
+
+<a id="rule-hook-003"></a>
+
+## RULE-HOOK-003 — 选择最小足够作用域的接入点，并保存原契约。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+选择最小足够作用域的接入点，并保存原契约。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+选择最小足够作用域的接入点，并保存原契约。
+
+### Why
+
+类、实例、闭包共享状态的影响范围不同。
+
+### Applies When
+
+PostInit、实例包装、类改写或私有 patch。
+
+### Does Not Mean
+
+不是私有 upvalue 一律禁止。
+
+### Evidence
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 7–9；12–13
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：没有公开接入点且能版本检测、失败降级时可审慎采用。
+
+### Failure If Violated
+
+污染所有实例或丢失原始清理/返回值。
+
+### Detection Questions
+
+- 该改动影响旧实例还是新实例？能否回退？
+
+### Related Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Related Anti Patterns
+
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+
+### Origin Round6 Rule
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 7–9；12–13
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+- [ANTI-HOOK-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-hook-002)
+
+
+---
+
+## 来源：`knowledge/rules/life.md`
+
+原始 SHA-256：`67be60c5abfa5bcdfd786ae7ededdd7c35d47641196fc62098b1670bfb0daa72`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-life-001"></a>
+
+## RULE-LIFE-001 — Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+Task、Listener、临时状态和 Hook 都要有可追踪的生命周期 Owner。
+
+### Why
+
+短命对象注销不自动清理挂在长命实体上的资源。
+
+### Applies When
+
+绑定玩家、UI、世界服务。
+
+### Does Not Mean
+
+不是实体正常 Remove 后仍需重复手动清所有引擎资源。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16–17
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：任务本来就属于整世界时可持续运行。
+
+### Failure If Violated
+
+旧闭包、旧监听或临时字段继续影响会话。
+
+### Detection Questions
+
+- 注销谁时应取消哪一个句柄？
+
+### Related Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Related Anti Patterns
+
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### Origin Round6 Rule
+
+13
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16–17
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+
+---
+
+## 来源：`knowledge/rules/net.md`
+
+原始 SHA-256：`fd00af18eeb5b7168d1cca1f49837bc84e5785dacdf1c583aa967ad90c5a2373`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-net-001"></a>
+
+## RULE-NET-001 — Client 提交 Intent，服务端决定权威数量/材料。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+Client 提交 Intent，服务端决定权威数量/材料。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+Client 提交 Intent，服务端决定权威数量/材料。
+
+### Why
+
+伪造最终余额会跳过合法性检查。
+
+### Applies When
+
+客户端请求影响 gameplay。
+
+### Does Not Mean
+
+不要求所有操作自建 RPC；可复用原版 Action/Builder/Replica。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4–5；9
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：纯本地光效可由客户端决定。
+
+### Failure If Violated
+
+客户端越权设置结果。
+
+### Detection Questions
+
+- 谁根据当前真实状态计算结果？
+
+### Related Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Related Anti Patterns
+
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### Origin Round6 Rule
+
+1
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4–5；9
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+<a id="rule-net-002"></a>
+
+## RULE-NET-002 — Host 快路径应保留与 Remote 相同的业务验证。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+Host 快路径应保留与 Remote 相同的业务验证。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+Host 快路径应保留与 Remote 相同的业务验证。
+
+### Why
+
+优化 transport 容易一起绕过 Adapter。
+
+### Applies When
+
+本地直调与远程 Handler 并存。
+
+### Does Not Mean
+
+不是禁止 Host 直调或要求回环网络包。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.3；8.1；9
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：纯本地 UI 不涉及服务端权限。
+
+### Failure If Violated
+
+Host 正常而 Remote 拒绝，或权限条件不同。
+
+### Detection Questions
+
+- 两条路径在哪里汇合验证？
+
+### Related Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Related Anti Patterns
+
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### Origin Round6 Rule
+
+5
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.3；8.1；9
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+<a id="rule-net-003"></a>
+
+## RULE-NET-003 — 乐观 UI 应与服务端最终可用性区分。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+乐观 UI 应与服务端最终可用性区分。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+乐观 UI 应与服务端最终可用性区分。
+
+### Why
+
+显示可尝试不代表客户端知道所有材料。
+
+### Applies When
+
+客户端没有完整权威库存。
+
+### Does Not Mean
+
+不要求复制全世界库存才能显示按钮。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 8.3；9
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：局部完整 Replica 足以给精确提示时不必乐观。
+
+### Failure If Violated
+
+把界面可点误当成业务已成功。
+
+### Detection Questions
+
+- 失败由谁反馈？何时重查？
+
+### Related Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Related Anti Patterns
+
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### Origin Round6 Rule
+
+12
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 8.3；9
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [ANTI-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-net-001)
+
+
+---
+
+## 来源：`knowledge/rules/persist.md`
+
+原始 SHA-256：`a8fd1e9c345de3f0f8415dc324652a9aa0d8a142492bda5d75ff41c69d4d31d0`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-persist-001"></a>
+
+## RULE-PERSIST-001 — 可从真实实体重建的 Registry/Cache 通常不独立持久化。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+可从真实实体重建的 Registry/Cache 通常不独立持久化。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+可从真实实体重建的 Registry/Cache 通常不独立持久化。
+
+### Why
+
+保存两份关联需修复 GUID 与初始化顺序。
+
+### Applies When
+
+派生实体注册表、候选缓存。
+
+### Does Not Mean
+
+不能把用户选择/进度一律归类成缓存丢弃。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：跨重启必须保留的排程/租约需单独设计保存。
+
+### Failure If Violated
+
+读档遗留失效引用或丢失不可重建意图。
+
+### Detection Questions
+
+- 这是重算能等价恢复，还是只重置默认？
+
+### Related Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Related Anti Patterns
+
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### Origin Round6 Rule
+
+9
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- persistence
+  - lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [ANTI-LIFE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-life-001)
+
+
+---
+
+## 来源：`knowledge/rules/resource.md`
+
+原始 SHA-256：`64ffb598441758bc813674e0b3ef6990237515d2bf4b9d9a0504c205ccf92626`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-resource-001"></a>
+
+## RULE-RESOURCE-001 — 多个资源 Provider 必须按实体身份和剩余预算组合。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+多个资源 Provider 必须按实体身份和剩余预算组合。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+多个资源 Provider 必须按实体身份和剩余预算组合。
+
+### Why
+
+同一实体可以从多个来源被发现。
+
+### Applies When
+
+合并多个 Entity→amount 查询结果。
+
+### Does Not Mean
+
+不是简单把重复项改成相加就修好。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：证明来源集合互斥时可直接组合。
+
+### Failure If Violated
+
+重复预算或覆盖已分配数量而少扣材料。
+
+### Detection Questions
+
+- Provider B 知道 A 已分配哪些实体多少吗？
+
+### Related Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Related Anti Patterns
+
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+### Origin Round6 Rule
+
+10
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - resources
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+<a id="rule-resource-002"></a>
+
+## RULE-RESOURCE-002 — Query/分配建议不等于 reservation 或扣款。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+Query/分配建议不等于 reservation 或扣款。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+Query/分配建议不等于 reservation 或扣款。
+
+### Why
+
+查询到执行之间可以有排队和同步回调。
+
+### Applies When
+
+延后执行、回调可变或共享资源。
+
+### Does Not Mean
+
+不是断言 Lua 每行会被其他任务抢占。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 10.3；11.4
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：无回调、无让出且立即执行的小操作可保持简单。
+
+### Failure If Violated
+
+旧计划被当作承诺，扣款失败无补偿。
+
+### Detection Questions
+
+- 执行前还有哪些状态变化点？
+
+### Related Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Related Anti Patterns
+
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+### Origin Round6 Rule
+
+11
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - resources
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 10.3；11.4
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [ANTI-RESOURCE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-resource-001)
+
+
+---
+
+## 来源：`knowledge/rules/shard.md`
+
+原始 SHA-256：`0748623c3dcf6d8130cac13712391dbc00ae0cb4193309ee8d1ef2ebd93cadd6`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-shard-001"></a>
+
+## RULE-SHARD-001 — 跨 Shard 稀缺资源应先定义写入权威和冲突语义。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+跨 Shard 稀缺资源应先定义写入权威和冲突语义。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+跨 Shard 稀缺资源应先定义写入权威和冲突语义。
+
+### Why
+
+基于同一旧值的完整 Set 会覆盖并行修改。
+
+### Applies When
+
+共享库存、积分等需要守恒。
+
+### Does Not Mean
+
+不等于任何广播完整值都错误。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 6–7
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：唯一写者广播可覆盖的显示配置通常合理。
+
+### Failure If Violated
+
+丢更新、余额分歧、合计超提。
+
+### Detection Questions
+
+- 操作是 delta 还是最终值？谁能拒绝旧写？
+
+### Related Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Related Anti Patterns
+
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### Origin Round6 Rule
+
+7
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 6–7
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+
+---
+
+## 来源：`knowledge/rules/state.md`
+
+原始 SHA-256：`6a71ba6ebcc915cd507f27f916ad804b215d88217c7d6940179ecef1f679f497`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-state-001"></a>
+
+## RULE-STATE-001 — 每个状态写清“相对于谁权威”。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+每个状态写清“相对于谁权威”。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+每个状态写清“相对于谁权威”。
+
+### Why
+
+客户端权威边界不等于 Shard 间一致性。
+
+### Applies When
+
+多端或多分片状态。
+
+### Does Not Mean
+
+不是所有数据都需要主世界集中持有。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3；7
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：互不共享的每世界天气配置可各自权威。
+
+### Failure If Violated
+
+把多个可写副本误当唯一账本。
+
+### Detection Questions
+
+- 谁能写？离线副本还能写吗？
+
+### Related Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Related Anti Patterns
+
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### Origin Round6 Rule
+
+2
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3；7
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [ANTI-SHARD-002](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-002)
+
+<a id="rule-state-002"></a>
+
+## RULE-STATE-002 — 分别记录 Owner、Server View、Client Cache 和 Display。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+分别记录 Owner、Server View、Client Cache 和 Display。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+分别记录 Owner、Server View、Client Cache 和 Display。
+
+### Why
+
+相同键名不代表相同存储职责。
+
+### Applies When
+
+有映射/缓存/界面的业务。
+
+### Does Not Mean
+
+不是强迫每层各建一个类或复制一份数据。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3；5
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：小业务可直接读取已有 Replica。
+
+### Failure If Violated
+
+UI 或副本被当作保存真相。
+
+### Detection Questions
+
+- View 是函数还是一份副本？
+
+### Related Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Related Anti Patterns
+
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### Origin Round6 Rule
+
+3
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3；5
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [ANTI-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-framework-001)
+
+<a id="rule-state-003"></a>
+
+## RULE-STATE-003 — 缓存可重建只说明恢复来源，不说明来源正确。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+缓存可重建只说明恢复来源，不说明来源正确。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+缓存可重建只说明恢复来源，不说明来源正确。
+
+### Why
+
+同步陈旧服务器仍会得到陈旧值。
+
+### Applies When
+
+缓存依赖分布式/异步 Owner。
+
+### Does Not Mean
+
+不是要求所有缓存强一致。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3；17
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：非关键统计允许明确的延迟误差。
+
+### Failure If Violated
+
+客户端看似刷新却掩盖服务器分歧。
+
+### Detection Questions
+
+- 恢复时向谁取值？该源如何保证正确？
+
+### Related Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Related Anti Patterns
+
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+### Origin Round6 Rule
+
+4
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3；17
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+<a id="rule-state-004"></a>
+
+## RULE-STATE-004 — 实体与账本互换必须定义提交及失败补偿边界。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+实体与账本互换必须定义提交及失败补偿边界。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+实体与账本互换必须定义提交及失败补偿边界。
+
+### Why
+
+Remove/Spawn 与数字修改并非一个原子操作。
+
+### Applies When
+
+物理物品转为计数、积分或共享资源。
+
+### Does Not Mean
+
+不要求所有普通容器操作实现分布式事务。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.4；5.2；7.3
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：无价值、可丢弃视觉实体无需账本守恒。
+
+### Failure If Violated
+
+物品已删未记账或已生成未可靠扣款。
+
+### Detection Questions
+
+- 第几步失败时，实体和余额如何保持不变量？
+
+### Related Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Related Anti Patterns
+
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+### Origin Round6 Rule
+
+6
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.4；5.2；7.3
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+- [ANTI-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-shard-001)
+
+
+---
+
+## 来源：`knowledge/rules/world.md`
+
+原始 SHA-256：`9b7be0560946243d1d6f1c737f86b1b922decb62ced92da86094b640344acc21`
+
+# rule · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="rule-world-001"></a>
+
+## RULE-WORLD-001 — 真实物品留给 Container/Item；Manager 可持有成员和候选。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：High · Status：candidate · Version：0.1.1
+
+真实物品留给 Container/Item；Manager 可持有成员和候选。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+真实物品留给 Container/Item；Manager 可持有成员和候选。
+
+### Why
+
+重复库存账本增加一致性责任。
+
+### Applies When
+
+世界级实体查询和协调。
+
+### Does Not Mean
+
+不是禁止经测量后维护数量索引。
+
+### Evidence
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 10.2–10.4
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：大量高频聚合可用有明确失效协议的索引。
+
+### Failure If Violated
+
+Manager 数字与实际实体分离。
+
+### Detection Questions
+
+- 查询读的是当前 Stack 还是另存的数量？
+
+### Related Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Related Anti Patterns
+
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+### Origin Round6 Rule
+
+8
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 10.2–10.4
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+<a id="rule-world-002"></a>
+
+## RULE-WORLD-002 — 注册与失效管理先正确，再按测量选择 Active Set/索引。
+
+类型：Engineering Rule Candidate · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+注册与失效管理先正确，再按测量选择 Active Set/索引。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Statement
+
+注册与失效管理先正确，再按测量选择 Active Set/索引。
+
+### Why
+
+一个 Manager 仍可能每秒遍历全部对象。
+
+### Applies When
+
+多个实体参与周期工作。
+
+### Does Not Mean
+
+不是一定需要任务队列或把所有查询变 O(1)。
+
+### Evidence
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 6；8；13；15
+
+### Counterexample
+
+适用边界示例（未作为独立项目证据）：小规模稀疏工作保持简单遍历更易维护。
+
+### Failure If Violated
+
+优化了任务数量，却仍有高扫描成本或漏注册。
+
+### Detection Questions
+
+- 空闲时扫描什么？注销是否使缓存失效？
+
+### Related Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Related Anti Patterns
+
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+### Origin Round6 Rule
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：mitigates
+   - **target**：[ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+### sources
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 6；8；13；15
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [ANTI-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/anti-patterns/case001.md#anti-world-001)
+
+
+---
+
+## 来源：`knowledge/tests/candidates.md`
+
+原始 SHA-256：`844beb327318e40cf0f5ca62534d6e0dee886a84f31de10738c5306cecec9395`
+
+# test_case · v0.1.1
+
+本文件由 `data/entries.json` 生成；证据等级与推荐置信度互相独立。没有执行这里的测试候选。
+
+<a id="test-net-001"></a>
+
+## TEST-NET-001 — Host vs Remote Client parity
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+发现本地快路径校验旁路。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+发现本地快路径校验旁路。
+
+### Setup
+
+同版本、同配置，Host 与远程玩家具备相同输入前置条件；分别测试合法/非法装备与状态。
+
+### Action
+
+分别发起同一业务意图。
+
+### Expected Invariant
+
+相同权威前置条件得到相同业务判定；传输差异不改变权限。
+
+### Failure Signal
+
+仅 Host 成功或参数检查不同且无设计依据。
+
+### Applicable Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.3；5.2
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 4.3；5.2
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+<a id="test-net-002"></a>
+
+## TEST-NET-002 — Dedicated Server request flow
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+排除对 ThePlayer/HUD 等本地客户端对象的服务器依赖。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+排除对 ThePlayer/HUD 等本地客户端对象的服务器依赖。
+
+### Setup
+
+隔离专服与远程客户端，记录版本/配置/日志，服务端无本地玩家UI。
+
+### Action
+
+进入、初始化通道、发送业务命令、退出。
+
+### Expected Invariant
+
+服务端权威逻辑无需 HUD；客户端只经允许状态/结果更新。
+
+### Failure Signal
+
+专服 nil 错误、未创建通道或只有 Host 能使用。
+
+### Applicable Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3.3；9
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+2. **type**：tests
+   - **target**：[PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 3.3；9
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+<a id="test-shard-001"></a>
+
+## TEST-SHARD-001 — Ground/Cave simultaneous modification
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+检查共享资源守恒。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+检查共享资源守恒。
+
+### Setup
+
+地面/洞穴同一逻辑资源，记录初始余额和物理物品数；同步控制两个请求时点。
+
+### Action
+
+跨分片并行存入/取出或其他写操作，等待通信稳定。
+
+### Expected Invariant
+
+在声明共享守恒的业务中，余额和实体变化符合合法串行/明确冲突语义，不超发。
+
+### Failure Signal
+
+分歧、丢更新或总量凭空变化。
+
+### Applicable Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+<a id="test-life-001"></a>
+
+## TEST-LIFE-001 — Player reconnect
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+检查重连重建与旧绑定资源回收。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+检查重连重建与旧绑定资源回收。
+
+### Setup
+
+记录每玩家 DB、任务、监听数量，准备可见状态。
+
+### Action
+
+多次退出/重连；必要时换 Shard；逐次核对实例身份。
+
+### Expected Invariant
+
+旧玩家绑定终止；新绑定拿到正确视图；任务数不随次数无界增长。
+
+### Failure Signal
+
+旧 owner 任务继续运行、重复回调或旧缓存显示。
+
+### Applicable Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+2. **type**：tests
+   - **target**：[PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 16
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+<a id="test-life-002"></a>
+
+## TEST-LIFE-002 — World save/load
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+区分真相保存与派生重建。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+区分真相保存与派生重建。
+
+### Setup
+
+记录真实物品/余额、用户选项及预期保存策略；正常保存。
+
+### Action
+
+重启同一存档并等初始化完成。
+
+### Expected Invariant
+
+真实状态符合保存点；派生 Registry 重建；被声明不保存的字段按约定重置。
+
+### Failure Signal
+
+双份注册、漏物品、把默认值误认作旧选择恢复。
+
+### Applicable Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+2. **type**：tests
+   - **target**：[PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7；15–16
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+<a id="test-life-003"></a>
+
+## TEST-LIFE-003 — Entity removed during query
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+检查失效候选和查询执行边界。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+检查失效候选和查询执行边界。
+
+### Setup
+
+注册容器并建立候选缓存；使用实际允许的事件/动作阶段注入移除，不假装逐行并发。
+
+### Action
+
+查询后、执行前或同步回调中删除实体/单独移除组件，再次请求。
+
+### Expected Invariant
+
+无失效引用崩溃；失败可解释；不得使用已失效实体或重复扣款。
+
+### Failure Signal
+
+nil/invalid Entity、旧计划执行、注销漏回调。
+
+### Applicable Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Evidence Source
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 13–14
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- lifecycle
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### sources
+
+- [REPORT-R4](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/sorachestmanager_DeepDive_20260928.txt>) · interpretation · 13–14
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+<a id="test-hook-001"></a>
+
+## TEST-HOOK-001 — Wrapped function throws error
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+检查临时替换的异常恢复。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+检查临时替换的异常恢复。
+
+### Setup
+
+在隔离测试对象的 old 调用加入可控 error；外层捕获以检查后态。
+
+### Action
+
+进入 wrapper 触发异常，然后检查字段并执行第二次正常调用。
+
+### Expected Invariant
+
+自己的临时修改被清理；原始错误保留；不覆盖第三方新赋值。
+
+### Failure Signal
+
+wrapper/flag 残留或原错误被吞掉。
+
+### Applicable Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Evidence Source
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 13
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 13
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+<a id="test-hook-002"></a>
+
+## TEST-HOOK-002 — Two Mods wrap same function
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+验证包装组合与 ownership。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+验证包装组合与 ownership。
+
+### Setup
+
+两个最小测试补丁分别包装同一目标，覆盖不同加载顺序及实例/类组合。
+
+### Action
+
+调用、让一方撤销或在回调中重装另一方。
+
+### Expected Invariant
+
+约定要保留的行为执行正确次数，撤销不抹掉别人包装，返回值契约保留。
+
+### Failure Signal
+
+双调用、丢调用、后装 wrapper 被旧恢复覆盖。
+
+### Applicable Patterns
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### Evidence Source
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 12–13
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- hooks
+  - compatibility
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：无 / 未建立
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+### sources
+
+- [REPORT-R5](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraFramework_DeepDive_20260928.txt>) · interpretation · 12–13
+
+### related
+
+- [PATTERN-FRAMEWORK-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-FRAMEWORK-001.md#pattern-framework-001)
+
+<a id="test-resource-001"></a>
+
+## TEST-RESOURCE-001 — Same Entity exposed by two resource providers
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+验证分配交集处理。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+验证分配交集处理。
+
+### Setup
+
+Provider A/B 返回同一 Stack；设真实可用量小于合并后的名义量。
+
+### Action
+
+执行不足和足够两组查询/制作，记录每实体分配及真实扣除。
+
+### Expected Invariant
+
+同一实体只消耗其实际可用预算；不足时拒绝或按声明的部分语义处理。
+
+### Failure Signal
+
+Has 通过但计划少扣、重复预算、覆盖数量。
+
+### Applicable Patterns
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- world
+  - resources
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 11.3
+
+### related
+
+- [PATTERN-WORLD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-WORLD-001.md#pattern-world-001)
+
+<a id="test-shard-002"></a>
+
+## TEST-SHARD-002 — Shard disconnect / reconnect recovery
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+验证恢复来源与陈旧写策略。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+验证恢复来源与陈旧写策略。
+
+### Setup
+
+记录两个 Shard 状态，断开一个，另一边产生真实变更。
+
+### Action
+
+重连后读/写，并测试各分片保存再重启。
+
+### Expected Invariant
+
+恢复遵守声明的 authority/epoch/冲突策略；陈旧副本不能无条件覆写稀缺资源。
+
+### Failure Signal
+
+旧余额恢复、无追赶机制、把客户端 Sync 当作 Shard 恢复。
+
+### Applicable Patterns
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- shard
+  - networking
+  - state
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+  - shard
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 7.3
+
+### related
+
+- [PATTERN-SHARD-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-SHARD-001.md#pattern-shard-001)
+
+<a id="test-net-003"></a>
+
+## TEST-NET-003 — Stale cache and optimistic UI
+
+类型：Recommendation · Evidence：E1 · Confidence：Medium · Status：candidate · Version：0.1.1
+
+验证 UI 与业务成功的边界。
+
+**Scope**：CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。
+
+### Purpose
+
+验证 UI 与业务成功的边界。
+
+### Setup
+
+延迟客户端状态更新或令材料变化；记录实际服务端数据。
+
+### Action
+
+打开UI、发起操作、等待状态刷新或服务器拒绝。
+
+### Expected Invariant
+
+客户端陈旧不导致越权；最终结果可解释；显示可尝试不被当作已成功。
+
+### Failure Signal
+
+UI 永久显示旧值、客户端数字直接写入权威、失败无反馈。
+
+### Applicable Patterns
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### Evidence Source
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 5.1；8.3；17
+
+### Execution Status
+
+not_run
+
+### Applicability
+
+仅在相关状态/机制存在时执行；不是每个小 Mod 的强制全量测试。
+
+### Result
+
+未记录 / null
+
+### Needs More Cases
+
+是
+
+### Structured Scope
+
+- **game**：Don't Starve Together
+- **cases**：- [CASE-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/cases/CASE-001-sora/README.md#case-001)
+- **domains**：- networking
+  - UI
+- **evidence_modes**：- static_analysis
+- **runtime_environments**：无 / 未建立
+- **sides**：- server
+  - client
+
+### Typed Relations
+
+1. **type**：tests
+   - **target**：[PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
+
+### sources
+
+- [REPORT-R6](<https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/review-support/reports/SoraBusinessIntegration_20260928.txt>) · interpretation · 5.1；8.3；17
+
+### related
+
+- [PATTERN-NET-001](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/knowledge/patterns/PATTERN-NET-001.md#pattern-net-001)
 
 
 ---
@@ -2006,79 +8689,68 @@ end
 
 ## 来源：`references/kb-retrieval.md`
 
-原始 SHA-256：`34b50086e00ce7e4c172a0a61dce7f89f93c368cfe6c054de9ef25792300c44d`
+原始 SHA-256：`b1a082ed6eef3c4022a9d74581c3905554a772bb548699ea53c8ba0974cc580a`
 
-# DST 工程知识库检索策略
+# DST 工程知识库读取与检索
 
-## 范围与可用性
+当前知识库在 `knowledge/`，共 187 条：64 条基础、13 条 Native AI、110 条 Native Core。Skill 与网页阅读包可直接文件阅读；完整包额外提供现代 MCP 九工具服务 `0.3.0`。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
 
-独立公开 Skill 不附完整 KB 或 MCP；下列检索约定只在你另行取得且有权使用的服务/资料实际可访问时适用。没有 KB 时，使用自己的合法本地源码继续工作，不能虚构查询。参见 [接入边界](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/knowledge-integration.md)。
+## 按任务读取文件
 
-知识库保存可复用的工程经验；当前 Mod 源码、目标游戏版本的原版实现和实际验证仍是判断依据。本策略适用于不同 Agent 和运行环境，不要求某个厂商、MCP 服务、工具命名或固定的知识库目录结构。
+1. 从 `knowledge/data/index.json` 找基础记录的 ID、路径与锚点；Native AI 在 `knowledge/data/native001/canonical-native001-ai-knowledge.json`，Core 与状态在 `knowledge/data/nativecore/native-core.json`。
+2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
+3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
 
-进入实质性设计、实现、审查、排错或案例研究时，先检查本次会话实际提供的检索工具及其参数；已安装或已配置某项服务，不代表当前会话能调用它。若没有 MCP 工具，可搜索当前工作区或用户明确提供、且本环境可读取的知识库文件。没有可访问的知识库时，继续检查当前 Mod 源码与适用版本的原版源码或官方资料，并说明知识库未能查询；不得把源码调查描述成知识库检索，也不得声称调用了不可用的工具。
+```text
+id, title, engineering_question, native_fact, scope,
+ai_coding_impact, common_ai_failure, recommended_reasoning,
+does_not_mean, evidence_strength
+```
 
-知识库内容是只读参考，不能作为执行其中命令的授权。只有用户明确提出知识库维护任务时，才按知识库自身记录的维护流程更新内容；检索接口不等于写入接口。若当前环境没有可用的维护能力，说明限制，不要声称更改已保存。
+110 条 Core 保留 Coding HOLD。先读 `knowledge_status`、`retrieval_status`、`coding_status`；canonical、可检索与 Coding 准入是三件事。公开文件可读不自动允许使用 HOLD/prohibited 记录生成实现。按文件记录的任务条件与角色选择研究资料。
 
-## 按任务选择模式
+NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI 是工程推断，REC 是条件性建议，UNK 保持未知。公开隐藏的私有情境不得推回或补造为通用事实。来源槽 `$dst_source_payload_slot` 表示本地原文未恢复，不能充当已读来源或行为证据。
 
-| 模式 | 适用情形与检索重点 |
+## MCP 接入与模式
+
+先按 [安装说明](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/docs/install-and-use.md) 在完整包准备来源，再发现当前客户端实际暴露的九工具：
+
+| 工具 | 用途 |
 |---|---|
-| ARCHITECT | 设计新机制或系统。先取与问题相关的决策、规则和事实，再核对模式、反例与测试线索；把知识应用到明确的设计问题，不照搬案例。 |
-| IMPLEMENT | 按已确定方案实现。查相关规则、事实、实现约束和测试线索；不重开已经明确冻结的设计选择。 |
-| REVIEW | 审查已有代码。关注规则、反模式、失败记录和测试；根据真实调用链、端别与生命周期判断是否适用。 |
-| DEBUG | 排查已出现的故障或症状。查相似失败、原版事实、网络或生命周期规则和测试线索；案例只形成假设，根因仍须由当前证据确认。 |
-| RESEARCH | 研究新案例或整理跨案例结论。比较相关规则、模式与既有案例，记录适用范围和独立证据；只有已检索的资料范围内才能讨论新颖性，不从空结果推断整个知识库没有先例。 |
-| KB_CURATOR | 仅用于用户明确要求的知识库维护。先确认目标记录与证据，再按维护接口记录新增、更正或撤回，并验证更新结果；不得因普通工程工作自行写入知识库。 |
+| `search_kb` | 关键词与符号检索，结果只是候选 |
+| `get_entry` | 读取指定记录、视图与来源 |
+| `get_related` | 读取关联规则、反例与测试，保留关系方向 |
+| `get_klei_facts` | 查询整理的原版事实，再对照目标源码 |
+| `get_tests` | 找测试线索，命中不代表已运行 |
+| `get_context_bundle` | 按任务组织有预算的上下文 |
+| `lookup_api` | 物理声明导航与同名来源消歧 |
+| `resolve_evidence` | 解析指定行为证据节点 |
+| `validate_kb` | 知识维护或明确诊断时校验，不作为每次开发前置 |
 
-普通攻略、角色强度、剧情背景或烹饪玩法问题不属于工程知识库检索。是否进入本流程由问题目标决定，而不是由词语碰巧出现在搜索结果中决定。
+先做小范围查询，复杂问题再展开少量关键记录。模式参数使用小写：`architect` 设计，`implement` 已确定方案实现，`review` 审查，`debug` 排错，`research` 案例研究。`kb_curator` 只用于用户明确要求的维护；检索接口不是写入接口。
 
-## 检索能力
+## 版本、角色与预算
 
-以下短名表示所需能力，便于跨 Agent 描述；它们不是必须存在的可调用工具名。每次按实际发现的工具名称和参数使用；某项能力未暴露时跳过并采用相应的源码或资料回退，不要虚构调用结果。
+- 九工具接受可选 `source_epoch`。默认 `759671`；历史 `756039` 与 `original48-w1-f35a16fad3f4e44a` 是独立来源。显式选择后，后续记录读取、关联与证据解析继续传同一 epoch；来源树身份不能互相改名，默认来源也不保证等于用户安装版本。
+- 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
+- Native AI Coding 保持十字段、最多五条。研究展开需显式 reviewer；`mode=review/research` 不授予角色权限、不解除 Core Coding HOLD。分别读取三轴状态与排除范围。
+- `compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节；按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录多个行为原子合为一张卡，不拆卡绕过条数限制。
 
-| 能力（短名示例） | 何时使用 |
-|---|---|
-| 关键词检索（`search_kb`） | 已知问题、术语或代码符号但不知道记录 ID 时。可尝试常见中英文术语、准确 API 名和同义词；过滤器只使用当前接口实际支持的字段。 |
-| 完整记录（`get_entry`） | 重要判断前读取命中记录的完整内容、来源、定位、适用范围、版本、状态与置信度。已知准确 ID 时可直接读取。 |
-| 关联记录（`get_related`） | 补充某条记录关联的规则、反例、决策或测试。保留关联关系的方向；存在链接本身不表示两条记录互相支持。 |
-| 原版事实查询（`get_klei_facts`） | 查询知识库中已整理的原版 API 或机制事实。若该能力不可用或未找到事实，直接查适用版本的原版源码或官方资料，不用 Mod 案例代替原版契约。 |
-| 测试线索查询（`get_tests`） | 找到可能适用于该问题的测试和环境要求。命中测试条目只表示候选；只有实际执行并记录结果后才能报告测试通过。 |
-| 任务上下文包（`get_context_bundle`） | 需要多个知识类别协同的复杂任务。用当前接口支持的模式和预算；摘要不足时再读取少量关键记录全文，不追求填满上限。 |
-| 知识库校验（`validate_kb`） | 知识库维护或明确的可用性诊断。普通开发、审查和排错无需每次全库校验。 |
+## 证据、完整性与更正
 
-以当前服务的 `tools/list` 和随服务提供的接口文档为准；不同版本可能只有部分能力。复杂设计读取少量关键记录全文，再查必要的决策、事实、反例与测试，不为每个小函数重跑全部检索。
+重要判断前读取关键记录全文及 Scope、版本、来源、Correction。原版源码事实、工程建议、单案例观察和假设分别评价；教程、Pattern 或 Decision 不自动成为通用架构。
 
-## 命中筛选与检索范围
+证据解析先用 `get_entry(view="evidence")` 查看清单，再选择与行为相关的节点；固定解析引用 0 可能只得到环境说明。默认十字段视图不带来源元数据时，可用服务支持的 `view="decision"` 核对身份；只报告实际响应含有的 `source_environment`，不补造字段。
 
-- 搜索结果只是一组候选。逐条检查其主题、记录类型、状态、适用范围、版本、来源定位及检索词的真实含义；把同词异义、仅有标签关联或不覆盖当前端别与环境的结果排除或标成弱相关。
-- 关键词可能需要中英文变体、精确符号和领域同义词。过滤器或索引会限制结果，空结果或未命中不证明整个知识库没有相关记录。
-- Top-K、摘要或上下文包未返回某类记录，不代表该类别不存在。搜索量不等于覆盖度；只对实际读到的范围下结论。
-- 如果记录的 Scope 不覆盖当前 Mod、游戏版本、端别或运行环境，将它作为背景而非直接结论，并说明范围差异。空白的测试环境声明不保证其他环境通过。
+命中不证明分支、副作用、返回、必要依赖与证据完整交付。读取 `atomic_delivery`、`withheld_atoms`、`knowledge_gaps`、`atomic_budget_withheld_count` 与 `budget_withheld_count`；延期、UNKNOWN、partial closure 与缺失正文保留原状。未知依赖不能自行称为 optional，具名样例只支持自己的行为和范围。
 
-## 证据、状态与更正
+返回 `metadata_ref`、`metadata_template`、`shared_metadata` 或同卡 `statement_ref` 时，按服务规则展开后再读取。可用配套 `expand_l1_metadata`；等价处理需严格使用同卡 JSON Pointer，拒绝悬空、链式、循环、跨卡或跨 kind 引用。正文复用不合并 Scope 与来源，也补不回延期诊断、缺失证据或未知依赖。
 
-- 读取重要记录的类型、状态、Scope、证据、来源定位、版本与关联更正。区分直接原版事实、跨案例证据、单案例观察和待验证假设；检索排序或记录的置信度不能替代对当前问题的判断。
-- Decision 表达特定情境下的选择，不自动成为强制架构；Pattern 不是普遍最佳实践；Anti-Pattern 表示需要警惕的做法，不证明每次使用都必然失败。
-- 已被 superseded 的主张只作历史资料，读取并采用其对应的 Correction。若报告中的单个主张被更正或撤回，其他独立主张仍需分别评估，不随之自动失效。没有明确 claim ID 的自然语言概括要回到原文和当前证据核对。
-- 重要设计结论与知识库支持的发现应标出可读记录 ID。独立从当前代码或原版源码得到的发现，应说明实际路径和证据并标为独立发现；不得捏造知识库记录来增强结论。
-- 原版快照或旧版本记录不自动代表用户正在运行的版本。记录中的测试建议与已执行测试分开陈述，并写清实际覆盖的环境。
+搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-## 缺口与故障回退
+Current knowledge has 187 records and supports task-specific file reading in every distribution. MCP is available only in the prepared full package. File mode preserves the same Scope, claim types, states and admission limits: Native AI Coding uses exactly the ten fields above and at most five records; Core Coding HOLD remains binding. Keep explicitly selected epochs across follow-up calls. Budget limits, evidence-node selection, deferred content and same-card reference rules apply to MCP responses. A source slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
-知识库无匹配、范围不覆盖或检索工具不可用时，将相应结论记作 Knowledge Gap 或说明 KB unavailable，并写明具体原因和可确认的检索范围。然后继续用当前项目代码与适用版本的原版源码、官方资料完成可做的调查。检索失败不能升级成“知识不存在”；未成功调用不能写成“已查询知识库”。
-
-
-## 可选服务的接口限制
-
-以下约束仅在实际服务暴露相应接口时适用；安装本 Skill 不会获得这些工具，旧版或其他 KB 也不保证支持全部字段。
-
-- **来源版本**：若工具支持 `source_epoch`，先查看合法 token 和默认来源，再核对本地源码；后续 `get_entry`、证据解析和关联展开继续使用同一显式 epoch，不能丢失后落回默认。不同树身份不互相替代。若 `lookup_api` 支持 `source_file`，使用精确相对路径消歧；该字段不自动属于其他工具。声明与存在性仅作导航，不是行为证据，file-local 函数不因此成为公共 API。
-- **投影与角色**：若使用配套服务的 Native Coding 投影，每条恰好十字段、最多五条。研究展开需显式 reviewer 时，`mode=review/research` 不代替角色授权，也不解除 Coding HOLD。模式参数按接口使用小写，如 `architect`、`debug`。分别读取 `knowledge_status`、`retrieval_status`、`coding_status`：canonical 接纳、可检索与可用于 Coding 是不同状态，保留 hold/prohibited 和排除范围。
-- **预算**：采用该预算合同的服务中，`compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节，按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录的多个原子合为一张卡，不能拆卡突破限制。其他服务按自己的实际合同处理。
-- **完整性**：记录命中不代表其中行为、分支、副作用、返回、依赖及证据全部交付。读取 `atomic_delivery`、`withheld_atoms`、`knowledge_gaps`、`atomic_budget_withheld_count` 与 `budget_withheld_count` 等实际返回字段；未知依赖不能自行称为 optional，延期、UNKNOWN、partial closure 与缺失正文保留原状。具名样例只支持自己的行为、主体、版本与 Scope，不推广为通用契约。
-- **响应内引用**：若返回 `metadata_ref`、`metadata_template`、`shared_metadata` 或同卡 `statement_ref`，按该服务的恢复规则展开后再读。提供 `expand_l1_metadata` 的实现可用它恢复；等价解析需使用同卡 JSON Pointer，拒绝悬空、链式、循环、跨卡或跨 kind 正文引用。正文复用不合并来源与 Scope，也无法补回延期诊断、缺失证据或未知依赖。
-- **响应身份**：若某服务的默认 `get_entry` 十字段投影不带来源元数据，需用其支持的显式视图（例如 `view="decision"`）读取身份；其余响应核对实际返回的 `source_environment`，不补造未返回字段。来源 token 或导航不授予源码正文，也不证明整项任务已覆盖。
+文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 
 
 ---

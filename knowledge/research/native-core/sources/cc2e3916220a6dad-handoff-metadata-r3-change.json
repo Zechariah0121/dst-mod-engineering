@@ -1,0 +1,103 @@
+{
+  "exact_changed_fields": [
+    {
+      "json_pointer": "#/readiness_scope",
+      "operation": "add",
+      "old_absent": true,
+      "new": {
+        "selected_capacity_contract_ids": [
+          "SC-CODE01",
+          "SC-CODE02",
+          "SC-CODE03",
+          "SC-CODE04"
+        ],
+        "meaning_zh": "scopedResearchReady仅表示固定快照所选四个容量合同已获独立源码审阅接受；不表示canonical整合、runtime验收或完整容器域就绪。",
+        "external_independent_acceptance": {
+          "artifact": "independent-trade-container-review.json",
+          "artifact_sha256": "7f87af4bd74c032a33a4c5b20ee519a69ab5d4d67577e79710cf625376424667",
+          "decision_json_pointer": "#/decisions_by_batch/1",
+          "decision": "AcceptScopedResearchReady",
+          "accepted_historical_input_path": "batch013/research/container-capacity-research.json",
+          "accepted_historical_input_sha256": "56d4cd62bab2c6888a21d58ec2d6a41813130204da0f14c8aeb012d118ae597e",
+          "accepted_historical_input_bytes": 76590,
+          "historical_acceptance_preserved": true
+        },
+        "handoff_revision_zh": "r3仅更新就绪/交接元数据；sourcefacts、Coding、引用与样本内容均未修改。"
+      }
+    },
+    {
+      "json_pointer": "#/researchReady",
+      "operation": "remove",
+      "old": true,
+      "new_absent": true
+    },
+    {
+      "json_pointer": "#/scope/stopping_condition_zh",
+      "operation": "replace",
+      "old": "固定快照下四种槽位量、两端入口、pool与listener初始化限制可分别用于静态创建建议；源链已闭合，独立review与具体Mod运行验证未完成。",
+      "new": "固定快照下四种槽位量、两端入口、pool与listener初始化限制可分别用于静态创建建议；所选四个容量合同已获外部独立审阅接受，具体Mod运行验证未完成。"
+    },
+    {
+      "json_pointer": "#/scopedReady",
+      "operation": "remove",
+      "old": false,
+      "new_absent": true
+    },
+    {
+      "json_pointer": "#/status",
+      "operation": "replace",
+      "old": "ResearchReady_scoped_static_pending_independent_review",
+      "new": "scopedResearchReady"
+    },
+    {
+      "json_pointer": "#/verification/final_self_check/independent_review_performed",
+      "operation": "replace",
+      "old": false,
+      "new": true
+    },
+    {
+      "json_pointer": "#/verification/final_self_check/independent_review_provenance",
+      "operation": "add",
+      "old_absent": true,
+      "new": "independent-trade-container-review.json#/decisions_by_batch/1; external review of the unchanged semantic/citation/Coding content at the historical input hash"
+    },
+    {
+      "json_pointer": "#/verification/independent_review",
+      "operation": "replace",
+      "old": "not_done_coordinator_will_arrange",
+      "new": "external_selected_scope_accepted; original_historical_acceptance_preserved"
+    },
+    {
+      "json_pointer": "#/verification/metadata_only_revision",
+      "operation": "add",
+      "old_absent": true,
+      "new": {
+        "target_release": "r3",
+        "protected_sections_unchanged": true,
+        "protected_section_hash_scheme": "sha256 of sort_keys=True compact UTF-8 JSON, ensure_ascii=False",
+        "protected_section_sha256": {
+          "direct_facts": "cfb74b67ac02a76a674f0aed63f4c12ab256c072b463f6338798723213c850f4",
+          "coding_projection": "47725c73348db7206e07ceb1183ad99eadfd831b80c04fcf890f31f1b3f467a1",
+          "citations": "aaff254aa41bda22fccb7ca96d626aa9ce91127f0044604f93809b613f60894a",
+          "sample_only": "250c66ede935c5c90530cf973bc5bd0e1caab7af3b38c2d9f25c9f68e7321c73",
+          "comment_only": "ac677e4a88f404fb70fb3a6b56efca4085b52c8d70caff3075fee3e21f360704",
+          "original_illustration": "d79086b381465b778758d729a3c2c8a13163b9a004cf0eb85d6c5b504f9c6dd4",
+          "reviewer_only": "a1bf3dfa75f94d0bd2721367ba35486c072c229633ee4930b4cb9b5400588494",
+          "contradiction_dedup_adversarial_checks": "48a2e056849d47d919fa105f89ad776bb20cf491460d6c665f9b6da1a06f12b8",
+          "unknowns": "a17963c8685e6502f81506ee6699a7463c69bf1907c3ab980de1290ead6e8f7f",
+          "source_reading_log": "f097d6a8c7398e1a5f66c413afcc54deba73f9a74eb45db3732a46580e51f617",
+          "reuse_pointers": "67628d07575211532bf474bec5f6877d608cd07d6c1d52691d3622b84e33508b"
+        },
+        "historical_review_artifact_unchanged": true,
+        "source_Lua_executed": false,
+        "r2_delivered_archive_written": false
+      }
+    },
+    {
+      "json_pointer": "#/whole_domain_ready",
+      "operation": "add",
+      "old_absent": true,
+      "new": false
+    }
+  ]
+}

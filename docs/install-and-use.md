@@ -1,34 +1,71 @@
 # 安装与使用 / Installation and use
 
-## 安装独立 Skill
+## 选择下载
 
-从 [发行页](https://github.com/Zechariah0121/dst-mod-engineering/releases) 下载 `dst-mod-engineering.skill.zip` 并完整解压。目录应为 `dst-mod-engineering/SKILL.md`，同时保留 `references/`、`docs/`、`scripts/`、`templates/`、`requirements.txt` 与 `LICENSE`。`web-reading.zip` 只提供阅读材料，不是可安装的 Skill。不要只复制 `SKILL.md`。
+首次本地使用建议下载 [完整包](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering-full.zip)：包含 Skill、187 条公开知识、开发辅助脚本、来源准备工具与现代 MCP。只需文件阅读时，可用 [独立 Skill ZIP](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/dst-mod-engineering.skill.zip)；网页使用 [web-reading.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.25.1/web-reading.zip)。三者都带当前知识，后两者没有 MCP 服务与来源准备工具。
 
-选一个安装位置，每种产品的目标路径中都包含 `dst-mod-engineering/`：
+对照同版 `SHA256SUMS.txt` 后完整解压。找到直接包含 `SKILL.md` 的目录，保留其 `knowledge/`、`references/`、`docs/`、`scripts/`、`templates/`、`requirements.txt` 和 `LICENSE`。网页阅读 ZIP 用于资料阅读，不直接当作技能安装包。
 
-| Agent | 项目安装位置 | 个人安装位置 | 调用 |
+## 安装 Skill
+
+选一个位置放入完整 `dst-mod-engineering/` 目录：
+
+| Agent | 项目位置 | 个人位置 | 调用 |
 |---|---|---|---|
 | Codex | `.agents/skills/dst-mod-engineering/` | `~/.agents/skills/dst-mod-engineering/` | `$dst-mod-engineering` 或技能选择器 |
 | Claude Code | `.claude/skills/dst-mod-engineering/` | `~/.claude/skills/dst-mod-engineering/` | `/dst-mod-engineering` |
-| Cursor | `.cursor/skills/dst-mod-engineering/` 或 `.agents/skills/dst-mod-engineering/` | `~/.cursor/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | Agent 聊天中输入 `/` 并选择技能 |
-| GitHub Copilot | `.github/skills/dst-mod-engineering/`；也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | 按所用界面选择或明确命名技能 |
+| Cursor | `.cursor/skills/dst-mod-engineering/` 或 `.agents/skills/dst-mod-engineering/` | `~/.cursor/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | Agent 聊天的 `/` 菜单 |
+| GitHub Copilot | `.github/skills/dst-mod-engineering/`；也支持 `.agents/skills/`、`.claude/skills/` | `~/.copilot/skills/dst-mod-engineering/` 或 `~/.agents/skills/dst-mod-engineering/` | 所用界面的技能入口 |
 
-`~` 是运行 Agent 的主机的用户目录。Windows 可用用户目录下的对应文件夹。以上位置来自各产品官方文档；官方来源、云端差异与能力要求见 [Agent 接入](../references/agent-setup.md)。
+`~` 属于运行 Agent 的主机。刷新技能列表或重启会话后，确认实际读取的 `SKILL.md`、相关专题和 `knowledge/`。不能自动发现时直接读取其绝对路径。官方来源及云端差异见 [Agent 接入](../references/agent-setup.md)。更新前保存定制版，避免同名副本混淆。
 
-安装后刷新技能列表或重新开始会话，确认实际读取的 `SKILL.md` 路径和相关专题。未自动发现时，直接让 Agent 读取该文件的绝对路径。更新前比较同名目录，保存定制版；回退时恢复旧目录，并确认加载路径。
+提供任务、Mod 根目录、实际 DST 版本与合法本地 `data/databundles/scripts.zip`。没有 MCP 时按 [知识文件入口](knowledge-integration.md) 选少量相关条目，报告文件读取，不需要安装或启动服务。
 
-Download and fully extract the standalone Skill. Copy the complete `dst-mod-engineering/` directory to one supported project or personal location above. `~` means the home directory on the agent's host. Preserve custom copies, refresh discovery, and verify the loaded file and relevant references. Explicit file reading works when automatic discovery is unavailable.
+## 完整包：准备来源并接入 MCP
 
-## 提供 Mod 与当前源码
+需要 Python 3.10+，且其 SQLite 含 FTS5；MCP 与来源准备使用标准库，无需安装 `luaparser`。在完整包根目录运行，替换为自己合法持有的来源：
 
-给 Agent 提供任务、Mod 根目录、实际游戏版本，以及自己合法安装的 DST 中的 `data/databundles/scripts.zip`。在 Skill 根目录运行：
+```text
+python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>" --source "<合法保留的756039 scripts.zip或源码目录>"
+```
+
+`--source` 可重复，可传 ZIP 或以 `scripts/` 为根、或直接包含 Lua 相对目录的源码文件夹。当前 `759671` ZIP 单独仍缺 13 种历史范围，涉及 9 个旧 Lua 文件；缺项时程序列出所需文件、哈希与行范围。不要用不匹配的当前片段替代历史证据。没有历史来源仍可读取公开知识，但不能启动完整 MCP。
+
+准备读取显式来源，只写 `cache/runtime/`，不改游戏、分发模板或客户端配置。恢复的范围按哈希和长度核对；缓存含游戏 Lua 原文，留在本地，不公开上传。更新包后重新准备。
+
+准备完成后：
+
+```text
+python -B -X utf8 run_kb.py status
+python -B -X utf8 run_kb.py mcp-config
+```
+
+`mcp-config` 是位置子命令，打印当前 Python 与入口路径，不修改客户端配置。把输出按客户端支持格式接入；服务启动命令是：
+
+```text
+python -B -X utf8 run_kb.py serve
+```
+
+这是等待 MCP 输入的 stdio 服务，不提供网页或监听端口。在客户端确认实际 `tools/list` 有九工具，再执行一次任务相关查询并检查响应与来源身份；打印配置或 `validate` 成功不能代替这一步。
+
+命令行查询使用 `call`；只有它接受 `--tool`、`--arguments-file` 与 `--source-epoch`：
+
+```text
+python -B -X utf8 run_kb.py call --tool get_context_bundle --arguments-file examples/review.json
+```
+
+其他位置子命令为 `status`、`validate`、`reindex`。工具参数、三套 epoch 与实际准入见 [检索策略](../references/kb-retrieval.md)。
+
+## 开发辅助脚本
+
+在含 `scripts/` 的 Skill 或完整包根目录，用 Python 3.10+ 读取本地源码：
 
 ```text
 python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" info
 python -B scripts/dst_zip_tool.py --zip "<scripts.zip>" show scripts/components/combat.lua --start 1 --count 80
 ```
 
-这两条命令只需 Python 3.10+ 标准库，不修改游戏。若要检查 Mod 的 Lua 语法和部分直接 API 调用，在自己的虚拟环境安装依赖后运行：
+检查 Mod 语法与部分 API 声明另需 `luaparser`，可用虚拟环境：
 
 ```text
 python -m venv .venv
@@ -36,21 +73,16 @@ python -m venv .venv
 .venv/Scripts/python -B scripts/check_api.py "<Mod目录>" --zip "<scripts.zip>"
 ```
 
-上例为 Windows；macOS/Linux 使用 `.venv/bin/python`。用实际路径替换占位符。`DECLARED` 只是查到声明，`NEEDS_REVIEW` 需要追踪源码；均不是运行正确性证明。隔离专服检查的 Windows 环境、参数与限制见 [测试与交付](../references/testing-release.md)。
+上例为 Windows；macOS/Linux 用 `.venv/bin/python`。`DECLARED` 只说明找到声明，`NEEDS_REVIEW` 需追踪源码，都不证明运行正确。隔离专服辅助程序仅支持 Windows，见 [测试与交付](../references/testing-release.md)。
 
-Provide your task, mod root, actual game version and authorized `data/databundles/scripts.zip`. Run the first commands from the Skill root with Python 3.10+. The checker additionally needs `luaparser`; use a virtual environment and replace `.venv/Scripts/python` with `.venv/bin/python` on macOS/Linux. Declaration matches do not prove runtime correctness.
-
-## 可选 KB 与故障排查
-
-本独立 Skill 不包含完整 KB/MCP。已有服务时，按 [接入说明](knowledge-integration.md) 检查其实际工具、版本和一次查询结果；没有时说明 `KB unavailable`，继续本地源码工作。
+## 常见问题
 
 | 现象 | 处理 |
 |---|---|
-| 找不到 Skill | 检查目录层级、发现位置和会话刷新；用绝对路径显式读取 |
-| 只能读 README | 保留完整目录，读取 `SKILL.md` 及相关专题 |
-| 找不到源码或组件 | 检查路径、实际游戏版本和 ZIP 成员，不静默换用旧源码 |
-| 缺少 Python / luaparser | 确认实际解释器与所需依赖；准备方法见上文 |
-| 网页 AI 无本地权限 | 按 [网页指南](../references/web-chat.md) 提供有权共享的必要材料 |
-| MCP 已配置却无响应 | 在服务主机检查启动命令、解释器、路径、stderr 和客户端连接 |
+| 找不到 Skill 或知识文件 | 检查目录层级、完整解压和实际加载路径；不要只复制 `SKILL.md` |
+| 找不到 `prepare_sources.py` / `run_kb.py` | 使用完整包；Skill/阅读 ZIP 只有知识文件，无服务 |
+| 来源准备缺少旧范围 | 按输出提供合法保留来源；可先文件阅读，不把部分缓存当完整服务 |
+| MCP 已配置但无工具或查询失败 | 核对当前 Python、包路径、准备状态、stderr 与客户端会话，不沿用旧七工具连接 |
+| 网页 AI 无本地权限 | 提供必要材料；云端不能直接读取用户电脑的游戏和缓存 |
 
-This standalone Skill has no complete KB/MCP. Connect an existing authorized service only after checking its real tools, version and a query result. Otherwise report `KB unavailable` and continue source-based work.
+All three downloads include the current 187 public records. The full package adds MCP and source preparation. Install the complete Skill directory in a supported location above. File reading needs no service. MCP requires Python 3.10+, SQLite FTS5 and authorized current plus historical sources; run the preparation command before configuring `run_kb.py serve`. One current ZIP is insufficient for all historical ranges. `mcp-config` only prints configuration; verify nine tools and a real query in your client. Restored Lua stays in local cache. Development syntax checks separately require `luaparser`, and the game-server helper supports Windows only.

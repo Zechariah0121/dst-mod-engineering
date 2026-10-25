@@ -1,0 +1,130 @@
+{
+  "changes": [
+    {
+      "json_pointer": "#/direct_facts/6/title_zh",
+      "before": "阈值看回调后的可变字段，最多推进一阶段",
+      "after": "阈值读取回调后字段，本层推进分支不循环"
+    },
+    {
+      "json_pointer": "#/direct_facts/6/statement_zh",
+      "before": "onupgradefn 正常返回后才比较当前 self.numupgrades>=self.upgradesperstage，因此 callback 修改这两个字段会影响此判断。命中就调用 AdvanceStage() 一次；不是 while，不逐 upgradevalue 推进，也不保留溢出进度。AdvanceStage 先赋 stage=stage+1，再把 numupgrades=0，然后若 onstageadvancefn 存在则 return fn(target_inst)，否则无显式返回。AdvanceStage 不做 max stage 上限检查；Upgrade 不读取 AdvanceStage 的任何返回，而是正常尾部 true。因此 onstageadvancefn false 也不是取消升级。以正常未改字段 count=4/threshold=5/value=7 为条件，一次消费1件先到11，然后只+1 stage 且 reset0。",
+      "after": "onupgradefn 正常返回后才比较当前 self.numupgrades>=self.upgradesperstage，因此 callback 修改这两个字段会影响此判断。本层 Upgrade 方法体命中这个 if 分支时显式调用 AdvanceStage() 一次；不是 while，不按 upgradevalue 循环推进，也不保留溢出进度。这只描述本层显式调用，callback 可另行调用或重入 Upgrade/AdvanceStage，源码没有锁，不能推成任意 callback 执行的总阶段上限。AdvanceStage 先赋 stage=stage+1；这个 stage 属性回调正常返回后，外层方法才继续把 numupgrades=0，然后若 onstageadvancefn 存在则 return fn(target_inst)，否则无显式返回。AdvanceStage 不做 max stage 上限检查；Upgrade 不读取 AdvanceStage 的任何返回，而是正常尾部 true。因此 onstageadvancefn false 也不是取消升级。以单次非重入、无 callback/hook 修改相关字段的 count=4/threshold=5/value=7 为条件，一次消费1件先到11，然后只+1 stage 且 reset0。"
+    },
+    {
+      "json_pointer": "#/direct_facts/6/callback_args/0/count",
+      "before": "单次调用命中阈值最多一次",
+      "after": "每层 AdvanceStage 方法体到达此处时调用一次；单次非重入 Upgrade 的显式阈值分支只调用一次 AdvanceStage；不限制 callback 自行调用/重入的总次数"
+    },
+    {
+      "json_pointer": "#/direct_facts/7/statement_zh",
+      "before": "Upgradeable 的 properties 是 upgradetype、stage、numstages。onstage 调 AddOrRemoveTag(self.upgradetype..\"_upgradeable\",self:CanUpgrade())，所以 SetStage、AdvanceStage 与 OnLoad 的 stage 赋值会触发标签刷新及可能的 canupgradefn；不是 onstageadvancefn。AdvanceStage 的 stage 属性回调发生在 numupgrades 清0之前，可观察新 stage 和旧 count。onupgradetype 仅在当前 CanUpgrade 真值时移除旧 <type>_upgradeable 并添加新标签；不可升级时连旧标签移除也跳过。Upgrader 的 type 属性回调则总是移除非 nil 旧 <type>_upgrader 并添加非 nil 新标签。SetOnUpgradeFn/SetCanUpgradeFn、numupgrades/upgradesperstage/upgradevalue 没有此属性刷新。目标 upgradetype=nil 之后再写 stage/numstages 时 onstage 没有 nil 拼接 guard；不要把 nil type 当所有 setter 都安全的通用 disabled 标记。",
+      "after": "Upgradeable 的 properties 是 upgradetype、stage、numstages。onstage 调 AddOrRemoveTag(self.upgradetype..\"_upgradeable\",self:CanUpgrade())，所以 SetStage、AdvanceStage 与 OnLoad 的 stage 赋值会触发标签刷新及可能的 canupgradefn；不是 onstageadvancefn。AdvanceStage 的 stage 属性回调发生在 numupgrades 清0之前，可观察新 stage 和旧 count；该属性回调正常返回后，外层 AdvanceStage 才继续清0。onupgradetype 仅在当前 CanUpgrade 真值时移除旧 <type>_upgradeable 并添加新标签；不可升级时连旧标签移除也跳过。Upgrader 的 type 属性回调则总是移除非 nil 旧 <type>_upgrader 并添加非 nil 新标签。SetOnUpgradeFn/SetCanUpgradeFn、numupgrades/upgradesperstage/upgradevalue 没有此属性刷新。目标 upgradetype=nil 之后再写 stage/numstages 时 onstage 没有 nil 拼接 guard；不要把 nil type 当所有 setter 都安全的通用 disabled 标记。"
+    },
+    {
+      "json_pointer": "#/coding_projection/2/source_contract",
+      "before": [
+        "onupgradefn 在阈值前，每次一次，看到已增加 count",
+        "onstageadvancefn(target) 在 stage+1和count0后，最多一次",
+        "AdvanceStage callback return被Upgrade丢弃；SetStage不重放效果",
+        "大value超阈值只+1且reset0，callback mutation影响后续判断"
+      ],
+      "after": [
+        "本层 onupgradefn 在阈值前，到达时调用一次，看到已增加 count",
+        "onstageadvancefn(target) 在 stage+1、stage属性回调正常返回、count0后调用；本层阈值分支只显式 AdvanceStage 一次，不保证 callback 重入的总次数",
+        "AdvanceStage callback return被Upgrade丢弃；SetStage不重放效果",
+        "单次非重入且无 callback/hook 改相关字段时，大value超阈值只+1且reset0；callback mutation影响后续判断"
+      ]
+    },
+    {
+      "json_pointer": "#/sample_only/0/statement_zh",
+      "before": "导出明确选择 MakeChest(\"treasurechest\",...,regular_master_postinit,...)。MakeChest.fn 在 SetPristine 后非 mastersim 返回；master 尾部才调用 regular_master_postinit。该函数添加 upgradeable、设 upgradetype=CHEST、SetOnUpgradeFn(OnUpgrade)，未改本组件默认 stage1/numstages3/threshold5，也未设阶段完成 callback。OnUpgrade 读取当前 numupgrades，只有 ==1 时设 _chestupgrade_stacksize=true；container存在时依次 Close、EnableInfiniteStackSize(true)、设置 inspectable status。upgraded_from_item 真值时生成特效并在6*FRAMES后改外观，无物品实参时立即 DoUpgradeVisuals。随后无论 numupgrades 是否==1 都将 upgradeable.upgradetype=nil，再按组件存在性改 loot/workable/恢复监听。普通首次 value=1的条件下，count成为1且未触发 threshold5，stage仍1，却已执行这项 prefab业务升级并清type；不能把升级结果等同于 AdvanceStage。regular_OnLoad 仅在组件存在且 count>0时调用 OnUpgrade(inst)，没有 performer/item，再调用普通 onload 的 burnt处理；这不是 Upgrade调用，因此不增count、不消费或回放live特效。SetPersistData 的既有组件→prefab顺序保证该 prefab OnLoad 看到已恢复 count（若对应组件数据确实存在）；不是各组件 pairs 的稳定总序。此样本不审材料 prefab/玩家标签授予、不证明所有 chest或upgradeable 一次升级、不验证特效 native spawn结果。EnableInfiniteStackSize 的单一调用不推导 numslots/Classified/UI动态扩槽或重开布局，本批复用N013边界。",
+      "after": "导出明确选择 MakeChest(\"treasurechest\",...,regular_master_postinit,...)。MakeChest.fn 在 SetPristine 后非 mastersim 返回；master 尾部才调用 regular_master_postinit。该函数添加 upgradeable、设 upgradetype=CHEST、SetOnUpgradeFn(OnUpgrade)，未改本组件默认 stage1/numstages3/threshold5，也未设阶段完成 callback。OnUpgrade 读取当前 numupgrades；numupgrades==1 的整个外层分支内先设 _chestupgrade_stacksize=true，然后仅在 container存在时依次 Close、EnableInfiniteStackSize(true)、设置 inspectable status；同一个 count==1 外层分支内，upgraded_from_item 真值时生成特效并在6*FRAMES后改外观，否则立即 DoUpgradeVisuals。随后无论 numupgrades 是否==1 都将 upgradeable.upgradetype=nil；仅 lootdropper:SetLoot 有组件存在 guard，workable 两次 SetOnWorkCallback/SetOnFinishCallback 与 ListenForEvent(\"restoredfromcollapsed\",...) 都无存在 guard 直接调用。普通首次 value=1的条件下，count成为1且未触发 threshold5，stage仍1，却已执行这项 prefab业务升级并清type；不能把升级结果等同于 AdvanceStage。regular_OnLoad 仅在组件存在且 count>0时调用 OnUpgrade(inst)，没有 performer/item，再调用普通 onload 的 burnt处理；这不是 Upgrade调用，因此不增count、不消费或回放live特效。SetPersistData 的既有组件→prefab顺序保证该 prefab OnLoad 看到已恢复 count（若对应组件数据确实存在）；不是各组件 pairs 的稳定总序。此样本不审材料 prefab/玩家标签授予、不证明所有 chest或upgradeable 一次升级、不验证特效 native spawn结果。EnableInfiniteStackSize 的单一调用不推导 numslots/Classified/UI动态扩槽或重开布局，本批复用N013边界。"
+    },
+    {
+      "json_pointer": "#/sample_only/0/conditional_assumptions_zh",
+      "before": [
+        "regular treasurechest 已正常构造；components和callback未被其他Mod改变",
+        "只对首次正常接受的 value=1 情况描述count1/stage1；不声称具体原版材料默认值已经额外审计",
+        "源代码调用FX并延迟6*FRAMES，实际生成失败/调度精度保持unknown"
+      ],
+      "after": [
+        "regular treasurechest 已正常构造；components和callback未被其他Mod改变",
+        "只对首次正常接受的 value=1 情况描述count1/stage1；不声称具体原版材料默认值已经额外审计",
+        "源代码调用FX并延迟6*FRAMES，实际生成失败/调度精度保持unknown",
+        "OnUpgrade 按正常 MakeChest/regular master 接线使用；workable callbacks和ListenForEvent是无guard直接调用，不把任意组件缺失形状视为可用。"
+      ]
+    },
+    {
+      "json_pointer": "#/contradiction_dedup_adversarial_checks/3/case",
+      "before": "count4 / threshold5 / value7, no hook mutation",
+      "after": "count4 / threshold5 / value7, single non-reentrant call and no hook mutation"
+    },
+    {
+      "json_pointer": "#/contradiction_dedup_adversarial_checks/3/expected_zh",
+      "before": "1件材料→count11→一次stage+1→count0；非推进7次或保留6进度。",
+      "after": "此条件下1件材料→count11→本层一次显式stage+1→count0；不按value循环，不保留6进度，也不限制callback自行重入的总效果。"
+    },
+    {
+      "json_pointer": "#/status",
+      "before": "SourceResearch_complete_external_review_required",
+      "after": "scopedResearchReady"
+    },
+    {
+      "json_pointer": "#/scopedResearchReady",
+      "before": false,
+      "after": true
+    },
+    {
+      "json_pointer": "#/scopedResearchReady_scope",
+      "before": {
+        "coding_projection_ids": [
+          "UC-P01",
+          "UC-P02",
+          "UC-P03",
+          "UC-P04",
+          "UC-P05"
+        ],
+        "supporting_only": [
+          "UC-SAMPLE-CHEST"
+        ],
+        "whole_domain_ready": false
+      },
+      "after": {
+        "coding_projection_ids": [
+          "UC-P01",
+          "UC-P02",
+          "UC-P03",
+          "UC-P04",
+          "UC-P05"
+        ],
+        "supporting_only": [
+          "UC-SAMPLE-CHEST"
+        ],
+        "meaning_zh": "仅五项所选静态consumer合同；chest为辅助样本，通用复用事实不是新核心。",
+        "whole_domain_ready": false
+      }
+    },
+    {
+      "json_pointer": "#/verification/independent_review",
+      "before": null,
+      "after": {
+        "path": "/workspace/shared/native-campaign/batch016/research/independent-upgrade-consumption-review.json",
+        "evidence_role": "external independent acceptance evidence; final verdict and exact final artifact hashes recorded there",
+        "selected_static_contract_ids": [
+          "UC-P01",
+          "UC-P02",
+          "UC-P03",
+          "UC-P04",
+          "UC-P05"
+        ],
+        "chest_role": "ancillary single source-wiring sample only; not an additional readiness/core contract",
+        "report_hash_embedded": false
+      }
+    },
+    {
+      "json_pointer": "#/verification/scope_completion_gate_zh",
+      "before": "有限源研究已完成；外部独立审查后只有 UC-P01..05 的 scopedResearchReady 可为true；样本为辅助，不引入通用ready梯度。",
+      "after": "有限源研究完成；仅 UC-P01..05 依据外部独立审查为 scopedResearchReady。sourceResearch_complete=true；canonical/runtime/whole-domain=false；不以self-check替代独立审查。"
+    }
+  ]
+}

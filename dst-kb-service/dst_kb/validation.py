@@ -4,6 +4,7 @@ import re
 from hashlib import sha256
 from pathlib import Path
 from .config import KBError
+from . import native,nativecore
 
 INPUTS = ['data/entries.json','data/sources.json','data/relations.json','data/index.json',
           'data/claims.json','review-support/case-metadata.json']
@@ -22,7 +23,16 @@ def inside(root, path):
 def signature(root):
     try:
         files = INPUTS + ['PACKAGE-MANIFEST.json'] + [p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json')]
-        return json.dumps([(n,(root/n).stat().st_size,(root/n).stat().st_mtime_ns) for n in sorted(files)])
+        if native.paths(root) or nativecore.paths(root):
+            files = sorted(set(files) | {p.relative_to(root).as_posix() for p in root.rglob('*')
+                if p.is_file() and '__pycache__' not in p.parts})
+        rows=[]
+        for n in sorted(files):
+            path=inside(root,n)
+            raw=path.read_bytes()
+            stat=path.stat()
+            rows.append((n,len(raw),stat.st_mtime_ns,sha256(raw).hexdigest()))
+        return json.dumps(rows)
     except OSError as exc:
         raise KBError('KB_UNAVAILABLE', str(exc)) from exc
 
@@ -133,9 +143,20 @@ def validate(root):
                 p=inside(root,s['artifact_path'])
                 if not p.is_file() or sha256(p.read_bytes()).hexdigest()!=s['sha256']:errors.append('source hash '+s['id'])
             elif s.get('artifact_path') is not None:errors.append('external source artifact')
+        native_data,native_report=native.load(root,schema_errors,check_supported_schema)
+        data['native']=native_data
+        if native_data and set(native.IDS)&known:errors.append('Native/legacy ID namespace collision')
+        core_data,core_report=nativecore.load(root,schema_errors,check_supported_schema,bool(native_data),known)
+        data['nativecore']=core_data
+        if native_data:
+            for relative in INPUTS+[p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json')
+                                     if p.name not in ('native-ai.schema.json','native-core.schema.json')]+['tools/validate_v011.py']:
+                frozen=root/'history/v0.1.1'/relative
+                if not frozen.is_file() or frozen.read_bytes()!=(root/relative).read_bytes():
+                    errors.append('frozen legacy preservation '+relative)
         manifest=read(root/'PACKAGE-MANIFEST.json')
         expected={x['path'] for x in manifest['files']}
-        actual={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() and p.name!='PACKAGE-MANIFEST.json' and '__pycache__' not in p.parts}
+        actual={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() and p!=root/'PACKAGE-MANIFEST.json' and '__pycache__' not in p.parts}
         if expected!=actual:errors.append('manifest file set')
         for row in manifest['files']:
             p=inside(root,row['path'])
@@ -144,8 +165,12 @@ def validate(root):
         versions={e['version'] for e in entries}
         title_version=re.search(r'\bv(\d+\.\d+(?:\.\d+)?)\b',data['entries'].get('kb_title',''))
         knowledge_version=title_version.group(1) if title_version else (next(iter(versions)) if len(versions)==1 else None)
-        return data, {'status':'PASS','schema_version':SCHEMA_VERSION,'kb_version':knowledge_version,
-            'entries':len(entries),'relations':len(edges),'manifest':'PASS','runtime_validation_performed':False,
+        return data, {'status':'PASS','schema_version':SCHEMA_VERSION,'kb_version':'0.1.2' if native_data else knowledge_version,
+            'base_kb_version':knowledge_version,'native':native_report,'nativecore':core_report,
+            'legacy_preservation':'BYTE_IDENTICAL_TO_V0_1_1_HISTORY' if native_data else 'not_applicable',
+            'entries':len(entries)+native_report['entries']+core_report['entries'],'legacy_entries':len(entries),
+            'native001_entries':native_report['entries'],'nativecore_entries':core_report['entries'],
+            'relations':len(edges),'manifest':'PASS','runtime_validation_performed':False,
             'limitations':['Schema subset checked fail-closed for unknown keywords.','Correction guard covers explicit claim references, not natural-language meaning.']}
     except KBError:raise
     except (OSError,ValueError,KeyError,TypeError) as exc:

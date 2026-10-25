@@ -1,0 +1,3046 @@
+{
+  "scope": {
+    "native_cloud_filesystem_only": true,
+    "user_computer_used": false,
+    "cloud_task_created": false,
+    "remote_used": false,
+    "dst_runtime_used": false,
+    "harness_used": false,
+    "runtime_tested": false,
+    "runtimeReady": false,
+    "baseline_modified": false,
+    "new_canonical_record_count": 0,
+    "raw_Lua_in_deliverable": false,
+    "private_source_cache_is_not_deliverable": true,
+    "full_interactions_closed": 1,
+    "complementary_display_examples": 1,
+    "whole_UI_domain_exhausted": false
+  },
+  "repository": "Zechariah0121/dst-scripts",
+  "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+  "schema_version": "native005.scoped-ui-complete.v1",
+  "reviewer_facts": [
+    {
+      "fact_id": "N005-UI-F01",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "PlayerHud:OnControl 显式取得当前 StatusDisplays 的可见 resurrectbutton，CheckControl 返回真时消费该控制。HUD 失去/获得焦点时调用按钮的 ToggleHUDFocus(false/true)。按钮的 hud_focus 只决定控制器提示文本；CheckControl 自己的门禁是 shown、down 和 CONTROL_CONTROLLER_ATTACK。按钮还用 self.inst 监听 TheWorld 的 continuefrompause，只有 shown 时重做 OnShow。它没有在这个路径登记自定义全局 TheInput handle。",
+      "scope": "补充 UI-S05 的实际 HUD 路由、提示焦点和监听所有者；hud_focus 不能被解释为服务器许可。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/screens/playerhud.lua",
+          "symbol": "PlayerHud:OnControl resurrect branch",
+          "line_start": 1506,
+          "line_end": 1514,
+          "file_sha256": "529bdd322dd5b3eef76ea28ecf7f567e507360f641cd509503bc8615988d1dc1",
+          "range_sha256": "3b576b87ef127c83ac1e8f18ac8db0df2b4b4a3c01d8e94552ddf38bb889868e",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/screens/playerhud.lua#L1506-L1514",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/screens/playerhud.lua",
+          "symbol": "PlayerHud focus toggles",
+          "line_start": 274,
+          "line_end": 305,
+          "file_sha256": "529bdd322dd5b3eef76ea28ecf7f567e507360f641cd509503bc8615988d1dc1",
+          "range_sha256": "5afeba95d4cead4c1c5b09e70b3a4cf8721c30efb350101103b02b3e0b63004f",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/screens/playerhud.lua#L274-L305",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/resurrectbutton.lua",
+          "symbol": "ResurrectButton constructor; ToggleHUDFocus",
+          "line_start": 6,
+          "line_end": 28,
+          "file_sha256": "f714c061bfb96e2f58ce6dd70a8624ff71b363043411dc59eedc6842d1e3da75",
+          "range_sha256": "b96d9cfecbf8887ce7bb7249004e5078271b2c1b3d1b6d876ed44ad42de5a911",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/resurrectbutton.lua#L6-L28",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/resurrectbutton.lua",
+          "symbol": "OnShow; CheckControl; DoResurrect",
+          "line_start": 39,
+          "line_end": 60,
+          "file_sha256": "f714c061bfb96e2f58ce6dd70a8624ff71b363043411dc59eedc6842d1e3da75",
+          "range_sha256": "6ef4aabdfbbb1f11eb323093715b366338205f943429137d6218661c4abbfc95",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/resurrectbutton.lua#L39-L60",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S05",
+        "VANILLA-UI-006",
+        "VANILLA-UI-007"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F02",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "原版 RPC 表中的 ResurrectButton handler 签名为 function(player)，从该 player.components 取 playercontroller，存在时调用 OnRemoteResurrectButton()。客户端 RemoteResurrectButton() 仅发送 RPC.ResurrectButton，没有目标、客户端资源数、成功值或业务结果参数；该 handler 本身不返回复活完成响应。",
+      "scope": "只关闭这个命名 handler；sender 编解码和原生传输仍复用 N002/N003 边界，不为任意 Mod RPC 提供业务校验。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/networkclientrpc.lua",
+          "symbol": "RPC_HANDLERS.ResurrectButton",
+          "line_start": 205,
+          "line_end": 210,
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "range_sha256": "e15edc4714855496118f6f496c2bf03424cd2ee48304694f82bedf5e5ebe70c5",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/networkclientrpc.lua#L205-L210",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S06",
+        "NATIVE002-G08-E01",
+        "N003-C02"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F03",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "SGwilsonghost 和 SGwilsonghost_client 都把 ACTIONS.REMOTERESURRECT 映射到 remoteresurrect。服务器状态在进入时停止移动、播放 dissipate、设置 fade/timeout；timeout 才调用 PerformBufferedAction，真值时标记 isresurrecting，否则回 haunt；退出恢复 fade、可见性和灯。客户端状态进入时调用 PerformPreviewBufferedAction，随后以 ServerStateMatches 加 FlattenMovementPrediction 或 bufferedaction 被清空进行退出，timeout 则清动作并播放 appear。客户端这条状态不调用 action.fn 来复活。",
+      "scope": "指定 ghost SG 配对，不推广为普通 SGwilson、任意角色/Mod 的通用执行帧；样例秒数/帧数仅供 Reviewer。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/stategraphs/SGwilsonghost.lua",
+          "symbol": "ghost actionhandlers",
+          "line_start": 18,
+          "line_end": 29,
+          "file_sha256": "6958c17e4885a4d1bc123617c8ddd9b444da45e35f48355cb33f9e0e315472e6",
+          "range_sha256": "84bed85d99784e2e25eaed4c3562deddb19c79ef738fdd3451062506b1730970",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilsonghost.lua#L18-L29",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/stategraphs/SGwilsonghost.lua",
+          "symbol": "server remoteresurrect state",
+          "line_start": 156,
+          "line_end": 202,
+          "file_sha256": "6958c17e4885a4d1bc123617c8ddd9b444da45e35f48355cb33f9e0e315472e6",
+          "range_sha256": "de844e89b53ecc579718e736c4ffe1a0daf65ff561b3efb6776930682ea576ea",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilsonghost.lua#L156-L202",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/stategraphs/SGwilsonghost_client.lua",
+          "symbol": "client ghost actionhandlers",
+          "line_start": 13,
+          "line_end": 19,
+          "file_sha256": "c98eb2f3285feb855c4af601c267b879ee6024a0fb7da5b82b05b49ac4470139",
+          "range_sha256": "497a4cebf1c7bbfc78402cbf5ceabc65414971234fb9d10841f78c2793ef2ed0",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilsonghost_client.lua#L13-L19",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/stategraphs/SGwilsonghost_client.lua",
+          "symbol": "client remoteresurrect state",
+          "line_start": 121,
+          "line_end": 151,
+          "file_sha256": "c98eb2f3285feb855c4af601c267b879ee6024a0fb7da5b82b05b49ac4470139",
+          "range_sha256": "385e52e67aa1ede4298a58f4f9d26ee798b1d7c881f9c81176545b2222c9fe0b",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilsonghost_client.lua#L121-L151",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N003-C02-NSF04",
+        "VANILLA-NETACT-009"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F04",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "ACTIONS.REMOTERESURRECT 的定义允许 ghost 且 ghost_exclusive。其 fn 在 doer 存在、有 attuner 且仍有 playerghost 标签时，重新从 attuner 取得 remoteresurrector 或 gravestoneresurrector 的当前目标；有目标就 PushEvent(respawnfromghost, source=target) 并返回 true，其他分支不返回成功。Attuner:GetAttunedTarget(tag) 仅在其 ismastersim 为真时从 attuned proxy 的键查 Ents 返回真实目标。这个 true 的直接含义是已找到当前目标并发出 respawn 事件。",
+      "scope": "具体动作业务重查和事件接受点；不是已经结束后续异步复活。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/actions.lua",
+          "symbol": "REMOTERESURRECT definition",
+          "line_start": 501,
+          "line_end": 507,
+          "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+          "range_sha256": "cfcfc3614aa3018f1dd84a068512fe6ad14835ac787e2228b58176ce1f6de76d",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L501-L507",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/actions.lua",
+          "symbol": "ACTIONS.REMOTERESURRECT.fn",
+          "line_start": 4098,
+          "line_end": 4110,
+          "file_sha256": "012824ef41643c616a1d93a14d4aad0c828de9d27049c42da3a946c7fe3a1096",
+          "range_sha256": "942de96f02abd50fba31e1f71092c2c3e9e1cab291adce331a7bdb3e166c01ba",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/actions.lua#L4098-L4110",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attuner.lua",
+          "symbol": "Attuner:GetAttunedTarget(tag)",
+          "line_start": 35,
+          "line_end": 46,
+          "file_sha256": "3d581e59fca91bd8a3714ccde7bbd4b065716a2858755b9c02176f19c4110f1a",
+          "range_sha256": "588ff3b1255b953e6b6ed1b2804d4b359d1883b06fa8ea8f640807763bda518d",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attuner.lua#L35-L46",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S06",
+        "NATIVE003-Q5-CALLBACK-03"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F05",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "player_common 在非 mastersim 返回之后，且 ghostenabled 时才注册 respawnfromghost→OnRespawnFromGhost。OnRespawnFromGhost 再要求 playerghost，设置 reviving、隐藏 HUD、禁用 controller 并加 busy。当前 SG 为 remoteresurrect 且 data.source 存在时，它安排玩家实体拥有的零延迟 DoMoveToRezSource。DoMoveToRezSource 和 DoRezDelay 都重新拒绝无效或 InLimbo 的 source；失败会 ShowHUD(true)、Enable(true)、清 rezsource/remoterezsource，恢复 haunt 等显示/移动状态。有效目标才进入 DoActualRez，延迟任务也归玩家实体。",
+      "scope": "关闭选定 remote source 分支，包含动作 true 后目标消失的实际回退。其他 revive item、跨 shard、corpse 分支未完整研究。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "mastersim early return",
+          "line_start": 2623,
+          "line_end": 2627,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "445c18eeab9ffd4693ec85c24cf7bf55f95fc418fd34d62f4633cafa14dd6a3c",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2623-L2627",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "authority ghost listeners",
+          "line_start": 2663,
+          "line_end": 2674,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "3ed863e25956de3e3f6d7820c122e811ab40a046814608f85ab025b744ac1988",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2663-L2674",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "OnRespawnFromGhost selected branch",
+          "line_start": 569,
+          "line_end": 592,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "f790534eec96da76c08dd4e5102568ac885e829cdf23c24a2676e00a85e47cab",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L569-L592",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "DoRezDelay; DoMoveToRezSource",
+          "line_start": 482,
+          "line_end": 536,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "24e98a8fed7fd09203098a43e812c62de776c660365f7a61589b963198b4546e",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L482-L536",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N005-UI-F04",
+        "VANILLA-HOOK-006"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F06",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "选定 resurrectionstatue 路径的 DoActualRez 会在源位置生成 die_fx，切换 SGwilson、传送玩家，并对 player_classified 调 SetGhostMode(false)。它向 source 发 activateresurrection，statue 分支进入 rebirth。CommonActualRez 恢复地图探索、inventory/age、health.canheal、适用的 hunger/temperature 和玩家动作/移动配置，并清 reviving；随后 DoActualRez 移除 playerghost、清 IS_GHOST user flag 并发 ms_respawnedfromghost。SGwilson.rebirth 在进入时禁用 controller、暂时 invincible、隐藏 HUD；动画完成到 idle 的退出路径恢复 controller、取消 invincible、ShowHUD(true) 和相机距离。",
+      "scope": "具体 statue 复活的业务状态、通知和退出；SetGhostMode(false) 在 rebirth 动画结束前发生，因此它也不能单独证明所有展示/输入恢复已经结束。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "CommonActualRez resource modes",
+          "line_start": 267,
+          "line_end": 284,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "1ea1c5e96c83f8f03e2330f52d545455bf7db7f7bcd21858b0fb8350cc3ea05d",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L267-L284",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "CommonActualRez movement/actions and reviving cleanup",
+          "line_start": 309,
+          "line_end": 325,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "545260c55cad8a9a93661683742d7c352e66588f4c19388a1dda2da2b51d67bb",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L309-L325",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "DoActualRez selected statue branch",
+          "line_start": 327,
+          "line_end": 378,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "89d68a9cba5cafb437d519fe50a8272b2bb3d2ae74b19f985d09e5208791b6d6",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L327-L378",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "DoActualRez ghost removal and event",
+          "line_start": 425,
+          "line_end": 431,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "7e22d56a7a09c19228f1eeca0791e3ca85dd403eccb8c7b5aa13b065b873fa8e",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L425-L431",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "symbol": "SGwilson rebirth entry and exit",
+          "line_start": 3407,
+          "line_end": 3469,
+          "file_sha256": "59e79da363d3eb0310cdfd065c52d4c970fe1ac91b753222250a6000f8118b69",
+          "range_sha256": "f947b62355c6aaee6f7c15278f06f68bc83b213a70938f7fccd734f53e0a7a8f",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/stategraphs/SGwilson.lua#L3407-L3469",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N005-UI-F05"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F07",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "resurrectionstatue 在 SetPristine 后非 mastersim 早退；权威端添加 attunable、设置 remoteresurrector，并让 activateresurrection 调 inst.Remove，消耗这座像。Attunable:OnRemoveEntity 对各当前 attuned player 调 UnlinkFromPlayer；后者移除对应 attunable_classified 并解除 player 监听。AttachToPlayer(player,source) 使 proxy 的 classified target 为 player，设 parent、source_guid 并注册；proxy 删除时通知 parent.attuner 注销。Attuner 的 Register/Unregister 更新本地表并发 gotnewattunement/attunementlost。player_common 在早退之前添加 attuner；它的 HasAttunement(tag) 是 common 本地表 getter，客户端注释限定仅本地玩家数据，真正远处 source 可能不可见。",
+      "scope": "目标消费→定向 classified 移除→本地 attunement 事件闭环。允许的 common component getter 不能被一律改写成不存在的 replica.attuner；本地 proxy 不是远端世界目标或服务器权限。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/resurrectionstatue.lua",
+          "symbol": "statue authority components and activateresurrection",
+          "line_start": 141,
+          "line_end": 178,
+          "file_sha256": "49f0ec3d7db984522d0e4f31129d3b402e1255b1397a0c75b17faefda89a605e",
+          "range_sha256": "9a785e9217e428d4919ce616b7c0ca57189cc89ba50b5165ae609efc2dc163e3",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/resurrectionstatue.lua#L141-L178",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attunable.lua",
+          "symbol": "Attunable:OnRemoveEntity",
+          "line_start": 48,
+          "line_end": 60,
+          "file_sha256": "d1c253a6f763aa0c4fc597444a8ef4a6774ce196227528105eb672b76c5cca40",
+          "range_sha256": "9366d95207eeb2f70c2cf9b4aed7437713db6d5941812483ac2d275d6dcfc055",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attunable.lua#L48-L60",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attunable.lua",
+          "symbol": "Attunable proxy creation and linking",
+          "line_start": 105,
+          "line_end": 118,
+          "file_sha256": "d1c253a6f763aa0c4fc597444a8ef4a6774ce196227528105eb672b76c5cca40",
+          "range_sha256": "baf15cae5bb1f6f145e03fc23dcea51bdb5690c9dcb96393793b3d7cfadac5ea",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attunable.lua#L105-L118",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attunable.lua",
+          "symbol": "Attunable:UnlinkFromPlayer",
+          "line_start": 121,
+          "line_end": 135,
+          "file_sha256": "d1c253a6f763aa0c4fc597444a8ef4a6774ce196227528105eb672b76c5cca40",
+          "range_sha256": "b363d018e51a0fa9276d49fd73123f273427aa55fd5c0eb257a5cc071fb44c32",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attunable.lua#L121-L135",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/attunable_classified.lua",
+          "symbol": "proxy remove/register/AttachToPlayer",
+          "line_start": 1,
+          "line_end": 22,
+          "file_sha256": "eaf993a7dcb84dcec68c0addec48d2a2a45773e63cb62186783bca50aa45c33b",
+          "range_sha256": "0e1eb912f5230c8d71545aa6f510a7348bd6bcd752263c602beba5f435f4bbab",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/attunable_classified.lua#L1-L22",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/attunable_classified.lua",
+          "symbol": "proxy client delayed registration",
+          "line_start": 28,
+          "line_end": 53,
+          "file_sha256": "eaf993a7dcb84dcec68c0addec48d2a2a45773e63cb62186783bca50aa45c33b",
+          "range_sha256": "4d5f700d6fa1bd866b6af0a650b25263e7c48e6e5ba87114aa85dea6e5d18395",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/attunable_classified.lua#L28-L53",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attuner.lua",
+          "symbol": "Attuner client data scope",
+          "line_start": 1,
+          "line_end": 8,
+          "file_sha256": "3d581e59fca91bd8a3714ccde7bbd4b065716a2858755b9c02176f19c4110f1a",
+          "range_sha256": "c95124eebb2e606d0ef2bcd25e1fbf7515f86b7cdb6b9c52bb4ebefcf4c331af",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attuner.lua#L1-L8",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attuner.lua",
+          "symbol": "Attuner:HasAttunement",
+          "line_start": 26,
+          "line_end": 33,
+          "file_sha256": "3d581e59fca91bd8a3714ccde7bbd4b065716a2858755b9c02176f19c4110f1a",
+          "range_sha256": "82f977e111736f2070bd8b80c5f3918d99fcb3ede433cf88702b45636c2bb491",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attuner.lua#L26-L33",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/attuner.lua",
+          "symbol": "Attuner proxy contract and events",
+          "line_start": 58,
+          "line_end": 79,
+          "file_sha256": "3d581e59fca91bd8a3714ccde7bbd4b065716a2858755b9c02176f19c4110f1a",
+          "range_sha256": "7e12e747c19db8da3b20ec840cc9780db91cdf0e6846dd5b9a0b2a14e25dfb80",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/attuner.lua#L58-L79",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "common attuner creation",
+          "line_start": 2518,
+          "line_end": 2520,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "2eceb85049cbc03cd13ec5d2b6b560f14147dff43bdae80f140900ccfbae5179",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2518-L2520",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N005-UI-F04",
+        "VANILLA-NETACT-003"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F08",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "player_classified 的 isghostmode 是带 isghostmodedirty 的 net_bool，ishudvisible 是带 playerhuddirty 的 net_bool。SetGhostMode(bool) 在 set 后直接调用 OnGhostModeDirty，ShowHUD(bool) 在 set 后直接调用 OnPlayerHUDDirty；注释明确服务器覆盖为立即处理以免 host HUD 延后一 wall update。客户端 common listener 绑定相应 dirty；OnGhostModeDirty 需要 parent，先更新 playervision，只有 HUD 存在时才调用 parent:SetGhostMode(value)。OnPlayerHUDDirty 只有 parent.HUD 存在才 Show/Hide HUD。玩家 SetGhostMode 交给 controls，controls 交给 status/secondary_status；非 master 预测形态还切换客户端 ghost/player SG。PlayerController:Enable(val) 仅 master 写 classified.iscontrollerenabled。",
+      "scope": "权威状态→owner classified→本地 HUD 的具体回流，host 有即时本地桥；dedicated 没有 HUD 不阻止这些权威写入。ShowHUD 的玩家 wrapper 自身也有 mastersim 门禁。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "OnGhostModeDirty; OnPlayerHUDDirty",
+          "line_start": 815,
+          "line_end": 851,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "693ece25e8a954ee23c13391a1c0fb7c99129e1627c8833ccf93d656eda276a7",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L815-L851",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "host immediate setters",
+          "line_start": 1125,
+          "line_end": 1147,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "aaf17265f514da92d5991482587d07234baf89770c18b9f5988aa96325a15e55",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1125-L1147",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "ghost/HUD common listeners",
+          "line_start": 1208,
+          "line_end": 1213,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "3bdcbb4ef8b37fde191efddb5076de85236526d9cca9f6b910973208b5b72858",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1208-L1213",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "controller and HUD net bool declarations",
+          "line_start": 1458,
+          "line_end": 1469,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "2c78754e4eab047a79828c152482c718854d1a5f6e4c30414b490f906deaeac2",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1458-L1469",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "ghost net bool declaration",
+          "line_start": 1587,
+          "line_end": 1592,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "ecb23d535d944775dc84d8c22d2db2e23e0a326b57c785de423d6ec6e26f8cf4",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1587-L1592",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "local player SetGhostMode",
+          "line_start": 955,
+          "line_end": 984,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "e4f24db03856f3c4bfc8bf9f982c7eb475278010b10a21dbf8f1c78ea4d09c2d",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L955-L984",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "authority ShowHUD wrapper",
+          "line_start": 1555,
+          "line_end": 1559,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "56c18d914473831473a0d49279432336739bc2bdc44fa995160740c2610facdd",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1555-L1559",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/controls.lua",
+          "symbol": "Controls:SetGhostMode",
+          "line_start": 487,
+          "line_end": 492,
+          "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+          "range_sha256": "484452774c11c31a77ffb7d99c926e132202f236526aa53107b9bb50ee9ca840",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/controls.lua#L487-L492",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "PlayerController:Enable(val)",
+          "line_start": 389,
+          "line_end": 393,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "eb844e0a7145dfa2d743fd76e9f0089248faf7e42852d9909dd4fbdf316a25ba",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L389-L393",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N002-AUTH-002",
+        "VANILLA-NETACT-003#F1",
+        "UI-S02"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F09",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "StatusDisplays 让 self.inst 监听 owner 的 gotnewattunement 和 attunementlost；取得相关 proxy 时替换 rezbutton_new_task，丢失时先读 owner.components.attuner 当前 HasAttunement，确实已失去该类型才替换 rezbutton_lost_task。延迟 callback 清各自 task 字段并 EnableResurrect。Disable callback 仅在原先 ghost 可见按钮被隐藏时播放本地 resurrectbuttonfx 的 break 动画和 TheFocalPoint 音效；UIAnim 的 animover listener 只 Hide 这个效果。EnableResurrect(true,type) 显示 heart effigy、设置按钮类型，只有 isghostmode 才显示按钮；false 隐藏 effigy 和按钮。GetResurrectButton() 只返回当前可见按钮。",
+      "scope": "UI 以当前 attunement+ghost mode 决定可见性，局部失去 attunement 不直接等于复活成功。注释不保证同帧 got/lost 顺序，两个独立任务槽也不能被推广为可靠合并队列。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "UpdateRezButton_Enable/Disable",
+          "line_start": 251,
+          "line_end": 269,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "f3027388d782728a882dc8b4a4a9d302ccc24651afb605795fb0f6799f3287d4",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L251-L269",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "status button FX, owner listeners and task slots",
+          "line_start": 344,
+          "line_end": 396,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "4c73a5093214e1e9e963cdc9adc87b8506b5671dcceab43d00a15dbca2f989cc",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L344-L396",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "GetResurrectButton",
+          "line_start": 971,
+          "line_end": 973,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "273e21b1d31a19be502cb97dbb4345ef400df4c28c04fd52eaedcbbba9ca0641",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L971-L973",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "EnableResurrect(enable,effigy_type)",
+          "line_start": 1001,
+          "line_end": 1021,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "d53575d53dd58847c693391e840b08325c27156c9057e82fb39f3dc8fa51c2d3",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L1001-L1021",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S02",
+        "N005-UI-F07"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F10",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "StatusDisplays:SetGhostMode 先在布尔模式未变时返回；变化时显示/隐藏活人 badges、取消并清 rezbutton_new_task/rezbutton_lost_task，读取当前 attuner attunement 后调用 EnableResurrect，替换 modetask 并安排 OnSetGhostMode 或 OnSetPlayerMode。这个原版样例没有完整的 attuner-nil 安全门禁：EnableResurrect 第一参数有 owner_attuner 存在性检查，第二参数仍直接调用 owner_attuner:HasAttunement。player_classified:RegisterNetListeners 除注册监听外还显式调用 OnInitialDirtyStates；该函数调用 OnGhostModeDirty 和 OnPlayerHUDDirty；seamless swap 时 FinishSeamlessPlayerSwap 解除一次性 callback 并重新调用 OnInitialDirtyStates。",
+      "scope": "补充当前 snapshot 与 listener 注册分离、模式任务和 swap 重放。应保留原版的 bootstrap 前提，不把一个局部 nil 检查包装成任意时机都 READY。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "SetGhostMode equal mode early exit",
+          "line_start": 539,
+          "line_end": 553,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "a0b715083e75db3200e1eb35216b82998d831cba0c3123c7f2b13e8b699bdb19",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L539-L553",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "SetGhostMode player badge display",
+          "line_start": 576,
+          "line_end": 582,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "b51207f9ceddeccb2c22fe27508b6a2226f2da8ee6d1e0464d83f88d22156733",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L576-L582",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "SetGhostMode current attunement and tasks",
+          "line_start": 609,
+          "line_end": 627,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "a168bb045ebb04bfe8c864e5950a1868cdc109afbe7ecaa6bdec160d40950299",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L609-L627",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "RegisterNetListeners explicit initialization",
+          "line_start": 1258,
+          "line_end": 1284,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "60f9c1424a62cd44626220a3a246054d3f7f4154b725b991358d013dddbaad14",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1258-L1284",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "OnInitialDirtyStates selected feedback; FinishSeamlessPlayerSwap",
+          "line_start": 1314,
+          "line_end": 1326,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "42b710c123dad3f947a05cbe35e841dd0685f5099069045b24b28148075bc1d9",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1314-L1326",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S01",
+        "UI-S02",
+        "UI-S03",
+        "VANILLA-HOOK-005#F1"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F11",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "补充已有 N003-C02-NSF04 的执行体上下文：player_classified 的 authority listener 把 parent 的 performaction 映射到 SetDirty(isperformactionsuccess,true)，把 actionfailed 映射到 false。客户端 OnIsPerformActionSuccessDirty 会清除正在 preview 的 bufferedaction；flag 为真时再在 parent PushEvent(performaction)。该 net_bool 及 listener 存在，但没有本次 resurrect 请求 ID、源像身份或复活阶段字段。已有 PerformBufferedAction 体在调用 BufferedAction:Do 之前发 performaction，所以这条 true/performaction 桥不能作为已完成 resurrect 业务的确认。",
+      "scope": "新增的是 player_classified/UI/prediction 反馈桥；事件先于 Do 的执行体复用 N003-C02-NSF04，Action 结果/动画/预测确认分类复用 N003-C05。不是否定任意其他 action-specific completion event。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "OnPerformAction; OnActionFailed",
+          "line_start": 144,
+          "line_end": 150,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "2a2acb37fddf24fb7e3021faef355630b7a1fa4c9842ae7505e144e7fc47599c",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L144-L150",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "OnIsPerformActionSuccessDirty",
+          "line_start": 625,
+          "line_end": 635,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "dff03b423e10c5ceb24c8e41e8a3c9d3aa497f318fdd8e071b103470c5f169fc",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L625-L635",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "authority action feedback registration",
+          "line_start": 1163,
+          "line_end": 1170,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "0e79c8b8f550e11ed8f3660a122f1ed723f780572d067c8c09a23390f56bd41e",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1163-L1170",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "client action feedback listener",
+          "line_start": 1202,
+          "line_end": 1203,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "35599518d4edd80d9cfae422f72cb843e8c8ff4570c7f3af6aa5a81aee5e1af7",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1202-L1203",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "isperformactionsuccess declaration",
+          "line_start": 1587,
+          "line_end": 1589,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "43e09f9adfb87eaff8ec57d7c8a44f5475771be2e0bd5572f4b302c8c5793c26",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1587-L1589",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "N003-C02-NSF04",
+        "N003-C05",
+        "N005-UI-F04",
+        "N005-UI-F05"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F12",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "复活 DoActualRez 生成的是 die_fx；scripts/fx.lua 把它定义为 die_fx bank、die build、small 动画、deathpoof 音效和 tint，没有自定义 fn 或 animqueue。它走已有 VANILLA-ASSET-006 的 MakeFx 网络 proxy + 每个执行该 prefab 的非 dedicated 端建立本地视觉的路径，普通 animover 清视觉、authority task 清 proxy。该世界 FX 没有采用 attunable_classified 的 owner 定向传输。StatusDisplays 的 break UIAnim/本地 sound 则归本地 HUD，不借此网络 proxy。",
+      "scope": "新增仅为选中交互的 die_fx 定义与复用路由选择；网络实体实际到达/可见范围未知，不能称保证所有在线客户端都收到。FX audience 与有无 gameplay mutation 分开判断。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/fx.lua",
+          "symbol": "die_fx definition",
+          "line_start": 55,
+          "line_end": 62,
+          "file_sha256": "a51001a06c187ab837b65edfe5fe32cb8ec34233f6c6cb6256187cc157c46be9",
+          "range_sha256": "4a1028946cb95750b731a0f161691217f4f61492579702d174ff3c8ff72ad3ce",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/fx.lua#L55-L62",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "DoActualRez die_fx spawn",
+          "line_start": 327,
+          "line_end": 335,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "ac5f6339261ae0e2f810ea8263f3a23f3e9555fa2f80cb3c300ae40c3066f915",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L327-L335",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "VANILLA-ASSET-006",
+        "N005-UI-F09",
+        "N005-UI-F07"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    },
+    {
+      "fact_id": "N005-UI-F13",
+      "classification": "DirectLuaSourceFact",
+      "new_fact": true,
+      "statement": "GetResurrectButtonAction 创建的 BufferedAction 只有 doer、nil target、REMOTERESURRECT，没有 invobject 或 pos；BufferedAction 构造把未传 pos 保存为 nil，GetActionPoint() 因而返回 nil。对这个无 target、无 action point 的命名实例，LocoMotor:PreviewAction 分流到 inst:PreviewBufferedAction；PushAction 经已有 pre_action_cb/TestForStart 前置后分流到 inst:PushBufferedAction。EntityScript 的 PreviewBufferedAction 在有 SG 时交 SG:PreviewAction，拒绝时清动作；此处仍不是 action.fn 执行。",
+      "scope": "只补充 N003-C10 已有 locomotor 入口之后、这个具体 no-target 交互所走分支，不复制通用 Action/SG 权限规则。",
+      "citations": [
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "named no-target BufferedAction construction",
+          "line_start": 2426,
+          "line_end": 2433,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "243163ec0c2825de427db202c137e5a027382964f452e81b1fb0798e53a402f0",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L2426-L2433",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/bufferedaction.lua",
+          "symbol": "BufferedAction constructor omitted pos",
+          "line_start": 2,
+          "line_end": 17,
+          "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+          "range_sha256": "2df93a979e6679ce742321ce32f25f04cbdc4d49e16fb595e2386776e4295d49",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L2-L17",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/bufferedaction.lua",
+          "symbol": "GetActionPoint",
+          "line_start": 90,
+          "line_end": 93,
+          "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+          "range_sha256": "0d4d8a13f912fc1603d4cc50395e7b893d453a7c55756ee33bf76aee52f1bac6",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L90-L93",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/locomotor.lua",
+          "symbol": "PreviewAction no-target branch",
+          "line_start": 841,
+          "line_end": 862,
+          "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+          "range_sha256": "3dbfbe02fb2dd941bd7431167c1914e2662c191c97758ea41855b8841fdb3969",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L841-L862",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/components/locomotor.lua",
+          "symbol": "PushAction no-target branch",
+          "line_start": 946,
+          "line_end": 962,
+          "file_sha256": "1dc0d33b575877f315b46c4af8852deba0a91053f41eb16ad80aafa7b611de72",
+          "range_sha256": "73e3d941030a0537ee4975513066c89d59da6980d62d525343873d68af99da0a",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/locomotor.lua#L946-L962",
+          "full_file_snapshot_sha256_match": true
+        },
+        {
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "path": "scripts/entityscript.lua",
+          "symbol": "PreviewBufferedAction SG dispatch",
+          "line_start": 1572,
+          "line_end": 1598,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "f6faf285f2f829aaedfa32ff0e3182e47401e5ce3b471018f7b7689768d97c9b",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1572-L1598",
+          "full_file_snapshot_sha256_match": true
+        }
+      ],
+      "supplements_existing_ids": [
+        "UI-S06",
+        "N003-C10-NSF01",
+        "N003-C10-NSF06",
+        "VANILLA-NETACT-009#F6"
+      ],
+      "runtime_tested": false,
+      "canonical_record_added": false
+    }
+  ],
+  "bounded_inferences": [
+    {
+      "inference_id": "N005-UI-I01",
+      "classification": "BoundedInference",
+      "statement": "请求发送、Action true、performaction/isperformactionsuccess、ghost mode false、rebirth/HUD/controller 恢复是不同阶段；这个 vanilla 路径没有逐请求业务完成 ack。必须根据选定 feature 的明确完成条件解释 UI。",
+      "support": [
+        "UI-S06",
+        "N005-UI-F04",
+        "N005-UI-F05",
+        "N005-UI-F06",
+        "N005-UI-F08",
+        "N005-UI-F11",
+        "N003-C02-NSF04"
+      ],
+      "limit": "不推广为其他 feature 从来没有业务 ack，也不发明 Mod 请求 token/result protocol 已存在。"
+    },
+    {
+      "inference_id": "N005-UI-I02",
+      "classification": "BoundedInference",
+      "statement": "ListenForEvent 的已读登记体没有初始 callback 调用；StatusDisplays/OnInitialDirtyStates 的初始 update 是额外显式步骤。新实例只订阅并不能据此承诺当前 UI 已刷新。",
+      "support": [
+        "VANILLA-HOOK-005#F1",
+        "UI-S01",
+        "N005-UI-F10"
+      ],
+      "limit": "Lua 注册体事实，不是 native initial dirty 时序保证。"
+    },
+    {
+      "inference_id": "N005-UI-I03",
+      "classification": "BoundedInference",
+      "statement": "host 同时有 components、HUD、authority direct branch 和 immediate dirty bridge，会遮住 remote-only 缺失 classified/getter/订阅耦合。dedicated 没有 local Widget 仍应完成 server gameplay。",
+      "support": [
+        "N002-AUTH-002",
+        "UI-S06",
+        "N005-UI-F08",
+        "UI-REUSE-VANILLA-NETACT-003-F4"
+      ],
+      "limit": "这是静态风险推导，未运行具体 Mod。"
+    },
+    {
+      "inference_id": "N005-UI-I04",
+      "classification": "BoundedInference",
+      "statement": "world FX network proxy 与 owner classified 的 Lua 路由不同；收到 proxy 的非 dedicated peer 才走 local visual，不能把它当保证全体在线玩家收到的广播。",
+      "support": [
+        "N005-UI-F07",
+        "N005-UI-F12",
+        "UI-REUSE-VANILLA-ASSET-006-F1",
+        "UI-REUSE-VANILLA-ASSET-006-F2"
+      ],
+      "limit": "native replication visibility/culling 和传输未读。"
+    }
+  ],
+  "compact_candidates": [
+    {
+      "candidate_id": "N005-UI-C01",
+      "role": "CORE_SEED",
+      "title": "复活按钮表达请求，业务结果由状态回流",
+      "engineering_question": "如何让点击/控制器请求到达权威效果，并正确识别实际结果？",
+      "compact_source_fact_projection": [
+        "ResurrectButton 委托 owner.playercontroller。host 直接 PushAction，remote 无 locomotor 直接 RPC，有 locomotor 则经 preview callback。",
+        "RPC handler 不接收 client success；authority controller 重新选 candidate。ghost SG 执行 REMOTERESURRECT.fn，重查当前 attuned source 后发 respawnfromghost。",
+        "Action true 之后仍有 source 校验和延迟回退。isperformactionsuccess/performaction 是预测反馈桥；ghost mode false、rebirth 结束、HUD/controller 恢复分别是不同阶段。"
+      ],
+      "supporting_fact_ids": [
+        "UI-S05",
+        "UI-S06",
+        "N005-UI-F02",
+        "N005-UI-F03",
+        "N005-UI-F04",
+        "N005-UI-F05",
+        "N005-UI-F06",
+        "N005-UI-F08",
+        "N005-UI-F11",
+        "N005-UI-F13",
+        "N003-C02-NSF04",
+        "NATIVE003-Q5-CALLBACK-02"
+      ],
+      "coding_recommendations": [
+        "把本地 intent、authority 接受/拒绝、最终业务状态和展示结束分开。自定义 UI 若需要逐请求成功/失败结果，必须设计自己的明确结果契约，不把已有 performaction 或 net_bool 当成逐请求 ack。",
+        "最终扣资源/世界 mutation 置于经授权的 server 路径；UI、preview、动画 onexit 不承担权威效果。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "DoResurrect(); DoResurrectButton(); GetResurrectButtonAction() → BufferedAction 或 nil。",
+        "RemoteResurrectButton() 实现只 SendRPCToServer(RPC.ResurrectButton)，零业务 payload；RPC handler function(player)。",
+        "DoResurrectButton：IsEnabled false 或 candidate nil 早退；master→PushAction；非 master 无 locomotor→可选 pre_action_cb 再 RPC；有 locomotor 且 CanLocomote→PreviewAction，否则没有请求分支。",
+        "OnRemoteResurrectButton：master、IsEnabled、handler nil 同时成立；重新取 candidate 后才 PushAction。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "UI-S05",
+        "UI-S06",
+        "N005-UI-F02",
+        "N005-UI-F03",
+        "N005-UI-F04",
+        "N005-UI-F05",
+        "N005-UI-F06",
+        "N005-UI-F08",
+        "N005-UI-F11",
+        "N005-UI-F13",
+        "N003-C02-NSF04",
+        "NATIVE003-Q5-CALLBACK-02"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    },
+    {
+      "candidate_id": "N005-UI-C02",
+      "role": "CORE_SEED",
+      "title": "当前 getter 与事件订阅是两件事",
+      "engineering_question": "新建/重建的状态显示如何获得现在的值？",
+      "compact_source_fact_projection": [
+        "ListenForEvent 只登记 callback，不执行初始更新。StatusDisplays 先保留并登记对应 callback，然后另调用 replica:GetPercent 做 current snapshot。",
+        "hunger replica 优先实际 component，其次 classified，缺失时仍有该 getter 的原版 fallback；返回数值不代表数据已 READY。",
+        "复活能力的例外是 common attuner:HasAttunement，本地 player 可用；不能虚构 replica.attuner 或用客户端 proxy 查远处真实 Ents。"
+      ],
+      "supporting_fact_ids": [
+        "UI-S01",
+        "UI-S04",
+        "VANILLA-HOOK-005#F1",
+        "UI-REUSE-VANILLA-NETACT-003-F4",
+        "VANILLA-NETACT-003#F3",
+        "UI-REUSE-VANILLA-NETACT-004-F4",
+        "UI-REUSE-VANILLA-NETACT-004-F5",
+        "N005-UI-F07",
+        "N005-UI-F10"
+      ],
+      "coding_recommendations": [
+        "为具体自定义字段选择真实 current getter、change/ready 事件、visibility 和 unavailable 状态；订阅后显式 current render。",
+        "先检查 owner、replica/getter、classified 的真实可用性，缺失时保持 loading/unavailable 或项目约定，勿把默认数值发明成服务器已确认 READY。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "ListenForEvent(event,fn,source) 与 RemoveEventCallback(event,同一fn,同一source) 成对。",
+        "GetPercent()/Max()/GetCurrent() 的 component/classified/fallback 分支不可压成一个万能 client getter。",
+        "StatusDisplays:SetGhostMode(ghostmode) 的 unchanged-mode early return 和 attuner 存在前提保留；原版第二个 type 参数仍直接解引用 attuner。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "UI-S01",
+        "UI-S04",
+        "VANILLA-HOOK-005#F1",
+        "UI-REUSE-VANILLA-NETACT-003-F4",
+        "VANILLA-NETACT-003#F3",
+        "UI-REUSE-VANILLA-NETACT-004-F4",
+        "UI-REUSE-VANILLA-NETACT-004-F5",
+        "N005-UI-F07",
+        "N005-UI-F10"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    },
+    {
+      "candidate_id": "N005-UI-C03",
+      "role": "SUPPORTING",
+      "title": "模式、销毁和替换都要按所有者收尾",
+      "engineering_question": "close/rebuild/ghost/revive/换 player 时谁拥有 callback、task、input/focus？",
+      "compact_source_fact_projection": [
+        "status listener/task、按钮的 continuefrompause listener、FX animover listener 各自归其 Widget.inst；mode switch 显式解绑核心 status callbacks 并替换任务。",
+        "Hide 只隐藏；RemoveChild 只脱离；Kill 进入 Widget/EntityScript 清理。owner/world 上自建任务和全局 TheInput handle 不因此变成 Widget 所有。",
+        "seamless swap 注销旧 HUD、绑定新 owner；StatusDisplays 和 classified 有明确一次性 refresh，旧引用/队列不因 ThePlayer 赋值自动改绑。"
+      ],
+      "supporting_fact_ids": [
+        "UI-S02",
+        "UI-S03",
+        "N005-UI-F01",
+        "N005-UI-F09",
+        "N005-UI-F10",
+        "UI-REUSE-VANILLA-UI-002-F2",
+        "UI-REUSE-VANILLA-UI-002-F3",
+        "UI-REUSE-VANILLA-UI-005-F3",
+        "VANILLA-UI-005#F2",
+        "VANILLA-UI-005#F4",
+        "UI-REUSE-VANILLA-UI-007-F3",
+        "NATIVE002-G08-E01",
+        "NATIVE002-G08-E02",
+        "NATIVE002-G08-E04"
+      ],
+      "coding_recommendations": [
+        "列明 listener/source/保存的 fn、task owner/handle、input handle、focus slot 的拥有者与退出点；close/hide 若仍存活需按功能停用，最终 Kill 保留基类清理。",
+        "延迟工作除了 IsValid 再核对当前 owner/业务身份；player 替换后按已授权生命周期重建，不能把旧 callback 或 RPC 自动搬到新玩家。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "Widget:Hide()/RemoveChild(child)/Kill() 不可互换。",
+        "TheInput:Add...Handler → handle；handle:Remove()。Screen:AddEventHandler(event,fn) → fn；Screen:RemoveEventHandler(event,fn)。",
+        "PlayerHud:SetModFocus(modname,focusid,hasfocus) 是布尔槽，不是引用计数；清自己的槽。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "UI-S02",
+        "UI-S03",
+        "N005-UI-F01",
+        "N005-UI-F09",
+        "N005-UI-F10",
+        "UI-REUSE-VANILLA-UI-002-F2",
+        "UI-REUSE-VANILLA-UI-002-F3",
+        "UI-REUSE-VANILLA-UI-005-F3",
+        "VANILLA-UI-005#F2",
+        "VANILLA-UI-005#F4",
+        "UI-REUSE-VANILLA-UI-007-F3",
+        "NATIVE002-G08-E01",
+        "NATIVE002-G08-E02",
+        "NATIVE002-G08-E04"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    },
+    {
+      "candidate_id": "N005-UI-C04",
+      "role": "SUPPORTING",
+      "title": "控制消费、提示焦点和权限分层",
+      "engineering_question": "一个按钮接住输入，是否足以允许 gameplay？",
+      "compact_source_fact_projection": [
+        "PlayerHud 取得可见按钮，CheckControl 真值只消费该 input。hud_focus 控制提示文本，与 authority candidate/IsEnabled 门禁不同。",
+        "raw key 是 EventProcessor 广播且不读取 handler 返回值；Screen control 消费与 raw handler 是不同路径。",
+        "PlayerController:IsEnabled 在 classified 缺失/禁用和 HUD input focus 时拒绝，第二返回值仅特定 HUD limited-gameplay 分支。"
+      ],
+      "supporting_fact_ids": [
+        "UI-S05",
+        "UI-S06",
+        "N005-UI-F01",
+        "VANILLA-UI-006#F1",
+        "UI-REUSE-VANILLA-UI-006-F3",
+        "UI-REUSE-VANILLA-UI-007-F4"
+      ],
+      "coding_recommendations": [
+        "使用合适 control/Screen 消费或自己的 ModFocus 门禁；不要用 raw-key 回调 return true 假定吞掉底层 gameplay。",
+        "UI 可点击/有提示/收到控制都不是服务器许可；controller 与 action-specific authority 仍需重查。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "CheckControl(control,down) 仅 shown、down、attack control；hud_focus 不在此门禁。",
+        "IsEnabled() → enabled，limited_gameplay（后者只列定状态）；不得压成简单 truthy tuple。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "UI-S05",
+        "UI-S06",
+        "N005-UI-F01",
+        "VANILLA-UI-006#F1",
+        "UI-REUSE-VANILLA-UI-006-F3",
+        "UI-REUSE-VANILLA-UI-007-F4"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    },
+    {
+      "candidate_id": "N005-UI-C05",
+      "role": "SUPPORTING",
+      "title": "本地 HUD、定向状态和世界 FX 分清受众",
+      "engineering_question": "复活的显示、FX、业务效果各发给谁？",
+      "compact_source_fact_projection": [
+        "status break/badge pulse/FrontEnd 或 FocalPoint sound 属本地显示；owner classified/attunable proxy 是定向 player 数据。",
+        "authority 的 die_fx 走世界 network proxy；收到这个 prefab 的非 dedicated 端创建 local visual，visual/proxy 有不同结束条件。",
+        "FX 标签不代表无伤害，也不等于保证 all clients 收到；选定 die_fx 定义和业务复活 mutation 是分开的。"
+      ],
+      "supporting_fact_ids": [
+        "UI-S04",
+        "N005-UI-F07",
+        "N005-UI-F09",
+        "N005-UI-F12",
+        "UI-REUSE-VANILLA-ASSET-006-F1",
+        "UI-REUSE-VANILLA-ASSET-006-F2",
+        "VANILLA-ASSET-006#F3",
+        "UI-REUSE-VANILLA-ASSET-010-F1"
+      ],
+      "coding_recommendations": [
+        "先决定 local owner / 指定玩家 / 世界可见 clients / 全体 clients 的项目受众，再选通道；若需要全体客户端通知，另外设计，不借 network FX proxy 的可见性作保证。",
+        "业务 mutation、proxy lifetime、local animation/sound/灯 lifetime 各自收尾，具体 FX 重用前检查其行为。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "attunable_classified:AttachToPlayer(player,source) 设置 classified target。",
+        "world MakeFx：not IsDedicated 才 startfx；mastersim 才 proxy removal task；animover 与 animqueueover 分支不同。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "UI-S04",
+        "N005-UI-F07",
+        "N005-UI-F09",
+        "N005-UI-F12",
+        "UI-REUSE-VANILLA-ASSET-006-F1",
+        "UI-REUSE-VANILLA-ASSET-006-F2",
+        "VANILLA-ASSET-006#F3",
+        "UI-REUSE-VANILLA-ASSET-010-F1"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    },
+    {
+      "candidate_id": "N005-UI-C06",
+      "role": "SUPPORTING",
+      "title": "host 即时捷径不能证明 remote 正确",
+      "engineering_question": "为何 host 成功会遮住 client-only 耦合？",
+      "compact_source_fact_projection": [
+        "三个条件独立：local ThePlayer/HUD、not IsDedicated 的 presentation、ismastersim 的 authority。",
+        "resurrect host 直接推权威动作，不走 remote RPC；classified SetGhostMode/ShowHUD 有即时 host handler，remote 依赖 dirty。hunger getter 在 host 可先读 component。",
+        "dedicated 没有本地 ThePlayer/HUD 展示，但存在权威玩家实体，能收 RPC、执行 SG、消费 source、写 classified；HUD 反馈分支按实际 HUD 是否存在。"
+      ],
+      "supporting_fact_ids": [
+        "N002-AUTH-001",
+        "N002-AUTH-002",
+        "UI-S06",
+        "N005-UI-F08",
+        "UI-REUSE-VANILLA-NETACT-003-F4"
+      ],
+      "coding_recommendations": [
+        "工程实现先排除 UI/HUD 作为 server 前提；具体 Mod 用 host、remote prediction on/off、dedicated 分别验收。这里只提供静态分支知识，不宣称 ModQA 已通过。"
+      ],
+      "recommendation_status": "EngineeringRecommendation_NotRuntimeValidated",
+      "preserved_signatures_and_branch_alternatives": [
+        "TheWorld.ismastersim、TheNet:IsDedicated()、inst==ThePlayer、inst.HUD 存在性不互相替换。"
+      ],
+      "expanded_reviewer_fact_refs": [
+        "N002-AUTH-001",
+        "N002-AUTH-002",
+        "UI-S06",
+        "N005-UI-F08",
+        "UI-REUSE-VANILLA-NETACT-003-F4"
+      ],
+      "runtime_tested": false,
+      "new_canonical_record": false
+    }
+  ],
+  "reused_direct_facts": [
+    {
+      "evidence_id": "UI-S01",
+      "kind": "reused_direct_source_fact",
+      "statement": "StatusDisplays.OnSetPlayerMode installs healthdelta, hungerdelta and sanitydelta callbacks only when their saved callback field is nil. Each callback is owned by self.inst, listens to self.owner, and is followed immediately by the corresponding owner.replica getter snapshot (GetPercent) and display setter.",
+      "citations": [
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "OnSetPlayerMode",
+          "line_start": 16,
+          "line_end": 40,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "09c5c8310c3e94c8319a18a9370be8d1b4bc2ca3d4df203ae50af807efa76c56",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L16-L40",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-UI-001",
+        "VANILLA-NETACT-003",
+        "VANILLA-NETACT-004"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "Only the listed three status channels in this vanilla Widget; no general ordering or readiness guarantee for custom netvars.",
+      "runtime_tested": false,
+      "fact_id": "UI-S01",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/0",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "UI-S02",
+      "kind": "reused_direct_source_fact",
+      "statement": "StatusDisplays.OnSetGhostMode removes its saved healthdelta/hungerdelta/sanitydelta callbacks with the same owner source and clears their fields. SetGhostMode cancels existing resurrect-button tasks, cancels the previous modetask if present, then assigns a new self.inst DoStaticTaskInTime(0) selecting OnSetGhostMode or OnSetPlayerMode.",
+      "citations": [
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "OnSetGhostMode core status listeners",
+          "line_start": 151,
+          "line_end": 177,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "51218f9a8df7564dc71c8138f41f1d44b5f2313d0be35b9cb16d1eefaa979fde",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L151-L177",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "StatusDisplays:SetGhostMode pending tasks",
+          "line_start": 609,
+          "line_end": 627,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "a168bb045ebb04bfe8c864e5950a1868cdc109afbe7ecaa6bdec160d40950299",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L609-L627",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-UI-002",
+        "VANILLA-UI-003",
+        "VANILLA-HOOK-005",
+        "VANILLA-HOOK-006"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "The core three listeners and listed tasks only; does not assert all specialized callbacks are symmetrically cleared or that Hide alone performs this cleanup.",
+      "runtime_tested": false,
+      "fact_id": "UI-S02",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/1",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "UI-S03",
+      "kind": "reused_direct_source_fact",
+      "statement": "StatusDisplays stores its constructor owner and registers finishseamlessplayerswap on that owner when owner.isseamlessswaptarget. OnFinishSeamlessPlayerSwap obtains owner.HUD.controls.status, removes its own callback, cancels and clears modetask, then invokes the selected mode initializer immediately. Constructor sets isghostmode=true and calls SetGhostMode(false) to force initial mode setup.",
+      "citations": [
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "OnFinishSeamlessPlayerSwap",
+          "line_start": 271,
+          "line_end": 284,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "7970f80a55e4c8550e30d5e0b55210fb45bf1ac18e3dda2e37af278d37c9f64c",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L271-L284",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "StatusDisplays constructor owner/swap",
+          "line_start": 286,
+          "line_end": 293,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "c3ce2fc31ddfe51ed90f07a5ae88614db0d63bd36491c7b141896ec38b7e63c5",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L286-L293",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "StatusDisplays initial mode setup",
+          "line_start": 391,
+          "line_end": 396,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "126b2b0603c04b761ccef6b21b001396b621c54dc193538c55319b11d8180176",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L391-L396",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-UI-001",
+        "VANILLA-PLAYER-002"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "Named seamless-swap consumer path, not all reconnect/remote-visibility cases; source dereferences the current owner HUD and is not a universal nil-safe bootstrap template.",
+      "runtime_tested": false,
+      "fact_id": "UI-S03",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/2",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "UI-S04",
+      "kind": "reused_direct_source_fact",
+      "statement": "StatusDisplays.SetHungerPercent passes the supplied percent and owner.replica.hunger:Max() to the stomach badge and starts/stops its warning. HungerDelta calls that setter, then either a badge-specific HungerDelta or local pulse and TheFrontEnd sound for non-overtime increase/decrease.",
+      "citations": [
+        {
+          "path": "scripts/widgets/statusdisplays.lua",
+          "symbol": "StatusDisplays:SetHungerPercent; HungerDelta",
+          "line_start": 684,
+          "line_end": 709,
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "range_sha256": "3a2a0e4cce43e0f5a7dd16b125994be3a086d7215424feb351cfdd1ce6cb2f9f",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/statusdisplays.lua#L684-L709",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-NETACT-003",
+        "VANILLA-ASSET-006",
+        "VANILLA-UI-001"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "This excerpt updates display/pulse/sound; no authoritative hunger mutation occurs in this excerpt. No claim about all Widget methods or the unseen badge-specific callback.",
+      "runtime_tested": false,
+      "fact_id": "UI-S04",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/3",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "UI-S05",
+      "kind": "reused_direct_source_fact",
+      "statement": "ResurrectButton is a Widget holding owner; its ImageButton click calls DoResurrect. CheckControl calls the same method when shown, down, and CONTROL_CONTROLLER_ATTACK, and returns true. DoResurrect only delegates to owner.components.playercontroller:DoResurrectButton when that controller exists.",
+      "citations": [
+        {
+          "path": "scripts/widgets/resurrectbutton.lua",
+          "symbol": "ResurrectButton constructor",
+          "line_start": 6,
+          "line_end": 12,
+          "file_sha256": "f714c061bfb96e2f58ce6dd70a8624ff71b363043411dc59eedc6842d1e3da75",
+          "range_sha256": "b6e24ecbf0335651714a80c8a67b9bf1b492eb53c31bd1be44f75dd11593e532",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/resurrectbutton.lua#L6-L12",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/widgets/resurrectbutton.lua",
+          "symbol": "ResurrectButton:CheckControl; DoResurrect",
+          "line_start": 48,
+          "line_end": 60,
+          "file_sha256": "f714c061bfb96e2f58ce6dd70a8624ff71b363043411dc59eedc6842d1e3da75",
+          "range_sha256": "89bd349c56b794ec17cd30f288c89601c763f45042f1aa2bdd59bb39cf5c893f",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/resurrectbutton.lua#L48-L60",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-UI-006",
+        "VANILLA-UI-007",
+        "VANILLA-NETACT-008"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "A named HUD-button sample, not a generic control-binding contract or proof of resurrection success.",
+      "runtime_tested": false,
+      "fact_id": "UI-S05",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/4",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "UI-S06",
+      "kind": "reused_direct_source_fact",
+      "statement": "PlayerController.GetResurrectButtonAction requires playerghost, allowed local SG/entity idle/moving state and listed attunement, then returns a REMOTERESURRECT BufferedAction or nil. DoResurrectButton first requires IsEnabled and a candidate: mastersim pushes it through locomotor; non-master without locomotor invokes optional pre_action_cb then RemoteResurrectButton; with locomotor and CanLocomote it sends from preview_cb through PreviewAction. OnRemoteResurrectButton requires mastersim, IsEnabled and no local handler, re-obtains the candidate and pushes it. RemoteResurrectButton sends RPC.ResurrectButton without a client success payload.",
+      "citations": [
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "PlayerController:GetResurrectButtonAction; DoResurrectButton",
+          "line_start": 2426,
+          "line_end": 2457,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "588ea330c0ca55202b8502b76c9e0432b552c0d5c8bde3147d7c6e7bf10e6701",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L2426-L2457",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "PlayerController:OnRemoteResurrectButton; RemoteResurrectButton",
+          "line_start": 2459,
+          "line_end": 2472,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "40c9bbafed8d20845cb94bc100944845016c832ad7f16696c2c25bb4a7dbd62a",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L2459-L2472",
+          "citation_scheme": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_EXACT_INCLUSIVE_SOURCE_LINE_BYTES_RETAIN_ENDINGS",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "supplements_existing_record_ids": [
+        "VANILLA-NETACT-008",
+        "VANILLA-NETACT-009",
+        "VANILLA-PREDICT-004"
+      ],
+      "new_canonical_record_requested": false,
+      "evidence_scope": "Only this named controller route; the RPC table handler, REMOTERESURRECT action.fn, stategraph effect frame and runtime success were not newly audited. No universal validation claim for arbitrary Mod handlers.",
+      "runtime_tested": false,
+      "fact_id": "UI-S06",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/ui-pre-research.json",
+        "json_pointer": "/new_supplementary_source_facts/5",
+        "artifact_sha256": "2b628455aa35cb5ec18a6fc2ed827b2d4634b659a023f55ced7ece362cb17a85",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "prefabs/fx.lua 的 MakeFx 为普通 build 声明 ANIM 资源，为 build_is_skin 声明 DYNAMIC_ANIM 与 PKGREF。返回的 prefab fn 创建 Transform/Network 代理；非专服延后一帧调用 startfx，mastersim 代理设置不存档并在1秒后 Remove。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/fx.lua",
+          "symbol": "MakeFx",
+          "line_start": 5,
+          "line_end": 16,
+          "file_sha256": "ea80462d327394e59e4c825656406857cc68abeaccae95afa8da52be034beb1d",
+          "range_sha256": "51cbd813a6dbc2c2877769f0abde67ded0d22e11b0d5edb11978b02f7641f9b6",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/fx.lua#L5-L16",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/fx.lua",
+          "symbol": "startfx",
+          "line_start": 121,
+          "line_end": 163,
+          "file_sha256": "ea80462d327394e59e4c825656406857cc68abeaccae95afa8da52be034beb1d",
+          "range_sha256": "9a31738e3b96d3b865a75e61898f3db6b856588cce9aa521377b304171044915",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/fx.lua#L121-L163",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-ASSET-006",
+      "fact_index_1based": 1,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-ASSET-006-F1",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/5/facts/0",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "startfx 另建不联网视觉实体，添加 Transform/AnimState，复制代理父对象与 Transform；该视觉实体禁止休眠、不存档，按定义设置 bank/build 和动画。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/fx.lua",
+          "symbol": "startfx",
+          "line_start": 18,
+          "line_end": 41,
+          "file_sha256": "ea80462d327394e59e4c825656406857cc68abeaccae95afa8da52be034beb1d",
+          "range_sha256": "1d58e482be5b21652df3cb486fd60bd93cc95b6130e0ad543aea57740e353d68",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/fx.lua#L18-L41",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/fx.lua",
+          "symbol": "SetBank",
+          "line_start": 63,
+          "line_end": 77,
+          "file_sha256": "ea80462d327394e59e4c825656406857cc68abeaccae95afa8da52be034beb1d",
+          "range_sha256": "1600f34525899f7f21a68659dbd4e2b38b56e8afe464f92263544a74b0ee61a1",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/fx.lua#L63-L77",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-ASSET-006",
+      "fact_index_1based": 2,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-ASSET-006-F2",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/5/facts/1",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "视觉实体按 t.animqueue 选择 animqueueover 或 animover 来 Remove，t.fn 可立即或按 fntime 延迟执行，支持 update_while_paused 对应的静态任务。该回调接收视觉 inst 和 proxy。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/fx.lua",
+          "symbol": "animqueue",
+          "line_start": 98,
+          "line_end": 114,
+          "file_sha256": "ea80462d327394e59e4c825656406857cc68abeaccae95afa8da52be034beb1d",
+          "range_sha256": "c5589b77ca4b81da881d06c87450040e6c17443987f042097a8e901dbe24c52d",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/fx.lua#L98-L114",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-ASSET-006",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-ASSET-006#F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/5/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "bramblefx 同时带 FX/thorny 标签、动画，并在 mastersim 添加 updatelooper 执行 OnUpdateThorns；因此该名字/标签对应的实体不只是装饰。服务器在 animover 时 Remove，并设 persists=false。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/bramblefx.lua",
+          "symbol": "MakeFX",
+          "line_start": 71,
+          "line_end": 120,
+          "file_sha256": "69a611d1fec391d2b2efe6992279b77107f7016e0b505f55b7e5f255c62a82f4",
+          "range_sha256": "8a911e13742e6d610ee11e8bc5d1b9fe2354d510770b5684dc5d2df75da60a56",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/bramblefx.lua#L71-L120",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-ASSET-010",
+      "fact_index_1based": 1,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-ASSET-010-F1",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/9/facts/0",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "ListenForEvent(event, fn, source) 中 source 默认为监听实体 self；函数把同一 fn 分别写入 source.event_listeners 与 self.event_listening。AddListener 直接 table.insert，没有重复注册检查。",
+      "citations": [
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "AddListener",
+          "line_start": 1172,
+          "line_end": 1203,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1172-L1203",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-HOOK-005",
+      "fact_index_1based": 1,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-HOOK-005#F1",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/48/facts/0",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "statement": "Hide 只隐藏实体、设置 shown=false 并回调 OnHide；Kill 会 StopUpdating、KillAllChildren、从父 children 删除自身、清 inst.widget、StopFollowMouse，最后 inst:Remove。",
+      "citations": [
+        {
+          "path": "scripts/widgets/widget.lua",
+          "symbol": "Hide",
+          "line_start": 311,
+          "line_end": 334,
+          "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+          "range_sha256": "0f368c7f23044d61ad5fef95b3b7cbcc5c080385e896c45e2be06202cb52c3ef",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/widget.lua#L311-L334",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-002",
+      "fact_index_1based": 2,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-002-F2",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/54/facts/1",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "Widget:Kill 进入的 EntityScript:Remove 路径调用 RemoveAllEventCallbacks 与 CancelAllPendingTasks；因此这条销毁路径明确包含 self.inst 上的事件/任务清理入口。",
+      "citations": [
+        {
+          "path": "scripts/widgets/widget.lua",
+          "symbol": "Kill",
+          "line_start": 325,
+          "line_end": 334,
+          "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+          "range_sha256": "fb43c12ca997c66e043c52e9f758621f85993a54e90833666a4a6bc2057eeaf7",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/widget.lua#L325-L334",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "Remove",
+          "line_start": 1705,
+          "line_end": 1727,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "51668de9aa8ac040c278e84513ada6f574d061bdda8a6ed8f3bd922cd479c37a",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1705-L1727",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-UI-002",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-002-F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/54/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    null,
+    null,
+    null,
+    {
+      "statement": "EventProcessor:AddEventHandler 为每次注册新建保存 event、fn、processor 的 EventHandler 并返回；handle:Remove 调 processor:RemoveHandler，以 handle 键删除登记。HandleEvent 用 pairs 遍历并调用 k.fn(...)，不检查函数返回值。",
+      "citations": [
+        {
+          "path": "scripts/events.lua",
+          "symbol": "EventHandler",
+          "line_start": 1,
+          "line_end": 9,
+          "file_sha256": "6bff572b49698466311e5db92de287720fb0df515c1a325496d4046bbe1fc61c",
+          "range_sha256": "db79b427b6248c5a2edac84c6894128684814fed75eac867383ee86c6f8dbbc4",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/events.lua#L1-L9",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        },
+        {
+          "path": "scripts/events.lua",
+          "symbol": "AddEventHandler",
+          "line_start": 17,
+          "line_end": 49,
+          "file_sha256": "6bff572b49698466311e5db92de287720fb0df515c1a325496d4046bbe1fc61c",
+          "range_sha256": "31d2321661f8877156b6561b389b03af61e5509078d4a6bf6dcc1575d8ec52cd",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/events.lua#L17-L49",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-005",
+      "fact_index_1based": 2,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-UI-005#F2",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/57/facts/1",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "PlayerController:Activate 仅为 self.inst == ThePlayer 且尚无 handler 的实例登记 general-control handle；Deactivate 在 handler 存在时调用 handler:Remove 并置 nil。Widget:FollowMouse 同样保存 move handler，StopFollowMouse 成对 Remove 并清引用。",
+      "citations": [
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "Activate",
+          "line_start": 313,
+          "line_end": 345,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "a1ffdc7f0d5d24d00e4d924201c4a27222ffd6c55945488163705415d244854e",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L313-L345",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "Deactivate",
+          "line_start": 348,
+          "line_end": 365,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "5cdcb7e1513ef26cf4328ac1a27a29e2f8d5c1da14eab2da36a62866b53b7dad",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L348-L365",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/widgets/widget.lua",
+          "symbol": "FollowMouse",
+          "line_start": 534,
+          "line_end": 546,
+          "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+          "range_sha256": "89e9a4dcbf83b52fb40fa6b1da825559e50dc1d47a6884b02f0f3c1366e67394",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/widget.lua#L534-L546",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-005",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-005-F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/57/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "Screen:AddEventHandler 使用 Screen 自己的 handlers[event][fn] 表，返回 fn；Screen:RemoveEventHandler 接收 event 与 fn。它没有返回 input EventHandler 对象。",
+      "citations": [
+        {
+          "path": "scripts/widgets/screen.lua",
+          "symbol": "AddEventHandler",
+          "line_start": 45,
+          "line_end": 68,
+          "file_sha256": "c191cad8353981246f01000b3da424ceff61dcc2292952a85ff1a2dcb42055fc",
+          "range_sha256": "4ed0d23d017028f621e34fa0cb9850e13713a24edc435435f918ea7e0f9f5e91",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/widgets/screen.lua#L45-L68",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-005",
+      "fact_index_1based": 4,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-UI-005#F4",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/57/facts/3",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "Input:OnControl 先检查鼠标启用条件，再调用 TheFrontEnd:OnControl；仅当其返回非真值时才向特定 control 与 general oncontrol 处理器分发。",
+      "citations": [
+        {
+          "path": "scripts/input.lua",
+          "symbol": "OnControl",
+          "line_start": 161,
+          "line_end": 171,
+          "file_sha256": "af635bcd74bc3f06b4db6245179b5c5656ed3bfe24bfe9d94f9ae5b9b613aecf",
+          "range_sha256": "5ac8be90fd0f8431f8d0ad81ec108ea28ef4bdfe5824d4ca4e61fa3ed2926aee",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/input.lua#L161-L171",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-006",
+      "fact_index_1based": 1,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-UI-006#F1",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/58/facts/0",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "Input:OnRawKey 先广播 onkey，再广播对应 keydown 或 keyup；FrontEnd 通过 AddKeyHandler 作为其中一个监听者处理 raw key。EventProcessor:HandleEvent 不读取回调返回值。",
+      "citations": [
+        {
+          "path": "scripts/input.lua",
+          "symbol": "OnRawKey",
+          "line_start": 186,
+          "line_end": 193,
+          "file_sha256": "af635bcd74bc3f06b4db6245179b5c5656ed3bfe24bfe9d94f9ae5b9b613aecf",
+          "range_sha256": "e136a8901054b13a3e816faeed4b985574ca2376c454dd0885c4547cda1e9cee",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/input.lua#L186-L193",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        },
+        {
+          "path": "scripts/frontend.lua",
+          "symbol": "AddKeyHandler",
+          "line_start": 220,
+          "line_end": 221,
+          "file_sha256": "4030c362052328c23411dc3ba9f69b38e18f190023d8aad362daa690b808286e",
+          "range_sha256": "2d42aea069b06a2c2b403ac9d9ab980d634eef2c46fe83f03259cc797670113c",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/frontend.lua#L220-L221",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        },
+        {
+          "path": "scripts/events.lua",
+          "symbol": "HandleEvent",
+          "line_start": 42,
+          "line_end": 49,
+          "file_sha256": "6bff572b49698466311e5db92de287720fb0df515c1a325496d4046bbe1fc61c",
+          "range_sha256": "68b921f244729472a867471960a1f4179d979192bc8e500e672a88c77988310f",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/events.lua#L42-L49",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-UI-006",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-006-F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/58/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    {
+      "statement": "PlayerHud:HasInputFocus 在存在其他 active Screen、textProcessorWidget、特定 controls 状态或 self.modfocus 时为真。SetModFocus(modname, focusid, hasfocus) 按 Mod 与 focusid 设置布尔槽，清除后移除空表；它不是同一 focusid 的引用计数。",
+      "citations": [
+        {
+          "path": "scripts/screens/playerhud.lua",
+          "symbol": "HasInputFocus",
+          "line_start": 1081,
+          "line_end": 1119,
+          "file_sha256": "529bdd322dd5b3eef76ea28ecf7f567e507360f641cd509503bc8615988d1dc1",
+          "range_sha256": "d40349278f7caf88c496b83a833000e02c7774a07bea76de5c527a6a69d69209",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/screens/playerhud.lua#L1081-L1119",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-UI-007",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-007-F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/59/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "PlayerController:IsEnabled 在 classified 不可用/禁用时返回 false，在 HUD HasInputFocus 时返回 false 并为若干内置 HUD 状态给出第二个 limited-gameplay 值。OnControl 若本地 IsPaused 为真立即返回，否则还根据上述两个返回值决定继续。",
+      "citations": [
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "IsEnabled",
+          "line_start": 490,
+          "line_end": 502,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "4e0b859af1e98df1bba1848cdbbd75a19be56a239d50dd65512f8614bd2c25f6",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L490-L502",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "OnControl",
+          "line_start": 601,
+          "line_end": 645,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "4d60715eb6582a669cdaf087e1e559a97e70ed0e5a70bb281757befb037d33bc",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L601-L645",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-UI-007",
+      "fact_index_1based": 4,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-UI-007-F4",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/59/facts/3",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    null,
+    {
+      "statement": "hunger_replica 构造时优先取 inst.player_classified 或 inst.pet_hunger_classified；mastersim 直接保存引用，其他端在已有 classified 时调用 AttachClassified。AttachClassified 监听 classified 的 onremove，DetachClassified 清空引用和回调字段。",
+      "citations": [
+        {
+          "path": "scripts/components/hunger_replica.lua",
+          "symbol": "Hunger",
+          "line_start": 1,
+          "line_end": 10,
+          "file_sha256": "117a9a5ae513c68353ce36e583968e691ca5b2aba669361b1306c38258ab0771",
+          "range_sha256": "0afdb5ac8bd67cdc247ecbe8f477d6b08ffe4f15fa92b95e1b206279debfce1f",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hunger_replica.lua#L1-L10",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        },
+        {
+          "path": "scripts/components/hunger_replica.lua",
+          "symbol": "AttachClassified",
+          "line_start": 28,
+          "line_end": 37,
+          "file_sha256": "117a9a5ae513c68353ce36e583968e691ca5b2aba669361b1306c38258ab0771",
+          "range_sha256": "f860fadeeb4ca7d7929345e330b993c7050563729e45b913370a9b6e769754f2",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hunger_replica.lua#L28-L37",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-NETACT-003",
+      "fact_index_1based": 3,
+      "runtime_tested": false,
+      "fact_id": "VANILLA-NETACT-003#F3",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/80/facts/2",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "Hunger 的 Max/GetPercent/GetCurrent 优先读取 inst.components.hunger；组件不存在时读取 classified netvar；两者都没有时分别返回 100、1、100。IsStarving 在无本地组件时要求 classified 存在且 currenthunger <= 0。",
+      "citations": [
+        {
+          "path": "scripts/components/hunger_replica.lua",
+          "symbol": "Max",
+          "line_start": 53,
+          "line_end": 90,
+          "file_sha256": "117a9a5ae513c68353ce36e583968e691ca5b2aba669361b1306c38258ab0771",
+          "range_sha256": "1e3c838c5a4375552e46fd3a001ae5faa2a37305b533f18702fda02024b3a9b3",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/hunger_replica.lua#L53-L90",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": false
+        }
+      ],
+      "source_record_id": "VANILLA-NETACT-003",
+      "fact_index_1based": 4,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-NETACT-003-F4",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/80/facts/3",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    null,
+    null,
+    {
+      "statement": "RegisterNetListeners_local 把 hungerdirty 连接到 OnHungerDirty；后者从 netvar 计算百分比，在父实体上 PushEvent(\"hungerdelta\")，清本地脉冲，并按跨零方向发 startstarving/stopstarving。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "RegisterNetListeners_local",
+          "line_start": 1181,
+          "line_end": 1189,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "3dbd124033a0fefd96ee499790ff4edf31ec4dbe1d8b7ca2a0d3202a41ed0443",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1181-L1189",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "OnHungerDirty",
+          "line_start": 332,
+          "line_end": 360,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "690d33b0dde3b3de8a386e2bdc753c198d4834424bd4cc94aa08fd4597124962",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L332-L360",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-NETACT-004",
+      "fact_index_1based": 4,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-NETACT-004-F4",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/81/facts/3",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "statement": "此 Prefab 在 SetPristine 与非 mastersim 返回前通过 DoStaticTaskInTime(0, RegisterNetListeners) 延迟监听，注释说明要等初值反序列化；RegisterNetListeners 分别建立 mastersim/local 监听，并调用 OnInitialDirtyStates 初始化旧值。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "RegisterNetListeners",
+          "line_start": 1258,
+          "line_end": 1298,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "fa54e34fb504170ec9472d47f2eb2a482914bb2323e94f57d97a62234e7cff67",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1258-L1298",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/player_classified.lua",
+          "symbol": "SetPristine",
+          "line_start": 1634,
+          "line_end": 1647,
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "range_sha256": "9edf3991c9a99a0a9a979268e2fcf367d41ffa035467deb375e66df420448eef",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_classified.lua#L1634-L1647",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "source_record_id": "VANILLA-NETACT-004",
+      "fact_index_1based": 5,
+      "runtime_tested": false,
+      "fact_id": "UI-REUSE-VANILLA-NETACT-004-F5",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/v04/vanilla-source-kb/data/records.json",
+        "json_pointer": "/records/81/facts/4",
+        "artifact_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    {
+      "atom_id": "N002-AUTH-001",
+      "engineering_questions": [
+        "Q1"
+      ],
+      "suggested_existing_record_ids": [
+        "VANILLA-NETACT-001",
+        "VANILLA-UI-005"
+      ],
+      "statement": "player_common.OnSetOwner 的控制器/动作选择器安装条件是 inst ~= nil 且 (inst == ThePlayer 或 TheWorld.ismastersim)；若该条件不成立但已有 playercontroller，则调用 RemovePlayerComponents。PlayerController 构造缓存 TheWorld.ismastersim，mastersim 在构造时启动 Update/WallUpdate；Activate 只有本地 ThePlayer 且尚无 handler 才注册 TheInput general-control handler，非 mastersim 的更新注册在该激活分支内。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "inst == ThePlayer",
+          "line_start": 1019,
+          "line_end": 1034,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "285b1e932daada53aeecb726e8b567a9808ccb6876154108071d0ed3ff95cb21",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1019-L1034",
+          "context_symbol": "OnSetOwner",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "PlayerController",
+          "line_start": 73,
+          "line_end": 79,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "3657167993e200b639fd55fe89dc296361c6c7127775e919cc5e8cfbe598b3e0",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L73-L79",
+          "context_symbol": "PlayerController constructor",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "self.ismastersim",
+          "line_start": 159,
+          "line_end": 178,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "adc8909b78bdbd23933afe6e26f3a57a929dce868c746b47bccb88ffe3893b4b",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L159-L178",
+          "context_symbol": "PlayerController constructor",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "Activate",
+          "line_start": 313,
+          "line_end": 345,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "a1ffdc7f0d5d24d00e4d924201c4a27222ffd6c55945488163705415d244854e",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L313-L345",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "evidence_level": "E3",
+      "runtime_tested": false,
+      "fact_id": "N002-AUTH-001",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/native002/supplementary-evidence-authority.json",
+        "json_pointer": "/facts/0",
+        "artifact_sha256": "0a95cb2665807007da5da79d891e970461ec5a8422ada9cd12d7ec4504485891",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "atom_id": "N002-AUTH-002",
+      "engineering_questions": [
+        "Q1"
+      ],
+      "suggested_existing_record_ids": [
+        "VANILLA-NETACT-001",
+        "VANILLA-UI-001"
+      ],
+      "statement": "专用服务器呈现门禁、本地 HUD 门禁和权威门禁是三个不同条件：player_common 构造在 not TheNet:IsDedicated() 中登记四个音乐/portal 事件并添加 hudindicatable；OnSetOwner 在 inst == ThePlayer 且 HUD == nil 时安装本地活动组件，且仅非 isseamlessswaptarget 才立即 ActivateHUD；SetPristine 后的 not TheWorld.ismastersim 返回与上述呈现门禁不同。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "TheNet:IsDedicated",
+          "line_start": 2592,
+          "line_end": 2600,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "51c2e063ec4739f00cc1581ce4c142aea53ff3175e6599ca6bd3496e8227af04",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2592-L2600",
+          "context_symbol": "MakePlayerCharacter presentation guard",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "inst == ThePlayer",
+          "line_start": 1036,
+          "line_end": 1057,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "83a183514cbfac788e89d8a24d6cb5c471ac6bde1321620f7dd4567a7653998f",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1036-L1057",
+          "context_symbol": "OnSetOwner",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "ActivateHUD",
+          "line_start": 740,
+          "line_end": 751,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "d1bfd8d1cffab40dbd4d72b7c1242343d5c8dc28da5bd0e73090f946216e465a",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L740-L751",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "TheWorld.ismastersim",
+          "line_start": 2623,
+          "line_end": 2627,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "2487d4220248244af242f1b53a880adef4588a96b5e9477d5e1062599503f21d",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2623-L2627",
+          "context_symbol": "MakePlayerCharacter mastersim guard",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "evidence_level": "E3",
+      "runtime_tested": false,
+      "scope_limits": [
+        "not IsDedicated 不等同 inst == ThePlayer；不能据此把每个非专用实例都当作本地玩家。",
+        "只证明列出的呈现组件/监听，不证明所有音效或呈现组件都由该门禁覆盖。"
+      ],
+      "fact_id": "N002-AUTH-002",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/native002/supplementary-evidence-authority.json",
+        "json_pointer": "/facts/1",
+        "artifact_sha256": "0a95cb2665807007da5da79d891e970461ec5a8422ada9cd12d7ec4504485891",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "NATIVE002-G08-E01",
+      "kind": "reused_direct_source_fact",
+      "delta_type": "queue_reference_detail",
+      "statement": "HandleModRPC 先把注册表中的函数解析成局部 fn；通过 sender 路径与限流后，Lua 队列保存 { fn, sender, data, tick }。HandleRPCQueue 从该队列项取回这四个值；若进入 Pending 分支，它把同一个 rpcdata 表放入新队列，最后替换 RPC_Queue。所示 Lua 路径没有按 namespace/code 重新查 handler，也没有复制 sender 对象或重新查当前玩家；表类型值仍是该 Lua 引用，data 的原生编码/内部结构不在此处展开。",
+      "citations": [
+        {
+          "path": "scripts/networkclientrpc.lua",
+          "symbol": "HandleModRPC",
+          "line_start": 1896,
+          "line_end": 1911,
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "range_sha256": "2126451c0b15a7ccd2a42665792554abe7f0d96fd52e99788b4dbbfcc4183457",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/networkclientrpc.lua#L1896-L1911",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/networkclientrpc.lua",
+          "symbol": "HandleRPCQueue",
+          "line_start": 1724,
+          "line_end": 1752,
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "range_sha256": "bc6af539c65baba671541bc3bb5b558d2a02343bc6467b8917a9a20a89fe1e95",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/networkclientrpc.lua#L1724-L1752",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "existing_record_overlap": [
+        "VANILLA-NETACT-005"
+      ],
+      "new_detail": "Pending 分支保留原 rpcdata、dispatch 解包已捕获的值，而非入队后按玩家身份重新解析。",
+      "fact_id": "NATIVE002-G08-E01",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/native002/supplementary-evidence-lifetime.json",
+        "json_pointer": "/facts/0",
+        "artifact_sha256": "2f8d5bee3d14c2d38da0b00272bd784c04672f59e72bd2d05db1d88badcead65",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "NATIVE002-G08-E02",
+      "kind": "reused_direct_source_fact",
+      "delta_type": "sender_gate_scope",
+      "statement": "HandleRPCQueue 的失效过滤只检查已存储 sender：当 type(sender) == \"table\" 且 not sender:IsValid() 时忽略该项；否则还需通过该 sender 对应的 timeline 分支才交给 TheNet:CallRPC(fn, sender, data)。这段 Lua guard 不比较 ThePlayer，不核对当前 userid 归属，也不验证 data 中的目标实体。被忽略的项不放入 RPC_Queue_new。",
+      "citations": [
+        {
+          "path": "scripts/networkclientrpc.lua",
+          "symbol": "HandleRPCQueue",
+          "line_start": 1724,
+          "line_end": 1752,
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "range_sha256": "bc6af539c65baba671541bc3bb5b558d2a02343bc6467b8917a9a20a89fe1e95",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/networkclientrpc.lua#L1724-L1752",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "existing_record_overlap": [
+        "VANILLA-NETACT-005"
+      ],
+      "new_detail": "明确 guard 的对象是入队时的 sender 值，IsValid 不是当前身份/新实例匹配检查；只限定这段 Lua guard。",
+      "fact_id": "NATIVE002-G08-E02",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/native002/supplementary-evidence-lifetime.json",
+        "json_pointer": "/facts/1",
+        "artifact_sha256": "2f8d5bee3d14c2d38da0b00272bd784c04672f59e72bd2d05db1d88badcead65",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "evidence_id": "NATIVE002-G08-E04",
+      "kind": "reused_direct_source_fact",
+      "delta_type": "minimal_replacement_bridge",
+      "statement": "ActivatePlayer 的 seamless-swap 分支先保存 oldplayer = ThePlayer，然后执行 ThePlayer = inst；后续仍显式使用 oldplayer.player_classified 关闭旧地图，仅在 oldplayer.delayclientdespawn_attempted 时调用 oldplayer:Remove()，否则清理旧玩家及其 classified 的 delayclientdespawn 字段。随后 ActivateHUD(inst)，并以 inst.player_classified 激活当前地图。这里同时出现旧对象引用和新全局玩家值，赋值本身不等价于旧对象在该行已被移除。",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "ActivatePlayer",
+          "line_start": 788,
+          "line_end": 819,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "2c14c24a73d19d049c643f0592deebfbe1b6323ca9590f18c71aba1c165f4021",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L788-L819",
+          "context_symbol": "ActivatePlayer seamless-swap branch",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "existing_record_overlap": [
+        "VANILLA-UI-001",
+        "VANILLA-PLAYER-002"
+      ],
+      "new_detail": "仅补充 replacement 与 queued-reference 推理需要的 oldplayer 局部引用、条件移除边界，不重复完整玩家生命周期。",
+      "fact_id": "NATIVE002-G08-E04",
+      "new_fact": false,
+      "classification": "DirectLuaSourceFact",
+      "origin": {
+        "artifact": "/workspace/shared/native004-005/reuse/native002/supplementary-evidence-lifetime.json",
+        "json_pointer": "/facts/3",
+        "artifact_sha256": "2f8d5bee3d14c2d38da0b00272bd784c04672f59e72bd2d05db1d88badcead65",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    null,
+    {
+      "atom_id": "N003-C02-NSF04",
+      "classification": "DirectLuaSourceFact",
+      "source_record_id": "VANILLA-NETACT-009",
+      "source_fact_index": 4,
+      "statement": "EntityScript:PerformPreviewBufferedAction 通过 playercontroller:RemoteBufferedAction 发送预演请求并标记 ispreviewing；RemoteBufferedAction 在 classified 控制器启用时调用 buffered action 的 preview_cb。它与 PerformBufferedAction 调用 bufferedaction:Do 的路径不同。",
+      "citations": [
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "PerformPreviewBufferedAction",
+          "line_start": 1600,
+          "line_end": 1607,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "bc077dc3cbee6b70cb11d66e2f00c3b0121e40e68608353fdb3be86d8dd5a744",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1600-L1607",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/components/playercontroller.lua",
+          "symbol": "RemoteBufferedAction",
+          "line_start": 5750,
+          "line_end": 5763,
+          "file_sha256": "b2f2c7688f1617983a19316cc3956fc33430573a36a15b8f68d4492ff5f9f6f1",
+          "range_sha256": "eb3f4c75de966b11be8c84820bfe1f123deeab7577fde1217fb1ef5352190449",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playercontroller.lua#L5750-L5763",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "symbol": "PerformBufferedAction",
+          "line_start": 1654,
+          "line_end": 1686,
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "range_sha256": "d029cc8fe242329285bc8c77d30a55dda5b777a308afb07e64801069dbcf0e10",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/entityscript.lua#L1654-L1686",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "fact_id": "N003-C02-NSF04",
+      "new_fact": false,
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native003/integration-candidates.json",
+        "json_pointer": "/candidates/1/direct_native_fact_atoms/3",
+        "artifact_sha256": "efb2efaa42d70492accc743bbb46981a7b62905fae5c80a2bbc8e671cac93440",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    },
+    {
+      "atom_id": "NATIVE003-Q5-CALLBACK-02",
+      "source_record_id": "SUPPLEMENT:NATIVE003-Q5-CALLBACKS",
+      "fact_id": "NATIVE003-Q5-CALLBACK-02",
+      "classification": "DirectLuaSourceFact",
+      "statement": "BufferedAction:Do 在 IsValid() 为假时直接 return false；这一早退没有调用 action.fn、Fail 或 Succeed，也未更新 self.reason 或清空成功/失败回调表。这只描述 Do 自身，不排除调用者另行执行 Fail。",
+      "citations": [
+        {
+          "path": "scripts/bufferedaction.lua",
+          "symbol": "BufferedAction:Do",
+          "line_start": 22,
+          "line_end": 37,
+          "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+          "range_sha256": "54bce4eccd8c3993e157cee24cb1961abad6328f20a2b0cc34101feccc379575",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L37",
+          "repository": "Zechariah0121/dst-scripts",
+          "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "range_hash_convention": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF",
+          "full_file_snapshot_sha256_match": true,
+          "cached_exact_range_reverified": true
+        }
+      ],
+      "novelty": "new_gap_evidence",
+      "evidence_level": "E3",
+      "runtime_tested": false,
+      "new_fact": false,
+      "kind": "reused_direct_source_fact",
+      "origin": {
+        "artifact": "/workspace/shared/native003/integration-candidates.json",
+        "json_pointer": "/candidates/4/direct_native_fact_atoms/3",
+        "artifact_sha256": "efb2efaa42d70492accc743bbb46981a7b62905fae5c80a2bbc8e671cac93440",
+        "reuse": "EXACT_EXISTING_FACT_ID_AND_STATEMENT"
+      }
+    }
+  ],
+  "unknowns_and_validation_classification": [
+    {
+      "unknown_id": "N005-UI-U01",
+      "classification": "EngineBoundaryUnknown",
+      "status": "UNKNOWN_NOT_BLOCKING_SCOPED_STATIC_READY",
+      "question": "join/rejoin 初始 netvar、dirty 合并、交付顺序与 native readiness 保证。",
+      "known": "显式 current getter、初始 handlers 和 swap refresh 只建立 Lua 消费路径。",
+      "next_step": "当前范围不承诺这些原生保证，也不提出宽泛未来测试；本次无 runtime/harness。"
+    },
+    {
+      "unknown_id": "N005-UI-U02",
+      "classification": "EngineBoundaryUnknown",
+      "status": "UNKNOWN_NOT_BLOCKING_SCOPED_STATIC_READY",
+      "question": "CallRPC 原生编解码/交付与 in-flight RPC 在 reconnect/swap/migration 时的顺序、丢弃和身份重绑。",
+      "known": "N002 的队列保存 fn/sender/data/tick、IsValid guard 和 oldplayer 引用限定 Lua 层；没有 current identity 自动重绑。",
+      "support": [
+        "NATIVE002-G08-E01",
+        "NATIVE002-G08-E02",
+        "NATIVE002-G08-E04"
+      ]
+    },
+    {
+      "unknown_id": "N005-UI-U03",
+      "classification": "EngineBoundaryUnknown",
+      "status": "UNKNOWN_NOT_BLOCKING_SCOPED_STATIC_READY",
+      "question": "世界 die_fx proxy 对各 peer 的实际网络可见范围、延迟及资源表现。",
+      "known": "本地/targeted/world Lua 路由已分清；network proxy 不等于 guaranteed all-client audience。"
+    },
+    {
+      "unknown_id": "N005-UI-U04",
+      "classification": "ProjectAcceptanceModQA",
+      "status": "NOT_RUN_REQUIRES_CONCRETE_MOD",
+      "question": "具体 Mod 在 unavailable data、close/reopen、ghost/revive、反复 rebuild/player replacement 后是否无泄漏且正确显示。",
+      "known": "已提供 callback/task/input/focus 所有者与 exact signatures；没有具体 Mod，也没有 runtime readiness。"
+    },
+    {
+      "unknown_id": "N005-UI-U05",
+      "classification": "ProjectAcceptanceModQA",
+      "status": "NOT_RUN_REQUIRES_CONCRETE_MOD",
+      "question": "实际 Mod 在 host、remote prediction on/off、dedicated 的请求、业务 outcome 与展示验收。",
+      "known": "分支知识够设计；验收 matrix 不代替引擎缺失事实。"
+    },
+    {
+      "unknown_id": "N005-UI-U06",
+      "classification": "ProjectDesignDecision",
+      "status": "PROJECT_DECISION_NOT_SOURCE_GAP",
+      "question": "自定义 unavailable UI、逐请求结果协议和 FX/value audience。",
+      "known": "这些是尚未给定的具体 feature 设计选择，不是引擎知识缺失或 runtime QA；现有原版契约不能替项目作决定。"
+    }
+  ],
+  "reused_interpretations_and_clarifications": [
+    {
+      "exact_interpretation": {
+        "classification": "EI/REC",
+        "text": "Place authoritative gameplay mutation in the intentionally chosen authoritative execution path. Validate before mutation; distinguish BufferedAction result from animation and prediction confirmation. IsValid false in Do returns without Fail; distinguish that early exit from action.fn returning failure. Succeed/Fail clear both callback lists after normal callback iteration, not on every possible exit."
+      }
+    },
+    {
+      "existing_id": "NATIVE003-NETACT009-F5-CLARIFICATION",
+      "origin_artifact": "/workspace/shared/native003/dispatch-evidence.json",
+      "json_pointer": "/baseline_clarification_overlays/0",
+      "exact_overlay": {
+        "overlay_id": "NATIVE003-NETACT009-F5-CLARIFICATION",
+        "kind": "supplementary_clarification",
+        "genuine_baseline_error": false,
+        "baseline_record_id": "VANILLA-NETACT-009",
+        "baseline_fact_index": 5,
+        "before": "BufferedAction:Do 先调用 IsValid，再调用 action.fn，并根据返回值执行成功或失败回调。IsValid 检查物品/执行者/目标有效性、所有权相关状态、平台和 self.validfn；action.validfn 额外只在 TheWorld.ismastersim 时评估。该 Do 函数自身没有总的 mastersim 门禁。",
+        "after": "BufferedAction:Do 在 IsValid 为假时直接返回 false，不调用 Fail、Succeed 或 action.fn。只有通过 IsValid 后才调用 action.fn，保存 reason，按返回的 success 调用 Succeed 或 Fail；成功分支在 Succeed 前还会对仍有效的 invobject 调用 OnUsedAsItem。原有 IsValid 条件与 Do 无总 mastersim 门禁的结论保持成立。",
+        "reason": "原事实正确概述通过校验后的 action.fn 分支，但没有单独写明 invalid 的直接早退。补充这一区分可避免把所有 Do 返回 false 都解释为已派发 onfail。原有 22–50 引用完整包含 IsValid；不是引用漏读错误。",
+        "classification": "NSF",
+        "citations": [
+          {
+            "path": "scripts/bufferedaction.lua",
+            "symbol": "BufferedAction:Do; BufferedAction:IsValid; BufferedAction.TestForStart",
+            "line_start": 22,
+            "line_end": 50,
+            "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+            "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+            "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L50",
+            "repository": "Zechariah0121/dst-scripts",
+            "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+            "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF"
+          }
+        ],
+        "hash_provenance": {
+          "baseline_records_sha256": "700e14ccbdb727c5a8c5bc2e1560ec0fdc32e3772e88b5d6eaaf1fa3fc401b33",
+          "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "file_hash_rule": "SHA-256 raw file bytes",
+          "range_hash_rule": "SHA-256 UTF-8 of LF-joined splitlines[start-1:end], no trailing LF",
+          "verification": [
+            {
+              "baseline_citation": {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "Do",
+                "line_start": 22,
+                "line_end": 50,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L50",
+                "repository": "Zechariah0121/dst-scripts",
+                "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+                "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF"
+              },
+              "verified_citation": {
+                "path": "scripts/bufferedaction.lua",
+                "symbol": "BufferedAction:Do; BufferedAction:IsValid; BufferedAction.TestForStart",
+                "line_start": 22,
+                "line_end": 50,
+                "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+                "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+                "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/bufferedaction.lua#L22-L50",
+                "repository": "Zechariah0121/dst-scripts",
+                "commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+                "citation_scheme": "SHA256_UTF8_LF_JOINED_SPLITLINES_NO_TRAILING_LF"
+              },
+              "file_hash_matches": true,
+              "range_hash_matches": true
+            }
+          ]
+        },
+        "baseline_modified": false
+      }
+    }
+  ]
+}

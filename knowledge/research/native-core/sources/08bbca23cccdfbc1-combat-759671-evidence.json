@@ -1,0 +1,2341 @@
+{
+  "facts": [
+    {
+      "id": "ENTRY-PUBLIC",
+      "kind": "NSF",
+      "statement": "759671默认 Combat:GetAttacked(attacker,damage,weapon,stimuli,spdamage) 仅调用 self:GetAttacked_Internal(...,nil)，没有 return；只要正常返回（含内部已死亡早退和blocked路径），公共返回值均为 nil。Internal 对已死 health 早退 true，正常末尾返回 not blocked；这不是正伤害、实际生命损失或击杀的布尔证明。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C01"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 570,
+          "line_end": 588,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "e25b0023a9ef140b5d8aee3644571be78e5df6e4573ca2ade8b48d20cdcbfcf1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "cba3a12416da696421856b68a48a17df739c8afde1cdc1f12647a1f9cd0e84d5"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 715,
+          "line_end": 738,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "5c2f62f9b029aec534cb670e25807970e6095b9c837c9276189abc7e54560781",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "8bb472fc7765a3c00b1770b3bc674141e12957ae8c1e982afd8c466dfe957b1b"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 568,
+          "line_end": 580,
+          "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+          "range_sha256": "920e6efe1487728d4b894c07097a5480a1537af1ece3a5365d0fe57b7b7c4800",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "922de2c0857e8533ba3a3b42927a9557af737ea935437c390df24ca0ae537bf6"
+          },
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "source_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "game_version": "756039",
+            "steam_buildid": "25643519",
+            "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": null
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 688,
+          "line_end": 712,
+          "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+          "range_sha256": "2cc14918d66346f8713e65b23f74521524ee1add3c6f89d1885a24195a177d0d",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "66639c9325b09bf2d2423cb70c49e3b88a4fd33939f1f5ad30709d2f4917046b"
+          },
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "source_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "game_version": "756039",
+            "steam_buildid": "25643519",
+            "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": null
+        }
+      ]
+    },
+    {
+      "id": "ATTACK-SETTLEMENT",
+      "kind": "NSF",
+      "statement": "759671 DoAttack直接结算先 CalcDamage，将普通dmg乘instancemult；仅projectile=nil时预先收集反伤，然后调用目标GetAttacked_Internal(...,true)。不检查其返回就继续Weapon:OnAttack、可选DoAreaAttack，清理临时状态；攻击主体完成后攻击者仍有health且未死时才结算反伤，反伤也调用自身Internal(...,true)。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C02",
+        "C03"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1192,
+          "line_end": 1242,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "d495d3c37fe3e3e249836b1f4ee6b39d643fcceec90732bdc55452cd3e45af64",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "efec3adab8dcf37a5a94159cf74ec6a7fdcc996ff12da220893cd30544d0fcbf"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "AREA-SETTLEMENT",
+      "kind": "NSF",
+      "statement": "759671 DoAreaAttack 的 onlyontarget 分支检查 IsValidTarget 与可选 validfn；查询分支额外排除中心target与攻击者。两者先发onareaattackother、CalcDamage后调用目标Internal(...,true)，不检查返回即递增hitcount；方法不逐目标调用Weapon:OnAttack。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C02",
+        "C03"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1311,
+          "line_end": 1340,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "a5960840d137348dc5ad773837896905d6404d3022950a1676b06fd418bb5648",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c409f9c7e86846910113f8c2a480f80ad9e84c117f2c02e3a5fb626ceffe5a94"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "REDIRECT-EVENTS",
+      "kind": "NSF",
+      "statement": "759671 Internal在redirectdamagefn返回带combat实体时临时设置接收者redirected_from，调用该接收者Internal(...,true)后清除；不透传输入from_doattack，也不把递归返回写入本体damageresolved。未blocked时依次发attacked、onhitfn、攻击者onhitother、onhitotherfn；blocked仅发blocked。killed/attacked/onhitother/blocked载荷含from_doattack，blocked另含weapon/stimuli；onhitfn/onhitotherfn签名没有新增该参数。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C03"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 669,
+          "line_end": 738,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "a786f1e5bd2c55411009203c68031fce4d63178277505f3e7b01d42e55384a19",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "1d757bb8fdbd9f0bcdfb51e54ba5a68bd2b1ae80f1df52f1f3743a6fa465f53c"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "HOOK-COVERAGE",
+      "kind": "EI",
+      "statement": "759671只包装公共GetAttacked，不能拦截源码直接进入Internal的DoAttack直接结算、DoAreaAttack两分支、重定向接收者与DoAttack反伤。普通projectile:Hit经DoAttack也属于此覆盖差异；complexprojectile基类Hit不自动结算，应沿具体Prefab回调判断。from_doattack是所选调用路径的标记，重定向可把public(nil)后继路径设为true，故不等价于原始调用必为DoAttack、近战、玩家普攻或伤害成功。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 570,
+          "line_end": 577,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "c2a3c1c2260aca7c077b02c67b27f2285bfb56503d6046b285e24e94f2c54f27",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "8b84ac17916b5809f8e80e97967fac77b3b9870d831d2e9ff1c39412dcf20ce9"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 693,
+          "line_end": 698,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "6f0eb942ab49c71c85139ef1b3db39799fc3d5db5fd1eca9a6906ad8df273d7f",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "e2fe2c218930a7b5c6806f245430831293208b69183ecb4aba7fa3a6e73c4a2c"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1212,
+          "line_end": 1241,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "2c33c5e015b772e8b86b9dcc0cc6745eed0e4790577a01c67eeed708b0209652",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "43de5b6e26f7667649ef57a93d91311e8eee41ffdcd8d3150a531e238dde9234"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1311,
+          "line_end": 1340,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "a5960840d137348dc5ad773837896905d6404d3022950a1676b06fd418bb5648",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "e70091f999b13fdf2a1056124c875d0f3322eed11259acbacbe09bf3e078a25e"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/projectile.lua",
+          "line_start": 236,
+          "line_end": 266,
+          "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+          "range_sha256": "62192a692218b5a9b02fb74492d100c1aca0768bf6ed45f6effb87622d81b677",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "a0a2551a76d36dbca8ee5fcaeb32ad6c1af921134aa6e15924f339544cb4c5ea"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/projectile.lua"
+        },
+        {
+          "path": "scripts/components/complexprojectile.lua",
+          "line_start": 191,
+          "line_end": 211,
+          "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+          "range_sha256": "d76fcbd4b28c7ef6605cc19e9c85c57df7325dacb4a0ac4f86dafdc146db19d1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "8b2ccd083c48fea316d608dfa8329c83bffc796d7725a3071499c03a892ec0e9"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/complexprojectile.lua"
+        }
+      ]
+    },
+    {
+      "id": "HEALTH-ENTRY",
+      "kind": "NSF",
+      "statement": "759671 Internal在已死health时早退true；正常路径先求redirectdamagefn，记录攻击者及stimuli并调用ShouldRecoil。仅有health、damage非nil、无重定向目标才计算本体伤害。isequipped要求attacker有equippable且确为受击者inventory:IsItemEquipped(attacker)，仅拥有或放背包不等价。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C01",
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 574,
+          "line_end": 615,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "37615a8a387a1263c061d1e179082d7f416550163e238f33f16d708086cbd99a",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "9a570ede72fbf7b1f6912db9be5fe9a078cf2732e676c2f0b5d307c68968894b"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "EQUIPPED-DEFENSE",
+      "kind": "NSF",
+      "statement": "759671 isequipped成立时跳过attackdodger、inventory:ApplyDamage及rideable鞍具ApplyDamage；其后的damagetyperesist、condition/external damage taken、planarentity吸收、特殊防御、Health无敌/DoDelta仍依源码执行，不等于无视一切防御。OnPlanarAttackUndefended还要求inventory存在且非ignorecombat、spdamage.planar、攻击者planarentity且装备无planar防御。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 607,
+          "line_end": 668,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "c9cbaabc4646081fd5927264b3c1ba4a9708fbaa5504f18a35e4b883e38cf3b1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "62cd96071e0cf6e455e857f592904f66073e3c259cb386993c47060680d63915"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "DAMAGE-GATE",
+      "kind": "NSF",
+      "statement": "759671 本体先计算damagetypemult及condition/external damage taken；进入伤害分支须(damage>0 or (spdamage and damagetypemult~=0))且health非无敌。仅damage>0时追加攻击者bonusdamagefn并调用目标planarentity:AbsorbDamage；随后有spdamage才ApplySpDefense并加damagetypemult*CalcTotalDamage，再Health:DoDelta；未通过门槛则blocked=true。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 644,
+          "line_end": 690,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "d793cc2aa864bb4ee6b99f82e908625f620b068f0bba204f82160b93b8767db0",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c1e5ad0a79c8325de6d1e82b298cfd66393584f9232535817f36774a6337cdfd"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "DAMAGE-RESULT",
+      "kind": "NSF",
+      "statement": "759671 damageresolved在Internal中取Health:DoDelta返回值之负；返回nil则回退当时damage。Health:DoDelta返回处理后的局部amount，SetVal另裁剪生命上下界；damageresolved不保证等于调用前后的currenthealth差值。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C01"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 669,
+          "line_end": 690,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "669f4809a90f978d8c0e6bbd80a5f0134d2a4fc9458c7f3a2eade37d8291b8dd",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "ed1360a6e5ba4d9dfa11be4fd2c2d0d3a3ebc330e0c926f38e7934ead430445f"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/health.lua",
+          "line_start": 565,
+          "line_end": 649,
+          "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+          "range_sha256": "1185e5cab8111ccfa67b60e4cc932f4b320ffc7625a80a28d2f67a09c5779671",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "dfadb72ebd899b46d32d1586d41218d98528716df0df03a4bdee408b69202433"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/health.lua"
+        }
+      ]
+    },
+    {
+      "id": "CAUSE-AFFLICTER",
+      "kind": "NSF",
+      "statement": "759671 Internal令afflicter=attacker==self.inst and weapon or attacker。afflicter=nil且TheWorld.components.charlie_tracker:IsCharlieDefeated()时cause=\"DARKNESS\"；否则cause取afflicter.nameoverride或prefab，无afflicter时\"NIL\"。Health:DoDelta第五参仍是afflicter实体，attacked/onhitother仍使用原attacker/weapon，不能把墓志铭cause与实体归因混同。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 669,
+          "line_end": 685,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "06bd7eb60427db44c4ab9e0292343a5ceabecc8ad95d9bfaaa97d01bc570f8db",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "cc35e00419a24d35e6b08b9f2ba1dfcb4a1ad4bccdfe90f05a2558d41d7aac14"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 715,
+          "line_end": 725,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "658aecf2312dcfa358d484907bcd7c6bac709e2965311b2339b825f5c4719aa5",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "19c72d2cecb70d0f049cd74bda3f8a8e26e17b1787d6be55c1fbff31831dab66"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "WEAPON-EVENTS",
+      "kind": "NSF",
+      "statement": "759671 Weapon:SetOnAttack赋self.onattack；OnAttack仍先以(item,attacker,target)三参调用onattack，再发weapononattack({attacker,target,projectile})；事件新增projectile不等于回调新增参数。回调/事件后按finiteuses排除条件、attackwear倍率和efficientuser处理耐久。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C06"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/weapon.lua",
+          "line_start": 55,
+          "line_end": 79,
+          "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+          "range_sha256": "c80db5ef85b42318b167e9b452defdd5a7aaf2be6170a4abcb21ad24a465ad39",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "07dcd1d0f21a998839e24d8c8cdd2fcb3fa26feff110b99e78f1d155154c9df7"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/weapon.lua"
+        },
+        {
+          "path": "scripts/components/weapon.lua",
+          "line_start": 105,
+          "line_end": 121,
+          "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+          "range_sha256": "56e19e9c4f67a2eff7fc1838029d4f756bb4d8e0ca7f4b40d7ff4d4c044c449a",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "d2ed33ca4ca3e3ba7ad5e358146af47f05cd22405ef35067e22f6d5691eb3a06"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/weapon.lua"
+        }
+      ]
+    },
+    {
+      "id": "WEAPON-LAUNCH",
+      "kind": "NSF",
+      "statement": "759671仅self.projectile非nil时，Weapon:LaunchProjectile先onprojectilelaunch再SpawnPrefab；普通弹体Throw(weapon,target,attacker)，复杂弹体Launch(target:GetPosition(),attacker,weapon)。随后onprojectilelaunched(item,attacker,target,proj)，再新增weapononprojectilelaunched({attacker,target,projectile=proj})；SpawnPrefab失败时proj可为nil。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C06"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/weapon.lua",
+          "line_start": 123,
+          "line_end": 157,
+          "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+          "range_sha256": "ffe8012bf0283dd180f93f7bdc39ea336d76d86d0da00ec2d6758d78a76b4154",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "18acd7ead01a4210cf8a2a321d60ca46d740ed95e0ef2f232fd6dac32ae15138"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/weapon.lua"
+        }
+      ]
+    },
+    {
+      "id": "PROJECTILE-HIT",
+      "kind": "NSF",
+      "statement": "759671 Projectile:Hit缓存owner作attacker、弹体作weapon，Stop清owner/target并停止物理；原owner无combat但有weapon/inventoryitem时按has_damage_set选择伤害武器并取其当前inventoryitem.owner。onprehit后仅attacker非nil且有combat才以临时ignorehitrange调用DoAttack；DoAttack返回后若弹体无效立即return，跳过onhit。其余到达末尾且有onhit才调用onhit(projectile,attacker,target)，不能保证每次Hit都执行onhit。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。",
+        "源码243行解引用attacker.components没有前置nil保护；此原子不声称任意失效owner输入安全。"
+      ],
+      "finding_ids": [
+        "C02",
+        "C08"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/projectile.lua",
+          "line_start": 217,
+          "line_end": 266,
+          "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+          "range_sha256": "d161e12f23a7a81d9ca227c835c8b1137cea241a70520e28d99ccc75046657d5",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "a4f2450a8179ac1310a30ba1b0085b079df7175b60d095bfcc9b7f6e31410853"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/projectile.lua"
+        }
+      ]
+    },
+    null,
+    null,
+    null,
+    {
+      "id": "PROJECTILE-PREFAB-BOUNDARY",
+      "kind": "NSF",
+      "statement": "759671 dumbbells的OnThrownHit在CanDamage通过且attacker非nil有效时调用attacker.combat:DoAttack(ent,inst,inst)，否则调用目标公共GetAttacked；slingshotammo附加AOE仍直接调用公共GetAttacked。因此不能把全部complexprojectile、全部弹体附加伤害概括为Internal(true)。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C02",
+        "C03"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/dumbbells.lua",
+          "line_start": 125,
+          "line_end": 170,
+          "file_sha256": "99237fe4d8289f08628203f7da43f527cbe68fd00281dc1f216a721a15c9e718",
+          "range_sha256": "dd3c9ad1cf54cf1131be7df0be25d50e4ec1ebf49b440864e4bad0be53912a2d",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "0819ddaef4af09e616e5a3ed4f1b10a8993ef4918c0dbdce8cc62e34b51e9eb8"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/dumbbells.lua"
+        },
+        {
+          "path": "scripts/prefabs/slingshotammo.lua",
+          "line_start": 407,
+          "line_end": 437,
+          "file_sha256": "ff4c4ffe8a4b2d99bd82825c72635b4219a3a8d7e8cb4cc7eb85b08fc6863af8",
+          "range_sha256": "bc6b8f315ca2ba13117388d927bc95f7d06a8310f640771eee9868b97c8d18e4",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "efc413d45d0dce8b55dd83494ab634e924d3e0e0d492d95bb6b15937ffcbf76e"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/slingshotammo.lua"
+        }
+      ]
+    },
+    {
+      "id": "BOMB-CALLBACK",
+      "kind": "NSF",
+      "statement": "759671 bomb_lunarplant在主模拟端给complexprojectile设置发射/命中回调；OnHit调用本Prefab的ConfigureExplosive(inst,attacker,nil)。该helper按需添加planardamage和shadow_aligned类型加成，添加并配置explosive，仅attacker存在才设置PVP/普通攻击归属，再OnBurnt(explodetarget)。实际伤害由Prefab回调安排，非complexprojectile:Hit自动伤害。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C02"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/bomb_lunarplant.lua",
+          "line_start": 15,
+          "line_end": 50,
+          "file_sha256": "22e51038a8e8e23198b735312462cd296f2034af1928b28adcbcc1a708064f76",
+          "range_sha256": "c8405665067b08134e57ee592bb9455badadc81f8fed5538f0a4809b22d6c60c",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "e16ff2d64592684642a0baa57158fbcd04ddaf5ef0dd43ee8f2246c98ba55683"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/bomb_lunarplant.lua"
+        },
+        {
+          "path": "scripts/prefabs/bomb_lunarplant.lua",
+          "line_start": 195,
+          "line_end": 245,
+          "file_sha256": "22e51038a8e8e23198b735312462cd296f2034af1928b28adcbcc1a708064f76",
+          "range_sha256": "748df4184df7b8f8b543c4ea0d3d20c1c6216c5ab5e25df3ec758bb710d5b6ca",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "b8cb2150c970d2287d65765ac74c26a36b0bfe7acf53994b33a22470a0d18f36"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/bomb_lunarplant.lua"
+        }
+      ]
+    },
+    {
+      "id": "PUREBRILLIANCE-FILTER",
+      "kind": "NSF",
+      "statement": "759671 PureBrilliance_OnOwnerAttacked在data=nil、redirected、攻击者attacktriggereddebuff标签或攻击者为buff自身时早退；还按153–156行重新收集attacker/weapon特殊伤害并要求结果含planar，之后才检查owner有效未死且CanBeAttacked，使用buff作攻击者以公共GetAttacked追加特殊伤害。该门槛读的是来源组件，不是data.spdamage；154行是重新赋值，weapon=nil时结果可变nil，不能概括为任意attacker有planar就足够。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。",
+        "本轮保留源码实际赋值语义；未游戏验证该新增过滤各组合。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/slingshotammo_debuffs.lua",
+          "line_start": 140,
+          "line_end": 180,
+          "file_sha256": "fc8855496db166747957f184b4627013a6a5d42c30e552035943792e14603454",
+          "range_sha256": "f6a34caaa71539160f61fc6d1a744d56251cc3c37d91d360323ca837adbd8ffc",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "74677fa3edd77142d8216cb4015ca1518307200570ffc8b8fafc8ba2c9548bec"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/slingshotammo_debuffs.lua"
+        }
+      ]
+    },
+    {
+      "id": "PUREBRILLIANCE-LIFETIME",
+      "kind": "NSF",
+      "statement": "759671该buff构造仍有attacktriggereddebuff标签，Attach缓存_owner、建立到期任务并监听目标attacked；Extend只取消并更新到期任务，不重装attacked监听或再建_fx；Detach解绑attacked并Remove。新增notarget标签不推翻此寿命子句。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/slingshotammo_debuffs.lua",
+          "line_start": 182,
+          "line_end": 263,
+          "file_sha256": "fc8855496db166747957f184b4627013a6a5d42c30e552035943792e14603454",
+          "range_sha256": "aed04489e5509e0786ea2263e05512d804af50948a1797199be5874397e6ee92",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "3dbf951678cd7498ab9e4cba7e09982a973ed0e113e6122fb40e674b04bf94ec"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/slingshotammo_debuffs.lua"
+        }
+      ]
+    },
+    {
+      "id": "FROM-CONSUMERS",
+      "kind": "NSF",
+      "statement": "759671 from_doattack出击消费者各有条件：Wolfgang OnHitOther先要求data.from_doattack，再要求target及无weapon或weapon当前由自己持有且非IsRangedWeapon，按目标标签加mightiness；SingingInspiration OnHitOther先要求flag，再保留有效target/health/validvictimfn与max(damageresolved or damage or 1,1)收益计算。它的OnAttacked另要求damageresolved且非IsEquipmentOnAttackedOrBlocked，不要求attacker存在。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C04",
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/wolfgang.lua",
+          "line_start": 243,
+          "line_end": 261,
+          "file_sha256": "220d3a75b7974580ad9ca30b22b2172de226e19c6ee0f04c44a0e428469921e1",
+          "range_sha256": "116ea79e31d8ecd36a47b9f0259f5e6e221df1867e87389430b3a9b7b21b9f7d",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c46d226337dae84312da0dbd0354b11657faab14c1fa071acf97257db57df497"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/wolfgang.lua"
+        },
+        {
+          "path": "scripts/components/singinginspiration.lua",
+          "line_start": 102,
+          "line_end": 132,
+          "file_sha256": "22bcb761c9eea0df1eb4efa41cf1a27f6b61196a6e0b3d66a2cf1eed65a2cc19",
+          "range_sha256": "d7631624f0bfcbdf188e42c2ca170f1ebc221d8c6c3d87f3a9f6b3bd8b4e4d86",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c04309d7624dda4baa5713fd417798c34a79aaab3f91ff13d4f2d62df027deba"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/singinginspiration.lua"
+        }
+      ]
+    },
+    {
+      "id": "CROWN-CONSUMER",
+      "kind": "NSF",
+      "statement": "759671月亮头冠触发改为装备时监听、卸装时解绑owner的onhitother；回调先要求active及data.from_doattack，owner未死，再筛target非自身、有效、排除gestalt_guard_evolved及指定tag。它不检查target当前是否死亡，允许本击致死；不能继续使用旧onattackother出手/发射前时点假设。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C04"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 3524,
+          "line_end": 3577,
+          "file_sha256": "ac34e7cdb5daa65093a553737ddfdf29346debba92053249ffa575d2857a8007",
+          "range_sha256": "bbfef955b93bb8f950c6174066a146d6403070e303cb8da41f045f0e806f1d45",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "8a53ecc9b3f2d7a7819272da46f48a639bb29b05588f1372e2b738952091cb2d"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/hats.lua"
+        },
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 3600,
+          "line_end": 3604,
+          "file_sha256": "ac34e7cdb5daa65093a553737ddfdf29346debba92053249ffa575d2857a8007",
+          "range_sha256": "9e56ec62ea388a34d27d6e71bfd5e41f1b91ed948aa2903da5aa852a4d900086",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "7fe2104e5d37ec920119a466db589bca2ca5f4a8805bd6fb061c7728cb069f5e"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/hats.lua"
+        },
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 3524,
+          "line_end": 3537,
+          "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+          "range_sha256": "70b99ca93db436c445f0b5ebe4eed1c45b1324a230498765eae88effd769d1f1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c9568015ec8c05113c840c933e9507503d9e96980a3e525ba8c23479cc0d476b"
+          },
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "source_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "game_version": "756039",
+            "steam_buildid": "25643519",
+            "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": null
+        },
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 3560,
+          "line_end": 3570,
+          "file_sha256": "eb9d81d11b3fb5fef2fb322a388c57040f49f33cf0b9763d926928a29e41f732",
+          "range_sha256": "cfa71e423603bff1f0b61c24c14d21378c8a835e377e1000b3820b7f8189b47d",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "22be6af83822cd59dfeb38c1718875a55ea959d879f59ef5f2636968554ac9dd"
+          },
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "source_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "game_version": "756039",
+            "steam_buildid": "25643519",
+            "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": null
+        }
+      ]
+    },
+    {
+      "id": "BAT-CONSUMER",
+      "kind": "NSF",
+      "statement": "759671蝙蝠尸帽onhitother吸血要求from_doattack、owner有health且活着缺血、target非自身且有效未死、IsLifeDrainable、weapon非IsRangedWeapon及owner未骑乘；装备阶段监听此事件。它延后一帧以帽子自身作attacker调用owner公共GetAttacked的自伤是不同路径，不能直接用flag为其补出击收益。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C04",
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 6508,
+          "line_end": 6524,
+          "file_sha256": "ac34e7cdb5daa65093a553737ddfdf29346debba92053249ffa575d2857a8007",
+          "range_sha256": "41e40cfff41f6e1335f2a72f39bb8cb0ff506ba9743530e13a8e2eaff0ecab23",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "e2577f3b2104dba746ad7d5e2b0b3cc9a5051ebcf839b5da12b329ca895024d0"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/hats.lua"
+        },
+        {
+          "path": "scripts/prefabs/hats.lua",
+          "line_start": 6567,
+          "line_end": 6585,
+          "file_sha256": "ac34e7cdb5daa65093a553737ddfdf29346debba92053249ffa575d2857a8007",
+          "range_sha256": "9bf50b71fcf8769ea22f7d9f783061f60fc7574990e029da8384239f7e9e2a72",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "ba8aac0a5be9c325c4d09d81e6bec5b0172d20c89cf75138d47cdfea74197c11"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/hats.lua"
+        }
+      ]
+    },
+    {
+      "id": "RANGED-HELPERS",
+      "kind": "NSF",
+      "statement": "759671 IsRangedWeapon(ent)要求非nil且有普通projectile组件、weapon:CanRangedAttack()或pseudorangedweapon标签之一，不直接测试complexprojectile。Internal用IsRangedWeapon(weapon or attacker)设置lastattacktype，取消旧damage>0门槛；weapon非nil时不另测attacker。commonstates命中恢复读取lastattacktype和laststimuli，因此分类差异有消费者。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/componentutil.lua",
+          "line_start": 103,
+          "line_end": 109,
+          "file_sha256": "8656ee201482418f3d2fb451dd28401d5420171e58a89b60cb82e7d30aa22249",
+          "range_sha256": "9da9d17eef512be5f16c62bf6f60d93f19ddfe351e48935a95193af8761d5e8f",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "938150dd01f3cc5c29cbaa5bcbf6c5686abb5739bd2d640c75d87211bb430479"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/componentutil.lua"
+        },
+        {
+          "path": "scripts/components/weapon.lua",
+          "line_start": 84,
+          "line_end": 86,
+          "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+          "range_sha256": "8a1b3f399200611f67bc1fec645a011c61dfeb4a2435c862b6b707ec5fb81953",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c49ecef867f73fd9c77f7eb20f4bc8222db0cffe822b8e2af531007843610fe5"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/weapon.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 591,
+          "line_end": 598,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "c4deea24f0673a59d3055c8063a342dfeb78502a734480498fd00d664506b0c0",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "09f304bb5c463e0e468c4f88a7597439ff505c819c6c5af8d687650148c06114"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/stategraphs/commonstates.lua",
+          "line_start": 88,
+          "line_end": 107,
+          "file_sha256": "21c92893b133047c8cebd3e960a80d44297d70b260b8277c2661930a117a6b94",
+          "range_sha256": "c7646ecaa3576d36d88d6daf19c6772debc0e8ad37195445bb1f81ea0fa5b6b4",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "964428ec738fc9b4d2fcf407339835ee3b30a33c0649e8ee1265527f732a1474"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/stategraphs/commonstates.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 584,
+          "line_end": 598,
+          "file_sha256": "f773a071377694e672ca3a598994c9fceffe55503e0ff1bb7218df1cf584c6f2",
+          "range_sha256": "ce9a5b25c6f15a4f536808235a2b501ef908d0184087134ad22d1c201667e9f9",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "533902793ba6f3d2203f5b54ddc6888526678ff623fb4a0ec22f3bc5be904b5a"
+          },
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "source_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "game_version": "756039",
+            "steam_buildid": "25643519",
+            "archive_sha256": "f8d7cff2e9f86cdab3de08c6e750ecec2986c9bc95b364724f4c77244a798bf1",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": null
+        }
+      ]
+    },
+    {
+      "id": "DEFENSIVE-HELPERS",
+      "kind": "NSF",
+      "statement": "759671 ShouldProcOnAttackedOrBlocked要求data存在、无redirected、有attacker，再按inventoryitem:GetGrandOwner()或attacker本身排除owner；IsEquipmentOnAttackedOrBlocked则要求attacker为inventoryitem、GrandOwner等于owner并有nodangermusic。两者不是同一谓词，也不同于Combat的equippable+IsItemEquipped。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/componentutil.lua",
+          "line_start": 111,
+          "line_end": 132,
+          "file_sha256": "8656ee201482418f3d2fb451dd28401d5420171e58a89b60cb82e7d30aa22249",
+          "range_sha256": "a787b057d1aa584b597d40fb0104754189352e19c6f17e1f5557d5631d8e992b",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "2275641029f9a4d31c84380c83ee8b49491623fb1ce78d7d047044d15c70bdc8"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/componentutil.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 607,
+          "line_end": 613,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "108dff8984601407a6ca34403992cb54914b858cbbf3a29bddb6a109be82ca8c",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "6f443526123d473513f311f0cfd66fa8f4f34a72f9c421458f2d73e91faa6857"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "DEFLECT-PROTOCOL",
+      "kind": "NSF",
+      "statement": "759671 Projectile提供SetOnDeflectFn/SetKeepOnDeflect/Deflect，回调(inst,self.owner,deflector)；ComplexProjectile对应SetOnDeflect（无Fn）/SetKeepOnDeflect/Deflect，回调(inst,self.attacker,deflector)。两者先回调，未keepondeflect则Remove，不自动反转飞行方向。独立deflectable组件以SetOwner保存owner并用同样owner回调/默认Remove协议。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C08"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/projectile.lua",
+          "line_start": 132,
+          "line_end": 138,
+          "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+          "range_sha256": "421e584d06f1ef996a8d67d793b0623bc8093e342afcc325e2887d51de2063a1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "56a23027f0cf61a98ff8c587f48bd63b5fbc081b9ac1ecd2e5032b6bb0b14e60"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/projectile.lua"
+        },
+        {
+          "path": "scripts/components/projectile.lua",
+          "line_start": 532,
+          "line_end": 539,
+          "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+          "range_sha256": "f45ef704b2c7f723f9e156391e13393af0e2934978ba5293f864df29fb09f61c",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "04cd405b3f9315a2eee71ef4d5802c99851ef850d51d3ba2c1a748b01b74f024"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/projectile.lua"
+        },
+        {
+          "path": "scripts/components/complexprojectile.lua",
+          "line_start": 73,
+          "line_end": 79,
+          "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+          "range_sha256": "5f8baa494a07c44e9805d582f3d95dac54487aa9eb29f04b3e66b3127450811e",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "1a36aa65a5f832c460e4805294ded0323d81307828cf3482804958f9ce26df3e"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/complexprojectile.lua"
+        },
+        {
+          "path": "scripts/components/complexprojectile.lua",
+          "line_start": 213,
+          "line_end": 220,
+          "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+          "range_sha256": "57e443e12f2251da9394eef819ee121754a8e2993ce982ecc9909322f5d30960",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "f4ea217b39ac74b56650deb9c584f25a0f5904f6a02cd0e88c1be7c871af9117"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/complexprojectile.lua"
+        },
+        {
+          "path": "scripts/components/deflectable.lua",
+          "line_start": 1,
+          "line_end": 40,
+          "file_sha256": "da350d54e57e709876396f572704bf33a368176e45c617d33641779be38a0b4f",
+          "range_sha256": "da350d54e57e709876396f572704bf33a368176e45c617d33641779be38a0b4f",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "8e898a8020a760c5d2a99190bc05c85e3e48a9b61e4e61ae7843cdec79259ed2"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/deflectable.lua"
+        }
+      ]
+    },
+    {
+      "id": "FIRENETTLE-RISK",
+      "kind": "EI",
+      "statement": "759671 weed_firenettle_bumped在非燃烧、非湿、非plantkin且目标活着有health时，仍把公共GetAttacked返回值赋给apply_toxin_debuff，truthy才AddDebuff(firenettle_toxin)。默认public正常返回nil，故此条件不成立而伤害调用仍发生；这是源码与受控Lua合约支持的施毒回归风险，未确认游戏实测。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。",
+        "不可提升为Runtime失败；不能据此全局给public补return。"
+      ],
+      "finding_ids": [
+        "C07"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/prefabs/weed_defs.lua",
+          "line_start": 104,
+          "line_end": 125,
+          "file_sha256": "083df1e22dc3d2b47f9c79c9b241899010573fe4e26042499af39b02eae1680e",
+          "range_sha256": "4f89e11e1c5cd4bd2a7e86d1f201ea00439c5b2aa00b755349589e6b9491f5d8",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "b7a3d4b61cc4eff1630b07d90f8f515f6edcf5c82d328d792b07925088d3fc21"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/weed_defs.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 570,
+          "line_end": 572,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "36dc8ed1aa665e9aa8844033de02b4edfb90502ca305af0a03b5d7fc274ed05e",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "730e178050facd69b3f4e7536baeb68a7bfb293fd297f7b1dc4bd21b399cd2f7"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        }
+      ]
+    },
+    {
+      "id": "SPELL-EVENT",
+      "kind": "NSF",
+      "statement": "759671 SpellCaster:CastSpell仅self.spell存在时先执行spell(item,target,pos,doer)，再已有onspellcast回调，最后新增物品onspellcast事件，载荷target/pos/doer；事件不替代回调。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C06"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/spellcaster.lua",
+          "line_start": 134,
+          "line_end": 143,
+          "file_sha256": "5eda6145e1587515a16648b71f55cbbeacd144dfdbaa69d5c6c6a0f40d66bbe2",
+          "range_sha256": "ae4e58341c339f639458dc43b6b6fd326521a9d74b7dcebd2669b59e420859b1",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "67b9f3c97d8d2ed122dbaa59f3fa0b58355eab63e1b0ece048b6c78c675de781"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/spellcaster.lua"
+        }
+      ]
+    },
+    {
+      "id": "ELECTRIC-BOUNDARY",
+      "kind": "NSF",
+      "statement": "759671 DoAttack在直接结算支路对electric stimuli或武器electric且目标非IsEntityElectricImmune时，以electric_damage_mult+electric_wet_damage_mult*targ:GetWetMultiplier()传CalcDamage；公共GetAttacked与Internal不自行补这个攻击倍率。GetWetMultiplier为服务端方法，依次处理无效、wet、moistureimmunity、inventoryitem湿状态、temp_moisture/moisture百分比、世界湿/游泳等分支。Electric stimuli仍不是保证SG触电的承诺。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1195,
+          "line_end": 1218,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "1f1110f61349780f85f563293b88f20003dd391317344cd3a4474dc7ade38076",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "f30ed8cc851e20afb346629a8a18e26a412da32e3e4d325805e0c59351cfe373"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 570,
+          "line_end": 690,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "d7c0f5a85890816e9b77b0d3e41259d961f6370f9f1db2aa3d1f8294f50ceed9",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "da16c9adb93be6ced98ac0a01b6f5f9b89a0a372806a4b215f6e78d3ad394b0a"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/componentutil.lua",
+          "line_start": 22,
+          "line_end": 24,
+          "file_sha256": "8656ee201482418f3d2fb451dd28401d5420171e58a89b60cb82e7d30aa22249",
+          "range_sha256": "2288854fef17923730f713bc541a7477393e94840d47743e9f27eef791dc8633",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "3564ce2fbc41c992e3a1eb4719ba175ef49611b214d91f389a85655afac514e1"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/componentutil.lua"
+        },
+        {
+          "path": "scripts/entityscript.lua",
+          "line_start": 747,
+          "line_end": 769,
+          "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+          "range_sha256": "2f308ae0cc6815b6d8e1ea0fb04f0a3492b1298488788a9dd9e3dcbd39fd50e8",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "b0e4dc267567ffd500c6efa686d27388bbace7ba40ca01976c75c11c540c5ff8"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/entityscript.lua"
+        }
+      ]
+    },
+    {
+      "id": "SG-BOUNDARY",
+      "kind": "NSF",
+      "statement": "759671 SGwilson attacked处理仅在health活着且非drowning/falling时进入；按变身/睡眠/格挡/devoured/suspended等分支后，nointerrupt状态只在electric、非绝缘且canelectrocute时转electrocute，否则播放受击声音；一般electric还受3FRAMES早退与noelectrocute/绝缘等分支影响。knockback处理有wereplayer、wxshielding、parrying分支；通常分支要求非nointerrupt，superheavyarmor推knockbackblocked并转hit，其余再按forcelanded/heavyarmor/heavybody选择状态。事件产生不证明接受击退或触电。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。",
+        "仅命名SGwilson分支，不概括全部Boss或所有SG。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "line_start": 1847,
+          "line_end": 1944,
+          "file_sha256": "ac1b6053c81358c37d5dcffbce9b3dd177f57204e35e0270d1cfb8213ebcff8b",
+          "range_sha256": "f4d27dc639a72b30327970ba65e0c141bf99f278f03401eee55722b85e57dd12",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "c5e6f2fc8ebc4de467d6459b03878be1a0760720ddbbfdb8c7c3bf1250fe2adf"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/stategraphs/SGwilson.lua"
+        },
+        {
+          "path": "scripts/stategraphs/SGwilson.lua",
+          "line_start": 1964,
+          "line_end": 2002,
+          "file_sha256": "ac1b6053c81358c37d5dcffbce9b3dd177f57204e35e0270d1cfb8213ebcff8b",
+          "range_sha256": "47052c6fa69d84c38519a3a903114dbc23d13add88d4af893786292876a7f7fb",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "5a2774177bd31bd2ad2ca0a373dd843825423887f294a361b93fdb6a10020f33"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/stategraphs/SGwilson.lua"
+        }
+      ]
+    },
+    null,
+    null,
+    {
+      "id": "HEALTH-UNCHANGED",
+      "kind": "NSF",
+      "statement": "759671 Health组件与756039逐字节相同：DoDelta的早退、吸收/定额减伤、deltamodifier/per-hit cap、SetVal裁剪与death事件、healthdelta再ondelta的顺序、返回局部amount，以及直接setter/SetPercent事件差异均仍受所引Lua分支限制。Combat调用者入口与payload变化需另行修订，不由Health文件相同推出战斗行为全部不变。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。"
+      ],
+      "finding_ids": [
+        "C05"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/health.lua",
+          "line_start": 1,
+          "line_end": 108,
+          "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+          "range_sha256": "edb72929da409d60509c481a22d9e0b24176c45478636a53eb81662c79e7615b",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "706e2606ccf6dd23029cb5aa6165a43bfa828d5660eb440c210628820fe44133"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/health.lua"
+        },
+        {
+          "path": "scripts/components/health.lua",
+          "line_start": 499,
+          "line_end": 552,
+          "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+          "range_sha256": "5dbacf501455453c5a5c5dea6dc6de9965981874beb0b483827627abf2ea961e",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "93106d9b43d61483d34ede1eb7f88ff2d879ecb9b17303ff3df2c30720f9a1e0"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/health.lua"
+        },
+        {
+          "path": "scripts/components/health.lua",
+          "line_start": 565,
+          "line_end": 649,
+          "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+          "range_sha256": "1185e5cab8111ccfa67b60e4cc932f4b320ffc7625a80a28d2f67a09c5779671",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "f5d1fa1a4e6b89242077f513bb36ae27784345830f417bf4f2dec17182255c2b"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/health.lua"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "line_start": 7,
+          "line_end": 59,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "fb25d9c0115f873ff09ba9b0db20185008aa9c5e9307e591d1af0e55d17d2d1c",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "3779071cfa7c4931458b15c411ab0918f4fb1a2dae7b4cd06dca21f7aaf219d9"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/util/sourcemodifierlist.lua"
+        }
+      ]
+    },
+    null,
+    {
+      "id": "HOOK-MIGRATION",
+      "kind": "REC",
+      "statement": "若需求覆盖所有到此Combat组件的结算，759671可按能力检测选择包装Internal并保留self、全部参数、原返回及调用次数；仅旧版本缺Internal时回退public。避免同时两层处理同一伤害，另核对其他Mod覆盖顺序。只观察事后时按真实分支选attacked/onhitother/blocked；事件不能替代结算前取消。自制主动攻击优先按完整需求复用DoAttack/DoAreaAttack，固定直接伤害可留public；不可机械把全部外部GetAttacked换成Internal(...,true)，须先决定原版角色/装备收益与连锁是否应触发。",
+      "source_scope": {
+        "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+        "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+        "game_version": "759671",
+        "steam_buildid": "26148036",
+        "branch": "public",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "source_commit": null,
+        "runtime_verified": false
+      },
+      "conditions": [
+        "项目已明确伤害/收益/连锁合同，当前运行版本与所引快照契约一致。"
+      ],
+      "limitations": [
+        "静态Lua事实；不证明native、专服、远端客户端或Mod组合行为。",
+        "兼容策略建议，不证明任何用户Mod已经故障或所有Mod组合安全。"
+      ],
+      "finding_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "runtime_verified": false,
+      "citations": [
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 570,
+          "line_end": 577,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "c2a3c1c2260aca7c077b02c67b27f2285bfb56503d6046b285e24e94f2c54f27",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "43151c86f91536cbc108b9889d08929b47e88d542e3557ffd4e732ec335a4852"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 693,
+          "line_end": 738,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "94d64a510b743d9ca14f30cadcafd5635567868e4bc69736a2cc943f54819765",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "efc1a0533d514b615f8598cd2843c838dadb2548e38c57f7115105111e7ccb68"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1212,
+          "line_end": 1241,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "2c33c5e015b772e8b86b9dcc0cc6745eed0e4790577a01c67eeed708b0209652",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "783e58da340281f1990568ce1dc3169a54e55e018f3a64f0bbb70fe8065c41e6"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/components/combat.lua",
+          "line_start": 1311,
+          "line_end": 1340,
+          "file_sha256": "062c5cd4e3db33e195d9adc9f841df1699dc9f1ff8ebde1b5f509747f4a134b3",
+          "range_sha256": "a5960840d137348dc5ad773837896905d6404d3022950a1676b06fd418bb5648",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "7cef95491b4e1ffbd0af51a88904900971cb702e5372cf39661988b9d32ec0ce"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/combat.lua"
+        },
+        {
+          "path": "scripts/prefabs/wolfgang.lua",
+          "line_start": 243,
+          "line_end": 261,
+          "file_sha256": "220d3a75b7974580ad9ca30b22b2172de226e19c6ee0f04c44a0e428469921e1",
+          "range_sha256": "116ea79e31d8ecd36a47b9f0259f5e6e221df1867e87389430b3a9b7b21b9f7d",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "cd14688becf5f6f177b2260da64dcb24cacac0e35e86a1a4e097b532749d6b6a"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/prefabs/wolfgang.lua"
+        },
+        {
+          "path": "scripts/components/singinginspiration.lua",
+          "line_start": 112,
+          "line_end": 132,
+          "file_sha256": "22bcb761c9eea0df1eb4efa41cf1a27f6b61196a6e0b3d66a2cf1eed65a2cc19",
+          "range_sha256": "26e100fea5c301ee4fbd0c1ebdd633d6c42a0c639f32e0d1dd03b9fefe31c985",
+          "range_hash_convention": "raw splitlines(keepends=True), inclusive 1-based whole-line bytes",
+          "source_excerpt": {
+            "$dst_source_payload_slot": "7f55d6af5320442eef2d9bec478a39138e13a3d9afcc74d2c5843b17687ec638"
+          },
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_scope": {
+            "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+            "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+            "game_version": "759671",
+            "steam_buildid": "26148036",
+            "branch": "public",
+            "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+            "source_commit": null,
+            "runtime_verified": false
+          },
+          "runtime_path": "_runtime/w27-source759671-input-audit-20261023/snapshots/759671/scripts/components/singinginspiration.lua"
+        }
+      ]
+    }
+  ],
+  "source_scope": {
+    "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+    "source_epoch_id": "STEAM-PUBLIC-759671-26148036-03d745ab",
+    "game_version": "759671",
+    "steam_buildid": "26148036",
+    "branch": "public",
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "source_commit": null,
+    "runtime_verified": false
+  }
+}

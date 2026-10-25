@@ -1,0 +1,722 @@
+{
+  "direct_facts": [
+    {
+      "id": "MODTIMER-SML-NEUTRAL",
+      "statement": "SourceModifierList:SetModifier ignores nil source; omitted key becomes the literal default key. A nil value or a value equal to this list’s _base calls RemoveModifier for that key. HasModifier with no key checks only the default key, whereas RemoveModifier with no key removes the entire source, including all its keys.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "SetModifier",
+          "line_start": 64,
+          "line_end": 76,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "ea07e41d7addefab1ec5b09ed1d310ec44c9cd1ef3ed819be34cd638d1c54f16",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L64-L76"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "RemoveModifier",
+          "line_start": 103,
+          "line_end": 122,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "6bd9a71563782b7a8e35f3cf23f181a1b98878c40f3530cdd59c0c9f7f77bbbc",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L103-L122"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "HasModifier",
+          "line_start": 169,
+          "line_end": 178,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "6380b1fdf5e635b940a8cbe631e35c6614e27e5df30306d7124cebda55d6ed33",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L169-L178"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-SML-NEUTRAL",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-SML-REDUCER",
+      "statement": "SourceModifierList accepts an explicit base and reducer. The default base is 1 and default reducer is multiplication; provided additive and boolean reducers respectively add and OR. RecalculateModifier starts from _base and folds every remaining source/key value using pairs, then stores the result and calls the optional dirty callback.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "SourceModifierList constructor and reducers",
+          "line_start": 8,
+          "line_end": 35,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "2e0f724605d95ff761203ee0d59b6895bbf11f2434731d1ae572180d37bc022c",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L8-L35"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "RecalculateModifier",
+          "line_start": 47,
+          "line_end": 58,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "c1abebffa6cc2c093864c9cd8f7cbade3a83fc20d708a5f7417f954c176c60aa",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L47-L58"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-SML-REDUCER",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-SML-RESET",
+      "statement": "SourceModifierList:Reset removes each tracked entity-source onremove callback, clears all sources, sets aggregate back to _base, and calls the optional dirty callback. This is a whole-list operation, not release of one effect.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "Reset",
+          "line_start": 124,
+          "line_end": 135,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "2f778b8f6a759a92e6f225fbc255081f57a9ebb3bc3cbc0ad89bf13d0a0ff4f3",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L124-L135"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-SML-RESET",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PSM-IDENTITY",
+      "statement": "PlayerSpeedMult constructs predicted and capped-predicted SourceModifierLists on both sides, and ordinary and capped server SourceModifierLists only when ismastersim is true. Its helper uses an EntityScript source directly with the default key; a non-entity source argument is instead used as a key under the player entity. Matching remove helpers use the same mapping. Public SetSpeedMult/RemoveSpeedMult and capped server operations only act when ismastersim is true.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "PlayerSpeedMult constructor",
+          "line_start": 16,
+          "line_end": 28,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "99726fcab842a6eb3592fad95ce6ed645312dcf4db6c618af119d9eacca78e05",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L16-L28"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "_set_speed_mult/_remove_speed_mult",
+          "line_start": 73,
+          "line_end": 87,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "1b7aa04793a551f2486c2bc5b26c4a5f22303f3908e1f9babe9b83fb2871e0bd",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L73-L87"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "SetSpeedMult/RemoveSpeedMult",
+          "line_start": 127,
+          "line_end": 142,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "440cfbab8fe264b4677b19a9f1651103698613de9dbd91926f5cbc43203fa94a",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L127-L142"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "SetCappedSpeedMult/RemoveCappedSpeedMult",
+          "line_start": 144,
+          "line_end": 159,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "9cba77c8e024b6616231789e2571e39ea21541265d1c8cfc65dbcf5daae6a3ec",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L144-L159"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-PSM-IDENTITY",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PSM-BASE",
+      "statement": "PlayerSpeedMult’s header explicitly states that it overrides locomotor.runspeed to avoid stacking with mount speed and assumes players do not otherwise set runspeed dynamically. TryRecacheBaseSpeed_Internal copies the current runspeed into the classified base only on the master simulation and when all four modifier lists have no modifiers. SetSpeedMult and SetCappedSpeedMult attempt that recache before setting their respective source.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "module contract",
+          "line_start": 1,
+          "line_end": 3,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "2fa33aeee4429a823663787174cd5c8a7a4299f9382be25be18bdd4d6b12831f",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L1-L3"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "TryRecacheBaseSpeed_Internal",
+          "line_start": 115,
+          "line_end": 125,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "15dc8333659cc870342ca2efbcc361ed4c40622e0666c1e693b559d4deacab44",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L115-L125"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "SetSpeedMult",
+          "line_start": 127,
+          "line_end": 134,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "44a2d10aee448c93a88531df9000a966796c2a170a4c904cc47300d568fa64d1",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L127-L134"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "SetCappedSpeedMult",
+          "line_start": 144,
+          "line_end": 151,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "ca8c50efae75e0144b43b031c1d46700185deaf76b512cd934d286b2b5e653fe",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L144-L151"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-PSM-BASE",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PSM-APPLY",
+      "statement": "ApplyRunSpeed_Internal calculates ordinary server times predicted multipliers and capped server times predicted multipliers, optionally adjusts the capped part against GetSpeedMultiplier and multcap, then writes cached base times adjusted multiplier to server runspeed or client predictrunspeed. A client with no predicted modifiers clears predictrunspeed. Predicted setters/removers use their own lists.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "_basespeed",
+          "line_start": 89,
+          "line_end": 91,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "5d838708912f16ec97ffb17a148c1eb28408b7d2c24780729d9761d3967f0c59",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L89-L91"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "predicted speed operations",
+          "line_start": 161,
+          "line_end": 175,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "287e329ce97542d1a0a4b4da7add2d47c5ecb0e31a9350bdda20698ef6a75397",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L161-L175"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "ApplyRunSpeed_Internal",
+          "line_start": 177,
+          "line_end": 199,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "84fd0681751a38560ad4bb19b19c8688d85fda5a1adcb0ff3441dd3a16cbb15b",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L177-L199"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-PSM-APPLY",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PSM-CLEANUP",
+      "statement": "PlayerSpeedMult:OnRemoveFromEntity resets each owned modifier list and cancels its saved initialization task on the master simulation. The complete module defines no OnSave, OnLoad or TransferComponent method.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "OnRemoveFromEntity",
+          "line_start": 50,
+          "line_end": 63,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "902a1dd4cedacf606233702f04d830205b56a4eb336601ca91b92c5bbaf16b9b",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L50-L63"
+        },
+        {
+          "path": "scripts/components/playerspeedmult.lua",
+          "symbol": "complete PlayerSpeedMult module method surface",
+          "line_start": 1,
+          "line_end": 219,
+          "file_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_sha256": "dd5dfac0d38558518bf696c4a0e64189a9543d5a1bfd23f9ec10d7f8231a1b5f",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/playerspeedmult.lua#L1-L219"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Absence assertion is limited to the complete pinned module, not every caller or external save system.",
+      "fact_id": "MODTIMER-PSM-CLEANUP",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-CD-RESTART",
+      "statement": "Cooldown starts uncharged with no deadline/task. StartCharging chooses the passed time or cooldown_duration, sets charged=false and a GetTime deadline, cancels an old task if present, schedules a new task on its inst, and calls startchargingfn. Repeating this operation replaces its own task rather than using ordinary timer’s named-collision contract.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "Cooldown constructor",
+          "line_start": 1,
+          "line_end": 8,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "f044bf61dc0cad177c4effb736cb6acd1cf4b1e3f4159d4786c1a6d4d6789397",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L1-L8"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "StartCharging",
+          "line_start": 31,
+          "line_end": 44,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "36d5067e80712a320b3832cd62314f9a1adbed03354da9565b64f0deb022a37d",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L31-L44"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-CD-RESTART",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-CD-DONE",
+      "statement": "Cooldown donecharging cancels and clears the saved task, sets charged=true, clears the deadline, then calls onchargedfn. FinishCharging only invokes that path if a deadline exists. IsCharging requires not charged and a nonnil deadline, while GetTimeToCharged returns deadline minus GetTime or zero.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "donecharging",
+          "line_start": 17,
+          "line_end": 29,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "cdcef8bc13bd099094cbf10a90581e17419d4e21097d7597aa4d9785d0112b41",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L17-L29"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "FinishCharging/GetTimeToCharged/IsCharged/IsCharging",
+          "line_start": 46,
+          "line_end": 62,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "4521484f3410068a8da2be58d00e56e1ea32941feecc04a2fd2ac0cef0a333a6",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L46-L62"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-CD-DONE",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-CD-LOAD",
+      "statement": "Cooldown:OnSave saves charged as true-or-nil and clamps remaining charge time to at least zero. OnLoad of charged data calls donecharging, including onchargedfn; saved remaining time calls StartCharging, including startchargingfn. This module does not serialize callback functions.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "OnSave",
+          "line_start": 64,
+          "line_end": 69,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "725435fa5a9bd2da6902a72b12e0f47228ca7633a937cd34095a6687ae2e7a1d",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L64-L69"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "OnLoad",
+          "line_start": 87,
+          "line_end": 93,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "2d57f9f40817233fd8287fdbf700f44e917b13cacf899cd0a2115c9da1ad7c20",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L87-L93"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "donecharging",
+          "line_start": 17,
+          "line_end": 29,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "cdcef8bc13bd099094cbf10a90581e17419d4e21097d7597aa4d9785d0112b41",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L17-L29"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "StartCharging",
+          "line_start": 31,
+          "line_end": 44,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "36d5067e80712a320b3832cd62314f9a1adbed03354da9565b64f0deb022a37d",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L31-L44"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-CD-LOAD",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-CD-LONG",
+      "statement": "Cooldown:LongUpdate subtracts dt from its deadline. If the adjusted deadline is strictly less than GetTime it completes synchronously; otherwise it calls StartCharging for the difference, repeating its start callback. Equality uses StartCharging(0). OnRemoveFromEntity cancels and clears the task; the component contains no named timer table or TransferComponent method.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "LongUpdate",
+          "line_start": 75,
+          "line_end": 85,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "a1495d80fdf12c813545e3454c0c40f64ac10bc5ca2b9a757e5e3be5de0c5591",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L75-L85"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "OnRemoveFromEntity",
+          "line_start": 10,
+          "line_end": 15,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "5a88c4ff25ecafcdfc60d65f37b53993c8d3eb423a98fbeb851586102bf5d78a",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L10-L15"
+        },
+        {
+          "path": "scripts/components/cooldown.lua",
+          "symbol": "complete Cooldown module method surface",
+          "line_start": 1,
+          "line_end": 95,
+          "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/cooldown.lua#L1-L95"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Method-surface absence is for this pinned module; no claim about another component or character callback forwarding data.",
+      "fact_id": "MODTIMER-CD-LONG",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-RC-RATE",
+      "statement": "Rechargeable uses SourceModifierList(inst, 0, additive) for charge-time contributions. OnUpdate uses base chargetime times (1 + aggregate); when this is nonpositive it sets full charge. SetChargeTimeMod(source,key,mod) and RemoveChargeTimeMod(source,key) update the list and explicitly refresh replica charge time and component updating only when the aggregate changes. These values are additive time adjustments, not a direct multiplicative speed or damage API.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "Rechargeable constructor",
+          "line_start": 20,
+          "line_end": 32,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "5cd5e5282116e5e85a707d6d75557ef8a5e45e21d66547b156c3041b9a76837f",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L20-L32"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "OnUpdate",
+          "line_start": 66,
+          "line_end": 69,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "5c985b562c6b9b5308f51f797c6c7122737382e21c38dce0ce14ef47574b5afb",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L66-L69"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "SetChargeTimeMod/RemoveChargeTimeMod",
+          "line_start": 86,
+          "line_end": 106,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "cf2820168fc0fce789db27ca6e08351de5fdd17243c948e63d154d072e7d595c",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L86-L106"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "GetRechargeTime",
+          "line_start": 153,
+          "line_end": 159,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "b6b57460f306a4db870e96384c22725b3832dec2d5fb218a0425407316f22cb7",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L153-L159"
+        }
+      ],
+      "runtime_tested": false,
+      "fact_id": "MODTIMER-RC-RATE",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-RC-SAVE",
+      "statement": "Rechargeable:OnSave returns data only while not charged, and saves the base chargetime and current absolute charge. OnLoad uses SetChargeTime and SetCharge. It does not serialize its chargetimemod source/key table, total, callback functions or updating state in this save payload.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "OnSave/OnLoad",
+          "line_start": 161,
+          "line_end": 175,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "2cfe14eba78b6762d01ee28df5cff6568729d48dd0da7a9d58cf8821090329f3",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L161-L175"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Payload assertion is specific to Rechargeable:OnSave, not the enclosing prefab or another serialization wrapper.",
+      "fact_id": "MODTIMER-RC-SAVE",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-RC-SOURCE-REMOVE",
+      "statement": "Rechargeable constructs chargetimemod without a SourceModifierList dirty callback. SourceModifierList’s entity-source onremove handler deletes the source and recalculates the aggregate; it does not call Rechargeable:RemoveChargeTimeMod. The latter wrapper performs onchargetime and StartUpdatingCharge when the aggregate changed.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "Rechargeable constructor",
+          "line_start": 20,
+          "line_end": 28,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "7e7ba45b9b8db059302fa85057280218ff28210826aad9cfa29b5a5c4dec08c5",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L20-L28"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "SetModifier entity-source listener",
+          "line_start": 84,
+          "line_end": 94,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "4443d3e840389be3eb8cbc2945e617d3f982428ce6c4c70a5a6fc09e0d65c0f9",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L84-L94"
+        },
+        {
+          "path": "scripts/util/sourcemodifierlist.lua",
+          "symbol": "RecalculateModifier",
+          "line_start": 47,
+          "line_end": 58,
+          "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+          "range_sha256": "c1abebffa6cc2c093864c9cd8f7cbade3a83fc20d708a5f7417f954c176c60aa",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/util/sourcemodifierlist.lua#L47-L58"
+        },
+        {
+          "path": "scripts/components/rechargeable.lua",
+          "symbol": "RemoveChargeTimeMod",
+          "line_start": 99,
+          "line_end": 106,
+          "file_sha256": "921f45d047a425c7de63f21d66b127277c1787730764478d1a2e234d583a697b",
+          "range_sha256": "322767fdbdc1816d31f5e7b184c3ab2f4524dbb4d4d0bda3fe17859b9d126b07",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/rechargeable.lua#L99-L106"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Direct statement is the Lua callback path. A visible stale replica symptom requires project-specific execution and is not claimed here.",
+      "fact_id": "MODTIMER-RC-SOURCE-REMOVE",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PLAYER-COMMON-TIMER",
+      "statement": "The common player master construction adds a timer component. CommonPlayerDeath removes particular components and disables debuffable but contains no timer StopTimer, PauseTimer, RemoveComponent(\"timer\") or CancelAllPendingTasks call. OnMakePlayerGhost calls CommonPlayerDeath on the same inst, then changes ghost physics, tags, classified state and locomotor before pushing ms_becameghost.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "common player component construction",
+          "line_start": 2852,
+          "line_end": 2863,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "bc5646227adeb4d07070c2631be705ed4131e3351d6b6f1469295b27dfc7f065",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2852-L2863"
+        },
+        {
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "CommonPlayerDeath complete body",
+          "line_start": 632,
+          "line_end": 671,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "eb64f0d10a10fac6be8b662171513bee3b5e324dd33f9c7c1bdc01f534c329aa",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L632-L671"
+        },
+        {
+          "path": "scripts/prefabs/player_common_extensions.lua",
+          "symbol": "OnMakePlayerGhost same-entity ghost conversion",
+          "line_start": 719,
+          "line_end": 738,
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "range_sha256": "ce39194608b2b97dd5d984dee28ae611a76cd689d4a3b5fd28d1145646c7316e",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common_extensions.lua#L719-L738"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "The absence assertion is limited to CommonPlayerDeath. Other character, stategraph or event callbacks may explicitly alter their own timers.",
+      "fact_id": "MODTIMER-PLAYER-COMMON-TIMER",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PLAYER-SWAP",
+      "statement": "The MONKEY-labelled SwapAllCharacteristics function iterates the old player’s components and invokes TransferComponent(newinst) only on components defining that method. Timer:TransferComponent calls newinst.components.timer:StartTimer for each source record with remaining time, paused and initial_time; it does not stop the old record or clear target name collisions in this function.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "fns.SwapAllCharacteristics",
+          "line_start": 2338,
+          "line_end": 2344,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "d164a8081a136761a7dd4650c5194bd44c677c51241f698dc72c3fec738e8286",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L2338-L2344"
+        },
+        {
+          "path": "scripts/components/timer.lua",
+          "symbol": "TransferComponent",
+          "line_start": 150,
+          "line_end": 157,
+          "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+          "range_sha256": "d1d00deac1fc3df19f096e88f196269943aeb5e3f7a74ffc9d15aab530b64585",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/timer.lua#L150-L157"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "This proves the specified swap path, not all character replacements or reconnect paths. Timer collision behavior is reused from VANILLA-INV-007.",
+      "fact_id": "MODTIMER-PLAYER-SWAP",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-DEBUFF-SWAP",
+      "statement": "Debuffable:TransferComponent calls its own OnSave, ensures the target has debuffable, and calls target OnLoad. That OnLoad skips names already on the target and otherwise SpawnSaveRecord followed by RegisterDebuff. Thus this explicit transfer path reconstructs buff records and does not move the original buff entity or task handles.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/components/debuffable.lua",
+          "symbol": "TransferComponent",
+          "line_start": 152,
+          "line_end": 162,
+          "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+          "range_sha256": "c369ffd94da6de2f9cd4e7e059fc280e3269d91a3dd5f18bf5b853cc2ce7080d",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L152-L162"
+        },
+        {
+          "path": "scripts/components/debuffable.lua",
+          "symbol": "OnSave/OnLoad",
+          "line_start": 126,
+          "line_end": 150,
+          "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+          "range_sha256": "9ffc2a8c17b532352d9d4e9f2b48e7fdefa2e19b4e8151947196de8fe5d30536",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/components/debuffable.lua#L126-L150"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "The record-reconstruction conclusion follows the directly visible SpawnSaveRecord call. Its component-load semantics are reused from VANILLA-INV-006.",
+      "fact_id": "MODTIMER-DEBUFF-SWAP",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-PLAYER-REROLL",
+      "statement": "Common SaveForReroll returns an explicit selected table containing age, builder, petleash, maps, seamlessplayerswapper and curses. This table includes neither timer nor debuffable. Its shown LoadForReroll restore branches address those selected fields rather than invoking a generic component-transfer loop.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "SaveForReroll selected payload",
+          "line_start": 1834,
+          "line_end": 1863,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "d32484543fe81c8873e735fa6d21cd3b8f238a589d5e59069aaff21e716a1ebb",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1834-L1863"
+        },
+        {
+          "path": "scripts/prefabs/player_common.lua",
+          "symbol": "LoadForReroll selected restore branches",
+          "line_start": 1865,
+          "line_end": 1891,
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "range_sha256": "f4b9728c6f198206e5794913b9ee26281e752c1b5225a7931490ab51b33dcf16",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/player_common.lua#L1865-L1891"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Not a claim that every caller or character-specific reroll mechanism clears every custom timer. The separate seamlessplayerswapper payload has not been expanded in this audit.",
+      "fact_id": "MODTIMER-PLAYER-REROLL",
+      "classification": "SOURCE_FACT"
+    },
+    {
+      "id": "MODTIMER-FOODBUFF-OWNED-TIMER",
+      "statement": "MakeBuff’s prefab constructor starts buffover on the buff entity’s own timer component. OnAttached parents that buff to the target and installs its target-death listener; OnExtended stops and restarts buffover to the full duration, and OnDetached runs effect cleanup then removes the buff entity. The target player’s timer is not the owner of this buffover record.",
+      "evidence_level": "E3",
+      "evidence_scope": "direct_source_facts_only",
+      "citations": [
+        {
+          "path": "scripts/prefabs/foodbuffs.lua",
+          "symbol": "MakeBuff.fn buff-owned timer construction",
+          "line_start": 182,
+          "line_end": 210,
+          "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+          "range_sha256": "939fb3b33ec3fabb1ff58fc951a1a680353a6d72f5a72400dd14f78e088d4401",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L182-L210"
+        },
+        {
+          "path": "scripts/prefabs/foodbuffs.lua",
+          "symbol": "OnAttached/OnExtended/OnDetached",
+          "line_start": 150,
+          "line_end": 180,
+          "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+          "range_sha256": "cdc034ebbaffbcc9bca57d91e80c7239155d5c0d195efed613ff43b08c97bbfe",
+          "range_hash_scheme": "exact_utf8_source_bytes_splitlines_keepends_1based_inclusive",
+          "url": "https://github.com/Zechariah0121/dst-scripts/blob/d6ab7e6332e10e67aef1e52349cb23287266e565/scripts/prefabs/foodbuffs.lua#L150-L180"
+        }
+      ],
+      "runtime_tested": false,
+      "scope": "Ownership statement is limited to this MakeBuff family. Refresh/removal/persistence contracts themselves are already covered by VANILLA-BUFF-001/002/003.",
+      "fact_id": "MODTIMER-FOODBUFF-OWNED-TIMER",
+      "classification": "SOURCE_FACT"
+    }
+  ]
+}

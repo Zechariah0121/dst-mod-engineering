@@ -1,0 +1,117 @@
+{
+  "main_json_field_changes": [
+    {
+      "pointer": "#/acceptance_metadata_normalized_at_utc",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": "2026-10-06T02:13:27+00:00"
+    },
+    {
+      "pointer": "#/artifact_role",
+      "operation": "replace",
+      "before_exists": true,
+      "before": "Noncanonical source research + compact query/coding facets; external acceptance pending",
+      "after": "Noncanonical source research + compact query/coding facets; only five finite static contracts independently semantically passed"
+    },
+    {
+      "pointer": "#/external_acceptance/accepted_static_contract_ids",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": [
+        "BR-P01",
+        "BR-P02",
+        "BR-P03",
+        "BR-P04",
+        "BR-P05"
+      ]
+    },
+    {
+      "pointer": "#/external_acceptance/draft_semantic_review_verdict",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": "PASS_DRAFT_SEMANTIC_REVIEW_PENDING_FINAL_METADATA_BYTE_BINDING"
+    },
+    {
+      "pointer": "#/external_acceptance/final_byte_binding_zh",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": "最终ResearchReady main/summary/delta实际hash由稳定路径独立报告的final_reviewed_inputs/final_acceptance_metadata_delta记录；本字段所存draft hash仅标识此前语义稿，不冒充final身份。独立报告自身hash不反向写入本稿，避免循环hash。"
+    },
+    {
+      "pointer": "#/external_acceptance/report_created",
+      "operation": "replace",
+      "before_exists": true,
+      "before": false,
+      "after": true
+    },
+    {
+      "pointer": "#/external_acceptance/reviewed_source_draft_sha256",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": "0078a112dc55d3f7321157d78bf2155a8f78d6165f972088984be6d7082178cf"
+    },
+    {
+      "pointer": "#/prior_artifact_audit/current_phase",
+      "operation": "replace",
+      "before_exists": true,
+      "before": "batch018 source research completed; not yet independently accepted",
+      "after": "batch018 five finite source contracts independently semantically passed; acceptance-only final bytes submitted for independent observation"
+    },
+    {
+      "pointer": "#/proposed_scopedResearchReady_scope_zh",
+      "operation": "replace",
+      "before_exists": true,
+      "before": "仅FIRE-Q01..05五问及BR-P01..05；完成独立source/semantic/context review后才由coordinator接受。",
+      "after": "仅FIRE-Q01..05五问及BR-P01..05；独立source/semantic/context review已通过。实际最终字节接受由external_acceptance所指独立报告记录，不由draft hash替代。"
+    },
+    {
+      "pointer": "#/scopedResearchReady",
+      "operation": "replace",
+      "before_exists": true,
+      "before": false,
+      "after": true
+    },
+    {
+      "pointer": "#/scopedResearchReady_scope",
+      "operation": "add",
+      "before_exists": false,
+      "before": null,
+      "after": {
+        "question_ids": [
+          "FIRE-Q01",
+          "FIRE-Q02",
+          "FIRE-Q03",
+          "FIRE-Q04",
+          "FIRE-Q05"
+        ],
+        "compact_contract_ids": [
+          "BR-P01",
+          "BR-P02",
+          "BR-P03",
+          "BR-P04",
+          "BR-P05"
+        ],
+        "ordinary_branch_only": true,
+        "single_prefab": "regular treasurechest; numupgrades=0; ordinary non-infinitestack container; factory callback wire unmodified",
+        "canonical": false,
+        "runtimeReady": false,
+        "runtime_tested": false,
+        "whole_domain_ready": false,
+        "whole_FinalKB_ready": false
+      }
+    },
+    {
+      "pointer": "#/status",
+      "operation": "replace",
+      "before_exists": true,
+      "before": "sourceResearch_complete_pendingIndependentReview",
+      "after": "scopedResearchReady"
+    }
+  ],
+  "source_contract_changes": false
+}

@@ -1,37 +1,31 @@
-# Skill、知识库与检索服务
+# Skill 与知识库接入 / Skill and KB integration
 
-> 本页介绍完整公开仓库保留的 **v0.1.1、64条参考知识** 及其可选只读服务。独立 Skill ZIP 不包含这些数据和服务；该公开参考集不代表其他配套 KB 的内容或版本。
+本版将 Skill 与当前 **187 条公开知识**串联分发，默认知识目录为 `knowledge/`。完整包、独立 Skill ZIP 与网页阅读 ZIP 都带知识文件；完整包另含来源准备工具与现代 MCP 九工具服务 `0.3.0`。仓库中的旧版兼容目录不作为当前 KB 入口。
 
-三个目录职责不同：根目录 `SKILL.md` 与 `references/` 保存工作策略；`dst-engineering-kb/` 保存知识；`dst-kb-service/` 只读检索，SQLite 索引位于知识库以外。知识条目不是代码模板，也不是让 Agent 无条件执行的指令。
+## 不运行 MCP：按文件读取
 
-参考案例为“小穹”v13.80，既有元数据记录作者为 FL。保留案例名称与符号用于研究归属和定位，不代表原作者背书本知识库。本仓库自行编写的工具与文档适用 [非商业使用许可](../LICENSE)，历史有效 MIT 授权不追溯撤销；不对第三方 Mod 或 Klei 游戏源码重新授予许可，本包不包含这些原始源码与素材。
+先读 `knowledge/data/index.json` 的基础记录索引，再按任务定位：
 
-## 从任务到证据
+| 知识范围 | 文件入口 | 读取方式 |
+|---|---|---|
+| 64 条基础知识 | `knowledge/data/index.json` | 按索引的 `path`、`anchor` 读取指定条目及相关更正 |
+| 13 条 Native AI 知识 | `knowledge/data/native001/canonical-native001-ai-knowledge.json` | 按问题选择最多 5 条，Coding 默认只投影文件声明的十字段 |
+| 110 条 Native Core 知识及状态 | `knowledge/data/nativecore/native-core.json` | 先核对三轴状态与 Scope；保留 Core Coding HOLD，不当作可直接实现的通用契约 |
 
-| 实际制作问题 | 模式 | 可作为起点的条目 | 仍要确认 |
-|---|---|---|---|
-| 按钮消耗资源释放技能 | architect | `DECISION-NET-001`、`RULE-NET-001` | 原版 Action 是否足够、Host/远端共同校验 |
-| 重连后效果重复或残留 | debug | `RULE-LIFE-001`、`ANTI-LIFE-001` | 实际任务和监听归属；相似案例不直接证明根因 |
-| 自动收纳与箱子制作供料 | architect | `PATTERN-WORLD-001`、`FACT-DST-003` | 真实物品归属、查询与扣除边界、注册/注销 |
-| 地面洞穴共享仓库 | architect | `RULE-SHARD-001`、`PATTERN-SHARD-001` | 写入权威、重复请求、断线恢复 |
-| 自定义数值存档与 HUD | implement | `FACT-DST-001`、`DECISION-PERSIST-001` | 真实状态保存、显示重建、首次同步 |
-| 两个 Mod 包装同一函数 | review | `RULE-HOOK-002`、`TEST-HOOK-002` | 加载顺序、异常恢复、撤销时不覆盖别人 |
+用 JSON 解析或定向读取提取所需记录，报告“知识文件读取”及实际记录 ID，不把它写成 MCP 查询。不要把完整 JSON 或全库加入默认提示词。原条目的 NSF、RV、EI、REC、UNK 类型分别读取；公开隐藏的私有情境仍为 `UNK`，不能由标题或关联推回正文。
 
-以上 ID 可在 [索引](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/INDEX.md) 查询。重要决策读取完整条目，再沿明确关系找到反例与测试；不要仅凭摘要或相关性排名作结论。
+公开证据只保留必要、经审的片段，并绑定公开路径与新哈希；不表示原始研究全部公开。`$dst_source_payload_slot` 是原版 Lua 的本地恢复槽，遇到它应记录来源缺口，继续用自己合法持有的当前源码核对，不能称为已解析证据。
 
-例如自动收纳任务：检索候选模式 → 读取适用/不适用条件 → 决定状态 Owner → 查当前 Container/Builder 原版链路 → 实现注册与查询 → 执行本任务能覆盖的验证。World Manager 不替代单体 Component，也不能由“减少扫描”推断所有查询都是常数复杂度。
+## 运行 MCP：先准备来源
 
-## 覆盖与回退
+按 [安装说明](install-and-use.md) 在完整包根目录运行 `prepare_sources.py`，提供合法持有的 `759671` 及所需历史源码。当前单份 `759671 scripts.zip` 仍缺 13 种旧范围，涉及 9 个文件。缺少必需来源时不启动部分库，也不放松原准入；此时仍可按上述方法阅读公开知识。
 
-当前知识集中在状态归属、联机、分片、生命周期、存档、Hook 和世界协调。Skill 的制作专题覆盖更广；动画、音效等问题应继续读取相应专题和工具契约。检索使用词语匹配，非空结果可能不相关；无匹配也不能证明整个领域不存在知识。
+准备只写 `cache/runtime/`；其中恢复的游戏 Lua 片段不属于公开再分发内容。完成准备后，用 `run_kb.py mcp-config` 生成客户端配置，在实际客户端验证工具发现与一次任务查询。九工具、版本与预算见 [检索策略](../references/kb-retrieval.md)。
 
-检测到实际 MCP 工具后主动按需使用，不把配置存在当成已连接。没有 MCP 但能读文件时，读取 `data/index.json`、相关文档或 `data/entries.json` 中指定条目，说明使用了文件读取。没有任何可访问知识时，说明 `KB unavailable` 并继续能做的源码工作。不得虚报查询或测试成功。
+## 证据与维护
 
-普通开发不会自动修改知识库。发现新证据或知识缺口时在任务报告记录，只有明确维护请求才进入知识更新与 Correction 流程。来源事实、单案例观察和建议分别看待；历史撤回 Claim 只能作为历史。
+当前 Mod 与目标游戏源码仍是工程判断依据。保留来源 epoch、Scope、版本、Correction、缺失/延期与 Coding HOLD；检索命中、声明存在或文件可读都不等于完整行为已交付。仅在用户明确要求维护知识库时写库，检索服务本身是只读接口。
 
-## 获取与验收
+All three distributions include the current 187 public records in `knowledge/`; only the full package adds source preparation and the modern nine-tool MCP service. File mode reads a task-specific subset from the three entries above and reports record IDs as file access. Native AI Coding uses the declared ten-field projection and at most five records; Native Core Coding HOLD remains in force. Public evidence is limited to reviewed excerpts. Source slots are missing local Lua payloads, not evidence already read. MCP requires authorized current and historical sources first; one current ZIP is insufficient. Restored source stays in `cache/runtime/` and must not be publicly redistributed. Preserve Scope, claim types, versions, corrections, gaps and admission limits in either mode.
 
-- 完整仓库包含三层；网页技能 ZIP 只包含技能与辅助资料，不包含知识库和服务。
-- [服务接入](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-kb-service/README.md) 使用 Python 3.10+，不需要第三方 Python 包或 API Key。
-- [知识库入口](https://github.com/Zechariah0121/dst-mod-engineering/blob/main/dst-engineering-kb/README.md) 说明条目的来源、证据等级和版本范围。
-- 数据校验、服务回归、Agent 真正按任务自动检索、DST 实机验证是四种不同验收。
+文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。

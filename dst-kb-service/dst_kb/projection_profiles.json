@@ -1,0 +1,1091 @@
+{
+  "schema_version": "dst-consumption-profiles/2",
+  "purpose": "Finite emphasis / negative-boundary overlays; canonical statements and governance remain unchanged.",
+  "selection_unit": "whole canonical typed atom; never substring truncation",
+  "default_all_records_supported": true,
+  "profiles": {
+    "NC-N002-FINAL-08": {
+      "record_sha256": "7a7885aa726eeeeb3bae26ae1355f79eb1d754dd0134cbadabcf8c9abf3d00a3",
+      "claim_indexes": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        9
+      ],
+      "boundary_indexes": [
+        0,
+        1,
+        2
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "延迟项保存的 fn/sender/data、旧玩家对象与当前玩家绑定分别处理；只有项目显式选择重绑定后，才取得并校验新的 consumer。userid or sender 的 nil/false 回退保留。",
+          "basis_record_pointers": [
+            "/claims/1",
+            "/claims/2",
+            "/claims/3",
+            "/claims/4",
+            "/claims/8",
+            "/claims/9"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N003-INT-02": {
+      "record_sha256": "8cd521ee7ac85c087f6114b7db29c4dfee25b29d1841cdda8673681bef71d139",
+      "claim_indexes": [
+        7,
+        8,
+        10,
+        11,
+        13,
+        17,
+        18
+      ],
+      "boundary_indexes": [
+        1,
+        3
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "动作可能分别由 locomotor.bufferedaction 与实体 bufferedaction 持有；取消前沿实际转交阶段确认 owner，Stop 与 Clear 不互换。DoAction 分发不等于 action.fn 已执行。",
+          "basis_record_pointers": [
+            "/claims/8",
+            "/claims/10",
+            "/claims/11",
+            "/claims/13",
+            "/claims/17",
+            "/claims/18"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N003-INT-04": {
+      "record_sha256": "53a1f1b38ab280be37b1f7024628f76ece135c915cb922d79999ef75d6a1fad3",
+      "claim_indexes": [
+        3,
+        4,
+        7,
+        8,
+        14,
+        15
+      ],
+      "boundary_indexes": [
+        0,
+        2,
+        3
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "保留 action.fn 的第一返回值和 reason 原始口径：nil/false 均按假值分支，但不把二者的原值合并成布尔值。invalid 早退与 fn-failure 分开；captured attempt 是否随 current buffer 替换失效由公开项目政策决定。",
+          "basis_record_pointers": [
+            "/claims/3",
+            "/claims/4",
+            "/claims/7",
+            "/claims/8",
+            "/claims/14",
+            "/claims/19"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N003-INT-05": {
+      "record_sha256": "2011f06433226470c30936fd1aa7c7272b07f03ffad994f2ce3e45faa5ca5ac0",
+      "claim_indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "boundary_indexes": [
+        0,
+        1
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "timeline/timeout/onexit 与资源退款分别审查；具名 REPAIR 的同对象 cleanup 不能推广成所有 captured attempt 的 universal current-buffer gate。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/3",
+            "/claims/4"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-01": {
+      "record_sha256": "4832ebc075f7f41d76a8dd18f978f1e77cf8ea037e7c2dfd9b2e1d76f6825ec9",
+      "claim_indexes": [
+        0,
+        9,
+        13,
+        15,
+        20,
+        21,
+        22
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "DoAttack 内部 CanHitTarget 是该效果入口的内部检查；除非项目明确选择新的资格规则，不能把它搬成外层 DoAttack 前的统一 gate。Weapon:OnAttack、Projectile:onhit 到达也不能改述成正 HP 损失。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/9",
+            "/claims/13",
+            "/claims/15",
+            "/claims/20",
+            "/claims/22"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-02": {
+      "record_sha256": "1e50549e2507227e43e36dffc366ca48fe39c3880603b39b5ed81ce9404631bb",
+      "claim_indexes": [
+        1,
+        2,
+        3,
+        5,
+        8,
+        9,
+        10,
+        11
+      ],
+      "boundary_indexes": [
+        3
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "Hit/contact 的到达、目标死亡和目标 Remove 是不同观察。终局优先级由公开项目合同锁定；不能从该原版链默认发明 hitting 屏障。Miss 的 Stop 不停止 Physics；所选回调明确负责后续处置。",
+          "basis_record_pointers": [
+            "/claims/2",
+            "/claims/5",
+            "/claims/8",
+            "/claims/11",
+            "/claims/13"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-03": {
+      "record_sha256": "d2d0d13c8b8ac90846659d6390e5169eb343415ecc61186c080dd1af6537a68c",
+      "claim_indexes": [
+        6,
+        8,
+        9,
+        18,
+        19,
+        20,
+        21
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "GetAttacked 的未 blocked、damageresolved、DoDelta amount 与最终净 HP 差分别保留。先由项目定义计分/吸血的采样阶段与重定向口径，不能将任一 native 返回命名成所有业务的 success。",
+          "basis_record_pointers": [
+            "/claims/6",
+            "/claims/8",
+            "/claims/9",
+            "/claims/18",
+            "/claims/19",
+            "/claims/21",
+            "/claims/22"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-05": {
+      "record_sha256": "d1e354ea526650ff06d2f570a88cb3ce854d679a5c281ff480ebfe83c435ba8f",
+      "claim_indexes": [
+        6,
+        18,
+        19,
+        22,
+        23,
+        24
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "HasModifier(source) 只查 default key；RemoveModifier(source) 却删该 source 的所有 key。精确 source/key 撤销、wrapper 附属收尾及仍持有写入值时的恢复分别处理。",
+          "basis_record_pointers": [
+            "/claims/6",
+            "/claims/18",
+            "/claims/22",
+            "/claims/23",
+            "/claims/24"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-06": {
+      "record_sha256": "3ec3d5554543654a911695b0d4338ee03af59aed321ba41c9979a497a031cd4c",
+      "claim_indexes": [
+        0,
+        1,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "buff logical name、贡献 source/key 与 buff-owned timer 分开；直接 Remove 不自动等同 RemoveDebuff/OnDetach，Extend 刷新也不表示再次安装。",
+          "basis_record_pointers": [
+            "/claims/6",
+            "/claims/7",
+            "/claims/10",
+            "/claims/11",
+            "/claims/12",
+            "/claims/13"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-07": {
+      "record_sha256": "66f027d1755436599bacb05a1b586c99c72f7f264fca771d1afc60734a9e8f2b",
+      "claim_indexes": [
+        0,
+        2,
+        3,
+        14,
+        16,
+        17,
+        23,
+        24
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "Timer 同名拒绝、Cooldown 重建自己的 task、两种 LongUpdate 暂停/边界处理分别消费。加载回调可以再次运行；离线补偿和奖励策略须由项目明示。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/2",
+            "/claims/3",
+            "/claims/14",
+            "/claims/16",
+            "/claims/17",
+            "/claims/24",
+            "/claims/27"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "NC-N004-FINAL-08": {
+      "record_sha256": "2d6368ecd26d4a6e87a52cbafa072542020354f3b275101df74402f981f7c104",
+      "claim_indexes": [
+        2,
+        10,
+        13,
+        14,
+        18,
+        25,
+        26
+      ],
+      "boundary_indexes": [
+        3,
+        4
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "普通非建筑菜单资格保留 KnowsRecipe(recipe) OR (CanLearn(recipe.name) AND CanPrototypeRecipe(recipe.level, accessible_tech_trees))，材料与 inventory-open 前提另行保留。合法 caller 链为 MakeRecipe → BUILD BufferedAction / locomotor:PushAction → ACTIONS.BUILD.fn → DoBuild；不能为取得效果绕开 caller 资格。MakeRecipe true 是提交，DoBuild 的 false/nil/true 与 partial earlier effects 分开；退款/补偿属于项目政策。",
+          "basis_record_pointers": [
+            "/claims/2",
+            "/claims/10",
+            "/claims/13",
+            "/claims/14",
+            "/claims/18",
+            "/claims/19",
+            "/claims/25",
+            "/claims/26",
+            "/claims/29"
+          ],
+          "verified_source_locators": [
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/components/builder.lua",
+              "sha256": "6abbfb50e48b1030d445dde162637021b0f74ab7833df80e67373d9227c62581",
+              "line_start": 1041,
+              "line_end": 1088,
+              "symbols": [
+                "Builder:MakeRecipeFromMenu"
+              ],
+              "canonical_artifact_reference": false
+            }
+          ]
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "Builder:MakeRecipe",
+          "receiver": "builder component",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/2",
+            "/claims/10",
+            "/claims/13",
+            "/claims/14",
+            "/claims/18",
+            "/claims/19",
+            "/claims/25",
+            "/claims/26",
+            "/claims/29"
+          ]
+        },
+        {
+          "symbol": "Builder:DoBuild",
+          "receiver": "builder component",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/2",
+            "/claims/10",
+            "/claims/13",
+            "/claims/14",
+            "/claims/18",
+            "/claims/19",
+            "/claims/25",
+            "/claims/26",
+            "/claims/29"
+          ]
+        }
+      ]
+    },
+    "NC-N004-FINAL-11": {
+      "record_sha256": "e9c2def84336035c7c64c414157a2fbab72daf708dad81c9fcae11b6b62a8578",
+      "claim_indexes": [
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "Rechargeable 保存未充满时的 base chargetime 与 absolute charge，不保存贡献 source/key 表。贡献是 additive 时间调整，重新加载后的贡献来源从当前装备/技能重建；自动 source 删除不等同 wrapper 通知。",
+          "basis_record_pointers": [
+            "/claims/22",
+            "/claims/23",
+            "/claims/24",
+            "/claims/25",
+            "/claims/26"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "N005-UI-C02": {
+      "record_sha256": "a3e98d189139ee10751383c89c0933b3eebe7bfd526243ea9d568cf42ef2391e",
+      "claim_indexes": [
+        0,
+        2,
+        3,
+        6,
+        9,
+        10,
+        11
+      ],
+      "boundary_indexes": [
+        1,
+        3
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "区分 Widget 与它承载的 widget.inst（EntityScript）。有效性与实体 listener/task 在 widget.inst 上核对，例如 widget.inst:IsValid() / ListenForEvent / RemoveEventCallback；Hide/Show/Kill 调用在 Widget 上。不要把示例的 self.inst:ListenForEvent 压成 Widget:ListenForEvent 或 Widget:IsValid。 订阅与初始 current render 是两步；getter fallback 值不是服务器 READY 的证明。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/2",
+            "/claims/3",
+            "/claims/9",
+            "/claims/10",
+            "/claims/11"
+          ],
+          "verified_source_locators": [
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/widgets/widget.lua",
+              "sha256": "252877399c8e6005c3a874207a2eb4d4ee8921d674514f8ad13425ac6c403edd",
+              "line_start": 1,
+              "line_end": 32,
+              "symbols": [
+                "Widget._ctor"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/widgets/widget.lua",
+              "sha256": "252877399c8e6005c3a874207a2eb4d4ee8921d674514f8ad13425ac6c403edd",
+              "line_start": 311,
+              "line_end": 334,
+              "symbols": [
+                "Widget:Hide",
+                "Widget:Show",
+                "Widget:Kill"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/entityscript.lua",
+              "sha256": "5884ee088475e9b89b82ae6dc33a747481aa38d9b052388fc58c9ac7d24851d7",
+              "line_start": 1774,
+              "line_end": 1776,
+              "symbols": [
+                "EntityScript:IsValid"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/entityscript.lua",
+              "sha256": "5884ee088475e9b89b82ae6dc33a747481aa38d9b052388fc58c9ac7d24851d7",
+              "line_start": 1188,
+              "line_end": 1230,
+              "symbols": [
+                "EntityScript:ListenForEvent",
+                "EntityScript:RemoveEventCallback"
+              ],
+              "canonical_artifact_reference": false
+            }
+          ]
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "IsValid",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/2",
+            "/claims/3",
+            "/claims/9",
+            "/claims/10",
+            "/claims/11"
+          ]
+        },
+        {
+          "symbol": "ListenForEvent",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/2",
+            "/claims/3",
+            "/claims/9",
+            "/claims/10",
+            "/claims/11"
+          ]
+        },
+        {
+          "symbol": "RemoveEventCallback",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/2",
+            "/claims/3",
+            "/claims/9",
+            "/claims/10",
+            "/claims/11"
+          ]
+        }
+      ]
+    },
+    "N005-UI-C03": {
+      "record_sha256": "8f370220094ca2a39034da8e7654570f1fc506ad9fcf40dbe6ccd2cc7afe525e",
+      "claim_indexes": [
+        0,
+        5,
+        6,
+        7,
+        9,
+        14,
+        15
+      ],
+      "boundary_indexes": [
+        1,
+        3
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "区分 Widget 与它承载的 widget.inst（EntityScript）。有效性与实体 listener/task 在 widget.inst 上核对，例如 widget.inst:IsValid() / ListenForEvent / RemoveEventCallback；Hide/Show/Kill 调用在 Widget 上。不要把示例的 self.inst:ListenForEvent 压成 Widget:ListenForEvent 或 Widget:IsValid。 Hide、close 停用与最终 Kill 不互换；解绑保留同一 fn、source、handle/focus slot 所有者。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/5",
+            "/claims/6",
+            "/claims/7",
+            "/claims/9",
+            "/claims/14",
+            "/claims/15"
+          ],
+          "verified_source_locators": [
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/widgets/widget.lua",
+              "sha256": "252877399c8e6005c3a874207a2eb4d4ee8921d674514f8ad13425ac6c403edd",
+              "line_start": 1,
+              "line_end": 32,
+              "symbols": [
+                "Widget._ctor"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/widgets/widget.lua",
+              "sha256": "252877399c8e6005c3a874207a2eb4d4ee8921d674514f8ad13425ac6c403edd",
+              "line_start": 311,
+              "line_end": 334,
+              "symbols": [
+                "Widget:Hide",
+                "Widget:Show",
+                "Widget:Kill"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/entityscript.lua",
+              "sha256": "5884ee088475e9b89b82ae6dc33a747481aa38d9b052388fc58c9ac7d24851d7",
+              "line_start": 1774,
+              "line_end": 1776,
+              "symbols": [
+                "EntityScript:IsValid"
+              ],
+              "canonical_artifact_reference": false
+            },
+            {
+              "origin": "previous_frozen_snapshot_verification_only",
+              "path": "../native-core-product-retrieval-wave-20261006/snapshot/vanilla/entityscript.lua",
+              "sha256": "5884ee088475e9b89b82ae6dc33a747481aa38d9b052388fc58c9ac7d24851d7",
+              "line_start": 1188,
+              "line_end": 1230,
+              "symbols": [
+                "EntityScript:ListenForEvent",
+                "EntityScript:RemoveEventCallback"
+              ],
+              "canonical_artifact_reference": false
+            }
+          ]
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "IsValid",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/5",
+            "/claims/6",
+            "/claims/7",
+            "/claims/9",
+            "/claims/14",
+            "/claims/15"
+          ]
+        },
+        {
+          "symbol": "ListenForEvent",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/5",
+            "/claims/6",
+            "/claims/7",
+            "/claims/9",
+            "/claims/14",
+            "/claims/15"
+          ]
+        },
+        {
+          "symbol": "RemoveEventCallback",
+          "receiver": "widget.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/5",
+            "/claims/6",
+            "/claims/7",
+            "/claims/9",
+            "/claims/14",
+            "/claims/15"
+          ]
+        },
+        {
+          "symbol": "Kill",
+          "receiver": "Widget",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/5",
+            "/claims/6",
+            "/claims/7",
+            "/claims/9",
+            "/claims/14",
+            "/claims/15"
+          ]
+        }
+      ]
+    },
+    "SLOT-CODE01": {
+      "record_sha256": "d4d92c0dbc2ee5760de9220ab24ec614c3d230babcc9966621b6472d2f44389a",
+      "claim_indexes": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "boundary_indexes": [
+        4
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "ItemTile 的绑定对象是 self.item，listener owner 是 tile.inst。SetOnQuantityChangedFn 收到 (tile,quantity)，itemtile_Refresh 收到 (item,dragging)；不能把两种 callback receiver 混用。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3",
+            "/claims/5"
+          ],
+          "verified_source_locators": []
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "ListenForEvent",
+          "receiver": "tile.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3",
+            "/claims/5"
+          ]
+        },
+        {
+          "symbol": "SetOnQuantityChangedFn",
+          "receiver": "ItemTile",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3",
+            "/claims/5"
+          ]
+        }
+      ]
+    },
+    "SLOT-CODE02": {
+      "record_sha256": "e5ed8178453aaefcf386ffe96978ac13047febb12739937510f166a57672edec",
+      "claim_indexes": [
+        0,
+        1,
+        2
+      ],
+      "boundary_indexes": [
+        4
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "使用 ItemSlot:SetTile 的 changed/same/nil 分支；old tile Kill 收尾的是 tile.inst 和被 Kill 的子 Widget，不是所引用 item 的任务。保留 EquipSlot 已有唯一 ontilechangedfn 装饰。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ],
+          "verified_source_locators": []
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "SetTile",
+          "receiver": "ItemSlot / inherited InvSlot and EquipSlot",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ]
+        },
+        {
+          "symbol": "ListenForEvent",
+          "receiver": "tile.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ]
+        }
+      ]
+    },
+    "SLOT-CODE03": {
+      "record_sha256": "9424563fa89ac0db41ff96918cf58352a31c40878eac69f86da506e8a655852c",
+      "claim_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "boundary_indexes": [
+        4
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "相同 item 身份触发 Refresh 与相同 tile 身份令 SetTile 跳过是两种判断。owner 在构造时固定；player swap 后何时退役旧显示、何时重建新 owner consumer 由实际项目生命周期锁定。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3"
+          ],
+          "verified_source_locators": []
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "ListenForEvent",
+          "receiver": "bar.inst (EntityScript)",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3"
+          ]
+        }
+      ]
+    },
+    "N007-MC-01": {
+      "record_sha256": "f17f2a0f63fed8209bf7bdc23b53b84c4f3dd244e26d12c93895624c646e9dc3",
+      "claim_indexes": [
+        0,
+        1,
+        2
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "env 包装第二参数是 get_local_config，不是 modname；跨 Mod 用 GLOBAL 原签名。只按 nil 补项目缺省，false/0/空串保留；临时映射与普通记录列表不能按名称相似合并。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ],
+          "verified_source_locators": []
+        }
+      ],
+      "receiver_bindings": [
+        {
+          "symbol": "env.GetModConfigData(optionname, get_local_config)",
+          "receiver": "Mod environment wrapper",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ]
+        },
+        {
+          "symbol": "GLOBAL.GetModConfigData(optionname, modname, get_local_config)",
+          "receiver": "GLOBAL original function",
+          "kind": "REC",
+          "consumption_hint": true,
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ]
+        }
+      ]
+    },
+    "STUI-P03": {
+      "record_sha256": "2e308e26c09277a048775f8fbdf32c1a2a0970a3b3d3eff7cfc9942f1bc85e31",
+      "claim_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "boundary_indexes": [],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "targetdata.inst 为真才切换 art target；没有自动 or prefabname 回退。BG art 用 resolved self.target，settings 用原 prefabname。颜色 nil→默认、false→不执行后续 SetTint；alpha nil/false→默认、0→保留，不统一强制布尔化。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2",
+            "/claims/3"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    },
+    "TR-C04": {
+      "record_sha256": "ceb7f86df48ced666d8ae91ff4f4a05bfb44adbb28a5c394ced786b6af353e23",
+      "claim_indexes": [
+        0,
+        1,
+        2
+      ],
+      "boundary_indexes": [
+        3,
+        4
+      ],
+      "critical_boundary": [
+        {
+          "kind": "REC",
+          "consumption_hint": true,
+          "statement": "WantsToAccept 保留 raw Lua 真值表达式；AcceptGift false 与 GIVE 在其正常返回后 true 可同时成立。回调已运行、接受效果与最终交付分别判断，不把所有信号压成 success/fail。",
+          "basis_record_pointers": [
+            "/claims/0",
+            "/claims/1",
+            "/claims/2"
+          ],
+          "verified_source_locators": []
+        }
+      ]
+    }
+  },
+  "record_variants": {
+    "NC-N003-INT-02": {
+      "9ad395b46f01cf67c1ecde8d21a18818ec23b8f8fbe639b381e42eef03e2f0a2": {
+        "record_sha256": "9ad395b46f01cf67c1ecde8d21a18818ec23b8f8fbe639b381e42eef03e2f0a2",
+        "claim_indexes": [
+          7,
+          8,
+          10,
+          11,
+          13,
+          17,
+          18
+        ],
+        "boundary_indexes": [
+          1,
+          3
+        ],
+        "critical_boundary": [
+          {
+            "kind": "REC",
+            "consumption_hint": true,
+            "statement": "动作可能分别由 locomotor.bufferedaction 与实体 bufferedaction 持有；取消前沿实际转交阶段确认 owner，Stop 与 Clear 不互换。DoAction 分发不等于 action.fn 已执行。",
+            "basis_record_pointers": [
+              "/claims/8",
+              "/claims/10",
+              "/claims/11",
+              "/claims/13",
+              "/claims/17",
+              "/claims/18"
+            ],
+            "verified_source_locators": []
+          }
+        ]
+      }
+    },
+    "NC-N004-FINAL-01": {
+      "f7745d6628243970ec740ea42957f5445cff2230fb4d7110ebb55186652cd19a": {
+        "record_sha256": "f7745d6628243970ec740ea42957f5445cff2230fb4d7110ebb55186652cd19a",
+        "claim_indexes": [
+          0,
+          9,
+          13,
+          15,
+          20,
+          21,
+          22
+        ],
+        "boundary_indexes": [],
+        "critical_boundary": [
+          {
+            "kind": "REC",
+            "consumption_hint": true,
+            "statement": "DoAttack 内部 CanHitTarget 是该效果入口的内部检查；除非项目明确选择新的资格规则，不能把它搬成外层 DoAttack 前的统一 gate。Weapon:OnAttack、Projectile:onhit 到达也不能改述成正 HP 损失。",
+            "basis_record_pointers": [
+              "/claims/0",
+              "/claims/9",
+              "/claims/13",
+              "/claims/15",
+              "/claims/20",
+              "/claims/22"
+            ],
+            "verified_source_locators": []
+          }
+        ]
+      }
+    },
+    "NC-N004-FINAL-02": {
+      "aaaed63ccf14c2b4691306a2e1430e226ba04a40563bd31b90139cc89cb8223c": {
+        "record_sha256": "aaaed63ccf14c2b4691306a2e1430e226ba04a40563bd31b90139cc89cb8223c",
+        "claim_indexes": [
+          1,
+          2,
+          3,
+          5,
+          8,
+          9,
+          10,
+          11
+        ],
+        "boundary_indexes": [
+          3
+        ],
+        "critical_boundary": [
+          {
+            "kind": "REC",
+            "consumption_hint": true,
+            "statement": "Hit/contact 的到达、目标死亡和目标 Remove 是不同观察。终局优先级由公开项目合同锁定；不能从该原版链默认发明 hitting 屏障。Miss 的 Stop 不停止 Physics；所选回调明确负责后续处置。",
+            "basis_record_pointers": [
+              "/claims/2",
+              "/claims/5",
+              "/claims/8",
+              "/claims/11",
+              "/claims/13"
+            ],
+            "verified_source_locators": []
+          }
+        ]
+      }
+    },
+    "NC-N004-FINAL-03": {
+      "9754f56fbb2251c506ba8cae5d3d0c201b9ce9409a7ad5626058e4a38f15fa87": {
+        "record_sha256": "9754f56fbb2251c506ba8cae5d3d0c201b9ce9409a7ad5626058e4a38f15fa87",
+        "claim_indexes": [
+          6,
+          8,
+          9,
+          18,
+          19,
+          20,
+          21
+        ],
+        "boundary_indexes": [],
+        "critical_boundary": [
+          {
+            "kind": "REC",
+            "consumption_hint": true,
+            "statement": "GetAttacked_Internal 的未 blocked 布尔返回、damageresolved、DoDelta amount 与最终净 HP 差分别保留。先由项目定义计分/吸血的采样阶段与重定向口径，不能将任一 native 返回命名成所有业务的 success。",
+            "basis_record_pointers": [
+              "/claims/6",
+              "/claims/8",
+              "/claims/9",
+              "/claims/18",
+              "/claims/19",
+              "/claims/21",
+              "/claims/22",
+              "/claims/25"
+            ],
+            "verified_source_locators": []
+          }
+        ]
+      }
+    },
+    "NC-N004-FINAL-11": {
+      "d18e2403bfcdf0e7a09873adee7d68f587d9433cd5f7f9085ff5f192317d052d": {
+        "record_sha256": "d18e2403bfcdf0e7a09873adee7d68f587d9433cd5f7f9085ff5f192317d052d",
+        "claim_indexes": [
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "boundary_indexes": [],
+        "critical_boundary": [
+          {
+            "kind": "REC",
+            "consumption_hint": true,
+            "statement": "Rechargeable 保存未充满时的 base chargetime 与 absolute charge，不保存贡献 source/key 表。贡献是 additive 时间调整，重新加载后的贡献来源从当前装备/技能重建；自动 source 删除不等同 wrapper 通知。",
+            "basis_record_pointers": [
+              "/claims/22",
+              "/claims/23",
+              "/claims/24",
+              "/claims/25",
+              "/claims/26"
+            ],
+            "verified_source_locators": []
+          }
+        ]
+      }
+    }
+  },
+  "variant_selection": "Exact original record value SHA256 only; unknown or supplied mismatched profiles fail closed. No source-epoch guessing or governance override."
+}

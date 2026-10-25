@@ -1,0 +1,2828 @@
+{
+  "candidates": [
+    {
+      "candidate_id": "NC-0011-01",
+      "canonical_id": null,
+      "candidate_name": "Prefab construction crosses a native bridge",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Lua SpawnPrefab calls TheSim:SpawnPrefab and resolves Ents[guid]. SpawnPrefabFromSim invokes prefab.fn; player fn calls Lua CreateEntity, which bridges to native entity creation. Lua does not contain the complete connection→creation dispatcher.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "SpawnPrefab",
+          "side": "Lua bridge; caller-dependent side",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function SpawnPrefab(name,",
+            "anchor_line": 403,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E01"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "SpawnPrefabFromSim",
+          "side": "engine callback entry; shared construction",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function SpawnPrefabFromSim(name)",
+            "anchor_line": 347,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E02"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "CreateEntity",
+          "side": "shared Lua/native entity bridge",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function CreateEntity(name)",
+            "anchor_line": 486,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E03"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn",
+          "side": "shared definition; master/remote branches",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function MakePlayerCharacter(",
+            "anchor_line": 1980,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E04"
+        }
+      ],
+      "scope": {
+        "description": "Installed snapshot; prefab construction bridge, not all engine callbacks.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "Engine callback producer: UNKNOWN FROM LUA SOURCE; Lua SpawnPrefab callers vary."
+      ],
+      "callees": [
+        "DIRECT: SpawnPrefab→TheSim:SpawnPrefab (native); SpawnPrefabFromSim→prefab.fn→CreateEntity."
+      ],
+      "what_it_proves": [
+        "Visible Lua constructor and callback bodies are distinct from engine entry/return edges."
+      ],
+      "what_it_does_not_prove": [
+        "Every connection starts by calling Lua SpawnPrefab; engine creates exactly one entity; GUID allocator policy."
+      ],
+      "engine_boundary": [
+        "EB-0011-01",
+        "EB-0011-07"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Observe native callback entry and first GUID/Ents availability without assigning an engine total order.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-02",
+      "canonical_id": null,
+      "candidate_name": "AllPlayers precedes common and master readiness",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Player fn inserts inst into AllPlayers immediately after CreateEntity. common_postinit runs before shared userid empty-string initialization and SetPristine; remote then returns. master_postinit and lifecycle wrapper installation occur only after the master branch.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn",
+          "side": "shared definition; master/remote branches",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function MakePlayerCharacter(",
+            "anchor_line": 1980,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E04"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: AllPlayers insertion",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "table.insert(AllPlayers, inst)",
+            "anchor_line": 2414,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E05"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: common_postinit",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "common_postinit(inst)",
+            "anchor_line": 2548,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E06"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: master_postinit",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "master_postinit(inst)",
+            "anchor_line": 2715,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E07"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: SetPristine and remote return",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst.entity:SetPristine()",
+            "anchor_line": 2623,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E08"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: lifecycle wrapper capture",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst._OnLoad = inst.OnLoad",
+            "anchor_line": 2946,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E09"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: userid initialization",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst.userid = \"\"",
+            "anchor_line": 1062,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E63"
+        }
+      ],
+      "scope": {
+        "description": "MakePlayerCharacter ordinary shared constructor, excluding event-mode custom branches as general guarantees.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: SpawnPrefabFromSim→registered player prefab.fn."
+      ],
+      "callees": [
+        "DIRECT: fn→CreateEntity; table.insert; common_postinit; SetPristine; conditional master_postinit."
+      ],
+      "what_it_proves": [
+        "AllPlayers membership and common_postinit are early construction facts; master-only callbacks do not execute in remote view branch."
+      ],
+      "what_it_does_not_prove": [
+        "AllPlayers means authenticated, owned, loaded, active or local; common_postinit sees final userid."
+      ],
+      "engine_boundary": [
+        "EB-0011-02"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record AllPlayers membership, userid, side axes, and common/master phases separately.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-03",
+        "NC-0011-09"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-03",
+      "canonical_id": null,
+      "candidate_name": "ms_playerspawn is an in-constructor server event",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "The master player fn emits ms_playerspawn after master_postinit and wrapper installation but before returning. In SpawnPrefabFromSim, SetPrefabName, Mod prefab post-inits, PrefabPostInitAny and entity_spawned execute after prefab.fn returns. New-spawn/resume completion is a separate engine callback path.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "SpawnPrefabFromSim",
+          "side": "engine callback entry; shared construction",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function SpawnPrefabFromSim(name)",
+            "anchor_line": 347,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E02"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: master_postinit",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "master_postinit(inst)",
+            "anchor_line": 2715,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E07"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: lifecycle wrapper capture",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst._OnLoad = inst.OnLoad",
+            "anchor_line": 2946,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E09"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: ms_playerspawn",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "TheWorld:PushEvent(\"ms_playerspawn\", inst)",
+            "anchor_line": 2977,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E10"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "SpawnNewPlayerOnServerFromSim",
+          "side": "server engine callback",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function SpawnNewPlayerOnServerFromSim(",
+            "anchor_line": 249,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E11"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeExistingUserSession",
+          "side": "master sim engine callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeExistingUserSession(data, guid)",
+            "anchor_line": 2074,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E15"
+        }
+      ],
+      "scope": {
+        "description": "Visible ordinary player fn + SpawnPrefabFromSim path; listeners may have effects of their own.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: player fn emits event; listener calls are EVENT edges."
+      ],
+      "callees": [
+        "EVENT: TheWorld ms_playerspawn; later DIRECT: SpawnPrefabFromSim post-init loops and entity_spawned."
+      ],
+      "what_it_proves": [
+        "This event is earlier than surrounding Mod post-init dispatch on the visible Lua path."
+      ],
+      "what_it_does_not_prove": [
+        "It guarantees final transform, load, starting items, owner, HUD, or completed Mod post-inits; it fixes engine callback interleaving."
+      ],
+      "engine_boundary": [
+        "EB-0011-01",
+        "EB-0011-02"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Compare in-constructor event with passive post-init/body-return markers; avoid assuming prefab naming finalized there.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-04",
+      "canonical_id": null,
+      "candidate_name": "OnNewSpawn is an entity new-spawn hook, not first-account join",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "SpawnNewPlayerOnServerFromSim selects Ents[player_guid], calls player.OnNewSpawn if present then clears it. Common OnNewSpawn gives starting inventory, invokes captured _OnNewSpawn() without forwarding starting_item_skins, clears hooks/inventory and emits ms_newplayerspawned. The world userid spawn history is consulted only for specific seasonal aid.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "SpawnNewPlayerOnServerFromSim",
+          "side": "server engine callback",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function SpawnNewPlayerOnServerFromSim(",
+            "anchor_line": 249,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E11"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnNewSpawn",
+          "side": "master sim new spawn",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnNewSpawn(inst, starting_item_skins)",
+            "anchor_line": 1480,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E12"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: lifecycle wrapper capture",
+          "side": "master sim constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst._OnLoad = inst.OnLoad",
+            "anchor_line": 2946,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E09"
+        }
+      ],
+      "scope": {
+        "description": "Master new-spawn callback; common wrapper captures character hook; seasonal helper scope is limited.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE CALLBACK: SpawnNewPlayerOnServerFromSim; DIRECT: player.OnNewSpawn."
+      ],
+      "callees": [
+        "DIRECT: common OnNewSpawn→starting inventory helper→_OnNewSpawn(); EVENT: ms_newplayerspawned."
+      ],
+      "what_it_proves": [
+        "Native one-shot hook and starting item path are per current entity invocation; userid-history and hook existence are separate checks."
+      ],
+      "what_it_does_not_prove": [
+        "A userid has never joined before; account identity is newly created; hook always runs on every resume; starting skins are forwarded to character hook."
+      ],
+      "engine_boundary": [
+        "EB-0011-01",
+        "EB-0011-02"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Compare new entity with existing-user resume; record hook presence and item grants, not only userid.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-05",
+        "NC-0011-07"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-05",
+      "canonical_id": null,
+      "candidate_name": "Resume loads an already indexed entity and disables new-spawn hooks",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "ResumeExistingUserSession reads Ents[guid]; on server it calls SetPersistData(data.data or {}), EnableLoadingProtection, resolves saved position and invokes SpawnAtLocation(..., true). Common player OnLoad clears OnNewSpawn, _OnNewSpawn and starting_inventory before captured _OnLoad(data). This body does not call player OnNewSpawn.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeExistingUserSession",
+          "side": "master sim engine callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeExistingUserSession(data, guid)",
+            "anchor_line": 2074,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E15"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityscript.lua",
+          "symbol": "EntityScript:SetPersistData",
+          "side": "shared method; here master resume",
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "supporting_locator": {
+            "anchor": "function EntityScript:SetPersistData(data, newents)",
+            "anchor_line": 1954,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E16"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnLoad",
+          "side": "master sim load wrapper",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnLoad(inst, data)",
+            "anchor_line": 1265,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E13"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/playerspawner.lua",
+          "symbol": "SpawnAtLocation",
+          "side": "master world",
+          "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+          "supporting_locator": {
+            "anchor": "function self:SpawnAtLocation(inst, player, x, y, z, isloading)",
+            "anchor_line": 238,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E18"
+        }
+      ],
+      "scope": {
+        "description": "Successful server resume callback for supplied existing guid; distinct from ordinary SpawnSaveRecord body reconstruction.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE CALLBACK: ResumeExistingUserSession producer/deserialize selection unknown."
+      ],
+      "callees": [
+        "DIRECT: SetPersistData→player preload/component load/player OnLoad; then SpawnAtLocation(isloading=true)."
+      ],
+      "what_it_proves": [
+        "Resume Lua body consumes an existing indexed player and enters load/placement branch."
+      ],
+      "what_it_does_not_prove": [
+        "The engine never constructs a new physical entity before this callback; every possible resume data executes all character hooks; missing guid is a new spawn."
+      ],
+      "engine_boundary": [
+        "EB-0011-01",
+        "EB-0011-06"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Success/failure resume traces with hook markers; account continuity and entity continuity logged independently.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-04",
+        "NC-0011-06"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-06",
+      "canonical_id": null,
+      "candidate_name": "Player load wrapper and component load have different parameter contracts",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "SetPersistData invokes prefab OnPreLoad, traverses component data using pairs with cmp:OnLoad(v,newents), then prefab OnLoad. Common player wrappers call captured _OnPreLoad(data) and _OnLoad(data) without forwarding newents. Ordinary ResumeExistingUserSession invokes SetPersistData without a newents argument and does not invoke LoadPostPass in that body.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityscript.lua",
+          "symbol": "EntityScript:SetPersistData",
+          "side": "shared method; here master resume",
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "supporting_locator": {
+            "anchor": "function EntityScript:SetPersistData(data, newents)",
+            "anchor_line": 1954,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E16"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnPreLoad",
+          "side": "master sim preload wrapper",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnPreLoad(inst, data)",
+            "anchor_line": 1255,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E14"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnLoad",
+          "side": "master sim load wrapper",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnLoad(inst, data)",
+            "anchor_line": 1265,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E13"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeExistingUserSession",
+          "side": "master sim engine callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeExistingUserSession(data, guid)",
+            "anchor_line": 2074,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E15"
+        }
+      ],
+      "scope": {
+        "description": "Visible SetPersistData and player wrappers; nested inventory entities can use other load/postpass paths.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: ResumeExistingUserSession→SetPersistData."
+      ],
+      "callees": [
+        "DIRECT: OnPreLoad→pairs component OnLoad→OnLoad; wrappers→captured character callbacks."
+      ],
+      "what_it_proves": [
+        "Prefab pre/component/post order and wrapper argument shape; component iteration is not a fixed component order."
+      ],
+      "what_it_does_not_prove": [
+        "All persistence callbacks receive newents; player resume has a full world newents/PostPass contract; no nested entity postpass occurs anywhere."
+      ],
+      "engine_boundary": [
+        "EB-0011-06"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record exact argument presence and component/prefab boundaries without adding a newents table.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-05"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-07",
+      "canonical_id": null,
+      "candidate_name": "New/load hooks precede visible final placement; serialization is a bridge request",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "New-spawn callback performs OnNewSpawn and skill selection before SpawnAtNextLocation and SerializeUserSession(true). Resume performs SetPersistData before ResolveSaveRecordPosition and SpawnAtLocation(isloading=true). SerializeUserSession prepares save data/metadata and calls TheNet:SerializeUserSession; it exposes no disk-completion callback here.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "SpawnNewPlayerOnServerFromSim",
+          "side": "server engine callback",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function SpawnNewPlayerOnServerFromSim(",
+            "anchor_line": 249,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E11"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnNewSpawn",
+          "side": "master sim new spawn",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnNewSpawn(inst, starting_item_skins)",
+            "anchor_line": 1480,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E12"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeExistingUserSession",
+          "side": "master sim engine callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeExistingUserSession(data, guid)",
+            "anchor_line": 2074,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E15"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/playerspawner.lua",
+          "symbol": "SpawnAtNextLocation",
+          "side": "master world",
+          "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+          "supporting_locator": {
+            "anchor": "function self:SpawnAtNextLocation(inst, player)",
+            "anchor_line": 232,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E17"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/playerspawner.lua",
+          "symbol": "SpawnAtLocation",
+          "side": "master world",
+          "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+          "supporting_locator": {
+            "anchor": "function self:SpawnAtLocation(inst, player, x, y, z, isloading)",
+            "anchor_line": 238,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E18"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "SerializeUserSession",
+          "side": "server or remote local client",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function SerializeUserSession(player, isnewspawn)",
+            "anchor_line": 303,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E19"
+        }
+      ],
+      "scope": {
+        "description": "Synchronous statements in successful callback branches; placement helper may emit further events/tasks.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: new/resume callbacks."
+      ],
+      "callees": [
+        "DIRECT: playerspawner placement methods; NATIVE BOUNDARY: TheNet:SerializeUserSession."
+      ],
+      "what_it_proves": [
+        "A hook invocation alone is not a final-placement marker; visible serialization request occurs after new-spawn placement helper call."
+      ],
+      "what_it_does_not_prove": [
+        "Filesystem commit/durability; deserialize timing; owner relative to placement; all later native relocation is absent."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-06"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record entry/exit transforms and request marker; never label request return as disk save complete.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-08",
+      "canonical_id": null,
+      "candidate_name": "OnSetOwner refreshes Lua identity from Network and selects local resources",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "OnSetOwner reads Network name/userid/colour, updates userid tags; master sets IsClientInWorld and classified target. Player control components are selected by master or inst==ThePlayer; HUD/active-local setup uses inst==ThePlayer with seamless-target handling. The setowner event producer and native owner revocation contract are not defined in these Lua bodies.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: userid initialization",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst.userid = \"\"",
+            "anchor_line": 1062,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E63"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: classified spawn",
+          "side": "master sim",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst.player_classified = SpawnPrefab(\"player_classified\")",
+            "anchor_line": 2657,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E27"
+        }
+      ],
+      "scope": {
+        "description": "Player setowner listener body on master/remote; ordinary ownership and cleanup branches.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "EVENT: setowner→OnSetOwner; native producer UNKNOWN."
+      ],
+      "callees": [
+        "NATIVE: Network getters/SetClassifiedTarget; DIRECT: local HUD/component registration; TASK: ActivatePlayer."
+      ],
+      "what_it_proves": [
+        "Lua userid/tag refresh and local/server branch predicates."
+      ],
+      "what_it_does_not_prove": [
+        "Userid authenticates a current connection; setowner only fires once; owner loss always destroys entity; OnSetOwner fixes when ThePlayer is initially assigned."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-03",
+        "EB-0011-04"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Separate owner callback begin/end, userid changes, local-pointer predicate and target request.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-09",
+        "NC-0011-10",
+        "NC-0011-11"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-09",
+      "canonical_id": null,
+      "candidate_name": "Client metadata, shard-visible player entity and account key are different identities",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "LookupPlayerInstByUserID scans this process AllPlayers. GetPlayerClientTable wraps TheNet:GetClientTable and conditionally removes dedicated host metadata identified by performance. ClientAuthenticationComplete and ClientDisconnected bridge userid into different world events. None of these bodies establishes an account↔connection↔entity↔shard global bijection.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: AllPlayers insertion",
+          "side": "shared constructor",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "table.insert(AllPlayers, inst)",
+            "anchor_line": 2414,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E05"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "LookupPlayerInstByUserID",
+          "side": "current process AllPlayers",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function LookupPlayerInstByUserID(userid)",
+            "anchor_line": 918,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E21"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "GetPlayerClientTable",
+          "side": "network metadata wrapper",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function GetPlayerClientTable()",
+            "anchor_line": 927,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E22"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "ClientAuthenticationComplete",
+          "side": "engine callback; world event bridge",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function ClientAuthenticationComplete(userid)",
+            "anchor_line": 945,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E23"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "ClientDisconnected",
+          "side": "engine callback; world event bridge",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function ClientDisconnected(userid)",
+            "anchor_line": 951,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E24"
+        }
+      ],
+      "scope": {
+        "description": "Lua identity usage in current process/shard; native table schema/connection lifetime remains boundary.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE CALLBACK: authentication/disconnect; DIRECT: metadata/entity lookup callers."
+      ],
+      "callees": [
+        "EVENT: ms_clientauthenticationcomplete/ms_clientdisconnected; NATIVE: GetClientTable."
+      ],
+      "what_it_proves": [
+        "Userid is used as an account-like session key; GUID identifies indexed entity; metadata table and entity collection serve different functions."
+      ],
+      "what_it_does_not_prove": [
+        "Each ClientTable row has live entity; AllPlayers spans every shard; same userid means same entity or same connection; GUID stable across replacements."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-07"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Log metadata presence, AllPlayers membership and entity GUID independently; anonymize userid consistently.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-10",
+      "canonical_id": null,
+      "candidate_name": "ThePlayer is a process-local pointer with explicit temporary and swap paths",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Visible Lua temporarily sets ThePlayer during seamless replication and console execution and explicitly changes it during local seamless ActivatePlayer. Initial ordinary assignment/clear is not established by these bodies. OnSetOwner tests equality with ThePlayer to enter local setup; the pointer is not an account registry.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ReplicateEntity",
+          "side": "client/global replication callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ReplicateEntity(guid)",
+            "anchor_line": 814,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E25"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ExecuteConsoleCommand",
+          "side": "console context",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ExecuteConsoleCommand(",
+            "anchor_line": 2135,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E26"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "ActivatePlayer",
+          "side": "local activation and seamless handoff",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function ActivatePlayer(inst)",
+            "anchor_line": 788,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E44"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        }
+      ],
+      "scope": {
+        "description": "Normal local-pointer boundary and visible special assignments; not a guarantee about every native write.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE: ordinary assignment UNKNOWN; DIRECT: ReplicateEntity/ExecuteConsoleCommand/ActivatePlayer."
+      ],
+      "callees": [
+        "DIRECT: entity ReplicateEntity / console body / seamless UnregisterHUD→pointer swap→ActivateHUD."
+      ],
+      "what_it_proves": [
+        "ThePlayer equality selects local context and can change inside specific Lua paths."
+      ],
+      "what_it_does_not_prove": [
+        "Non-nil ThePlayer implies HUD/classified/handshake ready; server must have local player; pointer cannot be temporarily replaced."
+      ],
+      "engine_boundary": [
+        "EB-0011-03"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Capture pointer at callback entry/exit and outside temporary contexts; distinguish old/new GUID.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-11",
+      "canonical_id": null,
+      "candidate_name": "Classified create, parent and owner target are separate operations",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Master player construction SpawnPrefabs player_classified and sets its entity parent; OnSetOwner separately calls SetClassifiedTarget(inst). Remote classified OnEntityReplicated reads native parent then attaches to player and selected replicas/components. Classified has CLASSIFIED/network/invisible presentation setup; native visibility routing is outside Lua.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn: classified spawn",
+          "side": "master sim",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "inst.player_classified = SpawnPrefab(\"player_classified\")",
+            "anchor_line": 2657,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E27"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "OnEntityReplicated",
+          "side": "remote classified view",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function OnEntityReplicated(inst)",
+            "anchor_line": 247,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E28"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "fn: register task",
+          "side": "classified constructor",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "inst:DoStaticTaskInTime(0, RegisterNetListeners)",
+            "anchor_line": 1635,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E65"
+        }
+      ],
+      "scope": {
+        "description": "Master construction versus remote attachment; CLASSIFIED routing values not inferred beyond callsites.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: player fn create/parent; EVENT: setowner target; ENGINE CALLBACK: remote replication."
+      ],
+      "callees": [
+        "DIRECT: player AttachClassified and replica attachments; NATIVE: SetParent/GetParent/SetClassifiedTarget."
+      ],
+      "what_it_proves": [
+        "Create/parent/target-request/remote-attach have distinct Lua sites."
+      ],
+      "what_it_does_not_prove": [
+        "Every client sees every classified; target request means delivered; parent is always available before scheduled consumers; attachment equals all values initialized."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-04"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Observe parent/target request and remote parent callback separately; avoid inducing an artificial parent delay.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-12",
+      "canonical_id": null,
+      "candidate_name": "Raw replica, public replica visibility and attached classified are independent conditions",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "ReplicateComponent can construct an object in replica._. Public replica lookup validates the _component tag. TryAttachClassifiedToReplicaComponent accesses replica._ directly, including pre-replicated or unreplicated components. UnreplicateComponent updates tags but does not remove the raw object in that body. AddComponent replicates before instantiating/mounting authoritative component.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityreplica.lua",
+          "symbol": "EntityScript:ReplicateComponent",
+          "side": "master and remote",
+          "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+          "supporting_locator": {
+            "anchor": "function EntityScript:ReplicateComponent(name)",
+            "anchor_line": 34,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E30"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityreplica.lua",
+          "symbol": "EntityScript:ValidateReplicaComponent",
+          "side": "public replica visibility gate",
+          "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+          "supporting_locator": {
+            "anchor": "function EntityScript:ValidateReplicaComponent(name, cmp)",
+            "anchor_line": 30,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E31"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityreplica.lua",
+          "symbol": "EntityScript:TryAttachClassifiedToReplicaComponent",
+          "side": "attachment, raw replica access",
+          "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+          "supporting_locator": {
+            "anchor": "function EntityScript:TryAttachClassifiedToReplicaComponent(classified, name)",
+            "anchor_line": 88,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E32"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityscript.lua",
+          "symbol": "EntityScript:AddComponent",
+          "side": "shared component construction",
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "supporting_locator": {
+            "anchor": "function EntityScript:AddComponent(name)",
+            "anchor_line": 610,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E33"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityreplica.lua",
+          "symbol": "EntityScript:ReplicateEntity",
+          "side": "replication callback raw replica creation",
+          "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+          "supporting_locator": {
+            "anchor": "function EntityScript:ReplicateEntity()",
+            "anchor_line": 75,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E61"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityreplica.lua",
+          "symbol": "EntityScript:UnreplicateComponent",
+          "side": "replica tag removal",
+          "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+          "supporting_locator": {
+            "anchor": "function EntityScript:UnreplicateComponent(name)",
+            "anchor_line": 62,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E62"
+        }
+      ],
+      "scope": {
+        "description": "Native entity replica Lua layer; raw storage is implementation evidence, not a recommended public Mod interface.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: AddComponent/ReplicateEntity/TryAttachClassifiedToReplicaComponent."
+      ],
+      "callees": [
+        "DIRECT: replica factory; ValidateReplicaComponent tag gate; AttachClassified on raw object."
+      ],
+      "what_it_proves": [
+        "Object allocation, public availability, component mount and classified attachment are not equivalent predicates."
+      ],
+      "what_it_does_not_prove": [
+        "Public nil means raw object absent; raw object proves authoritative component exists; raw access is a Mod best practice."
+      ],
+      "engine_boundary": [
+        "EB-0011-04"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Read-only record raw/public/attached booleans alongside tags, never alter tags or raw objects.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-13"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-13",
+      "canonical_id": null,
+      "candidate_name": "Initial classified application is scheduled and does not constitute a HUD barrier",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Classified fn schedules static RegisterNetListeners(0). RegisterNetListeners selects master/local/common listeners and calls OnInitialDirtyStates. OnInitialDirtyStates applies selected dirty functions and seeds old health state; OnGhostModeDirty only touches HUD when parent and HUD exist. It is not a universal all-netvars-ready callback or proof every HUD refresh was consumed.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "fn: register task",
+          "side": "classified constructor",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "inst:DoStaticTaskInTime(0, RegisterNetListeners)",
+            "anchor_line": 1635,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E65"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "RegisterNetListeners",
+          "side": "master/local/common listener dispatch",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function RegisterNetListeners(inst)",
+            "anchor_line": 1258,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E34"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "fns.OnInitialDirtyStates",
+          "side": "initial local/common application",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "function fns.OnInitialDirtyStates(inst)",
+            "anchor_line": 1286,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E35"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "OnGhostModeDirty",
+          "side": "local HUD conditional consumer",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function OnGhostModeDirty(inst)",
+            "anchor_line": 815,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E37"
+        }
+      ],
+      "scope": {
+        "description": "Current classified listener/application functions and guarded HUD consumers.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "TASK: classified fn→RegisterNetListeners."
+      ],
+      "callees": [
+        "DIRECT: dispatch listener registration→OnInitialDirtyStates→selected dirty handlers."
+      ],
+      "what_it_proves": [
+        "Scheduled registration/application differs from attachment and from HUD consumer execution."
+      ],
+      "what_it_does_not_prove": [
+        "Task delay establishes engine replication completion; every initial value produces dirty event; ghost initial application necessarily finds HUD."
+      ],
+      "engine_boundary": [
+        "EB-0011-04",
+        "EB-0011-05",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Capture initial apply entry/exit and ghost/HUD guard result; observe source of first visible state.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-14",
+      "canonical_id": null,
+      "candidate_name": "Initial health display reads current replica rather than requiring first healthdelta",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Classified OnInitialDirtyStates seeds _oldhealthpercent (with max>0 guard) without calling OnHealthDirty. StatusDisplays OnSetPlayerMode listens then reads health:GetPercent and health limits. Health replica may return fallback values without classified; health GetPercent/dirty current÷max do not share that initial max>0 guard.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "fns.OnInitialDirtyStates",
+          "side": "initial local/common application",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "function fns.OnInitialDirtyStates(inst)",
+            "anchor_line": 1286,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E35"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "OnHealthDirty",
+          "side": "classified listener, parent health view",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function OnHealthDirty(inst)",
+            "anchor_line": 264,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E36"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/health_replica.lua",
+          "symbol": "Health:Max",
+          "side": "master component/classified/fallback read",
+          "file_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+          "supporting_locator": {
+            "anchor": "function Health:Max()",
+            "anchor_line": 70,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E39"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/health_replica.lua",
+          "symbol": "Health:GetPercent",
+          "side": "replica gameplay view read",
+          "file_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+          "supporting_locator": {
+            "anchor": "function Health:GetPercent()",
+            "anchor_line": 90,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E40"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "widgets/statusdisplays.lua",
+          "symbol": "OnSetPlayerMode",
+          "side": "local HUD scheduled consumer",
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "supporting_locator": {
+            "anchor": "local function OnSetPlayerMode(inst, self)",
+            "anchor_line": 16,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E41"
+        }
+      ],
+      "scope": {
+        "description": "Health example only, including master-component/classified/default branches.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "TASK: StatusDisplays mode task→OnSetPlayerMode; EVENT: classified health dirty later."
+      ],
+      "callees": [
+        "DIRECT: health:GetPercent/Max/GetPenaltyPercent; EVENT: healthdelta from OnHealthDirty."
+      ],
+      "what_it_proves": [
+        "The initial HUD read and subsequent healthdelta are separate paths; a numeric fallback is not evidence of received server state."
+      ],
+      "what_it_does_not_prove": [
+        "All replicas share health defaults; max zero occurs in natural gameplay; division path is a confirmed runtime bug; initial fallback is final authoritative value."
+      ],
+      "engine_boundary": [
+        "EB-0011-05"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Log first health read source/values and classified attachment; max-zero is observation, not injected native claim.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-15",
+      "canonical_id": null,
+      "candidate_name": "HUD binding is synchronous but some display setup is a later task",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "ActivateHUD creates PlayerHud then calls SetMainCharacter. SetMainCharacter stores owner/maincharacter.HUD and creates Controls. StatusDisplays sets initial player mode using a scheduled task. Presence of HUD/Controls alone does not prove every status listener/read has executed or replicated state is valid.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "ActivateHUD",
+          "side": "local player HUD",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function ActivateHUD(inst)",
+            "anchor_line": 740,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E42"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "screens/playerhud.lua",
+          "symbol": "PlayerHud:SetMainCharacter",
+          "side": "local HUD binding",
+          "file_sha256": "529bdd322dd5b3eef76ea28ecf7f567e507360f641cd509503bc8615988d1dc1",
+          "supporting_locator": {
+            "anchor": "function PlayerHud:SetMainCharacter(maincharacter)",
+            "anchor_line": 915,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E43"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "widgets/statusdisplays.lua",
+          "symbol": "OnSetPlayerMode",
+          "side": "local HUD scheduled consumer",
+          "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+          "supporting_locator": {
+            "anchor": "local function OnSetPlayerMode(inst, self)",
+            "anchor_line": 16,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E41"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        }
+      ],
+      "scope": {
+        "description": "Local ordinary HUD setup and seamless local rebuild; specific health/status consumer.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: local OnSetOwner or seamless ActivatePlayer→ActivateHUD."
+      ],
+      "callees": [
+        "DIRECT: PlayerHud→SetMainCharacter→Controls; TASK: StatusDisplays mode setup."
+      ],
+      "what_it_proves": [
+        "Visible synchronous HUD ownership/Controls setup and a distinct delayed display step."
+      ],
+      "what_it_does_not_prove": [
+        "Any world player entity has HUD; Controls presence is final network readiness; AddPrefabPostInit or playeractivated is a universal safe state-read point."
+      ],
+      "engine_boundary": [
+        "EB-0011-05",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Log HUD and Controls creation separately from first mode-task/state consumption.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-16",
+      "canonical_id": null,
+      "candidate_name": "Activation emits two local event forms before initiating handshake",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "ActivatePlayer clears activatetask, conditionally activates classified minimap, emits entity playeractivated without player payload, emits world playeractivated with inst, then calls PostActivateHandshake(CTS_LOADED). The classified nil guard permits continuing past the minimap branch. Ordinary local ActivatePlayer was scheduled by OnSetOwner after local setup.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "ActivatePlayer",
+          "side": "local activation and seamless handoff",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function ActivatePlayer(inst)",
+            "anchor_line": 788,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E44"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "gamelogic.lua",
+          "symbol": "OnPlayerActivated",
+          "side": "local input/fade consumer",
+          "file_sha256": "e6965af1ac127dc4742f9affc896dd251e2ad40fb220f951e0641ca2e534c9b3",
+          "supporting_locator": {
+            "anchor": "local function OnPlayerActivated",
+            "anchor_line": 720,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E59"
+        }
+      ],
+      "scope": {
+        "description": "Visible completed local activation body; event listeners can synchronously affect state.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "TASK: OnSetOwner→ActivatePlayer; local seamless branch also inside body."
+      ],
+      "callees": [
+        "EVENT: inst playeractivated→world playeractivated; DIRECT: PostActivateHandshake CTS_LOADED."
+      ],
+      "what_it_proves": [
+        "This same-body local event/handshake order and different event sources/payloads."
+      ],
+      "what_it_does_not_prove": [
+        "Activation is server all-players spawn event; player_classified non-nil is explicitly required here; READY already reached; every gameplay component/netvar/HUD consumer stable."
+      ],
+      "engine_boundary": [
+        "EB-0011-04",
+        "EB-0011-05",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Assert same-process entry/event/call order, record attachment and UI predicates as separate observations.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-17",
+        "NC-0011-19"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-17",
+      "canonical_id": null,
+      "candidate_name": "Native handshake is per-side increasing state with specific skill/settings effects",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Client/server handlers each reject state<=current or state>READY; they do not require state==current+1. Client CTS backs up skill data and synchronizes settings; client STC invokes READY; client READY enables skill-data saving and emits skilltreeinitialized_client. Server CTS dispatches STC; server STC sends skill blob; server READY emits ms_skilltreeinitialized. Remote client READY occurs before its READY RPC send; server READY is separate.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "PostActivateHandshake",
+          "side": "host/server/remote local dispatch",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function PostActivateHandshake(inst, state)",
+            "anchor_line": 1101,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E45"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "OnPostActivateHandshake_Client",
+          "side": "client/local host state handler",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function OnPostActivateHandshake_Client(inst, state)",
+            "anchor_line": 1061,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E46"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "OnPostActivateHandshake_Server",
+          "side": "server/local host state handler",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function OnPostActivateHandshake_Server(inst, state)",
+            "anchor_line": 1081,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E47"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "skilltreedata.lua",
+          "symbol": "SkillTreeData:OPAH_DoBackup",
+          "side": "local client skill data",
+          "file_sha256": "0e12f1de006a68b0eaebe32ce02e11e13b5bd950a85c9963f24a2e8661fab790",
+          "supporting_locator": {
+            "anchor": "function SkillTreeData:OPAH_DoBackup()",
+            "anchor_line": 200,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E48"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "skilltreedata.lua",
+          "symbol": "SkillTreeData:OPAH_Ready",
+          "side": "local client skill data",
+          "file_sha256": "0e12f1de006a68b0eaebe32ce02e11e13b5bd950a85c9963f24a2e8661fab790",
+          "supporting_locator": {
+            "anchor": "function SkillTreeData:OPAH_Ready()",
+            "anchor_line": 221,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E49"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/skilltreeupdater.lua",
+          "symbol": "SkillTreeUpdater:SendFromSkillTreeBlob",
+          "side": "server skill blob dispatch",
+          "file_sha256": "6fe384c79e0c0e535378716dd21cf4dce6289e91a182b939b01f65fe8a7cbfbb",
+          "supporting_locator": {
+            "anchor": "function SkillTreeUpdater:SendFromSkillTreeBlob(inst)",
+            "anchor_line": 246,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E50"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networkclientrpc.lua",
+          "symbol": "RPCHandlers.PostActivateHandshake",
+          "side": "server RPC handler",
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "supporting_locator": {
+            "anchor": "PostActivateHandshake = function(player, state)",
+            "anchor_line": 1196,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E51"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networkclientrpc.lua",
+          "symbol": "CLIENT_RPC_HANDLERS.PostActivateHandshake",
+          "side": "remote client RPC handler",
+          "file_sha256": "15e15bc15d5a2fa6de5465f65a60092e8077e95bb94c4a56349438ebfbf8ed37",
+          "supporting_locator": {
+            "anchor": "PostActivateHandshake = function(state)",
+            "anchor_line": 1512,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E52"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "constants.lua",
+          "symbol": "POSTACTIVATEHANDSHAKE",
+          "side": "shared enum",
+          "file_sha256": "4c7e9be82d569874218c080d5c50215811057128d127ec193b444682c6791fd2",
+          "supporting_locator": {
+            "anchor": "POSTACTIVATEHANDSHAKE =",
+            "anchor_line": 2773,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E64"
+        }
+      ],
+      "scope": {
+        "description": "States NONE=0/CTS=1/STC=2/READY=3 on native post-activation protocol; statement is about visible handlers, not transport guarantees.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: ActivatePlayer; RPC: server player handler/client current ThePlayer handler."
+      ],
+      "callees": [
+        "DIRECT: OPAH/settings/blob-send and native events; TRANSPORT: RPC state delivery."
+      ],
+      "what_it_proves": [
+        "Accepted-state guard and direct consumers; client/server state storage and terminal events differ."
+      ],
+      "what_it_does_not_prove": [
+        "READY is all-Mod initialization barrier; engine blob/RPC delivery or application globally ordered; guard validates predecessor exactly; static state skip proves a network vulnerability."
+      ],
+      "engine_boundary": [
+        "EB-0011-05",
+        "EB-0011-09"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Log both state variables, blob dispatch/application and separate READY events; do not assert cross-process total order.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-18",
+      "canonical_id": null,
+      "candidate_name": "Host local, server remote, dedicated and remote views follow different dispatch",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "PostActivateHandshake uses ismastersim, IsDedicated and inst==ThePlayer: master nonlocal/dedicated runs server handler and sends client RPC; master local schedules client then server handlers; remote local runs client handler and sends server RPC; remote other view has no dispatch branch. ismastershard is a separate axis, not the authority/locality predicate used here.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "PostActivateHandshake",
+          "side": "host/server/remote local dispatch",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function PostActivateHandshake(inst, state)",
+            "anchor_line": 1101,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E45"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "MakePlayerCharacter/fn",
+          "side": "shared definition; master/remote branches",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function MakePlayerCharacter(",
+            "anchor_line": 1980,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E04"
+        }
+      ],
+      "scope": {
+        "description": "Five context matrix; evaluate predicates at call time; dedicated branch requires inst.userid truthiness as written.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: PostActivateHandshake caller in local activation; server/client RPC relay."
+      ],
+      "callees": [
+        "TASK: host local client→server handlers; DIRECT+RPC: other master/remote local paths."
+      ],
+      "what_it_proves": [
+        "Specific branch selection and host task-vs-remote RPC difference."
+      ],
+      "what_it_does_not_prove": [
+        "Host success proves remote client; master shard equals master sim; dedicated clients have HUD server-side; ismastershard is irrelevant to all DST systems."
+      ],
+      "engine_boundary": [
+        "EB-0011-08",
+        "EB-0011-09"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record all four side axes for every marker in all five contexts.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-19",
+      "canonical_id": null,
+      "candidate_name": "Pending activation cancellation returns without deactivated events",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "DeactivatePlayer cancels and clears non-nil activatetask then immediately returns. With no pending task it follows client local save-cache branch and emits entity/world playerdeactivated. Player OnRemoveEntity handles classified/AllPlayers/HUD/deactivation cleanup; EntityScript Remove separately cancels entity tasks/listeners and retires native entity.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "DeactivatePlayer",
+          "side": "local cancel/deactivation",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function DeactivatePlayer(inst)",
+            "anchor_line": 762,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E53"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "UnregisterHUD",
+          "side": "local HUD teardown",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function UnregisterHUD(inst)",
+            "anchor_line": 781,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E54"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnRemoveEntity",
+          "side": "master/remote player cleanup",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnRemoveEntity(inst)",
+            "anchor_line": 1163,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E55"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "entityscript.lua",
+          "symbol": "EntityScript:Remove",
+          "side": "shared removal; native retire boundary",
+          "file_sha256": "df52c6816fce28d22ed6fe5004575044da8fcf84a8a834ec14ef92aca3fe7501",
+          "supporting_locator": {
+            "anchor": "function EntityScript:Remove()",
+            "anchor_line": 1705,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E56"
+        }
+      ],
+      "scope": {
+        "description": "Visible local cancellation/teardown branch and entity cleanup; natural cancellation frequency not verified.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: UnregisterHUD; player OnRemoveEntity; EVENT/ENGINE exit trigger may vary."
+      ],
+      "callees": [
+        "DIRECT: task Cancel and early return OR events; entity Remove cleanup/Retire boundary."
+      ],
+      "what_it_proves": [
+        "Deactivation events are not guaranteed for a pending activation cancelled through this function."
+      ],
+      "what_it_does_not_prove": [
+        "Every disconnect reaches this branch; no stale callback can execute after native cancellation; exact engine disconnect/remove order."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Controlled contract test must first observe pending handle; natural fast-disconnect miss is not a pass.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-20",
+      "canonical_id": null,
+      "candidate_name": "Resume failure and disconnect events do not prove full activation-exit order",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "ResumeRequestLoadComplete(false) deletes local user-session cache and opens character-select lobby path. ClientDisconnected(userid) only bridges a world ms_clientdisconnected event in this body. OnSetOwner has explicit local/nonlocal cleanup branches, but owner revocation/event/remove ordering during activation is not established by Lua.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeRequestLoadComplete",
+          "side": "local client failure path",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeRequestLoadComplete(success)",
+            "anchor_line": 2033,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E57"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "networking.lua",
+          "symbol": "ClientDisconnected",
+          "side": "engine callback; world event bridge",
+          "file_sha256": "0d524dc3928624f285f52860b7a390e78d2c8a632b80f16760b0c7ea67914b29",
+          "supporting_locator": {
+            "anchor": "function ClientDisconnected(userid)",
+            "anchor_line": 951,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E24"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnSetOwner",
+          "side": "master and remote; local HUD branch",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnSetOwner(inst)",
+            "anchor_line": 1001,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E20"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "OnRemoveEntity",
+          "side": "master/remote player cleanup",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function OnRemoveEntity(inst)",
+            "anchor_line": 1163,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E55"
+        }
+      ],
+      "scope": {
+        "description": "Failure callback and local owner/exit cleanup sites; no full session protocol research claim.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE CALLBACK: ResumeRequestLoadComplete/ClientDisconnected; EVENT: setowner."
+      ],
+      "callees": [
+        "DIRECT: DeleteUserSession/LobbyScreen; EVENT: ms_clientdisconnected; conditional cleanup."
+      ],
+      "what_it_proves": [
+        "Visible failure recovery actions and separate metadata/entity cleanup signals."
+      ],
+      "what_it_does_not_prove": [
+        "ClientDisconnected itself removes player; failed resume creates a new player automatically; revocation always precedes remove or HUD teardown."
+      ],
+      "engine_boundary": [
+        "EB-0011-02",
+        "EB-0011-03",
+        "EB-0011-06",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record failure and exit marker coverage; missing native sequencing remains unknown.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-21",
+      "canonical_id": null,
+      "candidate_name": "Seamless local handoff has explicit order but no cross-side total order",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Local ActivatePlayer seamless branch unregisters old HUD, swaps ThePlayer, deactivates old minimap, conditionally removes old entity or clears delay flags, constructs new HUD, emits finishseamlessplayerswap, then continues activation events/handshake. Server MasterSeamlessPlayerSwap independently polls GetNetUpdates in a static periodic task and removes its source when the count differs from the captured value.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "ActivatePlayer",
+          "side": "local activation and seamless handoff",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function ActivatePlayer(inst)",
+            "anchor_line": 788,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E44"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "UnregisterHUD",
+          "side": "local HUD teardown",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function UnregisterHUD(inst)",
+            "anchor_line": 781,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E54"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "fns.MasterSeamlessPlayerSwap",
+          "side": "master sim delayed source remove",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "function fns.MasterSeamlessPlayerSwap(inst)",
+            "anchor_line": 1096,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E58"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ReplicateEntity",
+          "side": "client/global replication callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ReplicateEntity(guid)",
+            "anchor_line": 814,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E25"
+        }
+      ],
+      "scope": {
+        "description": "Visible local seamless branch and master delayed source cleanup; exact source/target engine event order remains unknown.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "EVENT: seamless source/target listeners; TASK: local ActivatePlayer."
+      ],
+      "callees": [
+        "DIRECT: local UnregisterHUD→ThePlayer assignment→conditional old Remove→ActivateHUD; TASK: master source Remove."
+      ],
+      "what_it_proves": [
+        "Local same-body old/new HUD/pointer order; separate server task."
+      ],
+      "what_it_does_not_prove": [
+        "Server remove occurs before/after remote new HUD globally; every old entity is immediately removed; character swap uses ordinary new/load path."
+      ],
+      "engine_boundary": [
+        "EB-0011-03",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Optional boundary trace old/new GUID and side-specific order; no expansion into character-swap/session campaign.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-22",
+      "canonical_id": null,
+      "candidate_name": "Missing parent and repeated attachment remain conditional risks to test",
+      "classification": "EI",
+      "status": "research_candidate_not_canonical",
+      "statement": "If remote OnEntityReplicated has no native parent it only prints and does not attach. RegisterNetListeners later dereferences _parent.isseamlessswaptarget without a nil guard. Player and health AttachClassified install removal callbacks without visible prior-source unbind/idempotence checks; hypothetical repeat/replacement can leave callbacks addressing the current reference. These are conditional static paths, not demonstrated native runtime defects.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "OnEntityReplicated",
+          "side": "remote classified view",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function OnEntityReplicated(inst)",
+            "anchor_line": 247,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E28"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_classified.lua",
+          "symbol": "RegisterNetListeners",
+          "side": "master/local/common listener dispatch",
+          "file_sha256": "27fe800b3c9c3a9af9f7cbeed367753186d2c798895278acb49d529f2f756d16",
+          "supporting_locator": {
+            "anchor": "local function RegisterNetListeners(inst)",
+            "anchor_line": 1258,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E34"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "AttachClassified",
+          "side": "remote player attachment",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function AttachClassified(inst, classified)",
+            "anchor_line": 1152,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E29"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/health_replica.lua",
+          "symbol": "Health:AttachClassified",
+          "side": "health replica attachment",
+          "file_sha256": "bbc1943ca318bdcb7b10505235251a777b71e745803fe215180b2f5b71d61d3b",
+          "supporting_locator": {
+            "anchor": "function Health:AttachClassified(classified)",
+            "anchor_line": 27,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E38"
+        }
+      ],
+      "scope": {
+        "description": "Conditional branch combination; natural native scheduling and attachment multiplicity unverified.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "ENGINE CALLBACK: classified OnEntityReplicated; TASK: RegisterNetListeners; DIRECT: attachment sites."
+      ],
+      "callees": [
+        "DIRECT: parent read/attachment/removal closure; conditional nil dereference path."
+      ],
+      "what_it_proves": [
+        "Readiness cannot be derived solely from existence of classified entity or a prior Attach call; cancellation/attachment predicates deserve logging."
+      ],
+      "what_it_does_not_prove": [
+        "Native engine produces parent-less registration or duplicate attachment in ordinary play; a leak/crash has been reproduced; engine retries are absent."
+      ],
+      "engine_boundary": [
+        "EB-0011-04",
+        "EB-0011-08"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Passive observe natural parent/attach counts; any injected missing/duplicate state is labelled synthetic and cannot prove natural defect.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "Conditional static inference",
+        "basis": "Conditional combination of source paths; natural occurrence unverified",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-11",
+        "NC-0011-13",
+        "NC-0011-19"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    },
+    {
+      "candidate_id": "NC-0011-23",
+      "canonical_id": null,
+      "candidate_name": "Spawn visibility, controller enable and load protection are separate gameplay gates",
+      "classification": "NSF",
+      "status": "research_candidate_not_canonical",
+      "statement": "Resume enables loading protection (tags/invincibility/Physics inactive) before placement. SpawnAtLocation in isloading or non-fixed branches hides player and disables controller, later schedules Show and a colour tween whose callback enables controller. Global DisableLoadingProtection(guid) forwards to the player method, which restores Physics immediately then removes tags/invincibility in a delayed task. Its native producer is unknown; neither activated nor READY tests these gates.",
+      "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+      "evidence": [
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "ResumeExistingUserSession",
+          "side": "master sim engine callback",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function ResumeExistingUserSession(data, guid)",
+            "anchor_line": 2074,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E15"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/playerspawner.lua",
+          "symbol": "SpawnAtLocation",
+          "side": "master world",
+          "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+          "supporting_locator": {
+            "anchor": "function self:SpawnAtLocation(inst, player, x, y, z, isloading)",
+            "anchor_line": 238,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E18"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "fns.EnableLoadingProtection",
+          "side": "master resume loading protection",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "function fns.EnableLoadingProtection(inst)",
+            "anchor_line": 1122,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E66"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "fns.DisableLoadingProtection",
+          "side": "master load protection release",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "function fns.DisableLoadingProtection(inst)",
+            "anchor_line": 1134,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E67"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "mainfunctions.lua",
+          "symbol": "DisableLoadingProtection",
+          "side": "native callback bridge; producer unknown",
+          "file_sha256": "ce849b04647c5350f872f943aacc77ef437c83a973b00869ca637b95f9e6d801",
+          "supporting_locator": {
+            "anchor": "function DisableLoadingProtection(guid)",
+            "anchor_line": 830,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E68"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "components/colourtweener.lua",
+          "symbol": "ColourTweener:StartTween",
+          "side": "player spawn visual/control tween",
+          "file_sha256": "56fef1abd28e4ce224eeac01559e67bb15358117a6df452786da1057acdadb30",
+          "supporting_locator": {
+            "anchor": "function ColourTweener:StartTween(",
+            "anchor_line": 54,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E69"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common.lua",
+          "symbol": "ActivatePlayer",
+          "side": "local activation and seamless handoff",
+          "file_sha256": "aae85dd6b305005534bc9a18df55b5a8cb5a1bea7d261c23b04d86b7d5f6c451",
+          "supporting_locator": {
+            "anchor": "local function ActivatePlayer(inst)",
+            "anchor_line": 788,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E44"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "OnPostActivateHandshake_Client",
+          "side": "client/local host state handler",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function OnPostActivateHandshake_Client(inst, state)",
+            "anchor_line": 1061,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E46"
+        },
+        {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "file": "prefabs/player_common_extensions.lua",
+          "symbol": "OnPostActivateHandshake_Server",
+          "side": "server/local host state handler",
+          "file_sha256": "976fbf85ff57cbe3650d22562b7ca464073066d27fd294b005e20be737c1ec0c",
+          "supporting_locator": {
+            "anchor": "local function OnPostActivateHandshake_Server(inst, state)",
+            "anchor_line": 1081,
+            "occurrence_zero_based": 0,
+            "locator_priority": "file + symbol + snapshot; line is auxiliary"
+          },
+          "evidence_mode": "static_source_inspection",
+          "runtime_verified": false,
+          "evidence_id": "E47"
+        }
+      ],
+      "scope": {
+        "description": "Native visible entry/spawn/load protection branches; not exhaustive input/action/stategraph acceptance conditions.",
+        "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+        "runtime_environments_verified": []
+      },
+      "callers": [
+        "DIRECT: ResumeExistingUserSession→EnableLoadingProtection→SpawnAtLocation; ENGINE ENTRY: global DisableLoadingProtection producer unknown."
+      ],
+      "callees": [
+        "TASK/TWEEN: Show→StartTween→controller Enable(true); DIRECT/TASK: Physics restore→delayed tag/invincibility release."
+      ],
+      "what_it_proves": [
+        "Physics protection, visual reveal, controller enable and handshake are distinct source state transitions."
+      ],
+      "what_it_does_not_prove": [
+        "Fixed frame delay guarantees wallclock readiness; tween callback always completes before disconnect; READY implies movable, rendered or accepted gameplay action; loading protection and spawnprotectionbuff have the same lifecycle."
+      ],
+      "engine_boundary": [
+        "EB-0011-08",
+        "EB-0011-10"
+      ],
+      "runtime_test_needed": {
+        "test_id": "T-P0-01",
+        "execution_status": "design_only",
+        "focus": "Record loadingprotection/tags/Physics requests, hidden state and controller Enable calls plus actual input acceptance separately; do not infer gameplay from READY.",
+        "runtime_verified": false
+      },
+      "confidence": {
+        "level": "High for scoped source branch",
+        "basis": "Direct current-snapshot Lua control flow",
+        "limits": "No DST runtime trace; no native-engine implementation evidence"
+      },
+      "related_candidate_ids": [
+        "NC-0011-05",
+        "NC-0011-15",
+        "NC-0011-16",
+        "NC-0011-17"
+      ],
+      "recommendation_policy": "Native usage does not automatically establish Mod best practice"
+    }
+  ]
+}
