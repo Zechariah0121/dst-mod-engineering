@@ -31,6 +31,6 @@ Klei、参考 Mod 和工具作者保留各自权利。署名、研究引用或�
 
 ## 分发范围 / Distribution scope
 
-同一完整发行包包含 Skill、当前187条公开知识与MCP；游戏源码、私人项目与原始私人研究不随包分发。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
+同一完整发行包包含 Skill、当前 210 条登记知识与 MCP（保留旧 187 条并增加 23 条受限机制研究）；游戏源码、私人项目与原始私人研究不随包分发。公开分享材料前需确认自己拥有相应权利；本地提取、研究引用或去除路径不等于再分发许可。
 
-Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. One complete distribution includes the Skill, current 187 public records and MCP. Game source, private projects and original private research are excluded. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.
+Project-owned material uses the custom non-commercial LICENSE. Valid historical MIT grants and third-party terms remain in force. One complete distribution includes the Skill, 210 registered public records (the preserved historical 187 plus 23 restricted mechanism research records) and MCP. Game source, private projects and original private research are excluded. Local extraction and research do not grant redistribution rights. The Chinese LICENSE controls; this summary does not replace it.

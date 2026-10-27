@@ -16,13 +16,17 @@ from prepare_sources import PreparationError, prepared_runtime
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config'])
+    supplied = list(sys.argv[1:] if argv is None else argv)
+    if supplied and supplied[0] == 'maintain-sources':
+        from scripts.source_compatibility import main as compatibility_main
+        return compatibility_main(supplied[1:])
+    parser = argparse.ArgumentParser(description=__doc__, epilog='maintain-sources assess|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
+    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources'])
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
     parser.add_argument('--source-epoch', choices=['759671'])
     parser.add_argument('--mode', choices=['auto', 'full', 'catalog'], default='auto',
-                        help='auto uses the public catalog only when sources are unprepared; full requires verified sources')
+                        help='auto uses verified public review for unprepared sources or package drift with a visible reason; cache damage stays an error; full requires verified sources')
     args = parser.parse_args(argv)
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required')
@@ -35,6 +39,7 @@ def main(argv=None):
         }}}, ensure_ascii=False, indent=2))
         return 0
     try:
+        fallback_notice = None
         values = None
         if args.command == 'call':
             if not args.tool:
@@ -51,15 +56,18 @@ def main(argv=None):
             try:
                 config, build = prepared_runtime(ROOT)
             except PreparationError as exc:
-                if (args.mode != 'auto' or exc.code != 'SOURCES_NOT_PREPARED'
-                        or (ROOT / 'cache/runtime/retrieval-config.json').exists()):
+                if args.mode != 'auto':
+                    raise
+                from scripts.catalog_fallback_policy import catalog_fallback
+                fallback_notice = catalog_fallback(args.mode, exc.code, ROOT)
+                if fallback_notice is None:
                     raise
         if build is None:
             sys.path.insert(0, str(ROOT / 'dst-kb-service'))
             from dst_kb.public_catalog import main as catalog_main
             from dst_kb.config import KBError
             try:
-                return catalog_main(ROOT, args.command, args.tool, values)
+                return catalog_main(ROOT, args.command, args.tool, values, fallback_notice=fallback_notice)
             except KBError as exc:
                 raise PreparationError(exc.code, str(exc)) from exc
         try:

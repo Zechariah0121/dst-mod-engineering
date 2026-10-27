@@ -72,7 +72,7 @@ def derive_legacy_fixture(source, destination):
     # Derive a protocol-only fixture in test scratch from the single canonical
     # root. Native source templates are deliberately absent from this fixture.
     shutil.copytree(source, destination, ignore=shutil.ignore_patterns(
-        'native001', 'nativecore', 'research', 'history', '__pycache__'))
+        'native001', 'nativecore', 'research', 'history', '__pycache__', 'FAMILY-REGISTRY.json'))
     catalog = read(destination / 'CATALOG.json')
     catalog['entries'] = [row for row in catalog['entries'] if row['family'] == 'legacy']
     catalog['counts'] = {'total': len(catalog['entries']), 'legacy': len(catalog['entries']),

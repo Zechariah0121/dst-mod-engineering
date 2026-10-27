@@ -87,7 +87,7 @@ def load_helper(path, name):
 
 def package_inputs(root):
     paths = [child(root, name) for name in RUNTIME_FILES]
-    paths += [helper_path(root, name) for name in ('source_payload.py', 'public_rebind.py')]
+    paths += [helper_path(root, name) for name in ('source_payload.py', 'public_rebind.py', 'source_compatibility.py', 'catalog_fallback_policy.py', 'legacy_adapter.py')]
     paths += [child(root, name) for name in ('prepare_sources.py', 'run_kb.py')]
     for name in RUNTIME_TREES:
         folder = child(root, name)
@@ -160,8 +160,11 @@ def validate_runtime(root):
         context.assert_current()
         with bind_epoch(context):
             _, report = validate(context.root)
-            if report.get('status') != 'PASS' or report.get('entries') != 187:
-                raise PreparationError('VALIDATION_FAILED', 'The original validator did not accept 187 records: ' + epoch)
+            from dst_kb import family_registry
+            families = family_registry.load(context.root)
+            expected_count = family_registry.counts(families)['total'] if families else 187
+            if report.get('status') != 'PASS' or report.get('entries') != expected_count:
+                raise PreparationError('VALIDATION_FAILED', 'The original validator did not accept all registered records: ' + epoch)
             core = read(context.root / 'data/nativecore/native-core.json')['entries']
             registry = source_identity._registry()
             accepted = 0
@@ -224,15 +227,13 @@ def prepared_runtime(root=ROOT):
     config = child(root, 'cache/runtime/retrieval-config.json')
     if not config.is_file():
         raise PreparationError('SOURCES_NOT_PREPARED',
-            'Prepare local sources first: python -B -X utf8 prepare_sources.py --source "<759671 scripts.zip>". '
+            'Prepare local sources first: python -B -X utf8 prepare_sources.py --source "<scripts.zip>". '
             'Public JSON slots are reading templates, not source evidence. '
             'Current-source preparation does not require historical comparison payloads.')
     value = read(config)
     state = value.get('prepared_runtime', {})
     if state.get('schema') != SCHEMA:
         raise PreparationError('SOURCES_NOT_PREPARED', 'Prepared runtime activation is missing or unsupported.')
-    if state.get('package_input_sha256') != digest(package_inputs(root)):
-        raise PreparationError('PACKAGE_CHANGED', 'Public package inputs changed; prepare sources again.')
     name = state.get('runtime_build', '')
     build_id = name.removeprefix('builds/')
     if not name.startswith('builds/') or len(build_id) != 64 or any(c not in '0123456789abcdef' for c in build_id):
@@ -244,6 +245,12 @@ def prepared_runtime(root=ROOT):
     catalog = read(build / 'source-epochs.json')
     for epoch in catalog['epochs'].values():
         child(build, epoch['index_path'])
+    # PACKAGE_CHANGED permits public-catalog fallback. Establish the activated
+    # old runtime's own integrity first so simultaneous cache damage is never
+    # hidden by a public package upgrade. New public inputs are compared only
+    # afterwards; they do not enlarge the old runtime's committed file set.
+    if state.get('package_input_sha256') != digest(package_inputs(root)):
+        raise PreparationError('PACKAGE_CHANGED', 'Public package inputs changed; prepare sources again.')
     return config, build
 
 
@@ -252,9 +259,10 @@ def same_source_inputs(build, sources):
     previous = receipt.get('source_inputs', [])
     if len(previous) != len(sources):
         return False
-    # Whole-archive hashes detect every input change, including optional ranges.
-    # A directory can acquire previously missing files without changing matches.
-    if receipt['hydration']['missing_optional_identity_cache_count'] and any(p.is_dir() for p in sources):
+    # Archive hashes cover both hydrated payloads and locator-only mechanisms.
+    # Directory membership can change outside hydration.matches; reassess every
+    # explicitly requested directory preparation rather than reuse stale checks.
+    if any(p.is_dir() for p in sources):
         return False
     for row, source in zip(previous, sources):
         if source.is_file():
@@ -269,6 +277,33 @@ def same_source_inputs(build, sources):
                 if path is None or sha(path.read_bytes()) != expected:
                     return False
     return True
+
+
+def write_source_assessment(assembled, sources, hydrated, mechanisms):
+    """Bind supplied-input checks separately from the frozen evidence epoch."""
+    catalog = read(assembled / 'source-epochs.json')
+    known = {row['archive_sha256']: row for row in catalog.get('source_input_targets', [])}
+    inputs = []
+    for index, path in enumerate(sources):
+        archive_hash = sha(path.read_bytes()) if path.is_file() else None
+        row = {'source_input_index': index, 'kind': 'ZIP' if path.is_file() else 'DIRECTORY',
+               'archive_sha256': archive_hash, 'identified_target': known.get(archive_hash)}
+        inputs.append(row)
+    summary = {'sources': inputs, 'recovered_source_slots': hydrated['recovered_count'],
+               'missing_required_source_slots': hydrated['missing_required_count'],
+               'missing_optional_identity_cache_slots': hydrated['missing_optional_count'],
+               'mechanism_reference_counts': mechanisms.get('reference_counts', {}),
+               'record_scopes_retained': True, 'runtime_game_verified': False,
+               'notice': 'Supplied source input checks do not relabel historical evidence or prove current game behavior.'}
+    assessment = {'schema': 'dst-source-preparation-assessment/1', 'summary': summary,
+                  'native_mechanisms': mechanisms}
+    relative = 'SOURCE-PREPARATION.json'
+    write(assembled / relative, assessment)
+    commitment = {'path': relative, 'sha256': sha((assembled / relative).read_bytes())}
+    for epoch in catalog['epochs'].values():
+        epoch['source_preparation'] = commitment
+    write(assembled / 'source-epochs.json', catalog)
+    return summary
 
 
 @contextmanager
@@ -372,18 +407,23 @@ def prepare(root, values):
             hydrated, _ = payload.hydrate(templates, recipe, sources, output_root=assembled)
             if (hydrated.get('missing_required_count') or hydrated.get('missing_noncache_source_literal_count')):
                 raise PreparationError('SOURCE_GAP',
-                    'Required source ranges do not match the supplied input. Use the supported 759671 source archive or review the reported source-version gaps; no partial runtime was activated.',
+                    'Required source ranges do not match the supplied input. Review the reported ranges or supply an authorized matching source; no partial runtime was activated.',
                     {'hydration_status': hydrated['status'], 'missing_required_count': hydrated['missing_required_count'],
                      'missing_noncache_source_literal_count': hydrated['missing_noncache_source_literal_count'],
                      'source_gaps': unique_gaps(hydrated)})
             remaining = remaining_slots(assembled)
             if remaining:
                 raise PreparationError('SOURCE_GAP', 'Unresolved source slots remain; no runtime activated.', {'files': remaining})
+            mechanism_checks = {'status': 'NO_REGISTERED_MECHANISM_FAMILY'}
+            if (assembled / 'knowledge/FAMILY-REGISTRY.json').is_file():
+                verifier = load_helper(assembled / 'dst-kb-service/dst_kb/native_mechanism_source.py', 'prepared_mechanism_source')
+                mechanism_checks = verifier.verify(assembled, sources)
             rebound, origins = rebind.rebind(assembled, assembled / 'PUBLICATION-ORIGIN-MAP.json')
             if rebound.get('unresolved'):
                 raise PreparationError('REBIND_FAILED', 'Typed source commitments could not be rebound.', {'unresolved': rebound['unresolved']})
             write(assembled / 'PUBLICATION-ORIGIN-MAP.json', origins)
             write(assembled / 'retrieval-config.json', {'source_epochs_path': 'source-epochs.json', 'default_source_epoch': '759671'})
+            source_assessment = write_source_assessment(assembled, sources, hydrated, mechanism_checks)
             guards = check_in_subprocess(assembled)
             receipt = {'schema': SCHEMA, 'package_input_sha256': package_hash,
                 'source_payload_input_sha256': digest(hydrated['matches']),
@@ -398,7 +438,8 @@ def prepare(root, values):
                     'whole_historical_snapshot_identity_inferred': False},
                 'rebind': {'typed_reference_updates': len(rebound.get('typed_reference_updates', [])),
                            'historical_source_hashes_globally_replaced': False},
-                'guards': guards, 'client_configuration_modified': False, 'local_source_payload_do_not_publish': True}
+                'guards': guards, 'source_input_assessment': source_assessment,
+                'native_mechanism_source_verification': mechanism_checks, 'client_configuration_modified': False, 'local_source_payload_do_not_publish': True}
             write(assembled / 'PREPARATION-RECEIPT.json', receipt)
             manifest = build_manifest(assembled)
             build_id = digest(manifest)

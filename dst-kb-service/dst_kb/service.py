@@ -11,7 +11,7 @@ from typing import Protocol
 from .config import KBError,settings
 from .source_epoch_runtime import resolve_epoch, bind_epoch, epoch_bound
 from .validation import signature,validate,RELATIONS
-from . import native,nativecore
+from . import native,nativecore,native_mechanism
 from .retrieval_v2 import Ranker, record_family, VERSION as RETRIEVAL_VERSION
 from . import projection_v2
 from . import facet_contracts, source_identity
@@ -27,7 +27,7 @@ from .source_context import (SourceContextRegistry, exact_identity, bounded_cont
 from hashlib import sha256
 from pathlib import Path
 
-INDEX_VERSION=17
+INDEX_VERSION=18
 _BUNDLE_WIRE_TOKEN=object()
 N001_CODING_SUBSET_LIMIT=5
 
@@ -304,6 +304,9 @@ class Service:
                     navigation_registry._snapshot_check=None
                     navigation_registry.context_for(record)
             navigation_registry._snapshot_check=lambda:self.loaded_signature==start_signature
+            for identifier, mechanism in data.get('native_mechanism',{}).items():
+                indexed=dict(mechanism['entry'],entry_type=native_mechanism.TYPE)
+                db.execute('INSERT INTO entries VALUES(?,?,?)',(identifier,native_mechanism.TYPE,json.dumps(indexed,ensure_ascii=False)))
             meta={'root':str(self.root),'signature':start_signature,'index_version':str(INDEX_VERSION),
                 'last_validation':json.dumps(report,ensure_ascii=False),'kb_version':report['kb_version'],
                 'schema_version':report['schema_version'],'last_index_build':datetime.now(timezone.utc).isoformat(),
@@ -359,6 +362,8 @@ class Service:
         return {'governance':metadata} if metadata else {}
 
     def _native_allowed(self,id,projection):
+        mechanism=self.db.execute('SELECT 1 FROM entries WHERE id=? AND type=?',(id,native_mechanism.TYPE)).fetchone()
+        if mechanism:return projection=='reviewer'
         core=self.db.execute('SELECT json FROM entries WHERE id=? AND type=?',(id,nativecore.TYPE)).fetchone()
         if core:
             entry=json.loads(core[0])
@@ -413,9 +418,15 @@ class Service:
 
     @epoch_bound
     @analyzed_request
-    def get_entry(self,id,projection='coding',view=None):
+    def get_entry(self,id,projection='coding',view=None,pointer='',max_bytes=24000):
         self.ready()
         native.projection(projection)
+        if view is not None and view not in ('decision','reviewer','evidence'):raise KBError('INVALID_ARGUMENT','Unknown view')
+        mechanism=self._mechanisms().get(id)
+        if mechanism is not None:
+            if projection!='reviewer':return {'id':id,'entry':None,'withheld':True,'reason':'restricted_research_requires_explicit_reviewer','governance':{id:native_mechanism.STATES}}
+            return self._mechanism_read(mechanism,pointer,max_bytes)
+        if pointer or max_bytes!=24000:raise KBError('INVALID_ARGUMENT','pointer/max_bytes applies only to registered mechanism research')
         if view is not None:
             row=self.db.execute('SELECT json FROM entries WHERE id=?',(id,)).fetchone()
             if row is None:raise KBError('INVALID_ID','Unknown knowledge '+id)
@@ -452,9 +463,86 @@ class Service:
         return {'kb_version':self.db.execute('SELECT value FROM meta WHERE key=?',('kb_version',)).fetchone()[0],
             'entry':e,'source_registry':sources,'correction_warnings':warnings}
 
+    def _mechanisms(self):
+        if not hasattr(self,'root') or not (self.root/'FAMILY-REGISTRY.json').is_file():return {}
+        if not hasattr(self,'_mechanism_records') or self._mechanism_records[0]!=self.loaded_signature:
+            self._mechanism_records=(self.loaded_signature,native_mechanism.load(self.root))
+        return self._mechanism_records[1]
+
+    def _mechanism_read(self,record,pointer='',maximum=24000):
+        environment=self.epoch_context.metadata() if self.epoch_context is not None else None
+        wrapper={'projection':'reviewer','evidence_status':'LOCATOR_HASH_ONLY'}
+        if environment is not None:wrapper['source_environment']=environment
+        reserve=len(json.dumps(dict(wrapper,entry=None),ensure_ascii=False).encode())
+        if type(maximum) is not int or not 1000<=maximum<=64000:raise KBError('INVALID_ARGUMENT','max_bytes must be 1000..64000')
+        if maximum-reserve<1000:return {'id':record['entry']['id'],'withheld':True,'reason':'REQUIRED_CONTEXT_EXCEEDS_BUDGET'}
+        entry=native_mechanism.bounded(record,pointer,maximum-reserve)
+        return dict(wrapper,entry=entry)
+
+    def _mechanism_matches(self,query,projection,mode,filters):
+        # An exact ID is an explicit request; general restricted/default browsing
+        # and Coding never enter this path. Research is an explicit Reviewer mode.
+        if not isinstance(query,str) or len(query)>4000:raise KBError('INVALID_ARGUMENT','query must be a bounded string')
+        records=self._mechanisms()
+        exact=query.strip().lower() in {identifier.lower() for identifier in records}
+        if projection!='reviewer' or not query.strip() or not (exact or mode=='research'):return []
+        allowed={'entry_types','families','knowledge_statuses','retrieval_statuses','coding_statuses'}
+        if any(values for key,values in filters.items() if key not in allowed):return []
+        expected={'entry_types':native_mechanism.TYPE,'families':'native_mechanism',
+                  'knowledge_statuses':'research','retrieval_statuses':'restricted','coding_statuses':'hold'}
+        if any(filters.get(key) and value not in filters[key] for key,value in expected.items()):return []
+        scored=[(native_mechanism.score(record,query),identifier,record) for identifier,record in records.items()]
+        return [record for score,_,record in sorted(scored,key=lambda row:(-row[0],row[1])) if score>0]
+
+    def _mechanism_results(self,records,query,count,maximum):
+        payload={'results':[],'withheld_atoms':[],'query':query,'projection':'reviewer','family':'native_mechanism',
+                 'restricted_research_explicitly_requested':True,'notice':native_mechanism.NOTICE,
+                 'total_matches':len(records),'maximum_payload_bytes':maximum}
+        if self.epoch_context is not None:payload['source_environment']=self.epoch_context.metadata()
+        for record in records:
+            entry=native_mechanism.envelope(record,assessment_detail=False)
+            candidate=dict(payload,results=payload['results']+[entry])
+            if len(candidate['results'])<=count and len(json.dumps(candidate,ensure_ascii=False).encode())+100<=maximum:
+                payload=candidate
+            else:
+                identifier=record['entry']['id']
+                deferred={'id':identifier,'reason':'WHOLE_ENTRY_AND_REQUIRED_CONTEXT_EXCEED_BUDGET',
+                          'followup':{'tool':'get_entry','id':identifier,'projection':'reviewer','pointer':'/claims/0','max_bytes':24000}}
+                if len(json.dumps(dict(payload,withheld_atoms=payload['withheld_atoms']+[deferred]),ensure_ascii=False).encode())+100<=maximum:
+                    payload['withheld_atoms'].append(deferred)
+        payload['knowledge_gap']=not bool(payload['results'])
+        payload['whole_values_delivered']=True
+        payload['payload_bytes']=0
+        for _ in range(4):
+            cost=serialized_payload_cost(payload)
+            if cost==payload['payload_bytes']:break
+            payload['payload_bytes']=cost
+        return payload
+
+    def _mechanism_evidence(self,record,index,subpointer,maximum):
+        entry=record['entry'];doc=record['document']
+        refs={ref['id']:ref for ref in doc['source_references']}
+        ids=native_mechanism.local_refs(entry)
+        if index>=len(ids):raise KBError('INVALID_ARGUMENT','Mechanism reference index outside entry manifest')
+        ref=refs[ids[index]]
+        if subpointer:
+            try:nativecore.pointer(ref,subpointer)
+            except (ValueError,KeyError,IndexError,TypeError) as exc:raise KBError('INVALID_ARGUMENT','Invalid source locator subpointer') from exc
+        context=native_mechanism.envelope(record)
+        context.update(value=ref,source_references=[ref],pointer='/source_references/'+str(doc['source_references'].index(ref)),reference_index=index)
+        # Whole locator is retained even for a narrower request: hash/file/range
+        # cannot be stripped from one another by a subfield pointer.
+        context['artifact']['pointer']=context['pointer']
+        context['requested_subpointer']=subpointer
+        payload={'evidence':context,'projection':'reviewer'}
+        if self.epoch_context is not None:payload['source_environment']=self.epoch_context.metadata()
+        if len(json.dumps(payload,ensure_ascii=False).encode())>maximum:
+            return {'id':entry['id'],'bounded':True,'withheld_reason':'LOCATOR_AND_REQUIRED_SCOPE_EXCEED_BUDGET','value':None}
+        return payload
+
     def _ranker_v2(self):
         if getattr(self, '_retrieval_ranker', None) is None:
-            entries=[json.loads(row[0]) for row in self.db.execute('SELECT json FROM entries')]
+            entries=[json.loads(row[0]) for row in self.db.execute('SELECT json FROM entries WHERE type!=?',(native_mechanism.TYPE,))]
             ids=[e['id'] for e in entries]
             nav=json.loads(dict(self.db.execute('SELECT key,value FROM meta')).get('source_symbol_navigation','{}'))
             self._retrieval_ranker=Ranker(entries,self._governance(ids).get('governance',{}),self._native_routing(),nav,defer_semantics=True)
@@ -671,6 +759,9 @@ class Service:
         if scope_logic not in ['and','or']:raise KBError('INVALID_ARGUMENT','scope_logic must be and or or')
         for key,items in filters.items():
             if key not in FILTERS or not isinstance(items,list) or any(not isinstance(v,str) for v in items):raise KBError('INVALID_ARGUMENT','Invalid filter '+key)
+        mechanism_matches=self._mechanism_matches(query,projection,mode,filters)
+        if mechanism_matches:
+            return self._mechanism_results(mechanism_matches,query,top_k,64000)
         ranker=self._ranker_v2()
         rank_options={'view':view} if view!='decision' else {}
         rows,diagnosis=ranker.search(query,projection,max(top_k,len(ranker.documents)),filters,scope_logic,mode=mode,**rank_options)
@@ -814,6 +905,9 @@ class Service:
         if type(reference_index) is not int or not 0<=reference_index<=9999:raise KBError('INVALID_ARGUMENT','reference_index must be 0..9999')
         if type(max_bytes) is not int or not 1000<=max_bytes<=24000:raise KBError('INVALID_ARGUMENT','max_bytes must be 1000..24000')
         if not isinstance(subpointer,str) or len(subpointer)>2000 or (subpointer and not subpointer.startswith('/')):raise KBError('INVALID_ARGUMENT','subpointer must be empty or an absolute JSON pointer')
+        mechanism=self._mechanisms().get(id)
+        if mechanism is not None:
+            return self._mechanism_evidence(mechanism,reference_index,subpointer,max_bytes)
         refs=self._references_v2(id)
         if reference_index>=len(refs):raise KBError('INVALID_ARGUMENT','reference index is outside this record manifest')
         ref=refs[reference_index];target=(self.root/ref['artifact_path']).resolve()
@@ -903,8 +997,11 @@ class Service:
     def get_context_bundle(self,task_description,mode='architect',budget='normal',projection='coding',view='decision'):
         self.ready();native.projection(projection)
         if mode not in MODE_TYPES:raise KBError('INVALID_ARGUMENT','Unknown mode')
+        if view not in ['decision','reviewer','evidence']:raise KBError('INVALID_ARGUMENT','Unknown view')
         if budget not in ['compact','normal','deep']:raise KBError('INVALID_ARGUMENT','Unknown budget')
         count,maximum={'compact':(5,16000),'normal':(8,32000),'deep':(12,64000)}[budget]
+        mechanism_matches=self._mechanism_matches(task_description,projection,mode,{})
+        if mechanism_matches:return self._mechanism_results(mechanism_matches,task_description,count,maximum)
         # The MCP adapter repeats this exact field after dispatch. Include it
         # before every fit decision so the declared complete-payload limit also
         # covers epoch identity; single-root callers retain their old shape.

@@ -1,0 +1,2801 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "growth-regrowth",
+  "source_epoch": "759671",
+  "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+  "entries": [
+    {
+      "id": "EXP-GROW-001",
+      "title": "Growable 阶段数据、任务与正常推进",
+      "aliases": [
+        "growable",
+        "StartGrowing",
+        "StopGrowing",
+        "SetStage",
+        "DoGrowth",
+        "stages",
+        "growonly",
+        "loopstages"
+      ],
+      "engineering_question": "生长阶段表与计时怎样配合，直接 SetStage 是否重启倒计时，阶段回调是否总会执行？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "运行时权威实体 Growable；树木/可采集灌木消费者；不等同世界生成或父实体繁殖",
+        "excluded": "不覆盖全部农作物/部署/采集业务、native 调度精度、离线现实时间或联网表现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GROW-001-C01",
+          "kind": "NSF",
+          "statement": "构造将 stages 设 nil、stage=1、pausereasons={}；所列原版 prefab 随后直接将模块级阶段表赋给 growable.stages，没有组件内复制。GetCurrentStageData 直接返回 self.stages[self.stage]；回调收到的 stagedata 是该表项，不是独立副本。",
+          "evidence_refs": [
+            "GROW-S001",
+            "GROW-S003",
+            "GROW-S019",
+            "GROW-S020",
+            "GROW-S023",
+            "GROW-S025"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C02",
+          "kind": "NSF",
+          "statement": "StartGrowing 先将 usetimemultiplier=false；要求 stages 已是可取长度的表。空表或 stage 超上界返回；其余先 StopGrowing。未显式传 time 时调用当前阶段 time(inst,stage,stagedata)，该函数缺失回退 10，存在但返回 nil 则停止且不建新任务；stagedata.multiplier 仅在此无显式 time 路径赋给 usetimemultiplier。springgrowth 真值时按当次 SpringGrowthMod 变换时长，不是持续监听季节。",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S003",
+            "GROW-S010"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C03",
+          "kind": "NSF",
+          "statement": "StartGrowingTask 把时长钳到至少 0 并写 targettime=GetTime()+time；仅 growoffscreen 为真值或实体未睡眠时取消旧 task 并用 inst:DoTaskInTime(time,OnGrow,self) 保存新 handle。OnGrow 先清 task 再 DoGrowth。StopGrowing 清 targettime/pausedremaining 并取消非 nil task，未清 pausereasons 或 sleeptime。组件移除 hook 是 StopGrowing 别名；实体移除另通过 CancelAllPendingTasks 清任务。",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S001",
+            "GROW-S003",
+            "GROW-S009",
+            "GROW-S011",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S012"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C04",
+          "kind": "NSF",
+          "statement": "SetStage 只把超上界的 stage 钳到 #stages，写 self.stage，存在 fn 时调 fn(inst,stage,stagedata)；没有下界/整数统一校验，不改计时、不调 pregrowfn/growfn。GetNextStage 在未越界时返回 stage+1，否则按 loopstages/loopstages_start 或最后阶段返回。",
+          "evidence_refs": [
+            "GROW-S006",
+            "GROW-S003"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C05",
+          "kind": "NSF",
+          "statement": "DoGrowth 在 targettime 与 pausedremaining 均 nil 时返回 false；否则取目标阶段，先调其 pregrowfn(inst,stage,stagedata)，非 growonly 才 SetStage。之后若 inst:IsValid()，按 skipgrownfn 决定是否调用目标 growfn(inst,stage,stagedata)，再按当前 stage 与 loopstages 启动或停止。最终返回 true 不等于实体仍有效或产物生成成功；skipgrownfn 不跳过 pregrowfn 或 SetStage.fn，且 growfn 后没有第二次 IsValid 守卫。",
+          "evidence_refs": [
+            "GROW-S004",
+            "GROW-S003",
+            "GROW-S006",
+            "GROW-S002"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C06",
+          "kind": "NSF",
+          "statement": "常青树在 master 分界后设共享四阶段表、loopstages/springgrowth/magicgrowable 并 StartGrowing；make_stump 在保留实体时 StopGrowing。石果灌木也在 master 侧设置共享四阶段表，但阶段 fn 联动 pickable：前两阶段清产品并不可采，第三阶段改 rock_avocado_fruit 并 Regen，第四阶段清产品且必要时 Regen；采集回调 SetStage(1)，枯竭时另 StopGrowing。其 makeemptyfn 在非 POPULATING 时显式 SetStage(1)+StartGrowing。这是原地状态更新，不是 regrowthmanager 重建新实体。",
+          "evidence_refs": [
+            "GROW-S020",
+            "GROW-S019",
+            "GROW-S021",
+            "GROW-S025",
+            "GROW-S023",
+            "GROW-S024",
+            "GROW-S052"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C07",
+          "kind": "EI",
+          "statement": "直接修改共享阶段表可影响其他同表实例，直接 SetStage 与 StartGrowing 不能互换。time/pregrowfn/fn/growfn 是直接调用，无局部 protected call 或回滚；阶段字段、先前副作用、任务状态可能在后续回调报错前已改写，不能从方法存在推出异常原子性。",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S004",
+            "GROW-S006",
+            "GROW-S020",
+            "GROW-S025"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C08",
+          "kind": "REC",
+          "statement": "先配置有效阶段表，阶段 time 应返回适合实际设计的有限时长或明确 nil；暂停不要靠省略 time。按需要分别应用静态阶段、转换回调和重新计时，修改共享定义前确定影响范围；回调需自行处理目标失效、移除和重入，不能把 DoGrowth true 当最终效果验收。",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S006",
+            "GROW-S004",
+            "GROW-S019"
+          ]
+        },
+        {
+          "id": "EXP-GROW-001-C09",
+          "kind": "UNK",
+          "statement": "没有执行阶段回调或游戏调度，未验证生长动画、采集产物、魔法链、多人同步或任意自定义阶段表的兼容性。Growable 的 magicgrowable 标记与 DoMagicGrowth 仅可见为配置/转交 domagicgrowthfn 的入口，未在本卡扩展所有魔法调用者。",
+          "evidence_refs": [
+            "GROW-S004",
+            "GROW-S020",
+            "GROW-S025"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Growable:StartGrowing(time)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "time: 可选数字；nil 时用当前阶段 time 回调或 10 秒 fallback"
+          ],
+          "returns": [
+            "无显式返回（nil）；不返回是否建任务"
+          ],
+          "preconditions": [
+            "stages 已初始化为表；索引/回调/时长有效；#stages==0 或 stage 超上界为提前返回"
+          ],
+          "side_effects": [
+            "清 usetimemultiplier；正常路径先停止旧任务；计算春季变换与 targettime，按睡眠策略建任务；不会先检查 pausereasons"
+          ],
+          "lifecycle": "阶段初始化、转换后重启或显式重设时长",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S003",
+            "GROW-S010"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:StartGrowingTask(time)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件；底层计时方法，正常 StartGrowing/Resume/LongUpdate 使用",
+          "parameters": [
+            "time: 数字时长，math.max(0,time)"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "实体提供任务/睡眠接口；若睡眠且 growoffscreen 为假值，只改 targettime"
+          ],
+          "side_effects": [
+            "写目标时间；仅实际调度分支取消旧 handle 并创建实体所有的延迟任务"
+          ],
+          "lifecycle": "实际建任务/修正剩余时间",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S001",
+            "GROW-S011"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:StopGrowing()",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "组件存在；可在无任务时调用"
+          ],
+          "side_effects": [
+            "清 targettime/pausedremaining；取消并清 task；不清 pausereasons/sleeptime；不自动取消其他组件或 prefab 的任务"
+          ],
+          "lifecycle": "停止、组件移除；实体移除通过所有者任务清理",
+          "evidence_refs": [
+            "GROW-S003",
+            "GROW-S009",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S012"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:SetStage(stage)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "stage: 目标阶段索引；只处理超上界钳制"
+          ],
+          "returns": [
+            "无显式返回（nil）；不转交 fn 返回值"
+          ],
+          "preconditions": [
+            "stages 有效；调用方提供合理下界/整数索引和可用 fn"
+          ],
+          "side_effects": [
+            "先写 self.stage，再调当前表项 fn(inst,stage,stagedata)；不修改倒计时或调 growfn"
+          ],
+          "lifecycle": "初始化、读档、正常转移的静态阶段应用",
+          "evidence_refs": [
+            "GROW-S006",
+            "GROW-S002",
+            "GROW-S007"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:DoGrowth(skipgrownfn)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "skipgrownfn: 真值只跳过目标 growfn，LongUpdate 用 true"
+          ],
+          "returns": [
+            "完全停止时 false；其余执行路径末尾 true；不是产物或有效性状态"
+          ],
+          "preconditions": [
+            "targettime 或 pausedremaining 非 nil；stages/索引/回调有效；暂停状态本身不禁止本方法"
+          ],
+          "side_effects": [
+            "目标 pregrowfn；非 growonly 时 SetStage.fn；有效性条件内的目标 growfn；随后重启或停止；回调可以移除实体或写其他状态"
+          ],
+          "lifecycle": "任务到期/显式阶段推进",
+          "evidence_refs": [
+            "GROW-S004",
+            "GROW-S006",
+            "GROW-S002",
+            "GROW-S003"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "原版 master prefab 将模块级阶段表直接交组件并设初始阶段；stage.fn 可联动采集状态。",
+          "evidence_refs": [
+            "GROW-S020",
+            "GROW-S019",
+            "GROW-S025",
+            "GROW-S023"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "StartGrowing 清旧计时，按显式时长或阶段 time 计算时长，按睡眠策略写 targettime/安排实体任务。",
+          "evidence_refs": [
+            "GROW-S002",
+            "GROW-S003",
+            "GROW-S010",
+            "GROW-S011"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "OnGrow 清 handle 后 DoGrowth：目标 pregrowfn → 条件 SetStage.fn → 有效性条件内 growfn → 重启或停止。",
+          "evidence_refs": [
+            "GROW-S001",
+            "GROW-S004",
+            "GROW-S006"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "原地变树桩或枯竭可显式停止；移除组件与移除实体有不同清理调用路径。",
+          "evidence_refs": [
+            "GROW-S021",
+            "GROW-S024",
+            "GROW-S009",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S012"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-GROW-001-C09: 没有执行阶段回调或游戏调度，未验证生长动画、采集产物、魔法链、多人同步或任意自定义阶段表的兼容性。Growable 的 magicgrowable 标记与 DoMagicGrowth 仅可见为配置/转交 domagicgrowthfn 的入口，未在本卡扩展所有魔法调用者。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GROW-S001",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S002",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C02",
+              "EXP-GROW-001-C03",
+              "EXP-GROW-001-C05",
+              "EXP-GROW-001-C07",
+              "EXP-GROW-001-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S003",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C02",
+              "EXP-GROW-001-C03",
+              "EXP-GROW-001-C04",
+              "EXP-GROW-001-C05"
+            ]
+          },
+          {
+            "ref": "GROW-S004",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C05",
+              "EXP-GROW-001-C07",
+              "EXP-GROW-001-C08",
+              "EXP-GROW-001-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S006",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C04",
+              "EXP-GROW-001-C05",
+              "EXP-GROW-001-C07",
+              "EXP-GROW-001-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S007",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": []
+          },
+          {
+            "ref": "GROW-S009",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S010",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C02"
+            ]
+          },
+          {
+            "ref": "GROW-S011",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S012",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S013",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S014",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C03"
+            ]
+          },
+          {
+            "ref": "GROW-S019",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C06",
+              "EXP-GROW-001-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S020",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C06",
+              "EXP-GROW-001-C07",
+              "EXP-GROW-001-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S021",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C06"
+            ]
+          },
+          {
+            "ref": "GROW-S023",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C06"
+            ]
+          },
+          {
+            "ref": "GROW-S024",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C06"
+            ]
+          },
+          {
+            "ref": "GROW-S025",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C01",
+              "EXP-GROW-001-C06",
+              "EXP-GROW-001-C07",
+              "EXP-GROW-001-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S052",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-001-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "未穷举全部 prefab、回调闭包、第三方 Mod 或 native/动态依赖；未变化的已列指纹不证明未来版本语义全部兼容。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-GROW-002",
+      "title": "Growable 暂停原因、睡眠长更新与保存载入",
+      "aliases": [
+        "Pause",
+        "Resume",
+        "LongUpdate",
+        "OnEntitySleep",
+        "OnEntityWake",
+        "pausedremaining",
+        "pausereasons",
+        "usetimemultiplier"
+      ],
+      "engineering_question": "暂停是否保留进度，睡眠/长更新如何追赶，存读档会不会自动恢复全部暂停原因？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "运行时 Growable 计时、实体调度/保存分发；树桩恢复与受季节/地皮约束的远古树苗；不声称现实离线时钟语义",
+        "excluded": "不覆盖全部农作物/部署/采集业务、native 调度精度、离线现实时间或联网表现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GROW-002-C01",
+          "kind": "NSF",
+          "statement": "Pause 首次在 pausedremaining 为 nil 时采样 GetTime；若有 sleeptime，先清它并 LongUpdate 追赶，再取 targettime、StopGrowing，并用最先采样时间 floor(targettime-time) 保存剩余（可为负）。reason 仅在 Lua 真值时加入 pausereasons。Resume 可删指定原因，仅在原因表为空且 pausedremaining 非 nil 时 StartGrowingTask(remaining)、清 remaining 并返回 true，否则 nil。IsPaused 只看 remaining，不等同原因表非空；StopGrowing 不清原因表。",
+          "evidence_refs": [
+            "GROW-S005",
+            "GROW-S003",
+            "GROW-S008",
+            "GROW-S002"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C02",
+          "kind": "NSF",
+          "statement": "暂停并非所有入口的硬锁：DoGrowth 允许 pausedremaining 非 nil 的路径；StartGrowing 不检查 pausereasons，会 StopGrowing 清 pausedremaining；Resume 直接 StartGrowingTask，不重新调用阶段 time 或 SpringGrowthMod。调用方必须区分“消除一个暂停原因”“停止”和“强制重设计时”。",
+          "evidence_refs": [
+            "GROW-S005",
+            "GROW-S004",
+            "GROW-S002",
+            "GROW-S003"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C03",
+          "kind": "NSF",
+          "statement": "OnEntitySleep 在 task 存在且 growoffscreen 为假值时取消 task、保留 targettime 并记 sleeptime；OnEntityWake 在 targettime 非 nil 且非 growoffscreen 时，若累计睡眠 dt>0，清 sleeptime 后 LongUpdate(dt)，否则按 targettime-now 重建任务。已睡眠时首次 StartGrowingTask 可能只写目标而不记 sleeptime；不能把睡眠等同 Pause。原版全局分发先调用 prefab OnEntitySleep/Wake，再遍历当前 components 对应方法。",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S002",
+            "GROW-S018"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C04",
+          "kind": "NSF",
+          "statement": "LongUpdate 在非 IsGrowing 时返回；有 sleeptime 则只减 sleeptime 以累积补偿后返回。其余 while(dt>0,inst 有效,IsGrowing) 逐次减 timeleft，未到期重排任务，否则 DoGrowth(true)。这仍逐阶段调用 pregrowfn/SetStage.fn；growonly 时额外推进局部 currentstage 以便最后回调。循环后仅在实体有效且局部 currentstage~=self.stage 时调用所选 stagedata.growfn(inst)，不传 stage/stagedata；回到起始阶段的完整循环也可能不触发此末尾 growfn。",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S004",
+            "GROW-S002",
+            "GROW-S006",
+            "GROW-S003"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C05",
+          "kind": "NSF",
+          "statement": "OnSave 返回 stage、time、sleeptime、usetimemultiplier：剩余 time 优先 pausedremaining，否则 targettime-now，floor 后钳非负；记录睡眠经过量，且在 usetimemultiplier 真值时将 time 除以当前阶段 multiplier 或 1。没有保存 pausereasons、暂停标志、task、stages 或回调。OnLoad(nil) 返回；否则 SetStage(data.stage or 1)、恢复睡眠基点；有 data.time 才 StartGrowing(data.time)，没有 time 不主动 StopGrowing 初始任务。",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S002",
+            "GROW-S006"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C06",
+          "kind": "NSF",
+          "statement": "若 data.usetimemultiplier 为真值，OnLoad 先置 self.usetimemultiplier=true 并原地将 data.time 乘阶段 multiplier；随后调用 StartGrowing(data.time)，其首行又将该字段设 false。显式 time 路径不再从 stagedata.multiplier 重置它，springgrowth 仍可再走当次 SpringGrowthMod。该语句顺序不能改述成标志在读档后保证保持 true 或任意倍率反复存取无漂移。",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S002",
+            "GROW-S010"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C07",
+          "kind": "NSF",
+          "statement": "EntityScript 先收集组件 OnSave 再调 prefab OnSave；SetPersistData 先按保存项调用各组件 OnLoad（pairs 无固定组件顺序），之后调 prefab OnLoad。常青树 prefab onload 在 stump 标记下 make_stump，后者 StopGrowing，说明停止状态可由 prefab 额外恢复，不能仅凭 Growable time 缺失推定已停。",
+          "evidence_refs": [
+            "GROW-S015",
+            "GROW-S016",
+            "GROW-S022",
+            "GROW-S021",
+            "GROW-S007"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C08",
+          "kind": "NSF",
+          "statement": "远古树苗在 master 侧绑定共享 GROWTH_STAGES、启动 growable，监听 season 并安排 0 延迟 CheckGrowConstraints；OnSetStage 也安排同检查。该检查读取当时 tile/season：seed 阶段满足其中任一条件会 Resume 两原因并返回，其他路径逐项 Pause/Resume WRONG_TILE、WRONG_SEASON；不是所有阶段都要求相同条件。最终阶段 fn 尝试生成成年树、传数据、清果实并移除原树苗，即使 SpawnPrefab 返回 nil 也会移除原树苗。",
+          "evidence_refs": [
+            "GROW-S026",
+            "GROW-S027",
+            "GROW-S028",
+            "GROW-S029"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C09",
+          "kind": "EI",
+          "statement": "保存的剩余时间不能代表暂停原因已持久化；调用者需由环境约束重新判断。Growable 长更新的回调次数/参数也不等同连续运行，正时长正常阶段可逐次消费 dt，但零/负时长配合循环阶段可能不减少 dt，所列 while 没有独立迭代上限；这是静态风险而非本轮运行故障结论。",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S005",
+            "GROW-S008",
+            "GROW-S002",
+            "GROW-S028"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C10",
+          "kind": "REC",
+          "statement": "对自定义阶段统一支持正常 growfn(inst,stage,stagedata) 与长更新末尾 growfn(inst) 两种形状；需要暂停原因时在实际消费者重建条件，而不是期待通用存档自动复原。给循环阶段配置可推进时间的规则，并实际验证长更新、睡眠、完整循环回到起点、暂停存档和 prefab 二次恢复路径。",
+          "evidence_refs": [
+            "GROW-S004",
+            "GROW-S008",
+            "GROW-S007",
+            "GROW-S016",
+            "GROW-S028"
+          ]
+        },
+        {
+          "id": "EXP-GROW-002-C11",
+          "kind": "UNK",
+          "statement": "未实际睡眠、长更新或存读档；native 的睡眠时机、GetTime 精度、任务取消边界、现实离线时间及回调重入/移除结果仍未知。未审阅所有植物的 prefab OnLongUpdate/季节/watch/数据迁移，不推广为全体作物合同。",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S005",
+            "GROW-S007",
+            "GROW-S018",
+            "GROW-S017"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Growable:Pause(reason)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "reason: 可选键，只有 Lua 真值才存入原因集合"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "计时/阶段回调可用；无活动/暂停剩余时也可记录 reason，但 IsPaused 不一定 true"
+          ],
+          "side_effects": [
+            "首次暂停可先 LongUpdate 睡眠时间；停止任务；floor 保存剩余并追加原因；不保证无生长副作用"
+          ],
+          "lifecycle": "环境约束/状态暂停",
+          "evidence_refs": [
+            "GROW-S005",
+            "GROW-S008",
+            "GROW-S003"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:Resume(reason)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "reason: 可选键；真值时只删除对应原因"
+          ],
+          "returns": [
+            "原因表为空且pausedremaining非nil时，调用StartGrowingTask、清pausedremaining并返回true；true不保证task handle存在，睡眠且非growoffscreen时可能仅恢复targettime。其他路径nil。"
+          ],
+          "preconditions": [
+            "需有 pausedremaining 才能重启；余下原因阻止恢复"
+          ],
+          "side_effects": [
+            "删除原因；直接按保存时长 StartGrowingTask 并清 pausedremaining；不重算阶段 time 或春季时长"
+          ],
+          "lifecycle": "消除暂停原因后恢复",
+          "evidence_refs": [
+            "GROW-S005",
+            "GROW-S002"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:LongUpdate(dt)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件",
+          "parameters": [
+            "dt: 追赶时长；while 仅对正值迭代，已有 sleeptime 路径直接调整基点"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "IsGrowing；阶段表/回调有效；循环时间需可推进以使追赶收敛"
+          ],
+          "side_effects": [
+            "修正睡眠基点或逐阶段 DoGrowth(true)；末尾条件 growfn 仅接 inst；不保证每阶段转换 growfn 均执行"
+          ],
+          "lifecycle": "EntityScript:LongUpdate、睡醒、Pause 的睡眠追赶调用",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S004",
+            "GROW-S017",
+            "GROW-S005"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:OnEntitySleep()",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件；全局睡眠分发回调",
+          "parameters": [],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "task 存在且 growoffscreen 为假值才执行"
+          ],
+          "side_effects": [
+            "取消当前 task，保留 targettime，记录 sleeptime；不建立暂停原因"
+          ],
+          "lifecycle": "prefab 睡眠回调之后遍历组件",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S018"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:OnEntityWake()",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件；全局唤醒分发回调",
+          "parameters": [],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "targettime 非 nil 且 growoffscreen 为假值"
+          ],
+          "side_effects": [
+            "正睡眠间隔时清基点并 LongUpdate；否则重排剩余时长任务"
+          ],
+          "lifecycle": "prefab 唤醒回调之后遍历组件",
+          "evidence_refs": [
+            "GROW-S008",
+            "GROW-S018",
+            "GROW-S002"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:OnSave()",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件；组件保存回调",
+          "parameters": [],
+          "returns": [
+            "保存 table（正常含 stage）；表达式在表为空时才返回 nil"
+          ],
+          "preconditions": [
+            "阶段 multiplier 在启用标志时可用且适合除法"
+          ],
+          "side_effects": [
+            "计算并归一化剩余/睡眠时间，不保存任务或原因表"
+          ],
+          "lifecycle": "EntityScript:GetPersistData 的组件阶段",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S015"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Growable:OnLoad(data)",
+          "source_file": "scripts/components/growable.lua",
+          "visibility": "Growable 类方法；原版所列消费者在 ismastersim 分界后安装；组件构造本身未 assert 端别，不推出客户端存在该组件；组件载入回调",
+          "parameters": [
+            "data: 可 nil；stage/time/sleeptime/usetimemultiplier 字段"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "阶段定义已由 prefab 恢复；非 nil data 的字段满足算术；不要依赖原因表持久化"
+          ],
+          "side_effects": [
+            "SetStage 可执行 fn/移除；恢复睡眠基点；可原地改 data.time；有 time 时 StartGrowing 再清倍率标志；无 time 不主动停止初始任务"
+          ],
+          "lifecycle": "组件 OnLoad 在 prefab OnLoad 之前；组件顺序不是保证",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S006",
+            "GROW-S002",
+            "GROW-S016"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "原版消费者用 Pause/Resume 管理约束；Pause 的首次记录可能先补睡眠时间，恢复需原因表为空。",
+          "evidence_refs": [
+            "GROW-S005",
+            "GROW-S028"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "睡眠分发先到 prefab 后到组件；Growable 取消任务但保留目标，睡醒或显式长更新走追赶算法。",
+          "evidence_refs": [
+            "GROW-S018",
+            "GROW-S008",
+            "GROW-S017"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "保存只记录数值剩余/阶段与睡眠信息；读档应用阶段并按有无 time 条件重建计时，不保存全部暂停语义。",
+          "evidence_refs": [
+            "GROW-S007",
+            "GROW-S002"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "prefab OnLoad 或延迟约束检查补恢复语义：常青树 stump 停止；远古树苗按 seed/后续阶段不同环境条件重判。",
+          "evidence_refs": [
+            "GROW-S016",
+            "GROW-S022",
+            "GROW-S021",
+            "GROW-S027",
+            "GROW-S028",
+            "GROW-S029"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-GROW-002-C11: 未实际睡眠、长更新或存读档；native 的睡眠时机、GetTime 精度、任务取消边界、现实离线时间及回调重入/移除结果仍未知。未审阅所有植物的 prefab OnLongUpdate/季节/watch/数据迁移，不推广为全体作物合同。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GROW-S002",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C01",
+              "EXP-GROW-002-C02",
+              "EXP-GROW-002-C03",
+              "EXP-GROW-002-C04",
+              "EXP-GROW-002-C05",
+              "EXP-GROW-002-C06",
+              "EXP-GROW-002-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S003",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C01",
+              "EXP-GROW-002-C02",
+              "EXP-GROW-002-C04"
+            ]
+          },
+          {
+            "ref": "GROW-S004",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C02",
+              "EXP-GROW-002-C04",
+              "EXP-GROW-002-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S005",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C01",
+              "EXP-GROW-002-C02",
+              "EXP-GROW-002-C09",
+              "EXP-GROW-002-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S006",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C04",
+              "EXP-GROW-002-C05"
+            ]
+          },
+          {
+            "ref": "GROW-S007",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C05",
+              "EXP-GROW-002-C06",
+              "EXP-GROW-002-C07",
+              "EXP-GROW-002-C09",
+              "EXP-GROW-002-C10",
+              "EXP-GROW-002-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S008",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C01",
+              "EXP-GROW-002-C03",
+              "EXP-GROW-002-C04",
+              "EXP-GROW-002-C09",
+              "EXP-GROW-002-C10",
+              "EXP-GROW-002-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S010",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C06"
+            ]
+          },
+          {
+            "ref": "GROW-S015",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S016",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C07",
+              "EXP-GROW-002-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S017",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S018",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C03",
+              "EXP-GROW-002-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S021",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S022",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S026",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S027",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S028",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C08",
+              "EXP-GROW-002-C09",
+              "EXP-GROW-002-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S029",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-002-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "未穷举全部 prefab、回调闭包、第三方 Mod 或 native/动态依赖；未变化的已列指纹不证明未来版本语义全部兼容。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-GROW-003",
+      "title": "RegrowthManager：移除事件、世界队列与再生成尝试",
+      "aliases": [
+        "regrowthmanager",
+        "beginregrowth",
+        "AddToRegrowthManager",
+        "RemoveFromRegrowthManager",
+        "SetRegrowthForType"
+      ],
+      "engineering_question": "采走或移除的原生资源如何排队再生成，定时到期是否保证原位置出现新实体？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "forest/cave 运行时 master 世界组件；胡萝卜与花的移除消费者；不是 Growable 原实体阶段恢复",
+        "excluded": "不覆盖全部农作物/部署/采集业务、native 调度精度、离线现实时间或联网表现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GROW-003-C01",
+          "kind": "NSF",
+          "statement": "RegrowthManager 构造 assert TheWorld.ismastersim，捕获 TheWorld.state/Map，维护按 prefab 的配置、内部时钟与链表；forest/cave 的 master_postinit 添加此组件。它监听世界 beginregrowth，并在 inst 上安排 29 周期任务调用 LongUpdate(29)，未在构造中保存该 periodic handle。",
+          "evidence_refs": [
+            "GROW-S030",
+            "GROW-S032",
+            "GROW-S039",
+            "GROW-S040",
+            "GROW-S011"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C02",
+          "kind": "NSF",
+          "statement": "AddToRegrowthManager 在源实体登记 onremove→OnStartRegrowth，将源实体作为世界 beginregrowth 的 data，并登记 despawnedfromhaunt→RemoveFromRegrowthManager。RemoveFromRegrowthManager 仅撤这两个监听并清 inst.OnStartRegrowth，不删除管理器里已排队 timer。OnBeginRegrowth 不认识 target.prefab 时打印并返回；认识时快照 product、目标内部时钟+regrowtime、target:GetPosition 和调试 i，追加链表，没有保存源实体全部状态或去重 target。",
+          "evidence_refs": [
+            "GROW-S035",
+            "GROW-S031"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C03",
+          "kind": "NSF",
+          "statement": "SetRegrowthForType(prefab,regrowtime,product,timemult) 整项覆盖该类型配置，并将 _internaltimes[prefab] 重设 0，不清空或重新排序已排 timer。timemult 是 LongUpdate 中无参调用的函数；仅其结果 >0 才增加时钟并处理该类型，增量为 dt*TUNING.REGROWTH_TIME_MULTIPLIER*prefabtimemult。原版 carrot 在夜/冬/雪量>0 时因子 0；flower 在雨/夜/冬/wetness<=1/雪量>0 时因子 0，否则春季采用两倍 flower 倍率。这里只读取当次 state，不按过去每段天气积分。",
+          "evidence_refs": [
+            "GROW-S032",
+            "GROW-S033"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C04",
+          "kind": "NSF",
+          "statement": "DoRegrowth 用 timer 保存的位置作为中心，但 orig_tile 是尝试当时中心位置的地皮，不是移除时保存的地皮；随机偏移至半径 20 内。候选玩家外圈无玩家时才检相同 orig_tile、CanPlantAtPoint、道路、半径 3 全实体和半径 20 的 structure/wall/regrowth_blocker；合格调用 SpawnPrefab(product)，非 nil 才设位置，但无论 SpawnPrefab 是否 nil 均返回内部 SUCCESS。附近玩家导致 CACHE，空间检查失败导致 FAILED。",
+          "evidence_refs": [
+            "GROW-S030",
+            "GROW-S031"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C05",
+          "kind": "NSF",
+          "statement": "LongUpdate 按链表遍历已到期 timer，遇首个 regrowtime>内部时钟即 break；SUCCESS 移除 timer，CACHE 留原记录待下一更新，FAILED 移除后将到期设为当前内部时钟+完整 regrowtime 并追加尾部。虽然定义 RETRY_MULT=0.25，当前失败赋值未使用它；不能说失败四分之一时间后必重试。追加/迭代由 LinkedList 实现，并有回到 starttimer 的循环退出判断，不提供任意重配置后的排序保证。",
+          "evidence_refs": [
+            "GROW-S030",
+            "GROW-S033",
+            "GROW-S051"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C06",
+          "kind": "NSF",
+          "statement": "OnSave 保存每类型队列的 product、相对内部时钟的 regrowtime 和坐标（0 省为 nil）；不保存类型配置、绝对时钟或源实体身份。OnLoad 要求 data.timers，只有已重建内部时钟的类型才 AppendTimer，将相对剩余恢复为当前时钟+剩余并重分配调试 i；不清现有队列，没有重复载入去重。",
+          "evidence_refs": [
+            "GROW-S034",
+            "GROW-S032",
+            "GROW-S031"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C07",
+          "kind": "NSF",
+          "statement": "胡萝卜 master 端设置 pickable.remove_when_picked=true 并 AddToRegrowthManager；花 master 端也设置采后移除，并在非 isplanted 的构造分支安排 CheckForPlanted，后者仅当 inst.planted 为假值时登记。Pickable:Pick 通过可采/交互/非 stuck 门槛后最终按 remove_when_picked 调 Remove；EntityScript:Remove 先发 onremove 再清监听与所有实体待办任务，因此能进入上述移除事件链。",
+          "evidence_refs": [
+            "GROW-S036",
+            "GROW-S037",
+            "GROW-S038",
+            "GROW-S049",
+            "GROW-S014",
+            "GROW-S035"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C08",
+          "kind": "EI",
+          "statement": "此机制是按类型/位置重新生成尝试，不是复活同一个 GUID、逐字段还原或严格补回每个被采资源。队列 SUCCESS 不能代表 SpawnPrefab 成功，RemoveFromRegrowthManager 不能撤销既有队列。仅 RemoveComponent 也不能视为删除管理器宿主：其通用路径未 CancelAllPendingTasks 或清全部监听，而周期任务/监听在 inst 上登记；动态卸载此世界组件需另审清理策略。",
+          "evidence_refs": [
+            "GROW-S031",
+            "GROW-S033",
+            "GROW-S034",
+            "GROW-S035",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S011",
+            "GROW-S032"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C09",
+          "kind": "REC",
+          "statement": "新资源先配置类型与有效产品/时间函数，再接入移除事件；配置变化或重复登记/载入要显式设计迁移和幂等。验收区分事件入队、到期尝试、产品实际生成、位置和最终数量，不把局部 SUCCESS 或定时器消耗当生成保证；不从注释和未使用常量推测重试时长。",
+          "evidence_refs": [
+            "GROW-S032",
+            "GROW-S031",
+            "GROW-S033",
+            "GROW-S034",
+            "GROW-S035"
+          ]
+        },
+        {
+          "id": "EXP-GROW-003-C10",
+          "kind": "UNK",
+          "statement": "未执行采集、移除、world periodic、出生点检查或存读档；native 空间/玩家距离查询、状态变化与时钟实际交互、模组产品加载失败、跨分片和管理器动态移除仍待验证。原版其他类型及所有 destruction/haunt 特例未穷举。",
+          "evidence_refs": [
+            "GROW-S031",
+            "GROW-S033",
+            "GROW-S034",
+            "GROW-S035"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "RegrowthManager:SetRegrowthForType(prefab, regrowtime, product, timemult)",
+          "source_file": "scripts/components/regrowthmanager.lua",
+          "visibility": "RegrowthManager 构造闭包内挂到 self 的公开方法；仅 master 世界组件（构造有 assert），不是 modworldgenmain API",
+          "parameters": [
+            "prefab: 源类型键",
+            "regrowtime: 内部时钟时长",
+            "product: SpawnPrefab 用产品名",
+            "timemult: 无参返回数值的函数"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "master 世界已构造；提供有效函数/数值/产品；未做统一类型校验"
+          ],
+          "side_effects": [
+            "覆盖配置并将此类型内部时钟置 0；不清 timer、不重排/rebase 旧队列"
+          ],
+          "lifecycle": "构造原版配置或受控外部配置",
+          "evidence_refs": [
+            "GROW-S032",
+            "GROW-S033",
+            "GROW-S031"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "RegrowthManager:LongUpdate(dt)",
+          "source_file": "scripts/components/regrowthmanager.lua",
+          "visibility": "RegrowthManager 构造闭包内挂到 self 的公开方法；仅 master 世界组件（构造有 assert），不是 modworldgenmain API",
+          "parameters": [
+            "dt: 用于每类型内部时钟的时间增量；周期路径固定传 29"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "每个有队列类型都有配置与可调用 timemult；队列/产品有效"
+          ],
+          "side_effects": [
+            "因子>0 时推进时钟、尝试生成并删除/缓存/延后队列；生成 nil 仍可能消耗记录"
+          ],
+          "lifecycle": "world periodic 或 EntityScript 长更新分发",
+          "evidence_refs": [
+            "GROW-S033",
+            "GROW-S032",
+            "GROW-S031",
+            "GROW-S017"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "RegrowthManager:OnSave()",
+          "source_file": "scripts/components/regrowthmanager.lua",
+          "visibility": "RegrowthManager 构造闭包内挂到 self 的公开方法；仅 master 世界组件（构造有 assert），不是 modworldgenmain API",
+          "parameters": [],
+          "returns": [
+            "{timers=按类型的记录数组}"
+          ],
+          "preconditions": [
+            "timer 结构有效"
+          ],
+          "side_effects": [
+            "计算相对剩余并省略零坐标；不变更队列"
+          ],
+          "lifecycle": "组件保存阶段",
+          "evidence_refs": [
+            "GROW-S034",
+            "GROW-S032",
+            "GROW-S031"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "RegrowthManager:OnLoad(data)",
+          "source_file": "scripts/components/regrowthmanager.lua",
+          "visibility": "RegrowthManager 构造闭包内挂到 self 的公开方法；仅 master 世界组件（构造有 assert），不是 modworldgenmain API",
+          "parameters": [
+            "data.timers: 按源类型的队列记录"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "data/timers 非 nil 且结构有效；类型先重新配置"
+          ],
+          "side_effects": [
+            "向已有支持类型队列追加；不支持类型跳过；不保存/恢复源实体 GUID，也不自动去重"
+          ],
+          "lifecycle": "组件加载阶段",
+          "evidence_refs": [
+            "GROW-S034",
+            "GROW-S032",
+            "GROW-S031"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "AddToRegrowthManager(inst)",
+          "source_file": "scripts/standardcomponents.lua",
+          "visibility": "原版全局 helper；所列 prefab 仅 master 初始化使用；不是管理器实例方法",
+          "parameters": [
+            "inst: 需接入移除再生的源实体"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "TheWorld 的管理器已存在并认识源 prefab；实体支持事件接口"
+          ],
+          "side_effects": [
+            "登记 onremove 与 despawnedfromhaunt，暴露 inst.OnStartRegrowth；不立即排队/生成"
+          ],
+          "lifecycle": "源实体初始化；移除事件再转世界事件",
+          "evidence_refs": [
+            "GROW-S035",
+            "GROW-S031",
+            "GROW-S036",
+            "GROW-S038"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "RemoveFromRegrowthManager(inst)",
+          "source_file": "scripts/standardcomponents.lua",
+          "visibility": "原版全局 helper；也是 despawnedfromhaunt 监听回调",
+          "parameters": [
+            "inst: 之前接入的源实体"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "实体事件接口可用"
+          ],
+          "side_effects": [
+            "撤销 helper 的两个监听，清 inst.OnStartRegrowth；不删除世界里已排队 timer"
+          ],
+          "lifecycle": "特殊 despawn 或显式撤销以后事件接入",
+          "evidence_refs": [
+            "GROW-S035",
+            "GROW-S031"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "世界 master 组件配置类型、监听 beginregrowth 并安排宿主周期任务；资源 helper 登记源实体移除事件。",
+          "evidence_refs": [
+            "GROW-S030",
+            "GROW-S032",
+            "GROW-S039",
+            "GROW-S040",
+            "GROW-S035"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "采后 Remove 发 onremove，helper 传源实体到世界事件；管理器快照位置/产品和内部到期时间入队。",
+          "evidence_refs": [
+            "GROW-S036",
+            "GROW-S038",
+            "GROW-S049",
+            "GROW-S014",
+            "GROW-S035",
+            "GROW-S031"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "LongUpdate 按当次 state 因子推进内部时钟；到期做玩家/空间检查和 SpawnPrefab，按内部状态删、缓存或延后。",
+          "evidence_refs": [
+            "GROW-S032",
+            "GROW-S033",
+            "GROW-S031"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "队列以相对剩余和坐标保存；载入只向已重新配置的支持类型追加，不恢复原实体身份或自动去重。",
+          "evidence_refs": [
+            "GROW-S034",
+            "GROW-S032"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-GROW-003-C10: 未执行采集、移除、world periodic、出生点检查或存读档；native 空间/玩家距离查询、状态变化与时钟实际交互、模组产品加载失败、跨分片和管理器动态移除仍待验证。原版其他类型及所有 destruction/haunt 特例未穷举。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GROW-S011",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C01",
+              "EXP-GROW-003-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S013",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S014",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C07",
+              "EXP-GROW-003-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S017",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": []
+          },
+          {
+            "ref": "GROW-S030",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C01",
+              "EXP-GROW-003-C04",
+              "EXP-GROW-003-C05"
+            ]
+          },
+          {
+            "ref": "GROW-S031",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C02",
+              "EXP-GROW-003-C04",
+              "EXP-GROW-003-C06",
+              "EXP-GROW-003-C08",
+              "EXP-GROW-003-C09",
+              "EXP-GROW-003-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S032",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C01",
+              "EXP-GROW-003-C03",
+              "EXP-GROW-003-C06",
+              "EXP-GROW-003-C08",
+              "EXP-GROW-003-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S033",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C03",
+              "EXP-GROW-003-C05",
+              "EXP-GROW-003-C08",
+              "EXP-GROW-003-C09",
+              "EXP-GROW-003-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S034",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C06",
+              "EXP-GROW-003-C08",
+              "EXP-GROW-003-C09",
+              "EXP-GROW-003-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S035",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C02",
+              "EXP-GROW-003-C07",
+              "EXP-GROW-003-C08",
+              "EXP-GROW-003-C09",
+              "EXP-GROW-003-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S036",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S037",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S038",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S039",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C01"
+            ]
+          },
+          {
+            "ref": "GROW-S040",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C01"
+            ]
+          },
+          {
+            "ref": "GROW-S049",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S051",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-003-C05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "未穷举全部 prefab、回调闭包、第三方 Mod 或 native/动态依赖；未变化的已列指纹不证明未来版本语义全部兼容。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-GROW-004",
+      "title": "PlantRegrowth：父实体、共享桶时钟与密度约束后代",
+      "aliases": [
+        "plantregrowth",
+        "TrySpawnNearby",
+        "SetRegrowthRate",
+        "TimeMultipliers",
+        "GetFiveRadius",
+        "UpdateBuckets"
+      ],
+      "engineering_question": "现存树如何在邻近产生树苗，为什么停止 growable、睡眠或设置 rate 不保证停止/立即繁殖？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "master 原版树 prefab 安装的运行时 PlantRegrowth；模块级共享时钟/桶与生成密度消费者；不扩展所有农作物",
+        "excluded": "不覆盖全部农作物/部署/采集业务、native 调度精度、离线现实时间或联网表现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GROW-004-C01",
+          "kind": "NSF",
+          "statement": "PlantRegrowth 模块维护共享 UpdateTask/UpdateBuckets/CurrentBucket/LastTime 和按父 inst.prefab 键的 InternalTimes；公开类表 TimeMultipliers 指向同一函数表。常青树因子依 summer/winter，月树因子依 moonphase 表；DoUpdate 用当次 GetTime()-LastTime 和当次倍率推进所有已有类型时钟，然后只轮到一桶执行 TrySpawnNearby。不是每个父实体独有周期任务，也不是每个周期所有实例都执行。",
+          "evidence_refs": [
+            "GROW-S041",
+            "GROW-S042"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C02",
+          "kind": "NSF",
+          "statement": "SetRegrowthRate 写 rate 并每次 RegisterUpdate；首次注册创建 TheWorld:DoPeriodicTask(31,DoUpdate) 和桶，后续找少于 50 项的桶追加，否则建新桶。每次设置 rate 都走追加，函数未检查 self._bucket 已登记，不能当可反复调用的幂等调速器。内部时钟缺失时先设 0，nextregrowth<=类型时钟才 ResetGrowthTime；Reset 用 GetRandomWithVariance(rate,rate*0.2) 得下次内部时刻。该时长是尝试间隔，不是生成成功期限。",
+          "evidence_refs": [
+            "GROW-S042",
+            "GROW-S043",
+            "GROW-S050"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C03",
+          "kind": "NSF",
+          "statement": "TrySpawnNearby 未到期返回，到期先 ResetGrowthTime，所以后续失败也消耗这次尝试。首次 GetFiveRadius 在原位置查生成区域密度；缺值则 UnregisterUpdate 并返回；得到 fiveradius 缓存在实例。候选点所在区域还另查父 prefab 的 targetradius，按 searchtag or 父 prefab 搜实体，数量<5 才 SpawnPrefab(product or 父 prefab)，随后直接访问 offspring.Transform，未判 nil。",
+          "evidence_refs": [
+            "GROW-S044",
+            "GROW-S043",
+            "GROW-S046"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C04",
+          "kind": "NSF",
+          "statement": "GetSpawnPoint 要 TheWorld.Map，可选 skip_plant_check 仅绕过 CanPlantAtPoint；仍检查 CanPlacePrefabFilteredAtPoint、道路、半径 3 的所有实体和半径 8 的 structure/wall，并最多尝试 10 个角度。这里没有 RegrowthManager 的玩家外圈/cache 状态或 regrowth_blocker 标签列表，不把两个机制的条件互抄。",
+          "evidence_refs": [
+            "GROW-S044",
+            "GROW-S031",
+            "GROW-S030"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C05",
+          "kind": "NSF",
+          "statement": "GetFiveRadius 按 TheSim:WorldPointInPoly 找首个 topology node，要求 TheWorld.generated、对应 topology id 和 densities 记录；取父 prefab 密度后 CalculateFiveRadius=math.sqrt((2*16*5/density)/math.pi)。显式guard覆盖的无区域、无generated、无对应topology id/区域密度记录或父prefab密度时返回nil；topology结构和generated.densities容器表本身缺失未被单独保护，不保证任意坏档安全返回nil；它依赖生成时数据，不是动态扫描计算全世界树总量，且不对密度正值做此处统一校验。",
+          "evidence_refs": [
+            "GROW-S046"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C06",
+          "kind": "NSF",
+          "statement": "组件 OnSave 只返回 regrowthtime=nextregrowth-InternalTimes[父 prefab]；OnLoad(data 非 nil) 将该相对剩余加到当前类型时钟。rate/product/searchtag/TimeMultipliers/桶/fiveradius 不在此存档数据中，需 prefab/模块重建；OnLoad 需已初始化类型时钟与有效 regrowthtime。模块未提供 LongUpdate 来积分历史季节，本卡不从这个剩余值推出现实离线时间增长。",
+          "evidence_refs": [
+            "GROW-S045",
+            "GROW-S042",
+            "GROW-S041",
+            "GROW-S043"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C07",
+          "kind": "NSF",
+          "statement": "OnRemoveFromEntity 与 OnRemoveEntity 都调用 UnregisterUpdate；未登记时可直接返回，正常移除当前桶中首个自身项，桶空时删桶，最后一桶消失时取消共享世界任务并清桶/索引。InternalTimes 不在此清理中删除；若曾重复 RegisterUpdate，单次移除并不保证所有重复项被撤。实体移除会先取消该实体自有任务，再组件 OnRemoveEntity；PlantRegrowth 的共享任务归世界所有，需桶清理而非依赖父实体任务自动取消。",
+          "evidence_refs": [
+            "GROW-S043",
+            "GROW-S042",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S011"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C08",
+          "kind": "NSF",
+          "statement": "常青树在 master 分界后同时安装 growable 和 plantregrowth，后者从 build 配 rate/product/searchtag；普通 build 产品 pinecone_sapling。月树也在 master 分界后安装两组件，plantregrowth 产品 moonbutterfly_sapling、searchtag=moon_tree；二者仍按父 inst.prefab 的 InternalTimes/密度计算，产品名和 searchtag 不替换父类型的时钟或密度键。",
+          "evidence_refs": [
+            "GROW-S020",
+            "GROW-S047",
+            "GROW-S048",
+            "GROW-S042",
+            "GROW-S044",
+            "GROW-S046"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C09",
+          "kind": "EI",
+          "statement": "父实体 Growable 的 StopGrowing/Pause 和 PlantRegrowth 桶登记属于不同所有权；所列邻近尝试链未以父 IsAsleep、Growable:IsGrowing 或 IsPaused 为守卫。因此不能仅停止阶段推进就宣称停止后代繁殖，也不能套用 RegrowthManager 的“移除后排队、玩家附近缓存”行为。",
+          "evidence_refs": [
+            "GROW-S003",
+            "GROW-S005",
+            "GROW-S042",
+            "GROW-S044",
+            "GROW-S031"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C10",
+          "kind": "REC",
+          "statement": "把 rate 当初始化登记入口审慎调用一次；新父类型需配有效 TimeMultipliers 函数、生成密度依据和产品 prefab。需要动态启停/改变繁殖策略时先设计桶清理及存档迁移，检查停止阶段与停止繁殖两层，不用强行填 density 或假造拓扑来绕过无密度退出。验收分别统计尝试、出生实体和动态密度。",
+          "evidence_refs": [
+            "GROW-S041",
+            "GROW-S042",
+            "GROW-S043",
+            "GROW-S044",
+            "GROW-S046",
+            "GROW-S045"
+          ]
+        },
+        {
+          "id": "EXP-GROW-004-C11",
+          "kind": "UNK",
+          "statement": "未执行共享任务、空间查询、SpawnPrefab 或存读档；native 多边形包含、碰撞过滤、随机点、任务/世界重建时序及远端表现未验证。新类型缺 TimeMultipliers、重复注册、产品加载失败的结果仅作静态失败边界，不宣称已复现游戏崩溃。未证明恒定数量、全图均匀分布或所有旧档都有 densities。",
+          "evidence_refs": [
+            "GROW-S041",
+            "GROW-S042",
+            "GROW-S044",
+            "GROW-S046",
+            "GROW-S045"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "PlantRegrowth:SetRegrowthRate(rate)",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API",
+          "parameters": [
+            "rate: 下次尝试的内部时间间隔，使用 ±20% 随机方差"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "TheWorld 任务可用；父 prefab 的 TimeMultipliers 有可调用项；rate 有效；正常初始化只登记一次"
+          ],
+          "side_effects": [
+            "写 rate、注册共享桶；到期才重置 nextregrowth；重复调用可追加同实例，未实现幂等"
+          ],
+          "lifecycle": "父 prefab 初始化登记",
+          "evidence_refs": [
+            "GROW-S042",
+            "GROW-S043",
+            "GROW-S041",
+            "GROW-S050"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:SetProduct(product)",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API",
+          "parameters": [
+            "product: offspring prefab 名；假值时生成用父 prefab"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "父组件已存在；仍需有效产品、时钟和密度"
+          ],
+          "side_effects": [
+            "只写 self.product，不改父类型时钟/密度键"
+          ],
+          "lifecycle": "尝试前配置",
+          "evidence_refs": [
+            "GROW-S043",
+            "GROW-S044",
+            "GROW-S046"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:SetSearchTag(tag)",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API",
+          "parameters": [
+            "tag: 密度搜索所需 tag；假值时用父 prefab"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "父组件已存在；仍需有效产品、时钟和密度"
+          ],
+          "side_effects": [
+            "只写 self.searchtag，不改生成密度键"
+          ],
+          "lifecycle": "尝试前配置",
+          "evidence_refs": [
+            "GROW-S043",
+            "GROW-S044",
+            "GROW-S046"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:SetSkipCanPlantCheck(bool)",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API",
+          "parameters": [
+            "bool: 真值绕过 CanPlantAtPoint 一项"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "父组件已存在；仍需有效产品、时钟和密度"
+          ],
+          "side_effects": [
+            "只写 skip_plant_check；不绕过过滤放置、道路、邻近实体/结构检查"
+          ],
+          "lifecycle": "尝试前配置",
+          "evidence_refs": [
+            "GROW-S043",
+            "GROW-S044",
+            "GROW-S046"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:TrySpawnNearby()",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API",
+          "parameters": [],
+          "returns": [
+            "无显式返回（nil）；不返回是否生成成功"
+          ],
+          "preconditions": [
+            "类型 InternalTimes 已注册；rate/product/Transform/TimeMultipliers 有效；density 正值及 native 查询可用"
+          ],
+          "side_effects": [
+            "到期先重置下一次时间；缺原位置密度注销；缓存原位置 radius；检查候选点密度与数量；尝试 SpawnPrefab 后无 nil 守卫地设 Transform"
+          ],
+          "lifecycle": "共享世界周期轮转桶回调或受控显式调用",
+          "evidence_refs": [
+            "GROW-S044",
+            "GROW-S043",
+            "GROW-S042",
+            "GROW-S046"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:OnSave()",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API；组件保存回调",
+          "parameters": [],
+          "returns": [
+            "{regrowthtime=相对类型时钟的剩余值}"
+          ],
+          "preconditions": [
+            "类型时钟已登记"
+          ],
+          "side_effects": [
+            "只读取 nextregrowth 与共享时钟；不保存桶/回调/产品配置"
+          ],
+          "lifecycle": "EntityScript:GetPersistData",
+          "evidence_refs": [
+            "GROW-S045",
+            "GROW-S015"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "PlantRegrowth:OnLoad(data)",
+          "source_file": "scripts/components/plantregrowth.lua",
+          "visibility": "PlantRegrowth 类方法；所列原版父 prefab 在 master 分界后安装，组件构造未自行 assert master；依赖运行时 TheWorld，不是 worldgen API；组件载入回调",
+          "parameters": [
+            "data: 可 nil；非 nil 要有效 regrowthtime"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "prefab 先完成 rate 登记并初始化类型时钟"
+          ],
+          "side_effects": [
+            "只将相对剩余加当前类型时钟写 nextregrowth；不自行注册或恢复全部配置"
+          ],
+          "lifecycle": "组件载入；后续按当前 world state 更新",
+          "evidence_refs": [
+            "GROW-S045",
+            "GROW-S042",
+            "GROW-S016"
+          ],
+          "unknowns": [
+            "仅静态契约；回调、native 调度和最终游戏效果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "父 prefab 在 master 侧设 rate/product/searchtag，模块共享世界周期任务与分桶；父 prefab 作为时钟/密度键。",
+          "evidence_refs": [
+            "GROW-S020",
+            "GROW-S047",
+            "GROW-S048",
+            "GROW-S041",
+            "GROW-S042",
+            "GROW-S043"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "每次周期按当前 state 推进各类型内部时间，仅处理一桶；到期的父实例先重置尝试间隔。",
+          "evidence_refs": [
+            "GROW-S041",
+            "GROW-S042",
+            "GROW-S044",
+            "GROW-S050"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按生成数据求半径，缺原点依据注销；候选点通过多重空间过滤及目标父类型密度数量门槛才尝试后代生成。",
+          "evidence_refs": [
+            "GROW-S046",
+            "GROW-S044",
+            "GROW-S043"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "保存相对剩余；移除父组件/实体从共享桶注销，最后一桶取消世界任务；不依赖停止 growable 来取消。",
+          "evidence_refs": [
+            "GROW-S045",
+            "GROW-S043",
+            "GROW-S013",
+            "GROW-S014",
+            "GROW-S003",
+            "GROW-S005"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-GROW-004-C11: 未执行共享任务、空间查询、SpawnPrefab 或存读档；native 多边形包含、碰撞过滤、随机点、任务/世界重建时序及远端表现未验证。新类型缺 TimeMultipliers、重复注册、产品加载失败的结果仅作静态失败边界，不宣称已复现游戏崩溃。未证明恒定数量、全图均匀分布或所有旧档都有 densities。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GROW-S003",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S005",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S011",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S013",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S014",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C07"
+            ]
+          },
+          {
+            "ref": "GROW-S015",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": []
+          },
+          {
+            "ref": "GROW-S016",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": []
+          },
+          {
+            "ref": "GROW-S020",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S030",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C04"
+            ]
+          },
+          {
+            "ref": "GROW-S031",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C04",
+              "EXP-GROW-004-C09"
+            ]
+          },
+          {
+            "ref": "GROW-S041",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C01",
+              "EXP-GROW-004-C06",
+              "EXP-GROW-004-C10",
+              "EXP-GROW-004-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S042",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C01",
+              "EXP-GROW-004-C02",
+              "EXP-GROW-004-C06",
+              "EXP-GROW-004-C07",
+              "EXP-GROW-004-C08",
+              "EXP-GROW-004-C09",
+              "EXP-GROW-004-C10",
+              "EXP-GROW-004-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S043",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C02",
+              "EXP-GROW-004-C03",
+              "EXP-GROW-004-C06",
+              "EXP-GROW-004-C07",
+              "EXP-GROW-004-C10"
+            ]
+          },
+          {
+            "ref": "GROW-S044",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C03",
+              "EXP-GROW-004-C04",
+              "EXP-GROW-004-C08",
+              "EXP-GROW-004-C09",
+              "EXP-GROW-004-C10",
+              "EXP-GROW-004-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S045",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C06",
+              "EXP-GROW-004-C10",
+              "EXP-GROW-004-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S046",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C03",
+              "EXP-GROW-004-C05",
+              "EXP-GROW-004-C08",
+              "EXP-GROW-004-C10",
+              "EXP-GROW-004-C11"
+            ]
+          },
+          {
+            "ref": "GROW-S047",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S048",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C08"
+            ]
+          },
+          {
+            "ref": "GROW-S050",
+            "role": "本机制显式源码事实/消费者/生命周期定位；非动态闭包",
+            "claim_ids": [
+              "EXP-GROW-004-C02"
+            ]
+          }
+        ],
+        "unknowns": [
+          "未穷举全部 prefab、回调闭包、第三方 Mod 或 native/动态依赖；未变化的已列指纹不证明未来版本语义全部兼容。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "GROW-S001",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 1,
+      "line_end": 24,
+      "range_sha256": "fda8534be15eb8854ac73d6e03b53ad7db99ae18088ef3e51183ff19727c1fee",
+      "symbols": [
+        "OnGrow",
+        "Growable"
+      ]
+    },
+    {
+      "id": "GROW-S002",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 28,
+      "line_end": 79,
+      "range_sha256": "995c3c3caf743b36d60315ff88ae3fc3c37e154dabe0be2c48885159829e8ea0",
+      "symbols": [
+        "Growable:StartGrowingTask",
+        "Growable:StartGrowing"
+      ]
+    },
+    {
+      "id": "GROW-S003",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 81,
+      "line_end": 113,
+      "range_sha256": "d55e874c3968723ac5404af934f130225a06174755105af4d7b1f9ad72fc21df",
+      "symbols": [
+        "Growable:StopGrowing",
+        "Growable:GetNextStage",
+        "Growable:GetCurrentStageData",
+        "Growable:IsGrowing"
+      ]
+    },
+    {
+      "id": "GROW-S004",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 117,
+      "line_end": 151,
+      "range_sha256": "fe384acef8f22c90816b54b577988ec01eb0357ecf1f7d9a74c87857eecd29f9",
+      "symbols": [
+        "Growable:DoMagicGrowth",
+        "Growable:DoGrowth"
+      ]
+    },
+    {
+      "id": "GROW-S005",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 155,
+      "line_end": 205,
+      "range_sha256": "13b842007abb1d997a1ceed26245db9dcf24a1727df63ea48fdf0f98f017e554",
+      "symbols": [
+        "Growable:Pause",
+        "Growable:Resume",
+        "Growable:IsPaused",
+        "Growable:ExtendGrowTime"
+      ]
+    },
+    {
+      "id": "GROW-S006",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 207,
+      "line_end": 219,
+      "range_sha256": "0a28f25b80a4d81f52bfdebb19ba838cb8132ccdf8e3f4eaf75f2e00adcbce92",
+      "symbols": [
+        "Growable:SetStage"
+      ]
+    },
+    {
+      "id": "GROW-S007",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 223,
+      "line_end": 269,
+      "range_sha256": "4e25ea40b67f9a2f0dc8a9c1700664f18108c8d8a89a80c25b0fdbce70ef4fd2",
+      "symbols": [
+        "GetStageTimeMultiplier",
+        "Growable:OnSave",
+        "Growable:OnLoad"
+      ]
+    },
+    {
+      "id": "GROW-S008",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 273,
+      "line_end": 339,
+      "range_sha256": "551e13256364c65f7e963366fbdf72007b34d3df95cb2c7e43eabed9ba9a5f83",
+      "symbols": [
+        "Growable:LongUpdate",
+        "Growable:OnEntitySleep",
+        "Growable:OnEntityWake"
+      ]
+    },
+    {
+      "id": "GROW-S009",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 365,
+      "line_end": 369,
+      "range_sha256": "52ddd583751d53d078392e64faff20642428ef8fd574a453c707c81efa61fe0e",
+      "symbols": [
+        "Growable.OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "GROW-S010",
+      "source_file": "scripts/simutil.lua",
+      "file_sha256": "13815df52c2ba681b88eea0f84c83fecd15934af921c180e7c48a824e8497f7e",
+      "line_start": 563,
+      "line_end": 565,
+      "range_sha256": "1e02b7b13edbce3c6424a3433da573baa1e3c21606a4307c5da32a5c2a6fe7d7",
+      "symbols": [
+        "SpringGrowthMod"
+      ]
+    },
+    {
+      "id": "GROW-S011",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1515,
+      "line_end": 1533,
+      "range_sha256": "74015930d04315d9f9b790f2bc61edd9756ce3df2fb7973577961875978f87f7",
+      "symbols": [
+        "EntityScript:DoPeriodicTask",
+        "EntityScript:DoTaskInTime"
+      ]
+    },
+    {
+      "id": "GROW-S012",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1472,
+      "line_end": 1488,
+      "range_sha256": "2d04eb0a077057d94233c5a5a16d12a546ccbb8ed10677f7b027932804d88d97",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish"
+      ]
+    },
+    {
+      "id": "GROW-S013",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 648,
+      "line_end": 663,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "GROW-S014",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1708,
+      "line_end": 1775,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "GROW-S015",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1906,
+      "line_end": 1940,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData"
+      ]
+    },
+    {
+      "id": "GROW-S016",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1957,
+      "line_end": 1992,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "GROW-S017",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 2029,
+      "line_end": 2039,
+      "range_sha256": "7010dd4d08f3636fa6330f00fe625e04e603569fa7adb2d076ab5a51bf79b7e2",
+      "symbols": [
+        "EntityScript:LongUpdate"
+      ]
+    },
+    {
+      "id": "GROW-S018",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 696,
+      "line_end": 757,
+      "range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+      "symbols": [
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "GROW-S019",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 348,
+      "line_end": 384,
+      "range_sha256": "68fbfbc926a52890073e3ada8483a75eb5eed80dc173de67d66ef0bc88fbba2b",
+      "symbols": [
+        "growth_stages",
+        "GetGrowthStages"
+      ]
+    },
+    {
+      "id": "GROW-S020",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 855,
+      "line_end": 910,
+      "range_sha256": "98922de558cbf6cb4c38bd2be0e650430488652f6706253378c0c5c6cc43e0ce",
+      "symbols": [
+        "growable",
+        "plantregrowth"
+      ]
+    },
+    {
+      "id": "GROW-S021",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 459,
+      "line_end": 487,
+      "range_sha256": "00e643c0bfda7b37d285b17e5cb86d3b25d767e90e7000ae94f4a3af5aa4b660",
+      "symbols": [
+        "make_stump"
+      ]
+    },
+    {
+      "id": "GROW-S022",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 578,
+      "line_end": 624,
+      "range_sha256": "74928a7f31b7c9b039ca270dd56d42f345440668165d9a09bba9de6078a21e58",
+      "symbols": [
+        "onsave",
+        "onload"
+      ]
+    },
+    {
+      "id": "GROW-S023",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "line_start": 33,
+      "line_end": 115,
+      "range_sha256": "b4d834aa5297996cfbd0be75b6d22ab824b181890883546e90ee08a3564c133f",
+      "symbols": [
+        "set_stage1",
+        "set_stage3",
+        "set_stage4",
+        "growth_stages"
+      ]
+    },
+    {
+      "id": "GROW-S024",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "line_start": 165,
+      "line_end": 213,
+      "range_sha256": "93e26d95a3ded4d0ca2ea8e44b1271495faf8bf43f64f98e53f49deeb863c234",
+      "symbols": [
+        "onpickedfn",
+        "makeemptyfn",
+        "makebarrenfn"
+      ]
+    },
+    {
+      "id": "GROW-S025",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "line_start": 264,
+      "line_end": 320,
+      "range_sha256": "dcaa9c2112f76be7ab666e9adbacac1233e5cbbe4653981a1f8a92eac8e8fa84",
+      "symbols": [
+        "growable",
+        "pickable"
+      ]
+    },
+    {
+      "id": "GROW-S026",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "line_start": 11,
+      "line_end": 15,
+      "range_sha256": "bdccfe28b74278b796dc358426899231b5ed8a4fa00ce638980871f514a1fcf1",
+      "symbols": [
+        "PAUSE_REASON"
+      ]
+    },
+    {
+      "id": "GROW-S027",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "line_start": 37,
+      "line_end": 111,
+      "range_sha256": "e2a41e4f39d29dc0f1263b7baadafa18e4e421c113dda559ad73c33b88783cb8",
+      "symbols": [
+        "OnSetStage",
+        "OnGrowthFull",
+        "GROWTH_STAGES"
+      ]
+    },
+    {
+      "id": "GROW-S028",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "line_start": 160,
+      "line_end": 202,
+      "range_sha256": "6c9954ded0e58caf111ebf98845fa3edfbb6ac8c0dd46515b71611d275c23185",
+      "symbols": [
+        "Sapling_CheckGrowConstraints",
+        "Sapling_DoMagicGrowthFn"
+      ]
+    },
+    {
+      "id": "GROW-S029",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "line_start": 563,
+      "line_end": 607,
+      "range_sha256": "ccdbf670e57d049ce1dd5b6833b1686ad1b4a12e153dfaa49661a602928ce2fa",
+      "symbols": [
+        "CheckGrowConstraints",
+        "growable",
+        "WatchWorldState"
+      ]
+    },
+    {
+      "id": "GROW-S030",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "line_start": 5,
+      "line_end": 43,
+      "range_sha256": "a61abc5aca55cb5085ddd621d735d02df0db81349fb09d9e65bc1244342b7ccd",
+      "symbols": [
+        "RegrowthManager",
+        "UPDATE_PERIOD",
+        "REGROW_STATUS"
+      ]
+    },
+    {
+      "id": "GROW-S031",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "line_start": 49,
+      "line_end": 129,
+      "range_sha256": "b82371d68067a6e0aa24d26877f00fd151d019553a73debf856c45c8c60196ab",
+      "symbols": [
+        "AppendTimer",
+        "TestForRegrow",
+        "DoRegrowth",
+        "OnBeginRegrowth"
+      ]
+    },
+    {
+      "id": "GROW-S032",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "line_start": 135,
+      "line_end": 159,
+      "range_sha256": "8397d84d1f5fa1fb4339bb67de8abd9889cfd183c2e1bc978ee8c00d94d14480",
+      "symbols": [
+        "SetRegrowthForType",
+        "beginregrowth"
+      ]
+    },
+    {
+      "id": "GROW-S033",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "line_start": 225,
+      "line_end": 270,
+      "range_sha256": "2a698b617e1a9f775ad1ce786e0cc9e017e941d206110cb19acdbb2600856963",
+      "symbols": [
+        "LongUpdate"
+      ]
+    },
+    {
+      "id": "GROW-S034",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "line_start": 276,
+      "line_end": 312,
+      "range_sha256": "bc2435ffa6b97d8e6941db714c0ed14d58ebf255edcd688fe09d1e3e7c35d0c8",
+      "symbols": [
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "GROW-S035",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 1834,
+      "line_end": 1847,
+      "range_sha256": "6f6a80c2ba12bb4373b8a44ce7113ad0dab3646d6e320685a463fdc92677c290",
+      "symbols": [
+        "OnStartRegrowth",
+        "AddToRegrowthManager",
+        "RemoveFromRegrowthManager"
+      ]
+    },
+    {
+      "id": "GROW-S036",
+      "source_file": "scripts/prefabs/carrot.lua",
+      "file_sha256": "367af438dfc1e1810ac4c34e565531a5e28c7107a8ad87e09ccbf5196f2634b7",
+      "line_start": 25,
+      "line_end": 44,
+      "range_sha256": "f541c36f424808ed76ac0014a463a435a6a8ea478e7ff724abba9a2c209d0037",
+      "symbols": [
+        "pickable",
+        "AddToRegrowthManager"
+      ]
+    },
+    {
+      "id": "GROW-S037",
+      "source_file": "scripts/prefabs/flower.lua",
+      "file_sha256": "deb0fcce54ab84d5bca453b20f981bb00657bdad73c5dae0aa9d9b4346a5cf08",
+      "line_start": 101,
+      "line_end": 105,
+      "range_sha256": "0a1f32d7a3e0c90d48ffe3e962f915453a48049ea60b373231e29ea6a58364de",
+      "symbols": [
+        "CheckForPlanted"
+      ]
+    },
+    {
+      "id": "GROW-S038",
+      "source_file": "scripts/prefabs/flower.lua",
+      "file_sha256": "deb0fcce54ab84d5bca453b20f981bb00657bdad73c5dae0aa9d9b4346a5cf08",
+      "line_start": 159,
+      "line_end": 187,
+      "range_sha256": "4b6c1a74d38cc33d2a344feed9cb7083886baa7875cfd3b1f8f6084fbbcd8782",
+      "symbols": [
+        "pickable",
+        "CheckForPlanted"
+      ]
+    },
+    {
+      "id": "GROW-S039",
+      "source_file": "scripts/prefabs/forest.lua",
+      "file_sha256": "c6ca8746fa4aa4cc5e0a1d119ff3f877433f6de8897cb0f64add8229f5bcabbc",
+      "line_start": 635,
+      "line_end": 663,
+      "range_sha256": "cc67e9cd06933f9067ef224e570e688ca24193c75ea6645757810d7dfdae44ba",
+      "symbols": [
+        "master_postinit",
+        "regrowthmanager"
+      ]
+    },
+    {
+      "id": "GROW-S040",
+      "source_file": "scripts/prefabs/cave.lua",
+      "file_sha256": "3322c2df3bf584c3df81ccb55ed669c07bb6866b92b12bd1583693beea46fddb",
+      "line_start": 518,
+      "line_end": 539,
+      "range_sha256": "009902cb7428e37fe12b4e4a900efd69908562c7386b96611fd6565c3ff1242f",
+      "symbols": [
+        "master_postinit",
+        "regrowthmanager"
+      ]
+    },
+    {
+      "id": "GROW-S041",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "line_start": 1,
+      "line_end": 60,
+      "range_sha256": "b19e1602f0e7b7aafc4e427526168fc2a419515e608f7a7b528f3e35aab56295",
+      "symbols": [
+        "TimeMultipliers",
+        "InternalTimes",
+        "moon_tree_mult"
+      ]
+    },
+    {
+      "id": "GROW-S042",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "line_start": 62,
+      "line_end": 101,
+      "range_sha256": "b304d1765a7aa6c4a0a64c7d4bd28aeee895524e034f1585030e85ddc9a4b14a",
+      "symbols": [
+        "DoUpdate",
+        "RegisterUpdate"
+      ]
+    },
+    {
+      "id": "GROW-S043",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "line_start": 103,
+      "line_end": 181,
+      "range_sha256": "3b457e3ebfda0ae2c3bc394f57d2cfac288bc82e1a8e4b71cb93e0a418741be1",
+      "symbols": [
+        "UnregisterUpdate",
+        "SetRegrowthRate",
+        "SetProduct",
+        "SetSearchTag",
+        "SetSkipCanPlantCheck",
+        "OnRemoveFromEntity",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "GROW-S044",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "line_start": 183,
+      "line_end": 242,
+      "range_sha256": "e2a005647ea5435f43e119a945c47fbb5d28003943a94c300da47ee2946b5b90",
+      "symbols": [
+        "GetSpawnPoint",
+        "TrySpawnNearby"
+      ]
+    },
+    {
+      "id": "GROW-S045",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "line_start": 244,
+      "line_end": 256,
+      "range_sha256": "bb8536b0816a4aa2433097392af283397d1129b96317ca052ecdc771f33b6ad2",
+      "symbols": [
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "GROW-S046",
+      "source_file": "scripts/regrowthutil.lua",
+      "file_sha256": "846b8132bae98c0b02d82073342aaec2b97a23eb1ce92852663ffe91c23f1aec",
+      "line_start": 2,
+      "line_end": 36,
+      "range_sha256": "4939ed4bcb1e2fba1fd13cb177a01cab9429f8c64ffbf79caa9cef8992eae5b9",
+      "symbols": [
+        "CalculateFiveRadius",
+        "GetFiveRadius"
+      ]
+    },
+    {
+      "id": "GROW-S047",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 57,
+      "line_end": 97,
+      "range_sha256": "d38bf1dff7ae514d012fd49d63dede7e563ec65fbce378121a746723a3e0e442",
+      "symbols": [
+        "builds"
+      ]
+    },
+    {
+      "id": "GROW-S048",
+      "source_file": "scripts/prefabs/moontree.lua",
+      "file_sha256": "78c0463672e1da8ba93af9a8acfcf96a8e89ee9afe6e7c7ea02afd5cfdd99719",
+      "line_start": 578,
+      "line_end": 640,
+      "range_sha256": "e98f75b735537ff81bc09e7b109501621919f8428a43f4ec9aae7f7310b98829",
+      "symbols": [
+        "growable",
+        "plantregrowth",
+        "moon_tree"
+      ]
+    },
+    {
+      "id": "GROW-S049",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 535,
+      "line_end": 583,
+      "range_sha256": "c94793daf25c53f65d8f2e332b9719426848d4ea75d34388c21a1bf37fb43561",
+      "symbols": [
+        "Pickable:Pick"
+      ]
+    },
+    {
+      "id": "GROW-S050",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 545,
+      "line_end": 547,
+      "range_sha256": "8d00b7491c84b2e52c42439d3abe61f7c5a806ba736fa330500e0379880edeea",
+      "symbols": [
+        "GetRandomWithVariance"
+      ]
+    },
+    {
+      "id": "GROW-S051",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 1157,
+      "line_end": 1267,
+      "range_sha256": "8ff299948c69fb8672350c13d464dd82bc5784a1ebdad3f7c842850be1c6d19e",
+      "symbols": [
+        "LinkedList",
+        "LinkedList:Append",
+        "LinkedList:Head",
+        "LinkedList:Iterator"
+      ]
+    },
+    {
+      "id": "GROW-S052",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 386,
+      "line_end": 396,
+      "range_sha256": "24bd88693f06049df94696a3c0cff56e74e4a637aadfa108d317f37ef1142dec",
+      "symbols": [
+        "Pickable:Regen"
+      ]
+    },
+    {
+      "id": "GROW-S053",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 426,
+      "line_end": 448,
+      "range_sha256": "73df2ab9e830e8cb78cb2e3b870dcb494fddef23333db5909d6d6e4f94809d66",
+      "symbols": [
+        "Pickable:MakeEmpty"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "植物的阶段表和倒计时怎样配合，设置阶段会重新计时吗？",
+      "expected_entry_ids": [
+        "EXP-GROW-001"
+      ],
+      "purpose": "纯中文：阶段与计时分离"
+    },
+    {
+      "query": "growable StartGrowing SetStage DoGrowth stages.fn time pregrowfn growfn",
+      "expected_entry_ids": [
+        "EXP-GROW-001"
+      ],
+      "purpose": "符号：回调与 API 身份"
+    },
+    {
+      "query": "缺少阶段时间就是永久暂停，手动设到末阶段就不会建任务，对吗？",
+      "expected_entry_ids": [
+        "EXP-GROW-001"
+      ],
+      "purpose": "边界负例：缺 time 回退与显式启动"
+    },
+    {
+      "query": "多种暂停原因、睡眠追赶和保存载入分别保留什么？",
+      "expected_entry_ids": [
+        "EXP-GROW-002"
+      ],
+      "purpose": "纯中文：暂停与持久化"
+    },
+    {
+      "query": "Pause Resume pausedremaining pausereasons LongUpdate OnLoad usetimemultiplier",
+      "expected_entry_ids": [
+        "EXP-GROW-002"
+      ],
+      "purpose": "符号：时钟与恢复"
+    },
+    {
+      "query": "暂停原因会全部写入存档，长更新会按同样参数逐次执行所有生长回调吗？",
+      "expected_entry_ids": [
+        "EXP-GROW-002"
+      ],
+      "purpose": "边界负例：原因未保存和回调差异"
+    },
+    {
+      "query": "移除后的胡萝卜与花怎样重新出现，附近玩家会怎样影响尝试？",
+      "expected_entry_ids": [
+        "EXP-GROW-003"
+      ],
+      "purpose": "纯中文：队列再生链"
+    },
+    {
+      "query": "regrowthmanager AddToRegrowthManager beginregrowth SetRegrowthForType LongUpdate",
+      "expected_entry_ids": [
+        "EXP-GROW-003"
+      ],
+      "purpose": "符号：移除事件与内部时钟"
+    },
+    {
+      "query": "再生返回成功就保证新实体存在，撤销登记就能清掉旧队列吗？",
+      "expected_entry_ids": [
+        "EXP-GROW-003"
+      ],
+      "purpose": "边界负例：SUCCESS 与队列撤销"
+    },
+    {
+      "query": "现存树怎样在附近生出树苗，为什么没有原始生成密度会退出？",
+      "expected_entry_ids": [
+        "EXP-GROW-004"
+      ],
+      "purpose": "纯中文：父实体邻近繁殖"
+    },
+    {
+      "query": "plantregrowth SetRegrowthRate TrySpawnNearby TimeMultipliers GetFiveRadius",
+      "expected_entry_ids": [
+        "EXP-GROW-004"
+      ],
+      "purpose": "符号：共享桶与生成密度"
+    },
+    {
+      "query": "反复设置繁殖速度是否幂等，跳过可种检查是否就绕过全部放置限制？",
+      "expected_entry_ids": [
+        "EXP-GROW-004"
+      ],
+      "purpose": "边界负例：重复登记和有限 skip"
+    },
+    {
+      "query": "停止原树生长是否会同时停止附近树苗繁殖？",
+      "expected_entry_ids": [
+        "EXP-GROW-001",
+        "EXP-GROW-002",
+        "EXP-GROW-004"
+      ],
+      "purpose": "跨机制：两类任务所有权分离"
+    },
+    {
+      "query": "采后原地恢复、移除后重建、父树生成后代有什么区别？",
+      "expected_entry_ids": [
+        "EXP-GROW-001",
+        "EXP-GROW-003",
+        "EXP-GROW-004"
+      ],
+      "purpose": "跨机制：三种“再生”不能互抄"
+    },
+    {
+      "query": "修改玩家饥饿上限和界面颜色",
+      "expected_entry_ids": [],
+      "purpose": "主题外负例：本候选不应提供成长/再生结论"
+    }
+  ],
+  "limitations": [
+    "所有新增研究维持 research/restricted/hold；静态研究和脚本检查不是游戏运行、Coding 准入或当前安装读取证明。",
+    "源版本 759671 由 CONTROL/PLAN 相同归档 SHA256 绑定，Lua 文件数 4084；没有修改游戏、存档、安装、MCP 配置、原仓库或 phase1 文件。",
+    "来源脚本只读 ZIP；原字节 SHA256，范围按 UTF-8 decode/splitlines 后 LF 连接、无尾 LF 计算；不复制完整游戏 Lua。",
+    "只覆盖有限的 growable/两类再生链与明确原版消费者，不把相邻 pickable/deploy 或全部农作物主题视为已验证。",
+    "未运行 Lua/游戏/注册/任务回调/实体生成/存读档；native 时间、空间/密度查询、实际资源产物、动画和远端状态仍未知。",
+    "enumerated_static 仅列实际引用，非消费者/动态/native 依赖闭包；新版本 compare/navigate 保持可用、局部待复核，不自动改 epoch 或禁用整库。",
+    "本轮 Reviewer research MCP 查询 growable/regrowthmanager 无命中；无命中仅表示该次受限检索空缺，本候选事实均另查原始本地源码。"
+  ]
+}

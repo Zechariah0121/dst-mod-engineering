@@ -1,0 +1,920 @@
+{
+  "schema_version": "dst-brain-independent-revision-review/1",
+  "review_date": "2026-10-26",
+  "candidate_sha256": "a22f7047617402d465d5b64b0fe2b660cd7ef570e3e3c5e41d9f1db000cc90c1",
+  "candidate_path": "local-private-artifact/brain-reviewed.json",
+  "frozen_revision_input": {
+    "path": "local-private-artifact/input-brain-revision.json",
+    "sha256": "a22f7047617402d465d5b64b0fe2b660cd7ef570e3e3c5e41d9f1db000cc90c1"
+  },
+  "previous_review": {
+    "path": "local-private-artifact/review.json",
+    "sha256": "2e561a31c8572d6c68d1cf1510a637c6d2664dbb827ad333c3b5057760185481",
+    "input_sha256": "0493476cce32fa4d54ea6c6b62d23224064343dfa1e609191cb160206f5ecace",
+    "coverage": {
+      "claims": 58,
+      "api_contracts": 37,
+      "mechanism_steps": 29
+    },
+    "relationship": "沿用原完整独立静态审阅，只独立核此11处JSON差异与新引用；不重复全量语义审查。"
+  },
+  "source_epoch": "759671",
+  "source_archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+  "runtime_verified": false,
+  "verdict": "delta_static_review_pass",
+  "all_prior_findings_resolved": true,
+  "finding_resolutions": [
+    {
+      "finding_id": "BRAIN-F001",
+      "previous_priority": "P3",
+      "status": "resolved",
+      "pointers": [
+        "/entries/6/api_contracts/0/lifecycle/failure_and_cleanup"
+      ],
+      "review_note": "改文正确限定为任一距离需读取action默认字段时才触发该构造错误；显式两项真值距离可绕过读取。保留action非nil为API使用前提，未引入稳定公共API或运行保证。有效action按契约前提理解，不解读成IsValid存在统一action非nil守卫；未变的IsValid精确and链仍为准。",
+      "source_refs": [
+        "BR-REV-001"
+      ]
+    },
+    {
+      "finding_id": "BRAIN-F002",
+      "previous_priority": "P3",
+      "status": "resolved",
+      "pointers": [
+        "/entries/6/claims/8/evidence_refs",
+        "/entries/6/claims/8/statement",
+        "/entries/6/mechanism_steps/3/evidence_refs",
+        "/entries/6/mechanism_steps/3/description",
+        "/entries/6/compatibility/dependency_refs"
+      ],
+      "review_note": "AI-S061精确绑定go_to_idle函数体56-58，AI-S062绑定StateGraph装配360；两引用均接到同一NSF及step4，并补到compatibility直接依赖。文字改成该状态handler请求idle，明确不排除其他退出；没有扩大到全部SG打断/native行为。",
+      "source_refs": [
+        "BR-REV-002",
+        "BR-REV-003"
+      ]
+    }
+  ],
+  "unresolved_findings": [],
+  "minimality": {
+    "status": "pass",
+    "changed_leaf_or_appended_object_count": 11,
+    "all_changes_within_expected_findings": true,
+    "unchanged_first_six_entries": true,
+    "unchanged_original_sixty_source_references": true,
+    "unchanged_entry_ids_counts_scope_unknowns_limitations_and_governance": true,
+    "new_reference_count": 62,
+    "claim_count": 58,
+    "api_count": 37,
+    "step_count": 29,
+    "notes": "只改EXP-AI-007的F001文案、F002声明/步骤及其证据/兼容依赖，新增两个短范围source_references；无其余JSON变化。"
+  },
+  "changes": [
+    {
+      "pointer": "/entries/6/api_contracts/0/lifecycle/failure_and_cleanup",
+      "operation": "replace",
+      "before": "无action会访问默认字段报错；不提供清理或自动最终状态。",
+      "after": "缺少action且distance或arrivedist任一需走默认字段读取时会报错；显式提供两项真值距离可能使构造通过，但后续Do/IsValid/分发仍要求有效action。action非nil是本契约前提；构造不提供清理或自动最终状态。"
+    },
+    {
+      "pointer": "/entries/6/claims/8/evidence_refs/7",
+      "operation": "add",
+      "after": "AI-S061"
+    },
+    {
+      "pointer": "/entries/6/claims/8/evidence_refs/8",
+      "operation": "add",
+      "after": "AI-S062"
+    },
+    {
+      "pointer": "/entries/6/claims/8/statement",
+      "operation": "replace",
+      "before": "普通猪人由FindFoodAction生成EAT，SGpig将EAT映射eat；eat的onenter停物理/播动画，TimeEvent(10*FRAMES)调用PerformBufferedAction，animover才转idle。State构造排序timeline，UpdateState在事件time<=timeinstate时调用fn。ACTIONS.EAT.fn选target或invobject并按组件分支转eater.Eat等；不直接证明食物已经被消费。",
+      "after": "普通猪人由FindFoodAction生成EAT，SGpig将EAT映射eat；eat的onenter停物理/播动画，TimeEvent(10*FRAMES)调用PerformBufferedAction，该eat状态的animover handler经go_to_idle请求idle，不排除其他显式或事件退出路径。State构造排序timeline，UpdateState在事件time<=timeinstate时调用fn。ACTIONS.EAT.fn选target或invobject并按组件分支转eater.Eat等；不直接证明食物已经被消费。"
+    },
+    {
+      "pointer": "/entries/6/compatibility/dependency_refs/25",
+      "operation": "add",
+      "after": {
+        "ref": "AI-S061",
+        "role": "pig SG callback body / StateGraph assembly; no runtime or transitive closure assertion",
+        "claim_ids": [
+          "EXP-AI-007-NSF-09"
+        ]
+      }
+    },
+    {
+      "pointer": "/entries/6/compatibility/dependency_refs/26",
+      "operation": "add",
+      "after": {
+        "ref": "AI-S062",
+        "role": "pig SG callback body / StateGraph assembly; no runtime or transitive closure assertion",
+        "claim_ids": [
+          "EXP-AI-007-NSF-09"
+        ]
+      }
+    },
+    {
+      "pointer": "/entries/6/mechanism_steps/3/description",
+      "operation": "replace",
+      "before": "具体状态时间线调用PerformBufferedAction→BufferedAction.Do→action.fn；猪人EAT在10*FRAMES事件，animover另行回idle。",
+      "after": "具体状态时间线调用PerformBufferedAction→BufferedAction.Do→action.fn；猪人EAT在10*FRAMES事件，该状态的animover handler经go_to_idle请求idle；本链不证明这是唯一退出路径。"
+    },
+    {
+      "pointer": "/entries/6/mechanism_steps/3/evidence_refs/8",
+      "operation": "add",
+      "after": "AI-S061"
+    },
+    {
+      "pointer": "/entries/6/mechanism_steps/3/evidence_refs/9",
+      "operation": "add",
+      "after": "AI-S062"
+    },
+    {
+      "pointer": "/source_references/60",
+      "operation": "add",
+      "after": {
+        "id": "AI-S061",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "line_start": 56,
+        "line_end": 58,
+        "range_sha256": "054c613b92f790d08adc0d228163f13950ce824124a3f73fd92b72a5d9c3815e",
+        "symbols": [
+          "go_to_idle"
+        ]
+      }
+    },
+    {
+      "pointer": "/source_references/61",
+      "operation": "add",
+      "after": {
+        "id": "AI-S062",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "line_start": 360,
+        "line_end": 360,
+        "range_sha256": "9e021854a7e7544c431065303622efc3288b36b5428d31af407bf9f5c77f3320",
+        "symbols": [
+          "StateGraph"
+        ]
+      }
+    }
+  ],
+  "source_reference_validation": {
+    "count": 62,
+    "unique_ids": 62,
+    "file_hash_matches": 62,
+    "range_hash_matches": 62,
+    "all_line_ranges_valid": true,
+    "no_dangling_claim_api_step_refs": true,
+    "references": [
+      {
+        "id": "AI-S001",
+        "source_file": "scripts/brain.lua",
+        "line_start": 159,
+        "line_end": 226,
+        "actual_file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+        "actual_range_sha256": "224182e75c223e73b84c8b58218389dba111e678e2734dec21fd4c869a13207b",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S002",
+        "source_file": "scripts/brain.lua",
+        "line_start": 238,
+        "line_end": 285,
+        "actual_file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+        "actual_range_sha256": "cd79acbe7be105dda9c76dfa0fbfb62842ff55213fa5ffb27ad0aa25f19d80ef",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S003",
+        "source_file": "scripts/entityscript.lua",
+        "line_start": 1082,
+        "line_end": 1121,
+        "actual_file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+        "actual_range_sha256": "6e93db416137aa6096de437db45f80227bf8d373da123ba93f099cac3c14d0ba",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S004",
+        "source_file": "scripts/entityscript.lua",
+        "line_start": 1123,
+        "line_end": 1150,
+        "actual_file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+        "actual_range_sha256": "b4330714bf8a33290e847b13bbfa71a138424c16c582d9569a8984b036f8003e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S005",
+        "source_file": "scripts/mainfunctions.lua",
+        "line_start": 696,
+        "line_end": 757,
+        "actual_file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+        "actual_range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S006",
+        "source_file": "scripts/brain.lua",
+        "line_start": 2,
+        "line_end": 104,
+        "actual_file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+        "actual_range_sha256": "2d20f3868ece61ce2b8e82563c442a2900347c73c47f446111be8117a0141cc1",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S007",
+        "source_file": "scripts/brain.lua",
+        "line_start": 106,
+        "line_end": 157,
+        "actual_file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+        "actual_range_sha256": "0f52a03b2abf208011e1af57c6faa9d47ac59bd4e8ba3f81defb5be60e058b9f",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S008",
+        "source_file": "scripts/brain.lua",
+        "line_start": 228,
+        "line_end": 236,
+        "actual_file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+        "actual_range_sha256": "e569c036d8954ab5748be8f9374b5290b251376b37a5b72693e7caf4558e0e67",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S009",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 4,
+        "line_end": 43,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "aab49cbcd24b51bdcde8deb922c97cc4bc56949e470fa325d247d30faf8f0e83",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S010",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 54,
+        "line_end": 70,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "e8cbb01f16f30e811b7359b7c280c113403f0f1aba24f12bb68fdccd0e148054",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S011",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 97,
+        "line_end": 138,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "15dabd59bc5d1f510f74db1db8302f5ca33943dadd5ccbe06ed079cee540c66e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S012",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 148,
+        "line_end": 191,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "73bfff21e39b082984897aca7584ab3db42260f08ae8b8d1c2bd083ebbc049b2",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S013",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 304,
+        "line_end": 336,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "ed8c305173491b9899aa01e440e77af502213e63b6757e01f65613b3ea56bff6",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S014",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 340,
+        "line_end": 375,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "66d8bf6a097fa0f5e796f213c4f2ab06bc343af0c2642b04f00ae3e50bdd4efd",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S015",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 533,
+        "line_end": 564,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "31abfb0f256e638197cde5040978007fb3d9e60c948c3d3d827f9783dc223592",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S016",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 577,
+        "line_end": 638,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "53c5652658c2bcfdef61d26286708d50c61d8a0fd0d1377b41e8bbb9755ddb62",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S017",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 644,
+        "line_end": 695,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "42faa336cdbc92bf645fc445f4a95eed88c2063ad6c2cdc7d2c5b25176e386ee",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S018",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 768,
+        "line_end": 789,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "bf04434aa9ce2d4482ba902f390a368d4f9922086bd050cb8fa58e2510897732",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S019",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 202,
+        "line_end": 213,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "932c7040344ff03c30873e6d4026f274df93b59ff745887719abf9a467afe3dd",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S020",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 702,
+        "line_end": 765,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "ec0293c5c2d6ec8b24b76d7d4f6ac37321589ba2d2d9957e703388955e2266d1",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S021",
+        "source_file": "scripts/behaviours/doaction.lua",
+        "line_start": 1,
+        "line_end": 58,
+        "actual_file_sha256": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
+        "actual_range_sha256": "f947907021e5550bf4a264b98f04b196c995d4fde9c6378bb8c679dc8aea2693",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S022",
+        "source_file": "scripts/bufferedaction.lua",
+        "line_start": 2,
+        "line_end": 20,
+        "actual_file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+        "actual_range_sha256": "a89889231a6e51ca361c2c0161fc3ec7dc5653ac436f8b25b30b5d87df108328",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S023",
+        "source_file": "scripts/bufferedaction.lua",
+        "line_start": 22,
+        "line_end": 50,
+        "actual_file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+        "actual_range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S024",
+        "source_file": "scripts/bufferedaction.lua",
+        "line_start": 74,
+        "line_end": 88,
+        "actual_file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+        "actual_range_sha256": "278b3d3f6e1846d0f35790b0de366346b7ab3d1573c44bb0a51e512ec5bd641b",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S025",
+        "source_file": "scripts/bufferedaction.lua",
+        "line_start": 104,
+        "line_end": 110,
+        "actual_file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+        "actual_range_sha256": "5dd8244617dd8b82d27de63615841036d7bab1a7230fa1a2cb81891eafc0a95b",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S026",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 882,
+        "line_end": 980,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "256cb6b98bb3469d302d5fd67ee5ac025b16b971a02c18354665b29a140de583",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S027",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 982,
+        "line_end": 1037,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "fd4957cd49126b69f2fa2bbc41eb164372b2f468b0d4fa3287f36107a763833e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S028",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 1040,
+        "line_end": 1076,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "7f5967e8eedbf68b34601bec2cdccf5e62666a7aae010fd7cd5ae61379fec12e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S029",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 1078,
+        "line_end": 1089,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "5907e8ce593d985e42ca58864cb4d4eae95a97c30a73e3dacf4e5928d9850139",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S030",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 755,
+        "line_end": 763,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "984ffd34eebb5887cc0a7219ae92998db2bcfde2d788f3d911ad1ce60efc6dc7",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S031",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 1091,
+        "line_end": 1114,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "753aee5c214b1a27d1ade05f036eaee9b005e17a4e97b9cf09d2bbb00a26ca80",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S032",
+        "source_file": "scripts/components/locomotor.lua",
+        "line_start": 1450,
+        "line_end": 1521,
+        "actual_file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+        "actual_range_sha256": "8b2ce18964570ce104416a7e4300d4ba19cef78b0bf7aeab48f111b504db5f4a",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S033",
+        "source_file": "scripts/entityscript.lua",
+        "line_start": 1566,
+        "line_end": 1573,
+        "actual_file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+        "actual_range_sha256": "212903647ab07cc468a6a8f79ebba8a1e48fd07b7ea7fa3a8f916ac7fd80032f",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S034",
+        "source_file": "scripts/entityscript.lua",
+        "line_start": 1612,
+        "line_end": 1655,
+        "actual_file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+        "actual_range_sha256": "b29f053b6aac5bc7499ecb24e889268b44fbc35d97df49efc8f4c085e5e41e31",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S035",
+        "source_file": "scripts/entityscript.lua",
+        "line_start": 1657,
+        "line_end": 1694,
+        "actual_file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+        "actual_range_sha256": "6076c015f696ed67d534f02f0144912f02bc0fec85dd45ea75c04e2ae45135d4",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S036",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 159,
+        "line_end": 171,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "fa53b88eeac7dc25d319af4bab5d0b2e41b605dfe57663950eacd1c8c981b850",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S037",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 430,
+        "line_end": 461,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "88706c92f04ed78f7d0db11e64862f3efe3d87ac0cd63ec818de63d1bb1507bb",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S038",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 529,
+        "line_end": 600,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S039",
+        "source_file": "scripts/brains/pigbrain.lua",
+        "line_start": 81,
+        "line_end": 119,
+        "actual_file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+        "actual_range_sha256": "9f4ebd3ff56328dad22ad819dcc2beb20abd4e4b19f975039485c01661ea13ac",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S040",
+        "source_file": "scripts/brains/pigbrain.lua",
+        "line_start": 333,
+        "line_end": 356,
+        "actual_file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+        "actual_range_sha256": "83d58a510417765e05ca2429c184454cfccd6b0b5fc264c9aa77e65331d3f182",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S041",
+        "source_file": "scripts/brains/pigbrain.lua",
+        "line_start": 382,
+        "line_end": 421,
+        "actual_file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+        "actual_range_sha256": "5cc2cf141cf90b151b369b56f4a5490e46ae52fa32dd8532f1569aa0f7b545e5",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S042",
+        "source_file": "scripts/prefabs/pigman.lua",
+        "line_start": 262,
+        "line_end": 262,
+        "actual_file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+        "actual_range_sha256": "12b210cf3a0aea82e3a316fd1523b13e7c84b1e0d43a9230caa7bae43797fa1d",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S043",
+        "source_file": "scripts/prefabs/pigman.lua",
+        "line_start": 307,
+        "line_end": 338,
+        "actual_file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+        "actual_range_sha256": "4bd0e9ec7e3e336a36726b8a98f2e92a86e917907237f018a2c467b9ac953127",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S044",
+        "source_file": "scripts/prefabs/pigman.lua",
+        "line_start": 631,
+        "line_end": 664,
+        "actual_file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+        "actual_range_sha256": "8f5d5c2d9be021448a592f90b3fb5cc118b077c121c7be8b1a0a7d4e5b62237b",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S045",
+        "source_file": "scripts/prefabs/pigman.lua",
+        "line_start": 742,
+        "line_end": 763,
+        "actual_file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+        "actual_range_sha256": "537162219f3519474a0f67c10346dc82e07d462b5adfda0c64e5a8cefeff0458",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S046",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "line_start": 3,
+        "line_end": 15,
+        "actual_file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "actual_range_sha256": "c4253a2b93fb6ae83e733b55a72c883465c4d6dd3534b2cab94ac783d4e01790",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S047",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "line_start": 223,
+        "line_end": 246,
+        "actual_file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "actual_range_sha256": "9ce5157bea0a93bb354868eb1b5dd7e0667546c29e681ac16f62fd05ad61fef9",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S048",
+        "source_file": "scripts/actions.lua",
+        "line_start": 796,
+        "line_end": 807,
+        "actual_file_sha256": "ba2455683ca4468cf41d9ccaade2847c56c6bf935f5807c3ffaf080075bf90b7",
+        "actual_range_sha256": "543bc2b26281bc7e846c47f4c8bbc64de7e91c4e3f910b2338113f052e328f80",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S049",
+        "source_file": "scripts/prefabs/spider.lua",
+        "line_start": 86,
+        "line_end": 86,
+        "actual_file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+        "actual_range_sha256": "e2af483f246b7a1af07bfafddb22fe572fc8e77e58fc019afdefd98052249a6e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S050",
+        "source_file": "scripts/prefabs/spider.lua",
+        "line_start": 623,
+        "line_end": 643,
+        "actual_file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+        "actual_range_sha256": "a66944e1dfadfca11e1f6e2c47776d392c0dc9112e3109a265c2721626b91e91",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S051",
+        "source_file": "scripts/prefabs/spider.lua",
+        "line_start": 724,
+        "line_end": 724,
+        "actual_file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+        "actual_range_sha256": "185c0eefcc3aca46fdb8d47979be23f0d9016329ef6d12676f6f1e8967af34af",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S052",
+        "source_file": "scripts/brains/spiderbrain.lua",
+        "line_start": 132,
+        "line_end": 202,
+        "actual_file_sha256": "dd6a2a00c60d843eca8203f70ca21ed05401f589dc6a5cb40d570641c4787191",
+        "actual_range_sha256": "030cdbcd4bf95b78a5f7e58701eacfa0b7cf9c3092ab176d8bba088409f2e1d6",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S053",
+        "source_file": "scripts/brains/spiderbrain.lua",
+        "line_start": 204,
+        "line_end": 207,
+        "actual_file_sha256": "dd6a2a00c60d843eca8203f70ca21ed05401f589dc6a5cb40d570641c4787191",
+        "actual_range_sha256": "ddb2016a81e07f3b8c979a93ef574691e58e3233f39523b80cf71e068c4318bd",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S054",
+        "source_file": "scripts/update.lua",
+        "line_start": 286,
+        "line_end": 294,
+        "actual_file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+        "actual_range_sha256": "4372701934274c6f92ebf46793e1fe24a1a110d009abb8fb5214ba05ef36e11b",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S055",
+        "source_file": "scripts/behaviours/chattynode.lua",
+        "line_start": 28,
+        "line_end": 98,
+        "actual_file_sha256": "217f6e6630c770e528e6e00aea1a80f3bbcd57b319421f5c5fb87df7c26eec1d",
+        "actual_range_sha256": "ecc38c1037fbb1dc956e5b2656b6cdd5165a3f1d4ab1a54c7520d10ed6a270ff",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S056",
+        "source_file": "scripts/mainfunctions.lua",
+        "line_start": 527,
+        "line_end": 543,
+        "actual_file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+        "actual_range_sha256": "06c94b55965a8a5fecb9595c3e9c1073834b33eec106ad9de8f0e26f1448e0f3",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S057",
+        "source_file": "scripts/behaviourtree.lua",
+        "line_start": 72,
+        "line_end": 77,
+        "actual_file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+        "actual_range_sha256": "f1e4d97afa41e507e41efc4bc2fad8dd1b77d800909ab162f3c4c1db336cb9d0",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S058",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 646,
+        "line_end": 690,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "6a98b764c37019b2a3da69699a1c8df08ab7f67320da687be4df80c0789b6a35",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S059",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 183,
+        "line_end": 191,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "707d4de4f27ada746151423fcb9d5633cb2131938c08a2a8cd473af6dfc84794",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S060",
+        "source_file": "scripts/stategraph.lua",
+        "line_start": 253,
+        "line_end": 262,
+        "actual_file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+        "actual_range_sha256": "cce26b8d41b74df641e5635434826c5b1955d07e74600349d8057f43333ae7af",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S061",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "line_start": 56,
+        "line_end": 58,
+        "actual_file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "actual_range_sha256": "054c613b92f790d08adc0d228163f13950ce824124a3f73fd92b72a5d9c3815e",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      },
+      {
+        "id": "AI-S062",
+        "source_file": "scripts/stategraphs/SGpig.lua",
+        "line_start": 360,
+        "line_end": 360,
+        "actual_file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+        "actual_range_sha256": "9e021854a7e7544c431065303622efc3288b36b5428d31af407bf9f5c77f3320",
+        "file_hash_matches": true,
+        "range_hash_matches": true,
+        "line_range_valid": true
+      }
+    ]
+  },
+  "independently_reread_delta_sources": [
+    {
+      "id": "BR-REV-001",
+      "source_file": "scripts/bufferedaction.lua",
+      "line_start": 2,
+      "line_end": 20,
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "range_sha256": "a89889231a6e51ca361c2c0161fc3ec7dc5653ac436f8b25b30b5d87df108328"
+    },
+    {
+      "id": "BR-REV-002",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "line_start": 56,
+      "line_end": 58,
+      "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+      "range_sha256": "054c613b92f790d08adc0d228163f13950ce824124a3f73fd92b72a5d9c3815e"
+    },
+    {
+      "id": "BR-REV-003",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "line_start": 360,
+      "line_end": 360,
+      "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+      "range_sha256": "9e021854a7e7544c431065303622efc3288b36b5428d31af407bf9f5c77f3320"
+    }
+  ],
+  "reproduction_script_review": {
+    "path": "local-private-artifact/revise_brain.py",
+    "sha256": "794f737faf1692940c42de0feec99824630ad519474a5e15d6b4a02d54c213f3",
+    "ast_parse": "pass",
+    "executed": false,
+    "reason": "脚本输出位于其他窗口目录；只读核对其操作与实际差异，不在本窗口执行外写脚本。"
+  },
+  "boundaries": [
+    "仅静态差异验收，没有游戏或动作函数执行；未验证native、所有回调重入、客户端、全SG取消/业务效果。",
+    "原review完整范围和unknown继续适用；新SHA与旧输入分别保留，不覆盖phase1或原报告。",
+    "research/restricted/hold未变化；接入和后续修订差异由总控决定，本窗口未授予Coding或发布许可。",
+    "759671仅绑定此次证据；未把该归档哈希用作新版知识读取/源码导航永久门槛。"
+  ],
+  "original_phase1_candidate_unchanged": true,
+  "mutations_outside_review_directory": false,
+  "integration_state_changed": false,
+  "publication_derivative": {
+    "schema": "dst-public-review-derivative/1",
+    "original_review_sha256": "8f9d3a51a6c7a6889cbcb4e475e106413163286460b9b954b881d9edd22ad26e",
+    "redacted_fields": [
+      {
+        "pointer": "/candidate_path",
+        "original_value_sha256": "4b668addb7cde030eda71a9da3f0865d9ffa5959f9414ecc28f89955fdc3cae0"
+      },
+      {
+        "pointer": "/frozen_revision_input/path",
+        "original_value_sha256": "7e3b34213a29cf430d7c95b385014538f50720d3fe45c38c7197ad401fdbbc20"
+      },
+      {
+        "pointer": "/previous_review/path",
+        "original_value_sha256": "9e2c2e343a9fb82302fc69fc46119fb2fcc4c8249802725259670a78b8fe52ac"
+      },
+      {
+        "pointer": "/reproduction_script_review/path",
+        "original_value_sha256": "ffb813ffee563c801330c97efc8a8300ebb3182f83c27c455572bcd8d9419a92"
+      }
+    ],
+    "policy": "Workstation paths removed; prior-review references rebound to public derivatives. Candidate/source commitments and review findings retained."
+  }
+}

@@ -113,6 +113,13 @@ class PublicCatalogTests(unittest.TestCase):
         from dst_kb import public_catalog
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
+            knowledge = root / 'knowledge'
+            knowledge.mkdir()
+            raw = b'{"entries": []}'
+            (knowledge / 'CATALOG.json').write_bytes(raw)
+            (knowledge / 'PACKAGE-MANIFEST.json').write_text(json.dumps({
+                'schema_version': 'dst-public-package-manifest/1', 'files': [{
+                'path': 'CATALOG.json', 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}]}), encoding='utf-8')
             error = PreparationError('SOURCES_NOT_PREPARED', 'missing')
             with patch.object(launcher, 'ROOT', root), patch.object(launcher, 'prepared_runtime', side_effect=error), \
                     patch.object(public_catalog, 'main', return_value=0) as catalog, contextlib.redirect_stderr(io.StringIO()):
@@ -127,9 +134,9 @@ class PublicCatalogTests(unittest.TestCase):
                 self.assertEqual(launcher.main(['status']), 2)
                 catalog.assert_not_called()
 
-    def test_changed_package_or_runtime_never_silently_downgrades(self):
+    def test_cache_corruption_never_silently_downgrades(self):
         from dst_kb import public_catalog
-        for code in ('PACKAGE_CHANGED', 'RUNTIME_CHANGED'):
+        for code in ('RUNTIME_CHANGED', 'INVALID_PATH', 'PACKAGE_INCOMPLETE'):
             with patch.object(launcher, 'prepared_runtime', side_effect=PreparationError(code, 'changed')), \
                     patch.object(public_catalog, 'main') as catalog, contextlib.redirect_stderr(io.StringIO()):
                 self.assertEqual(launcher.main(['status']), 2)

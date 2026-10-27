@@ -220,7 +220,8 @@ class RepositoryReleaseTests(unittest.TestCase):
         required = {row['path'] for row in bootstrap.package_inputs(root)}
         self.assertFalse(required - inputs.keys(), 'Runtime inputs absent from release')
         catalog = json.loads(inputs['knowledge/CATALOG.json'])
-        self.assertEqual(len(catalog['entries']), 187)
+        self.assertEqual(len(catalog['entries']), catalog['counts']['total'])
+        self.assertEqual(sum(row['family']!='native_mechanism' for row in catalog['entries']),187)
         self.assertFalse(any(name.startswith(('knowledge-history/', 'dst-engineering-kb/',
                                               'compatibility/', 'knowledge/history/')) for name in inputs))
 

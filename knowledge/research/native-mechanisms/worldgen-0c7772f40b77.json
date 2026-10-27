@@ -1,0 +1,2308 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "worldgen",
+  "source_epoch": "759671",
+  "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+  "entries": [
+    {
+      "id": "EXP-WG-001",
+      "title": "世界生成模组环境、Hook 注入与配置分支",
+      "aliases": [
+        "modworldgenmain.lua",
+        "CreateEnvironment",
+        "InsertPostInitFunctions",
+        "GetModConfigData",
+        "TheWorld"
+      ],
+      "engineering_question": "生成入口里能调用哪些模组 API，配置从哪里读，为什么不能照搬运行时世界对象？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "worldgen Lua 环境；非 worldgen 的模组加载作对照；不假定运行中的 world entity 已创建",
+        "update_policy": "逐引用、逐 claim 复核；旧知识可读；未知新版本不自动撤销整库可用性"
+      },
+      "claims": [
+        {
+          "id": "EXP-WG-001-C01",
+          "kind": "NSF",
+          "statement": "CreateEnvironment 返回独立 env，显式放入 GLOBAL=_G、modname、MODROOT、WORLD_TILES 及部分 Lua 名称，再注入 modutil 函数；此构造没有为任意裸全局名设置回落元表。modimport 每次加载脚本并 setfenv 到 env.env，执行结果没有被该 wrapper 返回。",
+          "evidence_refs": [
+            "WG-S001"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C02",
+          "kind": "NSF",
+          "statement": "在 LoadMods 的已启用模组循环中先执行 modworldgenmain.lua；只有 self.worldgen 为假才再执行 modmain.lua。worldgen_main 在 json.decode 后 moddata 为 Lua 真值时（预期为包含 index 的配置表）恢复索引并调用 LoadMods(true)，false 与 nil 均跳过。缺少入口文件被 InitializeModMain 视为跳过成功，加载/执行错误可记录为失败。",
+          "evidence_refs": [
+            "WG-S002",
+            "WG-S004",
+            "WG-S003"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C03",
+          "kind": "NSF",
+          "statement": "Room/Task/TaskSet/Level 的 PreInit 注册与 AddRoom/AddTask/AddTaskSet 以及地皮 wrapper 均在 isworldgen 提前 return 之前注入；运行时专属后段在 isworldgen 为真时不可由这次注入获得。注册只保存 callback，实际消费发生在 Level 和 Story 调用方。",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S007",
+            "WG-S052",
+            "WG-S008",
+            "WG-S018",
+            "WG-S021"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C04",
+          "kind": "NSF",
+          "statement": "环境版 GetModConfigData(optionname,get_local_config) 自动补 env.modname；第二参传给全局实现的 force_local_options，非默认值。临时配置直接索引；普通配置匹配 name 后，依次按 saved_server 且非本地、saved_client 且本地、saved 非 nil、default 返回；无匹配返回 nil。显式 false 通过 ~=nil 分支保留。",
+          "evidence_refs": [
+            "WG-S009",
+            "WG-S010"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C05",
+          "kind": "EI",
+          "statement": "WORLDGEN_MAIN 与 modworldgenmain 文件名不能等同：同一入口也会被非 worldgen LoadMods 执行。创建环境时没有注入裸 TheWorld；本轮生成调用链依赖 WorldSim。不能由入口存在推出运行时 TheWorld 或其 components 可用。",
+          "evidence_refs": [
+            "WG-S005",
+            "WG-S002",
+            "WG-S001",
+            "WG-S050"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C06",
+          "kind": "REC",
+          "statement": "将共享注册逻辑放在明确的模组环境载入路径，按所需阶段注册；配置要以 nil 判断缺省，避免 false 被 or 默认值覆盖。需要运行时实体时另选相应生命周期回调，勿在生成顶层捕获 TheWorld。",
+          "evidence_refs": [
+            "WG-S001",
+            "WG-S010",
+            "WG-S008",
+            "WG-S050"
+          ]
+        },
+        {
+          "id": "EXP-WG-001-C07",
+          "kind": "UNK",
+          "statement": "本研究未实际执行模组加载、前端配置界面、专服或客机流程，未证明所有平台的引擎全局集合、错误恢复、跨模组加载顺序兼容和配置最终一致性。Lua 中的 protected call 也不证明 callback 副作用自动回滚。",
+          "evidence_refs": [
+            "WG-S002",
+            "WG-S003",
+            "WG-S012"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "CreateEnvironment(modname, isworldgen, isfrontend)",
+          "source_file": "scripts/mods.lua",
+          "visibility": "全局原版 loader 函数；不是 env 注入的公开同名 Mod API；可调用环境：由原版模组加载器调用；返回的 env 用于入口和 modimport",
+          "parameters": [
+            "modname: 模组标识",
+            "isworldgen: 决定 API 注入与 CHARACTERLIST 分支",
+            "isfrontend: 决定前端辅助注入"
+          ],
+          "returns": [
+            "env table"
+          ],
+          "preconditions": [
+            "MODS_ROOT 及依赖模块已初始化"
+          ],
+          "side_effects": [
+            "构造 env 与闭包；require 相关模块；注入函数"
+          ],
+          "lifecycle": "每次原版创建模组环境时",
+          "evidence_refs": [
+            "WG-S001",
+            "WG-S008"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.modimport(modulename)",
+          "source_file": "scripts/mods.lua",
+          "visibility": "CreateEnvironment 内闭包；可调用环境：modworldgenmain/modmain 的同一 env，及由它载入的脚本",
+          "parameters": [
+            "modulename: 相对 MODROOT 的脚本路径，缺 .lua 时追加"
+          ],
+          "returns": [
+            "无显式返回（nil），不转交 chunk 返回值"
+          ],
+          "preconditions": [
+            "存在可加载 Lua chunk；当前 env 有效"
+          ],
+          "side_effects": [
+            "每次加载并执行 chunk；chunk 共享 env.env；缺文件/编译错误抛错"
+          ],
+          "lifecycle": "入口执行或已持有该闭包的调用",
+          "evidence_refs": [
+            "WG-S001"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.GetModConfigData(optionname, get_local_config)",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境闭包；与全局三参数函数身份不同；可调用环境：worldgen/main 共同注入段",
+          "parameters": [
+            "optionname: 配置项 name",
+            "get_local_config: 可选布尔/真值，控制强制本地配置分支"
+          ],
+          "returns": [
+            "配置值（包括 false）；无匹配 nil"
+          ],
+          "preconditions": [
+            "KnownModIndex 配置已准备；env.modname 有效"
+          ],
+          "side_effects": [
+            "查询 KnownModIndex；不写入默认值"
+          ],
+          "lifecycle": "按调用当时配置读取",
+          "evidence_refs": [
+            "WG-S009",
+            "WG-S010"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "worldgen_main 载入基础模块、地图定义与模组系统，json.decode 后 moddata 为 Lua 真值时恢复索引并 LoadMods(true)，false 与 nil 均跳过。",
+          "evidence_refs": [
+            "WG-S004"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "CreateEnvironment 构建 env，InsertPostInitFunctions 在阶段边界前注入地图与地皮 API；InitializeModMain 在环境内执行入口。",
+          "evidence_refs": [
+            "WG-S001",
+            "WG-S002",
+            "WG-S003",
+            "WG-S008"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "入口调用注册闭包将回调放到 env.postinitfns；以后消费者通过 ModManager 收集并调用；读取配置走绑定 modname 的闭包。",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S011",
+            "WG-S018",
+            "WG-S021",
+            "WG-S009",
+            "WG-S010"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-WG-001-C07: 本研究未实际执行模组加载、前端配置界面、专服或客机流程，未证明所有平台的引擎全局集合、错误恢复、跨模组加载顺序兼容和配置最终一致性。Lua 中的 protected call 也不证明 callback 副作用自动回滚。"
+      ]
+    },
+    {
+      "id": "EXP-WG-002",
+      "title": "Room → Task → TaskSet 的注册、复制与 PreInit 消费顺序",
+      "aliases": [
+        "AddRoom",
+        "AddTask",
+        "AddTaskSet",
+        "AddRoomPreInit",
+        "AddTaskPreInit",
+        "AddTaskSetPreInit",
+        "ChooseTasks"
+      ],
+      "engineering_question": "注册怎样进入实际地图，Hook 改的是原表还是副本，可选任务是否经过同一个 TaskPreInit？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Level:ChooseTasks 与 Story:GetRoom/GenerateNodesFromTask；只描述 Lua 选择和节点建模，不承诺 native 拓扑结果",
+        "update_policy": "逐引用、逐 claim 复核；旧知识可读；未知新版本不自动撤销整库可用性"
+      },
+      "claims": [
+        {
+          "id": "EXP-WG-002-C01",
+          "kind": "NSF",
+          "statement": "模组环境 AddRoom/AddTask/AddTaskSet 自动补 modname 转交 AddMod*。Room 注册保存传入 data（增加 __tostring 函数）；Task 通过 Task(name,data) 构造、选取声明字段，其中 room_choices 等表字段仍直接引用 data 对应表；TaskSet 保存 data 并以 data.location or \"forest\" 补缺省。三类 AddMod* 遇已存在名称均调用 moderror 并不添加，不是覆盖 API。",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S013",
+            "WG-S014",
+            "WG-S015",
+            "WG-S017"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C02",
+          "kind": "NSF",
+          "statement": "Room 查询先查 modrooms 后查原版，返回存储表；Task 查询先查原版后查 modtaskdefinitions，返回存储 Task；TaskSet 的 GetGenTasks 先查 Mod 后查原版且 deepcopy 返回。各模块 ClearModData 只删除对应 Mod 注册容器（或清全部 Mod 容器），没有在这些函数中撤销已创建副本。",
+          "evidence_refs": [
+            "WG-S013",
+            "WG-S014",
+            "WG-S016",
+            "WG-S029",
+            "WG-S030",
+            "WG-S031"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C03",
+          "kind": "NSF",
+          "statement": "ChooseTasks 要求 overrides.task_set：GetGenTasks 得副本，先指定 TaskSetPreInit 后 TaskSetPreInitAny，再将 task_set_data 各键直接写 self，之后运行指定 LevelPreInit 与 LevelPreInitAny。Hook callback 以原地修改工作表为用法；此处调用没有使用 callback 返回值替换表。",
+          "evidence_refs": [
+            "WG-S018",
+            "WG-S016"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C04",
+          "kind": "NSF",
+          "statement": "ChooseTasks 对 self.tasks 逐个 EnqueueATask（deepcopy 查到的 Task），然后 ApplyModsToTasks 只遍历此时 tasklist；之后才按 numoptionaltasks 从原地 shuffle 的 optionaltasks 加入可选 Task，最后应用替换并保存 chosen_tasks。本函数该路径没有对之后入队的可选 Task 再调用 ApplyModsToTasks。",
+          "evidence_refs": [
+            "WG-S018",
+            "WG-S020",
+            "WG-S019",
+            "WG-S025"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C05",
+          "kind": "NSF",
+          "statement": "Story:GetRoom 对查询结果 deepcopy；缺失返回 nil，否则写 name、补 type，调用 RoomPreInit，再返回副本。GenerateNodesFromTask 对 room_choices 的函数 count 无参求值，并每个循环独立 GetRoom；缺失房间 assert，contents.fn 在 Hook 后执行，contents 随后成为节点 terrain_contents。",
+          "evidence_refs": [
+            "WG-S021",
+            "WG-S022",
+            "WG-S023"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C06",
+          "kind": "EI",
+          "statement": "上述 deepcopy 递归复制 table 并保留原 metatable，非 table 直接返回，因此这些副本不等于所有外部状态隔离：函数及函数闭包状态仍共享，回调写 GLOBAL 或新塞入外部共享表仍可能跨房间/任务影响。TaskSet 字段覆盖 self 也不等于递归合并既有字段。",
+          "evidence_refs": [
+            "WG-S024",
+            "WG-S018",
+            "WG-S015",
+            "WG-S021"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C07",
+          "kind": "NSF",
+          "statement": "原版 default TaskSet 的 tasks 含 Make a pick；该 Task 的 Forest 数量函数为 1+math.random(SIZE_VARIATION)，并配置 background_room=BGGrass；Forest Room 的 value 使用 WORLD_TILES.FOREST，contents 同时有 countprefabs 和 distributeprefabs。此参照说明名字逐层关联，不是仅 AddRoom 即加入默认地图。",
+          "evidence_refs": [
+            "WG-S026",
+            "WG-S027",
+            "WG-S028"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C08",
+          "kind": "REC",
+          "statement": "新增定义用唯一名称并明确加入选中的 Task/TaskSet；改既有定义选窄 Hook。需要覆盖可选 Task 时先核对此快照消费顺序并另设计受控接入，不把 AddTaskPreInit 注册成功当成所有同名任务实例都已修改。保留各层必要子表，按实际覆盖语义增量修改。",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S013",
+            "WG-S018",
+            "WG-S021",
+            "WG-S026",
+            "WG-S027"
+          ]
+        },
+        {
+          "id": "EXP-WG-002-C09",
+          "kind": "UNK",
+          "statement": "未运行地图生成；未证明锁钥/区域的 native 生成可达性、所有 seed 连通、Mod 组合顺序兼容或异常后恢复。本卡也未完整研究背景房间、洞穴/事件地图分支及所有后续 overrides 的影响。",
+          "evidence_refs": [
+            "WG-S050",
+            "WG-S047",
+            "WG-S022"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "env.AddRoom",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境 wrapper；区别于原版全局 AddRoom；可调用环境：worldgen/main 共同注入段",
+          "parameters": [
+            "name: 唯一 Room 名",
+            "data: Room 定义表"
+          ],
+          "returns": [
+            "无显式返回（nil），成功与重名不靠返回值区分"
+          ],
+          "preconditions": [
+            "相关 map 模块已载入；名称不存在；数据符合消费者所需字段"
+          ],
+          "side_effects": [
+            "转交带 modname 的 AddMod*；修改注册容器；重名报告 moderror 并不添加"
+          ],
+          "lifecycle": "入口注册；必须在对应选择/消费前",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S013",
+            "WG-S008"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTask",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境 wrapper；区别于原版全局 AddTask；可调用环境：worldgen/main 共同注入段",
+          "parameters": [
+            "name: 唯一 Task 名",
+            "data: Task 构造数据，字段见 Task ctor"
+          ],
+          "returns": [
+            "无显式返回（nil），成功与重名不靠返回值区分"
+          ],
+          "preconditions": [
+            "相关 map 模块已载入；名称不存在；数据符合消费者所需字段"
+          ],
+          "side_effects": [
+            "转交带 modname 的 AddMod*；修改注册容器；重名报告 moderror 并不添加"
+          ],
+          "lifecycle": "入口注册；必须在对应选择/消费前",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S014",
+            "WG-S015",
+            "WG-S008"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSet",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境 wrapper；区别于原版全局 AddTaskSet；可调用环境：worldgen/main 共同注入段",
+          "parameters": [
+            "id: 唯一 TaskSet 标识",
+            "data: tasks 等定义表；location 缺省 forest"
+          ],
+          "returns": [
+            "无显式返回（nil），成功与重名不靠返回值区分"
+          ],
+          "preconditions": [
+            "相关 map 模块已载入；名称不存在；数据符合消费者所需字段"
+          ],
+          "side_effects": [
+            "转交带 modname 的 AddMod*；修改注册容器；重名报告 moderror 并不添加"
+          ],
+          "lifecycle": "入口注册；必须在对应选择/消费前",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S017",
+            "WG-S008"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddRoomPreInit",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "roomname: Room 名",
+            "fn(room): 修改工作 Room 的回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "每次 Story:GetRoom 创建成功副本后、contents.fn 前",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S021",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTaskPreInit",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "taskname: Task id",
+            "fn(task): 修改工作 Task 的回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "ChooseTasks 主任务入队后、可选任务入队前的 ApplyModsToTasks",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S019",
+            "WG-S018",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSetPreInit",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "tasksetname: TaskSet id",
+            "fn(task_set_data): 原地修改回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "ChooseTasks 读取 TaskSet 副本后、复制字段到 Level 前",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S018",
+            "WG-S016",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSetPreInitAny",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "fn(task_set_data): 原地修改当前选择集合的回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "指定 TaskSetPreInit 后",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S018",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddLevelPreInit",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "levelid: Level id",
+            "fn(level): 原地修改 Level 的回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "TaskSet 字段写入 Level 后、任务入队前",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S018",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddLevelPreInitAny",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "InsertPostInitFunctions 内环境闭包；可调用环境：worldgen/main 共同注入；消费只在明确的地图选择链",
+          "parameters": [
+            "fn(level): 原地修改当前 Level 的回调"
+          ],
+          "returns": [
+            "注册无显式返回（nil）；上述消费者不使用 fn 返回值替换对象"
+          ],
+          "preconditions": [
+            "fn 可调用；需在对应消费者发生前注册"
+          ],
+          "side_effects": [
+            "将 fn 追加到 env.postinitfns；消费时依 enabledmods 与注册序收集包装后执行；可能多次调用"
+          ],
+          "lifecycle": "指定 LevelPreInit 后",
+          "evidence_refs": [
+            "WG-S006",
+            "WG-S018",
+            "WG-S011",
+            "WG-S012"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "Story:GetRoom(roomname)",
+          "source_file": "scripts/map/storygen.lua",
+          "visibility": "Story 类方法；不是模组环境 AddRoom API；可调用环境：原版世界生成对象；需 Story receiver",
+          "parameters": [
+            "roomname: 已注册 Room 名"
+          ],
+          "returns": [
+            "工作 Room table；找不到 nil"
+          ],
+          "preconditions": [
+            "Rooms 模块可用；ModManager 可用"
+          ],
+          "side_effects": [
+            "deepcopy 定义、补 name/type 并应用 RoomPreInit"
+          ],
+          "lifecycle": "每次请求 Room 工作副本",
+          "evidence_refs": [
+            "WG-S021",
+            "WG-S024"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "入口经环境 wrapper 把定义注册到所属 Mod 的容器；重名被拒绝。",
+          "evidence_refs": [
+            "WG-S007",
+            "WG-S013",
+            "WG-S014",
+            "WG-S017"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Level 选择 task_set 副本，依次执行 TaskSet/Any Hook、字段覆盖、Level/Any Hook。",
+          "evidence_refs": [
+            "WG-S018",
+            "WG-S016"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "主任务复制入队并 TaskPreInit；可选任务随后从 shuffle 的列表复制入队；后续替换后写 chosen_tasks。",
+          "evidence_refs": [
+            "WG-S018",
+            "WG-S020",
+            "WG-S019",
+            "WG-S025"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "worldgen_main 将 chosen_tasks 交 forest_map.Generate，BuildStory 创建 Story 并运行 GenerationPipeline；Story 按 region 分组，区域构建再请求各 Task 的节点。每个目标 Room 经复制及 RoomPreInit，contents 进入 Node，Graph:AddNodeByNode 将节点交 WorldSim:AddChild。",
+          "evidence_refs": [
+            "WG-S047",
+            "WG-S050",
+            "WG-S048",
+            "WG-S049",
+            "WG-S068",
+            "WG-S067",
+            "WG-S022",
+            "WG-S021",
+            "WG-S023",
+            "WG-S066"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-WG-002-C09: 未运行地图生成；未证明锁钥/区域的 native 生成可达性、所有 seed 连通、Mod 组合顺序兼容或异常后恢复。本卡也未完整研究背景房间、洞穴/事件地图分支及所有后续 overrides 的影响。"
+      ]
+    },
+    {
+      "id": "EXP-WG-003",
+      "title": "Room 内容的每节点计数、分布与存档记录边界",
+      "aliases": [
+        "countprefabs",
+        "countprefabs_uses_filters",
+        "distributeprefabs",
+        "distributepercent",
+        "PopulateVoronoi",
+        "Node:AddEntity"
+      ],
+      "engineering_question": "Room 的目标数量如何被消费，为什么 countprefabs=N 不保证全世界最终 N 个？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Node:PopulateVoronoi 常规 Voronoi 节点填充与 AddEntity；不包含自定义 PopulateFunction、海洋专用人口或运行时 SpawnPrefab 验收",
+        "update_policy": "逐引用、逐 claim 复核；旧知识可读；未知新版本不自动撤销整库可用性"
+      },
+      "claims": [
+        {
+          "id": "EXP-WG-003-C01",
+          "kind": "NSF",
+          "statement": "PopulateVoronoi 对已 populated、不可通过地皮、没有 count/distribute 内容或无点位返回；以 WorldSim:GetPointsForSite 返回的 #points_x 作为此处 area。countprefabs 的函数以 (area,prefab,scratchpad) 调用；scratchpad 是本次节点填充内共享表，与 countstaticlayouts 的 scratchpad 分开。目标总数超过点位数 floor 比较时，整个本次填充直接返回。",
+          "evidence_refs": [
+            "WG-S032",
+            "WG-S037"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C02",
+          "kind": "NSF",
+          "statement": "countprefabs_uses_filters 分支从末点向前，调用 pickspawncountprefabforground 并减少对应目标；点位耗尽会返回，遍历后仍有目标会打印未能放置警告。非过滤分支按目标循环调用 AddEntity，越界可 break/return。这里不提供“全世界精确数量”的返回契约。",
+          "evidence_refs": [
+            "WG-S032"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C03",
+          "kind": "NSF",
+          "statement": "Node:AddEntity 先以 WorldSim:GetTile 取点位地皮，非 IsLandTile 直接返回；通过才调 PopulateWorld_AddEntity。后者预留 tile、转换为世界 x/z 并可随机偏移，构造保存记录、可执行 prefab_data.data()，追加 entitiesOut[prefab] 并更新 prefab_list；该函数没有调用 SpawnPrefab。",
+          "evidence_refs": [
+            "WG-S034",
+            "WG-S061"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C04",
+          "kind": "NSF",
+          "statement": "分布分支要求 distributepercent 和 distributeprefabs，先做 swap 解析/过滤，再对剩余点以 math.random()<distributepercent 门槛选 prefab；选中后仍经 AddEntity。distributepercent 的本次消费者是概率门槛，不能把它或 distributeprefabs 项数当绝对数量。",
+          "evidence_refs": [
+            "WG-S033"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C05",
+          "kind": "EI",
+          "statement": "同名 Room 被多个节点请求时，各副本内容分别交给节点填充；即使每节点 countprefabs 某项为 N，也还受点位、过滤、地皮与后续生成流程影响。计数目标、保存记录数和最终运行中实体数是不同验收层次。",
+          "evidence_refs": [
+            "WG-S022",
+            "WG-S023",
+            "WG-S032",
+            "WG-S034",
+            "WG-S047"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C06",
+          "kind": "REC",
+          "statement": "先检查选中 Task/Room 次数及目标函数参数，再读点位不足/过滤日志，最后检查生成存档与实际加载后的实体数量。对函数 count 使用明确的非负整数规则并保持 scratchpad 的节点局部语义，不把一次静态读取作为多 seed 验证。",
+          "evidence_refs": [
+            "WG-S032",
+            "WG-S022",
+            "WG-S034"
+          ]
+        },
+        {
+          "id": "EXP-WG-003-C07",
+          "kind": "UNK",
+          "statement": "原生点位的几何分布、每 seed 实际数量、最终存档载入的 prefab 成功率与联网表现未测试；本卡未展开 pickspawn* 和全局 swap 函数的全部过滤规则，故不声明某一 prefab 在所有地皮上的可放置性或精确权重公式。",
+          "evidence_refs": [
+            "WG-S032",
+            "WG-S033",
+            "WG-S034"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Node:PopulateVoronoi(spawnFn, entitiesOut, width, height, world_gen_choices, prefabDensities)",
+          "source_file": "scripts/map/graphnode.lua",
+          "visibility": "Node 类方法；原版内部填充消费者；可调用环境：worldgen Node receiver；不作为 modmain 顶层实体 API",
+          "parameters": [
+            "spawnFn: 提供 pickspawncountprefabforground/pickspawnprefab 的函数表",
+            "entitiesOut: 按 prefab 累积保存记录的表",
+            "width,height: 地图 tile 尺寸",
+            "world_gen_choices: 继续交 PopulateExtra",
+            "prefabDensities: 密度输出表"
+          ],
+          "returns": [
+            "无显式返回（nil）；不返回放置成功数"
+          ],
+          "preconditions": [
+            "Node data 及 WorldSim/TileGroupManager 有效；配置符合对应分支；目标 count 应适合循环与计数"
+          ],
+          "side_effects": [
+            "消耗/修改点位数组与目标表；追加实体保存记录；可能随机；输出日志和密度表"
+          ],
+          "lifecycle": "常规节点填充阶段",
+          "evidence_refs": [
+            "WG-S032",
+            "WG-S033",
+            "WG-S034"
+          ],
+          "unknowns": [
+            "未完整研究 swap 与 picker 内部规则；不提供任意数量保证。"
+          ]
+        },
+        {
+          "symbol": "countprefabs[prefab](area, prefab, scratchpad)",
+          "source_file": "scripts/map/graphnode.lua",
+          "visibility": "配置回调调用协议；不是全局公开函数名；可调用环境：仅当该项 type==function 且节点进入计数分支",
+          "parameters": [
+            "area: 此次可用点位数组长度",
+            "prefab: 当前计数项键",
+            "scratchpad: 本次节点 countprefabs 共用 table"
+          ],
+          "returns": [
+            "一个用于数量累加及循环的 count；这里无统一自动修正"
+          ],
+          "preconditions": [
+            "入口未因空点位等条件提前返回"
+          ],
+          "side_effects": [
+            "回调可更新 scratchpad；pairs 遍历无固定项目顺序保证"
+          ],
+          "lifecycle": "每次本节点 PopulateVoronoi 的 count 解析",
+          "evidence_refs": [
+            "WG-S032"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Story 将每个 Room 副本 contents 接到节点 terrain_contents。",
+          "evidence_refs": [
+            "WG-S022",
+            "WG-S023"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "forest_map 调根图 PopulateVoronoi，Graph 遍历本层节点并递归子图；Node 做 populated/地皮/内容/点位守卫，再解析每节点目标数量。",
+          "evidence_refs": [
+            "WG-S065",
+            "WG-S064",
+            "WG-S032"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "计数分支经可选 picker 过滤，分布分支经概率与 picker，各自尝试 AddEntity。",
+          "evidence_refs": [
+            "WG-S032",
+            "WG-S033"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "AddEntity 再做陆地地皮检查，PopulateWorld_AddEntity 输出保存记录而非当场创建运行时 prefab。",
+          "evidence_refs": [
+            "WG-S034"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-WG-003-C07: 原生点位的几何分布、每 seed 实际数量、最终存档载入的 prefab 成功率与联网表现未测试；本卡未展开 pickspawn* 和全局 swap 函数的全部过滤规则，故不声明某一 prefab 在所有地皮上的可放置性或精确权重公式。"
+      ]
+    },
+    {
+      "id": "EXP-WG-004",
+      "title": "静态布局的载入、集合分配、地皮映射与预留放置",
+      "aliases": [
+        "StaticLayout.Get",
+        "BG_TILES",
+        "FG_OBJECTS",
+        "ResurrectionStone",
+        "countstaticlayouts",
+        "ReserveAndPlaceLayout",
+        "set_pieces"
+      ],
+      "engineering_question": "Tiled Lua 怎样成为可放置 layout，数量配置在哪些阶段受限，额外属性会不会被覆盖？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "陆地 TaskSet set_pieces → Node:ConvertGround → object_layout；也说明显式 position 路径；不把此机制泛化为海洋 prefill 专用接口",
+        "update_policy": "逐引用、逐 claim 复核；旧知识可读；未知新版本不自动撤销整库可用性"
+      },
+      "claims": [
+        {
+          "id": "EXP-WG-004-C01",
+          "kind": "NSF",
+          "statement": "StaticLayout.Get 是模块导出的 ConvertStaticLayoutToLayout 别名，require(layoutsrc) 后直接使用 additionalProps or {} 作为返回表，覆盖 type/scale/layout_file/ground_types/ground/layout 字段；ground_types 是 GROUND_TYPES 的 shallowcopy。额外表不是先 deepcopy 后合并，调用方复用同一表会共享并被改写。",
+          "evidence_refs": [
+            "WG-S038"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C02",
+          "kind": "NSF",
+          "statement": "loader 以 ceil(64/tilewidth) 对名为 BG_TILES 的 tilelayer 抽样生成 ground 索引；名含 FG_OBJECTS 的 objectgroup 经过 PrefabSwaps inactive/proxy 处理，将对象中心坐标除以 64 并减布局半尺寸，属性按点号分层，字符串 true/false 转布尔、可 tonumber 则转数值。initfn 在每个匹配对象层处理后调用。该代码不按任意 Tiled firstgid 或 flip bit 自动重映射。",
+          "evidence_refs": [
+            "WG-S038"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C03",
+          "kind": "NSF",
+          "statement": "原版 default TaskSet 给 ResurrectionStone 配 count=2 与允许 Task 名单；layouts 表用 StaticLayout.Get 载入 resurrectionstone。该参照 Lua 的 tilewidth=16、8×8 BG_TILES 与 FG_OBJECTS 含 resurrectionstone/pighead；地面非零索引 9 经 GROUND_TYPES 对应 WORLD_TILES.WOODFLOOR，不是运行时 tile ID 9 的承诺。",
+          "evidence_refs": [
+            "WG-S026",
+            "WG-S044",
+            "WG-S046",
+            "WG-S038"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C04",
+          "kind": "NSF",
+          "statement": "ChooseSetPieces 将 set_pieces 的允许任务与 chosen_tasks 相交，count 缺省 1；无可选任务 assert，每次选中后从 choices 删除，直到 count<=0 或 choices 为空，将 {name,restrict_to} 追加到 Task。Story 的指定 set_pieces 分支过滤入口、背景限制、blank/不可通过节点，找不到时警告并 break；找到则赋 countstaticlayouts[name]=1，语义是赋值而非累加。",
+          "evidence_refs": [
+            "WG-S035",
+            "WG-S036"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C05",
+          "kind": "NSF",
+          "statement": "Node:ConvertGround 对 countstaticlayouts 的函数以 (WorldSim:GetSiteArea(self.id),布局名,scratchpad) 求 count 后循环 obj_layout.Convert；另处理 terrain_contents_extra.static_layouts。Convert 先 LayoutForDefinition 查多种注册表并 deepcopy，ConvertLayoutToEntitylist 处理 areas/defs 与静态/形状布局，再 ReserveAndPlaceLayout；未知布局名打印后返回 nil，会导致随后 entitylist assert。",
+          "evidence_refs": [
+            "WG-S037",
+            "WG-S039",
+            "WG-S040",
+            "WG-S042"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C06",
+          "kind": "NSF",
+          "statement": "ReserveAndPlaceLayout 默认 world=WorldSim，处理翻转、换轴及强制旋转；地面非零索引以 ground_types 映射。有 position 时对非零 ground 单元先 SetTile，再在 layout.SafeFromDisconnect 与 world.MakeSafeFromDisconnect 均为 Lua 真值时逐格调用 world:MakeSafeFromDisconnect(x,y)，并使用指定坐标，不调用 ReserveSpace。无 position 时传 tiles 给 world:ReserveSpace；只有返回的 rcx 为 Lua 真值，且上述两个保护条件均为真值时，才遍历 tiles 对 tileid~=0 的单元调用 MakeSafeFromDisconnect。随后对象回调另以 rcx~=nil 为守卫，失败只警告且无显式成功返回。函数还会写默认 mask/position 字段并可改 savedrotation；这些 Lua 条件调用不证明 native 连通保护实际效果。",
+          "evidence_refs": [
+            "WG-S041",
+            "WG-S042"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C07",
+          "kind": "EI",
+          "statement": "count=2 只描述向可用 Task 分配的上限式尝试，不证明两座布局成功：Task 候选数、Room 候选、同名 countstaticlayouts 赋值及原生 ReserveSpace 都可能改变实际结果。显式 position 路径跳过预留也不能被当作碰撞/通路已验证。",
+          "evidence_refs": [
+            "WG-S035",
+            "WG-S036",
+            "WG-S037",
+            "WG-S041"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C08",
+          "kind": "REC",
+          "statement": "以当前原版布局形状为参照，使用唯一布局键并明确接入 TaskSet/Room；给 StaticLayout.Get 每次传新额外属性表，检查被覆盖字段。检查 Tiled 索引、层名、尺寸和坐标，再用隔离新世界与多 seed 验证数量、海岸/路径、碰撞和小地图。",
+          "evidence_refs": [
+            "WG-S038",
+            "WG-S046",
+            "WG-S039",
+            "WG-S035",
+            "WG-S041"
+          ]
+        },
+        {
+          "id": "EXP-WG-004-C09",
+          "kind": "UNK",
+          "statement": "未在游戏内生成；ReserveSpace、SetTile、MakeSafeFromDisconnect 的 native 实现与最终地形连通未由这些 Lua 证明。未验证矩形/非标准 tilewidth、新 Tiled 导出、area 占位组合、海洋布局和任意 count 的可用性；静态解析通过不等于布局落位成功。",
+          "evidence_refs": [
+            "WG-S038",
+            "WG-S041",
+            "WG-S047"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "require(\"map/static_layout\").Get(layoutsrc, additionalProps)",
+          "source_file": "scripts/map/static_layout.lua",
+          "visibility": "模块返回表的 Get 字段，别名 ConvertStaticLayoutToLayout；可调用环境：正常 require 后取得；需要布局常量、WORLD_TILES、PrefabSwaps 与 source module 已可用",
+          "parameters": [
+            "layoutsrc: require 模块名，不是 layout 注册键",
+            "additionalProps: 可选 table；直接作为输出表并改写"
+          ],
+          "returns": [
+            "layout table（与传入 additionalProps 同身份或新表）"
+          ],
+          "preconditions": [
+            "源模块返回 loader 期待的 tilewidth,width,height,layers 结构；不是任意 Tiled 格式解析器"
+          ],
+          "side_effects": [
+            "require 源模块；覆盖基础布局字段；转换层、过滤 proxy；每个对象层后可调用 initfn"
+          ],
+          "lifecycle": "布局定义载入时；本身不把表注册到 Layouts，也不放置",
+          "evidence_refs": [
+            "WG-S038",
+            "WG-S044"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").LayoutForDefinition(name, choices)",
+          "source_file": "scripts/map/object_layout.lua",
+          "visibility": "模块导出局部函数；可调用环境：worldgen 布局消费者；所列注册模块需要可加载",
+          "parameters": [
+            "name: 布局注册键",
+            "choices: 仅 maze 分支的候选集合"
+          ],
+          "returns": [
+            "deepcopy 布局并写 name；所有库都无此键则 nil"
+          ],
+          "preconditions": [
+            "name 非 nil；maze choices 等结构有效"
+          ],
+          "side_effects": [
+            "require 多布局库；maze 路径可随机选；不放置"
+          ],
+          "lifecycle": "每次 Convert/Place 查定义",
+          "evidence_refs": [
+            "WG-S039",
+            "WG-S043"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").Convert(node_id, item, addEntity)",
+          "source_file": "scripts/map/object_layout.lua",
+          "visibility": "模块导出局部函数，内部组合三个步骤；可调用环境：worldgen 节点布局消费",
+          "parameters": [
+            "node_id: 原生节点标识",
+            "item: 非空布局注册键",
+            "addEntity: {fn=函数,args={entitiesOut,width,height,debug_prefab_list}}"
+          ],
+          "returns": [
+            "无显式返回（nil）；不能据此获得成功状态"
+          ],
+          "preconditions": [
+            "布局存在且结构完整；WorldSim 提供所需方法；addEntity.fn 接受消费者参数"
+          ],
+          "side_effects": [
+            "解析定义、展开对象、向 WorldSim 预留空间；ReserveSpace 返回 rcx 为 Lua 真值，且 layout.SafeFromDisconnect 与 world.MakeSafeFromDisconnect 均为真值时，逐格对 tiles 中 tileid~=0 的单元调用 world:MakeSafeFromDisconnect；对象回调另以 rcx~=nil 为守卫；失败可警告；native 连通保护实际效果未验证"
+          ],
+          "lifecycle": "Node:ConvertGround 等调用时",
+          "evidence_refs": [
+            "WG-S042",
+            "WG-S039",
+            "WG-S040",
+            "WG-S041",
+            "WG-S037"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").Place(position, item, addEntity, choices, world)",
+          "source_file": "scripts/map/object_layout.lua",
+          "visibility": "模块导出局部函数；可调用环境：worldgen 显式位置放置；world 参数必须满足消费者协议",
+          "parameters": [
+            "position: {tile_x,tile_y} 起始坐标",
+            "item: 非空布局注册键",
+            "addEntity: fn/args 结构同 Convert",
+            "choices: maze 候选，可选",
+            "world: 可选，缺省 WorldSim"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "有效 position；布局地面尺寸和索引有效；world:SetTile 等存在"
+          ],
+          "side_effects": [
+            "对非零 ground 单元直接 SetTile 后，在 layout.SafeFromDisconnect 与 world.MakeSafeFromDisconnect 均为 Lua 真值时逐格调用 world:MakeSafeFromDisconnect；跳过 ReserveSpace，进行相应坐标翻转并回调放置对象；native 连通保护实际效果未验证"
+          ],
+          "lifecycle": "已定位布局放置调用时",
+          "evidence_refs": [
+            "WG-S042",
+            "WG-S041",
+            "WG-S043"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "原版将静态源模块转换成布局表并在 Layouts 中以键暴露。",
+          "evidence_refs": [
+            "WG-S044",
+            "WG-S045",
+            "WG-S038",
+            "WG-S046"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "TaskSet 的 set_pieces 经 Level 选择 Task，再由 Story 选择 Room，将布局计数写入节点内容。",
+          "evidence_refs": [
+            "WG-S026",
+            "WG-S035",
+            "WG-S036"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "forest_map 调根 ConvertGround，Graph 获取包含子图的节点并转交；Node 按 countstaticlayouts 请求 object_layout.Convert。",
+          "evidence_refs": [
+            "WG-S051",
+            "WG-S063",
+            "WG-S069",
+            "WG-S037"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "布局库查找并复制定义，展开 areas/defs，转换为 prefab 点列表。",
+          "evidence_refs": [
+            "WG-S039",
+            "WG-S040"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "地面索引经 ground_types 映射，按无 position 预留或有 position 直接写地；相应分支还按 SafeFromDisconnect/MakeSafeFromDisconnect 的真值条件对非零单元调用保护方法；对象回调分支生成保存记录，native 保护效果仍未知。",
+          "evidence_refs": [
+            "WG-S038",
+            "WG-S041",
+            "WG-S034"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-WG-004-C09: 未在游戏内生成；ReserveSpace、SetTile、MakeSafeFromDisconnect 的 native 实现与最终地形连通未由这些 Lua 证明。未验证矩形/非标准 tilewidth、新 Tiled 导出、area 占位组合、海洋布局和任意 count 的可用性；静态解析通过不等于布局落位成功。"
+      ]
+    },
+    {
+      "id": "EXP-WG-005",
+      "title": "地皮注册、动态 ID、定义表副作用与生成读取",
+      "aliases": [
+        "AddTile",
+        "RegisterTileRange",
+        "WORLD_TILES",
+        "TileRanges",
+        "TileManager",
+        "GetWorldTileMap"
+      ],
+      "engineering_question": "模组如何登记新地皮并取得 ID，为什么不能硬编码旧 GROUND 数值或把范围名字当可通行保证？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "modutil 地皮环境 wrapper → tilemanager/tiledefs → WORLD_TILES 与生成消费者；不覆盖运行时 terraform、旧档迁移和 native 渲染/复制验收",
+        "update_policy": "逐引用、逐 claim 复核；旧知识可读；未知新版本不自动撤销整库可用性"
+      },
+      "claims": [
+        {
+          "id": "EXP-WG-005-C01",
+          "kind": "NSF",
+          "statement": "env.AddTile 与 env.RegisterTileRange 在 worldgen/main 共用注入段；wrapper 先设 mod_protect_TileManager=false，调用 TileManager 后设 true，无显式返回，也没有 finally/受保护恢复分支。直接调用模块函数在保护为真时 assert；不能据此推定异常中断后保护已复原。",
+          "evidence_refs": [
+            "WG-S052",
+            "WG-S008",
+            "WG-S053",
+            "WG-S056"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C02",
+          "kind": "NSF",
+          "statement": "RegisterTileRange 将名称大写，要求 range_end-range_start>=256 且该名称未登记，保存 range_end+1；GetTileID 后续用数值 for 从 range_start 到这个保存的 range_end（含端点）找 INVERTED_WORLD_TILES 第一个空位。这两个函数本身没有执行区间重叠、分类归属或最大 tile ID 的综合验证。",
+          "evidence_refs": [
+            "WG-S053",
+            "WG-S055"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C03",
+          "kind": "NSF",
+          "statement": "AddTile 将 tile_name 和 tile_range 大写，tile_data 缺省 {}，验证范围已存在，取 ID 后先写 WORLD_TILES、INVERTED_WORLD_TILES、GROUND_NAMES；新名重名被拒，范围耗尽 error。旧 GROUND 路径仅在 allow_existing_GROUND_entry==true 且 old_static_id 一致有效时复用旧 ID，tiledefs 完成后关闭该许可。",
+          "evidence_refs": [
+            "WG-S056",
+            "WG-S055",
+            "WG-S059"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C04",
+          "kind": "NSF",
+          "statement": "可选 ground_tile_def/minimap_tile_def 由验证函数原地补路径/属性，要求 name/noise_texture；ground 增加多个地皮分类表标记和资产，minimap 增加小地图资产；turf_def 要 name 并补 anim/bank_build 后写 GroundTiles.turf。主 ID 表写入早于这些验证，故后续 assert 不提供事务回滚。",
+          "evidence_refs": [
+            "WG-S056",
+            "WG-S054"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C05",
+          "kind": "NSF",
+          "statement": "TileRanges 是 tiledefs 局部表，原版注册 LAND/NOISE/OCEAN/IMPASSABLE 字符串范围；FOREST 示例同时提供地面、小地图与 turf 定义。WORLD_TILES 初始仅有 INVALID，GetWorldTileMap 返回新映射并补未冲突 GROUND 旧名。GROUND 注释已标 deprecated。",
+          "evidence_refs": [
+            "WG-S057",
+            "WG-S058",
+            "WG-S060",
+            "WG-S062"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C06",
+          "kind": "NSF",
+          "statement": "Forest Room 的 value 直接读取 WORLD_TILES.FOREST；静态布局用 ground_types 表映射后交 SetTile/ReserveSpace。Lua TileGroupManager 的陆地/海洋/不可通过/Noise 判断使用常量数值区间（及特例），不是从任意自定义范围名字自动推导分类。Node:AddEntity 还会以 IsLandTile 检查 tile。",
+          "evidence_refs": [
+            "WG-S028",
+            "WG-S038",
+            "WG-S041",
+            "WG-S061",
+            "WG-S034",
+            "WG-S060"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C07",
+          "kind": "EI",
+          "statement": "动态 ID 取决于已占用表与登记顺序，裸硬编码 ID 不能表达自定义地皮身份；RegisterTileRange 成功也不足以证明水陆分类正确。地面定义、世界生成和运行端需要一致的名称/注册过程，静态代码不足以证明跨进程最终 ID、资产和旧档映射一致。",
+          "evidence_refs": [
+            "WG-S055",
+            "WG-S056",
+            "WG-S061",
+            "WG-S001",
+            "WG-S002"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C08",
+          "kind": "REC",
+          "statement": "经模组环境 AddTile 注册并读取 WORLD_TILES[大写唯一名]；优先选符合用途的既有范围，勿依赖旧教程空闲数值段。每个实际环境只登记一次，定义表按调用独立准备；先检查所有必需字段与资产，再验证新生成、存读档和客户端地皮表现。",
+          "evidence_refs": [
+            "WG-S052",
+            "WG-S054",
+            "WG-S056",
+            "WG-S057",
+            "WG-S061"
+          ]
+        },
+        {
+          "id": "EXP-WG-005-C09",
+          "kind": "UNK",
+          "statement": "未运行地皮注册或资产加载；native 渲染、通行、网络、旧存档重映射、移除 Mod 后行为，以及跨 Mod 失败回滚未测试。本卡不提供可安全任意扩区、热注册地皮或通用填海系统的保证。",
+          "evidence_refs": [
+            "WG-S056",
+            "WG-S061",
+            "WG-S041"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "env.RegisterTileRange(range_name, range_start, range_end)",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境闭包；模块内同名局部函数是底层实现；可调用环境：worldgen/main 共同注入段",
+          "parameters": [
+            "range_name: 唯一字符串，转大写",
+            "range_start,range_end: 数值边界；差至少 256；实现保存 end+1"
+          ],
+          "returns": [
+            "无显式返回（nil）"
+          ],
+          "preconditions": [
+            "保护经 wrapper 临时关闭；名字未使用；数值满足 assert；自行核验常量分类/重叠"
+          ],
+          "side_effects": [
+            "新增 TILE_RANGES 项；正常返回后保护设 true；异常无保证恢复"
+          ],
+          "lifecycle": "新地皮引用自有范围之前；不自动改 TileGroupManager 分类",
+          "evidence_refs": [
+            "WG-S052",
+            "WG-S053",
+            "WG-S055",
+            "WG-S061"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "env.AddTile(tile_name, tile_range, tile_data, ground_tile_def, minimap_tile_def, turf_def)",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "模组环境闭包；区别于 require(\"tilemanager\").AddTile；可调用环境：worldgen/main 共同注入段；各需要地皮映射的环境登记一致",
+          "parameters": [
+            "tile_name: 新地皮唯一名，转大写",
+            "tile_range: 已注册字符串范围名，转大写",
+            "tile_data: 可选 table；ground_name、old_static_id（旧 ID 特许路径）",
+            "ground_tile_def: 可选地面定义；提供时 name/noise_texture 必需",
+            "minimap_tile_def: 可选小地图定义；提供时 name/noise_texture 必需",
+            "turf_def: 可选 turf 定义；提供时 name 必需"
+          ],
+          "returns": [
+            "无显式返回（nil）；随后从 WORLD_TILES[大写名] 读取 ID"
+          ],
+          "preconditions": [
+            "范围已注册且有空位；新名称未占用；定义字段/路径有效；旧 GROUND 复用仅原版许可窗口"
+          ],
+          "side_effects": [
+            "写 ID/反向/显示名表，原地修改定义并写地面、分类、小地图、资产、turf 表；保护 wrapper 正常返回后设 true；失败可留下前序修改"
+          ],
+          "lifecycle": "注册初始化；无热卸载/自动撤销契约",
+          "evidence_refs": [
+            "WG-S052",
+            "WG-S055",
+            "WG-S056",
+            "WG-S054",
+            "WG-S059"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        },
+        {
+          "symbol": "GetWorldTileMap()",
+          "source_file": "scripts/constants.lua",
+          "visibility": "原版全局函数；不是 env 注入闭包；可调用环境：在 constants 初始化且实际地皮注册后通过对应全局环境取用",
+          "parameters": [],
+          "returns": [
+            "新 table：WORLD_TILES 映射，加未冲突的旧 GROUND 映射"
+          ],
+          "preconditions": [
+            "WORLD_TILES/GROUND/INVERTED_WORLD_TILES 当前状态有效"
+          ],
+          "side_effects": [
+            "读取映射；返回新表；不注册新地皮"
+          ],
+          "lifecycle": "按调用时映射快照读取",
+          "evidence_refs": [
+            "WG-S060"
+          ],
+          "unknowns": [
+            "静态契约；未在游戏内调用验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "constants 建 ID 表及边界常量；tiledefs 注册局部 TileRanges 和原版地皮，结束后启保护并禁旧 GROUND 特许。",
+          "evidence_refs": [
+            "WG-S060",
+            "WG-S057",
+            "WG-S058",
+            "WG-S059"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Mod 环境 wrapper 临时开保护，TileManager 对名称/范围规范化，按空位分配 ID，写映射。",
+          "evidence_refs": [
+            "WG-S052",
+            "WG-S053",
+            "WG-S055",
+            "WG-S056"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按提供的可选定义写地面/小地图/turf/资产与属性分类；错误并非事务回滚。",
+          "evidence_refs": [
+            "WG-S056",
+            "WG-S054"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "Room 读取 WORLD_TILES 的值，布局读取 ground_types 映射；实际填充还经 TileGroupManager 的数值区间判断。",
+          "evidence_refs": [
+            "WG-S028",
+            "WG-S038",
+            "WG-S041",
+            "WG-S061",
+            "WG-S034"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-WG-005-C09: 未运行地皮注册或资产加载；native 渲染、通行、网络、旧存档重映射、移除 Mod 后行为，以及跨 Mod 失败回滚未测试。本卡不提供可安全任意扩区、热注册地皮或通用填海系统的保证。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "WG-S001",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 258,
+      "line_end": 320,
+      "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f",
+      "symbols": [
+        "CreateEnvironment",
+        "env.modimport"
+      ]
+    },
+    {
+      "id": "WG-S002",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 526,
+      "line_end": 582,
+      "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0",
+      "symbols": [
+        "ModWrangler:LoadMods",
+        "ModWrangler:InitializeModMain"
+      ]
+    },
+    {
+      "id": "WG-S003",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 786,
+      "line_end": 794,
+      "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0",
+      "symbols": [
+        "RunInEnvironment",
+        "RunInEnvironmentSafe"
+      ]
+    },
+    {
+      "id": "WG-S004",
+      "source_file": "scripts/worldgen_main.lua",
+      "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+      "line_start": 104,
+      "line_end": 148,
+      "range_sha256": "1fb8304c77ce70c702ad0be14595b2c5fbe5835d158b9a3f2fbabbc53af5010b",
+      "symbols": [
+        "ModManager:LoadMods"
+      ]
+    },
+    {
+      "id": "WG-S005",
+      "source_file": "scripts/worldgen_main.lua",
+      "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+      "line_start": 20,
+      "line_end": 25,
+      "range_sha256": "e43b5f4972afc267db264fa92508c8f94bd9c68d9e9c5971d9d0e6c35dad505f",
+      "symbols": [
+        "WORLDGEN_MAIN"
+      ]
+    },
+    {
+      "id": "WG-S006",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 237,
+      "line_end": 281,
+      "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474",
+      "symbols": [
+        "env.AddLevelPreInit",
+        "env.AddLevelPreInitAny",
+        "env.AddTaskSetPreInit",
+        "env.AddTaskSetPreInitAny",
+        "env.AddTaskPreInit",
+        "env.AddRoomPreInit"
+      ]
+    },
+    {
+      "id": "WG-S007",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 294,
+      "line_end": 305,
+      "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc",
+      "symbols": [
+        "env.AddTaskSet",
+        "env.AddTask",
+        "env.AddRoom"
+      ]
+    },
+    {
+      "id": "WG-S008",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 430,
+      "line_end": 438,
+      "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca",
+      "symbols": [
+        "InsertPostInitFunctions"
+      ]
+    },
+    {
+      "id": "WG-S009",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 329,
+      "line_end": 332,
+      "range_sha256": "41c6b14fe0bef984da7e47d0453753a34edf51b71af2d4e6d3bff4134e52a83f",
+      "symbols": [
+        "env.GetModConfigData"
+      ]
+    },
+    {
+      "id": "WG-S010",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 34,
+      "line_end": 62,
+      "range_sha256": "1cbfe62deb02a03b6c80797c3a48fce967ff4edb607209886b688e2a3135a811",
+      "symbols": [
+        "GetModConfigData"
+      ]
+    },
+    {
+      "id": "WG-S011",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 818,
+      "line_end": 838,
+      "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb",
+      "symbols": [
+        "ModWrangler:GetPostInitFns"
+      ]
+    },
+    {
+      "id": "WG-S012",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 153,
+      "line_end": 166,
+      "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619",
+      "symbols": [
+        "runmodfn"
+      ]
+    },
+    {
+      "id": "WG-S013",
+      "source_file": "scripts/map/rooms.lua",
+      "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+      "line_start": 5,
+      "line_end": 37,
+      "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4",
+      "symbols": [
+        "GetRoomByName",
+        "AddRoom",
+        "AddModRoom"
+      ]
+    },
+    {
+      "id": "WG-S014",
+      "source_file": "scripts/map/tasks.lua",
+      "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+      "line_start": 28,
+      "line_end": 70,
+      "range_sha256": "a716f5afbc965241d4ca9d36d0cdab8baa022c642ce974ad1189f8e8b01286ec",
+      "symbols": [
+        "GetTaskByName",
+        "AddTask",
+        "AddModTask"
+      ]
+    },
+    {
+      "id": "WG-S015",
+      "source_file": "scripts/map/task.lua",
+      "file_sha256": "f0bc60e0cbee3f6b5c13a0c7b65d749465e2d72d5330a85123556675c3b00288",
+      "line_start": 1,
+      "line_end": 40,
+      "range_sha256": "65011b39564f0bccb5fd90324af86a60ae9557f217791626e7f1add3dfad6209",
+      "symbols": [
+        "Task",
+        "Task:__tostring"
+      ]
+    },
+    {
+      "id": "WG-S016",
+      "source_file": "scripts/map/tasksets.lua",
+      "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+      "line_start": 9,
+      "line_end": 17,
+      "range_sha256": "0487f09d60fd15c8594e85a8b1dc467ef885b2909a796f5af755135c70cd83cd",
+      "symbols": [
+        "GetGenTasks"
+      ]
+    },
+    {
+      "id": "WG-S017",
+      "source_file": "scripts/map/tasksets.lua",
+      "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+      "line_start": 55,
+      "line_end": 71,
+      "range_sha256": "a1d059bfe54e8acdda3fdd420097a47d1efabed8b7bddb531fdd58e0228d7f35",
+      "symbols": [
+        "AddTaskSet",
+        "AddModTaskSet"
+      ]
+    },
+    {
+      "id": "WG-S018",
+      "source_file": "scripts/map/level.lua",
+      "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+      "line_start": 89,
+      "line_end": 150,
+      "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87",
+      "symbols": [
+        "Level:ChooseTasks"
+      ]
+    },
+    {
+      "id": "WG-S019",
+      "source_file": "scripts/map/level.lua",
+      "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+      "line_start": 43,
+      "line_end": 53,
+      "range_sha256": "0786dbc2290fd88539d034a20f0dd780149c2159f04315a06de2bc9506b380b8",
+      "symbols": [
+        "Level:ApplyModsToTasks"
+      ]
+    },
+    {
+      "id": "WG-S020",
+      "source_file": "scripts/map/level.lua",
+      "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+      "line_start": 219,
+      "line_end": 227,
+      "range_sha256": "accd837144d06baa3c1c73b52464c0d39f5460d18b473d5d44b56f5f0911aec5",
+      "symbols": [
+        "Level:EnqueueATask"
+      ]
+    },
+    {
+      "id": "WG-S021",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 98,
+      "line_end": 116,
+      "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3",
+      "symbols": [
+        "Story:ModRoom",
+        "Story:GetRoom"
+      ]
+    },
+    {
+      "id": "WG-S022",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 1233,
+      "line_end": 1289,
+      "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01",
+      "symbols": [
+        "Story:GenerateNodesFromTask"
+      ]
+    },
+    {
+      "id": "WG-S023",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 1311,
+      "line_end": 1350,
+      "range_sha256": "da4ae84f158f5d1fb57a080b92c409c550cadc8b40b86cea82b886130fddd441",
+      "symbols": [
+        "Story:GenerateNodesFromTask"
+      ]
+    },
+    {
+      "id": "WG-S024",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 904,
+      "line_end": 920,
+      "range_sha256": "43c0b69d8562b0adb6b3a78990cd6361283255683d2267fa9ebd44de92d62226",
+      "symbols": [
+        "deepcopy"
+      ]
+    },
+    {
+      "id": "WG-S025",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 864,
+      "line_end": 871,
+      "range_sha256": "4bd05a1e00d84170bb0327e311fec35de6cc18961d37501b779a2c995b878a9b",
+      "symbols": [
+        "shuffleArray"
+      ]
+    },
+    {
+      "id": "WG-S026",
+      "source_file": "scripts/map/tasksets/forest.lua",
+      "file_sha256": "1d0cf156eab56cc385fd08241ea514f4c9146df95d22ffdb19302b253be348a4",
+      "line_start": 2,
+      "line_end": 78,
+      "range_sha256": "8f281f14df6b4528b6bd3cd8e935024c9de611675f2d5ef15d8c5530f39b5b69",
+      "symbols": [
+        "AddTaskSet(\"default\")"
+      ]
+    },
+    {
+      "id": "WG-S027",
+      "source_file": "scripts/map/tasks/dst_tasks_forestworld.lua",
+      "file_sha256": "0a6b04c7e4227954c43a3d5d5d67e0cd608868c4be1ac297b2ca69c82778542a",
+      "line_start": 8,
+      "line_end": 20,
+      "range_sha256": "e7cec0b0bf8e8987d2d9e54bdf4cba764186e36f0fcbdf259ea1e8fb75b0b447",
+      "symbols": [
+        "AddTask(\"Make a pick\")"
+      ]
+    },
+    {
+      "id": "WG-S028",
+      "source_file": "scripts/map/rooms/forest/terrain_forest.lua",
+      "file_sha256": "fe120a60e41b0412345ecdbdf06b9ca955456a98291f6542382661f171a9f019",
+      "line_start": 155,
+      "line_end": 181,
+      "range_sha256": "db30550766bef85de32d5c0232b408850f4110d86e5c1e8789e24afe85027aea",
+      "symbols": [
+        "AddRoom(\"Forest\")"
+      ]
+    },
+    {
+      "id": "WG-S029",
+      "source_file": "scripts/map/rooms.lua",
+      "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+      "line_start": 122,
+      "line_end": 133,
+      "range_sha256": "ce8183d9c035614e1d406adfce5f11e093d96d6f54b5be2f9c36ccbd7cbcfcd2",
+      "symbols": [
+        "ClearModData",
+        "GetRoomByName"
+      ]
+    },
+    {
+      "id": "WG-S030",
+      "source_file": "scripts/map/tasks.lua",
+      "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+      "line_start": 45,
+      "line_end": 51,
+      "range_sha256": "8f5fc331bba19f858e1ec372cca798b2e4e6ebee9ca7000c1a33eec1fab2bc01",
+      "symbols": [
+        "ClearModData"
+      ]
+    },
+    {
+      "id": "WG-S031",
+      "source_file": "scripts/map/tasksets.lua",
+      "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+      "line_start": 43,
+      "line_end": 49,
+      "range_sha256": "92e410c2212fc7b4d8a73257025c4806cd3f4533252b2a78c9e0c42c768c2507",
+      "symbols": [
+        "ClearModData"
+      ]
+    },
+    {
+      "id": "WG-S032",
+      "source_file": "scripts/map/graphnode.lua",
+      "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+      "line_start": 330,
+      "line_end": 427,
+      "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a",
+      "symbols": [
+        "Node:PopulateVoronoi"
+      ]
+    },
+    {
+      "id": "WG-S033",
+      "source_file": "scripts/map/graphnode.lua",
+      "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+      "line_start": 449,
+      "line_end": 495,
+      "range_sha256": "09c0ae483319e6745559f5086b8aff20b554aef8631a18a1d0e3157077a0d347",
+      "symbols": [
+        "Node:PopulateVoronoi"
+      ]
+    },
+    {
+      "id": "WG-S034",
+      "source_file": "scripts/map/graphnode.lua",
+      "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+      "line_start": 188,
+      "line_end": 245,
+      "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06",
+      "symbols": [
+        "PopulateWorld_AddEntity",
+        "Node:AddEntity"
+      ]
+    },
+    {
+      "id": "WG-S035",
+      "source_file": "scripts/map/level.lua",
+      "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+      "line_start": 152,
+      "line_end": 217,
+      "range_sha256": "3b1050e91da857d97fc2fe8a3bea8bf9e6adc6ef79fa0dc6cefd3db94039888a",
+      "symbols": [
+        "Level:GetTasksForLevelSetPieces",
+        "Level:ChooseSetPieces"
+      ]
+    },
+    {
+      "id": "WG-S036",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 222,
+      "line_end": 297,
+      "range_sha256": "b933b88cd70480ddd4e0dc9c805872b13b3bf6737591b343e7f78a78cefd42d9",
+      "symbols": [
+        "Story:InsertAdditionalSetPieces"
+      ]
+    },
+    {
+      "id": "WG-S037",
+      "source_file": "scripts/map/graphnode.lua",
+      "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+      "line_start": 247,
+      "line_end": 279,
+      "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54",
+      "symbols": [
+        "Node:ConvertGround"
+      ]
+    },
+    {
+      "id": "WG-S038",
+      "source_file": "scripts/map/static_layout.lua",
+      "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+      "line_start": 5,
+      "line_end": 125,
+      "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96",
+      "symbols": [
+        "ParseNestedKey",
+        "GROUND_TYPES",
+        "ConvertStaticLayoutToLayout",
+        "Get"
+      ]
+    },
+    {
+      "id": "WG-S039",
+      "source_file": "scripts/map/object_layout.lua",
+      "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+      "line_start": 142,
+      "line_end": 181,
+      "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2",
+      "symbols": [
+        "LayoutForDefinition"
+      ]
+    },
+    {
+      "id": "WG-S040",
+      "source_file": "scripts/map/object_layout.lua",
+      "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+      "line_start": 184,
+      "line_end": 292,
+      "range_sha256": "68b816dd8b39f607530acd331e4e6031f13442728d0826b5e00bf8fdfed70484",
+      "symbols": [
+        "ConvertLayoutToEntitylist"
+      ]
+    },
+    {
+      "id": "WG-S041",
+      "source_file": "scripts/map/object_layout.lua",
+      "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+      "line_start": 294,
+      "line_end": 487,
+      "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90",
+      "symbols": [
+        "ReserveAndPlaceLayout"
+      ]
+    },
+    {
+      "id": "WG-S042",
+      "source_file": "scripts/map/object_layout.lua",
+      "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+      "line_start": 508,
+      "line_end": 521,
+      "range_sha256": "1ee92534fe00bce3a2e70da6fb5666c280c6debd68115ebf5f641de0c63a8cb1",
+      "symbols": [
+        "Convert",
+        "Place"
+      ]
+    },
+    {
+      "id": "WG-S043",
+      "source_file": "scripts/map/object_layout.lua",
+      "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+      "line_start": 549,
+      "line_end": 557,
+      "range_sha256": "5b4f42a19094188531136b099b744c8593aab48683c8b5bf69c2e2f3757e6fc4",
+      "symbols": [
+        "Convert",
+        "Place",
+        "ReserveAndPlaceLayout"
+      ]
+    },
+    {
+      "id": "WG-S044",
+      "source_file": "scripts/map/layouts.lua",
+      "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+      "line_start": 253,
+      "line_end": 274,
+      "range_sha256": "d58760b7d858c84f1fd44b6bc37bfa1ec882adf8f5c4f2a5a7544dd09f902a73",
+      "symbols": [
+        "ResurrectionStone",
+        "SimpleBase"
+      ]
+    },
+    {
+      "id": "WG-S045",
+      "source_file": "scripts/map/layouts.lua",
+      "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+      "line_start": 1395,
+      "line_end": 1395,
+      "range_sha256": "1e9ccd745390b2f8f16707c68bca9b8e1d48fb246593250293f25f7cc454b62d",
+      "symbols": [
+        "Layouts"
+      ]
+    },
+    {
+      "id": "WG-S046",
+      "source_file": "scripts/map/static_layouts/resurrectionstone.lua",
+      "file_sha256": "655bccfa9753b282a10f382c707f7daf79675e61b93024f66414ee66f6256cc8",
+      "line_start": 1,
+      "line_end": 113,
+      "range_sha256": "bd9a6288d3398615d0a8f37d1ea9aa50c8a07e25bde6f3874b12e3eb3e635c53",
+      "symbols": [
+        "BG_TILES",
+        "FG_OBJECTS",
+        "resurrectionstone"
+      ]
+    },
+    {
+      "id": "WG-S047",
+      "source_file": "scripts/worldgen_main.lua",
+      "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+      "line_start": 402,
+      "line_end": 439,
+      "range_sha256": "6b031c1036b1df19819573299cfc8b57ffcaad22f70ee972eec23b827f36a0c7",
+      "symbols": [
+        "level:ChooseTasks",
+        "level:ChooseSetPieces",
+        "forest_map.Generate"
+      ]
+    },
+    {
+      "id": "WG-S048",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 1395,
+      "line_end": 1409,
+      "range_sha256": "e45acf88332f5073f1ce9f0fa523bda8a38075854592e2e43fc6a25dff06299f",
+      "symbols": [
+        "BuildStory"
+      ]
+    },
+    {
+      "id": "WG-S049",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 86,
+      "line_end": 96,
+      "range_sha256": "10cc60841fb66f2471f138252205ad44b169d7efe0f9e13abce3a4f555914f07",
+      "symbols": [
+        "Story:GenerationPipeline"
+      ]
+    },
+    {
+      "id": "WG-S050",
+      "source_file": "scripts/map/forest_map.lua",
+      "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+      "line_start": 491,
+      "line_end": 506,
+      "range_sha256": "22b92ea9608550a4e884e76d2c58c55a1bbffaac14f0a147d0873477a1bd5d0a",
+      "symbols": [
+        "BuildStory",
+        "WorldSim:WorldGen_VoronoiPass"
+      ]
+    },
+    {
+      "id": "WG-S051",
+      "source_file": "scripts/map/forest_map.lua",
+      "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+      "line_start": 840,
+      "line_end": 844,
+      "range_sha256": "929c43f99400a0d2d68391fad4201d1a46883d8ce2e98836e236b399813086ef",
+      "symbols": [
+        "GlobalPrePopulate",
+        "ConvertGround"
+      ]
+    },
+    {
+      "id": "WG-S052",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 356,
+      "line_end": 376,
+      "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e",
+      "symbols": [
+        "env.RegisterTileRange",
+        "env.AddTile"
+      ]
+    },
+    {
+      "id": "WG-S053",
+      "source_file": "scripts/tilemanager.lua",
+      "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+      "line_start": 5,
+      "line_end": 21,
+      "range_sha256": "6c801884638b236448b1067ba580a5e11133300f9cc5f6a63c9d78ec3e16e11d",
+      "symbols": [
+        "RegisterTileRange",
+        "TILE_RANGES"
+      ]
+    },
+    {
+      "id": "WG-S054",
+      "source_file": "scripts/tilemanager.lua",
+      "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+      "line_start": 92,
+      "line_end": 124,
+      "range_sha256": "bea011528c17e4b87efa1d4e11dd49357c5bd88b63ba4b44803ac4e681634971",
+      "symbols": [
+        "ValidateGroundTileDef",
+        "ValidateMinimapTileDef",
+        "ValidateTurfDef"
+      ]
+    },
+    {
+      "id": "WG-S055",
+      "source_file": "scripts/tilemanager.lua",
+      "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+      "line_start": 126,
+      "line_end": 145,
+      "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2",
+      "symbols": [
+        "GetTileID"
+      ]
+    },
+    {
+      "id": "WG-S056",
+      "source_file": "scripts/tilemanager.lua",
+      "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+      "line_start": 147,
+      "line_end": 210,
+      "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9",
+      "symbols": [
+        "AddTile"
+      ]
+    },
+    {
+      "id": "WG-S057",
+      "source_file": "scripts/tiledefs.lua",
+      "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+      "line_start": 77,
+      "line_end": 100,
+      "range_sha256": "aadc83942ddc8843ef48b096d5ebec91b39565bd05374d175d061ca158d34831",
+      "symbols": [
+        "TileRanges",
+        "RegisterTileRange"
+      ]
+    },
+    {
+      "id": "WG-S058",
+      "source_file": "scripts/tiledefs.lua",
+      "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+      "line_start": 597,
+      "line_end": 617,
+      "range_sha256": "8041588ee51fce0b3680c02dd9b370534c4561e910f4df134899a32122f5fb61",
+      "symbols": [
+        "TileManager.AddTile(\"FOREST\")"
+      ]
+    },
+    {
+      "id": "WG-S059",
+      "source_file": "scripts/tiledefs.lua",
+      "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+      "line_start": 1652,
+      "line_end": 1653,
+      "range_sha256": "96c8a541329b714fa5342720130b13f4d2f631d419d7a7409f7121e71cfd335b",
+      "symbols": [
+        "mod_protect_TileManager",
+        "allow_existing_GROUND_entry"
+      ]
+    },
+    {
+      "id": "WG-S060",
+      "source_file": "scripts/constants.lua",
+      "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+      "line_start": 789,
+      "line_end": 838,
+      "range_sha256": "64d6e722e173cf89a4787b72b4cecdd4cc2b232351f4fd91a24fb78e7ec7a7e7",
+      "symbols": [
+        "WORLD_TILES",
+        "INVERTED_WORLD_TILES",
+        "GetWorldTileMap"
+      ]
+    },
+    {
+      "id": "WG-S061",
+      "source_file": "scripts/tilegroups.lua",
+      "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+      "line_start": 1,
+      "line_end": 62,
+      "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f",
+      "symbols": [
+        "TileGroupManager__index:IsLandTile",
+        "IsOceanTile",
+        "IsImpassableTile",
+        "IsNoiseTile"
+      ]
+    },
+    {
+      "id": "WG-S062",
+      "source_file": "scripts/constants.lua",
+      "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+      "line_start": 685,
+      "line_end": 695,
+      "range_sha256": "ade7d96a62e87f208773beed9de777db3ef5a75e57912f5b34aa4f3d5f4427b9",
+      "symbols": [
+        "GROUND"
+      ]
+    },
+    {
+      "id": "WG-S063",
+      "source_file": "scripts/map/network.lua",
+      "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+      "line_start": 681,
+      "line_end": 686,
+      "range_sha256": "897f67a2aad52295923ea9b6ec2f12a01b7124cdbeedef0246202add7a26cc6a",
+      "symbols": [
+        "Graph:ConvertGround"
+      ]
+    },
+    {
+      "id": "WG-S064",
+      "source_file": "scripts/map/network.lua",
+      "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+      "line_start": 729,
+      "line_end": 744,
+      "range_sha256": "1cdeb7141c071a13a3c38d5b534f27f00000509bafd0aa76a9f68a50d388045a",
+      "symbols": [
+        "Graph:PopulateVoronoi"
+      ]
+    },
+    {
+      "id": "WG-S065",
+      "source_file": "scripts/map/forest_map.lua",
+      "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+      "line_start": 870,
+      "line_end": 873,
+      "range_sha256": "50aa10e41be58c39febb248ac1b4da88088826cdaf4067e28113d3975be1bfc9",
+      "symbols": [
+        "Graph:PopulateVoronoi"
+      ]
+    },
+    {
+      "id": "WG-S066",
+      "source_file": "scripts/map/network.lua",
+      "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+      "line_start": 425,
+      "line_end": 477,
+      "range_sha256": "e9d66bb5f445386975ded1ac05e23c754fc93b7dd07868960909f07d74c57233",
+      "symbols": [
+        "Graph:AddNodeByNode",
+        "Graph:AddNode"
+      ]
+    },
+    {
+      "id": "WG-S067",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 849,
+      "line_end": 914,
+      "range_sha256": "a497824916ecc40a28ab803d185de05a4480fe1eea358853104b329a77dd44e6",
+      "symbols": [
+        "Story:GenerateNodesFromTasks",
+        "Story:GenerateNodesForRegion"
+      ]
+    },
+    {
+      "id": "WG-S068",
+      "source_file": "scripts/map/storygen.lua",
+      "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+      "line_start": 49,
+      "line_end": 84,
+      "range_sha256": "03d6f2d7f7a28dcad5f04b32f5be7a01e8689ea9157ed2f9ec37a914525ca790",
+      "symbols": [
+        "Story"
+      ]
+    },
+    {
+      "id": "WG-S069",
+      "source_file": "scripts/map/network.lua",
+      "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+      "line_start": 515,
+      "line_end": 532,
+      "range_sha256": "151816831538d1db47863d3877801891912ccfb732be5f6cb0ffb9794d9e2f62",
+      "symbols": [
+        "Graph:GetNodes"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "生成入口里为什么拿不到世界组件，配置的第二参数是默认值吗？",
+      "expected_entry_ids": [
+        "EXP-WG-001"
+      ],
+      "purpose": "纯中文入口；环境与配置边界"
+    },
+    {
+      "query": "modworldgenmain.lua CreateEnvironment GetModConfigData WORLDGEN_MAIN",
+      "expected_entry_ids": [
+        "EXP-WG-001"
+      ],
+      "purpose": "符号入口；区分入口名和实际阶段"
+    },
+    {
+      "query": "只写在生成入口就能直接修改现有存档的世界实体吗？",
+      "expected_entry_ids": [
+        "EXP-WG-001"
+      ],
+      "purpose": "边界负例；不推定运行时对象或已有档迁移"
+    },
+    {
+      "query": "新房间注册后怎么被任务集合选中，回调改的是哪张表？",
+      "expected_entry_ids": [
+        "EXP-WG-002"
+      ],
+      "purpose": "纯中文链路入口"
+    },
+    {
+      "query": "AddRoomPreInit AddTaskPreInit AddTaskSetPreInit ChooseTasks",
+      "expected_entry_ids": [
+        "EXP-WG-002"
+      ],
+      "purpose": "符号入口；复制/Hook 顺序"
+    },
+    {
+      "query": "任务预初始化会自动覆盖后来加入的所有可选任务吗？",
+      "expected_entry_ids": [
+        "EXP-WG-002"
+      ],
+      "purpose": "边界负例；ApplyModsToTasks 的调用位置"
+    },
+    {
+      "query": "房间写十个资源为什么全图不一定只有十个？",
+      "expected_entry_ids": [
+        "EXP-WG-003"
+      ],
+      "purpose": "纯中文数量边界"
+    },
+    {
+      "query": "countprefabs(area,prefab,scratchpad) countprefabs_uses_filters PopulateVoronoi",
+      "expected_entry_ids": [
+        "EXP-WG-003"
+      ],
+      "purpose": "符号入口；节点计数协议"
+    },
+    {
+      "query": "分布权重填一百是否保证生成一百个，追加存档记录是否等于实体生成成功？",
+      "expected_entry_ids": [
+        "EXP-WG-003"
+      ],
+      "purpose": "边界负例；分布与运行时结果分离"
+    },
+    {
+      "query": "固定建筑群从导出布局到地图落位会经过哪些检查？",
+      "expected_entry_ids": [
+        "EXP-WG-004"
+      ],
+      "purpose": "纯中文布局全链路"
+    },
+    {
+      "query": "StaticLayout.Get BG_TILES FG_OBJECTS countstaticlayouts ReserveSpace",
+      "expected_entry_ids": [
+        "EXP-WG-004"
+      ],
+      "purpose": "符号入口；载入和消费分离"
+    },
+    {
+      "query": "布局数量写成两座就一定两座且道路连通，地面索引就是地皮编号吗？",
+      "expected_entry_ids": [
+        "EXP-WG-004"
+      ],
+      "purpose": "边界负例；计数、native 和索引"
+    },
+    {
+      "query": "新地皮如何登记并读取编号，为什么不要写死旧数字？",
+      "expected_entry_ids": [
+        "EXP-WG-005"
+      ],
+      "purpose": "纯中文地皮入口"
+    },
+    {
+      "query": "AddTile RegisterTileRange WORLD_TILES TileRanges GetWorldTileMap",
+      "expected_entry_ids": [
+        "EXP-WG-005"
+      ],
+      "purpose": "符号入口；身份和返回值"
+    },
+    {
+      "query": "注册任意名字的地皮区间就自动成陆地，失败后会自动撤销吗？",
+      "expected_entry_ids": [
+        "EXP-WG-005"
+      ],
+      "purpose": "边界负例；分类与非事务副作用"
+    }
+  ],
+  "limitations": [
+    "本候选仅研究与受限检索；所有卡 research/restricted/hold，没有当前 canonical、安装或配置变更。",
+    "759671 由 CONTROL 的归档 SHA256 身份绑定，Lua 文件没有被声称含游戏版本字符串；已核验归档与 4084 Lua 清单计数。",
+    "仅静态读取合法本地 scripts.zip；未执行游戏、未生成任何 seed 地图、未验证 native/远端客户端/资产表现。",
+    "来源引用是原始 ZIP bytes SHA256 与 UTF-8 decode/splitlines/LF 无末尾换行的范围 SHA256；不交付完整游戏 Lua。",
+    "本卡的 evidence_refs 是明确依赖定位，不等于该依赖覆盖所有可能消费者；未列出的背景、海洋、洞穴/活动、native 路径仍需按任务研究。",
+    "未来源码允许只读导航与旧知识阅读；compare 输出逐 reference/claim/API/step 待复核状态，不自动升级事实适用版本，也不全局禁用知识库。",
+    "MCP reviewer 检索命中 SPATIAL-CODE-WALK-CHECKS，仅作邻域导航，没有将其不完整 Scope 或旧报告当成本候选源码证据。"
+  ]
+}

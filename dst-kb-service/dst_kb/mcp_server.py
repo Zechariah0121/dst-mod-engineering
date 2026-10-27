@@ -28,7 +28,7 @@ TOOLS=[
        'source_file':{'type':'string','maxLength':512,
                       'description':'Optional exact original scripts/...lua path. Required when accepted same-name declarations belong to different sources; does not promote file-local declarations to public APIs.'}},['symbol']),
  tool('get_entry','Read one canonical knowledge ID. Omitting view preserves the legacy call shape; explicit view=decision is compact, reviewer adds research detail, evidence exposes evidence navigation. projection separately controls admission: selecting a view never bypasses Coding HOLD. For research use projection=reviewer, then resolve one exact evidence reference if necessary.',
-      {'id':STR,'projection':PROJECTION,'view':VIEW},['id']),
+      {'id':STR,'projection':PROJECTION,'view':VIEW,'pointer':{'type':'string','maxLength':2000},'max_bytes':{'type':'integer','minimum':1000,'maximum':64000}},['id']),
  tool('resolve_evidence','Resolve one evidence reference for one knowledge ID, optionally narrowed by a relative JSON subpointer. Defaults to Reviewer research navigation. Returns bounded referenced evidence only, with locator/hash and truncation metadata; never fetches an entire evidence corpus or changes Coding admission.',
       {'id':STR,'reference_index':{'type':'integer','minimum':0,'maximum':9999,'default':0},
        'projection':REVIEWER_PROJECTION,'subpointer':{'type':'string','maxLength':2000},

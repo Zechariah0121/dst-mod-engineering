@@ -1,0 +1,4066 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "Brain / BehaviourTree / DoAction / BufferedAction / StateGraph bounded chain",
+  "source_epoch": "759671",
+  "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+  "entries": [
+    {
+      "id": "EXP-AI-001",
+      "title": "Brain 安装、具名停止、重启与休眠重建",
+      "aliases": [
+        "大脑生命周期",
+        "SetBrain",
+        "StopBrain",
+        "RestartBrain",
+        "Pause",
+        "Resume",
+        "_Start_Internal"
+      ],
+      "engineering_question": "何时复用同一 Brain，何时创建新实例；停止原因、暂停与树清理分别由谁负责？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "EntityScript 与 Brain 所引完整方法，mainfunctions 的 sleep/wake 回调；不把 engine 何时发出回调当作已知。",
+          "普通猪人 normal 分支及蜘蛛默认/可覆盖 brain 仅作为安装消费者。",
+          "未研究 Brain 序列化、所有实体移除事件顺序、客户端自定义 Brain 或 ModManager 注册实现。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-001-NSF-01",
+          "kind": "NSF",
+          "statement": "SetBrain 保存 brainfn，依据 sleepstatepending/limbo/asleep 决定是否禁用，先停止旧 Brain；可创建时调用 brainfn()（不传实体），随后设置 brain.inst，仅在没有 _brainstopped 原因集合时启动。",
+          "evidence_refs": [
+            "AI-S003"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-NSF-02",
+          "kind": "NSF",
+          "statement": "StopBrain 把 reason（nil/false 归一为空字符串）记为集合键，首个停止原因才触发 _Stop_Internal；RestartBrain 只删除同名已有键，集合清空才启动。重复相同 reason 不计数，未知 reason 不解除其他停止原因。",
+          "evidence_refs": [
+            "AI-S003"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-NSF-03",
+          "kind": "NSF",
+          "statement": "_Start_Internal 在 stopped 为真时依次 OnStart、置 stopped=false、未 paused 时注册调度、OnInitializationComplete、逐个 modpostinitfns；_Stop_Internal 依次 OnStop、bt:Stop、置 stopped=true、未 paused 时注销。Pause/Resume 只切 paused 与调度注册，不调用 bt:Stop/OnStart。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S002"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-NSF-04",
+          "kind": "NSF",
+          "statement": "OnEntitySleep 调用 _DisableBrain_Internal 停旧 Brain 并清空 inst.brain；OnEntityWake 在不处于 limbo 时通过 _EnableBrain_Internal 调用 brainfn() 创建新实例，保留 _brainstopped 的阻止启动效果。",
+          "evidence_refs": [
+            "AI-S004",
+            "AI-S005"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-NSF-05",
+          "kind": "NSF",
+          "statement": "普通猪人 normal() 在 mastersim 早退之后调用 local SetNormalPig，由后者安装 normalbrain（require pigbrain）和 SGpig；蜘蛛在 mastersim 早退后安装默认或 extra_data 指定的 SG/Brain。SpiderBrain 的 OnInitializationComplete 记录 home。local 工厂/设置函数是消费者，不因被引用而成为公共 API。",
+          "evidence_refs": [
+            "AI-S042",
+            "AI-S043",
+            "AI-S044",
+            "AI-S045",
+            "AI-S049",
+            "AI-S050",
+            "AI-S051",
+            "AI-S053"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-EI-01",
+          "kind": "EI",
+          "statement": "Brain 的 OnStart 可在同实例重启时再次执行，休眠唤醒又可换实例；对实体永久布尔标记不能充分证明当前树已被处理。暂停保留树状态与监听器，不能推成带清理的停止。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S002",
+            "AI-S003",
+            "AI-S004",
+            "AI-S005",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-REC-01",
+          "kind": "REC",
+          "statement": "需要成对暂停某个停止原因时使用自有命名空间 reason，并按当前树/当前节点判定补丁幂等；独立验证正常启动、双 reason、停止重启、休眠唤醒，不能把旧树对象当持久身份。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S002",
+            "AI-S003",
+            "AI-S004",
+            "AI-S005"
+          ]
+        },
+        {
+          "id": "EXP-AI-001-UNK-01",
+          "kind": "UNK",
+          "statement": "本轮没有游戏运行；native 发出 sleep/wake/移除回调的时机、实体被回调重入移除时的全链顺序，以及客户端自行安装 Brain 的可用性均未由上述 Lua 确定。",
+          "evidence_refs": [
+            "AI-S003",
+            "AI-S005",
+            "AI-S056"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:SetBrain",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "EntityScript 实体（self）",
+            "arguments": {
+              "brainfn": "可调用的无参 Brain 工厂，nil/false 表示卸下；不是已有 Brain 对象"
+            }
+          },
+          "returns": "无显式返回（nil）。可能立即建立并启动新 Brain。",
+          "preconditions": "实体支持 sleep/limbo 查询；工厂返回兼容 Brain；原版样例在 mastersim 组件构造后调用。",
+          "side_effects": "保存工厂；停止旧对象；可能替换为 nil；新对象 .inst 设为实体。",
+          "lifecycle": {
+            "sequence": "重设、卸下、禁用状态均先停止旧实例；未清 _brainstopped；后续 wake 可重新构造。",
+            "failure_and_cleanup": "工厂/OnStart 抛错无事务回滚；不自行清 locomotor 或实体动作。"
+          },
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S002",
+            "AI-S003",
+            "AI-S004",
+            "AI-S044",
+            "AI-S045",
+            "AI-S050",
+            "AI-S051"
+          ],
+          "unknowns": [
+            "任意 Mod 工厂异常恢复未运行。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopBrain",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "EntityScript 实体（self）",
+            "arguments": {
+              "reason": "可选表键，通常具名字符串；nil/false 映射空字符串，同键非引用计数"
+            }
+          },
+          "returns": "无显式返回；记录停止原因。",
+          "preconditions": "无端别防护；与同实体 RestartBrain 成对使用；原版消费者端别另核。",
+          "side_effects": "第一次建立原因集合才停 Brain；已有集合只加键。",
+          "lifecycle": {
+            "sequence": "停止不删除 .brain；bt:Stop 递归调用 OnStop；并不 Reset 树或取消动作。",
+            "failure_and_cleanup": "重复同键一次 Restart 即可解除该键；不解除其他键。清理回调异常没有保护。"
+          },
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S003",
+            "AI-S012",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "停止期间 SG/locomotor 运行效果未实测。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:RestartBrain",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "EntityScript 实体（self）",
+            "arguments": {
+              "reason": "须匹配 StopBrain 键；省略时空字符串"
+            }
+          },
+          "returns": "无显式返回；最后原因消失且 .brain 存在时尝试启动。",
+          "preconditions": "有同名已记录原因才有作用；不是无条件重建命令。",
+          "side_effects": "删除原因键/清空集合；可能运行 OnStart、初始化回调及 postinit。",
+          "lifecycle": {
+            "sequence": "复用已有 Brain；sleep 中 .brain=nil 时只清原因，wake 才构造。",
+            "failure_and_cleanup": "不存在的 reason 无操作；仍有其他原因不启动；OnStart 异常无回滚。"
+          },
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S003",
+            "AI-S004"
+          ],
+          "unknowns": [
+            "各 Mod reason 冲突与回调重入未运行。"
+          ]
+        },
+        {
+          "symbol": "Brain:_Start_Internal",
+          "source_file": "scripts/brain.lua",
+          "visibility": "internal method; source explicitly says EntityScript-only",
+          "parameters": {
+            "receiver": "Brain 实例（self），由 EntityScript 设置 .inst",
+            "arguments": {}
+          },
+          "returns": "无显式返回；若已运行则早退。",
+          "preconditions": "源码注释限定 EntityScript 调用；正常先有 stopped=true。",
+          "side_effects": "OnStart→stopped=false→调度注册（未 paused）→OnInitializationComplete→modpostinitfns。",
+          "lifecycle": {
+            "sequence": "每次从 stopped 恢复都执行；OnStart 是否重建 bt 由具体 Brain 决定。",
+            "failure_and_cleanup": "未检查 OnStart 必然创建 bt；回调异常不受保护。"
+          },
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S003",
+            "AI-S052",
+            "AI-S053"
+          ],
+          "unknowns": [
+            "构造/初始化重入没有通用原子性保证。"
+          ]
+        },
+        {
+          "symbol": "Brain:_Stop_Internal",
+          "source_file": "scripts/brain.lua",
+          "visibility": "internal method; source explicitly says EntityScript-only",
+          "parameters": {
+            "receiver": "Brain 实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；stopped=true 时早退。",
+          "preconditions": "源码注释限定 EntityScript 调用。",
+          "side_effects": "OnStop→bt:Stop（如有）→stopped=true→未 paused 时移出 BrainManager。",
+          "lifecycle": {
+            "sequence": "不丢弃 bt，也不调用 bt:Reset；替换/禁用路径随后另行丢弃实例。",
+            "failure_and_cleanup": "OnStop/子节点 OnStop 抛错可中止后续注销；没有自动动作撤销。"
+          },
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S003",
+            "AI-S004",
+            "AI-S012",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "实体动作的所有取消路径不在此契约内。"
+          ]
+        },
+        {
+          "symbol": "Brain:Pause",
+          "source_file": "scripts/brain.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "Brain 实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；设置 paused=true。",
+          "preconditions": "重复 Pause 幂等；无端别检查。",
+          "side_effects": "运行中的 Brain 从 Manager 移除；不执行 OnStop 或 Stop。",
+          "lifecycle": {
+            "sequence": "保留树、节点状态、监听器；已 stopped 时仅改 paused。",
+            "failure_and_cleanup": "不是 reason 集合，多个调用者共享一个布尔；取消已有动作需另查所有者。"
+          },
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S012",
+            "AI-S020",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "暂停期间节点事件与实体状态的游戏时序未测。"
+          ]
+        },
+        {
+          "symbol": "Brain:Resume",
+          "source_file": "scripts/brain.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "Brain 实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；设置 paused=false。",
+          "preconditions": "仅 paused 时处理；stopped 的 Brain 不注册。",
+          "side_effects": "若尚未 stopped，重新加入 Manager.updaters。",
+          "lifecycle": {
+            "sequence": "继续原树，不调用 OnStart；不会解除实体 _brainstopped 原因。",
+            "failure_and_cleanup": "多方 Pause 无独立所有权；需要协调；没有异常恢复机制。"
+          },
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S003",
+            "AI-S006"
+          ],
+          "unknowns": [
+            "恢复第一帧的可见行为未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "原版 prefab 在 mastersim 建组件并 SetBrain；EntityScript 保存工厂并赋 .inst。",
+          "evidence_refs": [
+            "AI-S003",
+            "AI-S042",
+            "AI-S043",
+            "AI-S044",
+            "AI-S045",
+            "AI-S049",
+            "AI-S050",
+            "AI-S051"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "启动按 OnStart→调度注册→OnInitializationComplete→mods 顺序；猪人 OnStart 新建 BT，蜘蛛初始化记录 home。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S041",
+            "AI-S052",
+            "AI-S053"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "首次具名停止进入 _Stop_Internal，递归树 Stop；同名原因去重，最后一原因解除才启动。",
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S003",
+            "AI-S012"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "Pause/Resume 只退/入调度；sleep 则停止并清 Brain，wake 新建实例并尊重停止集合。",
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S004",
+            "AI-S005"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-001-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S001",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-03",
+              "EXP-AI-001-EI-01",
+              "EXP-AI-001-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S002",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-03",
+              "EXP-AI-001-EI-01",
+              "EXP-AI-001-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S003",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-01",
+              "EXP-AI-001-NSF-02",
+              "EXP-AI-001-EI-01",
+              "EXP-AI-001-REC-01",
+              "EXP-AI-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S004",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-04",
+              "EXP-AI-001-EI-01",
+              "EXP-AI-001-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S005",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-04",
+              "EXP-AI-001-EI-01",
+              "EXP-AI-001-REC-01",
+              "EXP-AI-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S006",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S020",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S041",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S042",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S043",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S044",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S045",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S049",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S050",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S051",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S052",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S053",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S056",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-001-UNK-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-002",
+      "title": "调度、树一轮执行、状态保存与 Reset/Stop 分离",
+      "aliases": [
+        "BrainWrangler",
+        "BrainManager",
+        "BT",
+        "BehaviourTree（概念；源码类名BT）",
+        "BehaviourNode",
+        "SaveStatus",
+        "GetTreeSleepTime",
+        "ForceUpdate",
+        "休眠调度"
+      ],
+      "engineering_question": "树每轮怎样 Visit、保存结果并复位；sleep 与 hibernate 如何决定下一轮，Stop 是否就是 Reset？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "brain.lua 的 Manager/Brain 更新与 behaviourtree.lua 基础节点；不涵盖每个子类 override。",
+          "Manager 的 hibernaters 是调度容器，与实体 engine sleep 导致销毁 Brain 不同。",
+          "移除仅核到 mainfunctions→BrainManager 的注销调用，不宣称完成所有资源清理。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-002-NSF-01",
+          "kind": "NSF",
+          "statement": "update.lua 对每个补进的 tick 先 SGManager:Update(i) 再 BrainManager:Update(i)。Manager 把当前 tickwaiters 移到 updaters，先复制当时有效且未 asleep 的 Brain 键，再逐个 OnUpdate 并取 GetSleepTime；nil→Hibernate，>GetTickTime()→Sleep，其他值留在更新集合。",
+          "evidence_refs": [
+            "AI-S006",
+            "AI-S007",
+            "AI-S054"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-NSF-02",
+          "kind": "NSF",
+          "statement": "Manager.Sleep 把秒数除 GetTickTime，恰为0时改1 tick，floor(GetTick()+sleep_ticks)；仅 target_tick>当前 tick 才转移。Wake 只对已注册 Brain 转到 updaters，不会重新注册 Pause/Stop 已注销的对象。",
+          "evidence_refs": [
+            "AI-S006"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-NSF-03",
+          "kind": "NSF",
+          "statement": "Brain.OnUpdate 先调用可选 DoUpdate 再 bt:Update。BT.Update 顺序 root:Visit→SaveStatus→Step，然后清 forceupdate；SaveStatus 递归记录 lastresult。Step 对非 RUNNING 调 Reset，对 RUNNING 复合节点递归 Step。",
+          "evidence_refs": [
+            "AI-S008",
+            "AI-S009",
+            "AI-S012"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-NSF-04",
+          "kind": "NSF",
+          "statement": "基础 Reset 仅当 status~=READY 时设 READY 并递归 Reset；不调用 OnStop。基础 Stop 调本节点 OnStop（如有），再递归 Stop 全部孩子，不修改 status。两条路径不能互换。",
+          "evidence_refs": [
+            "AI-S012"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-NSF-05",
+          "kind": "NSF",
+          "statement": "GetTreeSleepTime 取 RUNNING 子树和自身有效 sleep 的最小值；基础叶只有 RUNNING、无 children、非 ConditionNode 才贡献 nextupdatetime 的非负剩余值（缺值为0）。Brain:ForceUpdate 设置 BT.forceupdate 并请求 Manager.Wake；该 flag 只影响取 sleep，不直接 Visit。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S009",
+            "AI-S011"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-NSF-06",
+          "kind": "NSF",
+          "statement": "OnRemoveEntity Lua 回调调用 BrainManager.OnRemoveEntity；该 Manager 方法在已注册时只 RemoveInstance，清各调度表，并未直接调用 bt:Stop。不能单凭 Manager 注销证明节点清理执行。",
+          "evidence_refs": [
+            "AI-S006",
+            "AI-S056"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-EI-01",
+          "kind": "EI",
+          "statement": "lastresult 可保留本轮终态而 status 已由 Step 变回 READY；只观察 status 会误判节点未执行。树重评导致 Reset 也不证明外部动作或监听器已清。",
+          "evidence_refs": [
+            "AI-S009",
+            "AI-S012",
+            "AI-S020",
+            "AI-S021"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-REC-01",
+          "kind": "REC",
+          "statement": "调试先区分调度注销、调度 hibernate、实体 asleep、节点 RUNNING/lastresult；清理应定位具体 OnStop/动作所有者，不能把 Reset 当取消 API。",
+          "evidence_refs": [
+            "AI-S002",
+            "AI-S005",
+            "AI-S006",
+            "AI-S007",
+            "AI-S009",
+            "AI-S012",
+            "AI-S020",
+            "AI-S021"
+          ]
+        },
+        {
+          "id": "EXP-AI-002-UNK-01",
+          "kind": "UNK",
+          "statement": "tick/GetTime/native 睡眠回调的实时精度、pathfinding 与网络负载下的延迟，以及更新过程中跨 Brain 注销/销毁的全部重入安全性没有实测；键快照不是完整并发保证。",
+          "evidence_refs": [
+            "AI-S006",
+            "AI-S007",
+            "AI-S054"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "BrainWrangler:Update",
+          "source_file": "scripts/brain.lua",
+          "visibility": "internal scheduler method; not a mod scheduling guarantee",
+          "parameters": {
+            "receiver": "BrainWrangler（原版全局 BrainManager）",
+            "arguments": {
+              "current_tick": "要处理的 tickwaiters 键；调用者逐 tick 传 i"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "由 update.lua 调度；依赖 GetTick/GetTickTime 与实体 native 方法。",
+          "side_effects": "唤醒到期列表、构建 _safe_updaters 快照、执行 Brain 更新、转移睡眠/休眠集合。",
+          "lifecycle": {
+            "sequence": "有效/醒着检查发生在复制键时；实际调用前没有再次检查注册/存活。",
+            "failure_and_cleanup": "OnUpdate/GetSleepTime 异常未捕获；不由此证明跨回调重入安全。"
+          },
+          "evidence_refs": [
+            "AI-S006",
+            "AI-S007",
+            "AI-S054"
+          ],
+          "unknowns": [
+            "引擎时序/运行负载未知。"
+          ]
+        },
+        {
+          "symbol": "Brain:ForceUpdate",
+          "source_file": "scripts/brain.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "Brain 实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；不立即执行树。",
+          "preconditions": "有 bt 才设其 flag；Manager.Wake 只接受仍登记的实例。",
+          "side_effects": "BT.forceupdate=true；已注册实例移到 updaters。",
+          "lifecycle": {
+            "sequence": "BT 下次 Update 结束清 flag；不重置 Priority.lasttime，EventNode 另做此事。",
+            "failure_and_cleanup": "对已 Pause/Stop 注销的实例不能靠 Wake 重新注册。"
+          },
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S006",
+            "AI-S009",
+            "AI-S020"
+          ],
+          "unknowns": [
+            "本轮 tick 内具体执行时机未运行。"
+          ]
+        },
+        {
+          "symbol": "BT:Update",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BT 树对象（self），持有效 .root",
+            "arguments": {}
+          },
+          "returns": "无显式返回；结果存节点字段。",
+          "preconditions": "root 实现 Visit/SaveStatus/Step；基础状态为 READY/RUNNING/SUCCESS/FAILED。",
+          "side_effects": "Visit→递归 SaveStatus→Step；最后 forceupdate=false。",
+          "lifecycle": {
+            "sequence": "终态常在同轮 Step 复位；RUNNING 继续，子类可 override。",
+            "failure_and_cleanup": "不做 xpcall/回滚，不自动 Stop 终态节点。"
+          },
+          "evidence_refs": [
+            "AI-S009",
+            "AI-S012"
+          ],
+          "unknowns": [
+            "任意自定义节点 override 的行为不由基础类保证。"
+          ]
+        },
+        {
+          "symbol": "BehaviourNode:Reset",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BehaviourNode 或继承且未改写此方法的节点",
+            "arguments": {}
+          },
+          "returns": "无显式返回；条件满足时 status=READY。",
+          "preconditions": "status~=READY 才递归 children；子类 Reset 需另查。",
+          "side_effects": "复位自身和孩子；不调用 OnStop、不改 lastresult。",
+          "lifecycle": {
+            "sequence": "用于 Step 终态复位及 Priority 放弃分支；READY 父节点不会遍历孩子。",
+            "failure_and_cleanup": "没有取消外部任务/动作/监听器的通用清理。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S016",
+            "AI-S020",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "子类自定义 Reset 效果需单独核验。"
+          ]
+        },
+        {
+          "symbol": "BehaviourNode:Stop",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BehaviourNode 或继承此方法的节点",
+            "arguments": {}
+          },
+          "returns": "无显式返回。",
+          "preconditions": "可从任意状态调用；无 RUNNING 限制或幂等防护。",
+          "side_effects": "先可选 OnStop 再全部孩子 Stop。",
+          "lifecycle": {
+            "sequence": "不修改 status/lastresult；BT.Stop 转发此方法。",
+            "failure_and_cleanup": "清理取决于具体 OnStop；异常中断后续孩子遍历。"
+          },
+          "evidence_refs": [
+            "AI-S009",
+            "AI-S012",
+            "AI-S020",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "全部具体节点的 OnStop 未穷举。"
+          ]
+        },
+        {
+          "symbol": "BehaviourNode:GetTreeSleepTime",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BehaviourNode 节点树",
+            "arguments": {}
+          },
+          "returns": "最小有效秒数或 nil；基础 leaf.GetSleepTime 返回>=0或nil。",
+          "preconditions": "children 正常维护状态；GetTime 可用；子类 GetSleepTime/Step 可 override。",
+          "side_effects": "只读取节点时间及 RUNNING 子树。",
+          "lifecycle": {
+            "sequence": "基础叶 Sleep(t) 储存 GetTime()+t；BT.forceupdate 可令树返回0。",
+            "failure_and_cleanup": "nil 不等于失败；Manager 会 hibernate；过期时间钳到0。"
+          },
+          "evidence_refs": [
+            "AI-S006",
+            "AI-S007",
+            "AI-S009",
+            "AI-S011",
+            "AI-S015"
+          ],
+          "unknowns": [
+            "跨 tick 精度/真实唤醒延迟未知。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "update.lua 逐 tick 先 SG 后 Brain；Manager 拉取到期 Brain 并复制有效/醒着更新键。",
+          "evidence_refs": [
+            "AI-S007",
+            "AI-S054"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Brain 可选 DoUpdate 后进入 BT；root Visit 的 status 被递归保存为 lastresult。",
+          "evidence_refs": [
+            "AI-S008",
+            "AI-S009",
+            "AI-S012"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "Step 对终态 Reset，RUNNING 向下 Step；Stop 是另一路 OnStop 递归，不能从 Reset 推导清理。",
+          "evidence_refs": [
+            "AI-S009",
+            "AI-S012"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "树汇总 sleep，Manager 决定继续/定时等待/hibernate；ForceUpdate 仅促使已注册 Brain 获得后续更新机会。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S006",
+            "AI-S007",
+            "AI-S009",
+            "AI-S011"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-002-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S001",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S002",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S005",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S006",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-01",
+              "EXP-AI-002-NSF-02",
+              "EXP-AI-002-NSF-06",
+              "EXP-AI-002-REC-01",
+              "EXP-AI-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S007",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-01",
+              "EXP-AI-002-REC-01",
+              "EXP-AI-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S008",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-03"
+            ]
+          },
+          {
+            "ref": "AI-S009",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-03",
+              "EXP-AI-002-NSF-05",
+              "EXP-AI-002-EI-01",
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S011",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-03",
+              "EXP-AI-002-NSF-04",
+              "EXP-AI-002-EI-01",
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S015",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S016",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S020",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-EI-01",
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-EI-01",
+              "EXP-AI-002-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S054",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-01",
+              "EXP-AI-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S056",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-002-NSF-06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-003",
+      "title": "PriorityNode 的周期重评、活动分支与事件例外",
+      "aliases": [
+        "优先级节点",
+        "PriorityNode",
+        "noscatter",
+        "lasttime",
+        "EventNode.priority",
+        "重评与抢占"
+      ],
+      "engineering_question": "优先级何时重新从首项检查，活动分支怎样失去资格，事件优先级是否等同普通列表顺序？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "PriorityNode constructor/GetSleepTime/Reset/Visit 与基础 Reset，直接 EventNode 子节点的特殊分支。",
+          "普通子节点次序结论排除 old_event 触发的 should_test_anyway 例外。",
+          "不承诺 wall-clock 周期精度、首次一定立即运行、抢占一定撤销 SG/动作。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-003-NSF-01",
+          "kind": "NSF",
+          "statement": "PriorityNode(children,period,noscatter) 默认 period=1；非 noscatter 时 lasttime 初始化为 period*0.5+period*math.random()（不是 GetTime 加偏移）。Visit 仅在无 lasttime、无 period 或 lasttime+period<GetTime() 时全量重评；相等不触发该条件。Reset 只额外清 idx，不清 lasttime。",
+          "evidence_refs": [
+            "AI-S015",
+            "AI-S016"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-NSF-02",
+          "kind": "NSF",
+          "statement": "全量重评从 children 顺序访问，先把已 FAILED/SUCCESS 的待测孩子 Reset；普通分支遇首个 SUCCESS/RUNNING 后保留其 idx/status，后续未测孩子 Reset。没有任何合格孩子时自己 FAILED。未到重评时间则只 Visit 当前 RUNNING 孩子；它结束时清 lasttime，供后续重评。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S016"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-NSF-03",
+          "kind": "NSF",
+          "statement": "若旧 idx 是直接 EventNode，old_event 固定为该节点；后续 EventNode 在 old_event.priority<=child.priority 时可即使 found 仍被访问，命中 SUCCESS/RUNNING 可 Reset 当前已选节点并改选。条件始终对比旧事件，不能简化为所有节点按最高 priority 数值排序。",
+          "evidence_refs": [
+            "AI-S016",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-NSF-04",
+          "kind": "NSF",
+          "statement": "Priority 的 GetSleepTime 在 READY 返回0，RUNNING 返回 max(0,lasttime+period-GetTime())（无 lasttime/period的分支为0），其他状态返回nil；树仍可被更短 RUNNING 子树 sleep 提前唤醒。提前 Visit 不等于一定全量重评。",
+          "evidence_refs": [
+            "AI-S011",
+            "AI-S015",
+            "AI-S016"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-EI-01",
+          "kind": "EI",
+          "statement": "普通优先级抢占体现为树状态/idx 改选和 Reset。由于 Reset 不等于 Stop，DoAction 又无取消实现，不能据此断言被替代分支已撤销 locomotor/实体中的动作。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S016",
+            "AI-S021",
+            "AI-S029",
+            "AI-S033"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-REC-01",
+          "kind": "REC",
+          "statement": "排查抢占延迟时分别检查 period、lasttime、idx、child.status、事件是否直接挂在 Priority 下；精确强制事件重评应遵守 EventNode 的 parent lasttime 清理链，不把 Brain.ForceUpdate 单独当作无条件重评。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S015",
+            "AI-S016",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-003-UNK-01",
+          "kind": "UNK",
+          "statement": "period 在真实帧率、同帧多事件及 SG 重入时的可见响应延迟、数值非法或为0时的游戏行为未运行；本轮不提供自动取消动作的运行保证。",
+          "evidence_refs": [
+            "AI-S007",
+            "AI-S015",
+            "AI-S016",
+            "AI-S020",
+            "AI-S021"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "PriorityNode",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "global Lua Class constructor; no stable external API guarantee",
+          "parameters": {
+            "receiver": "无 receiver；全局 Class 构造调用",
+            "arguments": {
+              "children": "按 ipairs 顺序的节点数组；构造时父指针设为此节点",
+              "period": "可选秒数，nil/false 默认1",
+              "noscatter": "truthy 时不设置随机 lasttime；省略时使用数值初始散布"
+            }
+          },
+          "returns": "PriorityNode 对象；初始 status/lastresult=READY。",
+          "preconditions": "孩子兼容 BehaviourNode；需时间函数；此构造器不检查数值范围。",
+          "side_effects": "保存 period、children、parent 链与随机 lasttime。",
+          "lifecycle": {
+            "sequence": "idx 由 Visit/Reset 管理；Reset 不重置 lasttime。",
+            "failure_and_cleanup": "不验证空数组、负周期等设计输入；不替孩子提供退出清理。"
+          },
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S015",
+            "AI-S016"
+          ],
+          "unknowns": [
+            "非法输入与首轮实际唤醒效果未运行。"
+          ]
+        },
+        {
+          "symbol": "PriorityNode:Visit",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "PriorityNode 实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；写 status、idx、lasttime。",
+          "preconditions": "已构造节点树；子节点 Visit 设置合法状态；全量重评使用严格小于时间判定。",
+          "side_effects": "周期扫描/活动孩子续跑；Reset 未选孩子；对旧直接 EventNode 有 should_test_anyway 例外。",
+          "lifecycle": {
+            "sequence": "当前 RUNNING 孩子结束可清 lasttime；重评改选不是 Stop。",
+            "failure_and_cleanup": "没有自动取消外部动作、统一异常保护；事件比较基于旧事件而非动态最高分。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S015",
+            "AI-S016",
+            "AI-S020",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "各消费者和自定义节点的副作用需逐一运行/核对。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造保存有序孩子、period 和可选随机 lasttime；默认存在初始散布。",
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S015"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Visit 判 do_eval；未到期仅续跑 idx 的 RUNNING 孩子，到期按顺序寻找合格孩子。",
+          "evidence_refs": [
+            "AI-S016"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "全量重评放弃分支调用 Reset；old_event 可使某些后续事件仍参与并替换当前选项。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S016",
+            "AI-S020"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "自身重评期限与 RUNNING 子树 sleep 汇总；结束/事件清 lasttime 影响下一轮，ForceUpdate 本身不清它。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S009",
+            "AI-S011",
+            "AI-S015",
+            "AI-S016",
+            "AI-S020"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-003-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S001",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S007",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S009",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S010",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S011",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-NSF-04"
+            ]
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-NSF-02",
+              "EXP-AI-003-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S015",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-NSF-01",
+              "EXP-AI-003-NSF-04",
+              "EXP-AI-003-REC-01",
+              "EXP-AI-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S016",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-NSF-01",
+              "EXP-AI-003-NSF-02",
+              "EXP-AI-003-NSF-03",
+              "EXP-AI-003-NSF-04",
+              "EXP-AI-003-EI-01",
+              "EXP-AI-003-REC-01",
+              "EXP-AI-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S020",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-NSF-03",
+              "EXP-AI-003-REC-01",
+              "EXP-AI-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-EI-01",
+              "EXP-AI-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S029",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S033",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-003-EI-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-004",
+      "title": "Sequence/Selector 的续跑位置与 While/If 的条件边界",
+      "aliases": [
+        "顺序节点",
+        "选择节点",
+        "SequenceNode",
+        "SelectorNode",
+        "ParallelNode",
+        "WhileNode",
+        "IfNode",
+        "条件中断"
+      ],
+      "engineering_question": "子行为 RUNNING 时会不会重查先前条件；While 所称中断是否会停止已提交动作？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "SequenceNode/SelectorNode、ParallelNode 与 ConditionNode、WhileNode/IfNode 的所引实现。",
+          "所称每次重查是该节点获 Visit 的轮次，不是实体每帧；未入选的子树不必获 Visit。",
+          "除直接解释 ParallelNodeAny 字段外不研究所有并行/循环/多条件装饰器。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-004-NSF-01",
+          "kind": "NSF",
+          "statement": "Sequence 的 idx 初始/Reset 为1，非 RUNNING 的 Visit 也重置到1；从 idx 顺序 Visit，遇 RUNNING 或 FAILED 即复制状态返回，其他状态继续，末尾 SUCCESS。RUNNING 时从原 idx 续跑，不重新访问之前成功孩子。",
+          "evidence_refs": [
+            "AI-S013"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-NSF-02",
+          "kind": "NSF",
+          "statement": "Selector 同样保留 RUNNING idx；遇 RUNNING 或 SUCCESS 即返回，其他状态继续，全部耗尽 FAILED。以上其他状态继续是实际实现，不能外推自定义孩子 READY 一定被拒绝。",
+          "evidence_refs": [
+            "AI-S014"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-NSF-03",
+          "kind": "NSF",
+          "statement": "WhileNode(cond,name,node) 返回 ParallelNode{ConditionNode(cond,name),node}；Parallel.Visit 每次 Reset ConditionNode，再 Visit 所有尚非 SUCCESS 的孩子，一项 FAILED 即返回 FAILED，其余有 RUNNING 则 RUNNING，全部完成则 SUCCESS。Parallel.Step 在自己 RUNNING 时只 Reset 成功的 ConditionNode，不递归全部孩子 Step。",
+          "evidence_refs": [
+            "AI-S017",
+            "AI-S018",
+            "AI-S019"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-NSF-04",
+          "kind": "NSF",
+          "statement": "IfNode(cond,name,node) 返回 SequenceNode{ConditionNode(cond,name),node}；条件通过而 node 持续 RUNNING 时 idx 停在第二项，不重查条件。While 条件在该并行节点下次 Visit 变假则不再 Visit 后续 node；Reset 发生在树 Step/父节点路径，不能等同孩子 Stop。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013",
+            "AI-S017",
+            "AI-S018",
+            "AI-S019"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-NSF-05",
+          "kind": "NSF",
+          "statement": "猪人 day 子树直接以 WhileNode 包住白天 Priority；蜘蛛 follow 分支用 IfNode 选择 defensive/aggressive，hider 分支也以 IfNode 约束 UseShield。这些是真实消费者，但不能由这些调用点证明每个下游行为的完整契约。",
+          "evidence_refs": [
+            "AI-S040",
+            "AI-S052"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-EI-01",
+          "kind": "EI",
+          "statement": "若需求是动作过程中持续约束某条件，单次 If 门槛不足；While 能阻止后续 Visit，却不承诺撤销已经交给 SG/locomotor 的动作或恢复副作用。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013",
+            "AI-S017",
+            "AI-S018",
+            "AI-S021",
+            "AI-S033",
+            "AI-S034"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-REC-01",
+          "kind": "REC",
+          "statement": "选节点先明确条件是入场门槛还是持续守卫；需要强制撤销时另定位动作所有者与退出函数，并验证条件在 READY、RUNNING、完成同轮及父 Priority 改选时的行为。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013",
+            "AI-S016",
+            "AI-S017",
+            "AI-S018",
+            "AI-S021",
+            "AI-S029",
+            "AI-S033"
+          ]
+        },
+        {
+          "id": "EXP-AI-004-UNK-01",
+          "kind": "UNK",
+          "statement": "本轮没有运行条件恰在 SG 时间线执行前后改变、Parallel 孩子副作用互相影响、自定义节点返回异常状态等边界，不能保证可见中断时机或外部回滚。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013",
+            "AI-S017",
+            "AI-S018",
+            "AI-S021",
+            "AI-S047"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SequenceNode:Visit",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "SequenceNode 实例；由 SequenceNode(children) 构造",
+            "arguments": {}
+          },
+          "returns": "无显式返回；status=RUNNING/FAILED/最终SUCCESS，idx记录位置。",
+          "preconditions": "children 为可 ipairs 的节点数组；构造初始化 idx=1；子节点按状态协议工作。",
+          "side_effects": "顺序 Visit，RUNNING 保留当前位置，下轮续跑。",
+          "lifecycle": {
+            "sequence": "Reset 递归基础 Reset 后总设 idx=1；非 RUNNING Visit 亦从1开始。",
+            "failure_and_cleanup": "孩子 FAILED 终止；不自动 Stop/回滚已成功孩子；异常未捕获。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013"
+          ],
+          "unknowns": [
+            "自定义状态/副作用组合未运行。"
+          ]
+        },
+        {
+          "symbol": "SelectorNode:Visit",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "SelectorNode 实例；由 SelectorNode(children) 构造",
+            "arguments": {}
+          },
+          "returns": "无显式返回；status=RUNNING/SUCCESS/最终FAILED。",
+          "preconditions": "有序孩子数组；构造/Reset 的 idx=1。",
+          "side_effects": "顺序尝试到首个 SUCCESS/RUNNING；RUNNING续原 idx。",
+          "lifecycle": {
+            "sequence": "下轮非 RUNNING从1；Reset重新从1，不主动每轮重评高位孩子。",
+            "failure_and_cleanup": "全部耗尽失败；无外部清理或回滚保证。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S014"
+          ],
+          "unknowns": [
+            "自定义孩子异常状态未运行。"
+          ]
+        },
+        {
+          "symbol": "ParallelNode:Visit",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "ParallelNode 实例；children按顺序",
+            "arguments": {}
+          },
+          "returns": "无显式返回；任一FAILED→FAILED；全完成或stoponanycomplete且任一完成→SUCCESS；否则RUNNING。",
+          "preconditions": "ConditionNode 用 is_a 识别；一般孩子 SUCCESS 后跳过，条件例外。",
+          "side_effects": "每 Visit 重置条件；失败时立刻返回，后面的孩子本轮不访问。",
+          "lifecycle": {
+            "sequence": "自身 RUNNING 时 Step 只 Reset 成功条件，不像基础 Step 递归子树；ParallelNodeAny 设置 stoponanycomplete=true。",
+            "failure_and_cleanup": "失败/完成不主动 Stop 子节点；需父/树 Step 的 Reset 路径；无外部取消。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S017",
+            "AI-S019"
+          ],
+          "unknowns": [
+            "多孩子副作用与游戏帧时序未运行。"
+          ]
+        },
+        {
+          "symbol": "WhileNode",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "global Lua factory function",
+          "parameters": {
+            "receiver": "无 receiver；全局函数",
+            "arguments": {
+              "cond": "每次条件 Visit 无参调用，Lua truthy通过",
+              "name": "条件节点名；nil时Condition",
+              "node": "被守卫的行为节点"
+            }
+          },
+          "returns": "ParallelNode 对象；不是独立 WhileNode 类。",
+          "preconditions": "cond可调用；node为兼容节点；构造后孩子parent链有效。",
+          "side_effects": "构造 ConditionNode 后放在node前；每获 Visit 先重查条件。",
+          "lifecycle": {
+            "sequence": "条件假导致并行FAILED并阻止该轮node Visit，后续Reset由树/父路径处理。",
+            "failure_and_cleanup": "仅控制访问/状态，不执行node.Stop或统一动作撤销。"
+          },
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S012",
+            "AI-S017",
+            "AI-S018",
+            "AI-S019",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "没有每帧检查或运行中外部回滚保证。"
+          ]
+        },
+        {
+          "symbol": "IfNode",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "global Lua factory function",
+          "parameters": {
+            "receiver": "无 receiver；全局函数",
+            "arguments": {
+              "cond": "进入Sequence第一项时无参调用的条件",
+              "name": "条件名",
+              "node": "通过门槛后的行为节点"
+            }
+          },
+          "returns": "SequenceNode 对象；不是独立 IfNode 类。",
+          "preconditions": "cond可调用，node兼容；没有单独端别检查。",
+          "side_effects": "构造条件→行为的两项Sequence。",
+          "lifecycle": {
+            "sequence": "行为RUNNING时不回访条件；整体Reset/重新进入才回到条件。",
+            "failure_and_cleanup": "条件假立即Sequence失败；不为已进入行为提供持续守卫/清理。"
+          },
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S012",
+            "AI-S013",
+            "AI-S018",
+            "AI-S019"
+          ],
+          "unknowns": [
+            "条件变化对应的可见响应由重入与父树调度决定，未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Sequence/Selector 依 idx 推进并在 RUNNING 持有当前位置，结束后由 Reset/下次非运行 Visit 重入。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S013",
+            "AI-S014"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "If 工厂组合 Condition+Sequence，While 工厂组合 Condition+Parallel。",
+          "evidence_refs": [
+            "AI-S013",
+            "AI-S017",
+            "AI-S018",
+            "AI-S019"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "While 所属 Parallel 每获 Visit 先重查条件；失败即返回，树状态复位与外部取消仍分开。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S017",
+            "AI-S018",
+            "AI-S021"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "以猪人 day 和蜘蛛 follow/hider 调用交叉核对组合用法，不泛化所有消费者行为。",
+          "evidence_refs": [
+            "AI-S040",
+            "AI-S052"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-004-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S010",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-04",
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01",
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S013",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-01",
+              "EXP-AI-004-NSF-04",
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01",
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S014",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-02"
+            ]
+          },
+          {
+            "ref": "AI-S016",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S017",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-03",
+              "EXP-AI-004-NSF-04",
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01",
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S018",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-03",
+              "EXP-AI-004-NSF-04",
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01",
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S019",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-03",
+              "EXP-AI-004-NSF-04"
+            ]
+          },
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01",
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S029",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S033",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-EI-01",
+              "EXP-AI-004-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S034",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S040",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S047",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S052",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-004-NSF-05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-005",
+      "title": "EventNode 的触发、父链唤醒与监听器退出",
+      "aliases": [
+        "事件行为节点",
+        "EventNode",
+        "OnEvent",
+        "triggered",
+        "DoToParents",
+        "OnStop"
+      ],
+      "engineering_question": "事件如何打断/唤醒树；Reset 与 Stop 对事件监听器的影响是否相同？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "EventNode 本类与 Priority/Brain 的直接交接；未抽样具体生物事件消费者。",
+          "不把事件到达次数、payload 或 native 事件系统当可靠队列语义。",
+          "此处公开名称是源码全局类/方法，不承诺任意 Mod 的稳定 API。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-005-NSF-01",
+          "kind": "NSF",
+          "statement": "EventNode 构造时创建闭包并 ListenForEvent；OnEvent 若自身 RUNNING 先 Reset 唯一子节点，再设 triggered=true、保存 data；有 inst.brain 时 ForceUpdate，并遍历父链将所有 Priority.lasttime=nil。",
+          "evidence_refs": [
+            "AI-S020",
+            "AI-S001",
+            "AI-S057"
+          ]
+        },
+        {
+          "id": "EXP-AI-005-NSF-02",
+          "kind": "NSF",
+          "statement": "Visit 仅在 READY且triggered 时转RUNNING；RUNNING时有且仅有一个孩子才Visit并复制其状态，否则FAILED。Step先走基础Step再清triggered；Reset先清triggered再走基础Reset。多事件只覆盖同一data字段，本类没有队列。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-005-NSF-03",
+          "kind": "NSF",
+          "statement": "OnStop移除注册的eventfn并设nil，基础Stop递归调用它；Reset不解绑。Stop后继续复用同一个EventNode没有本类重新注册路径，通常应由新树/新节点构造恢复。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-005-EI-01",
+          "kind": "EI",
+          "statement": "Brain.ForceUpdate与父Priority.lasttime=nil承担不同作用：前者使已注册Brain醒来/短sleep，后者让下一次Priority Visit走全量重评。只调前者不能保证Priority改选。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S006",
+            "AI-S009",
+            "AI-S016",
+            "AI-S020",
+            "AI-S057"
+          ]
+        },
+        {
+          "id": "EXP-AI-005-REC-01",
+          "kind": "REC",
+          "statement": "树补丁涉及EventNode时保留parent链并明确Stop后的重建策略；移除或替换事件节点前核对其OnStop，不能只从children删除后假设自动解绑。",
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S012",
+            "AI-S020"
+          ]
+        },
+        {
+          "id": "EXP-AI-005-UNK-01",
+          "kind": "UNK",
+          "statement": "native事件分发顺序、同帧多事件与SG切换交错、删除节点/实体时的重入安全及payload保留时长未运行；没有具体生物事件消费者的覆盖承诺。",
+          "evidence_refs": [
+            "AI-S007",
+            "AI-S012",
+            "AI-S020",
+            "AI-S054",
+            "AI-S056"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EventNode",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "global Lua Class constructor",
+          "parameters": {
+            "receiver": "无 receiver；全局 Class 构造调用",
+            "arguments": {
+              "inst": "监听目标实体",
+              "event": "事件名字符串",
+              "child": "唯一被触发孩子",
+              "priority": "可选，nil/false默认0；仅特定Priority旧事件分支使用"
+            }
+          },
+          "returns": "EventNode 对象，初始READY；立即注册eventfn。",
+          "preconditions": "inst支持ListenForEvent/RemoveEventCallback；child为兼容节点。",
+          "side_effects": "注册闭包监听器、设parent/priority/data相关字段。",
+          "lifecycle": {
+            "sequence": "生命周期清理由OnStop；Reset不解绑；Stop后没有自动重挂。",
+            "failure_and_cleanup": "无队列/订阅幂等保障；构造失败没有回滚。"
+          },
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S012",
+            "AI-S016",
+            "AI-S020"
+          ],
+          "unknowns": [
+            "事件系统native分发时序未知。"
+          ]
+        },
+        {
+          "symbol": "EventNode:OnEvent",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "EventNode（由注册闭包转发）",
+            "arguments": {
+              "data": "原始事件payload；本类直接储存，不复制或排队"
+            }
+          },
+          "returns": "无显式返回；triggered=true。",
+          "preconditions": "节点已构造，parent链可遍历；inst.brain可能不存在。",
+          "side_effects": "运行中Reset孩子；写data；可ForceUpdate；沿父链清Priority.lasttime。",
+          "lifecycle": {
+            "sequence": "triggered由Step/Reset清；data并未在这两方法清空。",
+            "failure_and_cleanup": "多次调用覆盖data；不自动解绑、不取消外部动作。"
+          },
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S012",
+            "AI-S016",
+            "AI-S020",
+            "AI-S057"
+          ],
+          "unknowns": [
+            "payload外部引用与事件重入运行边界未测。"
+          ]
+        },
+        {
+          "symbol": "EventNode:OnStop",
+          "source_file": "scripts/behaviourtree.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "EventNode 实例",
+            "arguments": {}
+          },
+          "returns": "无显式返回；eventfn存在时移除并置nil。",
+          "preconditions": "常由BehaviourNode.Stop调用；依赖实体事件API。",
+          "side_effects": "移除自己持有的监听器。",
+          "lifecycle": {
+            "sequence": "第二次OnStop因eventfn=nil不重复移除；不重置status/triggered/data。",
+            "failure_and_cleanup": "Stop后同节点继续Visit不能恢复监听，须重建或另行明确重挂。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S020"
+          ],
+          "unknowns": [
+            "实体已失效时事件API表现未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造节点时注册实体事件闭包并建立孩子parent指针。",
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S020"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "事件到达写triggered/data，运行中Reset孩子；唤醒Brain并沿父链清Priority.lasttime。",
+          "evidence_refs": [
+            "AI-S001",
+            "AI-S006",
+            "AI-S016",
+            "AI-S020",
+            "AI-S057"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "下次获Visit由READY+triggered进入RUNNING并访问孩子；Step/Reset清触发标记。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S020"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "树Stop调用OnStop解绑；树Reset不解绑，Stop后需要明确重建策略。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S020"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-005-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S001",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-NSF-01",
+              "EXP-AI-005-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S006",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S007",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S009",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S010",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-NSF-02",
+              "EXP-AI-005-NSF-03",
+              "EXP-AI-005-REC-01",
+              "EXP-AI-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S016",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S020",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-NSF-01",
+              "EXP-AI-005-NSF-02",
+              "EXP-AI-005-NSF-03",
+              "EXP-AI-005-EI-01",
+              "EXP-AI-005-REC-01",
+              "EXP-AI-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S054",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S056",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S057",
+            "role": "parent traversal implementation",
+            "claim_ids": [
+              "EXP-AI-005-NSF-01",
+              "EXP-AI-005-EI-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-006",
+      "title": "DoAction 的发起、回调观察、超时与取消缺口",
+      "aliases": [
+        "动作行为节点",
+        "DoAction",
+        "pendingstatus",
+        "动作超时",
+        "BufferedAction",
+        "旧动作回调"
+      ],
+      "engineering_question": "DoAction 的 RUNNING/SUCCESS/FAILED 来自哪里；超时或树抢占会不会取消底层动作？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "behaviours/doaction.lua 完整文件，基础 BehaviourNode 与必要 locomotor/BufferedAction 交接。",
+          "原版猪人 FindFoodAction 为 local callback，只做消费者核对，不宣称公共 API。",
+          "不覆盖 DoAction 之外的 DoAction 类同名函数、玩家 controller 的 DoAction 或全部 SG。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-006-NSF-01",
+          "kind": "NSF",
+          "statement": "DoAction 仅在 READY 调 getactionfn(inst)，保存 action 并清 pendingstatus；nil动作直接FAILED，有动作则附加成功/失败闭包，调用 locomotor:PushAction(action,FunctionOrValue(shouldrun))，记录GetTime并设RUNNING。它不读取PushAction返回值。",
+          "evidence_refs": [
+            "AI-S021"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-NSF-02",
+          "kind": "NSF",
+          "statement": "失败回调只在action仍为self.action且pendingstatus=nil时设FAILED；成功回调只检查action身份，设SUCCESS。因此同一身份的后到成功可以覆盖pending失败，后到失败不覆盖既有pending。旧action身份回调不会改变当前pending。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S024",
+            "AI-S025"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-NSF-03",
+          "kind": "NSF",
+          "statement": "RUNNING检查先以GetTime()-time>timeout判超时FAILED（严格大于）；随后有pendingstatus则复制，能覆盖前面超时；否则检查action:IsValid，假则FAILED。READY发起后同次Visit继续进入该RUNNING检查，故同步回调不必等下一轮。OnFail/OnSucceed只写pendingstatus，不直接唤醒Brain或执行动作。",
+          "evidence_refs": [
+            "AI-S021"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-NSF-04",
+          "kind": "NSF",
+          "statement": "完整DoAction类没有Reset/OnStop override；基础Reset只改树状态，基础Stop找不到本类OnStop。其timeout分支、动作无效分支也没有Fail/Clear/Stop底层动作调用。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S021"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-NSF-05",
+          "kind": "NSF",
+          "statement": "猪人day Priority把ChattyNode(DoAction(FindFoodAction))放在前部；ChattyNode.Visit先访问孩子并复制状态。FindFoodAction先拒绝busy，可从inventory或附近目标生成ACTIONS.EAT BufferedAction，也可生成TAKEITEM。这只证明具名调用，不证明所有觅食时机或结果。",
+          "evidence_refs": [
+            "AI-S039",
+            "AI-S040",
+            "AI-S041",
+            "AI-S055"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-EI-01",
+          "kind": "EI",
+          "statement": "DoAction成功代表观察到BufferedAction成功回调，可能早于SG动画结束；超时/放弃分支只改变行为树观察状态，动作仍可由其他所有者完成或取消。不能把节点FAILED当作一次游戏业务事务已经回滚。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S021",
+            "AI-S024",
+            "AI-S025",
+            "AI-S033",
+            "AI-S034",
+            "AI-S035",
+            "AI-S047"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-REC-01",
+          "kind": "REC",
+          "statement": "需要强制取消的行为应分别定位locomotor.bufferedaction与inst.bufferedaction，核对Clear/Stop差异与SG退出逻辑；验证晚到回调、超时同轮成功、目标移除和父Priority改选，避免取消新行为已持有的动作。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S016",
+            "AI-S021",
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033",
+            "AI-S034",
+            "AI-S035"
+          ]
+        },
+        {
+          "id": "EXP-AI-006-UNK-01",
+          "kind": "UNK",
+          "statement": "未运行超时与SG时间线同tick、目标所有者变化、旧回调晚到、重复动作去重与网络可见效果；未核完每种SG/节点的动作取消路径，不能提供可直接使用的demo承诺。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S023",
+            "AI-S026",
+            "AI-S032",
+            "AI-S034",
+            "AI-S035",
+            "AI-S047"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "DoAction",
+          "source_file": "scripts/behaviours/doaction.lua",
+          "visibility": "global Lua Class constructor; distinct from playercontroller DoAction",
+          "parameters": {
+            "receiver": "无 receiver；全局 Class 构造调用",
+            "arguments": {
+              "inst": "拥有components.locomotor的实体",
+              "getactionfn": "READY时以inst调用；返回BufferedAction或nil",
+              "name": "可选调试名，默认DoAction",
+              "run": "shouldrun，PushAction前经FunctionOrValue求值（此处不传inst）",
+              "timeout": "可选秒数；只在RUNNING的Visit严格超时检查"
+            }
+          },
+          "returns": "DoAction节点，初始READY；构造本身不发起动作。",
+          "preconditions": "需要BehaviourNode/FunctionOrValue/GetTime/状态常量；调用方负责所处端别与有效组件。",
+          "side_effects": "保存参数；action/time初始nil。",
+          "lifecycle": {
+            "sequence": "READY发起一次；Reset回READY后可再次调用getactionfn；构造并不注册全局事件。",
+            "failure_and_cleanup": "没有通用取消OnStop；getactionfn或组件缺失导致Lua错误，无保护。"
+          },
+          "evidence_refs": [
+            "AI-S010",
+            "AI-S012",
+            "AI-S021"
+          ],
+          "unknowns": [
+            "run函数/动作工厂抛错的游戏恢复未运行。"
+          ]
+        },
+        {
+          "symbol": "DoAction:Visit",
+          "source_file": "scripts/behaviours/doaction.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "DoAction节点实例（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；通过status/pendingstatus/action/time记录。",
+          "preconditions": "READY调用工厂，RUNNING检查结果；其他状态直接访问不会自动重新发起，通常由树Step/Reset处理。",
+          "side_effects": "附加动作回调、提交locomotor、写状态；忽略PushAction返回。",
+          "lifecycle": {
+            "sequence": "先超时再pending/IsValid；pending可覆盖超时；未清持有action引用；旧身份回调被闭包过滤。",
+            "failure_and_cleanup": "nil动作、无效、超时可失败；不会自动Fail/Clear底层动作；回调不ForceUpdate。"
+          },
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S021",
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S026"
+          ],
+          "unknowns": [
+            "到达/执行/回调与具体SG/引擎时序尚未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "READY调用动作工厂；nil失败，有动作则安装带身份守卫的回调并交locomotor。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S024",
+            "AI-S025",
+            "AI-S026"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "locomotor可立即交实体或先移动；具体SG/BufferedAction执行最终回调写pendingstatus。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S026",
+            "AI-S032",
+            "AI-S034",
+            "AI-S035",
+            "AI-S037"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "同次READY发起后或后续RUNNING Visit按超时→pending→IsValid顺序得状态；树Step/父节点可能Reset。",
+          "evidence_refs": [
+            "AI-S009",
+            "AI-S012",
+            "AI-S016",
+            "AI-S021"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "Reset/Stop/超时本身没有DoAction底层取消；需另核动作持有者与SG，不承诺回滚。",
+          "evidence_refs": [
+            "AI-S012",
+            "AI-S021",
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033",
+            "AI-S038"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-006-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S009",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S010",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S012",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-04",
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S016",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-01",
+              "EXP-AI-006-NSF-02",
+              "EXP-AI-006-NSF-03",
+              "EXP-AI-006-NSF-04",
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-REC-01",
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S023",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S024",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-02",
+              "EXP-AI-006-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S025",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-02",
+              "EXP-AI-006-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S026",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S029",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S030",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S031",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S032",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S033",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S034",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-REC-01",
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S035",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-REC-01",
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S037",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S038",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": []
+          },
+          {
+            "ref": "AI-S039",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S040",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S041",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-05"
+            ]
+          },
+          {
+            "ref": "AI-S047",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-EI-01",
+              "EXP-AI-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S055",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-006-NSF-05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-AI-007",
+      "title": "BufferedAction 经 locomotor、实体与 SG 的执行/失败交接",
+      "aliases": [
+        "缓冲动作",
+        "BufferedAction:Do",
+        "PushAction",
+        "PushBufferedAction",
+        "StartAction",
+        "PerformBufferedAction",
+        "ClearBufferedAction",
+        "SGpig",
+        "ACTIONS.EAT.fn"
+      ],
+      "engineering_question": "提交动作、到达位置、进入状态、执行业务与回调清理有哪些不同的成功/失败语义？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "side": "所列原版消费者为 mastersim；基础 Lua 类本身不统一检查端别",
+        "runtime_status": "not_run",
+        "bounds": [
+          "非玩家Brain动作链为主，locomotor/EntityScript 的完整分发方法及到达分支；玩家预测仅保留源码可见端别分支，不研究RPC闭环。",
+          "SG StartAction/GoToState、时间线UpdateState以及普通猪人EAT消费者；ACTIONS.EAT.fn只核到转交eater等组件，不推导组件业务效果。",
+          "LocoMotor.OnUpdate只取必要的dest有效性/到达分支，不声称穷尽pathfinder、平台跳跃或所有失败路径。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-007-NSF-01",
+          "kind": "NSF",
+          "statement": "BufferedAction构造保存doer/target/action/invobject等，记录initialtargetowner和doerownsobject；IsValid要求invobject为空或有效，doer为空或有效且（非autoequipped或doer.replica.inventory:GetActiveItem()==nil），target为空或有效且inventoryitem.owner与构造初值相同，pos未带walkable_platform或该平台有效，最初由doer持有的invobject仍通过replica.inventoryitem:IsHeldBy(doer)，self.validfn缺省或通过，并在mastersim额外要求action.validfn缺省或通过。autoequipped且doer非nil路径直接读取replica.inventory，无存在guard。TestForStart是IsValid别名。",
+          "evidence_refs": [
+            "AI-S022",
+            "AI-S023"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-02",
+          "kind": "NSF",
+          "statement": "BufferedAction.Do先IsValid，假直接return false，不调用Fail；有效才调用action.fn(self)，保存reason，truthy成功可OnUsedAsItem并Succeed，其他结果Fail，返回action.fn的success/reason。Succeed/Fail以pairs无参调用对应列表，随后清空两类回调；本类没有执行一次/终态锁。",
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S024",
+            "AI-S025"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-03",
+          "kind": "NSF",
+          "statement": "LocoMotor.PushAction前置回调后TestForStart失败仅发送actionfailed并return；有效时先Clear旧移动意图，再按WALKTO/LOOKAT/forced/instant/target/pos等分流。普通有限距离target进入GoToEntity，可能立刻OnUpdate(0,true)做到达检查。",
+          "evidence_refs": [
+            "AI-S026",
+            "AI-S027",
+            "AI-S028",
+            "AI-S030"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-04",
+          "kind": "NSF",
+          "statement": "locomotor到达分支在mastersim交EntityScript.PushBufferedAction，客户端交PreviewBufferedAction；交接前把自己的bufferedaction设nil，避免随后Clear误Fail同一动作。dest或action无效/死亡分支会Clear；customarrivecheck等还可判invalid。",
+          "evidence_refs": [
+            "AI-S029",
+            "AI-S030",
+            "AI-S032"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-05",
+          "kind": "NSF",
+          "statement": "EntityScript.PushBufferedAction在新旧动作均非nil、target/action/invobject三个字段分别相同，且（无SG，或SG没有idle标签）时可直接去重返回；否则先Fail旧实体动作，再TestForStart。WALKTO直接Succeed；instant直接Do；一般动作先写self.bufferedaction，无SG发startaction事件，有SG调用StartAction，受理失败时Fail并清空。TestForStart失败分支仅发actionfailed，不对新动作显式Fail。",
+          "evidence_refs": [
+            "AI-S034"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-06",
+          "kind": "NSF",
+          "statement": "SG.StartAction按bufferedaction.action查handler，condition只传inst；deststate可接inst和bufferedaction，返回truthy状态时GoToState，无deststate则直接PerformBufferedAction，再return true；无handler/条件不通过/无目标状态名返回nil。GoToState对不存在状态仅打印并return，StartAction不检查其结果，因此true不证明实际切换，更不证明动作执行。",
+          "evidence_refs": [
+            "AI-S036",
+            "AI-S037",
+            "AI-S038"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-07",
+          "kind": "NSF",
+          "statement": "PerformBufferedAction面对目标并发performaction事件，缓存旧action后Do；truthy成功返回true，仅在实体仍持同一action时清空。失败发actionfailed、Fail并同样按身份清空；失败或无动作无显式false返回。ClearBufferedAction/InterruptBufferedAction只Fail并清实体槽。",
+          "evidence_refs": [
+            "AI-S033",
+            "AI-S035"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-08",
+          "kind": "NSF",
+          "statement": "LocoMotor.Clear清dest/atdestfn/移动意图并SetBufferedAction(nil)，后者Fail旧locomotor动作；Clear不调用StopMoving/ResetPath。Stop清路径/移动意图、停止移动更新并发locomote，但不SetBufferedAction(nil)。Clear与Stop也不等同EntityScript.ClearBufferedAction。",
+          "evidence_refs": [
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-NSF-09",
+          "kind": "NSF",
+          "statement": "普通猪人由FindFoodAction生成EAT，SGpig将EAT映射eat；eat的onenter停物理/播动画，TimeEvent(10*FRAMES)调用PerformBufferedAction，animover才转idle。State构造排序timeline，UpdateState在事件time<=timeinstate时调用fn。ACTIONS.EAT.fn选target或invobject并按组件分支转eater.Eat等；不直接证明食物已经被消费。",
+          "evidence_refs": [
+            "AI-S039",
+            "AI-S046",
+            "AI-S047",
+            "AI-S048",
+            "AI-S058",
+            "AI-S059",
+            "AI-S060"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-EI-01",
+          "kind": "EI",
+          "statement": "动作被提交/被SG受理/业务action.fn成功/动画结束是不同节点；失败事件与BufferedAction.Fail回调也不等价，调用方须观察自己链路实际触发的信号。多个动作槽的清理应核对身份与所有者。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S026",
+            "AI-S029",
+            "AI-S033",
+            "AI-S034",
+            "AI-S035",
+            "AI-S037",
+            "AI-S047"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-REC-01",
+          "kind": "REC",
+          "statement": "排错按同一动作身份追踪工厂→locomotor槽→实体槽→SG handler→timeline→Do→action.fn→回调；对无handler、无效目标、owner改变、到达前取消、进入状态后取消、业务失败逐项验证，避免把返回nil解释成统一失败码。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S022",
+            "AI-S023",
+            "AI-S026",
+            "AI-S029",
+            "AI-S032",
+            "AI-S033",
+            "AI-S034",
+            "AI-S035",
+            "AI-S037",
+            "AI-S038",
+            "AI-S047",
+            "AI-S048"
+          ]
+        },
+        {
+          "id": "EXP-AI-007-UNK-01",
+          "kind": "UNK",
+          "statement": "native寻路/物理/平台、真实客户端预测RPC与同帧重入、SG被打断前后各动作具体清理、action.fn业务组件副作用均没有游戏运行验证；此处Lua链不能保证远端表现或恰好执行一次。",
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S026",
+            "AI-S032",
+            "AI-S034",
+            "AI-S035",
+            "AI-S037",
+            "AI-S038",
+            "AI-S047",
+            "AI-S048",
+            "AI-S058"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "BufferedAction",
+          "source_file": "scripts/bufferedaction.lua",
+          "visibility": "global Lua Class constructor",
+          "parameters": {
+            "receiver": "无 receiver；全局 Class 构造调用",
+            "arguments": {
+              "doer": "执行实体，可nil；非nil的存活/物品归属以后检查",
+              "target": "目标实体，可nil；构造记录inventoryitem.owner",
+              "action": "必需动作定义表，后续需fn；distance等取默认",
+              "invobject": "参与动作物品，可nil；构造记录doer是否持有",
+              "pos": "可nil；非nil包装DynamicPosition",
+              "recipe": "配方数据，直接保存",
+              "distance": "可选，nil/false取action.distance",
+              "forced": "直接保存，影响locomotor分流",
+              "rotation": "默认0",
+              "arrivedist": "可选，nil/false取action.arrivedist"
+            }
+          },
+          "returns": "BufferedAction对象；onsuccess/onfail/options初始空表。",
+          "preconditions": "action非nil；有组件/replica的实体符合其端别结构；DynamicPosition可用；构造没有权限/距离的统一校验。",
+          "side_effects": "捕获owner/持有快照，保存动态位置与字段。",
+          "lifecycle": {
+            "sequence": "此构造不执行/排队/注册到实体；IsValid与调用者另行核对。",
+            "failure_and_cleanup": "无action会访问默认字段报错；不提供清理或自动最终状态。"
+          },
+          "evidence_refs": [
+            "AI-S022",
+            "AI-S023"
+          ],
+          "unknowns": [
+            "网络实体结构、recipe及扩展字段协议未穷举。"
+          ]
+        },
+        {
+          "symbol": "BufferedAction:IsValid",
+          "source_file": "scripts/bufferedaction.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BufferedAction对象（self）",
+            "arguments": {}
+          },
+          "returns": "由Lua and链得truthy/false/nil；不是带统一reason的验证结果。TestForStart直接别名此方法。",
+          "preconditions": "对象字段和action结构有效；TheWorld存在；autoequipped为真且doer非nil时必须有doer.replica.inventory:GetActiveItem，源码无存在guard；最初doer持有物需仍有invobject.replica.inventoryitem。",
+          "side_effects": "依次检查invobject有效、doer有效及自动装备时active item为空、target有效及owner未变、动态平台有效、原持有物仍IsHeldBy(doer)；再调用self.validfn(self)，mastersim还可调用action.validfn(self)。自定义回调副作用不由本类限制。",
+          "lifecycle": {
+            "sequence": "autoequipped构造初值nil，可被后续设置；构造捕获的owner/持有快照是后续有效性的依据；不检查一般距离/SG handler。",
+            "failure_and_cleanup": "假不自动Fail，不清回调；缺失replica/validfn异常不捕获。"
+          },
+          "evidence_refs": [
+            "AI-S022",
+            "AI-S023"
+          ],
+          "unknowns": [
+            "回调具体实现与native实体状态可靠性未知。"
+          ]
+        },
+        {
+          "symbol": "BufferedAction:Do",
+          "source_file": "scripts/bufferedaction.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BufferedAction对象（self）",
+            "arguments": {}
+          },
+          "returns": "IsValid假→false（无reason赋值/Fail）；有效→action.fn的success,reason。",
+          "preconditions": "有效后action.fn可调用；需要权威业务调用者，方法本身未统一拦客户端。",
+          "side_effects": "保存reason；成功时有效invobject.OnUsedAsItem；触发Succeed或Fail并清对应回调表。",
+          "lifecycle": {
+            "sequence": "没有一次性锁；回调已清不意味着再次Do不会重复action.fn。",
+            "failure_and_cleanup": "IsValid假不通知Fail；action.fn/回调异常无保护/事务回滚。"
+          },
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S035"
+          ],
+          "unknowns": [
+            "具体action.fn业务副作用/重复执行安全未逐项运行。"
+          ]
+        },
+        {
+          "symbol": "BufferedAction:Succeed",
+          "source_file": "scripts/bufferedaction.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BufferedAction对象（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回。",
+          "preconditions": "onsuccess/onfail为回调表；由AddSuccessAction/AddFailAction追加函数。",
+          "side_effects": "pairs遍历onsuccess并无参调用；随后onsuccess/onfail换成空表。",
+          "lifecycle": {
+            "sequence": "不记录持久终态、不清实体/locomotor槽、不触发action.fn。",
+            "failure_and_cleanup": "顺序不保证；回调异常可阻断清空；不能当通用幂等事务。"
+          },
+          "evidence_refs": [
+            "AI-S024",
+            "AI-S025",
+            "AI-S035"
+          ],
+          "unknowns": [
+            "回调中增删回调/重入效果未运行。"
+          ]
+        },
+        {
+          "symbol": "BufferedAction:Fail",
+          "source_file": "scripts/bufferedaction.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "BufferedAction对象（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回。",
+          "preconditions": "onfail/onsuccess为回调表。",
+          "side_effects": "pairs遍历onfail并无参调用；随后两表清空。",
+          "lifecycle": {
+            "sequence": "只通知回调；不会自动清任何持有槽或撤销action.fn已完成业务。",
+            "failure_and_cleanup": "顺序不保证；回调异常可阻断清空；重复Do仍可能执行业务。"
+          },
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S029",
+            "AI-S033",
+            "AI-S035"
+          ],
+          "unknowns": [
+            "回调重入及异常游戏行为未运行。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:PushAction",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "实体components.locomotor（Lua类名LocoMotor）",
+            "arguments": {
+              "bufferedaction": "BufferedAction；nil直接return",
+              "run": "传给GoToEntity/GoToPoint的奔跑意图",
+              "try_instant": "签名保留；本方法体没有读取此参数"
+            }
+          },
+          "returns": "无显式成功码（nil）；DoAction不观察返回。",
+          "preconditions": "组件与实体就绪；action字段有效；本契约聚焦mastersim非玩家，玩家分支另有controller通知。",
+          "side_effects": "pre_action_cb、TestForStart、throttle=1、Clear旧移动意图，按动作/目标/位置走不同分发；可改forced动作target/owner。",
+          "lifecycle": {
+            "sequence": "普通目标可先移动；GoToEntity/Point可即刻做到达检查；到达后移交实体动作槽。",
+            "failure_and_cleanup": "TestForStart失败仅actionfailed事件、不显式Fail新动作；无统一抛错保护。"
+          },
+          "evidence_refs": [
+            "AI-S026",
+            "AI-S027",
+            "AI-S028",
+            "AI-S029",
+            "AI-S030",
+            "AI-S032"
+          ],
+          "unknowns": [
+            "完整预测、pathfinder/平台分支及无位置forced动作运行边界未测。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:Clear",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.locomotor",
+            "arguments": {}
+          },
+          "returns": "无显式返回。",
+          "preconditions": "SetBufferedAction方法可用；没有端别防护。",
+          "side_effects": "清dest/atdestfn/移动意图，SetBufferedAction(nil)会Fail旧locomotor动作。",
+          "lifecycle": {
+            "sequence": "只清此组件动作槽；不调用ResetPath/StopMoving；实体槽另清。",
+            "failure_and_cleanup": "Fail回调异常可中断清理；不能当物理停止或实体动作取消的完整组合。"
+          },
+          "evidence_refs": [
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033"
+          ],
+          "unknowns": [
+            "与其他状态/节点同时清理的重入安全未运行。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:Stop",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.locomotor",
+            "arguments": {
+              "sgparams": "可选数据，转交locomote事件"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "路径、物理、组件更新接口可用；softstop SG分支需具体状态标签。",
+          "side_effects": "清dest/路径/移动意图；通常StopMoving（softstop可交SG）；发locomote并StopUpdatingInternal。",
+          "lifecycle": {
+            "sequence": "刻意不调用SetBufferedAction(nil)，所以不自动Fail其动作槽。",
+            "failure_and_cleanup": "不等同Clear，也不清inst.bufferedaction；事件/物理运行效果需具体SG验证。"
+          },
+          "evidence_refs": [
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033"
+          ],
+          "unknowns": [
+            "softstop与native物理响应未运行。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:PushBufferedAction",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "执行实体（self）",
+            "arguments": {
+              "bufferedaction": "非nil BufferedAction；初始比较处的nil条件不是全方法nil保护"
+            }
+          },
+          "returns": "无显式返回（nil），不能以返回判受理/完成。",
+          "preconditions": "动作/实体结构有效；一般SG动作需handler；服务端样例由locomotor移交。",
+          "side_effects": "新旧动作均非nil、target/action/invobject分别相同，且（无SG，或SG没有idle标签）时直接去重返回；其余路径Fail旧动作、TestForStart、发事件、WALKTO完成、instant.Do或写实体槽交SG。",
+          "lifecycle": {
+            "sequence": "旧动作先失败后验证新动作；无SG只startaction事件，需外部处理；SG拒绝会Fail新动作并清槽。",
+            "failure_and_cleanup": "验证失败只发actionfailed；instant.Do返回未被此分支处理；去重不自动通知新动作回调。"
+          },
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S032",
+            "AI-S034",
+            "AI-S037"
+          ],
+          "unknowns": [
+            "去重与重入、无SG自定义处理、预测实际效果未运行。"
+          ]
+        },
+        {
+          "symbol": "StateGraphInstance:StartAction",
+          "source_file": "scripts/stategraph.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "实体self.sg（StateGraphInstance）",
+            "arguments": {
+              "bufferedaction": "持action定义、options等字段的BufferedAction"
+            }
+          },
+          "returns": "进入受理分支后true；无匹配/条件不通过/无deststate结果返回nil。true不证明GoToState成功或业务成功。",
+          "preconditions": "sg.actionhandlers以action对象为键；handler.condition(inst)；deststate(inst,bufferedaction)需返回存在状态名才实际切换。",
+          "side_effects": "可在旧statemem写is_going_to_action_state，GoToState；无deststate时PerformBufferedAction；玩家分支可快进预测。",
+          "lifecycle": {
+            "sequence": "GoToState调用旧onexit并换statemem/标签/时间线再新onenter；StartAction未检查GoToState返回。",
+            "failure_and_cleanup": "GoToState不存在状态仅打印返回；方法没有统一清动作；由EntityScript处理StartAction的nil。"
+          },
+          "evidence_refs": [
+            "AI-S036",
+            "AI-S037",
+            "AI-S038",
+            "AI-S034"
+          ],
+          "unknowns": [
+            "远端预测/动画快进与SG重入未运行。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:PerformBufferedAction",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "执行实体（self）",
+            "arguments": {}
+          },
+          "returns": "业务truthy成功时true；失败或无动作无显式返回（nil）。",
+          "preconditions": "self.bufferedaction为待执行动作；通常具体SG timeline调用；本方法不统一检查端别。",
+          "side_effects": "面向目标、performaction/theme事件、缓存action并Do；成功/失败按身份清槽；失败发actionfailed并Fail。",
+          "lifecycle": {
+            "sequence": "Do过程中允许槽变化；仅清仍等于旧action的槽，保护后续替换对象。",
+            "failure_and_cleanup": "Do失败可能已Fail过，此处仍调用Fail；IsValid早退false由此补Fail；异常未捕获。"
+          },
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S035",
+            "AI-S047"
+          ],
+          "unknowns": [
+            "事件或action.fn内重入/移除的完整游戏行为未运行。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:ClearBufferedAction",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "执行实体（self）",
+            "arguments": {}
+          },
+          "returns": "无显式返回；InterruptBufferedAction是直接别名。",
+          "preconditions": "检查self.bufferedaction是否非nil；不读取locomotor槽。",
+          "side_effects": "对实体槽动作Fail，然后槽设nil。",
+          "lifecycle": {
+            "sequence": "不切SG、不Stop移动、不回滚业务；locomotor槽独立。",
+            "failure_and_cleanup": "Fail回调异常可能阻断置nil；持有新动作时不能无条件清空来取消旧动作。"
+          },
+          "evidence_refs": [
+            "AI-S025",
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033",
+            "AI-S035"
+          ],
+          "unknowns": [
+            "回调重入导致替换槽时的实际结果未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "BufferedAction构造捕获对象/归属快照；DoAction附加结果回调后提交locomotor。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S022",
+            "AI-S023",
+            "AI-S024",
+            "AI-S025",
+            "AI-S026"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "locomotor校验并分流；普通target先GoToEntity；到达时清自己的动作槽再在mastersim交实体，客户端走preview。",
+          "evidence_refs": [
+            "AI-S026",
+            "AI-S027",
+            "AI-S028",
+            "AI-S029",
+            "AI-S030",
+            "AI-S032"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "实体重新校验并分流；一般动作写实体槽交SG handler。StartAction受理与GoToState成功/业务完成分别判断。",
+          "evidence_refs": [
+            "AI-S034",
+            "AI-S036",
+            "AI-S037",
+            "AI-S038"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "具体状态时间线调用PerformBufferedAction→BufferedAction.Do→action.fn；猪人EAT在10*FRAMES事件，animover另行回idle。",
+          "evidence_refs": [
+            "AI-S023",
+            "AI-S035",
+            "AI-S046",
+            "AI-S047",
+            "AI-S048",
+            "AI-S058",
+            "AI-S059",
+            "AI-S060"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "成功/失败回调只给DoAction.pendingstatus，实体按动作身份清槽；同次或后续节点Visit归入状态，取消需分别处理各所有者。",
+          "evidence_refs": [
+            "AI-S021",
+            "AI-S024",
+            "AI-S025",
+            "AI-S029",
+            "AI-S030",
+            "AI-S031",
+            "AI-S033",
+            "AI-S034",
+            "AI-S035"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-AI-007-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "AI-S021",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S022",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-01",
+              "EXP-AI-007-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S023",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-01",
+              "EXP-AI-007-NSF-02",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S024",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-02",
+              "EXP-AI-007-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S025",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-02",
+              "EXP-AI-007-EI-01"
+            ]
+          },
+          {
+            "ref": "AI-S026",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-03",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S027",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "AI-S028",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "AI-S029",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-04",
+              "EXP-AI-007-NSF-08",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S030",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-03",
+              "EXP-AI-007-NSF-04",
+              "EXP-AI-007-NSF-08"
+            ]
+          },
+          {
+            "ref": "AI-S031",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-08"
+            ]
+          },
+          {
+            "ref": "AI-S032",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-04",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S033",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-07",
+              "EXP-AI-007-NSF-08",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01"
+            ]
+          },
+          {
+            "ref": "AI-S034",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-05",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S035",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-07",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S036",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-06"
+            ]
+          },
+          {
+            "ref": "AI-S037",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-06",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S038",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-06",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S039",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09"
+            ]
+          },
+          {
+            "ref": "AI-S046",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09"
+            ]
+          },
+          {
+            "ref": "AI-S047",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09",
+              "EXP-AI-007-EI-01",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S048",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09",
+              "EXP-AI-007-REC-01",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S058",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09",
+              "EXP-AI-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "AI-S059",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09"
+            ]
+          },
+          {
+            "ref": "AI-S060",
+            "role": "direct cited Lua evidence; no transitive/native closure assertion",
+            "claim_ids": [
+              "EXP-AI-007-NSF-09"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本候选直接引用，未证明跨文件静态/动态/native传递依赖完整；新版本按引用局部复核，不阻断知识阅读或源码定位。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "AI-S001",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 159,
+      "line_end": 226,
+      "range_sha256": "224182e75c223e73b84c8b58218389dba111e678e2734dec21fd4c869a13207b",
+      "symbols": [
+        "Brain",
+        "Brain:_Start_Internal",
+        "Brain:ForceUpdate",
+        "Brain:GetSleepTime"
+      ]
+    },
+    {
+      "id": "AI-S002",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 238,
+      "line_end": 285,
+      "range_sha256": "cd79acbe7be105dda9c76dfa0fbfb62842ff55213fa5ffb27ad0aa25f19d80ef",
+      "symbols": [
+        "Brain:_Stop_Internal",
+        "Brain:Pause",
+        "Brain:Resume"
+      ]
+    },
+    {
+      "id": "AI-S003",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1082,
+      "line_end": 1121,
+      "range_sha256": "6e93db416137aa6096de437db45f80227bf8d373da123ba93f099cac3c14d0ba",
+      "symbols": [
+        "EntityScript:RestartBrain",
+        "EntityScript:StopBrain",
+        "EntityScript:SetBrain"
+      ]
+    },
+    {
+      "id": "AI-S004",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1123,
+      "line_end": 1150,
+      "range_sha256": "b4330714bf8a33290e847b13bbfa71a138424c16c582d9569a8984b036f8003e",
+      "symbols": [
+        "EntityScript:_DisableBrain_Internal",
+        "EntityScript:_EnableBrain_Internal"
+      ]
+    },
+    {
+      "id": "AI-S005",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 696,
+      "line_end": 757,
+      "range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+      "symbols": [
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "AI-S006",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 2,
+      "line_end": 104,
+      "range_sha256": "2d20f3868ece61ce2b8e82563c442a2900347c73c47f446111be8117a0141cc1",
+      "symbols": [
+        "BrainWrangler",
+        "BrainManager",
+        "BrainWrangler:Sleep",
+        "BrainWrangler:Wake",
+        "BrainWrangler:Hibernate",
+        "BrainWrangler:RemoveInstance",
+        "BrainWrangler:AddInstance",
+        "BrainWrangler:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "AI-S007",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 106,
+      "line_end": 157,
+      "range_sha256": "0f52a03b2abf208011e1af57c6faa9d47ac59bd4e8ba3f81defb5be60e058b9f",
+      "symbols": [
+        "BrainWrangler:Update"
+      ]
+    },
+    {
+      "id": "AI-S008",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 228,
+      "line_end": 236,
+      "range_sha256": "e569c036d8954ab5748be8f9374b5290b251376b37a5b72693e7caf4558e0e67",
+      "symbols": [
+        "Brain:OnUpdate"
+      ]
+    },
+    {
+      "id": "AI-S009",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 4,
+      "line_end": 43,
+      "range_sha256": "aab49cbcd24b51bdcde8deb922c97cc4bc56949e470fa325d247d30faf8f0e83",
+      "symbols": [
+        "SUCCESS",
+        "FAILED",
+        "READY",
+        "RUNNING",
+        "BT:Update",
+        "BT:Stop",
+        "BT:GetSleepTime"
+      ]
+    },
+    {
+      "id": "AI-S010",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 54,
+      "line_end": 70,
+      "range_sha256": "e8cbb01f16f30e811b7359b7c280c113403f0f1aba24f12bb68fdccd0e148054",
+      "symbols": [
+        "BehaviourNode"
+      ]
+    },
+    {
+      "id": "AI-S011",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 97,
+      "line_end": 138,
+      "range_sha256": "15dabd59bc5d1f510f74db1db8302f5ca33943dadd5ccbe06ed079cee540c66e",
+      "symbols": [
+        "BehaviourNode:Sleep",
+        "BehaviourNode:GetSleepTime",
+        "BehaviourNode:GetTreeSleepTime"
+      ]
+    },
+    {
+      "id": "AI-S012",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 148,
+      "line_end": 191,
+      "range_sha256": "73bfff21e39b082984897aca7584ab3db42260f08ae8b8d1c2bd083ebbc049b2",
+      "symbols": [
+        "BehaviourNode:Visit",
+        "BehaviourNode:SaveStatus",
+        "BehaviourNode:Step",
+        "BehaviourNode:Reset",
+        "BehaviourNode:Stop"
+      ]
+    },
+    {
+      "id": "AI-S013",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 304,
+      "line_end": 336,
+      "range_sha256": "ed8c305173491b9899aa01e440e77af502213e63b6757e01f65613b3ea56bff6",
+      "symbols": [
+        "SequenceNode",
+        "SequenceNode:Reset",
+        "SequenceNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S014",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 340,
+      "line_end": 375,
+      "range_sha256": "66d8bf6a097fa0f5e796f213c4f2ab06bc343af0c2642b04f00ae3e50bdd4efd",
+      "symbols": [
+        "SelectorNode",
+        "SelectorNode:Reset",
+        "SelectorNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S015",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 533,
+      "line_end": 564,
+      "range_sha256": "31abfb0f256e638197cde5040978007fb3d9e60c948c3d3d827f9783dc223592",
+      "symbols": [
+        "PriorityNode",
+        "PriorityNode:GetSleepTime"
+      ]
+    },
+    {
+      "id": "AI-S016",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 577,
+      "line_end": 638,
+      "range_sha256": "53c5652658c2bcfdef61d26286708d50c61d8a0fd0d1377b41e8bbb9755ddb62",
+      "symbols": [
+        "PriorityNode:Reset",
+        "PriorityNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S017",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 644,
+      "line_end": 695,
+      "range_sha256": "42faa336cdbc92bf645fc445f4a95eed88c2063ad6c2cdc7d2c5b25176e386ee",
+      "symbols": [
+        "ParallelNode",
+        "ParallelNode:Step",
+        "ParallelNode:Visit",
+        "ParallelNodeAny"
+      ]
+    },
+    {
+      "id": "AI-S018",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 768,
+      "line_end": 789,
+      "range_sha256": "bf04434aa9ce2d4482ba902f390a368d4f9922086bd050cb8fa58e2510897732",
+      "symbols": [
+        "WhileNode",
+        "IfNode"
+      ]
+    },
+    {
+      "id": "AI-S019",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 202,
+      "line_end": 213,
+      "range_sha256": "932c7040344ff03c30873e6d4026f274df93b59ff745887719abf9a467afe3dd",
+      "symbols": [
+        "ConditionNode",
+        "ConditionNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S020",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 702,
+      "line_end": 765,
+      "range_sha256": "ec0293c5c2d6ec8b24b76d7d4f6ac37321589ba2d2d9957e703388955e2266d1",
+      "symbols": [
+        "EventNode",
+        "EventNode:OnStop",
+        "EventNode:OnEvent",
+        "EventNode:Step",
+        "EventNode:Reset",
+        "EventNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S021",
+      "source_file": "scripts/behaviours/doaction.lua",
+      "file_sha256": "b602435be771bb72e22e01c8d03328655b5c04271e433dd96efb1b97be70750f",
+      "line_start": 1,
+      "line_end": 58,
+      "range_sha256": "f947907021e5550bf4a264b98f04b196c995d4fde9c6378bb8c679dc8aea2693",
+      "symbols": [
+        "DoAction",
+        "DoAction:OnFail",
+        "DoAction:OnSucceed",
+        "DoAction:Visit"
+      ]
+    },
+    {
+      "id": "AI-S022",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 2,
+      "line_end": 20,
+      "range_sha256": "a89889231a6e51ca361c2c0161fc3ec7dc5653ac436f8b25b30b5d87df108328",
+      "symbols": [
+        "BufferedAction"
+      ]
+    },
+    {
+      "id": "AI-S023",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 22,
+      "line_end": 50,
+      "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+      "symbols": [
+        "BufferedAction:Do",
+        "BufferedAction:IsValid",
+        "BufferedAction.TestForStart"
+      ]
+    },
+    {
+      "id": "AI-S024",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 74,
+      "line_end": 88,
+      "range_sha256": "278b3d3f6e1846d0f35790b0de366346b7ab3d1573c44bb0a51e512ec5bd641b",
+      "symbols": [
+        "BufferedAction:AddFailAction",
+        "BufferedAction:AddSuccessAction",
+        "BufferedAction:Succeed"
+      ]
+    },
+    {
+      "id": "AI-S025",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 104,
+      "line_end": 110,
+      "range_sha256": "5dd8244617dd8b82d27de63615841036d7bab1a7230fa1a2cb81891eafc0a95b",
+      "symbols": [
+        "BufferedAction:Fail"
+      ]
+    },
+    {
+      "id": "AI-S026",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 882,
+      "line_end": 980,
+      "range_sha256": "256cb6b98bb3469d302d5fd67ee5ac025b16b971a02c18354665b29a140de583",
+      "symbols": [
+        "LocoMotor:PushAction"
+      ]
+    },
+    {
+      "id": "AI-S027",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 982,
+      "line_end": 1037,
+      "range_sha256": "fd4957cd49126b69f2fa2bbc41eb164372b2f468b0d4fa3287f36107a763833e",
+      "symbols": [
+        "LocoMotor:GoToEntity"
+      ]
+    },
+    {
+      "id": "AI-S028",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 1040,
+      "line_end": 1076,
+      "range_sha256": "7f5967e8eedbf68b34601bec2cdccf5e62666a7aae010fd7cd5ae61379fec12e",
+      "symbols": [
+        "LocoMotor:GoToPoint"
+      ]
+    },
+    {
+      "id": "AI-S029",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 1078,
+      "line_end": 1089,
+      "range_sha256": "5907e8ce593d985e42ca58864cb4d4eae95a97c30a73e3dacf4e5928d9850139",
+      "symbols": [
+        "LocoMotor:SetBufferedAction"
+      ]
+    },
+    {
+      "id": "AI-S030",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 755,
+      "line_end": 763,
+      "range_sha256": "984ffd34eebb5887cc0a7219ae92998db2bcfde2d788f3d911ad1ce60efc6dc7",
+      "symbols": [
+        "LocoMotor:Clear"
+      ]
+    },
+    {
+      "id": "AI-S031",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 1091,
+      "line_end": 1114,
+      "range_sha256": "753aee5c214b1a27d1ade05f036eaee9b005e17a4e97b9cf09d2bbb00a26ca80",
+      "symbols": [
+        "LocoMotor:Stop"
+      ]
+    },
+    {
+      "id": "AI-S032",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "c810e77d1a2baebf01d742855724fd035add3baafee186ff4aa94168a28527fb",
+      "line_start": 1450,
+      "line_end": 1521,
+      "range_sha256": "8b2ce18964570ce104416a7e4300d4ba19cef78b0bf7aeab48f111b504db5f4a",
+      "symbols": [
+        "LocoMotor:OnUpdate"
+      ]
+    },
+    {
+      "id": "AI-S033",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1566,
+      "line_end": 1573,
+      "range_sha256": "212903647ab07cc468a6a8f79ebba8a1e48fd07b7ea7fa3a8f916ac7fd80032f",
+      "symbols": [
+        "EntityScript:ClearBufferedAction",
+        "EntityScript.InterruptBufferedAction"
+      ]
+    },
+    {
+      "id": "AI-S034",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1612,
+      "line_end": 1655,
+      "range_sha256": "b29f053b6aac5bc7499ecb24e889268b44fbc35d97df49efc8f4c085e5e41e31",
+      "symbols": [
+        "EntityScript:PushBufferedAction"
+      ]
+    },
+    {
+      "id": "AI-S035",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 1657,
+      "line_end": 1694,
+      "range_sha256": "6076c015f696ed67d534f02f0144912f02bc0fec85dd45ea75c04e2ae45135d4",
+      "symbols": [
+        "EntityScript:PerformBufferedAction",
+        "EntityScript:GetBufferedAction"
+      ]
+    },
+    {
+      "id": "AI-S036",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 159,
+      "line_end": 171,
+      "range_sha256": "fa53b88eeac7dc25d319af4bab5d0b2e41b605dfe57663950eacd1c8c981b850",
+      "symbols": [
+        "ActionHandler"
+      ]
+    },
+    {
+      "id": "AI-S037",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 430,
+      "line_end": 461,
+      "range_sha256": "88706c92f04ed78f7d0db11e64862f3efe3d87ac0cd63ec818de63d1bb1507bb",
+      "symbols": [
+        "StateGraphInstance:StartAction"
+      ]
+    },
+    {
+      "id": "AI-S038",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 529,
+      "line_end": 600,
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "symbols": [
+        "StateGraphInstance:GoToState"
+      ]
+    },
+    {
+      "id": "AI-S039",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 81,
+      "line_end": 119,
+      "range_sha256": "9f4ebd3ff56328dad22ad819dcc2beb20abd4e4b19f975039485c01661ea13ac",
+      "symbols": [
+        "FindFoodAction"
+      ]
+    },
+    {
+      "id": "AI-S040",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 333,
+      "line_end": 356,
+      "range_sha256": "83d58a510417765e05ca2429c184454cfccd6b0b5fc264c9aa77e65331d3f182",
+      "symbols": [
+        "PigBrain:OnStart"
+      ]
+    },
+    {
+      "id": "AI-S041",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 382,
+      "line_end": 421,
+      "range_sha256": "5cc2cf141cf90b151b369b56f4a5490e46ae52fa32dd8532f1569aa0f7b545e5",
+      "symbols": [
+        "PigBrain:OnStart"
+      ]
+    },
+    {
+      "id": "AI-S042",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+      "line_start": 262,
+      "line_end": 262,
+      "range_sha256": "12b210cf3a0aea82e3a316fd1523b13e7c84b1e0d43a9230caa7bae43797fa1d",
+      "symbols": [
+        "normalbrain"
+      ]
+    },
+    {
+      "id": "AI-S043",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+      "line_start": 307,
+      "line_end": 338,
+      "range_sha256": "4bd0e9ec7e3e336a36726b8a98f2e92a86e917907237f018a2c467b9ac953127",
+      "symbols": [
+        "SetNormalPig"
+      ]
+    },
+    {
+      "id": "AI-S044",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+      "line_start": 631,
+      "line_end": 664,
+      "range_sha256": "8f5d5c2d9be021448a592f90b3fb5cc118b077c121c7be8b1a0a7d4e5b62237b",
+      "symbols": [
+        "common"
+      ]
+    },
+    {
+      "id": "AI-S045",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "7b43ae3648eedeb70af644967dfdd9ad701abe2adb63f922ee3af054b0348eee",
+      "line_start": 742,
+      "line_end": 763,
+      "range_sha256": "537162219f3519474a0f67c10346dc82e07d462b5adfda0c64e5a8cefeff0458",
+      "symbols": [
+        "normal"
+      ]
+    },
+    {
+      "id": "AI-S046",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+      "line_start": 3,
+      "line_end": 15,
+      "range_sha256": "c4253a2b93fb6ae83e733b55a72c883465c4d6dd3534b2cab94ac783d4e01790",
+      "symbols": [
+        "actionhandlers"
+      ]
+    },
+    {
+      "id": "AI-S047",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "file_sha256": "77eccea2287e84573ff9fb2b4d4ca05ac230e2cbe6a009fd4423e6624b7736e5",
+      "line_start": 223,
+      "line_end": 246,
+      "range_sha256": "9ce5157bea0a93bb354868eb1b5dd7e0667546c29e681ac16f62fd05ad61fef9",
+      "symbols": [
+        "eat"
+      ]
+    },
+    {
+      "id": "AI-S048",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "ba2455683ca4468cf41d9ccaade2847c56c6bf935f5807c3ffaf080075bf90b7",
+      "line_start": 796,
+      "line_end": 807,
+      "range_sha256": "543bc2b26281bc7e846c47f4c8bbc64de7e91c4e3f910b2338113f052e328f80",
+      "symbols": [
+        "ACTIONS.EAT.fn"
+      ]
+    },
+    {
+      "id": "AI-S049",
+      "source_file": "scripts/prefabs/spider.lua",
+      "file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+      "line_start": 86,
+      "line_end": 86,
+      "range_sha256": "e2af483f246b7a1af07bfafddb22fe572fc8e77e58fc019afdefd98052249a6e",
+      "symbols": [
+        "brain"
+      ]
+    },
+    {
+      "id": "AI-S050",
+      "source_file": "scripts/prefabs/spider.lua",
+      "file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+      "line_start": 623,
+      "line_end": 643,
+      "range_sha256": "a66944e1dfadfca11e1f6e2c47776d392c0dc9112e3109a265c2721626b91e91",
+      "symbols": [
+        "create_common"
+      ]
+    },
+    {
+      "id": "AI-S051",
+      "source_file": "scripts/prefabs/spider.lua",
+      "file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+      "line_start": 724,
+      "line_end": 724,
+      "range_sha256": "185c0eefcc3aca46fdb8d47979be23f0d9016329ef6d12676f6f1e8967af34af",
+      "symbols": [
+        "create_common"
+      ]
+    },
+    {
+      "id": "AI-S052",
+      "source_file": "scripts/brains/spiderbrain.lua",
+      "file_sha256": "dd6a2a00c60d843eca8203f70ca21ed05401f589dc6a5cb40d570641c4787191",
+      "line_start": 132,
+      "line_end": 202,
+      "range_sha256": "030cdbcd4bf95b78a5f7e58701eacfa0b7cf9c3092ab176d8bba088409f2e1d6",
+      "symbols": [
+        "SpiderBrain:OnStart"
+      ]
+    },
+    {
+      "id": "AI-S053",
+      "source_file": "scripts/brains/spiderbrain.lua",
+      "file_sha256": "dd6a2a00c60d843eca8203f70ca21ed05401f589dc6a5cb40d570641c4787191",
+      "line_start": 204,
+      "line_end": 207,
+      "range_sha256": "ddb2016a81e07f3b8c979a93ef574691e58e3233f39523b80cf71e068c4318bd",
+      "symbols": [
+        "SpiderBrain:OnInitializationComplete"
+      ]
+    },
+    {
+      "id": "AI-S054",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 286,
+      "line_end": 294,
+      "range_sha256": "4372701934274c6f92ebf46793e1fe24a1a110d009abb8fb5214ba05ef36e11b",
+      "symbols": [
+        "BrainManager:Update",
+        "SGManager:Update"
+      ]
+    },
+    {
+      "id": "AI-S055",
+      "source_file": "scripts/behaviours/chattynode.lua",
+      "file_sha256": "217f6e6630c770e528e6e00aea1a80f3bbcd57b319421f5c5fb87df7c26eec1d",
+      "line_start": 28,
+      "line_end": 98,
+      "range_sha256": "ecc38c1037fbb1dc956e5b2656b6cdd5165a3f1d4ab1a54c7520d10ed6a270ff",
+      "symbols": [
+        "ChattyNode:Visit"
+      ]
+    },
+    {
+      "id": "AI-S056",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 543,
+      "range_sha256": "06c94b55965a8a5fecb9595c3e9c1073834b33eec106ad9de8f0e26f1448e0f3",
+      "symbols": [
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "AI-S057",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 72,
+      "line_end": 77,
+      "range_sha256": "f1e4d97afa41e507e41efc4bc2fad8dd1b77d800909ab162f3c4c1db336cb9d0",
+      "symbols": [
+        "BehaviourNode:DoToParents"
+      ]
+    },
+    {
+      "id": "AI-S058",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 646,
+      "line_end": 690,
+      "range_sha256": "6a98b764c37019b2a3da69699a1c8df08ab7f67320da687be4df80c0789b6a35",
+      "symbols": [
+        "StateGraphInstance:UpdateState"
+      ]
+    },
+    {
+      "id": "AI-S059",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 183,
+      "line_end": 191,
+      "range_sha256": "707d4de4f27ada746151423fcb9d5633cb2131938c08a2a8cd473af6dfc84794",
+      "symbols": [
+        "TimeEvent"
+      ]
+    },
+    {
+      "id": "AI-S060",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "2cf760f356c51718a3545a3d83fdb5a69a966c0ff21e9156675670bc625f3fa3",
+      "line_start": 253,
+      "line_end": 262,
+      "range_sha256": "cce26b8d41b74df641e5635434826c5b1955d07e74600349d8057f43333ae7af",
+      "symbols": [
+        "State"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "大脑停止后恢复为什么会重新建树，休眠醒来还是原来的对象吗",
+      "expected_entry_ids": [
+        "EXP-AI-001"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "EntityScript:StopBrain / RestartBrain / SetBrain / Brain:_Start_Internal",
+      "expected_entry_ids": [
+        "EXP-AI-001"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "停止原因相同调用两次是否要恢复两次；错误原因能否解除；Pause是否清理监听",
+      "expected_entry_ids": [
+        "EXP-AI-001"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "行为树结果成功了为什么状态又变成准备，多久会再更新",
+      "expected_entry_ids": [
+        "EXP-AI-002"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "BT:Update / BehaviourNode:SaveStatus / Step / GetTreeSleepTime / BrainWrangler:Update",
+      "expected_entry_ids": [
+        "EXP-AI-002"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "Reset是否一定调用OnStop；ForceUpdate能否复活已注销的大脑",
+      "expected_entry_ids": [
+        "EXP-AI-002"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "高优先级行为为什么没有马上抢占低优先级，事件怎么影响重评",
+      "expected_entry_ids": [
+        "EXP-AI-003"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "PriorityNode:Visit / period / lasttime / noscatter / EventNode.priority",
+      "expected_entry_ids": [
+        "EXP-AI-003"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "优先级是否每次都从头检查；时间刚好等于周期能否重评；事件是否总按数值最高获胜",
+      "expected_entry_ids": [
+        "EXP-AI-003"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "条件变化后怎样中断行为，入场检查和持续检查有什么区别",
+      "expected_entry_ids": [
+        "EXP-AI-004"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "SequenceNode / SelectorNode / ParallelNode / WhileNode / IfNode",
+      "expected_entry_ids": [
+        "EXP-AI-004"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "If条件真后孩子一直运行是否会重查；While变假是否自动撤销动作",
+      "expected_entry_ids": [
+        "EXP-AI-004"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "事件行为怎样唤醒大脑，树退出后监听器由谁移除",
+      "expected_entry_ids": [
+        "EXP-AI-005"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "EventNode:OnEvent / OnStop / triggered / BehaviourNode:DoToParents",
+      "expected_entry_ids": [
+        "EXP-AI-005"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "多个事件是否排队；Reset是否解绑；Stop后原节点是否自动重新订阅",
+      "expected_entry_ids": [
+        "EXP-AI-005"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "动作节点超时失败后原动作还会完成吗，成功是动画播完吗",
+      "expected_entry_ids": [
+        "EXP-AI-006"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "DoAction:Visit / pendingstatus / timeout / getactionfn",
+      "expected_entry_ids": [
+        "EXP-AI-006"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "超时同轮收到成功谁生效；旧动作回调能否改新节点；节点失败是否已经退款",
+      "expected_entry_ids": [
+        "EXP-AI-006"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "大脑提交动作后由谁移动谁执行，为什么进入状态还不算成功",
+      "expected_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "BufferedAction:Do / LocoMotor:PushAction / StartAction / PerformBufferedAction / SGpig",
+      "expected_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "Stop是否清动作；验证失败是否总回调Fail；StartAction返回true能否证明状态存在；Do能否当一次性锁",
+      "expected_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "purpose": "边界反例：应命中并明确否定错误推论，不将其当正确需求"
+    },
+    {
+      "query": "所有生物的最优战斗参数与胜率排名",
+      "expected_entry_ids": [],
+      "purpose": "范围负例：本候选没有玩法强度/穷举AI结论"
+    },
+    {
+      "query": "玩家点击动作的RPC预测已经跨两台机器实测通过了吗",
+      "expected_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "purpose": "运行边界负例：只能回答NOT_RUN，不能给实测通过承诺"
+    }
+  ],
+  "limitations": [
+    "knowledge_status=research / retrieval_status=restricted / coding_status=hold，研究候选不自动进入当前canonical或Coding上下文。",
+    "所有NSF限定759671引用的Lua分支；所有EI/REC/UNK是各自独立原子并引用本文件source_references，证据不能借给相邻未引用声明。",
+    "源文件原始字节SHA256与行段SHA256由脚本计算；range规则严格为UTF-8 decode后splitlines、LF拼接、无末尾LF。没有导出完整游戏Lua。",
+    "引擎native tick/time/entity sleep事件、pathfinder/physics/platform、网络传输/客户端预测、动画与视觉均无运行验证。静态源码没有证明游戏demo可用或业务恰好一次。",
+    "只交叉核对普通pigbrain/pigman/SGpig的觅食主链和spiderbrain/spider的安装/条件/初始化；未穷举所有Brain、动作、StateGraph、死亡/移除/存档路径。",
+    "ACTIONS.EAT.fn只核到eater/souleater/oceanfishable调用；未在本候选展开其业务契约。EventNode没有本轮具名prefab事件消费者。",
+    "引用冻结证据，而非工具可用门槛。compare/list/show接受其他合法ZIP；按claim/API/step依赖局部报告待复核，保留旧知识阅读与新源码定位，不自动提升准入。",
+    "compare只映射本候选显式直接引用；同文件其他函数及跨文件未引用的传递依赖仍需上下文复核。行段完全相同、甚至所有引用文件相同，也不证明新版本整体语义等价。",
+    "同名方法/类存在不等于稳定公共API。local FindFoodAction/SetNormalPig/normal/create_common只作受限消费者；_Start_Internal/_Stop_Internal和scheduler标明内部职责。",
+    "知识库仅作边界检索：实际读取MCP compact reviewer bundle返回NC-N002-FINAL-01部分原子，预算另保留缺口；其玩家点击链不作为本候选Brain事实证据。新结论来自直接ZIP核对。"
+  ]
+}

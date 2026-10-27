@@ -86,6 +86,8 @@ class BootstrapTests(unittest.TestCase):
         scripts.mkdir()
         shutil.copyfile(PAYLOAD, scripts / 'source_payload.py')
         shutil.copyfile(REBIND, scripts / 'public_rebind.py')
+        for name in ('source_compatibility.py', 'catalog_fallback_policy.py', 'legacy_adapter.py'):
+            shutil.copyfile(HERE.parent / 'scripts' / name, scripts / name)
         for name in ('run_kb.py', 'prepare_sources.py'):
             shutil.copyfile(HERE.parent / name, self.root / name)
         payload = prepare.load_helper(PAYLOAD, 'bootstrap_fixture_payload')
@@ -151,8 +153,8 @@ class BootstrapTests(unittest.TestCase):
         receipt = prepare.read(build / 'PREPARATION-RECEIPT.json')
         self.assertFalse(receipt['client_configuration_modified'])
         self.assertEqual(len(receipt['source_payload_input_sha256']), 64)
-        with patch.object(prepare, 'check_in_subprocess', side_effect=AssertionError('unchanged runtime must be reused')):
-            self.assertEqual(prepare.prepare(self.root, [self.current, self.historical])['status'], 'LOCAL_RUNTIME_ALREADY_PREPARED')
+        # Explicit directories must be reassessed, including locator-only files.
+        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_PREPARED')
 
     def test_missing_historical_range_preserves_existing_activation(self):
         self.build([self.current, self.historical])
@@ -268,7 +270,7 @@ class BootstrapTests(unittest.TestCase):
         output, error = process.communicate('\n', timeout=15)
         self.assertEqual(process.returncode, 0, error)
         self.assertEqual(json.loads(output)['status'], 'LOCAL_RUNTIME_PREPARED')
-        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_ALREADY_PREPARED')
+        self.assertEqual(self.build([self.current, self.historical])['status'], 'LOCAL_RUNTIME_PREPARED')
 
     def test_hard_killed_process_does_not_leave_preparation_busy(self):
         process = self.start_preparation()

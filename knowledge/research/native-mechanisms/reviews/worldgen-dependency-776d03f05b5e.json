@@ -1,0 +1,3465 @@
+{
+  "schema_version": "dst-worldgen-independent-semantic-review/1",
+  "review_date": "2026-10-26",
+  "reviewer_role": "独立语义复核窗口，未参与候选作者研究；未创建子代理/聊天",
+  "verdict": "bounded_static_content_supported_with_two_revisions",
+  "integration_recommendation": "先修订 F002 的重要副作用摘要与 F001 的条件精度，再由总控对修订差异复核。当前不建议原样提升；不要求解决明确保留的 native 未知。",
+  "input": {
+    "path": "local-private-artifact/input-mechanisms.json",
+    "sha256": "de0efd497a547c4fbf47528f6717f6a5b2646c100bd80b85138669004fc43399",
+    "frozen_copy": true,
+    "current_candidate_sha256_at_integrity_check": "de0efd497a547c4fbf47528f6717f6a5b2646c100bd80b85138669004fc43399",
+    "current_matches_frozen_at_integrity_check": true,
+    "later_author_changes": "本结论仅绑定冻结副本；后续差异由总控比较，不自动继承此复核。"
+  },
+  "source": {
+    "source_epoch": "759671",
+    "archive_path": "local-private-artifact/scripts.zip",
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "matches_CONTROL": true,
+    "lua_count": 4084,
+    "version_identity_basis": "CONTROL 与接通 MCP source_environment 均将同一归档 SHA256 绑定到 759671；未谎称 Lua 内自带版本号或验证执行文件。",
+    "runtime_verified": false
+  },
+  "method": {
+    "semantic": "独立从指定 ZIP 读取必要完整函数体及消费者，逐条人工比对；未使用候选作者检查结果作为语义依据。",
+    "integrity": "独立 audit_inputs.py 检查 69 个文件/范围引用及 ID 解析；程序明确不判语义。",
+    "kb_navigation": "调用 Reviewer research get_context_bundle；返回 AI-N001-10/NC-N002-FINAL-04 等跨领域噪音和不完整 Scope，未作为此次世界生成事实依据。",
+    "source_copy_policy": "未保存完整原版 Lua；只交付原创判断、定位和哈希。"
+  },
+  "coverage": {
+    "entries": 5,
+    "claims": 41,
+    "api_contracts": 22,
+    "mechanism_steps": 20,
+    "source_references_integrity_matched": 69,
+    "all_NSF_individually_reviewed": true,
+    "EI_REC_reviewed": true,
+    "api_return_visibility_side_effect_lifecycle_reviewed": true
+  },
+  "findings": [
+    {
+      "id": "F001",
+      "priority": "P3",
+      "type": "condition_precision",
+      "entry_id": "EXP-WG-001",
+      "claim_ids": [
+        "EXP-WG-001-C02"
+      ],
+      "affected_pointers": [
+        "/entries/0/claims/1",
+        "/entries/0/mechanism_steps/0"
+      ],
+      "title": "moddata 的进入条件是 Lua 真值，不是单纯非 nil",
+      "finding": "worldgen_main.lua:145 使用 if moddata then；nil 和 false 都跳过。C02 写“非 nil 时”包含 false，语义比源码更强。正常 table 数据路径描述正确。",
+      "source_evidence": [
+        {
+          "source_file": "scripts/worldgen_main.lua",
+          "line_start": 144,
+          "line_end": 148,
+          "candidate_ref": "WG-S004"
+        }
+      ],
+      "recommended_revision": "改为“json.decode 后 moddata 为真值时（预期为包含 index 的配置表）恢复索引并调用 LoadMods(true)”；step 1 的“存在 moddata”也宜统一为真值条件。",
+      "runtime_required_to_resolve": false
+    },
+    {
+      "id": "F002",
+      "priority": "P2",
+      "type": "important_side_effect_omission",
+      "entry_id": "EXP-WG-004",
+      "claim_ids": [
+        "EXP-WG-004-C06"
+      ],
+      "affected_pointers": [
+        "/entries/3/claims/5",
+        "/entries/3/api_contracts/2/side_effects",
+        "/entries/3/api_contracts/3/side_effects"
+      ],
+      "title": "布局 API 副作用摘要漏列 SafeFromDisconnect 的条件调用",
+      "finding": "显式 position 的非零地面单元 SetTile 后，在 layout.SafeFromDisconnect 且 world.MakeSafeFromDisconnect 存在时逐格调用；无 position 分支在 ReserveSpace 返回 rcx 为真值后，对 tiles 中非零单元调用。API Convert/Place 目前未列该可见 Lua 副作用。C09 正确保留 native 内部未知，但不能因此漏掉已经能由 Lua 确认的调用。C06 其余分支描述成立。",
+      "source_evidence": [
+        {
+          "source_file": "scripts/map/object_layout.lua",
+          "line_start": 370,
+          "line_end": 400,
+          "candidate_ref": "WG-S041"
+        },
+        {
+          "source_file": "scripts/map/object_layout.lua",
+          "line_start": 415,
+          "line_end": 431,
+          "candidate_ref": "WG-S041"
+        },
+        {
+          "source_file": "scripts/map/forest_map.lua",
+          "line_start": 853,
+          "line_end": 868,
+          "candidate_ref": "WG-S051",
+          "note": "此补充范围未被 WG-S051 原 840-844 覆盖，应新增精确引用；仅解释后续 DetectDisconnect/ClearSafeFromDisconnect 生命周期。若替换数超过 floor(map_width*map_height*0.05) 且 SKIP_GEN_CHECKS==false，860 提前 return nil，跳过 868 清理；不能声称所有路径无条件清理。"
+        }
+      ],
+      "recommended_revision": "在 C06 与 Convert/Place side_effects 增加两分支条件调用、作用于非零地面单元的说明；可补 forest_map.lua:853-868 后续检测/清理调用引用，但必须保留 860 提前 return nil 会跳过 868 ClearSafeFromDisconnect 的失败边界。保持 native 实际连通保护效果未验证。",
+      "runtime_required_to_resolve": false
+    }
+  ],
+  "high_risk_checks": [
+    {
+      "topic": "optional Task / TaskPreInit",
+      "status": "confirmed",
+      "evidence": "scripts/map/level.lua:123-149,219-227,43-53",
+      "result": "主任务复制入队 -> ApplyModsToTasks -> 可选任务入队 -> overrides/chosen_tasks。组形式的 optionaltasks 可在一次循环中加入整组，不额外承诺精确 numoptionaltasks 个。"
+    },
+    {
+      "topic": "Room / TaskSet copy timing",
+      "status": "confirmed",
+      "evidence": "scripts/map/tasksets.lua:9-17; scripts/map/level.lua:94-120; scripts/map/storygen.lua:98-115,1262-1279; scripts/util.lua:904-920",
+      "result": "TaskSet getter 复制后才 Hook，字段再写 Level；Room 每请求复制后才 Hook，随后 contents.fn；函数及 metatable 仍可共享。"
+    },
+    {
+      "topic": "StaticLayout.Get shared additionalProps",
+      "status": "confirmed",
+      "evidence": "scripts/map/static_layout.lua:40-58,114-125",
+      "result": "传入同表就返回同表并覆盖基础字段；无 deepcopy/纯合并语义。"
+    },
+    {
+      "topic": "ReserveSpace / explicit position",
+      "status": "confirmed_with_omission_F002",
+      "evidence": "scripts/map/object_layout.lua:294-487,508-521",
+      "result": "nil position 调 ReserveSpace；非 nil position 对非零地面直接 SetTile，跳预留；对象回调 guard 为 rcx~=nil。另有两分支 SafeFromDisconnect 条件调用，须补摘要。"
+    },
+    {
+      "topic": "RegisterTileRange endpoints",
+      "status": "confirmed",
+      "evidence": "scripts/tilemanager.lua:9-21,128-145",
+      "result": "保存 end+1，数值 for 含该端点；例如参数 [10000,10256] 的扫描上界为 10257（假定此前无占用），不能改述为半开区间。不会自动校验重叠或分类。"
+    },
+    {
+      "topic": "AddTile partial writes before exception",
+      "status": "confirmed_static_failure_trace_not_executed",
+      "evidence": "scripts/tilemanager.lua:147-208; scripts/modutil.lua:364-376",
+      "result": "对可分配新名称，ID 三表先写；若 ground_tile_def={}，ValidateGroundTileDef 首个 assert 抛错时映射已存在，wrapper 后续恢复 true 未执行。若失败点在 minimap/turf，可能另保留 ground/资产等更多前序写入。此为静态路径推演，没有执行注册或游戏。"
+    }
+  ],
+  "entries": [
+    {
+      "entry_id": "EXP-WG-001",
+      "title": "世界生成模组环境、Hook 注入与配置分支",
+      "status": "needs_small_revision",
+      "scope_review": "静态 scope 与未运行边界保留；不授予 Coding 准入或 native 完整性。",
+      "claims": [
+        {
+          "claim_id": "EXP-WG-001-C01",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "CreateEnvironment 返回独立 env，显式放入 GLOBAL=_G、modname、MODROOT、WORLD_TILES 及部分 Lua 名称，再注入 modutil 函数；此构造没有为任意裸全局名设置回落元表。modimport 每次加载脚本并 setfenv 到 env.env，执行结果没有被该 wrapper 返回。",
+          "review_note": "CreateEnvironment 的 table 构造、env.env 自引用、modimport 载入/设环境/执行和 return env 已逐行核对。InsertPostInitFunctions 也未给 env 设置全局回落元表。独立指新 env 身份，不意味着 math/WORLD_TILES 等引用隔离。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C02",
+          "kind": "NSF",
+          "status": "needs_precision",
+          "statement": "在 LoadMods 的已启用模组循环中先执行 modworldgenmain.lua；只有 self.worldgen 为假才再执行 modmain.lua。worldgen_main 在解码 moddata 且非 nil 时恢复索引并调用 LoadMods(true)。缺少入口文件被 InitializeModMain 视为跳过成功，加载/执行错误可记录为失败。",
+          "review_note": "模组循环与两个入口的条件/次序正确，InitializeModMain 缺文件返回 true、编译失败/执行失败记录路径正确。但 worldgen_main 的 if moddata 是 Lua 真值判断，不能写成无条件的非 nil 判断；false 也跳过。见 F001。",
+          "findings": [
+            "F001"
+          ],
+          "source_evidence": [
+            {
+              "id": "WG-S002",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 526,
+              "line_end": 582,
+              "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0"
+            },
+            {
+              "id": "WG-S004",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 104,
+              "line_end": 148,
+              "range_sha256": "1fb8304c77ce70c702ad0be14595b2c5fbe5835d158b9a3f2fbabbc53af5010b"
+            },
+            {
+              "id": "WG-S003",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 786,
+              "line_end": 794,
+              "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C03",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Room/Task/TaskSet/Level 的 PreInit 注册与 AddRoom/AddTask/AddTaskSet 以及地皮 wrapper 均在 isworldgen 提前 return 之前注入；运行时专属后段在 isworldgen 为真时不可由这次注入获得。注册只保存 callback，实际消费发生在 Level 和 Story 调用方。",
+          "review_note": "地图注册和地皮 wrapper 均在 modutil.lua:436 提前 return 前；注册存储与 Level/Story 消费已分别核验。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C04",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "环境版 GetModConfigData(optionname,get_local_config) 自动补 env.modname；第二参传给全局实现的 force_local_options，非默认值。临时配置直接索引；普通配置匹配 name 后，依次按 saved_server 且非本地、saved_client 且本地、saved 非 nil、default 返回；无匹配返回 nil。显式 false 通过 ~=nil 分支保留。",
+          "review_note": "绑定 modname、force_local_options、临时表索引、saved_server/client/saved/default 次序与 false 保留均与源码一致；仅限定此函数可见的读取，不证明 KnownModIndex 最终一致性。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S009",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 329,
+              "line_end": 332,
+              "range_sha256": "41c6b14fe0bef984da7e47d0453753a34edf51b71af2d4e6d3bff4134e52a83f"
+            },
+            {
+              "id": "WG-S010",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 34,
+              "line_end": 62,
+              "range_sha256": "1cbfe62deb02a03b6c80797c3a48fce967ff4edb607209886b688e2a3135a811"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C05",
+          "kind": "EI",
+          "status": "supported_bounded_inference",
+          "statement": "WORLDGEN_MAIN 与 modworldgenmain 文件名不能等同：同一入口也会被非 worldgen LoadMods 执行。创建环境时没有注入裸 TheWorld；本轮生成调用链依赖 WorldSim。不能由入口存在推出运行时 TheWorld 或其 components 可用。",
+          "review_note": "WORLDGEN_MAIN 赋值与 modworldgenmain 文件执行是不同条件；env 未放入裸 TheWorld，WorldSim 调用可见。该推论未将任意引擎全局缺失说成已证明。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S005",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 20,
+              "line_end": 25,
+              "range_sha256": "e43b5f4972afc267db264fa92508c8f94bd9c68d9e9c5971d9d0e6c35dad505f"
+            },
+            {
+              "id": "WG-S002",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 526,
+              "line_end": 582,
+              "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0"
+            },
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            },
+            {
+              "id": "WG-S050",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 491,
+              "line_end": 506,
+              "range_sha256": "22b92ea9608550a4e884e76d2c58c55a1bbffaac14f0a147d0873477a1bd5d0a"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C06",
+          "kind": "REC",
+          "status": "reasonable_recommendation",
+          "statement": "将共享注册逻辑放在明确的模组环境载入路径，按所需阶段注册；配置要以 nil 判断缺省，避免 false 被 or 默认值覆盖。需要运行时实体时另选相应生命周期回调，勿在生成顶层捕获 TheWorld。",
+          "review_note": "建议由明确环境入口及 false/nil 源码分支推出，未冒充额外 Native 事实或完整运行生命周期实现。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            },
+            {
+              "id": "WG-S010",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 34,
+              "line_end": 62,
+              "range_sha256": "1cbfe62deb02a03b6c80797c3a48fce967ff4edb607209886b688e2a3135a811"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            },
+            {
+              "id": "WG-S050",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 491,
+              "line_end": 506,
+              "range_sha256": "22b92ea9608550a4e884e76d2c58c55a1bbffaac14f0a147d0873477a1bd5d0a"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-001-C07",
+          "kind": "UNK",
+          "status": "boundary_retained",
+          "statement": "本研究未实际执行模组加载、前端配置界面、专服或客机流程，未证明所有平台的引擎全局集合、错误恢复、跨模组加载顺序兼容和配置最终一致性。Lua 中的 protected call 也不证明 callback 副作用自动回滚。",
+          "review_note": "未知边界保留得当；runmodfn 的 xpcall/错误处置未实现事务回滚，不能从 protected call 推出回滚。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S002",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 526,
+              "line_end": 582,
+              "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0"
+            },
+            {
+              "id": "WG-S003",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 786,
+              "line_end": 794,
+              "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "CreateEnvironment(modname, isworldgen, isfrontend)",
+          "input_pointer": "/entries/0/api_contracts/0",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "全局 loader 函数身份与 return env 成立；不是 env 的同名公开 API。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            }
+          ]
+        },
+        {
+          "symbol": "env.modimport(modulename)",
+          "input_pointer": "/entries/0/api_contracts/1",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "闭包反复 kleiloadlua/setfenv/result()，无 return；路径后缀与错误路径成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            }
+          ]
+        },
+        {
+          "symbol": "env.GetModConfigData(optionname, get_local_config)",
+          "input_pointer": "/entries/0/api_contracts/2",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "闭包 return 全局三参函数结果；参数绑定、false/nil 与即时读取语义成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S009",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 329,
+              "line_end": 332,
+              "range_sha256": "41c6b14fe0bef984da7e47d0453753a34edf51b71af2d4e6d3bff4134e52a83f"
+            },
+            {
+              "id": "WG-S010",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 34,
+              "line_end": 62,
+              "range_sha256": "1cbfe62deb02a03b6c80797c3a48fce967ff4edb607209886b688e2a3135a811"
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "status": "needs_precision",
+          "description": "worldgen_main 载入基础模块、地图定义与模组系统，存在 moddata 时 LoadMods(true)。",
+          "findings": [
+            "F001"
+          ],
+          "source_evidence": [
+            {
+              "id": "WG-S004",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 104,
+              "line_end": 148,
+              "range_sha256": "1fb8304c77ce70c702ad0be14595b2c5fbe5835d158b9a3f2fbabbc53af5010b"
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "status": "supported_static_in_bounded_scope",
+          "description": "CreateEnvironment 构建 env，InsertPostInitFunctions 在阶段边界前注入地图与地皮 API；InitializeModMain 在环境内执行入口。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            },
+            {
+              "id": "WG-S002",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 526,
+              "line_end": 582,
+              "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0"
+            },
+            {
+              "id": "WG-S003",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 786,
+              "line_end": 794,
+              "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "status": "supported_static_in_bounded_scope",
+          "description": "入口调用注册闭包将回调放到 env.postinitfns；以后消费者通过 ModManager 收集并调用；读取配置走绑定 modname 的闭包。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S009",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 329,
+              "line_end": 332,
+              "range_sha256": "41c6b14fe0bef984da7e47d0453753a34edf51b71af2d4e6d3bff4134e52a83f"
+            },
+            {
+              "id": "WG-S010",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 34,
+              "line_end": 62,
+              "range_sha256": "1cbfe62deb02a03b6c80797c3a48fce967ff4edb607209886b688e2a3135a811"
+            }
+          ]
+        }
+      ],
+      "compatibility_review": {
+        "dependency_coverage": "unknown",
+        "reason": "候选没有可选 compatibility 对象；按 CONTROL 解释为 unknown。局部 evidence_refs 可导航，但不是静态/动态依赖闭包。",
+        "tool_availability": "不得因后续源码变化全局禁用旧知识阅读或新源码导航；只标受影响契约待复核。"
+      }
+    },
+    {
+      "entry_id": "EXP-WG-002",
+      "title": "Room → Task → TaskSet 的注册、复制与 PreInit 消费顺序",
+      "status": "bounded_static_review_pass",
+      "scope_review": "静态 scope 与未运行边界保留；不授予 Coding 准入或 native 完整性。",
+      "claims": [
+        {
+          "claim_id": "EXP-WG-002-C01",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "模组环境 AddRoom/AddTask/AddTaskSet 自动补 modname 转交 AddMod*。Room 注册保存传入 data（增加 __tostring 函数）；Task 通过 Task(name,data) 构造、选取声明字段，其中 room_choices 等表字段仍直接引用 data 对应表；TaskSet 保存 data 并以 data.location or \"forest\" 补缺省。三类 AddMod* 遇已存在名称均调用 moderror 并不添加，不是覆盖 API。",
+          "review_note": "AddModRoom 持有 data 并写 __tostring；Task 构造逐字段选择并直接引用表字段；TaskSet 保存并补 location；三种重名路径均 moderror 后 return。没有覆盖 API。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S013",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 5,
+              "line_end": 37,
+              "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4"
+            },
+            {
+              "id": "WG-S014",
+              "source_file": "scripts/map/tasks.lua",
+              "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+              "line_start": 28,
+              "line_end": 70,
+              "range_sha256": "a716f5afbc965241d4ca9d36d0cdab8baa022c642ce974ad1189f8e8b01286ec"
+            },
+            {
+              "id": "WG-S015",
+              "source_file": "scripts/map/task.lua",
+              "file_sha256": "f0bc60e0cbee3f6b5c13a0c7b65d749465e2d72d5330a85123556675c3b00288",
+              "line_start": 1,
+              "line_end": 40,
+              "range_sha256": "65011b39564f0bccb5fd90324af86a60ae9557f217791626e7f1add3dfad6209"
+            },
+            {
+              "id": "WG-S017",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 55,
+              "line_end": 71,
+              "range_sha256": "a1d059bfe54e8acdda3fdd420097a47d1efabed8b7bddb531fdd58e0228d7f35"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C02",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Room 查询先查 modrooms 后查原版，返回存储表；Task 查询先查原版后查 modtaskdefinitions，返回存储 Task；TaskSet 的 GetGenTasks 先查 Mod 后查原版且 deepcopy 返回。各模块 ClearModData 只删除对应 Mod 注册容器（或清全部 Mod 容器），没有在这些函数中撤销已创建副本。",
+          "review_note": "三个 getter 的原版/Mod 优先顺序与复制差异正确；ClearModData 只清注册容器，不遍历既有 Room/Task/TaskSet 副本。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S013",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 5,
+              "line_end": 37,
+              "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4"
+            },
+            {
+              "id": "WG-S014",
+              "source_file": "scripts/map/tasks.lua",
+              "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+              "line_start": 28,
+              "line_end": 70,
+              "range_sha256": "a716f5afbc965241d4ca9d36d0cdab8baa022c642ce974ad1189f8e8b01286ec"
+            },
+            {
+              "id": "WG-S016",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 9,
+              "line_end": 17,
+              "range_sha256": "0487f09d60fd15c8594e85a8b1dc467ef885b2909a796f5af755135c70cd83cd"
+            },
+            {
+              "id": "WG-S029",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 122,
+              "line_end": 133,
+              "range_sha256": "ce8183d9c035614e1d406adfce5f11e093d96d6f54b5be2f9c36ccbd7cbcfcd2"
+            },
+            {
+              "id": "WG-S030",
+              "source_file": "scripts/map/tasks.lua",
+              "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+              "line_start": 45,
+              "line_end": 51,
+              "range_sha256": "8f5fc331bba19f858e1ec372cca798b2e4e6ebee9ca7000c1a33eec1fab2bc01"
+            },
+            {
+              "id": "WG-S031",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 43,
+              "line_end": 49,
+              "range_sha256": "92e410c2212fc7b4d8a73257025c4806cd3f4533252b2a78c9e0c42c768c2507"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C03",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "ChooseTasks 要求 overrides.task_set：GetGenTasks 得副本，先指定 TaskSetPreInit 后 TaskSetPreInitAny，再将 task_set_data 各键直接写 self，之后运行指定 LevelPreInit 与 LevelPreInitAny。Hook callback 以原地修改工作表为用法；此处调用没有使用 callback 返回值替换表。",
+          "review_note": "TaskSet 指定 Hook、Any、字段写 self、Level 指定 Hook、Any 顺序成立；消费者未读取 callback 返回值。额外注意源码在两个 TaskSet Hook 后才 assert task_set_data 非 nil，候选未声称相反顺序。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S016",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 9,
+              "line_end": 17,
+              "range_sha256": "0487f09d60fd15c8594e85a8b1dc467ef885b2909a796f5af755135c70cd83cd"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C04",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "ChooseTasks 对 self.tasks 逐个 EnqueueATask（deepcopy 查到的 Task），然后 ApplyModsToTasks 只遍历此时 tasklist；之后才按 numoptionaltasks 从原地 shuffle 的 optionaltasks 加入可选 Task，最后应用替换并保存 chosen_tasks。本函数该路径没有对之后入队的可选 Task 再调用 ApplyModsToTasks。",
+          "review_note": "完整 ChooseTasks 与 ApplyModsToTasks/EnqueueATask 已独立通读：主任务 deepcopy 入队，执行 Hook，再 shuffle optionaltasks 并入队，随后 overrides/chosen_tasks；本路径没有第二次 ApplyModsToTasks。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S020",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 219,
+              "line_end": 227,
+              "range_sha256": "accd837144d06baa3c1c73b52464c0d39f5460d18b473d5d44b56f5f0911aec5"
+            },
+            {
+              "id": "WG-S019",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 43,
+              "line_end": 53,
+              "range_sha256": "0786dbc2290fd88539d034a20f0dd780149c2159f04315a06de2bc9506b380b8"
+            },
+            {
+              "id": "WG-S025",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 864,
+              "line_end": 871,
+              "range_sha256": "4bd05a1e00d84170bb0327e311fec35de6cc18961d37501b779a2c995b878a9b"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C05",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Story:GetRoom 对查询结果 deepcopy；缺失返回 nil，否则写 name、补 type，调用 RoomPreInit，再返回副本。GenerateNodesFromTask 对 room_choices 的函数 count 无参求值，并每个循环独立 GetRoom；缺失房间 assert，contents.fn 在 Hook 后执行，contents 随后成为节点 terrain_contents。",
+          "review_note": "GetRoom 先 deepcopy，再 name/type，再 ModRoom；room_choices 函数无参调用，每次循环重新请求副本。contents.fn 在 RoomPreInit 后，后续 terrain_contents 直接引用副本 contents。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            },
+            {
+              "id": "WG-S023",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1311,
+              "line_end": 1350,
+              "range_sha256": "da4ae84f158f5d1fb57a080b92c409c550cadc8b40b86cea82b886130fddd441"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C06",
+          "kind": "EI",
+          "status": "supported_bounded_inference",
+          "statement": "上述 deepcopy 递归复制 table 并保留原 metatable，非 table 直接返回，因此这些副本不等于所有外部状态隔离：函数及函数闭包状态仍共享，回调写 GLOBAL 或新塞入外部共享表仍可能跨房间/任务影响。TaskSet 字段覆盖 self 也不等于递归合并既有字段。",
+          "review_note": "deepcopy 对非 table 原样返回、递归 table 且重用 metatable；函数和闭包状态不隔离的推理成立。字段写 self 为赋值，不是递归 merge。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S024",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 904,
+              "line_end": 920,
+              "range_sha256": "43c0b69d8562b0adb6b3a78990cd6361283255683d2267fa9ebd44de92d62226"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S015",
+              "source_file": "scripts/map/task.lua",
+              "file_sha256": "f0bc60e0cbee3f6b5c13a0c7b65d749465e2d72d5330a85123556675c3b00288",
+              "line_start": 1,
+              "line_end": 40,
+              "range_sha256": "65011b39564f0bccb5fd90324af86a60ae9557f217791626e7f1add3dfad6209"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C07",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "原版 default TaskSet 的 tasks 含 Make a pick；该 Task 的 Forest 数量函数为 1+math.random(SIZE_VARIATION)，并配置 background_room=BGGrass；Forest Room 的 value 使用 WORLD_TILES.FOREST，contents 同时有 countprefabs 和 distributeprefabs。此参照说明名字逐层关联，不是仅 AddRoom 即加入默认地图。",
+          "review_note": "已对照 default -> Make a pick -> Forest 完整示例字段，函数数量、background_room、WORLD_TILES.FOREST/countprefabs/distributeprefabs 均成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S026",
+              "source_file": "scripts/map/tasksets/forest.lua",
+              "file_sha256": "1d0cf156eab56cc385fd08241ea514f4c9146df95d22ffdb19302b253be348a4",
+              "line_start": 2,
+              "line_end": 78,
+              "range_sha256": "8f281f14df6b4528b6bd3cd8e935024c9de611675f2d5ef15d8c5530f39b5b69"
+            },
+            {
+              "id": "WG-S027",
+              "source_file": "scripts/map/tasks/dst_tasks_forestworld.lua",
+              "file_sha256": "0a6b04c7e4227954c43a3d5d5d67e0cd608868c4be1ac297b2ca69c82778542a",
+              "line_start": 8,
+              "line_end": 20,
+              "range_sha256": "e7cec0b0bf8e8987d2d9e54bdf4cba764186e36f0fcbdf259ea1e8fb75b0b447"
+            },
+            {
+              "id": "WG-S028",
+              "source_file": "scripts/map/rooms/forest/terrain_forest.lua",
+              "file_sha256": "fe120a60e41b0412345ecdbdf06b9ca955456a98291f6542382661f171a9f019",
+              "line_start": 155,
+              "line_end": 181,
+              "range_sha256": "db30550766bef85de32d5c0232b408850f4110d86e5c1e8789e24afe85027aea"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C08",
+          "kind": "REC",
+          "status": "reasonable_recommendation",
+          "statement": "新增定义用唯一名称并明确加入选中的 Task/TaskSet；改既有定义选窄 Hook。需要覆盖可选 Task 时先核对此快照消费顺序并另设计受控接入，不把 AddTaskPreInit 注册成功当成所有同名任务实例都已修改。保留各层必要子表，按实际覆盖语义增量修改。",
+          "review_note": "唯一注册名、窄 Hook 和可选 Task 顺序提醒都有直接源码依据；建议未承诺任意 Mod 组合安全。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S013",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 5,
+              "line_end": 37,
+              "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S026",
+              "source_file": "scripts/map/tasksets/forest.lua",
+              "file_sha256": "1d0cf156eab56cc385fd08241ea514f4c9146df95d22ffdb19302b253be348a4",
+              "line_start": 2,
+              "line_end": 78,
+              "range_sha256": "8f281f14df6b4528b6bd3cd8e935024c9de611675f2d5ef15d8c5530f39b5b69"
+            },
+            {
+              "id": "WG-S027",
+              "source_file": "scripts/map/tasks/dst_tasks_forestworld.lua",
+              "file_sha256": "0a6b04c7e4227954c43a3d5d5d67e0cd608868c4be1ac297b2ca69c82778542a",
+              "line_start": 8,
+              "line_end": 20,
+              "range_sha256": "e7cec0b0bf8e8987d2d9e54bdf4cba764186e36f0fcbdf259ea1e8fb75b0b447"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-002-C09",
+          "kind": "UNK",
+          "status": "boundary_retained",
+          "statement": "未运行地图生成；未证明锁钥/区域的 native 生成可达性、所有 seed 连通、Mod 组合顺序兼容或异常后恢复。本卡也未完整研究背景房间、洞穴/事件地图分支及所有后续 overrides 的影响。",
+          "review_note": "仅保留未运行/native/背景/洞穴/事件/后续覆盖等边界，无须强行解决候选明确未覆盖行为。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S050",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 491,
+              "line_end": 506,
+              "range_sha256": "22b92ea9608550a4e884e76d2c58c55a1bbffaac14f0a147d0873477a1bd5d0a"
+            },
+            {
+              "id": "WG-S047",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 402,
+              "line_end": 439,
+              "range_sha256": "6b031c1036b1df19819573299cfc8b57ffcaad22f70ee972eec23b827f36a0c7"
+            },
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "env.AddRoom",
+          "input_pointer": "/entries/1/api_contracts/0",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "wrapper 无 return；AddModRoom 保存/改写 data，重名错误路径无插入。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S013",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 5,
+              "line_end": 37,
+              "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTask",
+          "input_pointer": "/entries/1/api_contracts/1",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "wrapper 无 return；AddModTask 用 Task 构造，注册时并非 deepcopy 任意 data 字段。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S014",
+              "source_file": "scripts/map/tasks.lua",
+              "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+              "line_start": 28,
+              "line_end": 70,
+              "range_sha256": "a716f5afbc965241d4ca9d36d0cdab8baa022c642ce974ad1189f8e8b01286ec"
+            },
+            {
+              "id": "WG-S015",
+              "source_file": "scripts/map/task.lua",
+              "file_sha256": "f0bc60e0cbee3f6b5c13a0c7b65d749465e2d72d5330a85123556675c3b00288",
+              "line_start": 1,
+              "line_end": 40,
+              "range_sha256": "65011b39564f0bccb5fd90324af86a60ae9557f217791626e7f1add3dfad6209"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSet",
+          "input_pointer": "/entries/1/api_contracts/2",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "wrapper 无 return；保存 data、补 location；消费时另 deepcopy。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S017",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 55,
+              "line_end": 71,
+              "range_sha256": "a1d059bfe54e8acdda3fdd420097a47d1efabed8b7bddb531fdd58e0228d7f35"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddRoomPreInit",
+          "input_pointer": "/entries/1/api_contracts/3",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "按名追加、GetPostInitFns 按 enabledmods/注册序包装；每次 GetRoom 副本后调用并忽略返回值。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTaskPreInit",
+          "input_pointer": "/entries/1/api_contracts/4",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "按名追加；已限定 ChooseTasks 主任务批处理，正确避免承诺可选任务也经 Hook。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S019",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 43,
+              "line_end": 53,
+              "range_sha256": "0786dbc2290fd88539d034a20f0dd780149c2159f04315a06de2bc9506b380b8"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSetPreInit",
+          "input_pointer": "/entries/1/api_contracts/5",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "TaskSet 副本上原地 Hook，发生在写入 Level 前，无返回值替换。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S016",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 9,
+              "line_end": 17,
+              "range_sha256": "0487f09d60fd15c8594e85a8b1dc467ef885b2909a796f5af755135c70cd83cd"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTaskSetPreInitAny",
+          "input_pointer": "/entries/1/api_contracts/6",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "Any 紧随指定 TaskSet Hook，回调与注册均不提供替换返回契约。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddLevelPreInit",
+          "input_pointer": "/entries/1/api_contracts/7",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "TaskSet 字段写 Level 后，主任务入队前调用。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddLevelPreInitAny",
+          "input_pointer": "/entries/1/api_contracts/8",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "指定 Level Hook 后调用，按当前 self.id 等状态消费。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S006",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 237,
+              "line_end": 281,
+              "range_sha256": "19c08a67525514a0b19a8b84cd1f71f6b87d80389b4eb04418d8e164261e1474"
+            },
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S011",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 818,
+              "line_end": 838,
+              "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb"
+            },
+            {
+              "id": "WG-S012",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 153,
+              "line_end": 166,
+              "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619"
+            }
+          ]
+        },
+        {
+          "symbol": "Story:GetRoom(roomname)",
+          "input_pointer": "/entries/1/api_contracts/9",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "类方法 receiver 契约正确；缺定义返回 nil，成功复制并调用 Hook 后返回。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S024",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 904,
+              "line_end": 920,
+              "range_sha256": "43c0b69d8562b0adb6b3a78990cd6361283255683d2267fa9ebd44de92d62226"
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "status": "supported_static_in_bounded_scope",
+          "description": "入口经环境 wrapper 把定义注册到所属 Mod 的容器；重名被拒绝。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S007",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 294,
+              "line_end": 305,
+              "range_sha256": "9b85d19faaead7bf9650b6d50519fff3ced2c651ec9e6fcd80f16e2dcb32a5fc"
+            },
+            {
+              "id": "WG-S013",
+              "source_file": "scripts/map/rooms.lua",
+              "file_sha256": "64798f990da39077e2680282f0c6778b17e505a06ae0f122a486d8f2f4db5597",
+              "line_start": 5,
+              "line_end": 37,
+              "range_sha256": "4d206d40d9f0826a90986ba227bc730ccb9998464ceca3acf0a195e613e31cf4"
+            },
+            {
+              "id": "WG-S014",
+              "source_file": "scripts/map/tasks.lua",
+              "file_sha256": "daaa655d0ea186b853696c905161ca74dce80101677f9377d5d6af791ca15544",
+              "line_start": 28,
+              "line_end": 70,
+              "range_sha256": "a716f5afbc965241d4ca9d36d0cdab8baa022c642ce974ad1189f8e8b01286ec"
+            },
+            {
+              "id": "WG-S017",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 55,
+              "line_end": 71,
+              "range_sha256": "a1d059bfe54e8acdda3fdd420097a47d1efabed8b7bddb531fdd58e0228d7f35"
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "status": "supported_static_in_bounded_scope",
+          "description": "Level 选择 task_set 副本，依次执行 TaskSet/Any Hook、字段覆盖、Level/Any Hook。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S016",
+              "source_file": "scripts/map/tasksets.lua",
+              "file_sha256": "8ee6f0c9cfee9796277db993243bb8758805aea13bb08d90dea9a71333bbd292",
+              "line_start": 9,
+              "line_end": 17,
+              "range_sha256": "0487f09d60fd15c8594e85a8b1dc467ef885b2909a796f5af755135c70cd83cd"
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "status": "supported_static_in_bounded_scope",
+          "description": "主任务复制入队并 TaskPreInit；可选任务随后从 shuffle 的列表复制入队；后续替换后写 chosen_tasks。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S018",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 89,
+              "line_end": 150,
+              "range_sha256": "580f866bccfa458440cc79a3d9af09896d6baf67b033f740b729653c112baf87"
+            },
+            {
+              "id": "WG-S020",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 219,
+              "line_end": 227,
+              "range_sha256": "accd837144d06baa3c1c73b52464c0d39f5460d18b473d5d44b56f5f0911aec5"
+            },
+            {
+              "id": "WG-S019",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 43,
+              "line_end": 53,
+              "range_sha256": "0786dbc2290fd88539d034a20f0dd780149c2159f04315a06de2bc9506b380b8"
+            },
+            {
+              "id": "WG-S025",
+              "source_file": "scripts/util.lua",
+              "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+              "line_start": 864,
+              "line_end": 871,
+              "range_sha256": "4bd05a1e00d84170bb0327e311fec35de6cc18961d37501b779a2c995b878a9b"
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "status": "supported_static_in_bounded_scope",
+          "description": "worldgen_main 将 chosen_tasks 交 forest_map.Generate，BuildStory 创建 Story 并运行 GenerationPipeline；Story 按 region 分组，区域构建再请求各 Task 的节点。每个目标 Room 经复制及 RoomPreInit，contents 进入 Node，Graph:AddNodeByNode 将节点交 WorldSim:AddChild。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S047",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 402,
+              "line_end": 439,
+              "range_sha256": "6b031c1036b1df19819573299cfc8b57ffcaad22f70ee972eec23b827f36a0c7"
+            },
+            {
+              "id": "WG-S050",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 491,
+              "line_end": 506,
+              "range_sha256": "22b92ea9608550a4e884e76d2c58c55a1bbffaac14f0a147d0873477a1bd5d0a"
+            },
+            {
+              "id": "WG-S048",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1395,
+              "line_end": 1409,
+              "range_sha256": "e45acf88332f5073f1ce9f0fa523bda8a38075854592e2e43fc6a25dff06299f"
+            },
+            {
+              "id": "WG-S049",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 86,
+              "line_end": 96,
+              "range_sha256": "10cc60841fb66f2471f138252205ad44b169d7efe0f9e13abce3a4f555914f07"
+            },
+            {
+              "id": "WG-S068",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 49,
+              "line_end": 84,
+              "range_sha256": "03d6f2d7f7a28dcad5f04b32f5be7a01e8689ea9157ed2f9ec37a914525ca790"
+            },
+            {
+              "id": "WG-S067",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 849,
+              "line_end": 914,
+              "range_sha256": "a497824916ecc40a28ab803d185de05a4480fe1eea358853104b329a77dd44e6"
+            },
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            },
+            {
+              "id": "WG-S021",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 98,
+              "line_end": 116,
+              "range_sha256": "c5eb3a367abd1a410343587a55efeb473e240e1c8d100d18d8736b61c42299e3"
+            },
+            {
+              "id": "WG-S023",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1311,
+              "line_end": 1350,
+              "range_sha256": "da4ae84f158f5d1fb57a080b92c409c550cadc8b40b86cea82b886130fddd441"
+            },
+            {
+              "id": "WG-S066",
+              "source_file": "scripts/map/network.lua",
+              "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+              "line_start": 425,
+              "line_end": 477,
+              "range_sha256": "e9d66bb5f445386975ded1ac05e23c754fc93b7dd07868960909f07d74c57233"
+            }
+          ]
+        }
+      ],
+      "compatibility_review": {
+        "dependency_coverage": "unknown",
+        "reason": "候选没有可选 compatibility 对象；按 CONTROL 解释为 unknown。局部 evidence_refs 可导航，但不是静态/动态依赖闭包。",
+        "tool_availability": "不得因后续源码变化全局禁用旧知识阅读或新源码导航；只标受影响契约待复核。"
+      }
+    },
+    {
+      "entry_id": "EXP-WG-003",
+      "title": "Room 内容的每节点计数、分布与存档记录边界",
+      "status": "bounded_static_review_pass",
+      "scope_review": "静态 scope 与未运行边界保留；不授予 Coding 准入或 native 完整性。",
+      "claims": [
+        {
+          "claim_id": "EXP-WG-003-C01",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "PopulateVoronoi 对已 populated、不可通过地皮、没有 count/distribute 内容或无点位返回；以 WorldSim:GetPointsForSite 返回的 #points_x 作为此处 area。countprefabs 的函数以 (area,prefab,scratchpad) 调用；scratchpad 是本次节点填充内共享表，与 countstaticlayouts 的 scratchpad 分开。目标总数超过点位数 floor 比较时，整个本次填充直接返回。",
+          "review_note": "守卫、#points_x 作为 area、count 函数三个实参、节点内 scratchpad、floor(pos_needed) 早退均成立。这里的 area 与 ConvertGround 使用 GetSiteArea 的 area 不同。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S037",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 247,
+              "line_end": 279,
+              "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C02",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "countprefabs_uses_filters 分支从末点向前，调用 pickspawncountprefabforground 并减少对应目标；点位耗尽会返回，遍历后仍有目标会打印未能放置警告。非过滤分支按目标循环调用 AddEntity，越界可 break/return。这里不提供“全世界精确数量”的返回契约。",
+          "review_note": "过滤路径倒序扫描 picker 并消耗点位/目标数，耗尽直接 return；走出扫描后才逐剩余目标警告。非过滤路径每次 AddEntity 并按索引 break/return，未承诺成功数。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C03",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Node:AddEntity 先以 WorldSim:GetTile 取点位地皮，非 IsLandTile 直接返回；通过才调 PopulateWorld_AddEntity。后者预留 tile、转换为世界 x/z 并可随机偏移，构造保存记录、可执行 prefab_data.data()，追加 entitiesOut[prefab] 并更新 prefab_list；该函数没有调用 SpawnPrefab。",
+          "review_note": "Node:AddEntity 的 IsLandTile 守卫与 PopulateWorld_AddEntity 的 ReserveTile、坐标转换/随机偏移、保存记录、prefab_list 更新已核对；没有 SpawnPrefab。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C04",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "分布分支要求 distributepercent 和 distributeprefabs，先做 swap 解析/过滤，再对剩余点以 math.random()<distributepercent 门槛选 prefab；选中后仍经 AddEntity。distributepercent 的本次消费者是概率门槛，不能把它或 distributeprefabs 项数当绝对数量。",
+          "review_note": "两字段同时为真才进入分布分支，调用 swap/filter 后逐剩余点用随机门槛与 picker，再经 AddEntity。没有把概率或项数等同绝对数量。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S033",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 449,
+              "line_end": 495,
+              "range_sha256": "09c0ae483319e6745559f5086b8aff20b554aef8631a18a1d0e3157077a0d347"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C05",
+          "kind": "EI",
+          "status": "supported_bounded_inference",
+          "statement": "同名 Room 被多个节点请求时，各副本内容分别交给节点填充；即使每节点 countprefabs 某项为 N，也还受点位、过滤、地皮与后续生成流程影响。计数目标、保存记录数和最终运行中实体数是不同验收层次。",
+          "review_note": "每次 Room 副本到 Node 内容与每节点填充链成立，目标数/存档记录/载入后实体数的区分是有边界的工程推论。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            },
+            {
+              "id": "WG-S023",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1311,
+              "line_end": 1350,
+              "range_sha256": "da4ae84f158f5d1fb57a080b92c409c550cadc8b40b86cea82b886130fddd441"
+            },
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            },
+            {
+              "id": "WG-S047",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 402,
+              "line_end": 439,
+              "range_sha256": "6b031c1036b1df19819573299cfc8b57ffcaad22f70ee972eec23b827f36a0c7"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C06",
+          "kind": "REC",
+          "status": "reasonable_recommendation",
+          "statement": "先检查选中 Task/Room 次数及目标函数参数，再读点位不足/过滤日志，最后检查生成存档与实际加载后的实体数量。对函数 count 使用明确的非负整数规则并保持 scratchpad 的节点局部语义，不把一次静态读取作为多 seed 验证。",
+          "review_note": "参数、日志与存档/运行数量的分层验证建议适当；非负整数是建议，非声称原版自动验证。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-003-C07",
+          "kind": "UNK",
+          "status": "boundary_retained",
+          "statement": "原生点位的几何分布、每 seed 实际数量、最终存档载入的 prefab 成功率与联网表现未测试；本卡未展开 pickspawn* 和全局 swap 函数的全部过滤规则，故不声明某一 prefab 在所有地皮上的可放置性或精确权重公式。",
+          "review_note": "完整 picker/global swap 公式及 native 点位/最终加载行为明确未覆盖，不能外推某 prefab 的全部地皮适用性。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S033",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 449,
+              "line_end": 495,
+              "range_sha256": "09c0ae483319e6745559f5086b8aff20b554aef8631a18a1d0e3157077a0d347"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Node:PopulateVoronoi(spawnFn, entitiesOut, width, height, world_gen_choices, prefabDensities)",
+          "input_pointer": "/entries/2/api_contracts/0",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "内部 Node 方法，所有显式 return 都无结果；没有成功数量返回，点位/输出记录/密度等副作用准确。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S033",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 449,
+              "line_end": 495,
+              "range_sha256": "09c0ae483319e6745559f5086b8aff20b554aef8631a18a1d0e3157077a0d347"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        },
+        {
+          "symbol": "countprefabs[prefab](area, prefab, scratchpad)",
+          "input_pointer": "/entries/2/api_contracts/1",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "配置回调协议，area 为当前 #points_x；pairs 无项目固定顺序；数量未被统一归一化。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "status": "supported_static_in_bounded_scope",
+          "description": "Story 将每个 Room 副本 contents 接到节点 terrain_contents。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S022",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1233,
+              "line_end": 1289,
+              "range_sha256": "855b47a8808494f3fcb0ebebf0fc0c924e388e09b935e1acbd016cc185fedd01"
+            },
+            {
+              "id": "WG-S023",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 1311,
+              "line_end": 1350,
+              "range_sha256": "da4ae84f158f5d1fb57a080b92c409c550cadc8b40b86cea82b886130fddd441"
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "status": "supported_static_in_bounded_scope",
+          "description": "forest_map 调根图 PopulateVoronoi，Graph 遍历本层节点并递归子图；Node 做 populated/地皮/内容/点位守卫，再解析每节点目标数量。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S065",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 870,
+              "line_end": 873,
+              "range_sha256": "50aa10e41be58c39febb248ac1b4da88088826cdaf4067e28113d3975be1bfc9"
+            },
+            {
+              "id": "WG-S064",
+              "source_file": "scripts/map/network.lua",
+              "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+              "line_start": 729,
+              "line_end": 744,
+              "range_sha256": "1cdeb7141c071a13a3c38d5b534f27f00000509bafd0aa76a9f68a50d388045a"
+            },
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "status": "supported_static_in_bounded_scope",
+          "description": "计数分支经可选 picker 过滤，分布分支经概率与 picker，各自尝试 AddEntity。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S032",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 330,
+              "line_end": 427,
+              "range_sha256": "a0d2b7c48d0cda1e163229ac5c4ef7e9a574e5ec83492f83f3b4fbd636c6071a"
+            },
+            {
+              "id": "WG-S033",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 449,
+              "line_end": 495,
+              "range_sha256": "09c0ae483319e6745559f5086b8aff20b554aef8631a18a1d0e3157077a0d347"
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "status": "supported_static_in_bounded_scope",
+          "description": "AddEntity 再做陆地地皮检查，PopulateWorld_AddEntity 输出保存记录而非当场创建运行时 prefab。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        }
+      ],
+      "compatibility_review": {
+        "dependency_coverage": "unknown",
+        "reason": "候选没有可选 compatibility 对象；按 CONTROL 解释为 unknown。局部 evidence_refs 可导航，但不是静态/动态依赖闭包。",
+        "tool_availability": "不得因后续源码变化全局禁用旧知识阅读或新源码导航；只标受影响契约待复核。"
+      }
+    },
+    {
+      "entry_id": "EXP-WG-004",
+      "title": "静态布局的载入、集合分配、地皮映射与预留放置",
+      "status": "needs_small_revision",
+      "scope_review": "静态 scope 与未运行边界保留；不授予 Coding 准入或 native 完整性。",
+      "claims": [
+        {
+          "claim_id": "EXP-WG-004-C01",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "StaticLayout.Get 是模块导出的 ConvertStaticLayoutToLayout 别名，require(layoutsrc) 后直接使用 additionalProps or {} 作为返回表，覆盖 type/scale/layout_file/ground_types/ground/layout 字段；ground_types 是 GROUND_TYPES 的 shallowcopy。额外表不是先 deepcopy 后合并，调用方复用同一表会共享并被改写。",
+          "review_note": "Get 导出别名、additionalProps 身份、覆盖字段、ground_types shallowcopy 均准确；复用同表共享是直接后果，不是 deepcopy merge。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C02",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "loader 以 ceil(64/tilewidth) 对名为 BG_TILES 的 tilelayer 抽样生成 ground 索引；名含 FG_OBJECTS 的 objectgroup 经过 PrefabSwaps inactive/proxy 处理，将对象中心坐标除以 64 并减布局半尺寸，属性按点号分层，字符串 true/false 转布尔、可 tonumber 则转数值。initfn 在每个匹配对象层处理后调用。该代码不按任意 Tiled firstgid 或 flip bit 自动重映射。",
+          "review_note": "BG_TILES 抽样、FG_OBJECTS 名匹配、proxy 处理、对象中心坐标/尺寸、点号属性和布尔/数值转换、每匹配层 initfn 均成立；没有 firstgid/flip-bit 消费代码。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C03",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "原版 default TaskSet 给 ResurrectionStone 配 count=2 与允许 Task 名单；layouts 表用 StaticLayout.Get 载入 resurrectionstone。该参照 Lua 的 tilewidth=16、8×8 BG_TILES 与 FG_OBJECTS 含 resurrectionstone/pighead；地面非零索引 9 经 GROUND_TYPES 对应 WORLD_TILES.WOODFLOOR，不是运行时 tile ID 9 的承诺。",
+          "review_note": "default count=2/允许任务、Layouts 载入与 16px 8x8 源数据核验一致，非零索引 9 对应 GROUND_TYPES 第九项 WOODFLOOR；未把 9 当动态 tile ID。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S026",
+              "source_file": "scripts/map/tasksets/forest.lua",
+              "file_sha256": "1d0cf156eab56cc385fd08241ea514f4c9146df95d22ffdb19302b253be348a4",
+              "line_start": 2,
+              "line_end": 78,
+              "range_sha256": "8f281f14df6b4528b6bd3cd8e935024c9de611675f2d5ef15d8c5530f39b5b69"
+            },
+            {
+              "id": "WG-S044",
+              "source_file": "scripts/map/layouts.lua",
+              "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+              "line_start": 253,
+              "line_end": 274,
+              "range_sha256": "d58760b7d858c84f1fd44b6bc37bfa1ec882adf8f5c4f2a5a7544dd09f902a73"
+            },
+            {
+              "id": "WG-S046",
+              "source_file": "scripts/map/static_layouts/resurrectionstone.lua",
+              "file_sha256": "655bccfa9753b282a10f382c707f7daf79675e61b93024f66414ee66f6256cc8",
+              "line_start": 1,
+              "line_end": 113,
+              "range_sha256": "bd9a6288d3398615d0a8f37d1ea9aa50c8a07e25bde6f3874b12e3eb3e635c53"
+            },
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C04",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "ChooseSetPieces 将 set_pieces 的允许任务与 chosen_tasks 相交，count 缺省 1；无可选任务 assert，每次选中后从 choices 删除，直到 count<=0 或 choices 为空，将 {name,restrict_to} 追加到 Task。Story 的指定 set_pieces 分支过滤入口、背景限制、blank/不可通过节点，找不到时警告并 break；找到则赋 countstaticlayouts[name]=1，语义是赋值而非累加。",
+          "review_note": "指定 set_pieces 的交集、count 默认、选择后删除 Task 候选、无候选 assert 均准确；Story 过滤和无节点 break、countstaticlayouts[name]=1 非累加均成立。此结论不扩展到 random_set_pieces 分支。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S035",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 152,
+              "line_end": 217,
+              "range_sha256": "3b1050e91da857d97fc2fe8a3bea8bf9e6adc6ef79fa0dc6cefd3db94039888a"
+            },
+            {
+              "id": "WG-S036",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 222,
+              "line_end": 297,
+              "range_sha256": "b933b88cd70480ddd4e0dc9c805872b13b3bf6737591b343e7f78a78cefd42d9"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C05",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Node:ConvertGround 对 countstaticlayouts 的函数以 (WorldSim:GetSiteArea(self.id),布局名,scratchpad) 求 count 后循环 obj_layout.Convert；另处理 terrain_contents_extra.static_layouts。Convert 先 LayoutForDefinition 查多种注册表并 deepcopy，ConvertLayoutToEntitylist 处理 areas/defs 与静态/形状布局，再 ReserveAndPlaceLayout；未知布局名打印后返回 nil，会导致随后 entitylist assert。",
+          "review_note": "GetSiteArea/countstaticlayouts scratchpad 调用、额外 static_layouts、三步 Convert 和未知布局导致 ConvertLayoutToEntitylist(layout) 首行 assert 成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S037",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 247,
+              "line_end": 279,
+              "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54"
+            },
+            {
+              "id": "WG-S039",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 142,
+              "line_end": 181,
+              "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2"
+            },
+            {
+              "id": "WG-S040",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 184,
+              "line_end": 292,
+              "range_sha256": "68b816dd8b39f607530acd331e4e6031f13442728d0826b5e00bf8fdfed70484"
+            },
+            {
+              "id": "WG-S042",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 508,
+              "line_end": 521,
+              "range_sha256": "1ee92534fe00bce3a2e70da6fb5666c280c6debd68115ebf5f641de0c63a8cb1"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C06",
+          "kind": "NSF",
+          "status": "supported_with_side_effect_omission",
+          "statement": "ReserveAndPlaceLayout 默认 world=WorldSim，处理翻转、换轴及强制旋转；地面非零索引以 ground_types 映射。无 position 时传 tiles 给 world:ReserveSpace，rcx~=nil 才将变换后的实体交 add_entity.fn，失败只警告且无显式成功返回；有 position 时直接 SetTile 并使用指定坐标，不调用 ReserveSpace。函数还会写默认 mask/position 字段并可改 savedrotation。",
+          "review_note": "ReserveSpace/显式 position 的分支、地面映射、变换、mask 默认和 savedrotation 改写都成立。但条件性的 MakeSafeFromDisconnect 调用是重要地形副作用，当前事实/API摘要漏列，见 F002；native 具体效果依旧未知。",
+          "findings": [
+            "F002"
+          ],
+          "source_evidence": [
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S042",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 508,
+              "line_end": 521,
+              "range_sha256": "1ee92534fe00bce3a2e70da6fb5666c280c6debd68115ebf5f641de0c63a8cb1"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C07",
+          "kind": "EI",
+          "status": "supported_bounded_inference",
+          "statement": "count=2 只描述向可用 Task 分配的上限式尝试，不证明两座布局成功：Task 候选数、Room 候选、同名 countstaticlayouts 赋值及原生 ReserveSpace 都可能改变实际结果。显式 position 路径跳过预留也不能被当作碰撞/通路已验证。",
+          "review_note": "count=2 是分配/尝试边界而非最终两座；候选数量、同名赋值、节点过滤和预留失败均足以打破精确成功数量承诺。显式 position 跳过预留不证明碰撞安全。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S035",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 152,
+              "line_end": 217,
+              "range_sha256": "3b1050e91da857d97fc2fe8a3bea8bf9e6adc6ef79fa0dc6cefd3db94039888a"
+            },
+            {
+              "id": "WG-S036",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 222,
+              "line_end": 297,
+              "range_sha256": "b933b88cd70480ddd4e0dc9c805872b13b3bf6737591b343e7f78a78cefd42d9"
+            },
+            {
+              "id": "WG-S037",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 247,
+              "line_end": 279,
+              "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C08",
+          "kind": "REC",
+          "status": "reasonable_recommendation",
+          "statement": "以当前原版布局形状为参照，使用唯一布局键并明确接入 TaskSet/Room；给 StaticLayout.Get 每次传新额外属性表，检查被覆盖字段。检查 Tiled 索引、层名、尺寸和坐标，再用隔离新世界与多 seed 验证数量、海岸/路径、碰撞和小地图。",
+          "review_note": "传新 additionalProps 表、检查覆盖字段/索引/层结构及多 seed 运行验证建议与静态链路一致。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S046",
+              "source_file": "scripts/map/static_layouts/resurrectionstone.lua",
+              "file_sha256": "655bccfa9753b282a10f382c707f7daf79675e61b93024f66414ee66f6256cc8",
+              "line_start": 1,
+              "line_end": 113,
+              "range_sha256": "bd9a6288d3398615d0a8f37d1ea9aa50c8a07e25bde6f3874b12e3eb3e635c53"
+            },
+            {
+              "id": "WG-S039",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 142,
+              "line_end": 181,
+              "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2"
+            },
+            {
+              "id": "WG-S035",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 152,
+              "line_end": 217,
+              "range_sha256": "3b1050e91da857d97fc2fe8a3bea8bf9e6adc6ef79fa0dc6cefd3db94039888a"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-004-C09",
+          "kind": "UNK",
+          "status": "boundary_retained",
+          "statement": "未在游戏内生成；ReserveSpace、SetTile、MakeSafeFromDisconnect 的 native 实现与最终地形连通未由这些 Lua 证明。未验证矩形/非标准 tilewidth、新 Tiled 导出、area 占位组合、海洋布局和任意 count 的可用性；静态解析通过不等于布局落位成功。",
+          "review_note": "未运行边界准确；MakeSafeFromDisconnect 的 native 内部未知不妨碍确认 Lua 的条件调用，F002 只要求补此已知调用。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S047",
+              "source_file": "scripts/worldgen_main.lua",
+              "file_sha256": "de3042bcb034bc4e47ef9d1d161006ff4d3d52f95e02059902989710cab4f64d",
+              "line_start": 402,
+              "line_end": 439,
+              "range_sha256": "6b031c1036b1df19819573299cfc8b57ffcaad22f70ee972eec23b827f36a0c7"
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "require(\"map/static_layout\").Get(layoutsrc, additionalProps)",
+          "input_pointer": "/entries/3/api_contracts/0",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "local 函数经返回表 Get 导出；返回表身份、原地覆盖、source require、initfn 副作用准确。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S044",
+              "source_file": "scripts/map/layouts.lua",
+              "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+              "line_start": 253,
+              "line_end": 274,
+              "range_sha256": "d58760b7d858c84f1fd44b6bc37bfa1ec882adf8f5c4f2a5a7544dd09f902a73"
+            }
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").LayoutForDefinition(name, choices)",
+          "input_pointer": "/entries/3/api_contracts/1",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "local 经模块返回表导出；库查找/deepcopy/name、maze choices 路径、缺项 nil 准确。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S039",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 142,
+              "line_end": 181,
+              "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2"
+            },
+            {
+              "id": "WG-S043",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 549,
+              "line_end": 557,
+              "range_sha256": "5b4f42a19094188531136b099b744c8593aab48683c8b5bf69c2e2f3757e6fc4"
+            }
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").Convert(node_id, item, addEntity)",
+          "input_pointer": "/entries/3/api_contracts/2",
+          "status": "needs_side_effect_supplement",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "local 经模块返回表导出；三步内部调用、无显式返回、预留失败日志成立；需补 SafeFromDisconnect 条件副作用（F002）。",
+          "findings": [
+            "F002"
+          ],
+          "source_evidence": [
+            {
+              "id": "WG-S042",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 508,
+              "line_end": 521,
+              "range_sha256": "1ee92534fe00bce3a2e70da6fb5666c280c6debd68115ebf5f641de0c63a8cb1"
+            },
+            {
+              "id": "WG-S039",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 142,
+              "line_end": 181,
+              "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2"
+            },
+            {
+              "id": "WG-S040",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 184,
+              "line_end": 292,
+              "range_sha256": "68b816dd8b39f607530acd331e4e6031f13442728d0826b5e00bf8fdfed70484"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S037",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 247,
+              "line_end": 279,
+              "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54"
+            }
+          ]
+        },
+        {
+          "symbol": "require(\"map/object_layout\").Place(position, item, addEntity, choices, world)",
+          "input_pointer": "/entries/3/api_contracts/3",
+          "status": "needs_side_effect_supplement",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "local 导出且无显式返回；非 nil 有效 position 下直接写地并跳过 ReserveSpace，坐标翻转成立；需补 SafeFromDisconnect 条件副作用（F002）。",
+          "findings": [
+            "F002"
+          ],
+          "source_evidence": [
+            {
+              "id": "WG-S042",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 508,
+              "line_end": 521,
+              "range_sha256": "1ee92534fe00bce3a2e70da6fb5666c280c6debd68115ebf5f641de0c63a8cb1"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S043",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 549,
+              "line_end": 557,
+              "range_sha256": "5b4f42a19094188531136b099b744c8593aab48683c8b5bf69c2e2f3757e6fc4"
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "status": "supported_static_in_bounded_scope",
+          "description": "原版将静态源模块转换成布局表并在 Layouts 中以键暴露。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S044",
+              "source_file": "scripts/map/layouts.lua",
+              "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+              "line_start": 253,
+              "line_end": 274,
+              "range_sha256": "d58760b7d858c84f1fd44b6bc37bfa1ec882adf8f5c4f2a5a7544dd09f902a73"
+            },
+            {
+              "id": "WG-S045",
+              "source_file": "scripts/map/layouts.lua",
+              "file_sha256": "84c144ead485ad42107d07fb742b5c833bb13ac0b512ee4c6f710062b75cedbc",
+              "line_start": 1395,
+              "line_end": 1395,
+              "range_sha256": "1e9ccd745390b2f8f16707c68bca9b8e1d48fb246593250293f25f7cc454b62d"
+            },
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S046",
+              "source_file": "scripts/map/static_layouts/resurrectionstone.lua",
+              "file_sha256": "655bccfa9753b282a10f382c707f7daf79675e61b93024f66414ee66f6256cc8",
+              "line_start": 1,
+              "line_end": 113,
+              "range_sha256": "bd9a6288d3398615d0a8f37d1ea9aa50c8a07e25bde6f3874b12e3eb3e635c53"
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "status": "supported_static_in_bounded_scope",
+          "description": "TaskSet 的 set_pieces 经 Level 选择 Task，再由 Story 选择 Room，将布局计数写入节点内容。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S026",
+              "source_file": "scripts/map/tasksets/forest.lua",
+              "file_sha256": "1d0cf156eab56cc385fd08241ea514f4c9146df95d22ffdb19302b253be348a4",
+              "line_start": 2,
+              "line_end": 78,
+              "range_sha256": "8f281f14df6b4528b6bd3cd8e935024c9de611675f2d5ef15d8c5530f39b5b69"
+            },
+            {
+              "id": "WG-S035",
+              "source_file": "scripts/map/level.lua",
+              "file_sha256": "c075a5aa11c91adf31362b70eb38afabc4d19cab316f4ea113978fb576ccce7c",
+              "line_start": 152,
+              "line_end": 217,
+              "range_sha256": "3b1050e91da857d97fc2fe8a3bea8bf9e6adc6ef79fa0dc6cefd3db94039888a"
+            },
+            {
+              "id": "WG-S036",
+              "source_file": "scripts/map/storygen.lua",
+              "file_sha256": "bd19fac0a53d12ecefeb15773849a3330850e03791cbbb6c75f18d37b1989b00",
+              "line_start": 222,
+              "line_end": 297,
+              "range_sha256": "b933b88cd70480ddd4e0dc9c805872b13b3bf6737591b343e7f78a78cefd42d9"
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "status": "supported_static_in_bounded_scope",
+          "description": "forest_map 调根 ConvertGround，Graph 获取包含子图的节点并转交；Node 按 countstaticlayouts 请求 object_layout.Convert。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S051",
+              "source_file": "scripts/map/forest_map.lua",
+              "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+              "line_start": 840,
+              "line_end": 844,
+              "range_sha256": "929c43f99400a0d2d68391fad4201d1a46883d8ce2e98836e236b399813086ef"
+            },
+            {
+              "id": "WG-S063",
+              "source_file": "scripts/map/network.lua",
+              "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+              "line_start": 681,
+              "line_end": 686,
+              "range_sha256": "897f67a2aad52295923ea9b6ec2f12a01b7124cdbeedef0246202add7a26cc6a"
+            },
+            {
+              "id": "WG-S069",
+              "source_file": "scripts/map/network.lua",
+              "file_sha256": "58d613269bd965b220a947b46bc38dda40527e2c4c9ba346f6dab297b95f9e55",
+              "line_start": 515,
+              "line_end": 532,
+              "range_sha256": "151816831538d1db47863d3877801891912ccfb732be5f6cb0ffb9794d9e2f62"
+            },
+            {
+              "id": "WG-S037",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 247,
+              "line_end": 279,
+              "range_sha256": "2d8ca0a94da6169e4a17cd60dc6d10ca13d2187cb553c8635f3f012c5b4c3b54"
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "status": "supported_static_in_bounded_scope",
+          "description": "布局库查找并复制定义，展开 areas/defs，转换为 prefab 点列表。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S039",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 142,
+              "line_end": 181,
+              "range_sha256": "789f17e30fcf277f7d8f33e2750f3fa089aa13783f13807c31523c0379e3bab2"
+            },
+            {
+              "id": "WG-S040",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 184,
+              "line_end": 292,
+              "range_sha256": "68b816dd8b39f607530acd331e4e6031f13442728d0826b5e00bf8fdfed70484"
+            }
+          ]
+        },
+        {
+          "step": 5,
+          "status": "supported_static_in_bounded_scope",
+          "description": "地面索引经 ground_types 映射，按无 position 预留或有 position 直接写地；成功分支回调生成保存记录。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        }
+      ],
+      "compatibility_review": {
+        "dependency_coverage": "unknown",
+        "reason": "候选没有可选 compatibility 对象；按 CONTROL 解释为 unknown。局部 evidence_refs 可导航，但不是静态/动态依赖闭包。",
+        "tool_availability": "不得因后续源码变化全局禁用旧知识阅读或新源码导航；只标受影响契约待复核。"
+      }
+    },
+    {
+      "entry_id": "EXP-WG-005",
+      "title": "地皮注册、动态 ID、定义表副作用与生成读取",
+      "status": "bounded_static_review_pass",
+      "scope_review": "静态 scope 与未运行边界保留；不授予 Coding 准入或 native 完整性。",
+      "claims": [
+        {
+          "claim_id": "EXP-WG-005-C01",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "env.AddTile 与 env.RegisterTileRange 在 worldgen/main 共用注入段；wrapper 先设 mod_protect_TileManager=false，调用 TileManager 后设 true，无显式返回，也没有 finally/受保护恢复分支。直接调用模块函数在保护为真时 assert；不能据此推定异常中断后保护已复原。",
+          "review_note": "wrapper 保护 false -> 调用 -> true 无 finally/xpcall；底层 assert 要求保护恰为 false。异常后的保护恢复没有源码保证。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S008",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 430,
+              "line_end": 438,
+              "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca"
+            },
+            {
+              "id": "WG-S053",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 5,
+              "line_end": 21,
+              "range_sha256": "6c801884638b236448b1067ba580a5e11133300f9cc5f6a63c9d78ec3e16e11d"
+            },
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C02",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "RegisterTileRange 将名称大写，要求 range_end-range_start>=256 且该名称未登记，保存 range_end+1；GetTileID 后续用数值 for 从 range_start 到这个保存的 range_end（含端点）找 INVERTED_WORLD_TILES 第一个空位。这两个函数本身没有执行区间重叠、分类归属或最大 tile ID 的综合验证。",
+          "review_note": "注册 upper 名、差>=256、保存 end+1；GetTileID 的 Lua 数值 for 含保存端点，准确。没有重叠/分类/最大 ID 的综合校验。不得按注释意图擅改实际端点语义。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S053",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 5,
+              "line_end": 21,
+              "range_sha256": "6c801884638b236448b1067ba580a5e11133300f9cc5f6a63c9d78ec3e16e11d"
+            },
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C03",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "AddTile 将 tile_name 和 tile_range 大写，tile_data 缺省 {}，验证范围已存在，取 ID 后先写 WORLD_TILES、INVERTED_WORLD_TILES、GROUND_NAMES；新名重名被拒，范围耗尽 error。旧 GROUND 路径仅在 allow_existing_GROUND_entry==true 且 old_static_id 一致有效时复用旧 ID，tiledefs 完成后关闭该许可。",
+          "review_note": "AddTile 先 uppercase 和验证范围，GetTileID 后先写三个映射；新名重名、耗尽、旧 GROUND 特许路径及 tiledefs 结束关闭许可均成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            },
+            {
+              "id": "WG-S059",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 1652,
+              "line_end": 1653,
+              "range_sha256": "96c8a541329b714fa5342720130b13f4d2f631d419d7a7409f7121e71cfd335b"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C04",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "可选 ground_tile_def/minimap_tile_def 由验证函数原地补路径/属性，要求 name/noise_texture；ground 增加多个地皮分类表标记和资产，minimap 增加小地图资产；turf_def 要 name 并补 anim/bank_build 后写 GroundTiles.turf。主 ID 表写入早于这些验证，故后续 assert 不提供事务回滚。",
+          "review_note": "Validate 函数会原地修改定义；映射早于 ground/minimap/turf 验证及登记，后续 assert 不回滚。地面分类表和资产、minimap 资产与 turf 写入均与分支一致。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S054",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 92,
+              "line_end": 124,
+              "range_sha256": "bea011528c17e4b87efa1d4e11dd49357c5bd88b63ba4b44803ac4e681634971"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C05",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "TileRanges 是 tiledefs 局部表，原版注册 LAND/NOISE/OCEAN/IMPASSABLE 字符串范围；FOREST 示例同时提供地面、小地图与 turf 定义。WORLD_TILES 初始仅有 INVALID，GetWorldTileMap 返回新映射并补未冲突 GROUND 旧名。GROUND 注释已标 deprecated。",
+          "review_note": "TileRanges 局部身份、四个预置字符串范围、FOREST 定义、WORLD_TILES 初始 INVALID、GetWorldTileMap 新表及 GROUND deprecated 注释均核实。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S057",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 77,
+              "line_end": 100,
+              "range_sha256": "aadc83942ddc8843ef48b096d5ebec91b39565bd05374d175d061ca158d34831"
+            },
+            {
+              "id": "WG-S058",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 597,
+              "line_end": 617,
+              "range_sha256": "8041588ee51fce0b3680c02dd9b370534c4561e910f4df134899a32122f5fb61"
+            },
+            {
+              "id": "WG-S060",
+              "source_file": "scripts/constants.lua",
+              "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+              "line_start": 789,
+              "line_end": 838,
+              "range_sha256": "64d6e722e173cf89a4787b72b4cecdd4cc2b232351f4fd91a24fb78e7ec7a7e7"
+            },
+            {
+              "id": "WG-S062",
+              "source_file": "scripts/constants.lua",
+              "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+              "line_start": 685,
+              "line_end": 695,
+              "range_sha256": "ade7d96a62e87f208773beed9de777db3ef5a75e57912f5b34aa4f3d5f4427b9"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C06",
+          "kind": "NSF",
+          "status": "supported_static",
+          "statement": "Forest Room 的 value 直接读取 WORLD_TILES.FOREST；静态布局用 ground_types 表映射后交 SetTile/ReserveSpace。Lua TileGroupManager 的陆地/海洋/不可通过/Noise 判断使用常量数值区间（及特例），不是从任意自定义范围名字自动推导分类。Node:AddEntity 还会以 IsLandTile 检查 tile。",
+          "review_note": "Forest value 和布局映射消费者已核对；IsLandTile/IsOceanTile/IsImpassableTile/IsNoiseTile 依数值常量和特例，不通过自定义 range_name 自动分类。Node:AddEntity 陆地守卫成立。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S028",
+              "source_file": "scripts/map/rooms/forest/terrain_forest.lua",
+              "file_sha256": "fe120a60e41b0412345ecdbdf06b9ca955456a98291f6542382661f171a9f019",
+              "line_start": 155,
+              "line_end": 181,
+              "range_sha256": "db30550766bef85de32d5c0232b408850f4110d86e5c1e8789e24afe85027aea"
+            },
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            },
+            {
+              "id": "WG-S060",
+              "source_file": "scripts/constants.lua",
+              "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+              "line_start": 789,
+              "line_end": 838,
+              "range_sha256": "64d6e722e173cf89a4787b72b4cecdd4cc2b232351f4fd91a24fb78e7ec7a7e7"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C07",
+          "kind": "EI",
+          "status": "supported_bounded_inference",
+          "statement": "动态 ID 取决于已占用表与登记顺序，裸硬编码 ID 不能表达自定义地皮身份；RegisterTileRange 成功也不足以证明水陆分类正确。地面定义、世界生成和运行端需要一致的名称/注册过程，静态代码不足以证明跨进程最终 ID、资产和旧档映射一致。",
+          "review_note": "首空闲 ID 与注册顺序有关，成功注册范围不证明分类。多环境名称/注册一致性是必要工程约束，但源码未被外推成跨进程实际验证。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            },
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            },
+            {
+              "id": "WG-S001",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 258,
+              "line_end": 320,
+              "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f"
+            },
+            {
+              "id": "WG-S002",
+              "source_file": "scripts/mods.lua",
+              "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+              "line_start": 526,
+              "line_end": 582,
+              "range_sha256": "d4504f9da8d56d77b3c1b9614b4ee0a5b07092e536c1c46005aea0f8c3cb86b0"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C08",
+          "kind": "REC",
+          "status": "reasonable_recommendation",
+          "statement": "经模组环境 AddTile 注册并读取 WORLD_TILES[大写唯一名]；优先选符合用途的既有范围，勿依赖旧教程空闲数值段。每个实际环境只登记一次，定义表按调用独立准备；先检查所有必需字段与资产，再验证新生成、存读档和客户端地皮表现。",
+          "review_note": "env wrapper、upper 名读取、既有范围、独立定义表及先检查字段/资产的建议成立；没有建议绕保护或使用旧空闲段。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S054",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 92,
+              "line_end": 124,
+              "range_sha256": "bea011528c17e4b87efa1d4e11dd49357c5bd88b63ba4b44803ac4e681634971"
+            },
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S057",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 77,
+              "line_end": 100,
+              "range_sha256": "aadc83942ddc8843ef48b096d5ebec91b39565bd05374d175d061ca158d34831"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-WG-005-C09",
+          "kind": "UNK",
+          "status": "boundary_retained",
+          "statement": "未运行地皮注册或资产加载；native 渲染、通行、网络、旧存档重映射、移除 Mod 后行为，以及跨 Mod 失败回滚未测试。本卡不提供可安全任意扩区、热注册地皮或通用填海系统的保证。",
+          "review_note": "native、客户端、旧档/卸载/回滚均明确未运行，未提供任意扩区、热注册或填海安全保证。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "env.RegisterTileRange(range_name, range_start, range_end)",
+          "input_pointer": "/entries/4/api_contracts/0",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "env wrapper 与模块局部导出身份正确；upper、差值约束、end+1、无返回/无异常恢复准确。模块导出另见 tilemanager.lua:296-299。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S053",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 5,
+              "line_end": 21,
+              "range_sha256": "6c801884638b236448b1067ba580a5e11133300f9cc5f6a63c9d78ec3e16e11d"
+            },
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            }
+          ]
+        },
+        {
+          "symbol": "env.AddTile(tile_name, tile_range, tile_data, ground_tile_def, minimap_tile_def, turf_def)",
+          "input_pointer": "/entries/4/api_contracts/1",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "wrapper 不传回返回值；ID 从 WORLD_TILES 查；可选定义原地修改、分阶段副作用与异常残留准确。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            },
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S054",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 92,
+              "line_end": 124,
+              "range_sha256": "bea011528c17e4b87efa1d4e11dd49357c5bd88b63ba4b44803ac4e681634971"
+            },
+            {
+              "id": "WG-S059",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 1652,
+              "line_end": 1653,
+              "range_sha256": "96c8a541329b714fa5342720130b13f4d2f631d419d7a7409f7121e71cfd335b"
+            }
+          ]
+        },
+        {
+          "symbol": "GetWorldTileMap()",
+          "input_pointer": "/entries/4/api_contracts/2",
+          "status": "supported_static",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "unknowns"
+          ],
+          "review_note": "全局函数按当时映射生成新表，旧 GROUND 需名称与反向 ID 都不冲突才补入，未误说为实时引用。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S060",
+              "source_file": "scripts/constants.lua",
+              "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+              "line_start": 789,
+              "line_end": 838,
+              "range_sha256": "64d6e722e173cf89a4787b72b4cecdd4cc2b232351f4fd91a24fb78e7ec7a7e7"
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "status": "supported_static_in_bounded_scope",
+          "description": "constants 建 ID 表及边界常量；tiledefs 注册局部 TileRanges 和原版地皮，结束后启保护并禁旧 GROUND 特许。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S060",
+              "source_file": "scripts/constants.lua",
+              "file_sha256": "ab881da26919ad04c25e307fe38b802ef177d8a4ab0c175d5634711437da3a72",
+              "line_start": 789,
+              "line_end": 838,
+              "range_sha256": "64d6e722e173cf89a4787b72b4cecdd4cc2b232351f4fd91a24fb78e7ec7a7e7"
+            },
+            {
+              "id": "WG-S057",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 77,
+              "line_end": 100,
+              "range_sha256": "aadc83942ddc8843ef48b096d5ebec91b39565bd05374d175d061ca158d34831"
+            },
+            {
+              "id": "WG-S058",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 597,
+              "line_end": 617,
+              "range_sha256": "8041588ee51fce0b3680c02dd9b370534c4561e910f4df134899a32122f5fb61"
+            },
+            {
+              "id": "WG-S059",
+              "source_file": "scripts/tiledefs.lua",
+              "file_sha256": "a98a917f32d17e82801449cd73ab3b3b6a81175dc6b152146da28efb1c6b74c3",
+              "line_start": 1652,
+              "line_end": 1653,
+              "range_sha256": "96c8a541329b714fa5342720130b13f4d2f631d419d7a7409f7121e71cfd335b"
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "status": "supported_static_in_bounded_scope",
+          "description": "Mod 环境 wrapper 临时开保护，TileManager 对名称/范围规范化，按空位分配 ID，写映射。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S052",
+              "source_file": "scripts/modutil.lua",
+              "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+              "line_start": 356,
+              "line_end": 376,
+              "range_sha256": "86de0cd701e006d3f2c612b8efb115120754e7988db88c3c28718259fb44699e"
+            },
+            {
+              "id": "WG-S053",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 5,
+              "line_end": 21,
+              "range_sha256": "6c801884638b236448b1067ba580a5e11133300f9cc5f6a63c9d78ec3e16e11d"
+            },
+            {
+              "id": "WG-S055",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 126,
+              "line_end": 145,
+              "range_sha256": "7b9cebd912400bc73f593bb85d096f6c3c554929cf96340721dec10a242c76f2"
+            },
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "status": "supported_static_in_bounded_scope",
+          "description": "按提供的可选定义写地面/小地图/turf/资产与属性分类；错误并非事务回滚。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S056",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 147,
+              "line_end": 210,
+              "range_sha256": "888bf50f91decfe65607c4af4b072f7c3c01cc8c2d22aadfc4a4d981765840a9"
+            },
+            {
+              "id": "WG-S054",
+              "source_file": "scripts/tilemanager.lua",
+              "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+              "line_start": 92,
+              "line_end": 124,
+              "range_sha256": "bea011528c17e4b87efa1d4e11dd49357c5bd88b63ba4b44803ac4e681634971"
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "status": "supported_static_in_bounded_scope",
+          "description": "Room 读取 WORLD_TILES 的值，布局读取 ground_types 映射；实际填充还经 TileGroupManager 的数值区间判断。",
+          "findings": [],
+          "source_evidence": [
+            {
+              "id": "WG-S028",
+              "source_file": "scripts/map/rooms/forest/terrain_forest.lua",
+              "file_sha256": "fe120a60e41b0412345ecdbdf06b9ca955456a98291f6542382661f171a9f019",
+              "line_start": 155,
+              "line_end": 181,
+              "range_sha256": "db30550766bef85de32d5c0232b408850f4110d86e5c1e8789e24afe85027aea"
+            },
+            {
+              "id": "WG-S038",
+              "source_file": "scripts/map/static_layout.lua",
+              "file_sha256": "d6b8e88899929d90123862831ccbb603cbbe9a8d4764757aa209c06bef40b872",
+              "line_start": 5,
+              "line_end": 125,
+              "range_sha256": "93e5a02922f4886141046b1578d688f389c04b87f7ec9c303554b4e577a1fb96"
+            },
+            {
+              "id": "WG-S041",
+              "source_file": "scripts/map/object_layout.lua",
+              "file_sha256": "cc67c02530ce2216ce57d92982e84c86b80afafdfe09a2813406befae3e4d136",
+              "line_start": 294,
+              "line_end": 487,
+              "range_sha256": "b7881a01b92a4d3070c09c59aeb54a3fc1b5fdb4fa94f2b3ea112e362e4fca90"
+            },
+            {
+              "id": "WG-S061",
+              "source_file": "scripts/tilegroups.lua",
+              "file_sha256": "95550a6c7939132c79a098f7370cdb445abe7085f0ea1a57b28367d5cf56edc0",
+              "line_start": 1,
+              "line_end": 62,
+              "range_sha256": "3b141ac464e704192830dcec6200cc00488f4f925f51c63ba2aaaf7343870d7f"
+            },
+            {
+              "id": "WG-S034",
+              "source_file": "scripts/map/graphnode.lua",
+              "file_sha256": "c3de73a8d33261afa6867fb38d8ccedfd795d1f1b85aca96af1964e2b6cce577",
+              "line_start": 188,
+              "line_end": 245,
+              "range_sha256": "1e58bd67fb381e6fd81def8f11bd24b8ed4303a05ff4c1e304efec3233098e06"
+            }
+          ]
+        }
+      ],
+      "compatibility_review": {
+        "dependency_coverage": "unknown",
+        "reason": "候选没有可选 compatibility 对象；按 CONTROL 解释为 unknown。局部 evidence_refs 可导航，但不是静态/动态依赖闭包。",
+        "tool_availability": "不得因后续源码变化全局禁用旧知识阅读或新源码导航；只标受影响契约待复核。"
+      }
+    }
+  ],
+  "uncovered_or_unresolved": [
+    "没有运行游戏、模组加载、注册函数、任何地图 seed、专服或客机；无 runtime PASS。",
+    "未展开 picker/global swap 的全部规则、背景/洞穴/海洋/事件所有分支、锁钥/native 拓扑、跨 Mod 顺序、旧档和资产最终表现；候选已限制，不将这些未知当作事实错误。",
+    "候选 compatibility 缺省为 dependency_coverage=unknown；未证明列出的引用构成依赖闭包；本次不验收作者 compare 工具的新版本兼容能力。",
+    "未直接在 759671 以外的真实官方归档复核；研究版本绑定证据，不能作为知识工具永久硬门槛。",
+    "F001/F002 未在作者候选内改动；由总控/作者修订后比较并复核相关差异。"
+  ],
+  "writes_scope": "local-private-artifact/worldgen",
+  "external_changes_performed": false,
+  "canonical_or_installation_changes": false,
+  "supplemental_source_references": [
+    {
+      "id": "REVIEW-S001",
+      "source_file": "scripts/map/forest_map.lua",
+      "line_start": 853,
+      "line_end": 868,
+      "file_sha256": "68075b1f10ca20a3dd60ced960bd4fe6d9b15f89c098a598da9e0af718737d5b",
+      "range_sha256": "2162b96cbf0407d93512c7964f0119e76a2f6b5178596fd2bbc4e4eccd84e9d1",
+      "role": "布局 SafeFromDisconnect 后续 DetectDisconnect/ClearSafeFromDisconnect 调用生命周期；860 失败提前 return nil 会跳过 868 清理，不证明所有路径清理或 native 效果"
+    },
+    {
+      "id": "REVIEW-S002",
+      "source_file": "scripts/tilemanager.lua",
+      "line_start": 296,
+      "line_end": 312,
+      "file_sha256": "68d319fbbb5c5cf11957750e4080e721a89a19ee263f16ce9b3e88720d1e6142",
+      "range_sha256": "5b64939ebd58ef6c0c953437aeb8b75bce0a09debec38e08f384ce91f3acee13",
+      "role": "TileManager 的局部实现经模块返回表导出的身份"
+    },
+    {
+      "id": "REVIEW-S003",
+      "source_file": "scripts/modutil.lua",
+      "line_start": 178,
+      "line_end": 193,
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "range_sha256": "80206863be4e9fd798d47b732cecdd273d9baee85ff2f45061094c92d4be7c7d",
+      "role": "InsertPostInitFunctions 局部函数与 env.postinitfns 初始化"
+    }
+  ],
+  "publication_derivative": {
+    "schema": "dst-public-review-derivative/1",
+    "original_review_sha256": "776d03f05b5e1bef9610362e7fc417c2065c02149288773fb0014402449e9e89",
+    "redacted_fields": [
+      {
+        "pointer": "/input/path",
+        "original_value_sha256": "bc8c2eb409ba5cb2098e19bd46e085e54132be1679aed558561f673fbaec610b"
+      },
+      {
+        "pointer": "/source/archive_path",
+        "original_value_sha256": "ff2313e84e9accf681365c03400d2faf7ddd5e9690c89712fc79cf85f1cbf7aa"
+      },
+      {
+        "pointer": "/writes_scope",
+        "original_value_sha256": "73a466bb5c9d4fe4ae296c8c51d461467f11433a5d03eccb0867abf19bd68b8c"
+      }
+    ],
+    "policy": "Workstation paths removed; prior-review references rebound to public derivatives. Candidate/source commitments and review findings retained."
+  }
+}

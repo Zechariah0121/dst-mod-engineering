@@ -5,7 +5,9 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 当前 187 条公开知识（64 基础 + 13 Native AI + 110 Core）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
+当前版本：`v2026.10.27.1`；统一目录 210 条，其中独立机制研究族 23 条，保持 `research/restricted/hold`。
+
+面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
 当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
 
@@ -28,11 +30,11 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 工程知识库检索
 
-实质性设计、实现、审查、排错和研究按任务查库；简单机械编辑无需重复检索。优先使用当前会话实际接通的现代 MCP；没有服务时，先用 `knowledge/CATALOG.json` 的 187 条统一目录定位相关 ID，再按条目的 `file` 和 `pointer` 读取少量记录，报告实际记录 ID 与“文件读取”，不默认注入全库。目录是导航，不等于事实与证据已读。
+实质性设计、实现、审查、排错和研究按任务查库；简单机械编辑无需重复检索。优先使用当前会话实际接通的现代 MCP；没有服务时，先用 `knowledge/CATALOG.json` 的统一登记目录定位相关 ID，再按条目的 `file` 和 `pointer` 读取少量记录，报告实际记录 ID 与“文件读取”，不默认注入全库。目录是导航，不等于事实与证据已读。
 
 13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
 
-完整九工具 MCP 用一份合法持有、匹配当前支持快照 `759671` 的 `scripts.zip` 运行来源准备，再以 `--mode full` 或默认 `auto` 接入，不需要旧版源码。历史比较材料保留原来源标记，显式按 `metadata_only` 阅读，不当作已读的当前源码证据；未来版本需另做源码对照。工具集启动时固定，准备后重启已连接的目录会话才能切换。`auto` 仅在来源未准备时提供两工具目录模式；已准备缓存损坏或包版本变化时报错。目录模式用 `search_catalog` 导航、用 `read_public_entry` 显式按 `purpose="review"` 审阅，不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不代表运行验证，Core Coding HOLD 不变。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
+完整九工具 MCP 的来源准备面向一份合法持有的 `760178 / build 26230496 scripts.zip`，不需要旧版源码；`source_epoch=759671` 仍表示保留的证据基线，不把全库结论升级为 760178。核心必需来源槽严格校验；机制研究逐引用报告文件/范围匹配、变化或缺失，来源缺口保留未知，不封锁其他研究条目的阅读，也不解除 Coding HOLD。历史比较材料以 `metadata_only` 保留原来源标记，不作为已读当前源码证据；未来版本另做源码对照。工具集启动时固定，准备后重启已连接的目录会话才能切换。`auto` 对来源未准备或 `PACKAGE_CHANGED`，先核验公开文件清单再进入两工具审阅并报告原因；缓存损坏、无效激活及公开数据不可信仍报错，`full` 保持严格。`run_kb.py maintain-sources` 可独立定位任意明确新版 ZIP 和生成局部复核清单，见 [源码维护](docs/source-compatibility.md)。目录模式只提供导航与显式 `purpose="review"` 审阅，不提供 Coding 上下文或已恢复源码证据。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
 
 ## 按问题读取
 
@@ -42,7 +44,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 | 当前任务 | 参考文件 |
 |---|---|
-| 187 条知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
+| 登记知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
@@ -85,3 +87,5 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 能力、版本与未覆盖范围见 [公开限制](docs/public-limits.md)。
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
+
+独立原版机制研究族使用 `research/restricted/hold`，仅显式 Reviewer 研究请求或 ID 展开；Coding/default restricted 路径不注入。原子读取保留完整 Scope、顶层来源身份/limitations 与局部证据闭合，超过预算整体 withheld。登记、来源验证及参数见 [机制研究族](docs/native-mechanisms.md)。

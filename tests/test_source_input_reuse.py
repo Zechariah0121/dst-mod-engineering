@@ -36,6 +36,18 @@ class SourceInputReuseTests(unittest.TestCase):
                 'hydration': {'missing_optional_identity_cache_count': 1}})
             self.assertFalse(prepare.same_source_inputs(root, [source]))
 
+    def test_directory_with_no_payload_gaps_still_reassesses_locator_only_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / 'scripts'
+            source.mkdir()
+            member = source / 'mechanism.lua'
+            member.write_text('return "new locator-only behavior"\n', encoding='utf-8')
+            prepare.write(root / 'PREPARATION-RECEIPT.json', {
+                'source_inputs': [{'kind': 'DIRECTORY', 'matched_files': []}],
+                'hydration': {'missing_optional_identity_cache_count': 0}})
+            self.assertFalse(prepare.same_source_inputs(root, [source]))
+
 
 if __name__ == '__main__':
     unittest.main()

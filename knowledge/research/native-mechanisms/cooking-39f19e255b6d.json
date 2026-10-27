@@ -1,0 +1,4001 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "Cooking registration / weighted recipe selection / Stewer lifecycle and persistence / spiced food consumers",
+  "source_epoch": "759671",
+  "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+  "entries": [
+    {
+      "id": "EXP-COOK-001",
+      "title": "料理配方/配料注册、导出与 Mod 包装的区别",
+      "aliases": [
+        "AddCookerRecipe",
+        "AddIngredientValues",
+        "cooking.recipes",
+        "cooking.ingredients",
+        "配料标签",
+        "Mod料理注册"
+      ],
+      "engineering_question": "配方表、配料值和产品实体由谁建立；Mod环境接口与原始注册函数有什么副作用差别？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "cooking.lua的注册、别名、模块导出及官方装表；modutil指定env包装。",
+          "只以meatballs/wetgoop数据和原版preparedfoods prefab生成循环作为消费者，不穷举食谱。",
+          "GetIngredientValues是未导出的local；GetRecipe/IsCookingIngredient/CalculateRecipe虽由local实现，但被模块返回表显式导出。MakePreparedFood仍是prefab文件内部local。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-001-NSF-01",
+          "kind": "NSF",
+          "statement": "原始全局AddCookerRecipe(cooker,recipe,is_mod_food)以recipe.name为键保存原表引用，覆盖同锅同名项；mod标志真时写cookbook_category='mod'，否则标记official_foods并改cookbook_atlas。非portablespicer且未no_cookbook时，图鉴分类的同名记录仅在不存在时写入，因此覆盖锅配方不一定替换已有图鉴引用。",
+          "evidence_refs": [
+            "COOK-S001"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-NSF-02",
+          "kind": "NSF",
+          "statement": "modutil的env.AddCookerRecipe只接cooker、recipe，require cooking后调用原始全局函数并固定第三参true，再把name追加到env.cookerrecipes[cooker]；它不创建prefab，也不补name/weight/priority。env.AddIngredientValues仅加载、日志并转发。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S009"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-NSF-03",
+          "kind": "NSF",
+          "statement": "AddIngredientValues按传入names逐名替换ingredients[name]为新tags表，并按cancook/candry另建后缀表；每个tag复制过程中为熟/干表写precook/dried标记。tags为空时循环不执行、相应标记也不写；它不合并旧tags或在注册时走aliases。",
+          "evidence_refs": [
+            "COOK-S002",
+            "COOK-S003"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-NSF-04",
+          "kind": "NSF",
+          "statement": "IsCookingIngredient只查aliases规范化后是否有ingredients条目，不读实体tag或edible。别名把cookedsmallmeat/cookedmonstermeat/cookedmeat映射到对应_cooked名；GetIngredientValues按输入列表每项加一个names计数，已注册配料再累加各numeric tag，未注册名字仍会计入names但没有tags。",
+          "evidence_refs": [
+            "COOK-S003",
+            "COOK-S005"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-NSF-05",
+          "kind": "NSF",
+          "statement": "preparedfoods模块尾部为官方foods逐项补name、weight默认1、priority默认0和cookbook_category='cookpot'；cooking把它们注册到cookpot/portablecookpot/archive_cookpot，Warly表仅portablecookpot，spicedfoods表仅portablespicer。prefabs/preparedfoods另遍历基础、Warly、spiced表，调用文件local MakePreparedFood构建实际Prefab。",
+          "evidence_refs": [
+            "COOK-S004",
+            "COOK-S008",
+            "COOK-S012",
+            "COOK-S041"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-EI-01",
+          "kind": "EI",
+          "statement": "注册配方与注册产品实体是两层，原始配方表又与图鉴/模块导出共享引用；借同名覆盖或直接改嵌套表可产生跨消费者影响，不能把查到配方声明当成完整料理接入。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S004",
+            "COOK-S008",
+            "COOK-S009",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-REC-01",
+          "kind": "REC",
+          "statement": "Mod使用env包装保留mod标记，显式提供name/test/正数weight等消费所需字段；修改既有配料先比较全tags，新建产品另核Prefab注册与端别，不通过全局GenerateSpicedFoods假定自动注册所有层。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S002",
+            "COOK-S007",
+            "COOK-S009",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S041"
+          ]
+        },
+        {
+          "id": "EXP-COOK-001-UNK-01",
+          "kind": "UNK",
+          "statement": "Mod加载先后、热卸载/重复覆盖后的图鉴与存档兼容、资源和客户端图像没有运行；上述导出不是长期兼容承诺，未证明所有食物/锅均支持相同协议。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S009",
+            "COOK-S030",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "AddCookerRecipe",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "raw global Lua function; distinct from modutil env wrapper",
+          "parameters": {
+            "receiver": "无receiver；原始全局函数",
+            "arguments": {
+              "cooker": "真实锅prefab注册键",
+              "recipe": "含name/test等的表，保存引用不复制",
+              "is_mod_food": "truthy标记Mod；否则按官方处理"
+            }
+          },
+          "returns": "无显式返回（nil）。",
+          "preconditions": "recipe.name必须是有效表键；图鉴入表时需要非nil category；只注册数据，无端别/产品存在性检查。",
+          "side_effects": "改recipe分类/atlas；写official集合、锅注册表和有条件的图鉴表。",
+          "lifecycle": {
+            "sequence": "同锅同名覆盖；图鉴同类同名不覆盖；模块返回表暴露注册表引用。",
+            "failure_and_cleanup": "缺字段可能部分修改后报错；不校验test/weight/Prefab，不提供注销/回滚。"
+          },
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S008",
+            "COOK-S009"
+          ],
+          "unknowns": [
+            "注册时序/卸载影响未运行。"
+          ]
+        },
+        {
+          "symbol": "env.AddCookerRecipe",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "modutil-provided Mod environment wrapper",
+          "parameters": {
+            "receiver": "Mod环境env中的函数，点调用；不是冒号方法",
+            "arguments": {
+              "cooker": "锅注册键",
+              "recipe": "配方表，需显式name等字段"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "env由modutil初始化；cooking可require；产品Prefab须独立存在。",
+          "side_effects": "调用原始AddCookerRecipe(...,true)；在env.cookerrecipes中追加name。",
+          "lifecycle": {
+            "sequence": "日志/原始注册先发生；env列表记录已注册Mod食物，不去重。",
+            "failure_and_cleanup": "不补weight/name，不生成实体；下层错误无回滚。"
+          },
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S009",
+            "COOK-S041"
+          ],
+          "unknowns": [
+            "Mod初始化与并用冲突未运行。"
+          ]
+        },
+        {
+          "symbol": "AddIngredientValues",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "raw global Lua function",
+          "parameters": {
+            "receiver": "无receiver；全局函数",
+            "arguments": {
+              "names": "以pairs遍历的名字集合",
+              "tags": "标签键值表；累加消费者要求数值",
+              "cancook": "truthy另建name..'_cooked'",
+              "candry": "truthy另建name..'_dried'"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "输入表有效；注册不读aliases；后续数值累加须成立。",
+          "side_effects": "替换已有条目及tags；创建可选后缀条目；标记写入在逐tag循环内。",
+          "lifecycle": {
+            "sequence": "覆盖不保留旧标签；不创建真实食材prefab；当前tags值逐项复制而非共享tags表。",
+            "failure_and_cleanup": "tags为空不会补precook/dried标记；类型错误可能留下部分注册，不回滚。"
+          },
+          "evidence_refs": [
+            "COOK-S002",
+            "COOK-S003",
+            "COOK-S005",
+            "COOK-S059"
+          ],
+          "unknowns": [
+            "自带precook/dried冲突与异常输入未运行。"
+          ]
+        },
+        {
+          "symbol": "env.AddIngredientValues",
+          "source_file": "scripts/modutil.lua",
+          "visibility": "modutil-provided Mod environment wrapper",
+          "parameters": {
+            "receiver": "Mod环境env，点调用",
+            "arguments": {
+              "names": "名字集合",
+              "tags": "标签数值表",
+              "cancook": "熟后缀开关",
+              "candry": "干后缀开关"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "已初始化env；names还需适用于table.concat日志。",
+          "side_effects": "require cooking，输出初始化日志，转发原始注册。",
+          "lifecycle": {
+            "sequence": "遵循原始替换语义；没有独立回滚/卸载层。",
+            "failure_and_cleanup": "无输入校验；下层失败传播。"
+          },
+          "evidence_refs": [
+            "COOK-S002",
+            "COOK-S009"
+          ],
+          "unknowns": [
+            "Mod兼容性未运行。"
+          ]
+        },
+        {
+          "symbol": "cooking.IsCookingIngredient",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "module export backed by local implementation",
+          "parameters": {
+            "receiver": "require('cooking')返回表中的函数，点调用",
+            "arguments": {
+              "prefabname": "字符串名字；只处理明确的aliases"
+            }
+          },
+          "returns": "布尔：规范化后的ingredients键是否存在。",
+          "preconditions": "模块已加载；不传实体对象来代替字符串。",
+          "side_effects": "只查表，无状态改变。",
+          "lifecycle": {
+            "sequence": "由容器itemtestfn用来判断锅食材；不等于某一道配方命中。",
+            "failure_and_cleanup": "未注册名false；不检验物品可食、数量、锅忙闲。"
+          },
+          "evidence_refs": [
+            "COOK-S003",
+            "COOK-S008",
+            "COOK-S054"
+          ],
+          "unknowns": [
+            "客户端候选/Mod改表时序未运行。"
+          ]
+        },
+        {
+          "symbol": "cooking.GetRecipe",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "module export backed by local implementation",
+          "parameters": {
+            "receiver": "cooking模块返回表，点调用",
+            "arguments": {
+              "cooker": "锅注册键，调用者通常inst.prefab",
+              "product": "产品名键"
+            }
+          },
+          "returns": "已注册recipe原表或nil；不会复制或补默认字段。",
+          "preconditions": "必须用准确锅键；产品与锅应已注册。",
+          "side_effects": "只查表；返回值可被外部修改并影响消费者。",
+          "lifecycle": {
+            "sequence": "被stewer完成/保存载入/harvest和显示查询。",
+            "failure_and_cleanup": "未知锅/产品nil；调用方若直接解引用需自己保证存在。"
+          },
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S008",
+            "COOK-S015",
+            "COOK-S017",
+            "COOK-S021"
+          ],
+          "unknowns": [
+            "表热替换对已存product的影响未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "官方数据补齐默认字段；cooking按锅类型注册，Mod则经env包装保留mod标记。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S004",
+            "COOK-S009",
+            "COOK-S012"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "食材名字先按明确别名归一，names逐项计数，tags只累加已注册ingredients值。",
+          "evidence_refs": [
+            "COOK-S002",
+            "COOK-S003",
+            "COOK-S005"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "配方选择消费这些表，实际产品另由prefab模块构造；没有一键注册整条链的隐含保证。",
+          "evidence_refs": [
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-001-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S001",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-01",
+              "EXP-COOK-001-NSF-02",
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-REC-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S002",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-03",
+              "EXP-COOK-001-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S003",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-03",
+              "EXP-COOK-001-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S004",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-05",
+              "EXP-COOK-001-EI-01"
+            ]
+          },
+          {
+            "ref": "COOK-S005",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S006",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S007",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S008",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-05",
+              "EXP-COOK-001-EI-01"
+            ]
+          },
+          {
+            "ref": "COOK-S009",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-02",
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-REC-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S012",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S015",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S017",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S021",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S030",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S034",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S035",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S038",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S039",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S040",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S041",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-001-NSF-05",
+              "EXP-COOK-001-EI-01",
+              "EXP-COOK-001-REC-01",
+              "EXP-COOK-001-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S054",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S059",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-002",
+      "title": "候选最高优先级与同档权重随机选择",
+      "aliases": [
+        "CalculateRecipe",
+        "GetCandidateRecipes",
+        "GetIngredientValues",
+        "priority",
+        "weight",
+        "同档随机",
+        "食谱竞争"
+      ],
+      "engineering_question": "配方如何由names/tags筛出，平局为何不一定均匀，缺weight/无候选如何失败？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "原始全局GetCandidateRecipes及cooking.CalculateRecipe模块导出；内部GetIngredientValues不作为公共API。",
+          "以meatballs和wetgoop说明定义数据形状，不承诺任意四食材实际结果或随机分布。",
+          "正权重的概率解释是工程推断，native RNG分布/重放和pairs次序未验证。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-002-NSF-01",
+          "kind": "NSF",
+          "statement": "GetCandidateRecipes对该锅全部recipe以pairs调用test(cooker,ingdata.names,ingdata.tags)，收truthy结果；priority缺省作0降序排序，最后只返回最高priority档，不保留低档。未知锅返回空候选；test异常没有保护。",
+          "evidence_refs": [
+            "COOK-S006"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-NSF-02",
+          "kind": "NSF",
+          "statement": "CalculateRecipe先用内部GetIngredientValues归一计数并取最高档候选，再按weight或1降序排序、以weight或1求和，取math.random()*total，从首项逐项减candidate.weight，首次val<=0返回name和cooktime或1。没有选中时无显式返回。减法没有or1。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S008"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-NSF-03",
+          "kind": "NSF",
+          "statement": "官方meatballs测试为有tags.meat且无tags.inedible，priority=-1、cooktime=.75；wetgoop测试恒真、priority=-10、cooktime=.25。两者weight由preparedfoods尾部补1；这层补齐不属于AddCookerRecipe。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S010",
+            "COOK-S011",
+            "COOK-S012"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-EI-01",
+          "kind": "EI",
+          "statement": "在最高档权重均为正、数值合法且RNG按预期取值的条件下，抽取逻辑按权重区间分配结果；最高weight排序不是必胜，同档只有等权时才可推为等份。pairs/同权排序不保证稳定顺序或可重放。",
+          "evidence_refs": [
+            "COOK-S006",
+            "COOK-S007"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-EI-02",
+          "kind": "EI",
+          "statement": "缺weight的Mod候选可能在减法时报错，即使排序/total使用默认1；零/负权重或总和不正没有校验，不能作为安全禁用或公平随机协议。无候选返回nil也不是自动生成wetgoop，正常锅fallback来自已注册的恒真配方。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S011",
+            "COOK-S012",
+            "COOK-S017"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-REC-01",
+          "kind": "REC",
+          "statement": "显式写正数weight，分别验证候选集合、最高priority档和权重；正例之外要测无候选、nil字段、同档竞争与别名。不要用一次抽到目标菜证明概率正确或用高priority覆盖所有原版竞争。",
+          "evidence_refs": [
+            "COOK-S003",
+            "COOK-S005",
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S009",
+            "COOK-S010",
+            "COOK-S011",
+            "COOK-S012"
+          ]
+        },
+        {
+          "id": "EXP-COOK-002-UNK-01",
+          "kind": "UNK",
+          "statement": "未运行Lua配方判定、native RNG、边界math.random值、全部原版/Mod竞争与客户端预测；本候选不提供固定抽取顺序、精确实测概率或游戏可用demo。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S010",
+            "COOK-S011"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "GetCandidateRecipes",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "global Lua function; not a field of returned cooking module",
+          "parameters": {
+            "receiver": "无receiver；全局函数（未列入模块返回表）",
+            "arguments": {
+              "cooker": "锅注册键",
+              "ingdata": "含names与tags的计数表；test直接消费"
+            }
+          },
+          "returns": "数组：最高priority的全部truthy匹配recipe；无匹配空数组。",
+          "preconditions": "recipe.test可调用；字段缺失需test自行处理；未统一检查端别。",
+          "side_effects": "调用用户test并排序新候选数组；不复制recipe对象。",
+          "lifecycle": {
+            "sequence": "每次重新扫描该锅注册表；低priority即便命中也被排除。",
+            "failure_and_cleanup": "未知锅空数组；test抛错传播；不校验weight或产品存在性。"
+          },
+          "evidence_refs": [
+            "COOK-S006",
+            "COOK-S008"
+          ],
+          "unknowns": [
+            "自定义test副作用与遍历次序未运行。"
+          ]
+        },
+        {
+          "symbol": "cooking.CalculateRecipe",
+          "source_file": "scripts/cooking.lua",
+          "visibility": "module export backed by local implementation",
+          "parameters": {
+            "receiver": "cooking模块返回表，点调用",
+            "arguments": {
+              "cooker": "准确锅键",
+              "names": "名字列表，每项视作一个单位；不是预先聚合的names计数表"
+            }
+          },
+          "returns": "命中返回product_name, cooktime倍率（缺省1）；无选中无显式返回（nil）。",
+          "preconditions": "每个可到达候选需数值weight；建议正数；test需兼容缺失tags；没有物品实体/Prefab校验。",
+          "side_effects": "调用test、排序候选并消耗math.random；不创建成品或销毁食材。",
+          "lifecycle": {
+            "sequence": "注册表变化会影响下一次计算；同档按权重逐项减。",
+            "failure_and_cleanup": "缺weight可算术错误；空候选nil；无xpcall/回滚；零负权重无契约保证。"
+          },
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S006",
+            "COOK-S007",
+            "COOK-S008",
+            "COOK-S017"
+          ],
+          "unknowns": [
+            "RNG公平性、确定重放及全部食材冲突未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "GetIngredientValues按列表构建规范化names与累计tags。",
+          "evidence_refs": [
+            "COOK-S003",
+            "COOK-S005"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "逐recipe调用test，按priority保留最高档。",
+          "evidence_refs": [
+            "COOK-S006",
+            "COOK-S010",
+            "COOK-S011",
+            "COOK-S012"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按weight总和抽随机区间，逐项减原始weight返回名字/倍率；失败不自带fallback。",
+          "evidence_refs": [
+            "COOK-S007",
+            "COOK-S011",
+            "COOK-S017"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-002-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S001",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-03",
+              "EXP-COOK-002-EI-02"
+            ]
+          },
+          {
+            "ref": "COOK-S003",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S005",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-02",
+              "EXP-COOK-002-REC-01",
+              "EXP-COOK-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S006",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-01",
+              "EXP-COOK-002-NSF-02",
+              "EXP-COOK-002-EI-01",
+              "EXP-COOK-002-EI-02",
+              "EXP-COOK-002-REC-01",
+              "EXP-COOK-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S007",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-02",
+              "EXP-COOK-002-EI-01",
+              "EXP-COOK-002-EI-02",
+              "EXP-COOK-002-REC-01",
+              "EXP-COOK-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S008",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S009",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S010",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-03",
+              "EXP-COOK-002-REC-01",
+              "EXP-COOK-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S011",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-03",
+              "EXP-COOK-002-EI-02",
+              "EXP-COOK-002-REC-01",
+              "EXP-COOK-002-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S012",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-NSF-03",
+              "EXP-COOK-002-EI-02",
+              "EXP-COOK-002-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S017",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-002-EI-02"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-003",
+      "title": "Stewer 开始、完成、锅内变质与状态查询",
+      "aliases": [
+        "Stewer:StartCooking",
+        "Stewer:CanCook",
+        "dostew",
+        "dospoil",
+        "product_spoilage",
+        "cooktimemult",
+        "readytocook"
+      ],
+      "engineering_question": "材料何时消耗、烹饪时间怎样计算，完成与变质由组件还是prefab负责？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "stewer构造、查询、StartCooking及local任务回调；原版cookpot/portablecookpot和UI/动作所引消费分支。",
+          "ACTIONS.COOK仅研究stewer分支，不外推cooker单物品烤制；RPC/SG交互未完成联网验证。",
+          "dostew/dospoil仅列内部机制；onspoil等回调的实际动作以原版绑定为准。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-003-NSF-01",
+          "kind": "NSF",
+          "statement": "Stewer构造注册itemget/onclose检查关闭且满容器的readytocook标签、itemlose/onopen移除标签；done属性变化维护donecooking。CanCook只检查container存在且IsFull，不查burnt/忙闲/配方；IsCooking为not done且targettime非nil，IsSpoiling为done且targettime非nil，IsDone直接返回done。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S016",
+            "COOK-S056"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-NSF-02",
+          "kind": "NSF",
+          "statement": "StartCooking仅以targettime==nil且有container为入口，不自行调用CanCook或检查满锅；先记录chef/ingredient名单、清done/spoiltime并回调onstart，再从每个占用slot取一个v.prefab，CalculateRecipe后直接解引用GetRecipe(...).perishtime，无nil保护。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S007",
+            "COOK-S017"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-NSF-03",
+          "kind": "NSF",
+          "statement": "产品perishtime>0时只平均带perishable的slot百分比；无此slot取1，keepspoilage真取平均，否则取1-(1-平均)*.5。随后时间=BASE_COOK_TIME*配方倍率*cooktimemult，取消旧task并建dostew定时；Close、DestroyContents后禁止打开。DestroyContents逐slot取出并Remove整个物品实体。",
+          "evidence_refs": [
+            "COOK-S017",
+            "COOK-S023",
+            "COOK-S058"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-NSF-04",
+          "kind": "NSF",
+          "statement": "dostew先清task/targettime/spoiltime，再ondonecooking；产品为spoiledproduct时回调onspoil，否则按recipe.cookpot_perishtime或perishtime，乘product_spoilage或1设锅内腐烂任务，最后done=true。dospoil只清计时字段并回调onspoil，不自行把product改成spoiled_food；原版cookpot/spicer的spoilfn负责改product。",
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S029",
+            "COOK-S043"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-NSF-05",
+          "kind": "NSF",
+          "statement": "原版锅在mastersim分支装stewer/container并绑定显示/继续/收获/腐败回调。portablecookpot另设cooktimemult为TUNING.PORTABLE_COOK_POT_TIME_MULTIPLIER（本快照.8）。锅UI以满容器启用按钮，服务器COOK的stewer分支先处理已在烹饪、其他玩家占用和CanCook，再StartCooking并返回true。",
+          "evidence_refs": [
+            "COOK-S024",
+            "COOK-S026",
+            "COOK-S027",
+            "COOK-S046",
+            "COOK-S054",
+            "COOK-S057",
+            "COOK-S028"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-EI-01",
+          "kind": "EI",
+          "statement": "CanCook、UI可点击、COOK返回true、StartCooking已成功建立产品是不同判断；直接调用StartCooking可绕过满锅/占用约束，原料销毁后也没有内建事务退款。完成回调在done置真之前执行，不能假定回调内IsDone已真。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S017",
+            "COOK-S023",
+            "COOK-S024",
+            "COOK-S054"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-REC-01",
+          "kind": "REC",
+          "statement": "新增锅复用组件时同时提供有效fallback配方、onspoil/显示回调和容器协议；把注册、候选、任务、消耗、完成、变质分别验证，避免在无结果情况下继续解引用或宣称能退款。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S007",
+            "COOK-S011",
+            "COOK-S013",
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S017",
+            "COOK-S023",
+            "COOK-S026",
+            "COOK-S029"
+          ]
+        },
+        {
+          "id": "EXP-COOK-003-UNK-01",
+          "kind": "UNK",
+          "statement": "没有游戏运行；DoTaskInTime时钟/睡眠推进、回调重入、客户端按钮RPC、物品移除事件副作用、锅内动画音效未知。cookpot_perishtime只影响锅内，不证明取出后实体采用相同perish时间。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S017",
+            "COOK-S023",
+            "COOK-S024",
+            "COOK-S029",
+            "COOK-S040",
+            "COOK-S054"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Stewer:CanCook",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "self=实体components.stewer",
+            "arguments": {}
+          },
+          "returns": "container存在且IsFull的布尔；不返回原因。",
+          "preconditions": "实体组件表有效；无端别防护。",
+          "side_effects": "只查询。",
+          "lifecycle": {
+            "sequence": "原版COOK动作使用此门槛；StartCooking不自动使用。",
+            "failure_and_cleanup": "不检查忙闲/burnt/合法配方/实际生成产品；真不保证成功。"
+          },
+          "evidence_refs": [
+            "COOK-S016",
+            "COOK-S017",
+            "COOK-S024",
+            "COOK-S056"
+          ],
+          "unknowns": [
+            "并用Mod造成容器状态竞争未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:StartCooking",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "self=mastersim样例中的components.stewer",
+            "arguments": {
+              "doer": "可nil；有player_classified才记录其userid作图鉴chef身份"
+            }
+          },
+          "returns": "无显式返回，入口不满足直接无操作。",
+          "preconditions": "targettime为nil、有container；调用方应确保满锅/占用/合法可选配方，产品注册键需与inst.prefab一致；需任务/时间/销毁接口。",
+          "side_effects": "写product/名单/新鲜度/目标时间和task；先onstart回调，再计算；关闭并销毁容器内容，禁止打开。",
+          "lifecycle": {
+            "sequence": "计时完成走local dostew，再可进入锅内腐败；不即时SpawnPrefab。",
+            "failure_and_cleanup": "无候选/GetRecipe nil、坏权重或回调异常会传播且无回滚；不内建退款，不检查done本身。"
+          },
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S007",
+            "COOK-S013",
+            "COOK-S015",
+            "COOK-S017",
+            "COOK-S023",
+            "COOK-S024",
+            "COOK-S058"
+          ],
+          "unknowns": [
+            "回调/事件重入、异常后半状态与真实运行未测。"
+          ]
+        },
+        {
+          "symbol": "Stewer:IsCooking",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "not self.done and targettime~=nil；布尔。",
+          "preconditions": "状态字段由组件/调用者维护。",
+          "side_effects": "只查询，不推进计时。",
+          "lifecycle": {
+            "sequence": "done真时即使targettime存在也不算烹饪；可表示锅内腐败计时。",
+            "failure_and_cleanup": "不是task存活校验；不检查实际产物存在。"
+          },
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S017"
+          ],
+          "unknowns": [
+            "字段被Mod外改后的实际运行未测。"
+          ]
+        },
+        {
+          "symbol": "Stewer:IsDone",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "直接返回self.done，通常nil/true，不保证false布尔。",
+          "preconditions": "组件存在。",
+          "side_effects": "只查询。",
+          "lifecycle": {
+            "sequence": "dostew最后设true；Stop/Harvest清nil；OnLoad可恢复。",
+            "failure_and_cleanup": "不保证product非nil或SpawnPrefab成功。"
+          },
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S018",
+            "COOK-S020",
+            "COOK-S021"
+          ],
+          "unknowns": [
+            "自定义回调外改done未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:IsSpoiling",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "self.done and targettime~=nil，done=nil可返回nil。",
+          "preconditions": "状态字段存在即可。",
+          "side_effects": "只查询。",
+          "lifecycle": {
+            "sequence": "用于LongUpdate第二阶段；非正perishtime可能无腐败计时。",
+            "failure_and_cleanup": "不检查task有效或prefab onspoil实现。"
+          },
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S022"
+          ],
+          "unknowns": [
+            "原生任务是否准时未知。"
+          ]
+        },
+        {
+          "symbol": "Stewer:GetTimeToCook",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "未done且有targettime时targettime-GetTime，否则0；可为负。",
+          "preconditions": "GetTime可用。",
+          "side_effects": "只查询。",
+          "lifecycle": {
+            "sequence": "不自行完成过期任务，不钳非负。",
+            "failure_and_cleanup": "0不等于必定完成；状态应结合IsCooking/IsDone。"
+          },
+          "evidence_refs": [
+            "COOK-S016",
+            "COOK-S017",
+            "COOK-S022"
+          ],
+          "unknowns": [
+            "过期任务/真实时钟粒度未测。"
+          ]
+        },
+        {
+          "symbol": "Stewer:GetTimeToSpoil",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "done且有targettime时targettime-GetTime，否则0；可为负。",
+          "preconditions": "GetTime可用。",
+          "side_effects": "只查询。",
+          "lifecycle": {
+            "sequence": "Harvest用其与spoiltime比值计算产物新鲜度。",
+            "failure_and_cleanup": "不自动腐败，不钳非负；外部改字段可能违反假设。"
+          },
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S021"
+          ],
+          "unknowns": [
+            "任务延迟和perishable钳位效果不在本条。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "prefab在mastersim安装stewer和container；容器/动作分别提供满锅与占用门槛。",
+          "evidence_refs": [
+            "COOK-S024",
+            "COOK-S025",
+            "COOK-S026",
+            "COOK-S027",
+            "COOK-S054",
+            "COOK-S056",
+            "COOK-S057"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "StartCooking记录每slot名字，选择配方并计算食材平均新鲜度和倍率时间。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S007",
+            "COOK-S017",
+            "COOK-S058"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "设置定时任务后Close/销毁全部槽内容/禁开；没有原料退款链。",
+          "evidence_refs": [
+            "COOK-S017",
+            "COOK-S023"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "dostew回调显示后置done，按锅内保鲜时间安排dospoil；产品替换由onspoil回调负责。",
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S029",
+            "COOK-S043"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-003-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S001",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S005",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S007",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-02",
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S011",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S013",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-01",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S014",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-04",
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S015",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-04",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-REC-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S016",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-01",
+              "EXP-COOK-003-EI-01"
+            ]
+          },
+          {
+            "ref": "COOK-S017",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-02",
+              "EXP-COOK-003-NSF-03",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-REC-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S018",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S020",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S021",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S022",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S023",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-03",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-REC-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S024",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S025",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S026",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05",
+              "EXP-COOK-003-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S027",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S028",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S029",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-04",
+              "EXP-COOK-003-REC-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S040",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S043",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S046",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S054",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05",
+              "EXP-COOK-003-EI-01",
+              "EXP-COOK-003-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S056",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-01"
+            ]
+          },
+          {
+            "ref": "COOK-S057",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S058",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-003-NSF-03"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-004",
+      "title": "Stewer 收获、停止、烧毁与组件移除边界",
+      "aliases": [
+        "Stewer:Harvest",
+        "Stewer:StopCooking",
+        "OnRemoveFromEntity",
+        "DefaultBurntStructureFn",
+        "learncookbookrecipe",
+        "收获失败清理"
+      ],
+      "engineering_question": "完成品何时真正生成，生成失败会不会留在锅里；停止/烧毁/移除是否退款并恢复容器？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "stewer Harvest/StopCooking/OnRemoveFromEntity完整方法，cookpot/spicer具名烧毁/锤击/拆卸消费者。",
+          "不推广到所有结构或把EntityScript.RemoveComponent视为通用资源取消；只陈述所引Lua显式清理。",
+          "GetRecipe所得stacksize/perish等需要实际成品相应组件，未研究全部产品/背包溢出行为。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-004-NSF-01",
+          "kind": "NSF",
+          "statement": "Harvest只在done truthy时运行，先onharvest，再为非nil product SpawnPrefab；生成成功才查询recipe、图鉴条件、堆叠、新鲜度和交付。即使SpawnPrefab返回nil，仍清product，取消task/清计时与done并开放container，最后return true；未done则无显式返回。",
+          "evidence_refs": [
+            "COOK-S021"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-NSF-02",
+          "kind": "NSF",
+          "statement": "成功生成后，recipe.stacksize>1时直接调用loot.components.stackable:SetStackSize；有spoiltime且产物perishable时设百分比product_spoilage*(GetTimeToSpoil()/spoiltime)并StartPerishing。harvester有inventory则GiveItem，否则LaunchAt。图鉴事件还要求chef_id匹配harvester.userid且对应category/product已在cookbook_recipes。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S016",
+            "COOK-S021"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-NSF-03",
+          "kind": "NSF",
+          "statement": "StopCooking取消task；product非nil且reason恰为'fire'时尝试生成当前product并定位、安排0时刻StopProductPhysics，不要求done且不带入product_spoilage/stacksize。随后清product/product_spoilage/spoiltime/targettime/done；不开放container，也不调用onharvest或退原料，chef/ingredient元数据未清。",
+          "evidence_refs": [
+            "COOK-S018"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-NSF-04",
+          "kind": "NSF",
+          "statement": "Stewer.OnRemoveFromEntity只移除stewer/donecooking/readytocook三个标签，没有Cancel task或RemoveEventCallback。所引EntityScript.RemoveComponent会停止组件更新、从components表取下并调用OnRemoveFromEntity、移除replica/actions，未显式取消该实例DoTaskInTime任务或上述实体事件监听。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S017",
+            "COOK-S053"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-NSF-05",
+          "kind": "NSF",
+          "statement": "cookpot用MakeMediumBurnable(...,structure=true)接DefaultBurntStructureFn；该函数先Drop/Close并移除container，再StopCooking('fire')并移除stewer。spicer.OnBurnt也调用此默认函数，再处理碰撞/灰烬/拆卸组件和退场。普通锅锤击与spicer.ChangeToItem仅在product非nil且done时Harvest；烹饪中不走该收获条件。",
+          "evidence_refs": [
+            "COOK-S018",
+            "COOK-S026",
+            "COOK-S027",
+            "COOK-S031",
+            "COOK-S032",
+            "COOK-S042",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S052"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-EI-01",
+          "kind": "EI",
+          "statement": "Harvest的true表示走完完成状态清理，不证明实际产物生成/进入背包或图鉴解锁；StopCooking也不是退款/重置容器的总开关。任意直接移除stewer不能借原版烧毁先Stop的顺序推为已安全取消。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S018",
+            "COOK-S021",
+            "COOK-S031",
+            "COOK-S053"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-REC-01",
+          "kind": "REC",
+          "statement": "自定义取消/换组件先明确产品丢弃、原料补偿、任务、事件和容器恢复的所有者；按实际所持任务/状态清理，验证生成失败、坏stacksize、烧毁与收获回调重入，不直接把Harvest真当发奖成功。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S017",
+            "COOK-S018",
+            "COOK-S021",
+            "COOK-S023",
+            "COOK-S031",
+            "COOK-S053"
+          ]
+        },
+        {
+          "id": "EXP-COOK-004-UNK-01",
+          "kind": "UNK",
+          "statement": "SpawnPrefab失败后的native资源、GiveItem背包满的后续处理、LaunchAt物理、实体销毁自动任务处理和onharvest重入均未游戏验证；不承诺烧毁生成品的画面或每种食物资产/Physics存在。",
+          "evidence_refs": [
+            "COOK-S018",
+            "COOK-S021",
+            "COOK-S031",
+            "COOK-S042",
+            "COOK-S044",
+            "COOK-S052",
+            "COOK-S053"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Stewer:Harvest",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer（原版mastersim组件）",
+            "arguments": {
+              "harvester": "可nil；有inventory则给物品，否则抛出；userid还参与chef匹配"
+            }
+          },
+          "returns": "done truthy分支末尾true，即使product为空或SpawnPrefab失败；未done返回nil。",
+          "preconditions": "完成状态；stacksize>1需生成物有stackable；保鲜路径需有效product_spoilage/spoiltime；相关回调不得破坏后续假设。",
+          "side_effects": "onharvest先调用；SpawnPrefab后可图鉴事件/堆叠/新鲜度/交付；清产品、取消task、清状态并开放container。",
+          "lifecycle": {
+            "sequence": "消耗完成品状态；不会重建原料；未清chef_id/ingredient_prefabs。",
+            "failure_and_cleanup": "Spawn失败仍清空成功返回；回调/组件缺失/算术错误无回滚，GiveItem结果未检查。"
+          },
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S016",
+            "COOK-S021"
+          ],
+          "unknowns": [
+            "背包溢出、重入、资源与联网未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:StopCooking",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {
+              "reason": "只有字面值'fire'会尝试生成当前产品；其他值只停/清"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "任务如有需支持Cancel；fire产品应可Spawn且具Transform/Physics供后续函数使用。",
+          "side_effects": "取消task；fire可Spawn当前产品；清主要烹饪/保鲜字段。",
+          "lifecycle": {
+            "sequence": "既可停烹饪也可停完成品腐败；不要求done，不重开container，不清chef元数据。",
+            "failure_and_cleanup": "fire生成失败继续清空；不退款、不恢复显示/容器；异步StopProductPhysics假设Physics。"
+          },
+          "evidence_refs": [
+            "COOK-S018",
+            "COOK-S031"
+          ],
+          "unknowns": [
+            "所有自定义产品及火灾时序未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:OnRemoveFromEntity",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "component lifecycle hook, not a complete cancellation API",
+          "parameters": {
+            "receiver": "被EntityScript取下的Stewer实例",
+            "arguments": {}
+          },
+          "returns": "无显式返回。",
+          "preconditions": "由RemoveComponent生命周期调用；inst仍可RemoveTag。",
+          "side_effects": "仅移除stewer/donecooking/readytocook标签。",
+          "lifecycle": {
+            "sequence": "不等同StopCooking；不显式取消task或移除构造时注册的事件。",
+            "failure_and_cleanup": "不能据此保证无悬挂定时任务/事件；原版烧毁是先Stop再Remove。"
+          },
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S017",
+            "COOK-S031",
+            "COOK-S053"
+          ],
+          "unknowns": [
+            "实体native销毁自动清理与任意直接移除组件未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "完成品仅作为product字符串保留在组件；Harvest在done时才生成实体并处理元数据。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S021"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "新鲜度/堆叠/图鉴各有前提，生成失败仍会清空完成状态；交付成功需另查。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S016",
+            "COOK-S021"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "StopCooking取消任务和主要状态；fire分支另外生成当前product，不退原料/不重开容器。",
+          "evidence_refs": [
+            "COOK-S018"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "原版烧毁先移容器再Stop/移stewer，OnRemoveFromEntity自身只清标签；不能外推任意移组件安全。",
+          "evidence_refs": [
+            "COOK-S013",
+            "COOK-S026",
+            "COOK-S027",
+            "COOK-S031",
+            "COOK-S032",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S053"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-004-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S005",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S013",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-04",
+              "EXP-COOK-004-EI-01",
+              "EXP-COOK-004-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S015",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S016",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S017",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-04",
+              "EXP-COOK-004-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S018",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-03",
+              "EXP-COOK-004-NSF-05",
+              "EXP-COOK-004-EI-01",
+              "EXP-COOK-004-REC-01",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S021",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-01",
+              "EXP-COOK-004-NSF-02",
+              "EXP-COOK-004-EI-01",
+              "EXP-COOK-004-REC-01",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S023",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S026",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S027",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S031",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05",
+              "EXP-COOK-004-EI-01",
+              "EXP-COOK-004-REC-01",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S032",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S042",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S044",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S045",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S052",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-05",
+              "EXP-COOK-004-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S053",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-004-NSF-04",
+              "EXP-COOK-004-EI-01",
+              "EXP-COOK-004-REC-01",
+              "EXP-COOK-004-UNK-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-005",
+      "title": "Stewer 保存/载入与长更新跨烹饪、变质两阶段",
+      "aliases": [
+        "Stewer:OnSave",
+        "Stewer:OnLoad",
+        "Stewer:LongUpdate",
+        "remainingtime",
+        "product_spoilage",
+        "离线追赶"
+      ],
+      "engineering_question": "存档保留什么时间，读档怎样选择继续完成或腐败，长更新如何把剩余时间推进到下一阶段？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "完整OnSave/OnLoad/LongUpdate与local任务回调；cookpot/spicer继续显示回调作消费者。",
+          "不证明整个引擎存档调度、跨分片、坏档迁移或世界休眠策略；组件字段存载与prefab burnt标记是两层。",
+          "未知新版本recipe/product变化需逐项复核，不把旧product字符串自动视为仍可生成。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-005-NSF-01",
+          "kind": "NSF",
+          "statement": "OnSave保存done/product/product_spoilage/spoiltime、chef_id、ingredient_prefabs；remainingtime仅当targettime-GetTime()>0才保存，否则nil。它保存产品名与剩余秒数，不序列化task或重新存配方定义。",
+          "evidence_refs": [
+            "COOK-S019"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-NSF-02",
+          "kind": "NSF",
+          "statement": "OnLoad要求data表且仅在data.product非nil时恢复；取消已有task、清targettime，恢复done/product/元数据。remainingtime非nil时targettime按max(0,remainingtime)计算，但DoTaskInTime仍传原始remainingtime；done真安排dospoil并oncontinuedone，否则安排dostew并oncontinuecooking。",
+          "evidence_refs": [
+            "COOK-S020"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-NSF-03",
+          "kind": "NSF",
+          "statement": "无remainingtime且product非spoiledproduct、data.product_spoilage非nil时，OnLoad设targettime=GetTime、安排0秒dostew并oncontinuecooking；否则只在有oncontinuedone时调用它。只要data.product存在，最后有container就禁开。没有product则整段不处理，不能视为清空现有状态。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S020"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-NSF-04",
+          "kind": "NSF",
+          "statement": "LongUpdate先处理IsCooking：取消旧task，若扣dt后仍未来则减targettime/重排dostew并置dt=0；否则扣掉完成前时间并直接dostew。剩余dt>0且IsSpoiling再类似推进腐败，可能同一次长更新完成烹饪并变质。比较是严格>，恰好到期走完成/腐败分支。",
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S022"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-NSF-05",
+          "kind": "NSF",
+          "statement": "cookpot与spicer的oncontinuecooking恢复烹饪显示，oncontinuedone显示产品；prefab自己的onsave/onload只另存/恢复burnt标志，不能代替组件的产品/计时存档。",
+          "evidence_refs": [
+            "COOK-S020",
+            "COOK-S029",
+            "COOK-S030",
+            "COOK-S043",
+            "COOK-S044"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-EI-01",
+          "kind": "EI",
+          "statement": "在原版字段不变量成立时，LongUpdate保留跨阶段剩余dt；但读档没有remainingtime的补偿路径是重新进入dostew，并不证明所有过期/坏档保鲜比例完全连续。存档产品在新版本失去recipe/Prefab时也不能由读档成功推出可Harvest。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-REC-01",
+          "kind": "REC",
+          "statement": "覆盖进行中、已完成腐败中、刚好到期、跨两阶段、大dt、无remainingtime、有/无product_spoilage以及产品移除的存档情形；比较产品、done、targettime、task及显示，保留native时钟与调度未知。",
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022",
+            "COOK-S029",
+            "COOK-S043"
+          ]
+        },
+        {
+          "id": "EXP-COOK-005-UNK-01",
+          "kind": "UNK",
+          "statement": "未做真实保存重载、长更新、跨分片/崩溃恢复或旧存档迁移；DoTaskInTime负延迟处理、引擎调用顺序和游戏可见保鲜连续性未知。",
+          "evidence_refs": [
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S022",
+            "COOK-S030",
+            "COOK-S044"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Stewer:OnSave",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "component persistence hook",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {}
+          },
+          "returns": "状态表；remainingtime仅正值保留；nil字段在Lua表中缺失。",
+          "preconditions": "GetTime可用；状态字段由调用链维持。",
+          "side_effects": "读取状态，不取消task或修改烹饪。",
+          "lifecycle": {
+            "sequence": "由组件存档调用；保存当前产品名/新鲜度/剩余时间，不保存recipe副本。",
+            "failure_and_cleanup": "无targettime或已过期不存remainingtime；不证明可重载新版本产品。"
+          },
+          "evidence_refs": [
+            "COOK-S019",
+            "COOK-S020"
+          ],
+          "unknowns": [
+            "引擎序列化与调度原子性未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:OnLoad",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "component persistence hook",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {
+              "data": "非nil存档表；product缺失则不处理；remainingtime须适用于数学/任务接口"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "原版prefab已重装回调和container；product/recipe/prefab兼容需另核；本函数不校验存档类型。",
+          "side_effects": "恢复字段、取消旧task、按done/remainingtime建任务及继续回调、禁开容器。",
+          "lifecycle": {
+            "sequence": "0秒补dostew分支取决于product与product_spoilage；targettime钳值和任务实参不同。",
+            "failure_and_cleanup": "data=nil会直接索引报错；没有product不会清旧状态；回调异常/缺配方无回滚。"
+          },
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S029",
+            "COOK-S043"
+          ],
+          "unknowns": [
+            "坏档、负任务延迟与重载时序未运行。"
+          ]
+        },
+        {
+          "symbol": "Stewer:LongUpdate",
+          "source_file": "scripts/components/stewer.lua",
+          "visibility": "component long-update hook",
+          "parameters": {
+            "receiver": "components.stewer",
+            "arguments": {
+              "dt": "经过秒数，预期非负；代码没有输入校验"
+            }
+          },
+          "returns": "无显式返回。",
+          "preconditions": "GetTime/任务接口可用；状态符合IsCooking/IsSpoiling；完成回调与recipe可消费。",
+          "side_effects": "取消/重排任务或直接调用dostew/dospoil；烹饪完成后剩余dt继续推进腐败。",
+          "lifecycle": {
+            "sequence": "严格时间边界，恰好到期进入回调；不是存档字段恢复函数。",
+            "failure_and_cleanup": "非法dt/回调异常无保护；不证明native睡眠、长更新调用频率与联网效果。"
+          },
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S022"
+          ],
+          "unknowns": [
+            "真实大dt、同帧任务竞态未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "OnSave仅将正剩余时间和产品/新鲜度/chef名单持久化。",
+          "evidence_refs": [
+            "COOK-S019"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "OnLoad先恢复字段、取消旧任务，再按done和remainingtime选择继续腐败/继续烹饪/0秒补完成。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S020"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "继续回调重建具名prefab显示；burnt是另一层prefab存载。",
+          "evidence_refs": [
+            "COOK-S029",
+            "COOK-S030",
+            "COOK-S043",
+            "COOK-S044"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "LongUpdate先扣烹饪，再将剩余dt用于腐败；边界与坏档/native时序仍须运行。",
+          "evidence_refs": [
+            "COOK-S014",
+            "COOK-S015",
+            "COOK-S016",
+            "COOK-S022"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-005-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S014",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-04",
+              "EXP-COOK-005-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S015",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-03",
+              "EXP-COOK-005-NSF-04",
+              "EXP-COOK-005-EI-01",
+              "EXP-COOK-005-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S016",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S019",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-01",
+              "EXP-COOK-005-EI-01",
+              "EXP-COOK-005-REC-01",
+              "EXP-COOK-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S020",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-02",
+              "EXP-COOK-005-NSF-03",
+              "EXP-COOK-005-NSF-05",
+              "EXP-COOK-005-EI-01",
+              "EXP-COOK-005-REC-01",
+              "EXP-COOK-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S021",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-EI-01",
+              "EXP-COOK-005-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S022",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-04",
+              "EXP-COOK-005-EI-01",
+              "EXP-COOK-005-REC-01",
+              "EXP-COOK-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S029",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-05",
+              "EXP-COOK-005-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S030",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-05",
+              "EXP-COOK-005-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S043",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-05",
+              "EXP-COOK-005-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S044",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-005-NSF-05",
+              "EXP-COOK-005-UNK-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-006",
+      "title": "调味数据派生与基础效果组合",
+      "aliases": [
+        "GenerateSpicedFoods",
+        "spicedfoods",
+        "SPICES",
+        "basename",
+        "spice",
+        "调味变体"
+      ],
+      "engineering_question": "调味变体从哪些基础表生成，是否自动支持Mod食物，哪些字段复制、覆盖或组合？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "spicedfoods完整生成器与cooking注册/实际Prefab循环；不冒充modutil提供的无副作用工厂。",
+          "蒜糖辣回调只核到AddDebuff调用，不研究buff的实现、叠加、持续/存档规则；盐另追到Edible.GetHealth。",
+          "shallowcopy/ArrayUnion按调用关系核对，不宣称所有嵌套字段都深复制。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-006-NSF-01",
+          "kind": "NSF",
+          "statement": "spicedfoods定义蒜/糖/辣各自oneaten回调分别AddDebuff到buff_playerabsorption/buff_workeffectiveness/buff_attack，盐数据为空。GenerateSpicedFoods全局函数写模块local spicedfoods结果表，无显式返回；模块只主动对preparedfoods与preparedfoods_warly调用，然后返回该结果表。",
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S035"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-NSF-02",
+          "kind": "NSF",
+          "statement": "每个食物键与四种香料组合先shallowcopy基础data；非wetgoop测试names[foodname]且names[spicename]、priority=100，wetgoop变体仅测试香料名、priority=-10；设置cooktime=.12、stacksize=nil、spice大写、basename为基础表键、name为拼接名、official=true和可选spiced_分类，写入结果表。",
+          "evidence_refs": [
+            "COOK-S034",
+            "COOK-S062"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-NSF-03",
+          "kind": "NSF",
+          "statement": "辣椒仅在temperature缺省时添加HOT_FOOD_BONUS_TEMP/FOOD_TEMP_LONG/nochill，原temperature>0时延长duration取max并nochill，冷食分支不做这两项改动；有香料prefabs时用ArrayUnion或香料列表合并依赖，有基础oneatenfn时组合为先香料回调后原回调，而非简单覆盖。",
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S063"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-NSF-04",
+          "kind": "NSF",
+          "statement": "cooking加载spicedfoods后逐配方注册portablespicer，prefabs/preparedfoods另遍历该表调用local MakePreparedFood返回实际Prefab。GenerateSpicedFoods本身不调用AddCookerRecipe或Prefab；对任意Mod表后调用它只改结果表，不能由该调用单独证明注册表/已经加载的Prefab模块同步更新。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S004",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S041"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-EI-01",
+          "kind": "EI",
+          "statement": "生成是浅复制并带官方数据假设，未覆盖的嵌套表可能与基础食物共享；反复调用可替换结果表同名项，却不自动撤回原消费者引用。只加preparedfood标签也不能建立精确基础菜+香料配方与产品实体。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S036",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041",
+            "COOK-S062",
+            "COOK-S063"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-REC-01",
+          "kind": "REC",
+          "statement": "Mod调味接入分别建立明确变体数据、portablespicer注册和产品Prefab；保留基础回调与香料回调次序、依赖和字段来源，避免把GenerateSpicedFoods当独立纯函数或盲目将official=true带入Mod数据。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S009",
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        },
+        {
+          "id": "EXP-COOK-006-UNK-01",
+          "kind": "UNK",
+          "statement": "buff最终作用/保存/叠加、shallowcopy共享字段的Mod修改影响、任意自定义temperature缺字段、所有变体图像与网络均未运行；不承诺所有香料都直接乘三维。",
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S049"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "GenerateSpicedFoods",
+          "source_file": "scripts/spicedfoods.lua",
+          "visibility": "global Lua function with module-local mutable output; not a pure public Mod factory",
+          "parameters": {
+            "receiver": "无receiver；源码全局函数，不是modutil env包装",
+            "arguments": {
+              "foods": "foodname→基础data表；生成器假定官方字段形状，非任意Prefab实例"
+            }
+          },
+          "returns": "无显式返回；结果写闭包持有的spicedfoods表（模块返回此表）。",
+          "preconditions": "shallowcopy/ArrayUnion与TUNING可用；热食temperatureduration需适用于math.max；基础名/香料/Prefab必须后续另行注册。",
+          "side_effects": "每对组合覆盖/新增结果键；设置official=true、固定字段，改写test/priority并组合回调/依赖；浅复制不保证嵌套隔离。",
+          "lifecycle": {
+            "sequence": "模块初始化只调用两份官方基础表；后调用不会自行AddCookerRecipe/创建Prefab。",
+            "failure_and_cleanup": "无校验/事务回滚；坏字段可部分生成后报错；香料回调异常可阻断基础回调。"
+          },
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S004",
+            "COOK-S041",
+            "COOK-S062",
+            "COOK-S063"
+          ],
+          "unknowns": [
+            "实际buff、Mod重入/后加载与资源未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "模块定义四种香料数据与受限AddDebuff回调。",
+          "evidence_refs": [
+            "COOK-S033"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "遍历两份官方基础表作浅复制，设置变体名、判定、时间及香料字段，按需组合回调。",
+          "evidence_refs": [
+            "COOK-S034",
+            "COOK-S035"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "结果分别被cooking注册为portablespicer配方、被preparedfoods prefab模块实际构造。",
+          "evidence_refs": [
+            "COOK-S004",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "Mod扩展仍须逐层核注册/实体/标签/效果，生成器存在不授予完整可用性。",
+          "evidence_refs": [
+            "COOK-S001",
+            "COOK-S009",
+            "COOK-S034",
+            "COOK-S036",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-006-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S001",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-04",
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S004",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S009",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S033",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-01",
+              "EXP-COOK-006-NSF-03",
+              "EXP-COOK-006-REC-01",
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S034",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-01",
+              "EXP-COOK-006-NSF-02",
+              "EXP-COOK-006-NSF-03",
+              "EXP-COOK-006-NSF-04",
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01",
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S035",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-01",
+              "EXP-COOK-006-NSF-04",
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S036",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-EI-01"
+            ]
+          },
+          {
+            "ref": "COOK-S038",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-REC-01",
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S039",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01",
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S040",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01",
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S041",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-04",
+              "EXP-COOK-006-EI-01",
+              "EXP-COOK-006-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S046",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S047",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S049",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S062",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-02",
+              "EXP-COOK-006-EI-01"
+            ]
+          },
+          {
+            "ref": "COOK-S063",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-006-NSF-03",
+              "EXP-COOK-006-EI-01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-COOK-007",
+      "title": "调味站准入、真实变体 prefab 与香料消费边界",
+      "aliases": [
+        "portablespicer",
+        "preparedfood",
+        "spicedfood",
+        "meatballs_spice_salt",
+        "Edible:GetHealth",
+        "Edible:OnEaten",
+        "调味取出与存档"
+      ],
+      "engineering_question": "基础菜怎样进入调味站、何时产出变体并消费香料；盐和其他香料通过哪个实际实体接口生效？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "759671",
+        "runtime_status": "not_run",
+        "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+        "bounds": [
+          "portablespicer容器/组件/prefab实际链、preparedfoods产品工厂、盐GetHealth与oneaten消费；不扩成整个饮食系统。",
+          "meatballs→meatballs_spice_salt为具名静态链，无食用/客户端运行；buff细节只到AddDebuff边界。",
+          "container gate是选择/插入规则，不是StartCooking内置安全验证；MakePreparedFood/MakeSpice/ChangeToItem等仍是文件local。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COOK-007-NSF-01",
+          "kind": "NSF",
+          "statement": "portablespicer容器拒绝wetgoop和burnt站；slot1要求preparedfood且非spicedfood，slot2要求spice，slot=nil接受这两类之一，其他slot不通过；配置两槽、acceptsstacks=false。四种spice prefab在pristine前加spice，调味产品在pristine前同时加preparedfood和spicedfood，故不会再次按未调味基础菜进入slot1。",
+          "evidence_refs": [
+            "COOK-S036",
+            "COOK-S037",
+            "COOK-S039"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-02",
+          "kind": "NSF",
+          "statement": "portablespicer在SetPristine后的mastersim分支安装stewer并keepspoilage=true、绑定所有开始/继续/完成/收获/变质回调及container.WidgetSetup。它复用StartCooking→dostew→Harvest/OnSave/OnLoad/LongUpdate；没有独立spicer组件参与所引链。容器按钮显示SPICE但实际提交ACTIONS.COOK。",
+          "evidence_refs": [
+            "COOK-S017",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022",
+            "COOK-S024",
+            "COOK-S036",
+            "COOK-S043",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S055",
+            "COOK-S056"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-03",
+          "kind": "NSF",
+          "statement": "meatballs数据经GenerateSpicedFoods生成meatballs_spice_salt配方，test依赖names.meatballs及names.spice_salt；GetIngredientValues即使名字不在ingredients也保留names，故此链不靠食材meat等tags判定。只有preparedfood标签不能证明对应变体存在；已识别香料还可能命中低优先级wetgoop香料fallback。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S010",
+            "COOK-S011",
+            "COOK-S012",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S036"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-04",
+          "kind": "NSF",
+          "statement": "MakePreparedFood为spiced表每项返回Prefab(data.name,fn,...)。公共初始化用plate_food与spices图层、基础食物符号及inv_image_bg，加入preparedfood/spicedfood、可设置basename显示名；mastersim再将data健康/饥饿/类型/温度/spice/oneatenfn写入edible，设置stackable，正perishtime才加perishable并启动腐烂。",
+          "evidence_refs": [
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041",
+            "COOK-S048"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-05",
+          "kind": "NSF",
+          "statement": "spicer.Start使用keepspoilage保留带perishable槽的平均新鲜度；完成与变质由绑定回调显示/替换产品，正常完成后的取出由Harvest生成变体并按前提传入新鲜度；fire取消也可能生成当前product，但不带Harvest的保鲜/堆叠处理。OnSave/OnLoad/LongUpdate继承stewer两阶段规则；spicer自己的onsave/onload另处理burnt，拆卸/锤击只对done产品先Harvest，无原料退还承诺。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S017",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022",
+            "COOK-S042",
+            "COOK-S043",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S018"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-06",
+          "kind": "NSF",
+          "statement": "本快照SPICE_MULTIPLIERS仅列SPICE_SALT.HEALTH=.25；Edible.GetHealth先处理自定义healthvalue/忽略腐败/过期处理规则，进入非忽略腐败路径的IsSpoiled分支时设置spice_source=nil，其他允许保留香料的路径把HEALTH加到当前multiplier再乘healthvalue。它不是保证最终生命变化乘1.25，也没有在此函数直接应用蒜糖辣buff。",
+          "evidence_refs": [
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S050"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-NSF-07",
+          "kind": "NSF",
+          "statement": "Edible.SetOnEatenFn保存oneaten；Eater.Eat通过PrefersToEat并处理数值后调用food.edible.OnEaten，再HandleEatRemove。OnEaten先调用oneaten(inst,eater)，再可能处理腹中温度、发oneaten事件/音效；HandleEatRemove按自定义handler或单件/整叠规则移除。香料基础回调顺序来自生成器，而非标签自身触发。",
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S040",
+            "COOK-S048",
+            "COOK-S049",
+            "COOK-S050",
+            "COOK-S051"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-EI-01",
+          "kind": "EI",
+          "statement": "从定义到实体读取消费的链路存在，不等于香料效果/动画已在游戏验证；标签、配方、Prefab和edible字段是四个独立接线点。盐的加法系数还受腐败/食用者/后续吸收和自定义数值流程约束。",
+          "evidence_refs": [
+            "COOK-S017",
+            "COOK-S021",
+            "COOK-S034",
+            "COOK-S036",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S049",
+            "COOK-S050"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-REC-01",
+          "kind": "REC",
+          "statement": "验证调味要同时查slot与标签、精确名字候选、生成变体、收获新鲜度、盐读取和组合回调；加入已调味/湿糊/缺变体/坏香料/保存读档/烧毁负例，不以可放入调味站或Spawn成功代替全链通过。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S007",
+            "COOK-S017",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022",
+            "COOK-S031",
+            "COOK-S034",
+            "COOK-S036",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S042",
+            "COOK-S043",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S049"
+          ]
+        },
+        {
+          "id": "EXP-COOK-007-UNK-01",
+          "kind": "UNK",
+          "statement": "真实调味操作、远端UI/RPC、库存/地面图层、名称、成品保鲜、盐最终增量、buff持久化/清理和食用中断均未运行；native网络/物理与完整饮食契约不由所引Lua闭合。",
+          "evidence_refs": [
+            "COOK-S021",
+            "COOK-S034",
+            "COOK-S036",
+            "COOK-S038",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S043",
+            "COOK-S044",
+            "COOK-S045",
+            "COOK-S047",
+            "COOK-S049",
+            "COOK-S050",
+            "COOK-S051"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "containers.params.portablespicer.itemtestfn",
+          "source_file": "scripts/containers.lua",
+          "visibility": "container configuration callback, not standalone registration API",
+          "parameters": {
+            "receiver": "函数签名第一参container为容器；由WidgetSetup挂入，不是任意实体方法",
+            "arguments": {
+              "container": "含inst的容器上下文",
+              "item": "有prefab/HasTag的物品",
+              "slot": "1基础菜、2香料、nil任意合适槽，其他值拒绝"
+            }
+          },
+          "returns": "符合wetgoop排除、槽标签和非burnt条件的truthy/false。",
+          "preconditions": "输入非nil且支持标签查询；不是StartCooking的内部校验；需实际WidgetSetup生效。",
+          "side_effects": "只查询；不生成变体/消费食物。",
+          "lifecycle": {
+            "sequence": "同规则可被容器/replica消费；spicedfood不得按基础菜进入。",
+            "failure_and_cleanup": "preparedfood准入不保证精确配方/产品；不检查recipe注册或可食组件；联网未测。"
+          },
+          "evidence_refs": [
+            "COOK-S036",
+            "COOK-S037",
+            "COOK-S039",
+            "COOK-S045",
+            "COOK-S055",
+            "COOK-S056",
+            "COOK-S060",
+            "COOK-S061"
+          ],
+          "unknowns": [
+            "容器跨端执行时机与自定义物品字段未运行。"
+          ]
+        },
+        {
+          "symbol": "Edible:GetHealth",
+          "source_file": "scripts/components/edible.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "食物实体components.edible",
+            "arguments": {
+              "eater": "可nil；有eater组件时可能改变腐败处理规则；GetHealthFn另可接收它"
+            }
+          },
+          "returns": "返回最终healthvalue*multiplier；不直接对生命DoDelta。",
+          "preconditions": "healthvalue/自定义函数结果可数值比较；perishable/eater接口有效；spice须符合TUNING键。",
+          "side_effects": "可能调用gethealthfn及CanProcessSpoiledItem/IsStale/IsSpoiled状态查询；本方法不消费食物。",
+          "lifecycle": {
+            "sequence": "腐败处理可把healthvalue钳0、按stale/spoiled系数；普通spoiled分支去掉spice_source，其他路径可加HEALTH系数。",
+            "failure_and_cleanup": "坏数据/自定义回调异常未捕获；加.25不是对所有食物最终生命值统一乘1.25。"
+          },
+          "evidence_refs": [
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S050"
+          ],
+          "unknowns": [
+            "最终吸收/自定义数值/生命组件与buff效果未运行。"
+          ]
+        },
+        {
+          "symbol": "Edible:OnEaten",
+          "source_file": "scripts/components/edible.lua",
+          "visibility": "Lua method; no stable external API guarantee",
+          "parameters": {
+            "receiver": "食物components.edible，由Eater消费链调用",
+            "arguments": {
+              "eater": "预期有效吃者；oneaten回调可能直接要求AddDebuff；音效路径也可直接读eater.SoundEmitter"
+            }
+          },
+          "returns": "无显式返回；不是Eater.Eat的成功判定。",
+          "preconditions": "所需oneaten回调、温度组件/字段及事件接口有效；原版由服务端edible组件使用。",
+          "side_effects": "先oneaten(inst,eater)，再温度处理、oneaten事件及可选音效。",
+          "lifecycle": {
+            "sequence": "不自行移除食物；Eater随后HandleEatRemove；生成器可组合香料回调和原回调。",
+            "failure_and_cleanup": "无异常隔离/回滚；香料回调抛错可能阻断后续基础回调、事件与移除；不保证buff持久化。"
+          },
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S048",
+            "COOK-S049",
+            "COOK-S050",
+            "COOK-S051"
+          ],
+          "unknowns": [
+            "客户端表现、buff生命周期、食物在回调中移除的完整边界未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "基础meatballs与spice_salt分别被真实prefab注册；槽准入依据preparedfood/spice并排除spicedfood/wetgoop。",
+          "evidence_refs": [
+            "COOK-S010",
+            "COOK-S012",
+            "COOK-S034",
+            "COOK-S035",
+            "COOK-S036",
+            "COOK-S037",
+            "COOK-S039",
+            "COOK-S040",
+            "COOK-S041"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "按钮COOK/服务端动作进入stewer，names匹配高优先级变体；keepspoilage保留平均食材新鲜度。",
+          "evidence_refs": [
+            "COOK-S005",
+            "COOK-S017",
+            "COOK-S024",
+            "COOK-S034",
+            "COOK-S036",
+            "COOK-S045"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "完成/锅内变质、保存载入/长更新沿stewer；Harvest生成变体，烧毁/拆卸按具名回调清理。",
+          "evidence_refs": [
+            "COOK-S015",
+            "COOK-S019",
+            "COOK-S020",
+            "COOK-S021",
+            "COOK-S022",
+            "COOK-S031",
+            "COOK-S042",
+            "COOK-S043",
+            "COOK-S044",
+            "COOK-S045"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "产品把spice/oneatenfn写入edible，Eater读数值并调用OnEaten，盐读系数、其他香料进组合回调；不等同游戏实测。",
+          "evidence_refs": [
+            "COOK-S033",
+            "COOK-S034",
+            "COOK-S040",
+            "COOK-S046",
+            "COOK-S047",
+            "COOK-S048",
+            "COOK-S049",
+            "COOK-S050",
+            "COOK-S051"
+          ]
+        }
+      ],
+      "unknowns": [
+        "EXP-COOK-007-UNK-01"
+      ],
+      "compatibility": {
+        "dependency_coverage": "unknown",
+        "dependency_refs": [
+          {
+            "ref": "COOK-S005",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S007",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S010",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "COOK-S011",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "COOK-S012",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "COOK-S015",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-05"
+            ]
+          },
+          {
+            "ref": "COOK-S017",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S019",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S020",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S021",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S022",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S024",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S031",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S033",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-07"
+            ]
+          },
+          {
+            "ref": "COOK-S034",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03",
+              "EXP-COOK-007-NSF-07",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S035",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-03"
+            ]
+          },
+          {
+            "ref": "COOK-S036",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-01",
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-03",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S037",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-01"
+            ]
+          },
+          {
+            "ref": "COOK-S038",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-04",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S039",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-01",
+              "EXP-COOK-007-NSF-04",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S040",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-04",
+              "EXP-COOK-007-NSF-07",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S041",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-04"
+            ]
+          },
+          {
+            "ref": "COOK-S042",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S043",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S044",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S045",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02",
+              "EXP-COOK-007-NSF-05",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S046",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-06",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01"
+            ]
+          },
+          {
+            "ref": "COOK-S047",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-06",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S048",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-04",
+              "EXP-COOK-007-NSF-07"
+            ]
+          },
+          {
+            "ref": "COOK-S049",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-07",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-REC-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S050",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-06",
+              "EXP-COOK-007-NSF-07",
+              "EXP-COOK-007-EI-01",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S051",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-07",
+              "EXP-COOK-007-UNK-01"
+            ]
+          },
+          {
+            "ref": "COOK-S055",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S056",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-02"
+            ]
+          },
+          {
+            "ref": "COOK-S060",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S061",
+            "role": "direct cited Lua evidence; transitive/native closure unknown",
+            "claim_ids": []
+          },
+          {
+            "ref": "COOK-S018",
+            "role": "StopCooking fire exception to the normal Harvest path; no runtime claim",
+            "claim_ids": [
+              "EXP-COOK-007-NSF-05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "COOK-S001",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 9,
+      "line_end": 30,
+      "range_sha256": "1848dba6c8f379b83afcce64666dec870a71646f7e2444df08479ab20ba784e2",
+      "symbols": [
+        "AddCookerRecipe"
+      ]
+    },
+    {
+      "id": "COOK-S002",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 46,
+      "line_end": 72,
+      "range_sha256": "e881254f64aac685a1323cab54c53827591eb291efe0bb9427f4c48117984138",
+      "symbols": [
+        "AddIngredientValues"
+      ]
+    },
+    {
+      "id": "COOK-S003",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 178,
+      "line_end": 187,
+      "range_sha256": "f01620121389766e531b684411812b5e102ca555f274b9dc137561a734097f15",
+      "symbols": [
+        "aliases",
+        "IsCookingIngredient"
+      ]
+    },
+    {
+      "id": "COOK-S004",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 189,
+      "line_end": 215,
+      "range_sha256": "842de397f504070965d6cfdd10b2361155cbb6d40bf024a6e05ba1860a9396a2",
+      "symbols": [
+        "AddCookerRecipe",
+        "cookerrecipes"
+      ]
+    },
+    {
+      "id": "COOK-S005",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 217,
+      "line_end": 236,
+      "range_sha256": "2f21349be4b3acb7abcdfcdb482e41cedd31aaa2edfb11867bf07287ae5701d6",
+      "symbols": [
+        "GetIngredientValues",
+        "GetRecipe"
+      ]
+    },
+    {
+      "id": "COOK-S006",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 238,
+      "line_end": 266,
+      "range_sha256": "1e9d26a1f9841b89ca1f53ba5634e7e179c05e92dba0165a992ab065019f0e2e",
+      "symbols": [
+        "GetCandidateRecipes"
+      ]
+    },
+    {
+      "id": "COOK-S007",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 268,
+      "line_end": 288,
+      "range_sha256": "558a3f0b5957c4eb61cd20dd6a804ed746798844b939d2f8d9df85310681c036",
+      "symbols": [
+        "CalculateRecipe"
+      ]
+    },
+    {
+      "id": "COOK-S008",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 324,
+      "line_end": 324,
+      "range_sha256": "f58f91e4f826b185171efad6501ad20d015c35c6fbd08da3d1416dab7d11afae",
+      "symbols": [
+        "CalculateRecipe",
+        "IsCookingIngredient",
+        "GetRecipe"
+      ]
+    },
+    {
+      "id": "COOK-S009",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 636,
+      "line_end": 653,
+      "range_sha256": "f9e734b3cee2bc193e63e2e29dcd21073969d55c21408d7b76bcf228f7c8e595",
+      "symbols": [
+        "env.AddIngredientValues",
+        "env.AddCookerRecipe"
+      ]
+    },
+    {
+      "id": "COOK-S010",
+      "source_file": "scripts/preparedfoods.lua",
+      "file_sha256": "250ee48697633b5ef32dd6a787bc94d5f2d8b9b3c19f415175db339c285872d5",
+      "line_start": 185,
+      "line_end": 197,
+      "range_sha256": "05238a2e2837d9138164992daab860f47dbb120d6a03376ab8684d6c46ad824b",
+      "symbols": [
+        "meatballs"
+      ]
+    },
+    {
+      "id": "COOK-S011",
+      "source_file": "scripts/preparedfoods.lua",
+      "file_sha256": "250ee48697633b5ef32dd6a787bc94d5f2d8b9b3c19f415175db339c285872d5",
+      "line_start": 352,
+      "line_end": 363,
+      "range_sha256": "70ccbcc1bc171d3ce3f95948605e07521dbf92cb5e93ab57319e605f9c9b879b",
+      "symbols": [
+        "wetgoop"
+      ]
+    },
+    {
+      "id": "COOK-S012",
+      "source_file": "scripts/preparedfoods.lua",
+      "file_sha256": "250ee48697633b5ef32dd6a787bc94d5f2d8b9b3c19f415175db339c285872d5",
+      "line_start": 1098,
+      "line_end": 1106,
+      "range_sha256": "ab939cc5362b0352b4a317f064434b6dd6b847065cc68556f80d16a7922b409e",
+      "symbols": [
+        "foods"
+      ]
+    },
+    {
+      "id": "COOK-S013",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 3,
+      "line_end": 63,
+      "range_sha256": "b79e95fbf4dc171fdd519677860a8008d032c439a891857dd9de70e2d7e10e42",
+      "symbols": [
+        "ondone",
+        "oncheckready",
+        "onnotready",
+        "Stewer",
+        "Stewer:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "COOK-S014",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 65,
+      "line_end": 73,
+      "range_sha256": "e3acd70c89331a1840df0d93395f50a0d8071eb5aa1e90e40412360fdacab8e9",
+      "symbols": [
+        "dospoil"
+      ]
+    },
+    {
+      "id": "COOK-S015",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 75,
+      "line_end": 100,
+      "range_sha256": "7cfa1fdc9e9eb3ff37b9ed4bac5a06e8b9130535edc815ded864de035c4ef0c2",
+      "symbols": [
+        "dostew"
+      ]
+    },
+    {
+      "id": "COOK-S016",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 102,
+      "line_end": 128,
+      "range_sha256": "f3af6eb3c50c0c497105550967ac2155fec149ff7cd9c327f3d0a7ada5b808a2",
+      "symbols": [
+        "Stewer:IsDone",
+        "Stewer:IsSpoiling",
+        "Stewer:IsCooking",
+        "Stewer:GetTimeToCook",
+        "Stewer:GetTimeToSpoil",
+        "Stewer:CanCook",
+        "Stewer:GetRecipeForProduct"
+      ]
+    },
+    {
+      "id": "COOK-S017",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 130,
+      "line_end": 178,
+      "range_sha256": "66eff349a69ae0366a036b0f9e5e15dde545ca998dccf298870544599369b75e",
+      "symbols": [
+        "Stewer:StartCooking"
+      ]
+    },
+    {
+      "id": "COOK-S018",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 180,
+      "line_end": 201,
+      "range_sha256": "c7a975159732ba5addb0f6d835c6b5b66f474be88091dd8ae0f1b25103d9c5f2",
+      "symbols": [
+        "StopProductPhysics",
+        "Stewer:StopCooking"
+      ]
+    },
+    {
+      "id": "COOK-S019",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 203,
+      "line_end": 216,
+      "range_sha256": "a4721abcc6c197c4b9dc429401a838c2179563a591c7ba0da7cc99745ebd437d",
+      "symbols": [
+        "Stewer:OnSave"
+      ]
+    },
+    {
+      "id": "COOK-S020",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 218,
+      "line_end": 261,
+      "range_sha256": "99925ca0cdda3c1a17a7ebea249135f97619542e4d769a66d6397cb359243744",
+      "symbols": [
+        "Stewer:OnLoad"
+      ]
+    },
+    {
+      "id": "COOK-S021",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 276,
+      "line_end": 330,
+      "range_sha256": "e2875714f1eba1aee1a5eaf0533691ae0cfa61bb89c0f96098174ccead01dd6d",
+      "symbols": [
+        "Stewer:Harvest"
+      ]
+    },
+    {
+      "id": "COOK-S022",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 332,
+      "line_end": 358,
+      "range_sha256": "b60e1a2e4e79d33053b67e1204da302b98c4355bb1a0c6f2156c7f8de5107170",
+      "symbols": [
+        "Stewer:LongUpdate"
+      ]
+    },
+    {
+      "id": "COOK-S023",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 330,
+      "line_end": 342,
+      "range_sha256": "8a244963cb45e4cd66ba7951933b78aa09458cc269591635d4f1071c1932f552",
+      "symbols": [
+        "Container:DestroyContents"
+      ]
+    },
+    {
+      "id": "COOK-S024",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "ba2455683ca4468cf41d9ccaade2847c56c6bf935f5807c3ffaf080075bf90b7",
+      "line_start": 2038,
+      "line_end": 2050,
+      "range_sha256": "8ae829e9e405e13f15d926cb438e5f8644e2017b6c02e3ea1e67ece773033ee8",
+      "symbols": [
+        "ACTIONS.COOK.fn"
+      ]
+    },
+    {
+      "id": "COOK-S025",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "caa12a0db2bed7ffa53586986647d12b4876dbba8ad788fe5657341590867464",
+      "line_start": 837,
+      "line_end": 855,
+      "range_sha256": "4f6ad095678c280f72bf8d160542ea33af1d4826bf216893f84c22999bffcc1c",
+      "symbols": [
+        "stewer"
+      ]
+    },
+    {
+      "id": "COOK-S026",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 301,
+      "line_end": 322,
+      "range_sha256": "7997091cc0a37b08296a2f8c42b4836cc4726f2771ade572a0d9ec2faa08afaa",
+      "symbols": [
+        "MakeCookPot"
+      ]
+    },
+    {
+      "id": "COOK-S027",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 342,
+      "line_end": 361,
+      "range_sha256": "b3a9e3a8f914f29af87cd1b2a63e2f2684b76644f4d9873264ed5afebc8240aa",
+      "symbols": [
+        "MakeCookPot"
+      ]
+    },
+    {
+      "id": "COOK-S028",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 77,
+      "line_end": 84,
+      "range_sha256": "c1a9f0dcbf459f4b4a315f8d63b8ffd7a923b1e99cedc4762f8f8a9363a55ade",
+      "symbols": [
+        "startcookfn"
+      ]
+    },
+    {
+      "id": "COOK-S029",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 105,
+      "line_end": 174,
+      "range_sha256": "bfac7bbca461770f6901fb1feb5864c8f76df7db1bb48fa3b80bf9bae934b582",
+      "symbols": [
+        "SetProductSymbol",
+        "spoilfn",
+        "ShowProduct",
+        "donecookfn",
+        "continuedonefn",
+        "continuecookfn",
+        "harvestfn"
+      ]
+    },
+    {
+      "id": "COOK-S030",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 190,
+      "line_end": 210,
+      "range_sha256": "70c3f9e23df0ca0b8ac8ce7e826d99277f08480f171fa3956e8e60169ccff51a",
+      "symbols": [
+        "onsave",
+        "onload",
+        "onloadpostpass"
+      ]
+    },
+    {
+      "id": "COOK-S031",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 52,
+      "line_end": 130,
+      "range_sha256": "d95151b75ef7829798dda58de98ef81ca6fcbac7f9254e20c910e8d787cdfb57",
+      "symbols": [
+        "DefaultBurntStructureFn"
+      ]
+    },
+    {
+      "id": "COOK-S032",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 176,
+      "line_end": 186,
+      "range_sha256": "4f0986c776c3ef7d23947a012910385addafa77a64de342cacb3a63dd8e12c7c",
+      "symbols": [
+        "MakeMediumBurnable"
+      ]
+    },
+    {
+      "id": "COOK-S033",
+      "source_file": "scripts/spicedfoods.lua",
+      "file_sha256": "6ccaac6a0b37ca2aca5f93f999b04ddec4e9481f14d59eb7541dec0e1d4ee97d",
+      "line_start": 1,
+      "line_end": 23,
+      "range_sha256": "2e6b03bd1f9b13d623c19728b0d0964863c65815b57e36db7c263a755fe9ac1e",
+      "symbols": [
+        "oneaten_garlic",
+        "oneaten_sugar",
+        "oneaten_chili",
+        "SPICES"
+      ]
+    },
+    {
+      "id": "COOK-S034",
+      "source_file": "scripts/spicedfoods.lua",
+      "file_sha256": "6ccaac6a0b37ca2aca5f93f999b04ddec4e9481f14d59eb7541dec0e1d4ee97d",
+      "line_start": 25,
+      "line_end": 78,
+      "range_sha256": "dd8a4633fdeeea2a0163dedc507a66d0ad83924b2ccd10e6f57c01e71ce50547",
+      "symbols": [
+        "GenerateSpicedFoods"
+      ]
+    },
+    {
+      "id": "COOK-S035",
+      "source_file": "scripts/spicedfoods.lua",
+      "file_sha256": "6ccaac6a0b37ca2aca5f93f999b04ddec4e9481f14d59eb7541dec0e1d4ee97d",
+      "line_start": 80,
+      "line_end": 83,
+      "range_sha256": "c4dc3b641cfe48379e21d67ab1f131e9517da8bd70ce039cc1399465ec8dbce0",
+      "symbols": [
+        "GenerateSpicedFoods",
+        "spicedfoods"
+      ]
+    },
+    {
+      "id": "COOK-S036",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 396,
+      "line_end": 444,
+      "range_sha256": "d29a5e7eaf69523b92cf65ab80026770c8a93434e510c04da0df4ac4e8eff062",
+      "symbols": [
+        "params.portablespicer",
+        "params.portablespicer.itemtestfn",
+        "params.portablespicer.widget.buttoninfo.fn"
+      ]
+    },
+    {
+      "id": "COOK-S037",
+      "source_file": "scripts/prefabs/spices.lua",
+      "file_sha256": "0cc09d38622849c7f16fd41ecebfa5e1c60835287324e9a5b25688c21f2fe3b7",
+      "line_start": 6,
+      "line_end": 49,
+      "range_sha256": "517a99673e97de7abc216009f98c00817ff58578dd4cf6baace7a238433fcaa8",
+      "symbols": [
+        "MakeSpice"
+      ]
+    },
+    {
+      "id": "COOK-S038",
+      "source_file": "scripts/prefabs/preparedfoods.lua",
+      "file_sha256": "591e278ccefbf4a10e69a864324c13ea190432e52730f05503873748b300f96d",
+      "line_start": 7,
+      "line_end": 37,
+      "range_sha256": "2db108f98ee9a563737639e0a64cd25f95b3596da4a5d0ce1ec6857dbd39c2d7",
+      "symbols": [
+        "MakePreparedFood",
+        "DisplayNameFn"
+      ]
+    },
+    {
+      "id": "COOK-S039",
+      "source_file": "scripts/prefabs/preparedfoods.lua",
+      "file_sha256": "591e278ccefbf4a10e69a864324c13ea190432e52730f05503873748b300f96d",
+      "line_start": 39,
+      "line_end": 108,
+      "range_sha256": "4a84ee0349852c705d0331cfb7d540b03aa503daf8486224ea80b006f1a75cfc",
+      "symbols": [
+        "MakePreparedFood"
+      ]
+    },
+    {
+      "id": "COOK-S040",
+      "source_file": "scripts/prefabs/preparedfoods.lua",
+      "file_sha256": "591e278ccefbf4a10e69a864324c13ea190432e52730f05503873748b300f96d",
+      "line_start": 110,
+      "line_end": 166,
+      "range_sha256": "afc71bb87ce381ed0de7c7e2008d45f9efcae6b9a0eb23fe57c1e66b6286944b",
+      "symbols": [
+        "MakePreparedFood"
+      ]
+    },
+    {
+      "id": "COOK-S041",
+      "source_file": "scripts/prefabs/preparedfoods.lua",
+      "file_sha256": "591e278ccefbf4a10e69a864324c13ea190432e52730f05503873748b300f96d",
+      "line_start": 168,
+      "line_end": 182,
+      "range_sha256": "c9fed4b7c674e8b027cf8a31cb6fbe18470733f5dd314e45a52aab2ff8ea2067",
+      "symbols": [
+        "MakePreparedFood",
+        "prefs"
+      ]
+    },
+    {
+      "id": "COOK-S042",
+      "source_file": "scripts/prefabs/portablespicer.lua",
+      "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+      "line_start": 38,
+      "line_end": 66,
+      "range_sha256": "db1bb99fef9d359bfe7618bade5fd2bf7d1c82b6be7dbbe77a9a286d2ee432ef",
+      "symbols": [
+        "ChangeToItem",
+        "onhammered"
+      ]
+    },
+    {
+      "id": "COOK-S043",
+      "source_file": "scripts/prefabs/portablespicer.lua",
+      "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+      "line_start": 125,
+      "line_end": 190,
+      "range_sha256": "e57541755d96a55b0b70eb1d2fe47c3a3ffafcbc02cd9c480bd93e35813535b5",
+      "symbols": [
+        "spoilfn",
+        "ShowProduct",
+        "donecookfn",
+        "continuedonefn",
+        "continuecookfn",
+        "harvestfn"
+      ]
+    },
+    {
+      "id": "COOK-S044",
+      "source_file": "scripts/prefabs/portablespicer.lua",
+      "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+      "line_start": 200,
+      "line_end": 232,
+      "range_sha256": "b65424749df6df65509461be6f39b063e56d0d6e2336a0367e2f210ce9c2a007",
+      "symbols": [
+        "onsave",
+        "onload",
+        "OnDismantle",
+        "OnBurnt"
+      ]
+    },
+    {
+      "id": "COOK-S045",
+      "source_file": "scripts/prefabs/portablespicer.lua",
+      "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+      "line_start": 234,
+      "line_end": 310,
+      "range_sha256": "8f3ee0f05747e0074c3765be6dcab639d272a3a42afdcf6b379e1c504eb63748",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "COOK-S046",
+      "source_file": "scripts/tuning.lua",
+      "file_sha256": "6c44b813cf809655d2d0072a16d78a74d5f00b674c085027e4b2412e2afd2c7a",
+      "line_start": 4614,
+      "line_end": 4621,
+      "range_sha256": "2011af23f5714ed907364a7e2e20441a01e596cc14269ece95689bbac2edf27d",
+      "symbols": [
+        "PORTABLE_COOK_POT_TIME_MULTIPLIER",
+        "SPICE_MULTIPLIERS"
+      ]
+    },
+    {
+      "id": "COOK-S047",
+      "source_file": "scripts/components/edible.lua",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "line_start": 121,
+      "line_end": 143,
+      "range_sha256": "9aa66e59d35bde3a940a88dad79fc3972b0b4565404859dbaab4485944d7e770",
+      "symbols": [
+        "Edible:GetHealth"
+      ]
+    },
+    {
+      "id": "COOK-S048",
+      "source_file": "scripts/components/edible.lua",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "line_start": 149,
+      "line_end": 151,
+      "range_sha256": "e7c0bc50438678f9429bb754068c34bfbf5242799c917b84686cc9e7f4c85002",
+      "symbols": [
+        "Edible:SetOnEatenFn"
+      ]
+    },
+    {
+      "id": "COOK-S049",
+      "source_file": "scripts/components/edible.lua",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "line_start": 183,
+      "line_end": 214,
+      "range_sha256": "367dd9d6982de2078bd0c74ed619b046829617fa1cffc947d4403369368fb94c",
+      "symbols": [
+        "Edible:OnEaten"
+      ]
+    },
+    {
+      "id": "COOK-S050",
+      "source_file": "scripts/components/eater.lua",
+      "file_sha256": "d8de9b5c73274deb42198f8cc937915ff6b1bbb42eb908d72a84cc24bde688b4",
+      "line_start": 198,
+      "line_end": 286,
+      "range_sha256": "aa865236e57138534827e2c7344ddd14ad6138644d65dc26632620d8b13e17bd",
+      "symbols": [
+        "Eater:Eat"
+      ]
+    },
+    {
+      "id": "COOK-S051",
+      "source_file": "scripts/components/edible.lua",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "line_start": 216,
+      "line_end": 226,
+      "range_sha256": "25b6a8f8da9a11c6a14a6ad990c249f6d7604b0c4550a7d092ff473c7e7b0248",
+      "symbols": [
+        "Edible:HandleEatRemove"
+      ]
+    },
+    {
+      "id": "COOK-S052",
+      "source_file": "scripts/prefabs/cookpot.lua",
+      "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+      "line_start": 36,
+      "line_end": 51,
+      "range_sha256": "3cdec63c5a0f8feb2a924544c5db3707ccdbaab48ee6fd9d71a8f37a91eff468",
+      "symbols": [
+        "onhammered"
+      ]
+    },
+    {
+      "id": "COOK-S053",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "line_start": 648,
+      "line_end": 663,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "COOK-S054",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 348,
+      "line_end": 390,
+      "range_sha256": "62f32da8eb0b256bdb2aad3ffe31395a2f06412690ef255cce9410119db5c47f",
+      "symbols": [
+        "params.cookpot",
+        "params.cookpot.itemtestfn",
+        "params.cookpot.widget.buttoninfo.fn"
+      ]
+    },
+    {
+      "id": "COOK-S055",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 9,
+      "line_end": 17,
+      "range_sha256": "6dae530848ce47618c3d63aba208e034938089c205c78a6b2b920554ce14bafc",
+      "symbols": [
+        "containers.widgetsetup"
+      ]
+    },
+    {
+      "id": "COOK-S056",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 86,
+      "line_end": 109,
+      "range_sha256": "a483cfd339f7aa51714b8c5bf35a40a341b4ccea71cbdbc62074a985c09b8a5f",
+      "symbols": [
+        "Container:WidgetSetup",
+        "Container:IsFull"
+      ]
+    },
+    {
+      "id": "COOK-S057",
+      "source_file": "scripts/prefabs/portablecookpot.lua",
+      "file_sha256": "5b47abdb732171a83a68b063d86feabf86a16c765ac7d4a9ff09e3d766d48ea1",
+      "line_start": 271,
+      "line_end": 294,
+      "range_sha256": "1d82c9507028005640251cc2b1bb670564c2c2cfc54e319e764513bd2f7b727e",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "COOK-S058",
+      "source_file": "scripts/tuning.lua",
+      "file_sha256": "6c44b813cf809655d2d0072a16d78a74d5f00b674c085027e4b2412e2afd2c7a",
+      "line_start": 2096,
+      "line_end": 2096,
+      "range_sha256": "9edb07288ca23995413033d32d72d57ecd4b78e11806bf370efb4cee64f8832f",
+      "symbols": [
+        "BASE_COOK_TIME"
+      ]
+    },
+    {
+      "id": "COOK-S059",
+      "source_file": "scripts/cooking.lua",
+      "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+      "line_start": 100,
+      "line_end": 109,
+      "range_sha256": "6d9ab1b89d1284a0453b4e86fa6ecc6de554e43c6c6d82f79ef9a8153340d694",
+      "symbols": [
+        "AddIngredientValues"
+      ]
+    },
+    {
+      "id": "COOK-S060",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 4,
+      "line_end": 17,
+      "range_sha256": "35ce8581a30bc3ce10bc806e12090214e0e7f8f62ebac1d06e538c4bc74ebc90",
+      "symbols": [
+        "containers.params",
+        "containers.widgetsetup"
+      ]
+    },
+    {
+      "id": "COOK-S061",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 2500,
+      "line_end": 2500,
+      "range_sha256": "f9ca7c4a0e4f82cf747fb3def9dffe85623aa613362f7fbb38c1cceee433442a",
+      "symbols": [
+        "containers"
+      ]
+    },
+    {
+      "id": "COOK-S062",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 944,
+      "line_end": 955,
+      "range_sha256": "9d26407619ca9a4a4b1c8bd8f30b3978a040827e93292c202b1d16d5cfae9b30",
+      "symbols": [
+        "shallowcopy"
+      ]
+    },
+    {
+      "id": "COOK-S063",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "line_start": 357,
+      "line_end": 367,
+      "range_sha256": "fee2e80f5b8de6c68f84df84b70c4fe0c707c5129dfed820baed6b9e6617b4e1",
+      "symbols": [
+        "ArrayUnion"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "新增锅料理只注册食谱够吗，配料标签是合并还是替换",
+      "expected_entry_ids": [
+        "EXP-COOK-001"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "AddCookerRecipe / env.AddCookerRecipe / AddIngredientValues / cooking.GetRecipe",
+      "expected_entry_ids": [
+        "EXP-COOK-001"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "原始注册与Mod包装是否同一个接口；配料有可食标签就自动算肉度吗",
+      "expected_entry_ids": [
+        "EXP-COOK-001"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "多道菜同时符合时怎么决定结果，权重没有写安全吗",
+      "expected_entry_ids": [
+        "EXP-COOK-002"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "cooking.CalculateRecipe / GetCandidateRecipes / priority / weight",
+      "expected_entry_ids": [
+        "EXP-COOK-002"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "最高权重是否必胜；同档是否必定均匀；无候选是否自动生成湿糊",
+      "expected_entry_ids": [
+        "EXP-COOK-002"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "开始做饭时什么时候扣材料，料理做完后锅里怎么变质",
+      "expected_entry_ids": [
+        "EXP-COOK-003"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "Stewer:StartCooking / CanCook / IsCooking / dostew / dospoil",
+      "expected_entry_ids": [
+        "EXP-COOK-003"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "直接开始是否自己检查满锅；完成回调里是否已done；烹饪时间是不是秒数",
+      "expected_entry_ids": [
+        "EXP-COOK-003"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "收获失败会留着锅里成品吗，取消和烧毁会退材料吗",
+      "expected_entry_ids": [
+        "EXP-COOK-004"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "Stewer:Harvest / StopCooking / OnRemoveFromEntity / DefaultBurntStructureFn",
+      "expected_entry_ids": [
+        "EXP-COOK-004"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "Harvest返回真是否一定拿到物品；移除组件是否自动取消任务；Stop是否重开容器",
+      "expected_entry_ids": [
+        "EXP-COOK-004"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "锅的保存读档与离线追赶怎样跨过烹饪和腐烂两个阶段",
+      "expected_entry_ids": [
+        "EXP-COOK-005"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "Stewer:OnSave / OnLoad / LongUpdate / remainingtime",
+      "expected_entry_ids": [
+        "EXP-COOK-005"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "没有剩余时间是否必定已腐烂；长更新刚好到期是否仍继续等；读档是否重算配方",
+      "expected_entry_ids": [
+        "EXP-COOK-005"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "调味菜怎样从基础菜派生，会保留原来的食用效果吗",
+      "expected_entry_ids": [
+        "EXP-COOK-006"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "GenerateSpicedFoods / spicedfoods / basename / spice / oneatenfn",
+      "expected_entry_ids": [
+        "EXP-COOK-006"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "生成器是否纯函数并自动支持全部Mod菜；浅复制是否隔离全部嵌套表；香料是否覆盖原效果",
+      "expected_entry_ids": [
+        "EXP-COOK-006"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "食物能放进调味站就一定有对应成品吗，盐怎样影响回血",
+      "expected_entry_ids": [
+        "EXP-COOK-007"
+      ],
+      "purpose": "纯中文机制入口"
+    },
+    {
+      "query": "portablespicer / preparedfood / spicedfood / meatballs_spice_salt / Edible:GetHealth",
+      "expected_entry_ids": [
+        "EXP-COOK-007"
+      ],
+      "purpose": "实际符号入口"
+    },
+    {
+      "query": "湿糊或已调味菜能否再次调味；盐是否保证最终回血乘一点二五；食物标签是否直接触发增益",
+      "expected_entry_ids": [
+        "EXP-COOK-007"
+      ],
+      "purpose": "边界负例：命中后必须否定错误推论，不能直接据问句实现"
+    },
+    {
+      "query": "列出全部食谱最划算回血排名",
+      "expected_entry_ids": [],
+      "purpose": "范围外负例；未做游戏攻略/数值穷举"
+    },
+    {
+      "query": "调味料理已经在远端客户端运行通过了吗",
+      "expected_entry_ids": [
+        "EXP-COOK-007"
+      ],
+      "purpose": "运行负例，只能回答未运行，不宣称图像/联网通过"
+    }
+  ],
+  "limitations": [
+    "所有条目research/restricted/hold，NOT_RUN；候选格式/哈希通过不授予Coding，不等同语义审查或游戏运行。",
+    "759671绑定本轮证据。文件哈希对ZIP成员原始字节，行段按UTF-8 splitlines/含两端/LF拼接/无末尾LF计算。没有复制完整游戏Lua。",
+    "只闭合cooking/stewer与原版cookpot、portablespicer、preparedfoods的所引链，meatballs及其spice_salt为具名消费者；不穷举菜谱，不扩成完整eater/edible系统。",
+    "local GetIngredientValues、dostew/dospoil、MakePreparedFood、MakeSpice及prefab回调不是Mod公共API。由模块返回表显式导出的local实现按module export标明；modutil env包装与原始全局注册函数分开。",
+    "未知native：定时任务/睡眠/长更新时间顺序、SpawnPrefab资源、网络RPC/客户端、物理/音效/动画；buff叠加/持续/存档/清理不在本候选闭环。",
+    "逐claim/API/step有本文件引用。compatibility只枚举直接引用，dependency_coverage=unknown，不伪称静态传递/native依赖完整。新ZIP compare/list/show不因版本不同关闭阅读或定位。",
+    "盐读取链只证明当前HEALTH加法系数和腐败规则，不保证最终生命变化；eater吸收、custom_stats_mod_fn与健康状态仍可改变实际结果。",
+    "工具边界用原创合成Lua测试，不是料理Lua或游戏运行；自然语言/符号/负例查询为候选预期，不宣称已接入安装MCP或实测检索召回。",
+    "技能已按任务查MCP reviewer compact bundle，实际返回no_admitted_catalog_match；该检索缺口不证明全库无知识，也未借未读旧记录给新声明背书。事实来自合法本地ZIP核对。"
+  ]
+}

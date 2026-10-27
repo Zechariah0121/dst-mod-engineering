@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 NAME = 'dst-mod-engineering'
-VERSION = 'v2026.10.25.4'
+VERSION = 'v2026.10.27.1'
 ARCHIVE = NAME + '.zip'
 CHECKSUMS = 'SHA256SUMS.txt'
 MANIFEST = 'RELEASE-MANIFEST.json'
@@ -19,7 +19,7 @@ ROOT_FILES = ('SKILL.md', 'README.md', 'README.en.md', 'LICENSE', 'requirements.
               'prepare_sources.py', 'run_kb.py', 'retrieval-config.json',
               'source-epochs.json', 'source-payload-recipe.json', 'PUBLICATION-ORIGIN-MAP.json')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'examples': '.json'}
-SCRIPTS = ('dst_zip_tool.py', 'check_api.py', 'dst_modtest.py', 'source_payload.py', 'public_rebind.py')
+SCRIPTS = ('dst_zip_tool.py', 'check_api.py', 'dst_modtest.py', 'source_payload.py', 'public_rebind.py', 'source_compatibility.py', 'catalog_fallback_policy.py', 'register_mechanisms.py', 'legacy_adapter.py')
 SERVICE_FILES = ('LICENSE', 'README.md', 'config.example.json', 'dst_kb_cli.py', 'export_mcp_tools.py')
 SERVICE_DATA = ('dst-kb-service/dst_kb/contract_map.json',
                 'dst-kb-service/dst_kb/source_identity_map.json',
@@ -117,7 +117,14 @@ def source_files(root):
     catalog = json.loads(inputs['knowledge/CATALOG.json'])
     entries = catalog['entries']
     counts = {family: sum(row['family'] == family for row in entries) for family in EXPECTED_COUNTS}
-    if counts != EXPECTED_COUNTS or len(entries) != 187 or len({row['id'] for row in entries}) != 187:
+    registry_file = root / 'knowledge/FAMILY-REGISTRY.json'
+    if registry_file.is_file():
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('release_families', root / 'dst-kb-service/dst_kb/family_registry.py')
+        families = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(families)
+        families.validate_catalog(root / 'knowledge', catalog, families.load(root / 'knowledge'))
+    elif counts != EXPECTED_COUNTS or len(entries) != 187 or len({row['id'] for row in entries}) != 187:
         raise ValueError('Knowledge catalog must contain exactly 64 + 13 + 110 unique records')
     for row in entries:
         if 'knowledge/' + row['file'] not in inputs:
@@ -139,7 +146,8 @@ def zip_bytes(files):
 def make_outputs(root):
     inputs = source_files(root)
     manifest = {'schema': 'dst-complete-release/1', 'version': VERSION,
-                'knowledge_records': 187, 'knowledge_families': EXPECTED_COUNTS,
+                'knowledge_records': len(json.loads(inputs['knowledge/CATALOG.json'])['entries']),
+                'knowledge_families': {family: sum(row['family'] == family for row in json.loads(inputs['knowledge/CATALOG.json'])['entries']) for family in sorted({row['family'] for row in json.loads(inputs['knowledge/CATALOG.json'])['entries']})},
                 'source_epoch': '759671',
                 'files': {name: {'sha256': sha(data), 'bytes': len(data)} for name, data in inputs.items()}}
     files = {NAME + '/' + name: data for name, data in inputs.items()}

@@ -105,7 +105,16 @@ def validate_catalog_native(root,errors):
             schema=read(root/'schemas'/schemafile);errors.extend(schema_errors(doc,schema,schema,family))
         for entry in doc['entries']:expected.append((entry['id'],family))
     counts={'total':len(rows),**dict(Counter(row['family'] for row in rows))}
-    if counts!=catalog.get('counts') or counts!={'total':187,'legacy':64,'native_ai':13,'native_core':110}:errors.append('catalog counts mismatch')
+    registry_path=root/'FAMILY-REGISTRY.json'
+    if registry_path.is_file():
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('knowledge_families',root.parent/'dst-kb-service/dst_kb/family_registry.py')
+        registry_module=importlib.util.module_from_spec(spec);spec.loader.exec_module(registry_module)
+        registry=registry_module.load(root)
+        try:registry_module.validate_catalog(root,catalog,registry)
+        except ValueError as exc:errors.append(str(exc))
+        expected=[(row['id'],row['family']) for row in registry_module.catalog_rows(root,registry)]
+    elif counts!=catalog.get('counts') or counts!={'total':187,'legacy':64,'native_ai':13,'native_core':110}:errors.append('catalog counts mismatch')
     actual=[(row['id'],row['family']) for row in rows]
     if len(set(row['id'] for row in rows))!=len(rows) or actual!=expected:errors.append('catalog ID/family/order mismatch')
     for row in rows:

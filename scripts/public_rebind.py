@@ -265,6 +265,13 @@ def rebind(target, originmapping, report_path=None):
                 if node.get('lexical_witness_ref') in lexical_keys:
                     node['lexical_witness_ref'] = lexical_keys[node['lexical_witness_ref']]
             write(root / asset, doc)
+        registry_path = root / 'dst-kb-service/dst_kb/family_registry.py'
+        if (kb / 'FAMILY-REGISTRY.json').is_file():
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('rebind_families', registry_path)
+            families = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(families)
+            families.refresh_derived_baseline(kb)
         _manifest(kb)
     # Projection profiles use preserved selection indexes, with exact new record
     # hashes. Variant hash keys are remapped using their original record identity.

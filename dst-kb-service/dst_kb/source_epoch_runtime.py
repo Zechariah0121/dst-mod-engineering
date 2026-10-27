@@ -71,6 +71,19 @@ def active_epoch():
     return _ACTIVE.get()
 
 
+def source_preparation_document():
+    context = active_epoch()
+    if context is None:
+        return None
+    binding = context.metadata().get('source_preparation')
+    if binding is None:
+        return None
+    path, expected = _commitment(context.catalog.parent, binding, 'source_preparation')
+    if _hash(path) != expected:
+        raise KBError('SOURCE_EPOCH_STALE', 'Source preparation assessment changed; reconnect after preparing sources.')
+    return json.loads(path.read_bytes())
+
+
 def epoch_arguments(arguments):
     """Keep generated expansion/navigation calls in their originating epoch."""
     result = dict(arguments)
@@ -163,6 +176,17 @@ def resolve_epoch(config=None, source_epoch=None):
         raise KBError('INVALID_CONFIG', 'Source environments require committed source manifests.')
     for source in sources:
         commitments.append(_commitment(base, source, 'source_manifests'))
+    preparation = entry.get('source_preparation')
+    preparation_summary = None
+    if preparation is not None:
+        path, expected = _commitment(base, preparation, 'source_preparation')
+        commitments.append((path, expected))
+        if _hash(path) != expected:
+            raise KBError('SOURCE_EPOCH_STALE', 'Source preparation assessment commitment changed.')
+        assessment = json.loads(path.read_bytes())
+        if assessment.get('schema') != 'dst-source-preparation-assessment/1':
+            raise KBError('INVALID_CONFIG', 'Unsupported source preparation assessment.')
+        preparation_summary = assessment['summary']
     key_data = {'source_epoch': selected, 'root': str(root), 'index': str(index),
                 'commitments': [(str(p), h) for p, h in commitments]}
     key = sha256(json.dumps(key_data, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
@@ -170,6 +194,9 @@ def resolve_epoch(config=None, source_epoch=None):
                 'source_manifests': copy.deepcopy(sources), 'source_epoch_context_sha256': key,
                 'record_evidence_scope': 'Each record retains its original source Scope; environment selection does not verify all records for this build.',
                 'review_coverage': copy.deepcopy(entry.get('review_coverage', {}))}
+    if preparation is not None:
+        metadata['source_preparation'] = copy.deepcopy(preparation)
+        metadata['source_input_assessment'] = copy.deepcopy(preparation_summary)
     result = EpochContext(selected, root, index, config_path, catalog_path, assets['contract_map'],
                           assets['source_identity_map'], key, tuple(commitments),
                           json.dumps(metadata, ensure_ascii=False, separators=(',', ':')))

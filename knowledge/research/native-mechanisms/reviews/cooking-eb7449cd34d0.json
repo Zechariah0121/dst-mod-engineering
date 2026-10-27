@@ -1,0 +1,138 @@
+{
+  "schema_version": "dst-cooking-revision-review/1",
+  "candidate_sha256": "39f19e255b6daa103177ef8d3bea5cf4d556beee4efe1509ee95dfdd408c323b",
+  "runtime_verified": false,
+  "previous_review": {
+    "path": "local-private-artifact/cooking-review.json",
+    "sha256": "337dfaf0c42e5d8f8809918325a0eac4b894b7dd10b29802289070251007433f",
+    "frozen_candidate_sha256": "9cc47abeadd04d97891929520a8fd8f14a703a8d2768712a3999363120f8e009"
+  },
+  "candidate_path": "local-private-artifact/cooking-reviewed.json",
+  "verdict": "F001_resolved_bounded_static_revision_accepted",
+  "review_scope": "Only diff from the frozen 9cc47abe candidate already reviewed; not a new full-topic review or game verification.",
+  "finding_resolutions": [
+    {
+      "id": "F001",
+      "status": "resolved",
+      "claim_id": "EXP-COOK-007-NSF-05",
+      "pointer": "/entries/6/claims/4/statement",
+      "review_note": "新句明确正常完成后的取出由Harvest生成并按前提传保鲜；明确fire取消也可能Spawn当前product且不做Harvest保鲜/堆叠，排他性歧义已消除。",
+      "semantic_basis": "已重新读取stewer.lua:184-201完整StopCooking：product非nil且reason==fire即尝试Spawn，不查done，未走Harvest的新鲜度/stacksize逻辑。此前独立审阅已核完整Harvest及spicer→DefaultBurntStructureFn→StopCooking路径，本次对应来源身份仍匹配。",
+      "evidence_refs": [
+        "COOK-S018",
+        "COOK-S021",
+        "COOK-S031",
+        "COOK-S044"
+      ],
+      "runtime_required_to_resolve": false
+    }
+  ],
+  "diff_checks": [
+    {
+      "pointer": "/entries/6/claims/4/statement",
+      "change": "仅将旧排他措辞替换成正常取出限定和fire例外",
+      "exact_expected_replacement_verified": true
+    },
+    {
+      "pointer": "/entries/6/claims/4/evidence_refs",
+      "change": "仅末尾追加已有COOK-S018",
+      "original_prefix_unchanged": true
+    },
+    {
+      "pointer": "/entries/6/compatibility/dependency_refs",
+      "change": "仅末尾追加COOK-S018到该claim的依赖关联及限定role",
+      "original_prefix_unchanged": true
+    }
+  ],
+  "unchanged_checks": {
+    "all_other_candidate_content_equal_after_reverting_three_expected_paths": true,
+    "source_reference_definitions_unchanged": true,
+    "entry_claim_api_step_counts_unchanged": true,
+    "three_axis_states_unchanged": true,
+    "author_original_candidate_unchanged": true,
+    "author_original_sha256": "9cc47abeadd04d97891929520a8fd8f14a703a8d2768712a3999363120f8e009"
+  },
+  "source": {
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "source_epoch": "759671",
+    "source_references": [
+      {
+        "id": "COOK-S018",
+        "source_file": "scripts/components/stewer.lua",
+        "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+        "line_start": 180,
+        "line_end": 201,
+        "range_sha256": "c7a975159732ba5addb0f6d835c6b5b66f474be88091dd8ae0f1b25103d9c5f2",
+        "symbols": [
+          "StopProductPhysics",
+          "Stewer:StopCooking"
+        ],
+        "file_and_range_hash_matched": true
+      },
+      {
+        "id": "COOK-S021",
+        "source_file": "scripts/components/stewer.lua",
+        "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+        "line_start": 276,
+        "line_end": 330,
+        "range_sha256": "e2875714f1eba1aee1a5eaf0533691ae0cfa61bb89c0f96098174ccead01dd6d",
+        "symbols": [
+          "Stewer:Harvest"
+        ],
+        "file_and_range_hash_matched": true
+      },
+      {
+        "id": "COOK-S031",
+        "source_file": "scripts/standardcomponents.lua",
+        "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+        "line_start": 52,
+        "line_end": 130,
+        "range_sha256": "d95151b75ef7829798dda58de98ef81ca6fcbac7f9254e20c910e8d787cdfb57",
+        "symbols": [
+          "DefaultBurntStructureFn"
+        ],
+        "file_and_range_hash_matched": true
+      },
+      {
+        "id": "COOK-S044",
+        "source_file": "scripts/prefabs/portablespicer.lua",
+        "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+        "line_start": 200,
+        "line_end": 232,
+        "range_sha256": "b65424749df6df65509461be6f39b063e56d0d6e2336a0367e2f210ce9c2a007",
+        "symbols": [
+          "onsave",
+          "onload",
+          "OnDismantle",
+          "OnBurnt"
+        ],
+        "file_and_range_hash_matched": true
+      }
+    ],
+    "hash_check_is_semantic_proof": false
+  },
+  "remaining_boundaries": [
+    "原审阅中的native/任务/联网/物理/资源/全部食谱与buff生命周期等未知保持不变。",
+    "无Lua或游戏执行；不授予Coding准入、运行通过或未来版本普遍适用性。",
+    "其他56claims/25API/26steps的原审阅结论只按未变化部分沿用，本次没有重新全量审核或扩展主题。"
+  ],
+  "writes_scope": [
+    "phase2/growth/cooking-revision-review.json"
+  ],
+  "canonical_installation_game_or_save_changes": false,
+  "publication_derivative": {
+    "schema": "dst-public-review-derivative/1",
+    "original_review_sha256": "eb7449cd34d007d6e2f29223a27f3c4a44850f8d63abec95ef8daa77f629b139",
+    "redacted_fields": [
+      {
+        "pointer": "/previous_review/path",
+        "original_value_sha256": "d30e716361f08aac01591066fde4a8fd91b823433f13659a1db58daea0ca2c1c"
+      },
+      {
+        "pointer": "/candidate_path",
+        "original_value_sha256": "0b0300ad431718fc3550d087b5143d574bd8ea68270b69f2e8f10b42593a6201"
+      }
+    ],
+    "policy": "Workstation paths removed; prior-review references rebound to public derivatives. Candidate/source commitments and review findings retained."
+  }
+}

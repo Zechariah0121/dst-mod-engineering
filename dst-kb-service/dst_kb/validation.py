@@ -4,7 +4,7 @@ import re
 from hashlib import sha256
 from pathlib import Path
 from .config import KBError
-from . import native,nativecore
+from . import native,nativecore,family_registry,native_mechanism
 
 INPUTS = ['data/entries.json','data/sources.json','data/relations.json','data/index.json',
           'data/claims.json','review-support/case-metadata.json']
@@ -148,6 +148,9 @@ def validate(root):
         if native_data and set(native.IDS)&known:errors.append('Native/legacy ID namespace collision')
         core_data,core_report=nativecore.load(root,schema_errors,check_supported_schema,bool(native_data),known)
         data['nativecore']=core_data
+        families=family_registry.load(root)
+        mechanism_data=native_mechanism.load(root,families)
+        data['native_mechanism']=mechanism_data
         if native_data:
             baseline=read(root/'data/legacy-integrity-baseline.json')
             required=set(INPUTS)|{p.relative_to(root).as_posix() for p in (root/'schemas').glob('*.json')
@@ -176,11 +179,14 @@ def validate(root):
             for key in ('status','knowledge_status','retrieval_status','coding_status'):
                 if key in value and row.get(key)!=value[key]:errors.append('catalog state '+row['id']+':'+key)
         expected_catalog_ids=[e['id'] for e in entries]+[e['id'] for e in (native_data or {}).get('entries',[])]+[e['id'] for e in (core_data or {}).get('entries',[])]
+        expected_catalog_ids+=list(mechanism_data)
         if catalog_ids!=expected_catalog_ids or len(set(catalog_ids))!=len(catalog_ids):errors.append('catalog full ID registry')
         family_counts={name:sum(row['family']==name for row in catalog_rows) for name in ('legacy','native_ai','native_core')}
         expected_families={'legacy':64,'native_ai':13,'native_core':110} if native_data or core_data else {'legacy':64,'native_ai':0,'native_core':0}
         declared_counts={key:catalog.get('counts',{}).get(key,0) for key in ('total','legacy','native_ai','native_core')}
-        if declared_counts!={'total':len(catalog_rows),**family_counts} or family_counts!=expected_families:errors.append('catalog full family counts')
+        if families is not None:
+            family_registry.validate_catalog(root,catalog,families)
+        elif declared_counts!={'total':len(catalog_rows),**family_counts} or family_counts!=expected_families:errors.append('catalog full family counts')
         manifest=read(root/'PACKAGE-MANIFEST.json')
         expected={x['path'] for x in manifest['files']}
         actual={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() and p!=root/'PACKAGE-MANIFEST.json' and '__pycache__' not in p.parts}
@@ -196,7 +202,7 @@ def validate(root):
             'base_kb_version':knowledge_version,'native':native_report,'nativecore':core_report,
             'legacy_preservation':'SHA256_IDENTICAL_TO_RECORDED_BASELINE' if native_data else 'not_applicable',
             'catalog':'PASS','catalog_entries':len(catalog_rows),
-            'entries':len(entries)+native_report['entries']+core_report['entries'],'legacy_entries':len(entries),
+            'entries':len(entries)+native_report['entries']+core_report['entries']+len(mechanism_data),'native_mechanism_entries':len(mechanism_data),'legacy_entries':len(entries),
             'native001_entries':native_report['entries'],'nativecore_entries':core_report['entries'],
             'relations':len(edges),'manifest':'PASS','runtime_validation_performed':False,
             'limitations':['Schema subset checked fail-closed for unknown keywords.','Correction guard covers explicit claim references, not natural-language meaning.']}
