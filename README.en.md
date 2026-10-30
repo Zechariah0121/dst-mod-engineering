@@ -1,6 +1,6 @@
 # DST Mod Engineering
 
-Version `v2026.10.27.1` contains 210 registered records: the preserved historical 187 and 23 native_mechanism research records covering Brain, world generation, cooking/seasoning and growth/regeneration. `FAMILY-REGISTRY` generates `CATALOG.counts`. Research remains `research/restricted/hold` with explicit Reviewer access. See [research-family integration](docs/native-mechanisms.md).
+Version `v2026.10.30.1` contains 210 registered records: the preserved historical 187 and 23 native_mechanism research records covering Brain, world generation, cooking/seasoning and growth/regeneration. `FAMILY-REGISTRY` generates `CATALOG.counts`. Research remains `research/restricted/hold` with explicit Reviewer access. See [research-family integration](docs/native-mechanisms.md).
 
 An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
 
@@ -8,15 +8,15 @@ The public KB is in `knowledge/`: **210 records comprising 64 foundation records
 
 ## Download
 
-Release: [v2026.10.27.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.27.1). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
+Release: [v2026.10.30.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.30.1). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
 
 | File | Contents |
 |---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.27.1/dst-mod-engineering.zip) | Complete Skill, 210 registered public records in one `knowledge/` tree, development helpers, local source preparation and MCP |
+| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.30.1/dst-mod-engineering.zip) | Complete Skill, 210 registered public records in one `knowledge/` tree, development helpers, local source preparation and MCP |
 
 Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
 
-Source preparation in this version targets an authorized `760178 / Steam build 26230496` archive without requiring older source. `source_epoch=759671` remains the evidence baseline; it neither identifies the new input as an old archive nor upgrades every claim to 760178. Required core payload ranges remain strict. Mechanism research reports file/range matches per reference; changed or missing references remain unknown and do not grant Coding admission. Historical comparisons preserve their original metadata. An empty search result does not establish a knowledge gap. See [capabilities and limits](docs/public-limits.md) and [source maintenance](docs/source-compatibility.md).
+Source preparation in this version targets an authorized `760944 / Steam build 26306684` archive without requiring older source. `source_epoch=759671` remains the evidence baseline; it neither identifies the new input as an old archive nor upgrades every claim to 760944. Required core payload ranges remain strict. Mechanism research reports file/range matches per reference; changed or missing references remain unknown and do not grant Coding admission. Historical comparisons preserve their original metadata. An empty search result does not establish a knowledge gap. See [capabilities and limits](docs/public-limits.md) and [source maintenance](docs/source-compatibility.md).
 
 ## Start
 
@@ -25,13 +25,13 @@ Extract the package completely and install the directory containing `SKILL.md` i
 For full MCP, run from the package root with Python 3.10+ and SQLite FTS5:
 
 ```text
-python -B -X utf8 prepare_sources.py --source "<760178 scripts.zip>"
+python -B -X utf8 prepare_sources.py --source "<760944 scripts.zip>"
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
 
 Apply the printed configuration in your client and verify nine tools plus a real query. If a catalog session is already connected, restart it after preparation to switch tools. Printed configuration does not prove a successful connection or query. See [installation](docs/install-and-use.md).
 
-Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 760178 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
+Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 760944 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
 
 Prepared `cache/runtime/` contains locally restored game source excerpts and must stay local. A `$dst_source_payload_slot` in public JSON is a missing local-source slot, not source already read or behavioral evidence. Public evidence consists of reviewed excerpts, not complete original research; withheld private context remains `UNK`.
 

@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前版本：`v2026.10.27.1`；统一目录 210 条，其中独立机制研究族 23 条，保持 `research/restricted/hold`。
+当前版本：`v2026.10.30.1`；统一目录 210 条，其中独立机制研究族 23 条，保持 `research/restricted/hold`。
 
 面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
@@ -34,7 +34,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
 
-完整九工具 MCP 的来源准备面向一份合法持有的 `760178 / build 26230496 scripts.zip`，不需要旧版源码；`source_epoch=759671` 仍表示保留的证据基线，不把全库结论升级为 760178。核心必需来源槽严格校验；机制研究逐引用报告文件/范围匹配、变化或缺失，来源缺口保留未知，不封锁其他研究条目的阅读，也不解除 Coding HOLD。历史比较材料以 `metadata_only` 保留原来源标记，不作为已读当前源码证据；未来版本另做源码对照。工具集启动时固定，准备后重启已连接的目录会话才能切换。`auto` 对来源未准备或 `PACKAGE_CHANGED`，先核验公开文件清单再进入两工具审阅并报告原因；缓存损坏、无效激活及公开数据不可信仍报错，`full` 保持严格。`run_kb.py maintain-sources` 可独立定位任意明确新版 ZIP 和生成局部复核清单，见 [源码维护](docs/source-compatibility.md)。目录模式只提供导航与显式 `purpose="review"` 审阅，不提供 Coding 上下文或已恢复源码证据。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
+完整九工具 MCP 的来源准备面向一份合法持有的 `760944 / build 26306684 scripts.zip`，不需要旧版源码；`source_epoch=759671` 仍表示保留的证据基线，不把全库结论升级为 760944。核心必需来源槽严格校验；机制研究逐引用报告文件/范围匹配、变化或缺失，来源缺口保留未知，不封锁其他研究条目的阅读，也不解除 Coding HOLD。历史比较材料以 `metadata_only` 保留原来源标记，不作为已读当前源码证据；未来版本另做源码对照。工具集启动时固定，准备后重启已连接的目录会话才能切换。`auto` 对来源未准备或 `PACKAGE_CHANGED`，先核验公开文件清单再进入两工具审阅并报告原因；缓存损坏、无效激活及公开数据不可信仍报错，`full` 保持严格。`run_kb.py maintain-sources` 可独立定位任意明确新版 ZIP 和生成局部复核清单，见 [源码维护](docs/source-compatibility.md)。目录模式只提供导航与显式 `purpose="review"` 审阅，不提供 Coding 上下文或已恢复源码证据。模式、角色、预算与证据恢复见 [检索策略](references/kb-retrieval.md)。知识库默认只读；只有用户明确要求维护才进入更新流程。
 
 ## 按问题读取
 

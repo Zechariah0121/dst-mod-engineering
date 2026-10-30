@@ -31,7 +31,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 目录审阅不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不冒称运行验证，也不放松 Scope、类型、三轴状态或 Core Coding HOLD。若所选正文超过预算，服务不截断正文；按响应提示选择较小 `pointer` 再读。不要把目录摘要当作事实投影或完整证据。
 
-正常完整使用先按 [安装说明](../docs/install-and-use.md) 用一份合法持有的 `760178 / build 26230496 scripts.zip` 准备来源，不需要旧版源码。`source_epoch=759671` 保留为证据基线，不表示目标输入或全部事实属于同一新版本。核心必需来源槽严格校验；机制研究按引用报告文件/范围匹配与未知缺口，缺口不封锁其他研究条目的阅读，也不解除 HOLD。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为已读当前源码证据。两种模式的工具集均在启动时固定；准备成功后重启已连接的目录会话，再在客户端核对下列九工具：
+正常完整使用先按 [安装说明](../docs/install-and-use.md) 用一份合法持有的 `760944 / build 26306684 scripts.zip` 准备来源，不需要旧版源码。`source_epoch=759671` 保留为证据基线，不表示目标输入或全部事实属于同一新版本。核心必需来源槽严格校验；机制研究按引用报告文件/范围匹配与未知缺口，缺口不封锁其他研究条目的阅读，也不解除 HOLD。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为已读当前源码证据。两种模式的工具集均在启动时固定；准备成功后重启已连接的目录会话，再在客户端核对下列九工具：
 
 | 工具 | 用途 |
 |---|---|
@@ -49,7 +49,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 ## 完整模式的版本、角色与预算
 
-- 当前唯一证据环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；760178 是本次核验的来源输入，不新增 760178 epoch，服务不提供历史环境切换。条目保留历史原版证据和各自适用范围，不能改名为当前源码事实；目标游戏仍需单独核对。
+- 当前唯一证据环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；760944 是本次核验的来源输入，不新增 760944 epoch，服务不提供历史环境切换。条目保留历史原版证据和各自适用范围，不能改名为当前源码事实；目标游戏仍需单独核对。
 - 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
 - Native AI Coding 保持十字段、最多五条。研究展开需显式 reviewer；`mode=review/research` 不授予角色权限、不解除 Core Coding HOLD。分别读取三轴状态与排除范围。
 - `compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节；按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录多个行为原子合为一张卡，不拆卡绕过条数限制。
@@ -66,7 +66,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-The single complete package contains the registered records for file reading and MCP; historical 64/13/110 identities are preserved. This version targets one authorized `760178 / build 26230496 scripts.zip` for source preparation without older source. The sole `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report matching or unknown/missing source individually, without granting Coding admission. Historical comparisons remain `metadata_only`, preserving their original metadata without becoming restored current-source evidence. Default `auto` permits public catalog review for missing preparation or PACKAGE_CHANGED only after public-manifest validation, reporting the cause; cache corruption, invalid activation and untrusted public files remain errors. Explicit `catalog` provides public review without Coding context, restored source evidence or original Source/Identity Guards. `search_catalog` has a default limit of 5 and maximum of 20; `read_public_entry` requires `purpose="review"`, optional record-relative JSON Pointer, and a default 12000 / maximum 24000 byte budget. Oversized content is withheld rather than truncated; select a smaller pointer. Restart a connected catalog session after preparation to obtain nine tools. Native AI Coding uses exactly ten fields and at most five records; Core Coding HOLD remains binding. Future versions need separate source comparison. A slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
+The single complete package contains the registered records for file reading and MCP; historical 64/13/110 identities are preserved. This version targets one authorized `760944 / build 26306684 scripts.zip` for source preparation without older source. The sole `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report matching or unknown/missing source individually, without granting Coding admission. Historical comparisons remain `metadata_only`, preserving their original metadata without becoming restored current-source evidence. Default `auto` permits public catalog review for missing preparation or PACKAGE_CHANGED only after public-manifest validation, reporting the cause; cache corruption, invalid activation and untrusted public files remain errors. Explicit `catalog` provides public review without Coding context, restored source evidence or original Source/Identity Guards. `search_catalog` has a default limit of 5 and maximum of 20; `read_public_entry` requires `purpose="review"`, optional record-relative JSON Pointer, and a default 12000 / maximum 24000 byte budget. Oversized content is withheld rather than truncated; select a smaller pointer. Restart a connected catalog session after preparation to obtain nine tools. Native AI Coding uses exactly ten fields and at most five records; Core Coding HOLD remains binding. Future versions need separate source comparison. A slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 

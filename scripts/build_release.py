@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 NAME = 'dst-mod-engineering'
-VERSION = 'v2026.10.27.1'
+VERSION = 'v2026.10.30.1'
 ARCHIVE = NAME + '.zip'
 CHECKSUMS = 'SHA256SUMS.txt'
 MANIFEST = 'RELEASE-MANIFEST.json'

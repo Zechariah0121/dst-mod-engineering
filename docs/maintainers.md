@@ -1,6 +1,6 @@
 # 维护与构建
 
-用户安装与使用见根 [README](../README.md)。当前版本 `v2026.10.27.1` 只有一个 `dst-mod-engineering.zip` 和配套 `SHA256SUMS.txt`，Skill、210 条登记知识和 MCP 共用唯一 `knowledge/`。`source_epoch=759671` 保留为证据基线，本次核验的来源输入为 `760178 / build 26230496`；历史版本在 Git 历史中保留。
+用户安装与使用见根 [README](../README.md)。当前版本 `v2026.10.30.1` 只有一个 `dst-mod-engineering.zip` 和配套 `SHA256SUMS.txt`，Skill、210 条登记知识和 MCP 共用唯一 `knowledge/`。`source_epoch=759671` 保留为证据基线，本次核验的来源输入为 `760944 / build 26306684`；历史版本在 Git 历史中保留。
 
 ```text
 python -B -m unittest discover -s tests -v
@@ -16,7 +16,7 @@ python -B scripts/build_release.py --check
 
 修改知识或证据必须保留事实、Scope、角色、类型、版本、更正与来源边界，重新绑定公开证据的真实哈希。来源槽必须由用户合法来源恢复；不能绕过原校验器或 Coding HOLD。更新来源另做版本差异维护，不能把历史证据改名为当前来源。
 
-本版来源准备面向单份合法 `760178 / build 26230496 scripts.zip`，不要求旧版源码。核心必需载荷槽保持严格；机制研究从整 ZIP 身份锁改为逐引用报告文件/范围匹配、变化或缺失，研究缺口保留未知。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为当前已恢复源码证明。210 条记录的原知识陈述、Scope 和 HOLD 不因来源准备策略改变而自动升级。具体目标身份、必要范围收窄及验证边界见 [源码维护](source-compatibility.md)。
+本版来源准备面向单份合法 `760944 / build 26306684 scripts.zip`，不要求旧版源码。核心必需载荷槽保持严格；机制研究从整 ZIP 身份锁改为逐引用报告文件/范围匹配、变化或缺失，研究缺口保留未知。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为当前已恢复源码证明。210 条记录的原知识陈述、Scope 和 HOLD 不因来源准备策略改变而自动升级。具体目标身份、必要范围收窄及验证边界见 [源码维护](source-compatibility.md)。
 
 公开目录模式只提供导航与显式审阅，不承担完整模式的 Coding 上下文、源码恢复或原版 Source/Identity Guards。`auto` 对来源未准备或 `PACKAGE_CHANGED`，完整核验公开文件清单后选择两工具审阅并报告原因；已准备缓存损坏、无效激活及公开数据不可信仍保持可见错误。维护入口及依赖未知边界见 [源码维护](source-compatibility.md)。两工具与九工具在服务启动时选定，准备后需重启会话。损坏的恢复构建在 `cache/runtime/` 内隔离保留，准备锁随进程退出自动释放；不要把隔离材料加入发行包。
 
