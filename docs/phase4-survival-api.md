@@ -34,3 +34,9 @@ python -B run_kb.py maintain-sources assess-registered --knowledge-root knowledg
 批量维护中的 `unknown/missing_matching_old_source` 与准备回执的 `RANGE_ONLY` 属于不同证据条件和枚举，不应混加成同一覆盖率。批量报告含本机来源路径，仅用于本地维护；公开附件需要单独制作去除本机路径的派生版本。
 
 本轮不运行 DST、专服或远端客户端，不声称动画、音效、native 行为和任意 Mod 组合已经验证。局部源码中观察到的清理风险仍保留前提与动态注入未知；建议不等于游戏中已重现故障。
+
+## 已知检索边界
+
+完整服务的研究搜索沿用机制专路；有机制候选时，旧族结果可能未同时展示。独立对照确认该行为在上一版也存在。跨族发现可先查统一目录；已知 Core 目标可显式限定 `families=["core"]` 或按 ID 读取，不能从一次未命中推断没有知识。
+
+较大的条目会在搜索预算内整项 withheld，并提供读取入口；应按 claim/API/step 指针展开，必要时将 `get_entry.max_bytes` 提高至 64000。单引用 `resolve_evidence` 仍可能因所需上下文超过其预算而 withheld；相关原子读取保留完整定位元数据。后续将改进跨族导航和引用响应的预算使用。部分 local 回调尚无研究 API 契约，同名消歧只覆盖已经声明的身份。

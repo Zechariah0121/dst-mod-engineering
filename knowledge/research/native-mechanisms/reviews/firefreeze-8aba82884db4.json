@@ -1,0 +1,118 @@
+{
+  "schema": "dst-independent-api-completion-review/1",
+  "reviewer_window": "C",
+  "review_round": 3,
+  "candidate": "05-research-history/native-expansion-20261030/firefreeze/api-completion/candidate.json",
+  "candidate_sha256": "e8107e4b238bc145bcb9d58b9708f72d2d8bb818a88f020632b21bb6e7039c80",
+  "frozen_input": "05-research-history/native-expansion-20261030/windows/C/frozen-candidate-r3.json",
+  "runtime_verified": false,
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "verdict": "approved_for_research_registration",
+  "registration_approved": true,
+  "registration_boundary": "仅该精确新SHA中的3卡作为research/restricted/hold机制研究登记；本审阅不授予Coding、客户端或公共物理API身份，不证明运行效果。",
+  "previous_review": {
+    "path": "05-research-history/native-expansion-20261030/windows/C/review-r2.json",
+    "sha256": "5cf94b6f7b97a67569ccf34be858cf9297f7b3c033ea38dfc345bb7eaf060fd0",
+    "candidate_sha256": "0f1c82143df4d290b4e710c693e312b143461c466f7923ab213d2f5a586a4d9a",
+    "dependency": "R2及其绑定R1保留原3卡18claims/14API/12steps的语义审阅；本轮独立重读2个完整API及必要依赖，逐值证明无其他改动。"
+  },
+  "delta": {
+    "path": "05-research-history/native-expansion-20261030/firefreeze/api-completion/delta.json",
+    "sha256": "f06dd2b395683abbecf5549325eae26b1b897aaa13724815b8d129d1c4a2d3e7",
+    "operation_count": 2,
+    "operation_paths": [
+      "/entries/0/api_contracts/7",
+      "/entries/2/api_contracts/2"
+    ],
+    "forward_patch_equals_new": true,
+    "remove_exact_appends_equals_previous": true,
+    "unlisted_changes": 0
+  },
+  "coverage": {
+    "current_entries": 3,
+    "current_claims": 18,
+    "current_api_contracts": 16,
+    "current_mechanism_steps": 12,
+    "source_references": 27,
+    "new_api_full_fields_reviewed": 2,
+    "unchanged_api_semantics_inherited": 14,
+    "all16_api_identity_matches": "unique when qualified symbol/source_file/identity_kind bounded;4 file_local retained"
+  },
+  "api_reviews": [
+    {
+      "pointer": "/entries/0/api_contracts/7",
+      "symbol": "Freezable:OnRemoveFromEntity",
+      "verdict": "supported_static",
+      "field_reviews": {
+        "symbol/source_file/visibility": "Freezable:OnRemoveFromEntity与原组件声明完全对应，component_method身份；可见性限定卡片权威组件上下文，不将生命周期hook推成客户端/公共声明。",
+        "parameters": "冒号方法无额外参数，与62行声明一致。",
+        "returns": "完整hook无显式返回，未伪造清理成功布尔值。",
+        "preconditions": "hook依赖捕获的self与inst，以及可Cancel的非nil任务；EntityScript先清组件和shadow索引，手动调hook不清索引，均有实读证据。",
+        "side_effects": "63-70行按序解绑attacked/OnAttacked、去freezable标签、条件Cancel两任务；没有清handle、改state/coldness/伤害累计、Unfreeze/Reset/Brain/色调/事件/FX操作。",
+        "lifecycle": "构造58行注册监听；163-168及219-229建立实体所有任务、组件保留handle。RemoveComponent670-685与Remove/CancelAllPendingTasks1494-1501及1739-1752为不同分派。Freeze另可重排已存在抗性任务，已由不变的R2卡片整体事实保留；本新增hook不安排替代恢复。",
+        "evidence_refs": "FF-S01/02/03/04/21/26/27覆盖定义、注册、任务建立、业务退出对照与两种移除分派；精确文件及LF行范围hash复算一致。",
+        "unknowns": "明确不证明事件缓存竞态、重复调用业务幂等、替换任务、native调度和自定义SG/远端表现，未升级静态结论。"
+      },
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S02",
+        "FF-S03",
+        "FF-S04",
+        "FF-S21",
+        "FF-S26",
+        "FF-S27"
+      ]
+    },
+    {
+      "pointer": "/entries/2/api_contracts/2",
+      "symbol": "Burnable:SmotherSmolder",
+      "verdict": "supported_static",
+      "field_reviews": {
+        "symbol/source_file/visibility": "Burnable:SmotherSmolder与burnable.lua417行声明相符，component_method；蓝杖Scope仍只涵盖所列master无参消费者，非nil分支限定为声明局部调用语义。",
+        "parameters": "nil跳过smotherer消费/受伤；非nil依次finiteuses、stackable、health且combat三互斥分支，未匹配则不消费，全部与417-427一致。",
+        "returns": "Use/Get/DoFireDamage/StopSmoldering未被return透传；完整方法无显式返回。",
+        "preconditions": "声明没有有效性/燃烧/闷烧统一入口守卫；分支所需可调用组件、Get结果可Remove以及缺保护/回滚均准确。蓝杖IsBurning优先、IsSmoldering才调用是消费者条件，未冒充方法门禁。",
+        "side_effects": "非nil工具消耗/火伤害后发burnt，再StopSmoldering(-1)。目标即使不闷烧也可先消费或伤害smotherer。StopSmoldering仅smoldering时进入，smoke和task分别非nil才清理、回调非nil才调用，传播器存在才StopSpreading(true,-1)；负热量表达式不clamp，也不在StopSpreading内建撤周期任务。契约使用的“仅…时”保留闷烧必要门槛，按实际对象存在条件执行。",
+        "lifecycle": "局部直接调用未走Extinguish，不执行burning task/death/fuel或寒冷退出链；回调可另行改状态的未知边界保留。staff_common174-204的后续仇恨、SG条件attacked和加寒前二检属于蓝杖，未归因于SmotherSmolder。",
+        "evidence_refs": "FF-S15完整覆盖417-452；FF-S12覆盖StopSpreading104-111；FF-S19覆盖蓝杖174-204。3个已注册引用的file/range摘要独立复算一致。",
+        "unknowns": "明确非nil仅记录调用形状/顺序，不宣称消费最终结果、Health结算量或其他消费者闭包；native随机/调度、重入及视觉保持未验证。"
+      },
+      "evidence_refs": [
+        "FF-S15",
+        "FF-S12",
+        "FF-S19"
+      ]
+    }
+  ],
+  "scope_review": {
+    "verdict": "preserved",
+    "all_original_values_except_two_appends": "逐值相等，包括Scope、claims、steps、aliases、entry unknowns、compatibility、queries、limitations、source_references与三轴状态。",
+    "freezable_hook": "原卡已声明拆组件及恢复边界，补完整API未扩充消费者范围。",
+    "smother_smolder": "仍限蓝杖无参入口；非nil smotherer是已读方法的局部参数分支，不宣称其他消费者、实际Health结果或所有调用链覆盖。",
+    "scoring_protection": "未改评分/检索规则；API符号本身形成作者声明导航身份，不借aliases或来源symbols伪造完整API。",
+    "preserved_service_evidence_epoch": "759671未重标为760944。"
+  },
+  "checks": {
+    "artifact": "05-research-history/native-expansion-20261030/windows/C/review-r3-checks.json",
+    "sha256": "6909515dd46c9f63063819432c662962eb2d0be99bd66342b9d4a35d51defd85",
+    "current_archive_and_all27_file_range_hashes": "passed",
+    "schema_contract": "passed",
+    "exact_delta_and_inverse": "passed",
+    "api_identity_and_bounded_matches": "16/16 passed;2新增component_method，原4local仍file_local，public_api_inferred均false",
+    "method_limit": "Python current api_identity/api_matches narrow execution; not live full-MCP query/ranking or game/Lua runtime.",
+    "candidate_not_modified": true,
+    "R1_R2_preserved": true
+  },
+  "open_findings": [],
+  "remaining_limitations": [
+    "No game, dedicated server, client, Lua execution, save/reload or runtime timing verification.",
+    "No native FindEntities/visibility/animation/network internals or all-prefab/all-Mod dependency closure.",
+    "No tested multi-source overlap, event-driven removal/reentrancy, death/task races or endothermic/freezable runtime combinations.",
+    "Attack card begins at the named callback; full projectile/combat/weapon dispatch, durability/sanity outcomes, all variants and haunt callers are not newly claimed by this candidate.",
+    "API parser check is a narrow Python check of authored identity, not a live MCP end-to-end lookup or proof of physical/public declaration.",
+    "本轮新增两个API未运行实际拆组件、消费工具、受伤、回调移除/重入场景；非nil工具调用不等于证明最终消耗或伤害值。"
+  ],
+  "delegation": "No subagent used for R3."
+}

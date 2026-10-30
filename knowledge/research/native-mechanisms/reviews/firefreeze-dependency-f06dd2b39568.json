@@ -1,0 +1,91 @@
+{
+  "schema": "firefreeze-api-completion-input/1",
+  "input_candidate_sha256": "0f1c82143df4d290b4e710c693e312b143461c466f7923ab213d2f5a586a4d9a",
+  "candidate_sha256": "e8107e4b238bc145bcb9d58b9708f72d2d8bb818a88f020632b21bb6e7039c80",
+  "source_epoch": "760944",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "runtime_verified": false,
+  "patch_format": "RFC6902",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/entries/0/api_contracts/7",
+      "value": {
+        "symbol": "Freezable:OnRemoveFromEntity",
+        "source_file": "scripts/components/freezable.lua",
+        "visibility": "Lua组件方法及组件移除生命周期hook；仅本卡权威侧组件上下文，不授予客户端或公共物理声明身份",
+        "parameters": [],
+        "returns": "无显式返回；不会返回解冻或清理成功布尔值。",
+        "preconditions": [
+          "有效Freezable self与self.inst；非nil的diminishingtask/wearofftask须为可Cancel的任务对象，未在本方法内额外校验。",
+          "标准EntityScript:RemoveComponent分派时，组件索引及shadow索引已经清除；不能要求inst.components.freezable仍存在。手动调用本方法本身不删除组件索引。"
+        ],
+        "side_effects": [
+          "按顺序解绑构造时注册的attacked/OnAttacked监听，移除实体freezable标签；diminishingtask非nil则Cancel，wearofftask非nil则Cancel。",
+          "只取消任务，不把两个任务handle字段设nil；不调用Unfreeze/Reset，不改变state/coldness/damagetotal，不清色调、不生成碎冰、不RestartBrain，也不发unfreeze/onthaw。"
+        ],
+        "lifecycle": [
+          "这是拆组件hook；标准RemoveComponent先停止组件更新并清索引，再调用本hook，随后处理组件replica/actions注销。",
+          "所取消的wearoff与额外抗性衰减任务分别由StartWearingOff/SetExtraResist建立；本hook不建立替代任务或保存恢复状态。",
+          "对仍保留的实体拆组件不等于完成冻结业务退出；原Brain/SG/色调恢复不能由此hook推断。实体Remove另经CancelAllPendingTasks后调用各组件OnRemoveEntity，是不同分派路径。"
+        ],
+        "evidence_refs": [
+          "FF-S01",
+          "FF-S02",
+          "FF-S03",
+          "FF-S04",
+          "FF-S21",
+          "FF-S26",
+          "FF-S27"
+        ],
+        "unknowns": [
+          "静态核对，不验证游戏内拆除/重入/事件缓存竞态、任意替换的任务对象或远端表现。",
+          "未承诺任意直接重复调用hook时的全局业务幂等；不研究native Cancel调度精度或自定义SG恢复策略。"
+        ]
+      }
+    },
+    {
+      "op": "add",
+      "path": "/entries/2/api_contracts/2",
+      "value": {
+        "symbol": "Burnable:SmotherSmolder",
+        "source_file": "scripts/components/burnable.lua",
+        "visibility": "Lua组件方法；本卡限定master蓝杖onattack_blue闷烧分支的无参调用；非nil参数分支仅登记该声明的局部参数/副作用，不扩展为其他消费者完整合同或客户端API",
+        "parameters": [
+          "smotherer：可选实体；nil跳过全部工具/自身受伤分支。蓝杖所列消费者不传该参数。",
+          "非nil时读取smotherer.components：优先finiteuses，其次stackable，最后同时有health和combat；各分支互斥，没有符合组件则不消费smotherer。"
+        ],
+        "returns": "无显式返回；Use/Get/DoFireDamage及StopSmoldering的返回值不作为本方法成功返回。",
+        "preconditions": [
+          "有效Burnable self；smotherer非nil时须为可访问components的实体；没有IsValid、is-burning或is-smoldering的统一入口守卫。",
+          "所选分支要求finiteuses:Use可调用，或stackable:Get返回可Remove的实体，或health:DoFireDamage及smotherer:PushEvent可调用；本方法不另作nil结果保护或异常回滚。",
+          "本卡蓝杖实际调用由burnable存在、未进IsBurning分支且IsSmoldering为真时发生；不能把该消费者门槛当组件方法自身门槛。"
+        ],
+        "side_effects": [
+          "先处理非nil smotherer：finiteuses:Use()；否则stackable:Get():Remove()；否则health与combat均存在时health:DoFireDamage(TUNING.SMOTHER_DAMAGE,nil,true)，随后对smotherer发burnt事件。",
+          "处理smotherer后总是调用self:StopSmoldering(-1)。前述消费/受伤发生在StopSmoldering内部的smoldering守卫之前，故即使目标不闷烧也可能消费或伤害smotherer。",
+          "StopSmoldering仅smoldering为真时杀smoke声音并移除smoke实体、设smoldering=false、取消并清smolder_task、清smoldertimeremaining；若propagator存在则StopSpreading(true,-1)，最后调用onstopsmoldering(inst)。",
+          "StopSpreading清source/spreading，reset=true时把currentheat设为-1乘随机曲线值再乘flashpoint并清pauseheating；负热量未在该方法钳成0，也不直接取消或创建propagator周期任务。"
+        ],
+        "lifecycle": [
+          "该入口调用StopSmoldering而非Burnable:Extinguish；所列直接语句不取消burning完成任务、不解绑death监听、不停止fueled消耗，也不执行解冻或加寒冷；事件监听/自定义回调仍可能另行改变状态。",
+          "蓝杖在该调用后仍继续仇恨/条件attacked事件，并在再次检查目标有效后加寒冷/生成碎冰FX；这些后续业务属于攻击回调，不是SmotherSmolder内置效果。",
+          "没有建立新持久化字段或恢复任务；被调用者回调和smotherer的burnt监听可能改变实体，方法没有额外有效性复查/本地保护调用。"
+        ],
+        "evidence_refs": [
+          "FF-S15",
+          "FF-S12",
+          "FF-S19"
+        ],
+        "unknowns": [
+          "仅静态核对所列声明和蓝杖无参消费者；未运行游戏、多人或专服验证。",
+          "非nil smotherer分支记录直接调用形状及先后次序；不证明finiteuses/stackable消费结果、Health火伤害结算量、监听者业务或所有其他消费者闭包。",
+          "没有验证负热量随机值分布、native调度、任意自定义回调移除/重入或后续视觉行为。"
+        ]
+      }
+    }
+  ],
+  "recovery_assertion": "Removing exactly both appended API atoms yields input JSON equality; all other values unchanged.",
+  "source_references_changed": false,
+  "scope_changed": false
+}
