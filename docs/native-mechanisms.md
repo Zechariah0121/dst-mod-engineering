@@ -1,6 +1,6 @@
 # 独立原版机制研究族
 
-`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿与冻结/火热交互，独立机制研究族共 29 条；与历史三族合计 216 条，实际登记数量读目录 counts。
+`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充与表现机制，独立机制研究族共 37 条；与历史三族合计 224 条，实际登记数量读目录 counts。
 
 新族始终为 `research/restricted/hold`。独立审阅记录绑定精确候选 SHA，但不是旧 Native Core 的 Gate A，不授予 Coding 或游戏实测状态。source_references 是限定归档的原始文件/行范围 hash 和定位，不是已交付 Lua；当前归档 hash 一致也不证明所有 native/dynamic 行为。
 
@@ -49,3 +49,5 @@
 源码更新时，证据基线与当前目标分开。`run_kb.py maintain-sources locate --target <新版ZIP> --symbol <符号>` 可定位未登记的新归档；原正文和局部复核入口继续可读。核心必需证据恢复失败仍明确报错；机制研究的局部来源缺口单独报告，不能因此宣称库被删除或所有机制无效。具体差分维护见 [源码维护](source-compatibility.md)。
 
 本轮新增研究保留 `source_epoch=760944`，原 23 条研究继续保留 `759671`。服务的可选 source_epoch 参数仍选择历史证据运行环境759671；返回原子的 source_epoch 来自各自文档，不强制改标。新增覆盖、API入口和批量维护的验收范围见 [本阶段说明](phase4-survival-api.md)。
+
+生存补充与表现机制的新增范围见[本阶段说明](phase5-survival-presentation.md)。

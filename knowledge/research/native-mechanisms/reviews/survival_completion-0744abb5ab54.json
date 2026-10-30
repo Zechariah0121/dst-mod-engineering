@@ -1,0 +1,124 @@
+{
+  "schema": "dst-independent-survival-revision-review/1",
+  "reviewer_window": "D",
+  "review_round": 2,
+  "candidate_sha256": "b6c93ff9fd01379b998f41611aa89d2b7a97921a7a0731ccb85a6179bbd6f840",
+  "runtime_verified": false,
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "verdict": "approved_for_research_registration",
+  "registration_approved": true,
+  "registration_boundary": "Only this exact candidate as research/restricted/hold. Static source/identity review grants no Coding, physical/public API or game-runtime admission.",
+  "previous_review": {
+    "sha256": "8f25d16de921d978fd325a5a4734653fc56fc0e9d4279d27af78c143d01d093f",
+    "candidate_sha256": "306d3785af54d2dcdf8d544b3be11086306696b9d44ed14decbebddf24693c29",
+    "scope": "R1完整61原子语义审阅与59引用hash校验；其唯一阻塞为本轮修复的6处visibility。",
+    "dependency": "Registration must retain this exact prior review as a committed dependency."
+  },
+  "delta": {
+    "operation_count": 6,
+    "operation_paths": [
+      "/entries/0/api_contracts/1/visibility",
+      "/entries/0/api_contracts/3/visibility",
+      "/entries/1/api_contracts/4/visibility",
+      "/entries/2/api_contracts/4/visibility",
+      "/entries/3/api_contracts/3/visibility",
+      "/entries/3/api_contracts/4/visibility"
+    ],
+    "only_visibility_changed": true,
+    "complete_reconstruction_equals_R2": true,
+    "unlisted_changes": 0,
+    "source_references_scope_claims_steps_and_other_API_fields_unchanged": true
+  },
+  "coverage": {
+    "entries": 4,
+    "claims": 27,
+    "api_contracts": 19,
+    "mechanism_steps": 15,
+    "source_references": 59,
+    "inherited_semantic_units": 61,
+    "direct_identity_revision_reviews": 6,
+    "authored_API_contract_count_is_not_unique_new_API_count": true,
+    "legacy_context_not_counted_as_new": [
+      "Burnable:LongUpdate (BR-P02)",
+      "Burnable:StopSmoldering (BR-P03 context)"
+    ]
+  },
+  "finding_resolutions": [
+    {
+      "id": "D-SURV-R1-001",
+      "status": "resolved",
+      "reason": "Five source-local callbacks now parse as file_local; DefaultIgniteFn parses as global and no longer carries component/entity-method wording. All six bounded filters return exactly their own contract; public_api_inferred stays false."
+    }
+  ],
+  "identity_revision_probes": [
+    {
+      "pointer": "/entries/0/api_contracts/1/visibility",
+      "symbol": "SmolderUpdate",
+      "source_file": "scripts/components/burnable.lua",
+      "identity_kind": "file_local",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    },
+    {
+      "pointer": "/entries/0/api_contracts/3/visibility",
+      "symbol": "DefaultIgniteFn",
+      "source_file": "scripts/standardcomponents.lua",
+      "identity_kind": "global",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    },
+    {
+      "pointer": "/entries/1/api_contracts/4/visibility",
+      "symbol": "OnEntitySleep",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "identity_kind": "file_local",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    },
+    {
+      "pointer": "/entries/2/api_contracts/4/visibility",
+      "symbol": "onequip",
+      "source_file": "scripts/prefabs/minifan.lua",
+      "identity_kind": "file_local",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    },
+    {
+      "pointer": "/entries/3/api_contracts/3/visibility",
+      "symbol": "fumarolebuff_OnAttached",
+      "source_file": "scripts/prefabs/healingsalve.lua",
+      "identity_kind": "file_local",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    },
+    {
+      "pointer": "/entries/3/api_contracts/4/visibility",
+      "symbol": "buff_OnLoad",
+      "source_file": "scripts/prefabs/healingsalve.lua",
+      "identity_kind": "file_local",
+      "correct_kind_filter_match_count": 1,
+      "public_api_inferred": false
+    }
+  ],
+  "checks": {
+    "exact_R1_R2_and_prior_review_hashes": "pass",
+    "contract_validation": "pass",
+    "exact_six_field_diff_and_full_reconstruction": "pass",
+    "six_identity_filters": "6/6 pass",
+    "local_callbacks_not_promoted_to_global": "5/5 pass",
+    "R2_frozen_input_still_matches": true,
+    "all_source_hash_checks_rerun": false,
+    "source_hash_reuse_basis": "All59 source reference objects and source archive identity are exact-value unchanged from independently reviewed R1."
+  },
+  "open_findings": [],
+  "limitations": [
+    "Only targeted exact-delta and Python authored identity navigation checks executed in R2; complete source semantics inherited by exact SHA from R1.",
+    "No game, Lua/stub, dedicated server, remote client, actual equip/weather/shade, save/load or MCP retrieval execution.",
+    "File-local/global are authored research navigation identities, not proof of stable public API or runtime safety.",
+    "Historical evidence/Scope and research/restricted/hold remain unchanged."
+  ],
+  "candidate_modified": false,
+  "repository_install_configuration_or_game_modified": false
+}

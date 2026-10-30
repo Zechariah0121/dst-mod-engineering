@@ -1,0 +1,758 @@
+{
+  "schema": "dst-independent-presentation-semantic-review/1",
+  "reviewer_window": "E",
+  "review_round": 1,
+  "date": "2026-10-31",
+  "candidate": "05-research-history/native-expansion-20261031/coordinator/frozen/presentation-r1/candidate.json",
+  "candidate_sha256": "500e269bded304fb37d99561e2bdaa4431b09e31a6673eb0ba4f401477034507",
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "runtime_verified": false,
+  "verdict": "approved_for_research_registration",
+  "registration_approved": true,
+  "registration_boundary": "只批准该精确SHA的4卡作为research/restricted/hold独立研究登记；不提升Core/Coding，不证明native实现、资源可用、实际客户端视听或游戏运行。登记操作仍由总控执行。",
+  "coverage": {
+    "entries": 4,
+    "claims": 23,
+    "api_contracts": 17,
+    "mechanism_steps": 16,
+    "source_references": 24,
+    "queries": 15,
+    "claims_reviewed": 23,
+    "api_contracts_reviewed": 17,
+    "mechanism_steps_reviewed": 16,
+    "references_hash_verified": 24,
+    "semantic_read": "independent_static_current_archive_read",
+    "all_candidate_units_reviewed": true,
+    "stub_executed": false,
+    "game_started": false,
+    "retrieval_protocol_executed": false
+  },
+  "checks": {
+    "candidate_hash_before_and_after": "matched",
+    "schema_contract": "passed",
+    "reference_file_and_range_hashes": "24/24 matched",
+    "local_reference_closure": "passed",
+    "governance": "research/restricted/hold preserved",
+    "native_api_boundary": "call-site evidence only where native",
+    "side_and_audience": "master versus non-dedicated separated",
+    "ownership_and_removal": "explicit Lua chains only",
+    "incremental_coverage": "four bounded additions; inherited facts identified",
+    "public_attachment_privacy": "relative paths only; no original Lua"
+  },
+  "prior_knowledge_comparison": [
+    {
+      "id": "N005-UI-C05",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/32",
+      "record_sha256": "614d4955a7707a31c21dd0ac1322d6e596c2fd16dfcfc829bf2d111e79b2bdd9",
+      "read_mode": "file_read_scope_and_claims_reviewer_only",
+      "historical_scope_changed": false
+    },
+    {
+      "id": "BR-P03",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/103",
+      "record_sha256": "768a2ef16fb0a01b8ae99de009d695ef1b7c786b6a6ec9724177bdb6ad89f4b3",
+      "read_mode": "file_read_scope_and_claims_reviewer_only",
+      "historical_scope_changed": false
+    },
+    {
+      "id": "NC-N003-INT-05",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/12",
+      "record_sha256": "2011f06433226470c30936fd1aa7c7272b07f03ffad994f2ce3e45faa5ca5ac0",
+      "read_mode": "file_read_scope_and_claims_reviewer_only",
+      "historical_scope_changed": false
+    },
+    {
+      "id": "EXP-FIRE-001",
+      "file": "research/native-mechanisms/firefreeze-e8107e4b238b.json",
+      "pointer": "/entries/1",
+      "record_sha256": "89abfcac67f25981026e998c30ee98f86bdee42eb4b3829351bae17eaad9749e",
+      "read_mode": "file_read_scope_and_claims_reviewer_only",
+      "historical_scope_changed": false
+    }
+  ],
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-PRES-001",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "保留760944静态来源、research/restricted/hold及完整unknowns；不授予运行/远端视听或通用客户端调用身份。",
+      "incremental_coverage": {
+        "prior": [
+          "NC-N003-INT-05",
+          "N005-UI-C05"
+        ],
+        "new": "蜘蛛master工厂与born/spike_attack_pst/shield的具体Play/Push参数、完成事件和吸收退出组合。",
+        "inherited": "SG通用调度、onexit次序和MakeFx事件选择不是新覆盖。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-PRES-001-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S04"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "PR-S04明确非master返回和可替换SG选择，限定具体工厂而非所有变种。"
+        },
+        {
+          "id": "EXP-PRES-001-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "born、spike_attack及pst的调用和完成事件逐项一致；事件消费与native产生分开。"
+        },
+        {
+          "id": "EXP-PRES-001-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S03"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "shield省略loop实参、显式onexit吸收恢复和shield_end队列事件均准确。"
+        },
+        {
+          "id": "EXP-PRES-001-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S05",
+            "PR-S06",
+            "PR-S01",
+            "PR-S02"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "状态门禁与局部回调返回转发、全局fallback吻合；未将未return的回调写成事件吞噬。"
+        },
+        {
+          "id": "EXP-PRES-001-C05",
+          "kind": "REC",
+          "evidence_refs": [
+            "PR-S03",
+            "PR-S07"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "REC只要求保留具体状态业务退出，通用GoToState次序明确归旧记录。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "AnimState:PlayAnimation",
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02",
+            "PR-S03"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "仅PlayAnimation调用处参数和未消费返回证据；没有把native默认值、返回或画面行为写成定义。"
+        },
+        {
+          "index": 1,
+          "symbol": "AnimState:PushAnimation",
+          "evidence_refs": [
+            "PR-S02",
+            "PR-S03"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "unhide显式false与hide_loop省略参数均保留；只述Lua调用次序，不补全native队列契约。"
+        }
+      ],
+      "mechanism_step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "PR-S04"
+          ],
+          "verdict": "supported",
+          "reason": "工厂侧别与具体SG引用匹配。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02"
+          ],
+          "verdict": "supported",
+          "reason": "具体单播/排队完成链匹配。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "PR-S03",
+            "PR-S05",
+            "PR-S06"
+          ],
+          "verdict": "supported",
+          "reason": "shield业务退出与事件分发引用匹配。"
+        },
+        {
+          "step": 4,
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02",
+            "PR-S03"
+          ],
+          "verdict": "supported",
+          "reason": "native事件产生及远端效果明确未知。"
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-PRES-002",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "保留760944静态来源、research/restricted/hold及完整unknowns；不授予运行/远端视听或通用客户端调用身份。",
+      "incremental_coverage": {
+        "prior": [
+          "BR-P03",
+          "NC-N003-INT-05"
+        ],
+        "new": "torch具名spin槽的Launch/Hit/限定外部熄火链，及点火/熄火短音任务互消和移除补清理。",
+        "inherited": "通用任务取消/状态退出和Burnable退场协议不是新覆盖。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-PRES-002-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S11"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "共有初始化与master回调安装位置准确，未推导远端听感。"
+        },
+        {
+          "id": "EXP-PRES-002-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12",
+            "PR-S18",
+            "PR-S08"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "Launch在回调后才加标签/启动更新；OnThrown、具名声及短音/技能依赖引用完整。"
+        },
+        {
+          "id": "EXP-PRES-002-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "Hit先Cancel再onhitfn；Cancel没有声音调用，命中和取消的边界准确。"
+        },
+        {
+          "id": "EXP-PRES-002-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S10"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "外部熄灭包含fires/持有/燃料和内部activeprojectile两层条件，未扩大停止声的覆盖。"
+        },
+        {
+          "id": "EXP-PRES-002-C05",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S17",
+            "PR-S13"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "两种短音任务互消、force/instant分支、回调清字段及额外移除取消吻合；hook不声称Kill spin槽。"
+        },
+        {
+          "id": "EXP-PRES-002-C06",
+          "kind": "REC",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S09",
+            "PR-S10",
+            "PR-S17"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "REC以相同emitter/句柄和列举路径为限，未承诺native最终释放或听感。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "OnThrown",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S11",
+            "PR-S12",
+            "PR-S18",
+            "PR-S08"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "局部OnThrown两形参和master安装吻合；FX/光与技能依赖引用明确，不增加公共API身份。"
+        },
+        {
+          "index": 1,
+          "symbol": "OnHit",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12",
+            "PR-S11"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "局部OnHit单形参忽略组件额外实参；实际Hit先Cancel，副作用与未删除主体均吻合。"
+        },
+        {
+          "index": 2,
+          "symbol": "PlayIgniteSound",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S13",
+            "PR-S09",
+            "PR-S11"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "互消只在对方task存在时；force/instant及0秒排任务分支结合完整entry解释正确。"
+        },
+        {
+          "index": 3,
+          "symbol": "PlayExtinguishSound",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S13",
+            "PR-S10",
+            "PR-S11"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "熄火辅助与点火辅助对称，早退限互消分支；没有把它等同spin句柄停止。"
+        }
+      ],
+      "mechanism_step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "PR-S11"
+          ],
+          "verdict": "supported",
+          "reason": "master回调安装匹配。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "PR-S12",
+            "PR-S09",
+            "PR-S08"
+          ],
+          "verdict": "supported",
+          "reason": "发射/短音emitter归属匹配。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "PR-S12",
+            "PR-S09",
+            "PR-S10"
+          ],
+          "verdict": "supported",
+          "reason": "命中与限定熄火的取消/停止次序匹配。"
+        },
+        {
+          "step": 4,
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S17"
+          ],
+          "verdict": "supported",
+          "reason": "任务互消与移除hook匹配，听感另验。"
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-PRES-003",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "保留760944静态来源、research/restricted/hold及完整unknowns；不授予运行/远端视听或通用客户端调用身份。",
+      "incremental_coverage": {
+        "prior": [
+          "N005-UI-C05",
+          "BR-P03"
+        ],
+        "new": "torchfire_common非network灯、master字段导出/client复制回调、粒子manager四表清理及explicit灯移除。",
+        "inherited": "不重登记MakeFx proxy/visual，也不把泛论fxchildren作为新覆盖。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-PRES-003-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S09",
+            "PR-S11"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "普通无皮肤创建、保存fires、装备和投掷不同跟随目标均吻合；未隐去Spawn判nil缺口。"
+        },
+        {
+          "id": "EXP-PRES-003-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S15"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "联网FX与非network灯、可选AnimState、master导出字段和client回调分支清楚。"
+        },
+        {
+          "id": "EXP-PRES-003-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S14"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "局部AttachLightTo只改灯及playerlight；复制回调无parent不重试；范围索引无Lua额外校验。"
+        },
+        {
+          "id": "EXP-PRES-003-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S15",
+            "PR-S16"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "IsDedicated限制粒子配置而非master分支；nil lifetime发射器不是实体定时寿命。"
+        },
+        {
+          "id": "EXP-PRES-003-C05",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S10",
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "卸装/入库显式Remove，manager四表清理及prefab灯清理按EntityScript次序吻合。"
+        },
+        {
+          "id": "EXP-PRES-003-C06",
+          "kind": "REC",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S14",
+            "PR-S15",
+            "PR-S16",
+            "PR-S17"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "REC分别管理主体/跟随/灯/manager，无父关系、persist或粒子寿命泛化。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "AttachLightTo",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S13",
+            "PR-S09"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "显式形参inst/target；master实体字段导出与client内部调用均有证据，归属灯而非主体。"
+        },
+        {
+          "index": 1,
+          "symbol": "SetLightRange",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S18"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "master字段导出、值改变才set与本地dirty更新吻合；TUNING可索引前提和native未知保留。"
+        },
+        {
+          "index": 2,
+          "symbol": "OnRemoveEntity",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "prefab移除hook只Remove所持灯，不虚构KillSound/RemoveEmitter或资源即时释放。"
+        },
+        {
+          "index": 3,
+          "symbol": "EmitterManagerClass:RemoveEmitter",
+          "evidence_refs": [
+            "PR-S16",
+            "PR-S17"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "Lua manager方法以inst为键清四表；不删除实体也不自行解绑监听，契约与实现一致。"
+        }
+      ],
+      "mechanism_step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S09"
+          ],
+          "verdict": "supported",
+          "reason": "装备与投掷的普通FX创建匹配。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S15"
+          ],
+          "verdict": "supported",
+          "reason": "共有灯与非专服粒子分支分别匹配。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "PR-S14"
+          ],
+          "verdict": "supported",
+          "reason": "灯parent/dirty与主体跟随分离正确。"
+        },
+        {
+          "step": 4,
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S10",
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ],
+          "verdict": "supported",
+          "reason": "Remove事件、manager清表、prefab灯清理次序匹配。"
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-PRES-004",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "保留760944静态来源、research/restricted/hold及完整unknowns；不授予运行/远端视听或通用客户端调用身份。",
+      "incremental_coverage": {
+        "prior": [
+          "BR-P03",
+          "EXP-FIRE-001"
+        ],
+        "new": "FireFX主体门禁、动画可选分支、路径/强度缓存、sleep/wake恢复和独立network灯目标监听/移除hooks。",
+        "inherited": "Burnable KillFX的延迟Remove协议和Propagator火热链保持旧记录。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-PRES-004-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20",
+            "PR-S22",
+            "PR-S23"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "FireFX只在所列fire master安装，独立network light及Burnable成功生成后的组件调用吻合。"
+        },
+        {
+          "id": "EXP-PRES-004-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "stopcontrolled、and/or门禁、上限钳制和已有level强制immediate准确；普通fire无pre限定明确。"
+        },
+        {
+          "id": "EXP-PRES-004-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "路径缓存差异和强度差异两层分支完整，睡眠与PlayingSound条件没有省略。"
+        },
+        {
+          "id": "EXP-PRES-004-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "sleep保缓存停声、wake条件重播及强度恢复吻合；全局分发不是client组件存在证明。"
+        },
+        {
+          "id": "EXP-PRES-004-C05",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "Extinguish缓存清理、test门禁和fast/controlled/普通pst回退、true/nil返回准确；不包办删除/关灯。"
+        },
+        {
+          "id": "EXP-PRES-004-C06",
+          "kind": "NSF",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17",
+            "PR-S24"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "AttachLightTo目标监听管理、目标移除回挂、两个移除hook的同函数别名和不同分发准确。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "FireFX:SetLevel",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20",
+            "PR-S22"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "Lua组件方法实际lev/immediate/controlled_burn参数、分支与无显式返回吻合；非法索引风险明确。"
+        },
+        {
+          "index": 1,
+          "symbol": "FireFX:OnEntitySleep",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "组件sleep hook无显式业务实参，只有Kill命名槽；不删除灯也不清缓存。"
+        },
+        {
+          "index": 2,
+          "symbol": "FireFX:OnEntityWake",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "组件wake hook条件重播并恢复intensity；播放中不重启，不承诺所有参数恢复。"
+        },
+        {
+          "index": 3,
+          "symbol": "FireFX:Extinguish",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "与Burnable同名方法区分owner；fast与post回退和test无显式参数、true/nil返回完整。"
+        },
+        {
+          "index": 4,
+          "symbol": "FireFX:AttachLightTo",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S22",
+            "PR-S23"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "实际显式业务形参为target；parameters文本中的inst/light是宿主与字段上下文，不作为额外调用实参。监听与回挂生命周期证据准确。"
+        },
+        {
+          "index": 5,
+          "symbol": "FireFX:OnRemoveEntity",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "组件entity移除hook仅Remove light；通用实体清理另有引用，没有据此虚构声音回滚。"
+        },
+        {
+          "index": 6,
+          "symbol": "FireFX:OnRemoveFromEntity",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S24"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "拆组件hook是赋值别名，RemoveComponent先清索引再调用；未将别名计作新函数实现。"
+        }
+      ],
+      "mechanism_step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "PR-S20",
+            "PR-S22",
+            "PR-S19",
+            "PR-S23"
+          ],
+          "verdict": "supported",
+          "reason": "fire/Burnable/light创建和调用边界匹配。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "verdict": "supported",
+          "reason": "档位动画、声路径/强度缓存匹配。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21"
+          ],
+          "verdict": "supported",
+          "reason": "睡醒和熄火缓存转换匹配。"
+        },
+        {
+          "step": 4,
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17",
+            "PR-S24"
+          ],
+          "verdict": "supported",
+          "reason": "目标移除回挂和组件/实体移除删除灯匹配。"
+        }
+      ]
+    }
+  ],
+  "open_findings": [],
+  "remaining_limitations": [
+    "未运行游戏、专服、真实远端客户端或音画资源验证；native参数默认值、事件产生/时序、播放返回、队列/混音/复制细节未知。",
+    "不枚举所有蜘蛛变种/外部中断、所有火炬皮肤/死亡/Deflect组合或所有FX消费者；只支持所列具体范围。",
+    "SetParent/Follower挂接不等于Lua children登记、所有权转移或所有native资源自动清理保证。",
+    "FireFX pre/pst仅方法中可选配置分支；普通fire配置无这些字段，不宣称该实例实际播放pre/pst。",
+    "未运行睡醒、受控燃烧同档切换、非法level、重复hook、回调重入和异常长帧测试；完整动态/native消费者闭包未知。",
+    "15条queries仅核对候选格式及预期ID，不是实际检索或协议命中验证；该验收属于总控/A窗口。"
+  ],
+  "artifacts": [
+    {
+      "path": "05-research-history/native-expansion-20261031/windows/E/CHECKS-r1.json",
+      "sha256": "52e2f3dea584b0a973c4b186e82caa0d9ee2719eb55467af31edcc9c62cc2e82"
+    },
+    {
+      "path": "05-research-history/native-expansion-20261031/windows/E/CHECKLIST.json",
+      "sha256": "e190d2afe853489ee7e0ba7fd1f1bf67cfe1e152fea3c06c4f9e7ddfa9e45e60"
+    }
+  ],
+  "delegation": {
+    "subagents": 0
+  },
+  "author_files_modified": false
+}

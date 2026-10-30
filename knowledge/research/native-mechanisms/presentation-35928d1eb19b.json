@@ -1,0 +1,1515 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "presentation",
+  "source_epoch": "760944",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "entries": [
+    {
+      "id": "EXP-PRES-001",
+      "title": "蜘蛛SG的单动画、动画队列和状态退出边界",
+      "aliases": [
+        "AnimState:PlayAnimation",
+        "AnimState:PushAnimation",
+        "animover",
+        "animqueueover",
+        "SGspider",
+        "spike_attack_pst",
+        "shield",
+        "动画队列"
+      ],
+      "engineering_question": "何时等animover，何时等animqueueover，离开表现状态是否自动还原业务？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "spider公共factory的master SGspider安装；选born、spike_attack/spike_attack_pst、shield/shield_end实际状态。",
+        "excluded": "不重建通用SG调度知识NC-N003-INT-05；不覆盖全部蜘蛛变种、所有动画资源、客户端预测和native事件产生机制。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-001-C01",
+          "kind": "NSF",
+          "statement": "spider工厂在SetPristine后非master返回，master才选择extra_data.sg或SGspider；这里的SG消费者范围不代表所有变种必用同一SG。",
+          "evidence_refs": [
+            "PR-S04"
+          ]
+        },
+        {
+          "id": "EXP-PRES-001-C02",
+          "kind": "NSF",
+          "statement": "born进态仅PlayAnimation(\"taunt\")，由animover处理器转idle。spike_attack在hide的animover转spike_attack_pst；后者PlayAnimation(\"hit_shield\")后PushAnimation(\"unhide\",false)，等animqueueover才转idle。这两条Lua布线不同，不能把第一次动画结束与队列结束当成同一清理信号。",
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02"
+          ]
+        },
+        {
+          "id": "EXP-PRES-001-C03",
+          "kind": "NSF",
+          "statement": "shield进态设置壳吸收、停物理、PlayAnimation(\"hide\")后PushAnimation(\"hide_loop\")，后一个调用没有显式loop实参；退出函数把吸收设0。shield_end单播unhide却仍监听animqueueover。可见事件选择不是只由本状态有没有PushAnimation决定，也不能替省略参数补成已验证的native默认值。",
+          "evidence_refs": [
+            "PR-S03"
+          ]
+        },
+        {
+          "id": "EXP-PRES-001-C04",
+          "kind": "NSF",
+          "statement": "State:HandleEvent仅在data非表、data.state缺省或匹配当前state名时查本状态事件；回调返回值原样上交。StateGraphInstance先处理当前状态，结果是假值才查全局处理器；这里的完成事件回调未return true，不能泛化为它们阻止所有全局处理。",
+          "evidence_refs": [
+            "PR-S05",
+            "PR-S06",
+            "PR-S01",
+            "PR-S02"
+          ]
+        },
+        {
+          "id": "EXP-PRES-001-C05",
+          "kind": "REC",
+          "statement": "保持本状态选定的完成事件与显式退出业务；中断后不依赖旧状态的完成事件还原。GoToState先onexit后重建statemem/进新态等通用次序复用既有NC-N003-INT-05，本卡只提供蜘蛛动画消费者的具体证据。",
+          "evidence_refs": [
+            "PR-S03",
+            "PR-S07"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "AnimState:PlayAnimation",
+          "source_file": "scripts/stategraphs/SGspider.lua",
+          "visibility": "native method call-site only; 仅该Lua消费者的调用形状；未读native声明/完整参数、返回或渲染实现，不授予公共或客户端通用API契约",
+          "parameters": [
+            "本卡调用animation字符串；born传taunt，spike_attack_pst传hit_shield，shield传hide；这些调用未显式传loop。"
+          ],
+          "returns": "Lua调用处未使用返回值；native返回契约未知。",
+          "preconditions": [
+            "所列实体已有AnimState，动作资源是否存在及运行表现需另验。"
+          ],
+          "side_effects": [
+            "按所列代码先发起Play调用；不能由调用证明画面或native队列内部行为。"
+          ],
+          "lifecycle": [
+            "完成信号由各状态独立监听；离开状态的业务还原见onexit，不由该调用自动证明。"
+          ],
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02",
+            "PR-S03"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "AnimState:PushAnimation",
+          "source_file": "scripts/stategraphs/SGspider.lua",
+          "visibility": "native method call-site only; 仅该Lua消费者的调用形状；未读native声明/完整参数、返回或渲染实现，不授予公共或客户端通用API契约",
+          "parameters": [
+            "spike_attack_pst在Play后传unhide,false；shield传hide_loop但省略loop。"
+          ],
+          "returns": "调用处未使用返回值；native实际返回与省略参数默认值未知。",
+          "preconditions": [
+            "所列实体已有AnimState；前置Play调用属于同一进态函数。"
+          ],
+          "side_effects": [
+            "记录将后续动画传给Push的Lua调用次序；native排队/中断细节未读。"
+          ],
+          "lifecycle": [
+            "spike_attack_pst的退出监听animqueueover；shield另有onexit还原吸收，未承诺循环能自然触发完成事件。"
+          ],
+          "evidence_refs": [
+            "PR-S02",
+            "PR-S03"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "权威工厂安装实际SG，先确定具体state。",
+          "evidence_refs": [
+            "PR-S04"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "对单播taunt与hit_shield→unhide链分别核对完成事件。",
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "shield退出显式还原业务，事件经状态处理器派发。",
+          "evidence_refs": [
+            "PR-S03",
+            "PR-S05",
+            "PR-S06"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "引擎动画事件与远端视觉保留未知。",
+          "evidence_refs": [
+            "PR-S01",
+            "PR-S02",
+            "PR-S03"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。",
+        "未枚举所有导致shield退出的事件或证明同帧/旧动画事件是否到达新state；data.state门禁不是native事件必带state字段的证明。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PR-S04",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S01",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S02",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S03",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S05",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S06",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S07",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          }
+        ],
+        "unknowns": [
+          "未证明所有动态调用者、native实现或所有Mod兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PRES-002",
+      "title": "火炬投掷具名声音、命中停止与短音任务互消",
+      "aliases": [
+        "torch",
+        "OnThrown",
+        "OnHit",
+        "PlayIgniteSound",
+        "PlayExtinguishSound",
+        "spin_loop",
+        "KillSound",
+        "具名音效"
+      ],
+      "engineering_question": "具名声音应由哪个emitter停止，命中/外部熄灭/移除路径是否一样？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "torch master安装的complexprojectile回调，从Launch/Hit实际派发及所列装备声音调用出发。",
+        "excluded": "不覆盖FMOD银行实际循环配置、声音传播/音量/解码、完整投掷弹道、所有皮肤、燃料和技能数值政策。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-002-C01",
+          "kind": "NSF",
+          "statement": "torch共有初始化添加SoundEmitter/Network，SetPristine后非master返回；master安装OnThrown/OnHit和burnable的OnExtinguish及prefab OnRemoveEntity。声音回调的权威安装不等于证实远端听见或播放几次。",
+          "evidence_refs": [
+            "PR-S11"
+          ]
+        },
+        {
+          "id": "EXP-PRES-002-C02",
+          "kind": "NSF",
+          "statement": "ComplexProjectile:Launch在调用非nil onlaunchfn(inst,attacker,targetPos)后才加activeprojectile并启动更新。torch OnThrown设置thrower技能快照，播放spin_loop动画和该火炬SoundEmitter上的torch_spin事件，句柄名spin_loop；再强制即时点火短音、IgniteTossed，禁拾取并加FX标签。实际音频银行是否循环没有在Lua中证明。",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12",
+            "PR-S18",
+            "PR-S08"
+          ]
+        },
+        {
+          "id": "EXP-PRES-002-C03",
+          "kind": "NSF",
+          "statement": "ComplexProjectile:Hit先Cancel后调onhitfn；torch OnHit播land，KillSound(\"spin_loop\")并播stick_ground，恢复拾取且去FX。Cancel自身仅去activeprojectile/停止更新与物理/清速度，没有KillSound，故不能把取消投射组件等同停止该具名声音。",
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12"
+          ]
+        },
+        {
+          "id": "EXP-PRES-002-C04",
+          "kind": "NSF",
+          "statement": "OnExtinguish仅在fires非nil且物品未持有、燃料非空时进入外部地面熄火分支；移除fires并清表、即时熄火短音。仅该分支内且activeprojectile时才Cancel与KillSound(\"spin_loop\")并恢复拾取/去FX，随后改idle并给随机弹跳。不能推广为任意Extinguish或Cancel都会运行全部停止声逻辑。",
+          "evidence_refs": [
+            "PR-S10"
+          ]
+        },
+        {
+          "id": "EXP-PRES-002-C05",
+          "kind": "NSF",
+          "statement": "PlayIgniteSound和PlayExtinguishSound对称取消并清对方待执行task；若force假值即返回，否则继续。instant真值取消本方旧task再即时播放，否则本方task缺省才排0秒任务。Do回调先清task字段，选择有效owner或inst的SoundEmitter，存在才播短音。torch OnRemoveEntity额外Cancel/nil两短音task，因为移除中卸装可能已过通用任务取消阶段；此hook没有显式KillSound spin_loop。",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S17",
+            "PR-S13"
+          ]
+        },
+        {
+          "id": "EXP-PRES-002-C06",
+          "kind": "REC",
+          "statement": "停止句柄必须指向发声的火炬emitter及同名spin_loop；保留命中和限定外部熄火的显式停止路径。实体最终移除时native emitter释放、听感和重复触发仍需运行验证，不能拿短音task已取消代替证明所有声音停止。",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S09",
+            "PR-S10",
+            "PR-S17"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "OnThrown",
+          "source_file": "scripts/prefabs/torch.lua",
+          "visibility": "file-local; 仅所列原版消费者中的局部函数，未作为公共导出API",
+          "parameters": [
+            "inst：master火炬，具备AnimState/SoundEmitter及burnable/inventoryitem等初始化对象；thrower可nil。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "由complexprojectile onlaunch安装；skilltree存在时需可查询列举技能，FX生成依赖按当前皮肤选择，未作Spawn失败保护。"
+          ],
+          "side_effects": [
+            "写thrower快照，spin动画/具名声、PlayIgniteSound强制即时播放、IgniteTossed及FX/光/技能应用，禁拾取/加FX标签。"
+          ],
+          "lifecycle": [
+            "本函数不重复声句柄门禁、不建声音停止任务；Hit或特定OnExtinguish显式停，native emitter移除行为未知。"
+          ],
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S11",
+            "PR-S12",
+            "PR-S18",
+            "PR-S08"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "OnHit",
+          "source_file": "scripts/prefabs/torch.lua",
+          "visibility": "file-local; 仅所列原版消费者中的局部函数，未作为公共导出API",
+          "parameters": [
+            "inst：有效master火炬；component额外传attacker,target被此单参数函数忽略。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "所列对象具备AnimState/SoundEmitter/inventoryitem；真实Hit已先Cancel。"
+          ],
+          "side_effects": [
+            "播放land、停止本emitter的spin_loop、播放stick_ground；恢复拾取并去FX。"
+          ],
+          "lifecycle": [
+            "无新task/保存；不删除火炬或fires，不等价熄火。"
+          ],
+          "evidence_refs": [
+            "PR-S09",
+            "PR-S12",
+            "PR-S11"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "PlayIgniteSound",
+          "source_file": "scripts/prefabs/torch.lua",
+          "visibility": "file-local; 仅所列原版消费者中的局部函数，未作为公共导出API",
+          "parameters": [
+            "inst：task所有者火炬；owner可nil或失效，回调选择有效owner否则inst；instant/force按Lua真值。"
+          ],
+          "returns": "无显式返回；取消对方task且force假值时早退nil。",
+          "preconditions": [
+            "非nil task可Cancel；被选emitter可nil，有则需PlaySound；未封装异常回滚。"
+          ],
+          "side_effects": [
+            "先Cancel/nil熄火task；force控制是否继续。instant则Cancel本方旧task并DoIgniteSound；否则仅无本方task时DoTaskInTime(0)。"
+          ],
+          "lifecycle": [
+            "Do回调先清_ignitesoundtask；prefab OnRemoveEntity再次Cancel/nil。此短音辅助不管理spin_loop。"
+          ],
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S13",
+            "PR-S09",
+            "PR-S11"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "PlayExtinguishSound",
+          "source_file": "scripts/prefabs/torch.lua",
+          "visibility": "file-local; 仅所列原版消费者中的局部函数，未作为公共导出API",
+          "parameters": [
+            "inst：火炬；owner可nil/失效；instant/force按Lua真值。"
+          ],
+          "returns": "无显式返回；互消早退nil。",
+          "preconditions": [
+            "同点火辅助的task/emitter前提；此处选择有效owner或inst。"
+          ],
+          "side_effects": [
+            "先Cancel/nil点火task；非force则早退。instant则Cancel旧熄火task并即时DoExtinguishSound，否则仅缺task时排0秒任务。"
+          ],
+          "lifecycle": [
+            "Do回调先清_extinguishsoundtask；移除hook显式Cancel/nil；不停止spin_loop。"
+          ],
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S13",
+            "PR-S10",
+            "PR-S11"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master factory注册发射/命中/熄灭与移除回调。",
+          "evidence_refs": [
+            "PR-S11"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Launch调用OnThrown，具名声归火炬emitter，短音归选择的owner或火炬。",
+          "evidence_refs": [
+            "PR-S12",
+            "PR-S09",
+            "PR-S08"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "命中先Cancel再OnHit；限定外部熄火显式取消与停止句柄。",
+          "evidence_refs": [
+            "PR-S12",
+            "PR-S09",
+            "PR-S10"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "短音任务互消并在移除hook兜底取消；native听感另验。",
+          "evidence_refs": [
+            "PR-S08",
+            "PR-S17"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。",
+        "未证明所有死亡/卸装/Deflect/外部Remove组合都先执行KillSound；尤其OnRemoveEntity这里只清短音任务。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PR-S11",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S09",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S12",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S18",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S08",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S10",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S17",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S13",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          }
+        ],
+        "unknowns": [
+          "未证明所有动态调用者、native实现或所有Mod兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PRES-003",
+      "title": "普通torchfire的网络FX、独立本地灯与symbol跟随清理",
+      "aliases": [
+        "torchfire",
+        "torchfire_common",
+        "AttachLightTo",
+        "SetLightRange",
+        "FollowSymbol",
+        "EmitterManagerClass:AddEmitter",
+        "粒子",
+        "playerlight"
+      ],
+      "engineering_question": "火焰、跟随节点和照明是否同一个实体，专服和非master分别创建什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "普通无皮肤torch→torchfire，装备与投掷的显式挂接/移除；torchfire_common和本地EmitterManager Lua清理。",
+        "excluded": "不泛化全部torch皮肤或所有FX；不覆盖native FollowSymbol/SetParent复制、光照实际范围、粒子视觉或物品死亡时装备系统的全部调用链。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-003-C01",
+          "kind": "NSF",
+          "statement": "普通torch onequip在fires缺省时生成torchfire，parent设owner，AddFollower后FollowSymbol(owner.GUID,\"swap_object\",偏移)，再AttachLightTo(owner)并存fires；投掷IgniteTossed类似但parent/FollowSymbol目标是torch自身与swap_torch。Spawn结果未在这些循环里判nil。",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S09",
+            "PR-S11"
+          ]
+        },
+        {
+          "id": "EXP-PRES-003-C02",
+          "kind": "NSF",
+          "statement": "MakeTorchFire共有factory建Transform/SoundEmitter/Network和FX标签，播放torch具名声并设置intensity；还CreateLight出不联网且不保存的_light，先parent到FX。仅overridedata.hasanimstate时AddAnimState，普通torchfire未给该选项，不能假设所有火焰都是AnimState动画。master设置FX persists=false并导出AttachLightTo/SetLightRange；客户端只安装OnEntityReplicated与dirty监听等共有路径。",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S15"
+          ]
+        },
+        {
+          "id": "EXP-PRES-003-C03",
+          "kind": "NSF",
+          "statement": "AttachLightTo只改_light的parent到target，并按target的player标签增删playerlight，不移动FX主体或调用FollowSymbol。OnEntityReplicated仅在FX已存在parent时对该parent调用AttachLightTo；无parent时不另排重试。SetLightRange只在值改变时set net_tinybyte并本地更新半径/衰减，索引直接取TUNING表，无额外数值范围校验。",
+          "evidence_refs": [
+            "PR-S14"
+          ]
+        },
+        {
+          "id": "EXP-PRES-003-C04",
+          "kind": "NSF",
+          "statement": "torchfire common_postinit先检查TheNet:IsDedicated，专服直接返回而非用ismastersim替代；非专服初始化envelope一次并AddVFXEffect/两emitter，设置烟/火渲染资源、寿命及曲线。EmitterManager注册nil lifetime的更新函数，因此粒子最大寿命不等于FX实体定时删除；主机可视端没有被master门禁排除。",
+          "evidence_refs": [
+            "PR-S15",
+            "PR-S16"
+          ]
+        },
+        {
+          "id": "EXP-PRES-003-C05",
+          "kind": "NSF",
+          "statement": "torch onunequip与OnPutInInventory显式Remove所持fires并清表；FX OnRemoveEntity显式Remove其_light，即使灯已改parent到owner，也由FX的Lua字段清理。EmitterManager:AddEmitter在inst自己的onremove事件绑定RemoveEmitter，后者删除四张醒/睡、限时/无限表的引用；它不调用inst:Remove或清VFX对象。EntityScript先发onremove再清监听/任务，较后才调prefab OnRemoveEntity，均为已读Lua次序。",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S10",
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ]
+        },
+        {
+          "id": "EXP-PRES-003-C06",
+          "kind": "REC",
+          "statement": "分别管理FX主体、symbol跟随、独立_light和EmitterManager注册，不能以persists=false、粒子寿命或父级关系推断整个生命周期。死亡/父实体被删的native传播没有本卡保证，所列显式卸装/入库/FX Remove链才是静态证据。",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S14",
+            "PR-S15",
+            "PR-S16",
+            "PR-S17"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "AttachLightTo",
+          "source_file": "scripts/prefabs/torchfire_common.lua",
+          "visibility": "file-local; 局部实现，master另赋给实体AttachLightTo字段；非通用全局API",
+          "parameters": [
+            "inst：持有_light的torchfire；target：有entity及HasTag的有效目标。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "只在master作为inst.AttachLightTo赋值导出；同一局部函数由client OnEntityReplicated内部调用；不自行检查nil目标。"
+          ],
+          "side_effects": [
+            "把_light parent设target；按player标签增删playerlight。"
+          ],
+          "lifecycle": [
+            "不更换FX本身parent、不生成新灯；FX自己的OnRemoveEntity仍通过_light字段Remove灯。"
+          ],
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S13",
+            "PR-S09"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "SetLightRange",
+          "source_file": "scripts/prefabs/torchfire_common.lua",
+          "visibility": "file-local; 局部实现，master赋给实体SetLightRange字段",
+          "parameters": [
+            "inst：有_lightrange与_light；value：调用者给定的TUNING表可索引档位。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "仅master赋为实体SetLightRange；不校验范围，依赖net字段与TUNING.TORCH_RADIUS/FALLOFF索引可用。"
+          ],
+          "side_effects": [
+            "值不同才写net字段并OnLightRangeDirty设置灯radius/falloff；相同不操作。"
+          ],
+          "lifecycle": [
+            "非master通过dirty监听调用本地更新；不生成任务，也不证明native同步或光照观感。"
+          ],
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S18"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "OnRemoveEntity",
+          "source_file": "scripts/prefabs/torchfire_common.lua",
+          "visibility": "file-local; 仅所列原版消费者中的局部函数，未作为公共导出API",
+          "parameters": [
+            "inst：持有_light。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "factory共有路径安装为prefab OnRemoveEntity；_light须支持Remove，无nil/valid守卫。"
+          ],
+          "side_effects": [
+            "只显式调用inst._light:Remove()。"
+          ],
+          "lifecycle": [
+            "不显式KillSound或RemoveEmitter；EmitterManager通过FX onremove先做自身表清理。不得据此保证native灯/声音/粒子实时释放。"
+          ],
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "EmitterManagerClass:RemoveEmitter",
+          "source_file": "scripts/emitters.lua",
+          "visibility": "Lua class method; 本卡仅torchfire本地发射器消费者",
+          "parameters": [
+            "inst：用作manager表键的实体。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "有效manager含醒/睡两组表；调用入口是AddEmitter注册的实体onremove。"
+          ],
+          "side_effects": [
+            "将awake/sleeping的limited/infinite四张表中inst键全部设nil。"
+          ],
+          "lifecycle": [
+            "不删除实体，不解除AddEmitter安装的监听，也不证明VFX native清理。"
+          ],
+          "evidence_refs": [
+            "PR-S16",
+            "PR-S17"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master火炬装备/投掷创建普通torchfire并显式parent和FollowSymbol。",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S09"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "共有factory创建联网FX与独立本地灯；非专服再创建粒子。",
+          "evidence_refs": [
+            "PR-S14",
+            "PR-S15"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "AttachLightTo与dirty更新只管灯，非FX主体跟随。",
+          "evidence_refs": [
+            "PR-S14"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "卸装/入库Remove FX，经onremove清manager表，再由FX hook清灯。",
+          "evidence_refs": [
+            "PR-S13",
+            "PR-S10",
+            "PR-S14",
+            "PR-S16",
+            "PR-S17"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。",
+        "不保证接收网络FX的所有peer范围或死亡后必先卸装；未证明灯、声、粒子native资源释放及休眠视觉。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PR-S13",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S09",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S11",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S14",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S15",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S16",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S10",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S17",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S18",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          }
+        ],
+        "unknowns": [
+          "未证明所有动态调用者、native实现或所有Mod兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PRES-004",
+      "title": "FireFX档位动画、具名火声缓存与sleep/wake恢复",
+      "aliases": [
+        "FireFX:SetLevel",
+        "FireFX:OnEntitySleep",
+        "FireFX:OnEntityWake",
+        "FireFX:Extinguish",
+        "FireFX:AttachLightTo",
+        "playingsound",
+        "fire",
+        "睡眠唤醒"
+      ],
+      "engineering_question": "火焰换档何时播pre/loop，睡眠停声为何仍留缓存，熄火后会被唤醒重播吗？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "fire prefab在master安装FireFX；Burnable SpawnFX给该组件档位/controlled_burn并挂接独立firefx_light，mainfunctions分派睡醒hook。组件可选pre/pst分支作为声明局部契约，普通fire表无这些字段。",
+        "excluded": "不重复BR-P03的KillFX退场删除协议；不覆盖所有火焰prefab、controlled burn玩法、native声音/动画/网络复制或实际睡醒触发时机。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-004-C01",
+          "kind": "NSF",
+          "statement": "fire共有factory创建AnimState/SoundEmitter/Network，master早退之后才AddComponent firefx并赋firelevels；不能说每个peer都运行该组件。FireFX构造Spawn独立firefx_light并parent到自身、StartUpdatingComponent；firefx_light本身是联网Light prefab，master才设persists=false。Burnable SpawnFX在成功生成并发现该组件时调用SetLevel和AttachLightTo，既有SpawnFX通用协议为邻接前提。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20",
+            "PR-S22",
+            "PR-S23"
+          ]
+        },
+        {
+          "id": "EXP-PRES-004-C02",
+          "kind": "NSF",
+          "statement": "SetLevel先算旧controlled_burn非nil而新参数nil的stopcontrolled，再写新值；主体条件为(lev>0且lev不同当前level)或stopcontrolled。已存在level时强制immediate=true，level只math.min上限，没下限保护；immediate或params.pre缺省则Play循环，否则Play pre后Push循环，并依controlled_burn选对应字段。普通firelevels无pre，故不把组件可选pre路径说成普通fire每次都会播放。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ]
+        },
+        {
+          "id": "EXP-PRES-004-C03",
+          "kind": "NSF",
+          "statement": "只有音效路径与缓存playingsound不同时才Kill旧fire句柄、改路径缓存并清强度缓存；新路径非nil且实体未睡眠才PlaySound(path,fire)。强度改变且sound非nil才改playingsoundintensity，强度非nil且PlayingSound(fire)才SetParameter。普通fire同路径档位可只改强度而不重启声音，缓存非nil不证明此刻在播放。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ]
+        },
+        {
+          "id": "EXP-PRES-004-C04",
+          "kind": "NSF",
+          "statement": "OnEntitySleep只KillSound(fire)，不清playingsound/强度缓存；OnEntityWake仅缓存路径非nil且当前PlayingSound(fire)为假时重新Play，并在缓存强度非nil时还原intensity。mainfunctions先发entitysleep/entitywake与prefab hook，再遍历组件hook；这里的master实例有FireFX，不由全局函数的存在推断客户端也装同一组件。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ]
+        },
+        {
+          "id": "EXP-PRES-004-C05",
+          "kind": "NSF",
+          "statement": "FireFX Extinguish先在playingsound非nil时Kill fire并清路径/强度缓存；随后只有extinguishsoundtest缺省或真值才播熄火声并选择fast真值且pst_fast存在时优先、再controlled pst、再普通pst。存在退场动画才Play并返回true，否则nil；本方法不排删除任务、不清level，也不关闭light。熄火已清缓存时wake不会按旧缓存重播。普通fire的test会汇总附近其他firefx档位，只有总量<5允许后段声音/退场。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ]
+        },
+        {
+          "id": "EXP-PRES-004-C06",
+          "kind": "NSF",
+          "statement": "AttachLightTo对不同parent解绑旧非自身target的onremove监听，再对新非自身target安装同一callback并改parent；target移除时callback把light parent改回FX，而不是删除FX。FireFX OnRemoveEntity只Remove light，OnRemoveFromEntity是同一函数的赋值别名；两种移除分派分别由EntityScript处理，不在这两个hook显式Kill声音或还原其他状态。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17",
+            "PR-S24"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FireFX:SetLevel",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component method; 仅所列master fire消费者及局部声明",
+          "parameters": [
+            "lev：数值，主体需要有效levels索引；immediate按Lua真值；controlled_burn可nil或所列调用方提供的数据。"
+          ],
+          "returns": "无显式返回；不返回档位切换成功布尔值。",
+          "preconditions": [
+            "所列master组件、AnimState/SoundEmitter/light及配置levels；只钳上限，stopcontrolled可绕过lev>0，调用者不能据此传0/负值保证安全。"
+          ],
+          "side_effects": [
+            "总写controlled_burn；符合门禁才点火短音、设置level/动画/light、声路径与强度缓存。已存在level强制即时，不再播pre；增加controlled参数但档位不变且非stopcontrolled可不进入主体。"
+          ],
+          "lifecycle": [
+            "不排清理任务；sleep保缓存停止句柄，wake按缓存恢复；默认firelevels无pre/pst，其他配置的可选分支仅本方法声明证据。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20",
+            "PR-S22"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:OnEntitySleep",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component lifecycle hook; 所列fire仅master安装",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "有效组件及SoundEmitter；由全局实体sleep分派到当前安装的组件。"
+          ],
+          "side_effects": [
+            "仅KillSound(fire)，不清路径/强度缓存。"
+          ],
+          "lifecycle": [
+            "不等价Extinguish或删除FX/light；保留wake恢复所需缓存。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:OnEntityWake",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component lifecycle hook; 所列fire仅master安装",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "SoundEmitter具备PlayingSound/PlaySound/SetParameter；缓存可nil。"
+          ],
+          "side_effects": [
+            "仅路径缓存非nil且句柄当前未播放才Play，随后仅强度缓存非nil才设置intensity。"
+          ],
+          "lifecycle": [
+            "已有句柄播放时不重启也不重新设强度；Extinguish清路径后本hook不恢复旧路径；不安排新任务。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21",
+            "PR-S20"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:Extinguish",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component method; 与Burnable:Extinguish不同owner",
+          "parameters": [
+            "fast：Lua真值，优先选择pst_fast。"
+          ],
+          "returns": "满足test且存在所选pst时返回true；其余无显式返回nil。",
+          "preconditions": [
+            "有效组件/emitter；test非nil须可调用且不接参数，levels可无当前leveldata。"
+          ],
+          "side_effects": [
+            "条件Kill fire并清两个缓存，再按test选择熄火声/退场动画；不设置level=nil或关light。"
+          ],
+          "lifecycle": [
+            "true只报告已有退场动画，不自行删实体；BR-P03已有调用方延迟删除协议，不在此重新计为新增。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:AttachLightTo",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component method; 所列Burnable成功SpawnFX消费者",
+          "parameters": [
+            "target：有entity和事件接口的目标。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "不防nil；旧parent预期为自身或有效事件source；offset字段若真值须支持Get。",
+            "inst：组件宿主；light：构造时生成。"
+          ],
+          "side_effects": [
+            "parent改变时按条件解绑旧target/监听新target并移动light；可选局部offset。"
+          ],
+          "lifecycle": [
+            "新target移除时self.light的callback挂回自身；component/entity移除hook最终Remove light，不保证native父级传播语义。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S22",
+            "PR-S23"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:OnRemoveEntity",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component lifecycle hook; master FireFX",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "light已生成且可Remove，未在hook做nil/valid防御。"
+          ],
+          "side_effects": [
+            "仅self.light:Remove()。"
+          ],
+          "lifecycle": [
+            "没有显式KillSound/StopUpdating或缓存恢复；实体通用移除另有任务/更新清理。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        },
+        {
+          "symbol": "FireFX:OnRemoveFromEntity",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component lifecycle alias; 同函数别名，非新实现",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "FireFX.OnRemoveFromEntity直接赋为OnRemoveEntity；RemoveComponent清索引后调用此hook。"
+          ],
+          "side_effects": [
+            "与OnRemoveEntity相同，仅Remove light。"
+          ],
+          "lifecycle": [
+            "拆组件不删除宿主；不能据此宣称声音/动画回滚，native行为和Mod后续责任未知。"
+          ],
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S24"
+          ],
+          "unknowns": [
+            "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "fire master安装组件，Burnable成功Spawn后传档位与挂光目标。",
+          "evidence_refs": [
+            "PR-S20",
+            "PR-S22",
+            "PR-S19",
+            "PR-S23"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "SetLevel选择动画并缓存fire声路径和强度。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S20"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "sleep只停句柄，wake查缓存和实际句柄；Extinguish清缓存。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S21"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "target移除挂光回FX；组件/实体移除显式删除独立light。",
+          "evidence_refs": [
+            "PR-S19",
+            "PR-S17",
+            "PR-S24"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。",
+        "未运行睡醒、受控燃烧同档切换、非法level、重复hook或test回调移除/重入；缓存行为不证明音频事件是否真实循环或远端听感。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PR-S19",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S20",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S22",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S23",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S21",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S17",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          },
+          {
+            "ref": "PR-S24",
+            "role": "本卡所列定义/消费者/生命周期静态依赖"
+          }
+        ],
+        "unknowns": [
+          "未证明所有动态调用者、native实现或所有Mod兼容闭包。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "PR-S01",
+      "source_file": "scripts/stategraphs/SGspider.lua",
+      "file_sha256": "9b4493db28b78b4eb229d09bdfd07dd136d9a33b7a576b13ad7193bd9a05df0f",
+      "line_start": 261,
+      "line_end": 273,
+      "range_sha256": "884a66dfa99999aa370fd2db011db4de59c568732fd66e635bca3409841b7195",
+      "symbols": [
+        "born",
+        "animover"
+      ]
+    },
+    {
+      "id": "PR-S02",
+      "source_file": "scripts/stategraphs/SGspider.lua",
+      "file_sha256": "9b4493db28b78b4eb229d09bdfd07dd136d9a33b7a576b13ad7193bd9a05df0f",
+      "line_start": 433,
+      "line_end": 476,
+      "range_sha256": "ecba057e4355e2cddc70cbd63cd320ccd59ae1da83cedbac1a4a9dcdf898baea",
+      "symbols": [
+        "spike_attack",
+        "spike_attack_pst",
+        "animqueueover"
+      ]
+    },
+    {
+      "id": "PR-S03",
+      "source_file": "scripts/stategraphs/SGspider.lua",
+      "file_sha256": "9b4493db28b78b4eb229d09bdfd07dd136d9a33b7a576b13ad7193bd9a05df0f",
+      "line_start": 529,
+      "line_end": 558,
+      "range_sha256": "890e1e83487eea94fef155129e1c85dc16af76bf1ceba1328049bf7aedd4b584",
+      "symbols": [
+        "shield",
+        "shield_end",
+        "onexit"
+      ]
+    },
+    {
+      "id": "PR-S04",
+      "source_file": "scripts/prefabs/spider.lua",
+      "file_sha256": "1da356d84caa8dc5e654b59af0b7bcbdb18e79643aea15825cafcb4c3a7f58dd",
+      "line_start": 611,
+      "line_end": 643,
+      "range_sha256": "a5c2953dd468104bfde175a80a395f1d58b20302d52d15adda272d0002dae16f",
+      "symbols": [
+        "SetPristine",
+        "SGspider"
+      ]
+    },
+    {
+      "id": "PR-S05",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 264,
+      "line_end": 272,
+      "range_sha256": "8ccc25b305e56c623694a80e2a4de51c6c8606b9f8a17190ed669bc6d7678375",
+      "symbols": [
+        "State:HandleEvent"
+      ]
+    },
+    {
+      "id": "PR-S06",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 463,
+      "line_end": 488,
+      "range_sha256": "cbfb0870e4dbe987ed46b777cf39e68e7dbd6df9bdff6ca567b79f5743193db7",
+      "symbols": [
+        "StateGraphInstance:HandleEvent",
+        "StateGraphInstance:HandleEvents"
+      ]
+    },
+    {
+      "id": "PR-S07",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 529,
+      "line_end": 600,
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "symbols": [
+        "StateGraphInstance:GoToState"
+      ]
+    },
+    {
+      "id": "PR-S08",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 13,
+      "line_end": 75,
+      "range_sha256": "65ff7c16eb0ddb0573c0a9c134fa41682dcc3857352c6437cd6a43aa4b957807",
+      "symbols": [
+        "DoIgniteSound",
+        "DoExtinguishSound",
+        "PlayIgniteSound",
+        "PlayExtinguishSound",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "PR-S09",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 279,
+      "line_end": 323,
+      "range_sha256": "40aefc2960766917cf4a597aa8a4a4b529be4e63a9a5275f8d4bc135ad16184c",
+      "symbols": [
+        "IgniteTossed",
+        "OnThrown",
+        "OnHit"
+      ]
+    },
+    {
+      "id": "PR-S10",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 344,
+      "line_end": 393,
+      "range_sha256": "514be2d2489fc4fd9910b09a6a0bc81b8e3af3a55b0151c43c9058b3cab3dad6",
+      "symbols": [
+        "RemoveThrower",
+        "OnPutInInventory",
+        "OnExtinguish"
+      ]
+    },
+    {
+      "id": "PR-S11",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 415,
+      "line_end": 530,
+      "range_sha256": "3791681187c744ec6d78a1d8b300ad7c1ab11c03811dab58fe242d506ce9dbaa",
+      "symbols": [
+        "fn",
+        "OnThrown",
+        "OnHit",
+        "OnExtinguish",
+        "OnRemoveEntity",
+        "onequip",
+        "onunequip"
+      ]
+    },
+    {
+      "id": "PR-S12",
+      "source_file": "scripts/components/complexprojectile.lua",
+      "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+      "line_start": 134,
+      "line_end": 196,
+      "range_sha256": "43f05455b66cd2b45a953139dffe7818202466cf10f4f88ad4932638a137d6d2",
+      "symbols": [
+        "ComplexProjectile:Launch",
+        "ComplexProjectile:Cancel",
+        "ComplexProjectile:Hit"
+      ]
+    },
+    {
+      "id": "PR-S13",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 130,
+      "line_end": 186,
+      "range_sha256": "4e603b7ea7939b0a3fa4ac43cd0df3b61353b041ac4322d66bf9eb4c4f95dde6",
+      "symbols": [
+        "onequip",
+        "onunequip",
+        "FollowSymbol",
+        "AttachLightTo"
+      ]
+    },
+    {
+      "id": "PR-S14",
+      "source_file": "scripts/prefabs/torchfire_common.lua",
+      "file_sha256": "1d66f6ebe9f1cacf3cc994da5215bc854fe1844cf5c9d6b0dcc2c86aba77eb3e",
+      "line_start": 1,
+      "line_end": 119,
+      "range_sha256": "ac1f8c3a5b4792b39d6703c1edf851a16fc322302375fcd0d6efa2b0c14628c2",
+      "symbols": [
+        "CreateLight",
+        "AttachLightTo",
+        "OnEntityReplicated",
+        "OnRemoveEntity",
+        "SetLightRange",
+        "MakeTorchFire"
+      ]
+    },
+    {
+      "id": "PR-S15",
+      "source_file": "scripts/prefabs/torchfire.lua",
+      "file_sha256": "a10a60bc55027e115b789f39385188c0adb15cbd499924537ab3ced0ec46064b",
+      "line_start": 1,
+      "line_end": 184,
+      "range_sha256": "7d1e8c02253455a5ea5ee3538ef360e137c3643953d0b71e008524611794fe7c",
+      "symbols": [
+        "common_postinit",
+        "master_postinit",
+        "InitEnvelope",
+        "emit_smoke_fn",
+        "emit_fire_fn"
+      ]
+    },
+    {
+      "id": "PR-S16",
+      "source_file": "scripts/emitters.lua",
+      "file_sha256": "0732943d3b70feb243455cbf32f60c20768f033c43e17bed94b146971a2e4589",
+      "line_start": 1,
+      "line_end": 99,
+      "range_sha256": "b35078937af39ea25f8339d2a9dbaf9c14373f511b54dd3e9027133e85b6e4cb",
+      "symbols": [
+        "EmitterManagerClass:AddEmitter",
+        "EmitterManagerClass:RemoveEmitter",
+        "EmitterManagerClass:PostUpdate",
+        "EmitterManagerClass:Hibernate",
+        "EmitterManagerClass:Wake"
+      ]
+    },
+    {
+      "id": "PR-S17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "PR-S18",
+      "source_file": "scripts/prefabs/torch.lua",
+      "file_sha256": "402c6ed47a18fedff9299489b8b9c55e254cf1bb1459d825cd21cf4d9ce8ba6d",
+      "line_start": 77,
+      "line_end": 128,
+      "range_sha256": "c70d87d136bd8ef67951a109d4270f9e280b9e5c3c2cc4e836e4b2f34e1276fc",
+      "symbols": [
+        "applyskillbrightness",
+        "RefreshAttunedSkills",
+        "WatchSkillRefresh"
+      ]
+    },
+    {
+      "id": "PR-S19",
+      "source_file": "scripts/components/firefx.lua",
+      "file_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+      "line_start": 1,
+      "line_end": 174,
+      "range_sha256": "780c87ad1aa95160b484ad7f9fe79f8a1abee3c135f4633618261985a3acb4b6",
+      "symbols": [
+        "FireFX:SetLevel",
+        "FireFX:Extinguish",
+        "FireFX:OnEntitySleep",
+        "FireFX:OnEntityWake",
+        "FireFX:AttachLightTo",
+        "FireFX:OnRemoveEntity",
+        "FireFX:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "PR-S20",
+      "source_file": "scripts/prefabs/fire.lua",
+      "file_sha256": "0cd3f2ee5c2b33da18d7a64f4c42450a2b89be40c31717c630dcc5e888429ad8",
+      "line_start": 1,
+      "line_end": 75,
+      "range_sha256": "f58d3bab04949033231694df9c35280a736105e41c2ccf31897b2a56a7b47e59",
+      "symbols": [
+        "firelevels",
+        "fn",
+        "GetHeatFn"
+      ]
+    },
+    {
+      "id": "PR-S21",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 696,
+      "line_end": 757,
+      "range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+      "symbols": [
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "PR-S22",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 496,
+      "line_end": 540,
+      "range_sha256": "948663af2c9e8a0dd0c1c14e86ba5d32f3d76aa5d6cef1d283da8f7f12fa80d5",
+      "symbols": [
+        "Burnable:SpawnFX"
+      ]
+    },
+    {
+      "id": "PR-S23",
+      "source_file": "scripts/prefabs/firefx_light.lua",
+      "file_sha256": "8e6a21a26d5f9fc78ad026b7cccda9aa50485f99f4c8e8a24362db54ae414173",
+      "line_start": 1,
+      "line_end": 21,
+      "range_sha256": "4a62b0941200d1f30ccedfba174a9dbf293212692394fce73744e6a91c7e09c0",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "PR-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "蜘蛛 hit_shield unhide animqueueover",
+      "expected_entry_ids": [
+        "EXP-PRES-001"
+      ],
+      "purpose": "具体动画链"
+    },
+    {
+      "query": "PlayAnimation PushAnimation省略loop",
+      "expected_entry_ids": [
+        "EXP-PRES-001"
+      ],
+      "purpose": "native默认值未知"
+    },
+    {
+      "query": "animover 与 animqueueover 一样吗",
+      "expected_entry_ids": [
+        "EXP-PRES-001"
+      ],
+      "purpose": "歧义"
+    },
+    {
+      "query": "torch OnHit KillSound spin_loop",
+      "expected_entry_ids": [
+        "EXP-PRES-002"
+      ],
+      "purpose": "具名声owner"
+    },
+    {
+      "query": "Cancel自动停止投掷音效吗",
+      "expected_entry_ids": [
+        "EXP-PRES-002"
+      ],
+      "purpose": "取消与音效分开"
+    },
+    {
+      "query": "PlayIgniteSound PlayExtinguishSound互消",
+      "expected_entry_ids": [
+        "EXP-PRES-002"
+      ],
+      "purpose": "短音任务"
+    },
+    {
+      "query": "AttachLightTo和FollowSymbol有什么区别",
+      "expected_entry_ids": [
+        "EXP-PRES-003"
+      ],
+      "purpose": "独立灯和FX"
+    },
+    {
+      "query": "torchfire dedicated粒子",
+      "expected_entry_ids": [
+        "EXP-PRES-003"
+      ],
+      "purpose": "端别"
+    },
+    {
+      "query": "torchfire OnRemoveEntity灯清理",
+      "expected_entry_ids": [
+        "EXP-PRES-003"
+      ],
+      "purpose": "移除hook"
+    },
+    {
+      "query": "FireFX OnEntitySleep OnEntityWake缓存",
+      "expected_entry_ids": [
+        "EXP-PRES-004"
+      ],
+      "purpose": "睡醒恢复"
+    },
+    {
+      "query": "FireFX SetLevel首次pre和immediate",
+      "expected_entry_ids": [
+        "EXP-PRES-004"
+      ],
+      "purpose": "动画档位"
+    },
+    {
+      "query": "FireFX Extinguish后wake还会播放吗",
+      "expected_entry_ids": [
+        "EXP-PRES-004"
+      ],
+      "purpose": "退出缓存"
+    },
+    {
+      "query": "所有全服玩家都听见循环音效",
+      "expected_entry_ids": [],
+      "purpose": "未验证native/远端"
+    },
+    {
+      "query": "MakeFx die_fx proxy一秒",
+      "expected_entry_ids": [],
+      "purpose": "已有N005-UI-C05，不重复登记"
+    },
+    {
+      "query": "Burnable KillFX fallback任务",
+      "expected_entry_ids": [],
+      "purpose": "已有BR-P03"
+    }
+  ],
+  "limitations": [
+    "未运行游戏、专服或远端客户端；native资源加载、事件产生时机、动画/声音/粒子实际效果未验证。",
+    "只提供自撰机制、引用定位及hash，不分发原版Lua；file/range匹配不证明native实现或运行兼容。",
+    "保留历史759671证据身份；本批760944静态新证据不重标旧条目。",
+    "research/restricted/hold；需独立审阅绑定候选SHA后由总控决定登记，不授予Coding。"
+  ]
+}

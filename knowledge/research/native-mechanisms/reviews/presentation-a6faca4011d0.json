@@ -1,0 +1,87 @@
+{
+  "schema": "dst-independent-presentation-delta-review/1",
+  "reviewer_window": "E",
+  "review_round": 2,
+  "date": "2026-10-31",
+  "candidate": "05-research-history/native-expansion-20261031/coordinator/frozen/presentation-r2/candidate.json",
+  "candidate_sha256": "35928d1eb19b061b63db373ea38d1dc7d60c7477b149cb71c769ea1cf8372798",
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "runtime_verified": false,
+  "verdict": "approved_for_research_registration",
+  "registration_approved": true,
+  "registration_boundary": "仅批准该精确R2 SHA的4卡作为research/restricted/hold研究登记；R1未变语义按精确差异继承，不授予Coding、native完整API或游戏/客户端视听验证。登记由总控执行。",
+  "previous_review": {
+    "file": "05-research-history/native-expansion-20261031/windows/E/review.json",
+    "sha256": "9720e6b576f958c432f8e72a6299c0d2bc0c4d152e51a7b0700f242c127823bb",
+    "candidate_sha256": "500e269bded304fb37d99561e2bdaa4431b09e31a6673eb0ba4f401477034507",
+    "runtime_verified": false
+  },
+  "delta": {
+    "entry_id": "EXP-PRES-004",
+    "api_symbol": "FireFX:AttachLightTo",
+    "api_pointer": "/entries/3/api_contracts/4",
+    "changed_fields": [
+      "/entries/3/api_contracts/4/parameters",
+      "/entries/3/api_contracts/4/preconditions"
+    ],
+    "parameters_before": [
+      "target：有entity和事件接口的目标；inst：组件宿主；light：构造时生成。"
+    ],
+    "parameters_after": [
+      "target：有entity和事件接口的目标。"
+    ],
+    "preconditions_before": [
+      "不防nil；旧parent预期为自身或有效事件source；offset字段若真值须支持Get。"
+    ],
+    "preconditions_after": [
+      "不防nil；旧parent预期为自身或有效事件source；offset字段若真值须支持Get。",
+      "inst：组件宿主；light：构造时生成。"
+    ],
+    "semantic_review": "parameters现在只列真实业务形参target；inst宿主与light字段说明移动到preconditions，不再可能被解释为额外调用实参。原前提保持。",
+    "all_other_values_identical": true,
+    "restoring_two_fields_yields_exact_r1_json_value": true,
+    "r1_canonical_json_sha256": "06139e386cb139d495710f5f89704c445bdc40639199b13a8215978e564e95df",
+    "r2_after_field_restore_canonical_json_sha256": "06139e386cb139d495710f5f89704c445bdc40639199b13a8215978e564e95df"
+  },
+  "coverage": {
+    "entries": 4,
+    "claims": 23,
+    "api_contracts": 17,
+    "mechanism_steps": 16,
+    "source_references": 24,
+    "claims_unchanged_inherited": 23,
+    "api_contracts_unchanged_inherited": 16,
+    "api_contracts_delta_reviewed": 1,
+    "mechanism_steps_unchanged_inherited": 16,
+    "source_references_unchanged_inherited": 24,
+    "inheritance": "All unchanged units and original current-archive semantic/hash checks inherit only from the exact previous_review SHA above.",
+    "source_reread_performed_this_round": false,
+    "game_started": false,
+    "stub_executed": false,
+    "retrieval_protocol_executed": false
+  },
+  "checks": {
+    "r1_candidate_hash": "matched",
+    "r2_candidate_hash": "matched",
+    "previous_review_hash": "matched",
+    "independent_structural_diff": "only two allowed API fields changed",
+    "shipped_mechanism_contract": "passed",
+    "source_epoch_archive_references_scope_governance_unknowns": "identical to R1",
+    "public_attachment_paths": "relative only; no machine paths or original Lua"
+  },
+  "open_findings": [],
+  "remaining_limitations": [
+    "未运行游戏、专服、真实远端客户端或音画资源验证；native参数默认值、事件产生/时序、播放返回、队列/混音/复制细节未知。",
+    "不枚举所有蜘蛛变种/外部中断、所有火炬皮肤/死亡/Deflect组合或所有FX消费者；只支持所列具体范围。",
+    "SetParent/Follower挂接不等于Lua children登记、所有权转移或所有native资源自动清理保证。",
+    "FireFX pre/pst仅方法中可选配置分支；普通fire配置无这些字段，不宣称该实例实际播放pre/pst。",
+    "未运行睡醒、受控燃烧同档切换、非法level、重复hook、回调重入和异常长帧测试；完整动态/native消费者闭包未知。",
+    "15条queries仅核对候选格式及预期ID，不是实际检索或协议命中验证；该验收属于总控/A窗口。"
+  ],
+  "author_files_modified": false,
+  "delegation": {
+    "subagents": 0
+  }
+}

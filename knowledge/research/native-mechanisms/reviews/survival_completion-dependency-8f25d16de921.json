@@ -1,0 +1,1237 @@
+{
+  "schema": "dst-independent-survival-review/1",
+  "reviewer_window": "D",
+  "review_round": 1,
+  "candidate": "coordinator/frozen/survival-r1/candidate.json",
+  "candidate_sha256": "306d3785af54d2dcdf8d544b3be11086306696b9d44ed14decbebddf24693c29",
+  "runtime_verified": false,
+  "verdict": "changes_required",
+  "registration_approved": false,
+  "semantic_review_complete": true,
+  "coverage": {
+    "entries": 4,
+    "claims": 27,
+    "api_contracts": 19,
+    "mechanism_steps": 15,
+    "source_references": 59
+  },
+  "reviewed_unit_count": 61,
+  "unit_reviews": [
+    {
+      "pointer": "/entries/0/claims/0",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "P01",
+        "P03",
+        "B11"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "AddHeat早退、地皮阻力与剩余cap的min、严格越闪点及controlled burn抑制回调均相符；Flash只改本轮计数再复用AddHeat。"
+    },
+    {
+      "pointer": "/entries/0/claims/1",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "SC1",
+        "SC2",
+        "P04",
+        "P03"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "标准两个Propagator helper确实绑定DefaultIgniteFn；其仅调用StartWildfire，传播器距离缩放与AcceptsHeat是另一层条件。"
+    },
+    {
+      "pointer": "/entries/0/claims/2",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "B01",
+        "B03"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "smoldering属性映射/回调在timer赋值前；canlight不在守卫，propagator优先timer、周期2和随机首延迟均按源码描述；精确native时钟未声称。"
+    },
+    {
+      "pointer": "/entries/0/claims/3",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "B01",
+        "B02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "求和循环没有自身/负heat/spreading/INLIMBO排除或距离权重；限制于该Lua循环，不推断native必返回所有这些实体。"
+    },
+    {
+      "pointer": "/entries/0/claims/4",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "B02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "雨门禁和正热/非正热加回量、随后固定扣量正确；未借moisture或sheltered虚构免疫。"
+    },
+    {
+      "pointer": "/entries/0/claims/5",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "B02",
+        "B05",
+        "B06"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "到期优先Stop后Ignite，严格上界且依赖propagator/flashpoint；停止回调与点燃可能失败的边界保留。"
+    },
+    {
+      "pointer": "/entries/0/claims/6",
+      "entry_id": "EXP-SURV-001",
+      "kind": "claims",
+      "evidence_refs": [
+        "WF1",
+        "WF2",
+        "WF3",
+        "SC1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "wildfires master及自然天气门禁是调用者上下文，未加到DefaultIgniteFn或StartWildfire声明自身。"
+    },
+    {
+      "pointer": "/entries/0/api_contracts/0",
+      "entry_id": "EXP-SURV-001",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B01",
+        "B03"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "无额外参数/无成功返回，守卫与同步回调、timer、周期任务及重复入口边界已逐字段核对。"
+    },
+    {
+      "pointer": "/entries/0/api_contracts/1",
+      "entry_id": "EXP-SURV-001",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B01",
+        "B02",
+        "B03"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "参数inst/self无dt、算术与查询前提、计时及停止/点燃调用范围有证据；visibility需改成现有解析器识别的file-local前缀。"
+    },
+    {
+      "pointer": "/entries/0/api_contracts/2",
+      "entry_id": "EXP-SURV-001",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "P01",
+        "P02",
+        "P03",
+        "P04"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "amount未禁止负数，source可nil但非nil需components；所有早退、cap累加、开始更新及越阈回调、nil返回均核对。"
+    },
+    {
+      "pointer": "/entries/0/api_contracts/3",
+      "entry_id": "EXP-SURV-001",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "SC1",
+        "SC2"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "真实为standardcomponents.lua全局声明，参数/返回及burnable条件正确；visibility不应泛称组件/实体方法，需明确可识别global前缀。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/0",
+      "entry_id": "EXP-SURV-001",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "P01",
+        "P03",
+        "P04",
+        "SC1",
+        "SC2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "阈值与标准回调入口闭合。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/1",
+      "entry_id": "EXP-SURV-001",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "B01",
+        "B03"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "状态→回调→计时→任务顺序闭合。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/2",
+      "entry_id": "EXP-SURV-001",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "B01",
+        "B02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "无dt固定步长和先雨后扣热量闭合。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/3",
+      "entry_id": "EXP-SURV-001",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "B02",
+        "B05",
+        "B06"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "到期/严格上界分支与停止回调闭合。"
+    },
+    {
+      "pointer": "/entries/1/claims/0",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "B09",
+        "EN1",
+        "EN2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "完整Burnable定义无睡醒hook；mainfunctions先事件/实体hook再Brain/SG/emitter及组件hook，未假造通用取消。"
+    },
+    {
+      "pointer": "/entries/1/claims/1",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "B09",
+        "B06",
+        "EN1",
+        "EN2",
+        "TR1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "EI有明确推理边界：LongUpdate没有阴燃tick回放，未声称native离屏任务频率或全部prefab行为。"
+    },
+    {
+      "pointer": "/entries/1/claims/2",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "B01",
+        "B03",
+        "B06",
+        "LC1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "setter仅写字段，开始/停止回调调用点正确，locator交互标签消费者有独立证据；无删除重入保护保证。"
+    },
+    {
+      "pointer": "/entries/1/claims/3",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "TR1",
+        "TR4",
+        "TR5",
+        "TR6",
+        "EN3",
+        "B08",
+        "B07",
+        "B06"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "evergreens烧着树桩走DefaultBurntFn，其他分支拆三个组件并条件清生长/石化和置burnt；仅阴燃仍拆组件并经移除hook停阴燃。"
+    },
+    {
+      "pointer": "/entries/1/claims/4",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "TR1",
+        "TR2",
+        "TR3"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "醒来burnt与非burning重建分支、按树桩选helper、onsave/onload烧毁状态均相符；没有保存阴燃剩余值或全prefab推广。"
+    },
+    {
+      "pointer": "/entries/1/claims/5",
+      "entry_id": "EXP-SURV-002",
+      "kind": "claims",
+      "evidence_refs": [
+        "EQ1",
+        "LC1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "Equippable设置isequipped后先StopSmoldering，再onequip/equipped/model；locator master、NOCLICK、persist=false和nil burntime均相符。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts/0",
+      "entry_id": "EXP-SURV-002",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B04",
+        "B06",
+        "EN2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "dt不使用、burning且task分支取消清任务后DoneBurning、无阴燃更新，实体长更新分派及nil返回核对；属于旧基础上下文。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts/1",
+      "entry_id": "EXP-SURV-002",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B01",
+        "B06",
+        "P02",
+        "EQ1",
+        "B08",
+        "B10"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "smoldering门禁、烟雾/任务/计时/tag、可选propagator reset和最后回调正确；heatpct非nil含负数未补钳制；旧基础上下文。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts/2",
+      "entry_id": "EXP-SURV-002",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B01",
+        "B03"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "setter只替换onsmoldering，fn/nil形状和未校验类型、开始时调用点核对。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts/3",
+      "entry_id": "EXP-SURV-002",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "B01",
+        "B06",
+        "LC1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "setter只替换onstopsmoldering，停止调用点和locator消费者核对。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts/4",
+      "entry_id": "EXP-SURV-002",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "TR1",
+        "TR4",
+        "TR6",
+        "EN1"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "evergreens local而非同名全局guid入口，树桩/燃烧与组件拆卸条件正确；需规范file-local visibility才能按身份导航。"
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/0",
+      "entry_id": "EXP-SURV-002",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "B09",
+        "EN1",
+        "EN2",
+        "B06"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "睡眠与长更新分派有据，未假造阴燃回放。"
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/1",
+      "entry_id": "EXP-SURV-002",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "TR1",
+        "B08",
+        "B07",
+        "B06",
+        "EN3"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "树木拆组件及醒来重建，保留不恢复timer。"
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/2",
+      "entry_id": "EXP-SURV-002",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "TR1",
+        "TR2",
+        "EQ1",
+        "LC1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "保存终态与装备/locator消费者各有据。"
+    },
+    {
+      "pointer": "/entries/2/claims/0",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "T01",
+        "T02",
+        "I01"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "聚合从固有值出发且只迭代equipslots；按insulator第二返回分类，无效类型print；没有其他库存扫描。"
+    },
+    {
+      "pointer": "/entries/2/claims/1",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "I01",
+        "V01",
+        "F02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "Insulator默认winter/0、setter无类型钳制和双返回正确；两件实例在master配置summer，不按世界季节自动切。"
+    },
+    {
+      "pointer": "/entries/2/claims/2",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "IV1",
+        "IV2",
+        "IV3",
+        "EQ1",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "Inventory成功写槽路径在OnPutInInventory及Equippable:Equip之后，Unequip回调在清槽之前；不能在onequip中假定新槽已生效。"
+    },
+    {
+      "pointer": "/entries/2/claims/3",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "F01",
+        "F02",
+        "EQ1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "minifan只在移动状态改变耗能时改提供值，未consuming且停着不会额外清初始值；卸下/model分支有fueled条件。完整燃料/FX闭包被明确排除。"
+    },
+    {
+      "pointer": "/entries/2/claims/4",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "T02",
+        "BD1",
+        "SK1",
+        "SK2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "胡须冬加夏减、bits/factor及3→2→1倍率选择，skilltreeupdater无nil保护与SkillTreeData无角色定义false均相符。"
+    },
+    {
+      "pointer": "/entries/2/claims/5",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "BD1",
+        "BD2",
+        "WL1",
+        "SK1",
+        "SK2",
+        "PL1",
+        "PL2",
+        "PL3"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "Wilson4/8/16回调写bits；Beard cycles启停、Reset/移除、保存字段和加载逐日回调均实读；player_common安装顺序和后续当前技能依赖保留。"
+    },
+    {
+      "pointer": "/entries/2/claims/6",
+      "entry_id": "EXP-SURV-003",
+      "kind": "claims",
+      "evidence_refs": [
+        "T02",
+        "T03",
+        "T04"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "遮蔽夏加、modifier分季节、非cave时段分支与最终各侧max0正确；速率消费不是GetInsulation本身修改current。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/0",
+      "entry_id": "EXP-SURV-003",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "T01",
+        "T02",
+        "I01",
+        "BD1",
+        "SK1",
+        "SK2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "双返回分别钳0，全提供者分支、beard/skilltree前提、无效type print及即时读取核对。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/1",
+      "entry_id": "EXP-SURV-003",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "I01",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "返回原值和GetType两个结果，无状态写；类型选择不按世界季节自动变化。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/2",
+      "entry_id": "EXP-SURV-003",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "I01",
+        "F01",
+        "F02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "原样覆盖不改type，无返回、不校验类型；动态minifan消费者及无自定义保存hook已核。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/3",
+      "entry_id": "EXP-SURV-003",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "BD1",
+        "T02",
+        "SK1",
+        "SK2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "bits/factor/技能乘积，无nil skilltreeupdater保护，查询不写bits，冬夏消费者符号已核。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/4",
+      "entry_id": "EXP-SURV-003",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "F01",
+        "F02",
+        "EQ1"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "minifan局部onequip的AnimState、wheel创建/parent、旧owner解绑及新owner注册，必要对象前提和外部FX未知边界已核；需file-local前缀。"
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/0",
+      "entry_id": "EXP-SURV-003",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "T01",
+        "T02",
+        "I01",
+        "IV1",
+        "IV2",
+        "IV3"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "固有/槽/类型数据流闭合。"
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/1",
+      "entry_id": "EXP-SURV-003",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "EQ1",
+        "F01",
+        "F02",
+        "V01"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "风扇动态条件及卸下/model边界有据。"
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/2",
+      "entry_id": "EXP-SURV-003",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "BD1",
+        "BD2",
+        "WL1",
+        "SK1",
+        "SK2",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "角色/技能/胡须恢复到聚合链闭合。"
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/3",
+      "entry_id": "EXP-SURV-003",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "T02",
+        "T03",
+        "T04"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "遮蔽/来源/时段/最终钳制及方向消费有据。"
+    },
+    {
+      "pointer": "/entries/3/claims/0",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "SH1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "canopy level2/否则半径2过滤、mounted先比较level、presheltered后续shade确认均相符；Stop/移除缺level的条件性风险未夸成必崩。"
+    },
+    {
+      "pointer": "/entries/3/claims/1",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "SH2",
+        "T01",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "replica net_bool与_shade<=.6、初始化直设及update渐变、Temperature事件table/boolean写法正确；未把画面当立即提供值。"
+    },
+    {
+      "pointer": "/entries/3/claims/2",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "T02",
+        "SM1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "base0 additive延迟列表、显式Remove的空容器清理及只读取WINTER/SUMMER均相符。"
+    },
+    {
+      "pointer": "/entries/3/claims/3",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "SM1",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "来源/key替换、nil/base删除、实体onremove与字符串区别正确；自动移除不走温度外层空表归一的限制明确。"
+    },
+    {
+      "pointer": "/entries/3/claims/4",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "HA1",
+        "HA2",
+        "T02",
+        "T05",
+        "EN8"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "治疗请求不保证附着；实际附着/有效目标解除的summer source和Temperature保存不含列表均相符；Entity AddDebuff gate证据已读。"
+    },
+    {
+      "pointer": "/entries/3/claims/5",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "HA1",
+        "HA2",
+        "DB1",
+        "DB2",
+        "EN8"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "buff非master排移除，master隐藏非网络、parent/death监听、数据回调、detach业务再Remove及Stop/RemoveDebuff/OnDetach次序均相符。"
+    },
+    {
+      "pointer": "/entries/3/claims/6",
+      "entry_id": "EXP-SURV-004",
+      "kind": "claims",
+      "evidence_refs": [
+        "HA1",
+        "HA2",
+        "DB1",
+        "DB2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "保存remaining、加载替换任务、创建/延长实际使用ACID常量、Debuffable保存/SpawnSaveRecord后重新Attach与不重建已有同名buff均相符。"
+    },
+    {
+      "pointer": "/entries/3/api_contracts/0",
+      "entry_id": "EXP-SURV-004",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "T02",
+        "SM1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "季节键、实体/字符串来源、nil/0删除和可选key、列表创建与无普通目标温偏移，逐字段核对。"
+    },
+    {
+      "pointer": "/entries/3/api_contracts/1",
+      "entry_id": "EXP-SURV-004",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "T02",
+        "SM1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "正确src/key或整来源删除、缺表返回、实体监听释放与空表归一、自动onremove差异核对。"
+    },
+    {
+      "pointer": "/entries/3/api_contracts/2",
+      "entry_id": "EXP-SURV-004",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "SH1",
+        "SH2"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [],
+      "review_note": "mounted的level前提、replica需求、预遮蔽与确认事件、条件台词和Stop未传level的边界核对。"
+    },
+    {
+      "pointer": "/entries/3/api_contracts/3",
+      "entry_id": "EXP-SURV-004",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "HA1",
+        "HA2",
+        "DB1"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "局部数据附着回调只在目标组件存在时写health火伤倍率/temperature夏季modifier，不是通用公开抗火入口；需file-local前缀。"
+    },
+    {
+      "pointer": "/entries/3/api_contracts/4",
+      "entry_id": "EXP-SURV-004",
+      "kind": "api_contracts",
+      "evidence_refs": [
+        "HA1",
+        "DB1",
+        "DB2"
+      ],
+      "semantic_source_review": "supported_static_with_identity_metadata_issue",
+      "all_api_fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "finding_ids": [
+        "D-SURV-R1-001"
+      ],
+      "review_note": "data nil早退、Lua真值remaining含0、取消当前handle后重排到期、无直接附着/写modifier，恢复职责不混淆；需file-local前缀。"
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/0",
+      "entry_id": "EXP-SURV-004",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "SH1",
+        "SH2",
+        "T01",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "shade确认→事件→夏季提供值次序有据。"
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/1",
+      "entry_id": "EXP-SURV-004",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "T02",
+        "SM1"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "季节与source/key到GetInsulation有据。"
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/2",
+      "entry_id": "EXP-SURV-004",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "HA1",
+        "HA2",
+        "DB1",
+        "DB2",
+        "SM1",
+        "T02"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "附着建立、显式或source移除释放有据。"
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/3",
+      "entry_id": "EXP-SURV-004",
+      "kind": "mechanism_steps",
+      "evidence_refs": [
+        "HA1",
+        "DB1",
+        "DB2",
+        "T05"
+      ],
+      "semantic_source_review": "supported_static",
+      "all_api_fields_reviewed": [],
+      "finding_ids": [],
+      "review_note": "buff与debuffable分层恢复，不归因于温度保存来源表。"
+    }
+  ],
+  "open_findings": [
+    {
+      "id": "D-SURV-R1-001",
+      "priority": "P2",
+      "status": "open",
+      "title": "六个回调的可见性文本与现有API身份导航契约不兼容",
+      "pointers": [
+        "/entries/0/api_contracts/1/visibility",
+        "/entries/0/api_contracts/3/visibility",
+        "/entries/1/api_contracts/4/visibility",
+        "/entries/2/api_contracts/4/visibility",
+        "/entries/3/api_contracts/3/visibility",
+        "/entries/3/api_contracts/4/visibility"
+      ],
+      "observed": "13 component_method，5个真实local回调和1个真实global均被解析为unknown；按应有identity_kind过滤6次均0命中。",
+      "source_counterexamples": [
+        {
+          "symbol": "SmolderUpdate",
+          "source_file": "scripts/components/burnable.lua",
+          "line_start": 212,
+          "line_end": 212,
+          "actual_scope": "file_local"
+        },
+        {
+          "symbol": "DefaultIgniteFn",
+          "source_file": "scripts/standardcomponents.lua",
+          "line_start": 6,
+          "line_end": 10,
+          "actual_scope": "global"
+        },
+        {
+          "symbol": "OnEntitySleep",
+          "source_file": "scripts/prefabs/evergreens.lua",
+          "line_start": 626,
+          "line_end": 640,
+          "actual_scope": "file_local"
+        },
+        {
+          "symbol": "onequip",
+          "source_file": "scripts/prefabs/minifan.lua",
+          "line_start": 20,
+          "line_end": 37,
+          "actual_scope": "file_local"
+        },
+        {
+          "symbol": "fumarolebuff_OnAttached",
+          "source_file": "scripts/prefabs/healingsalve.lua",
+          "line_start": 233,
+          "line_end": 240,
+          "actual_scope": "file_local"
+        },
+        {
+          "symbol": "buff_OnLoad",
+          "source_file": "scripts/prefabs/healingsalve.lua",
+          "line_start": 125,
+          "line_end": 137,
+          "actual_scope": "file_local"
+        }
+      ],
+      "implementation_evidence": {
+        "file": "dst-kb-service/dst_kb/native_mechanism.py",
+        "method": "api_identity",
+        "accepted_local_prefixes": [
+          "file-local",
+          "local function",
+          "文件局部",
+          "文件 local"
+        ],
+        "accepted_global_prefixes": [
+          "global ",
+          "raw global ",
+          "原版全局",
+          "全局原版"
+        ]
+      },
+      "reproduction": "CHECKS-r1.json identity_filter_probes：源定位+正确kind无命中；仅内存副本规范visibility后同查询单命中，未改冻结候选。",
+      "impact": "作者已有局部/全局证据却无法按对应identity_kind检索；不是已观察到的公共API升级或游戏故障。",
+      "requested_fix": "仅规范这6个visibility：5个用file-local等受支持前缀并保留未导出/局部注册上下文；DefaultIgniteFn用原版全局等前缀并保留非稳定API限制。不要改共享parser或把local改public；交付精确新SHA和完整delta后定向复核。"
+    }
+  ],
+  "mechanical_checks": {
+    "path": "windows/D/CHECKS-r1.json",
+    "sha256": "e2c766004f294e89f8fdbfc50d0f6265b10c9f127a43eaef863b554dc7a70c07",
+    "contract": "pass",
+    "all_59_reference_file_range_hashes": "pass",
+    "scope_states": "research/restricted/hold and runtime false retained"
+  },
+  "deduplication": {
+    "authored_api_contracts": 19,
+    "unique_candidate_symbol_file_pairs": 19,
+    "unique_new_api_claim_not_made": true,
+    "legacy_context_not_counted_as_new": [
+      "Burnable:LongUpdate (BR-P02)",
+      "Burnable:StopSmoldering (BR-P03 context)"
+    ],
+    "other_old_bases": [
+      "EXP-TEMP-001",
+      "EXP-WET-001",
+      "EXP-WET-002",
+      "EXP-FIRE-001"
+    ],
+    "note": "No exact normalized API pair found in registered native_mechanism API arrays; this does not prove absence from historical Core/full-source studies."
+  },
+  "limitations": [
+    "All61 authored units were read against the frozen current ZIP; acceptance is blocked only on the listed identity navigation metadata issue.",
+    "Python API identity/match functions executed narrowly; no full MCP/ranking/registration or game/Lua/stub execution.",
+    "Native scheduler, spatial inclusion, network replication, mounted timing, save/load, equip and callback reentry remain untested.",
+    "No candidate, repository, installation, configuration, game or other worker files modified."
+  ],
+  "public_review_json_written": false
+}

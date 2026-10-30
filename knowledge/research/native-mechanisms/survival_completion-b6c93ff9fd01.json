@@ -1,0 +1,2193 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "survival_completion",
+  "source_epoch": "760944",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "entries": [
+    {
+      "id": "EXP-SURV-001",
+      "title": "阴燃的热量、雨水与固定步长计时链",
+      "aliases": [
+        "smolder",
+        "SmolderUpdate",
+        "StartWildfire",
+        "AddHeat",
+        "flashpoint",
+        "阴燃",
+        "闷烧"
+      ],
+      "engineering_question": "阴燃剩余时间如何受附近热量与雨水影响，传播器越过闪点是否立即点燃？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Burnable/Propagator及DefaultIgniteFn；权威wildfires只作为实际入口示例，未展开其完整概率/玩家调度业务。",
+        "excluded": "不覆盖任意Mod覆盖、全部prefab、native内部、实际调度精度、联机画面或游戏运行。"
+      },
+      "claims": [
+        {
+          "id": "EXP-SURV-001-C01",
+          "kind": "NSF",
+          "statement": "Propagator:AddHeat在delay非nil、fireimmune或本轮heat达到上限时早退；实际加热量按地皮GetHeatResistance和本轮剩余额度取min。currentheat严格大于flashpoint才设pauseheating；受控燃烧来源抑制onflashpoint，但pauseheating仍已写入。Flash检查acceptsheat、pauseheating、delay并借调整本轮计数再调用AddHeat，不是直接Ignite。",
+          "evidence_refs": [
+            "P01",
+            "P03",
+            "B11"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C02",
+          "kind": "NSF",
+          "statement": "MakeSmall/MediumPropagator安装DefaultIgniteFn作为onflashpoint；该全局函数检查burnable后调用StartWildfire。传播器在spreading分支对非自身、具有propagator且AcceptsHeat的目标按距离缩放heatoutput*dt调用AddHeat；阴燃启动与普通燃烧启动是两个阶段。",
+          "evidence_refs": [
+            "SC1",
+            "SC2",
+            "P04",
+            "P03"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C03",
+          "kind": "NSF",
+          "statement": "StartWildfire只在未burning、未smoldering且无fireimmune时进入，不检查canlight。先置smoldering并同步smolder标签，再调用onsmoldering(inst)，之后创建烟雾、设置smoldertimeremaining；有propagator则采用flashpoint，否则取MIN/MAX_SMOLDER_TIME随机值。最后建立2秒周期任务、初延迟随机在0至2秒之间；重复启动不刷新剩余时间。",
+          "evidence_refs": [
+            "B01",
+            "B03"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C04",
+          "kind": "NSF",
+          "statement": "local SmolderUpdate每次在半径12内直接累加全部命中实体的propagator.currentheat；没有在此循环排除自身、负heat、非spreading或INLIMBO标签，也没有按距离给该求和衰减。它不以实际dt为参数，每次固定使用SMOLDER_TICK_TIME=2。",
+          "evidence_refs": [
+            "B01",
+            "B02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C05",
+          "kind": "NSF",
+          "statement": "只有世界正在下雨且目标没有rainimmunity组件才增加剩余时间：nearbyheat>0时加2*1.8*precipitationrate，否则加2*3。随后无论是否下雨均扣2*clamp(Remap(nearbyheat,20,90,1,2.2),1,2.2)。没有读取目标moisture百分比、GetIsWet或sheltered防水；不能把湿度免疫/遮雨等同于此入口的雨免疫。",
+          "evidence_refs": [
+            "B02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C06",
+          "kind": "NSF",
+          "statement": "调整后剩余时间<=0时先StopSmoldering再Ignite；否则仅当目标有propagator和flashpoint且剩余时间严格大于flashpoint*1.1时StopSmoldering。雨中有热不保证停止阴燃，无propagator目标也没有这条上界停止分支。两种停止都会走停止回调；不能仅因到期调用Ignite认定实际点燃成功。",
+          "evidence_refs": [
+            "B02",
+            "B05",
+            "B06"
+          ]
+        },
+        {
+          "id": "EXP-SURV-001-C07",
+          "kind": "NSF",
+          "statement": "world wildfires组件构造断言mastersim；其季节/白天/世界温度/湿雪/chance门禁控制自然入口，选中有效候选后调用StartWildfire。与此不同，DefaultIgniteFn直接进入StartWildfire，不执行这些world门禁；本条不把自然野火条件泛化成所有阴燃来源的条件。",
+          "evidence_refs": [
+            "WF1",
+            "WF2",
+            "WF3",
+            "SC1"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Burnable:StartWildfire()",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [],
+          "returns": [
+            "nil；阻止启动时也无成功布尔"
+          ],
+          "preconditions": [
+            "有效实体与世界/任务/SpawnPrefab环境；自定义onsmoldering须自行满足后续访问条件"
+          ],
+          "side_effects": [
+            "改变smoldering/tag；同步回调；创建烟雾；初始化计时并排周期任务"
+          ],
+          "lifecycle": "入口阻止重复启动；退出见StopSmoldering及移除路径",
+          "evidence_refs": [
+            "B01",
+            "B03"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "SmolderUpdate(inst, self)",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "file-local 文件内local回调，仅所列注册者/调度器使用，不是全局或公共组件API。",
+          "parameters": [
+            "inst:任务实体",
+            "self:捕获的Burnable对象"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "smoldertimeremaining可算术；Transform/TheSim/World及相关组件可读；由StartWildfire注册"
+          ],
+          "side_effects": [
+            "求和heat、修改计时；可停止阴燃并尝试Ignite"
+          ],
+          "lifecycle": "文件内local周期回调；无dt参数，不能当公共任意对象更新接口",
+          "evidence_refs": [
+            "B01",
+            "B02",
+            "B03"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Propagator:AddHeat(amount, source)",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "amount:数值，入口未禁止负值",
+            "source:可nil；非nil时受控燃烧检查需要components"
+          ],
+          "returns": [
+            "nil；含所有早退"
+          ],
+          "preconditions": [
+            "GetCurrentTileType与本轮heat cap可用；回调没有局部事务保护"
+          ],
+          "side_effects": [
+            "按地皮和本轮上限累加heat；必要时排更新；越闪点写pauseheating并可能回调"
+          ],
+          "lifecycle": "传播输入或Flash复用；本轮cap由OnUpdate重新计算",
+          "evidence_refs": [
+            "P01",
+            "P02",
+            "P03",
+            "P04"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "DefaultIgniteFn(inst)",
+          "source_file": "scripts/standardcomponents.lua",
+          "visibility": "global 原版全局函数；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "inst:目标实体"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "inst.components可访问"
+          ],
+          "side_effects": [
+            "仅有burnable时StartWildfire"
+          ],
+          "lifecycle": "全局标准回调，经SetOnFlashPoint绑定；不是直接Ignite的别名",
+          "evidence_refs": [
+            "SC1",
+            "SC2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "传播器接收加热并越过严格闪点，标准回调进入StartWildfire。",
+          "evidence_refs": [
+            "P01",
+            "P03",
+            "P04",
+            "SC1",
+            "SC2"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "设置阴燃状态、执行自定义起始回调，再初始化剩余时间和周期任务。",
+          "evidence_refs": [
+            "B01",
+            "B03"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "local tick累加附近heat，先应用有条件的雨水延时，再扣固定2秒热量项。",
+          "evidence_refs": [
+            "B01",
+            "B02"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "到期先停止再尝试点燃；超过闪点缓冲上界则仅停止，保持真实停止回调。",
+          "evidence_refs": [
+            "B02",
+            "B05",
+            "B06"
+          ]
+        }
+      ],
+      "unknowns": [
+        "没有执行随机初延迟、雨量/负heat组合或删实体回调；native空间查询及周期调度精度未知。",
+        "未展开wildfires完整玩家调度、保护/地皮提供者，也未验证实际火焰/伤害。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "B01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B03",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B05",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B06",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B11",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "P01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "P02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "P03",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "P04",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SC1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SC2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "WF1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "WF2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "WF3",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          }
+        ],
+        "unknowns": [
+          "列举静态依赖不等于全体native/动态消费者闭包；来源变化须逐引用复核。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-SURV-002",
+      "title": "阴燃在睡眠、长更新、重新装备与有限存档中的退出恢复",
+      "aliases": [
+        "LongUpdate",
+        "OnEntitySleep",
+        "OnEntityWake",
+        "StopSmoldering",
+        "evergreens",
+        "SetOnSmolderingFn",
+        "阴燃恢复"
+      ],
+      "engineering_question": "睡眠或长更新会自动补算阴燃剩余时间吗，树木与装备怎样实际退出及恢复？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Burnable完整声明、实体睡眠/长更新分派、evergreens和burnable_locator_medium及Equippable实际消费者；树木例仅所列分支。BR-P02/BR-P03的烧尽与熄灭基础仅作必要上下文，不作为新增缺口。",
+        "excluded": "不覆盖任意Mod覆盖、全部prefab、native内部、实际调度精度、联机画面或游戏运行。"
+      },
+      "claims": [
+        {
+          "id": "EXP-SURV-002-C01",
+          "kind": "NSF",
+          "statement": "Burnable本Lua完整定义没有OnEntitySleep或OnEntityWake。mainfunctions睡/醒先发事件并调用prefab hook，再处理Brain/SG及组件各自声明的同名hook；这里没有给所有组件统一取消或保存阴燃任务。EntityScript:LongUpdate先prefab OnLongUpdate再各组件LongUpdate。",
+          "evidence_refs": [
+            "B09",
+            "EN1",
+            "EN2"
+          ]
+        },
+        {
+          "id": "EXP-SURV-002-C02",
+          "kind": "EI",
+          "statement": "BR-P02已有LongUpdate不推进阴燃的基础，本条不另登记烧尽流程。结合通用长更新分派和Burnable没有睡醒恢复hook，可得：仅调用EntityScript:LongUpdate不能证明离屏阴燃热雨tick被补算；所列树的真实退出/重建由prefab睡醒hook另行完成。",
+          "evidence_refs": [
+            "B09",
+            "B06",
+            "EN1",
+            "EN2",
+            "TR1"
+          ]
+        },
+        {
+          "id": "EXP-SURV-002-C03",
+          "kind": "NSF",
+          "statement": "SetOnSmolderingFn/SetOnStopSmolderingFn只是替换阴燃回调字段；StartWildfire置smoldering后、初始化剩余时间前执行onsmoldering(inst)，StopSmoldering在BR-P03已述主要状态/传播器清理后执行onstopsmoldering(inst)。这两个回调位置没有删除/重入回滚保护；locator实际绑定这些setter后改变NOCLICK交互标签。",
+          "evidence_refs": [
+            "B01",
+            "B03",
+            "B06",
+            "LC1"
+          ]
+        },
+        {
+          "id": "EXP-SURV-002-C04",
+          "kind": "NSF",
+          "statement": "evergreens在master分界后安装burnable/propagator并登记prefab睡/醒、保存/加载hook。睡眠先记录是否IsBurning；烧着的树桩直接DefaultBurntFn，否则移除burnable、propagator和inspectable，烧着时再移除growable/petrifiable并加burnt。仅阴燃不满足doBurnt，但拆组件会经Burnable移除hook→Extinguish→StopSmoldering终止阴燃。",
+          "evidence_refs": [
+            "TR1",
+            "TR4",
+            "TR5",
+            "TR6",
+            "EN3",
+            "B08",
+            "B07",
+            "B06"
+          ]
+        },
+        {
+          "id": "EXP-SURV-002-C05",
+          "kind": "NSF",
+          "statement": "evergreens醒来若有burnt则tree_burnt；否则在非正在燃烧时按树桩/树身重新添加缺失的burnable及propagator。该路径未传回旧smoldertimeremaining；prefab onsave把burnt标签或IsBurning写成data.burnt，onload按烧毁终态处理，不保存阴燃进度。这是所列树木的特例，不能泛化所有prefab。",
+          "evidence_refs": [
+            "TR1",
+            "TR2",
+            "TR3"
+          ]
+        },
+        {
+          "id": "EXP-SURV-002-C06",
+          "kind": "NSF",
+          "statement": "Equippable:Equip先isequipped=true，有burnable即StopSmoldering，再onequipfn和equipped事件；不是仅把物品放入背包就必走该函数。burnable_locator_medium在master后绑定阴燃开始/停止回调，分别去掉/添加NOCLICK；其persists=false且burntime=nil，实际消费展示阴燃回调影响交互，不把这些local函数提升公共API。",
+          "evidence_refs": [
+            "EQ1",
+            "LC1"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Burnable:LongUpdate(dt)",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "dt:外层长更新时间，本函数不使用"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "burning/task分支需有效实体及DoneBurning依赖"
+          ],
+          "side_effects": [
+            "已有燃烧任务时立即完成；不更新阴燃计时"
+          ],
+          "lifecycle": "EntityScript长更新分派；不是睡眠回放或完整状态恢复",
+          "evidence_refs": [
+            "B04",
+            "B06",
+            "EN2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Burnable:StopSmoldering(heatpct)",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "heatpct:可nil；非nil供propagator reset计算"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "仅smoldering分支执行；烟雾/传播器/回调依赖按实体配置"
+          ],
+          "side_effects": [
+            "取消阴燃任务、清剩余时间和标签、重置传播器、停止回调"
+          ],
+          "lifecycle": "显式停止、点燃前、装备、组件/实体移除复用",
+          "evidence_refs": [
+            "B01",
+            "B06",
+            "P02",
+            "EQ1",
+            "B08",
+            "B10"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Burnable:SetOnSmolderingFn(fn)",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "fn:函数或nil，未类型校验"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "调用方提供适合fn(inst)的回调"
+          ],
+          "side_effects": [
+            "替换onsmoldering字段"
+          ],
+          "lifecycle": "开始阴燃置状态后、计时初始化前执行；不自动注册其他实体事件",
+          "evidence_refs": [
+            "B01",
+            "B03"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Burnable:SetOnStopSmolderingFn(fn)",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "fn:函数或nil，未类型校验"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "调用方提供适合fn(inst)的回调"
+          ],
+          "side_effects": [
+            "替换onstopsmoldering字段"
+          ],
+          "lifecycle": "主要阴燃状态清理后执行；locator是实际消费者",
+          "evidence_refs": [
+            "B01",
+            "B06",
+            "LC1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "OnEntitySleep(inst)",
+          "source_file": "scripts/prefabs/evergreens.lua",
+          "visibility": "file-local 文件内local回调，仅所列注册者/调度器使用，不是全局或公共组件API。",
+          "parameters": [
+            "inst:本文件创建的树实体"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "所列树组件/标签有效；由prefab hook分派"
+          ],
+          "side_effects": [
+            "按燃烧/树桩条件烧毁或移除热相关组件"
+          ],
+          "lifecycle": "文件local树木睡眠回调；不等同mainfunctions同名全局入口",
+          "evidence_refs": [
+            "TR1",
+            "TR4",
+            "TR6",
+            "EN1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "实体睡眠/长更新只分派已声明hook；Burnable无睡眠恢复器，LongUpdate不推进阴燃。",
+          "evidence_refs": [
+            "B09",
+            "EN1",
+            "EN2",
+            "B06"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "evergreens睡眠拆组件，间接停止阴燃；醒来重建缺失组件而不恢复阴燃剩余值。",
+          "evidence_refs": [
+            "TR1",
+            "B08",
+            "B07",
+            "B06",
+            "EN3"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "prefab存档保留烧毁终态；装备与locator回调提供另外的实际消费/退出。",
+          "evidence_refs": [
+            "TR1",
+            "TR2",
+            "EQ1",
+            "LC1"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行离屏、睡醒、装备、存读档或任务取消；不能据Lua分派宣称native睡眠期间的实际任务频率。",
+        "树木OnBurnt的完整掉落/重生/视觉业务不在范围；组件无保存hook不排除其他prefab自定义恢复。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "B01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B03",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B04",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B06",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B07",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B08",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B09",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "B10",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EN1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EN2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EN3",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EQ1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "LC1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "P02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR3",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR4",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR5",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "TR6",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          }
+        ],
+        "unknowns": [
+          "列举静态依赖不等于全体native/动态消费者闭包；来源变化须逐引用复核。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-SURV-003",
+      "title": "保温完整聚合链：装备槽、动态风扇与胡须技能提供者",
+      "aliases": [
+        "Temperature:GetInsulation",
+        "Insulator:GetInsulation",
+        "Beard:GetInsulation",
+        "minifan",
+        "保温",
+        "胡须"
+      ],
+      "engineering_question": "GetInsulation究竟读取哪些提供者，背包物品、夏季装备与胡须技能如何影响返回？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Temperature:GetInsulation全部聚合分支；Insulator/Beard、inventory装备槽及minifan/reflectivevest/Wilson提供者。非所列角色固有值写入不展开。",
+        "excluded": "不覆盖任意Mod覆盖、全部prefab、native内部、实际调度精度、联机画面或游戏运行。"
+      },
+      "claims": [
+        {
+          "id": "EXP-SURV-003-C01",
+          "kind": "NSF",
+          "statement": "GetInsulation以inherentinsulation/inherentsummerinsulation为起点，仅遍历inventory.equipslots中有insulator的物品；按GetInsulation第二返回SEASONS.WINTER/SUMMER加入对应总和，其他类型只打印警告。它不扫描itemslots、activeitem、溢出背包，也不读取物品温度来充当保温值。",
+          "evidence_refs": [
+            "T01",
+            "T02",
+            "I01"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C02",
+          "kind": "NSF",
+          "statement": "Insulator默认0且类型WINTER；SetSummer/SetWinter只换type，SetInsulation直接存值，不钳制或检查数值；GetInsulation返回insulation,GetType()。reflectivevest的master构造装夏季中档insulator；minifan装夏季小档insulator，说明组件本身不按世界季节自动变成另一种类型。",
+          "evidence_refs": [
+            "I01",
+            "V01",
+            "F02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C03",
+          "kind": "NSF",
+          "statement": "Inventory:Equip入口检查物品存在、有效、equippable及限制/重物条件；成功路径先inventoryitem:OnPutInInventory、equippable:Equip再把item写入equipslots，最后equip事件。Unequip调用equippable退出回调后清槽并发unequip。GetInsulation按当前槽即时读取；onequip回调执行时不能假定新物品已写进该槽。",
+          "evidence_refs": [
+            "IV1",
+            "IV2",
+            "IV3",
+            "EQ1",
+            "T02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C04",
+          "kind": "NSF",
+          "statement": "minifan onequip绑定owner locomote；其_onlocomote在WantsToMoveForward且尚未consuming时开始燃料消耗、设小档保温和冷源；停止前进且正在consuming才停耗、保温设0并关闭热力。onunequip解绑owner并在有fueled时归零保温；装备到equipmentmodel也会由onequiptomodel停耗归零。因此不能把初始小档值当作所有装备时刻的恒定提供值。",
+          "evidence_refs": [
+            "F01",
+            "F02",
+            "EQ1"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C05",
+          "kind": "NSF",
+          "statement": "有beard时GetInsulation将Beard:GetInsulation加到冬季并从夏季减去。Beard返回bits*INSULATION_PER_BEARD_BIT*insulation_factor*skill_mod；依次检测wilson_beard_3、_2、_1，首个激活取对应倍率，否则1。GetInsulation直接访问skilltreeupdater，没有像生长日回调那样判nil；skilltreeupdater转发skilltreedata按角色激活表查询，无该角色技能定义时false。",
+          "evidence_refs": [
+            "T02",
+            "BD1",
+            "SK1",
+            "SK2"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C06",
+          "kind": "NSF",
+          "statement": "Wilson master_postinit添加beard并按4/8/16日登记局部生长回调，各自写对应BEARD_BITS；beard的cycles监听在生长启用时运行，Reset归零bits，移除时停监听并解绑复活事件。OnSave含growth/growthaccumulator/bits/skinname，OnLoad恢复后逐日回调重建；倍率不是独立保温数值快照，后续查询仍依赖当前技能与配置。原版player_common在较早位置装skilltreeupdater，temperature/sheltered在master分界后安装。",
+          "evidence_refs": [
+            "BD1",
+            "BD2",
+            "WL1",
+            "SK1",
+            "SK2",
+            "PL1",
+            "PL2",
+            "PL3"
+          ]
+        },
+        {
+          "id": "EXP-SURV-003-C07",
+          "kind": "NSF",
+          "statement": "聚合还含sheltered时仅夏季加shelterinsulation、对应季节来源modifier，以及非cave世界的dusk优先于night的夏季bonus；最后冬夏各自math.max(0,total)。此处不是单个提供者先钳0，也不是按世界季节只返回一项。DoDelta和自然OnUpdate随后选择不同季节的值用于速率，不在本函数直接改变current。",
+          "evidence_refs": [
+            "T02",
+            "T03",
+            "T04"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Temperature:GetInsulation()",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [],
+          "returns": [
+            "winterInsulation,summerInsulation：分别聚合后至少0"
+          ],
+          "preconditions": [
+            "固有值为数值；装备insulator与可选beard返回合理值；beard存在时需其skilltreeupdater"
+          ],
+          "side_effects": [
+            "读取全部列明提供者；无效装备类型会print；自身不改变current"
+          ],
+          "lifecycle": "按查询时槽/技能/遮蔽/世界状态计算，不是持久化缓存",
+          "evidence_refs": [
+            "T01",
+            "T02",
+            "I01",
+            "BD1",
+            "SK1",
+            "SK2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Insulator:GetInsulation()",
+          "source_file": "scripts/components/insulator.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [],
+          "returns": [
+            "insulation,type：原字段和GetType返回"
+          ],
+          "preconditions": [
+            "组件存在；未在此校验配置"
+          ],
+          "side_effects": [
+            "无额外状态写入"
+          ],
+          "lifecycle": "Temperature装备聚合调用；不能从方法名推导world季节切换",
+          "evidence_refs": [
+            "I01",
+            "T02"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Insulator:SetInsulation(val)",
+          "source_file": "scripts/components/insulator.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "val:原样写入；Temperature消费时需数值"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "调用方负责类型与范围"
+          ],
+          "side_effects": [
+            "覆盖insulation，不改type"
+          ],
+          "lifecycle": "装备动态回调可重写，未声明OnSave/OnLoad",
+          "evidence_refs": [
+            "I01",
+            "F01",
+            "F02"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Beard:GetInsulation()",
+          "source_file": "scripts/components/beard.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [],
+          "returns": [
+            "bits、配置和技能倍率的乘积"
+          ],
+          "preconditions": [
+            "skilltreeupdater存在，bits/insulation_factor与TUNING可计算"
+          ],
+          "side_effects": [
+            "读取当前技能；不改变bits"
+          ],
+          "lifecycle": "由Temperature每次聚合调用，冬加夏减；不是普通无依赖实体通用入口",
+          "evidence_refs": [
+            "BD1",
+            "T02",
+            "SK1",
+            "SK2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "onequip(inst, owner)",
+          "source_file": "scripts/prefabs/minifan.lua",
+          "visibility": "file-local 文件内local回调，仅所列注册者/调度器使用，不是全局或公共组件API。",
+          "parameters": [
+            "inst:minifan",
+            "owner:有所需实体/事件接口的装备者"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "wheel prefab可创建；原版组件配置满足；没有任意nil owner安全承诺"
+          ],
+          "side_effects": [
+            "创建wheel并换owner locomote监听"
+          ],
+          "lifecycle": "文件local回调，经equippable注册；实际保温动态写入在_onlocomote",
+          "evidence_refs": [
+            "F01",
+            "F02",
+            "EQ1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "组件按固有冬夏值和当前equipslots获取各装备insulator数值/类型。",
+          "evidence_refs": [
+            "T01",
+            "T02",
+            "I01",
+            "IV1",
+            "IV2",
+            "IV3"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "实际装备回调可动态修改提供值；风扇移动/停止/卸下分别更新保温。",
+          "evidence_refs": [
+            "EQ1",
+            "F01",
+            "F02",
+            "V01"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "胡须bits由角色生长/恢复维护，再乘当前技能倍率，冬加夏减。",
+          "evidence_refs": [
+            "BD1",
+            "BD2",
+            "WL1",
+            "SK1",
+            "SK2",
+            "T02"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "叠加遮蔽、季节来源modifier与非洞穴时段bonus后分别钳0；消费者据方向选速率。",
+          "evidence_refs": [
+            "T02",
+            "T03",
+            "T04"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行真实equip/unequip回调先后、燃料消耗或胡须存读档；相关输入校验缺口不宣称已重现崩溃。",
+        "不枚举所有51处装备提供值配置及全部角色固有值业务；完整覆盖指GetInsulation列明的提供者种类/直接返回链，不是所有prefab配置闭包。",
+        "技能激活表的授权/存档握手、胡须容器和装备完整燃料/FX业务仍未展开。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "BD1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "BD2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EQ1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "F01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "F02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "I01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "IV1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "IV2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "IV3",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "PL1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "PL2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "PL3",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SK1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SK2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T03",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T04",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "V01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "WL1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          }
+        ],
+        "unknowns": [
+          "列举静态依赖不等于全体native/动态消费者闭包；来源变化须逐引用复核。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-SURV-004",
+      "title": "遮蔽确认与来源保温modifier的生效、释放和药膏恢复链",
+      "aliases": [
+        "SetInsulationModifier",
+        "RemoveInsulationModifier",
+        "Sheltered:SetSheltered",
+        "healingsalve_fumarolebuff",
+        "来源保温"
+      ],
+      "engineering_question": "遮蔽何时真正给夏季保温，来源modifier如何撤销、移除和经过药膏存档恢复？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Temperature遮蔽与SourceModifierList、Sheltered/replica确认，以及healingsalve_fumarolebuff的所列附着/延长/解除/有限保存消费者。",
+        "excluded": "不覆盖任意Mod覆盖、全部prefab、native内部、实际调度精度、联机画面或游戏运行。"
+      },
+      "claims": [
+        {
+          "id": "EXP-SURV-004-C01",
+          "kind": "NSF",
+          "statement": "Sheltered:OnUpdate有canopytrees>0时用level2，否则半径2计数shelter实体并排除FX/NOCLICK/DECOR/INLIMBO/stump/burnt。SetSheltered在mounted且level<2时拒绝遮蔽；首次请求真只设presheltered并启动replica shade，后续调用且replica:IsSheltered真才设self.sheltered并发事件。level在mounted比较时需要有效值；Stop和移除调用SetSheltered(false)未传level，故本条不保证任意mounted配置下这些调用无异常。",
+          "evidence_refs": [
+            "SH1"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C02",
+          "kind": "NSF",
+          "statement": "replica:IsSheltered要求net_bool真且_shade<=.6；shade由OnUpdate按速度趋向目标，初始化也可直接设置shade。Temperature构造监听sheltered，table事件写sheltered且data.level真值时写level；布尔事件仅改sheltered。GetInsulation只检查temperature.sheltered加夏季shelterinsulation，不直接用presheltered、树数量或画面阴影作为提供值。",
+          "evidence_refs": [
+            "SH2",
+            "T01",
+            "T02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C03",
+          "kind": "NSF",
+          "statement": "SetInsulationModifier为给定insulationtype延迟创建base0、additive的SourceModifierList并SetModifier；RemoveInsulationModifier删除后仅在列表IsEmpty时删除季节项，再在无季节时清总表。GetInsulation只消费WINTER和SUMMER键；未知type可创建但不会被该聚合读取。",
+          "evidence_refs": [
+            "T02",
+            "SM1"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C04",
+          "kind": "NSF",
+          "statement": "SourceModifierList以source/key存值，同source同key替换而非叠次数，省略key使用固定key；source=nil直接返回，m=nil或等于base则删除该key。EntityScript来源才自动监听其onremove并删除该来源全部键、重算；字符串来源无自动实体移除监听。显式RemoveModifier有key时仅删该key，无key删整个来源并解绑监听。自动移除回调不调用Temperature:RemoveInsulationModifier，所以空季节容器不保证立即归一为nil，但Get聚合回到base0。",
+          "evidence_refs": [
+            "SM1",
+            "T02"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C05",
+          "kind": "NSF",
+          "statement": "healingsalve_fumarole的局部治疗回调请求添加同名buff；EntityScript:AddDebuff通过DebuffsEnabled和非死亡/幽灵门禁（或skip_test）才转发给debuffable，不保证请求一定附着。buff实际附着时若target有temperature，以buff实体为source加夏季INSULATION_SMALL，解除时目标有效且仍有temperature才移除相同source。该实例是可恢复业务重建modifier的消费者，不是Temperature:OnSave保存整个来源表；Temperature保存字段中没有insulation_modifiers。",
+          "evidence_refs": [
+            "HA1",
+            "HA2",
+            "T02",
+            "T05",
+            "EN8"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C06",
+          "kind": "NSF",
+          "statement": "MakeHealingSalveBuff在非master分支排移除并返回；master创建隐藏、非网络buff，绑定debuff附着/解除/延长回调。附着先parent到target、监听target death以Stop，再加来源值；解除先执行对应业务回调再Remove。buff_Expire经Debuff:Stop→目标RemoveDebuff→OnDetach触发解除，Debuff:OnDetach先清name/target再调用保存的目标参数。",
+          "evidence_refs": [
+            "HA1",
+            "HA2",
+            "DB1",
+            "DB2",
+            "EN8"
+          ]
+        },
+        {
+          "id": "EXP-SURV-004-C07",
+          "kind": "NSF",
+          "statement": "药膏buff保存GetTaskRemaining到remaining，加载真值remaining时取消当前任务再排；创建与延长都走局部buff_OnExtended，实际排任务使用HEALINGSALVE_ACIDBUFF_DURATION，不能仅据FUMAROLEBUFF_DATA.duration推定实际排程常量。Debuffable保存各buff GetSaveRecord，读档SpawnSaveRecord后RegisterDebuff再次AttachTo，重施来源modifier；已存在同名buff则不再生成。未验证实际存读档和时间补偿。",
+          "evidence_refs": [
+            "HA1",
+            "HA2",
+            "DB1",
+            "DB2"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Temperature:SetInsulationModifier(insulationtype, src, insulation, key)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "insulationtype:列表键；GetInsulation只读WINTER/SUMMER",
+            "src:实体或名字来源",
+            "insulation:加法值；nil/0用于移除",
+            "key:可省略"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "src/值满足SourceModifierList；任意key或类型不在入口校验"
+          ],
+          "side_effects": [
+            "创建季节来源列表；添加/替换值，实体来源可注册onremove"
+          ],
+          "lifecycle": "不是普通SetModifier目标温度偏移；SourceModifierList生命周期由来源或显式释放控制",
+          "evidence_refs": [
+            "T02",
+            "SM1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Temperature:RemoveInsulationModifier(insulationtype, src, key)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "insulationtype:对应季节键",
+            "src:原来源身份",
+            "key:可省略，省略删该来源全部键"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "列表可不存在；需要正确来源/键才能移除请求值"
+          ],
+          "side_effects": [
+            "删除来源/键、解绑对应来源监听；空列表及总表可清nil"
+          ],
+          "lifecycle": "自动来源移除只重算列表，和本方法清容器的路径不同",
+          "evidence_refs": [
+            "T02",
+            "SM1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "Sheltered:SetSheltered(issheltered, level)",
+          "source_file": "scripts/components/sheltered.lua",
+          "visibility": "原版组件或实体方法；仅所列权威安装/调用链已核读，不保证任意客户端存在，不授予公共稳定API身份。",
+          "parameters": [
+            "issheltered:真假值",
+            "level:mounted时需可与2比较，其他路径也写sheltered_level"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "inst.replica.sheltered存在；调用方负责mounted/level前提"
+          ],
+          "side_effects": [
+            "管理presheltered和replica，确认后发sheltered；可播放台词"
+          ],
+          "lifecycle": "非即时单布尔赋值；Stop/移除传nil level的mounted边界未运行验证",
+          "evidence_refs": [
+            "SH1",
+            "SH2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "fumarolebuff_OnAttached(inst, target)",
+          "source_file": "scripts/prefabs/healingsalve.lua",
+          "visibility": "file-local 文件内local回调，仅所列注册者/调度器使用，不是全局或公共组件API。",
+          "parameters": [
+            "inst:buff来源实体",
+            "target:目标实体"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "target.components可读；health/temperature可选"
+          ],
+          "side_effects": [
+            "有temperature时设夏季来源modifier；有health时另设火伤乘数"
+          ],
+          "lifecycle": "文件local，作为data.onattachedfn经debuff附着调用，不是公共抗火接口",
+          "evidence_refs": [
+            "HA1",
+            "HA2",
+            "DB1"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        },
+        {
+          "symbol": "buff_OnLoad(inst, data)",
+          "source_file": "scripts/prefabs/healingsalve.lua",
+          "visibility": "file-local 文件内local回调，仅所列注册者/调度器使用，不是全局或公共组件API。",
+          "parameters": [
+            "inst:药膏buff实例",
+            "data:可nil；remaining为真时作为任务时间"
+          ],
+          "returns": [
+            "nil"
+          ],
+          "preconditions": [
+            "DoTaskInTime可用；未验证负时长/类型"
+          ],
+          "side_effects": [
+            "用保存remaining替换实例当前到期任务；不直接附着目标或写modifier"
+          ],
+          "lifecycle": "文件local prefab加载回调；来源重施由Debuffable注册/AttachTo完成",
+          "evidence_refs": [
+            "HA1",
+            "DB1",
+            "DB2"
+          ],
+          "unknowns": [
+            "静态核读；未运行Lua/游戏/联网、第三方回调或native调度，不承诺异常回滚。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Sheltered探测并经过replica shade确认，发事件后Temperature才读取该遮蔽提供值。",
+          "evidence_refs": [
+            "SH1",
+            "SH2",
+            "T01",
+            "T02"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "按季节/source/key增加modifier；GetInsulation仅消费冬夏对应列表。",
+          "evidence_refs": [
+            "T02",
+            "SM1"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "药膏buff附着建立实体来源；显式解除或来源移除释放对应值。",
+          "evidence_refs": [
+            "HA1",
+            "HA2",
+            "DB1",
+            "DB2",
+            "SM1",
+            "T02"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "buff剩余任务和Debuffable子记录可分别恢复，再附着重建modifier；Temperature本身不保存来源表。",
+          "evidence_refs": [
+            "HA1",
+            "DB1",
+            "DB2",
+            "T05"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行shade确认时序、mounted移除边界、药膏到期/目标死亡、源移除/存读档或网络；不能把静态条件性缺口说成必崩。",
+        "未追完整治疗/防火乘数数值、角色canopytrees生产链、native net_bool复制及通用技能/存档系统；只列所读恢复调用。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "DB1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "DB2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "EN8",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "HA1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "HA2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SH1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SH2",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "SM1",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T01",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T02",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          },
+          {
+            "ref": "T05",
+            "role": "本记录明确列举的定义、提供者、实际消费或生命周期边界；具体关联见逐单元evidence_refs。"
+          }
+        ],
+        "unknowns": [
+          "列举静态依赖不等于全体native/动态消费者闭包；来源变化须逐引用复核。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "B01",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 1,
+      "line_end": 78,
+      "range_sha256": "32d4765d049d4909efdc2b79d2bff59b4f2c2a1a9881b65bde6c9e6cc691546b",
+      "symbols": [
+        "Burnable",
+        "SetOnSmolderingFn",
+        "SetOnStopSmolderingFn"
+      ]
+    },
+    {
+      "id": "B02",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 212,
+      "line_end": 249,
+      "range_sha256": "9f79f1e16eeb387dc0792bedd66dadf3484c149a97c6525f179e3ad5e9f078ac",
+      "symbols": [
+        "SmolderUpdate"
+      ]
+    },
+    {
+      "id": "B03",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 251,
+      "line_end": 289,
+      "range_sha256": "d8e21a8b3e78d0646f7bb168ed8de8ccb915c4ef0c18c6cccd73fb107584ca3d",
+      "symbols": [
+        "Burnable:StartWildfire"
+      ]
+    },
+    {
+      "id": "B04",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 291,
+      "line_end": 315,
+      "range_sha256": "33881cc874f9606ee52f0232ec284e27436beb93f875b0a2abeb2658a55391ec",
+      "symbols": [
+        "DoneBurning"
+      ]
+    },
+    {
+      "id": "B05",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 352,
+      "line_end": 389,
+      "range_sha256": "21a8b3e847c1235800cdee6e173db8d24da594324ca0b05563a9a1dfd2cbbae2",
+      "symbols": [
+        "Burnable:Ignite"
+      ]
+    },
+    {
+      "id": "B06",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 399,
+      "line_end": 452,
+      "range_sha256": "f5823b576883f8176a94acba353a85c611ae282b204bc101424d3f9c69ed1240",
+      "symbols": [
+        "Burnable:LongUpdate",
+        "Burnable:SmotherSmolder",
+        "Burnable:StopSmoldering"
+      ]
+    },
+    {
+      "id": "B07",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 454,
+      "line_end": 494,
+      "range_sha256": "f87f6da68b9a441d404dd5800f8b2def5c73326a71b917b56945bb25025918ea",
+      "symbols": [
+        "Burnable:Extinguish"
+      ]
+    },
+    {
+      "id": "B08",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 593,
+      "line_end": 606,
+      "range_sha256": "afb882599a5c5dab540e564ed84f0af72e1d26ffd2881e96ef43f4c4f2137ae8",
+      "symbols": [
+        "Burnable:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "B09",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 1,
+      "line_end": 606,
+      "range_sha256": "520bd272ed6bae4d151929ca8cb47134067e58c9fb707c3d98cf9e1814fb4a64",
+      "symbols": [
+        "Burnable; no declared OnSave/OnLoad/OnEntitySleep/OnEntityWake"
+      ]
+    },
+    {
+      "id": "B10",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 206,
+      "line_end": 210,
+      "range_sha256": "4f4841f94ed516a13eedbb762c652b7733d7e3e53e27234cb346193d36e57860",
+      "symbols": [
+        "Burnable:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "B11",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 338,
+      "line_end": 350,
+      "range_sha256": "3144803a7821bba5967356c9da59e02f4275245d0799fd4e0bc18c416bed4920",
+      "symbols": [
+        "Burnable:GetControlledBurn"
+      ]
+    },
+    {
+      "id": "P01",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 8,
+      "line_end": 36,
+      "range_sha256": "932c99741970b9c602ab1a08d85b7fefeee0e050f70a87aaeb27b7f0c4e67ea4",
+      "symbols": [
+        "Propagator",
+        "CalculateHeatCap"
+      ]
+    },
+    {
+      "id": "P02",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 65,
+      "line_end": 111,
+      "range_sha256": "c1848327dd1539d7e8c242ea174c0cc0842051933b53321bad4de0b3bd92f50e",
+      "symbols": [
+        "SetOnFlashPoint",
+        "StartUpdating",
+        "StopSpreading"
+      ]
+    },
+    {
+      "id": "P03",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 114,
+      "line_end": 172,
+      "range_sha256": "e87d33b49947af759033bebe82adb2adaa6a3305dd21ec241dcd63d116da44ec",
+      "symbols": [
+        "GetHeatResistance",
+        "AddHeat",
+        "Flash"
+      ]
+    },
+    {
+      "id": "P04",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 174,
+      "line_end": 203,
+      "range_sha256": "856ea2786884fc3c50bcac17654409ca6c50216920b7afe30a1f3f1c4cd99ab2",
+      "symbols": [
+        "Propagator:OnUpdate"
+      ]
+    },
+    {
+      "id": "SC1",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 6,
+      "line_end": 10,
+      "range_sha256": "26ca3293e4fde5ec1c2bd5206bc57beb7842b5c4d48d2703aa9ace7a32033234",
+      "symbols": [
+        "DefaultIgniteFn"
+      ]
+    },
+    {
+      "id": "SC2",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 164,
+      "line_end": 228,
+      "range_sha256": "c31246c11a618fbd024fd3ec4ec2a182fad902b3793970be4932e21f0d63ae40",
+      "symbols": [
+        "MakeSmallBurnable",
+        "MakeLargeBurnable",
+        "MakeSmallPropagator",
+        "MakeMediumPropagator"
+      ]
+    },
+    {
+      "id": "WF1",
+      "source_file": "scripts/components/wildfires.lua",
+      "file_sha256": "a505c3b08e80e9732510e15f85df4a47614cc87f81c84d73b2267b1b2f23f1cd",
+      "line_start": 5,
+      "line_end": 35,
+      "range_sha256": "bef1ee27eb26cb0041733381301fd5f894f7bc6f75ea31ba6244c10da131e1e0",
+      "symbols": [
+        "Wildfires",
+        "ShouldActivateWildfires"
+      ]
+    },
+    {
+      "id": "WF2",
+      "source_file": "scripts/components/wildfires.lua",
+      "file_sha256": "a505c3b08e80e9732510e15f85df4a47614cc87f81c84d73b2267b1b2f23f1cd",
+      "line_start": 51,
+      "line_end": 104,
+      "range_sha256": "d8c28b8ac79d25fce380fd799095f8a367f308d58cb2f80c1d5ff93d4696d7d0",
+      "symbols": [
+        "CheckValidWildfireStarter",
+        "LightFireForPlayer"
+      ]
+    },
+    {
+      "id": "WF3",
+      "source_file": "scripts/components/wildfires.lua",
+      "file_sha256": "a505c3b08e80e9732510e15f85df4a47614cc87f81c84d73b2267b1b2f23f1cd",
+      "line_start": 139,
+      "line_end": 156,
+      "range_sha256": "40adcf04f70171ac0fee1044a7cbbdbe8310a74bac800b7a6c7db969e96cdf8b",
+      "symbols": [
+        "OnSeasonTick",
+        "OnWeatherTick",
+        "OnTemperatureTick",
+        "OnPhaseChanged"
+      ]
+    },
+    {
+      "id": "LC1",
+      "source_file": "scripts/prefabs/burnable_locator_medium.lua",
+      "file_sha256": "055269b8e75989937157d4d5ad6ffd3160913f490d376e9221fd2f6bc8662edd",
+      "line_start": 1,
+      "line_end": 69,
+      "range_sha256": "943f7586369a1defda804073bf89e8bd7aef3e8f2e35064d45eedb40b2ac7202",
+      "symbols": [
+        "onsmoldering",
+        "onstopsmoldering",
+        "fn"
+      ]
+    },
+    {
+      "id": "EQ1",
+      "source_file": "scripts/components/equippable.lua",
+      "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "line_start": 68,
+      "line_end": 123,
+      "range_sha256": "0e7109993d22e0769fb163c8a7a82046e176fa7ff3244414fbf18211fa9cc687",
+      "symbols": [
+        "SetOnEquip",
+        "SetOnUnequip",
+        "Equip",
+        "Unequip"
+      ]
+    },
+    {
+      "id": "EN1",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 696,
+      "line_end": 757,
+      "range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+      "symbols": [
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "EN2",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 2051,
+      "line_end": 2061,
+      "range_sha256": "7010dd4d08f3636fa6330f00fe625e04e603569fa7adb2d076ab5a51bf79b7e2",
+      "symbols": [
+        "EntityScript:LongUpdate"
+      ]
+    },
+    {
+      "id": "EN3",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "EN8",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 2140,
+      "line_end": 2160,
+      "range_sha256": "4a50229773f17d4926157b62196f02452b3118905aa8428578bf7a018f1d8a20",
+      "symbols": [
+        "EntityScript:AddDebuff",
+        "EntityScript:RemoveDebuff"
+      ]
+    },
+    {
+      "id": "TR1",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 578,
+      "line_end": 665,
+      "range_sha256": "58c14f00c08311339a60690837811541e037d83242fa817d506641191aace42d",
+      "symbols": [
+        "onsave",
+        "onload",
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "TR2",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 171,
+      "line_end": 215,
+      "range_sha256": "a894f1769fac68c8500a1671eee868d27c1ed64ef8fe09629233b3c291020ca2",
+      "symbols": [
+        "OnBurnt"
+      ]
+    },
+    {
+      "id": "TR3",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 561,
+      "line_end": 569,
+      "range_sha256": "173d707c31a8b39ed79cd2dd9b686a823aa7a4983a6050b045bae73af4f1e9ae",
+      "symbols": [
+        "tree_burnt"
+      ]
+    },
+    {
+      "id": "TR4",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 864,
+      "line_end": 877,
+      "range_sha256": "79569bf6702d73611c3b715782c88724fade9e3d70cda2ce59a37d70c0ee8ab3",
+      "symbols": [
+        "master boundary",
+        "MakeLargeBurnable"
+      ]
+    },
+    {
+      "id": "TR5",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 934,
+      "line_end": 935,
+      "range_sha256": "a00654d30465e52288543e0c57bbafc5445ab3bfb74c00e924824200b62dcdc3",
+      "symbols": [
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "TR6",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 978,
+      "line_end": 982,
+      "range_sha256": "63d696b8a1afe08525c3f0f4e6185743b985659f9c18a4d0c415d0e12bd1cc08",
+      "symbols": [
+        "OnEntitySleep",
+        "OnEntityWake"
+      ]
+    },
+    {
+      "id": "T01",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 13,
+      "line_end": 61,
+      "range_sha256": "a565e3ab1599e8c02abed999ada9a8e2bbb26fa497a32aa4a58f8ac340801c29",
+      "symbols": [
+        "onsheltered",
+        "Temperature"
+      ]
+    },
+    {
+      "id": "T02",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 231,
+      "line_end": 303,
+      "range_sha256": "aad3b2b0bcfb27fbede5efe38dfcf59e74fc20efd70d39cdb893a07b07cf0815",
+      "symbols": [
+        "SetInsulationModifier",
+        "RemoveInsulationModifier",
+        "GetInsulation"
+      ]
+    },
+    {
+      "id": "T03",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 71,
+      "line_end": 83,
+      "range_sha256": "08bbd933fbd6d3df9f6956df76f6d90aff11d4bbfa39ecf103e5df96c78e7c5a",
+      "symbols": [
+        "Temperature:DoDelta"
+      ]
+    },
+    {
+      "id": "T04",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 487,
+      "line_end": 514,
+      "range_sha256": "8cc47651a98912765cd04b30fff30ca2309da26933b3c1b9c083adc074d4a73d",
+      "symbols": [
+        "Temperature:OnUpdate"
+      ]
+    },
+    {
+      "id": "T05",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 103,
+      "line_end": 153,
+      "range_sha256": "a6122c07c89e48fb58847276846042b53b668babf0c6c57e7c0ba2c81e6dac54",
+      "symbols": [
+        "OnRemoveFromEntity",
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "I01",
+      "source_file": "scripts/components/insulator.lua",
+      "file_sha256": "d1f80810cc39df282f981aa5a9c195a757f9ee10d4c040dcd8480365727d5a9b",
+      "line_start": 1,
+      "line_end": 31,
+      "range_sha256": "98d71fc2ef447e91d504590b0a4c6a79d4d2f8573d6941dcfc2edc314bb4efa6",
+      "symbols": [
+        "Insulator",
+        "SetSummer",
+        "SetWinter",
+        "SetInsulation",
+        "GetInsulation"
+      ]
+    },
+    {
+      "id": "IV1",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1219,
+      "line_end": 1248,
+      "range_sha256": "dd6db820c264aa348508423b204d0e852460b26fcd68995e93fb18dad924c901",
+      "symbols": [
+        "Inventory:Unequip"
+      ]
+    },
+    {
+      "id": "IV2",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1266,
+      "line_end": 1295,
+      "range_sha256": "df0851772f62ee948df4ce6f396c6a9e6d366efa04a64f2223e648bf163fcaa2",
+      "symbols": [
+        "Inventory:Equip"
+      ]
+    },
+    {
+      "id": "IV3",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1350,
+      "line_end": 1388,
+      "range_sha256": "a131de5a1b25c1c7eed302ab995108b6036d0d14716a17357aa01250df1eb574",
+      "symbols": [
+        "Inventory:Equip"
+      ]
+    },
+    {
+      "id": "F01",
+      "source_file": "scripts/prefabs/minifan.lua",
+      "file_sha256": "2c3cf0bde71713fecf85533b2fac8f9ce82d775f6e97d4c285eca970c8a57508",
+      "line_start": 20,
+      "line_end": 66,
+      "range_sha256": "85dfa916e4a6ab100e48e92c942ad4b81d5c30198227846c6d8f1b58711f3395",
+      "symbols": [
+        "onequip",
+        "onunequip",
+        "onequiptomodel"
+      ]
+    },
+    {
+      "id": "F02",
+      "source_file": "scripts/prefabs/minifan.lua",
+      "file_sha256": "2c3cf0bde71713fecf85533b2fac8f9ce82d775f6e97d4c285eca970c8a57508",
+      "line_start": 104,
+      "line_end": 163,
+      "range_sha256": "c283294e7af8401d58078a0e67377b8fc28adcec197b9fe813473f926966b729",
+      "symbols": [
+        "master boundary",
+        "_onlocomote",
+        "insulator"
+      ]
+    },
+    {
+      "id": "V01",
+      "source_file": "scripts/prefabs/reflectivevest.lua",
+      "file_sha256": "15e8f5f5705d7c0d17a7dcee8bb198a7e7bfb1d6cb96b7530532cc9cb6c56e66",
+      "line_start": 52,
+      "line_end": 79,
+      "range_sha256": "264028ad5e44f99b9491d143cdf0288ea9ba6090d66be5ac684608b79472c225",
+      "symbols": [
+        "master boundary",
+        "insulator"
+      ]
+    },
+    {
+      "id": "BD1",
+      "source_file": "scripts/components/beard.lua",
+      "file_sha256": "b3d1016fe175cc1540093a05e5bc9eac2b3b671f32176eb7f23a0d6c888c5d33",
+      "line_start": 1,
+      "line_end": 93,
+      "range_sha256": "d9bee08b2bfb6c8862db9e23302b87a03d2ce5c502b287a27b484d3d30d1d2a9",
+      "symbols": [
+        "OnDayComplete",
+        "EnableGrowth",
+        "GetInsulation"
+      ]
+    },
+    {
+      "id": "BD2",
+      "source_file": "scripts/components/beard.lua",
+      "file_sha256": "b3d1016fe175cc1540093a05e5bc9eac2b3b671f32176eb7f23a0d6c888c5d33",
+      "line_start": 168,
+      "line_end": 218,
+      "range_sha256": "30b2cb60474d692058e90db6b1b4e604bf40cc61ad5f73aab13e7bbc15512ace",
+      "symbols": [
+        "AddCallback",
+        "Reset",
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "WL1",
+      "source_file": "scripts/prefabs/wilson.lua",
+      "file_sha256": "90027108df04c1dcfcf8fad739295ef82fda0b0d0b4bcd5accdfdfa2f84c4711",
+      "line_start": 94,
+      "line_end": 170,
+      "range_sha256": "3b7f3d0101232090498e0985d943b300dd64884d9c750b752bef229e0483ffa5",
+      "symbols": [
+        "OnGrowShortBeard",
+        "OnGrowMediumBeard",
+        "OnGrowLongBeard",
+        "master_postinit"
+      ]
+    },
+    {
+      "id": "SK1",
+      "source_file": "scripts/components/skilltreeupdater.lua",
+      "file_sha256": "08484408863d37b3f8c4e827fada4803b3153ca59411520f8b986bec31a6c43a",
+      "line_start": 13,
+      "line_end": 29,
+      "range_sha256": "1dfce0da11203927a8275847bfd92a47dbbfd12f2ebf37c6aa6bf18c0ff4a864",
+      "symbols": [
+        "SkillTreeUpdater:IsActivated"
+      ]
+    },
+    {
+      "id": "SK2",
+      "source_file": "scripts/skilltreedata.lua",
+      "file_sha256": "55684ed8c280464c371746d7941d2caee66ae43e26bc9106334713f070003031",
+      "line_start": 27,
+      "line_end": 34,
+      "range_sha256": "74aad716d147d0466b7599e515b2729039f2f149d79b86440354a96afcc0395e",
+      "symbols": [
+        "SkillTreeData:IsActivated"
+      ]
+    },
+    {
+      "id": "PL1",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2514,
+      "line_end": 2518,
+      "range_sha256": "5967e6e8ba3c9daf22f8797538b8623ccc40382499fc3da4c0bc1a710d3b6a50",
+      "symbols": [
+        "skilltreeupdater"
+      ]
+    },
+    {
+      "id": "PL2",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2611,
+      "line_end": 2615,
+      "range_sha256": "2487d4220248244af242f1b53a880adef4588a96b5e9477d5e1062599503f21d",
+      "symbols": [
+        "master boundary"
+      ]
+    },
+    {
+      "id": "PL3",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2731,
+      "line_end": 2738,
+      "range_sha256": "2b6a4ff719fd58b8733beb61487725f6b1ecba5ff2c52b0193366fc2433a1506",
+      "symbols": [
+        "temperature",
+        "sheltered"
+      ]
+    },
+    {
+      "id": "SH1",
+      "source_file": "scripts/components/sheltered.lua",
+      "file_sha256": "7a050b2d7439bf3a3f9e84c543b2aee74d4c6c4d7f9617d0ee86fa87cbc46bac",
+      "line_start": 1,
+      "line_end": 88,
+      "range_sha256": "7a050b2d7439bf3a3f9e84c543b2aee74d4c6c4d7f9617d0ee86fa87cbc46bac",
+      "symbols": [
+        "Sheltered",
+        "Start",
+        "Stop",
+        "SetSheltered",
+        "OnUpdate"
+      ]
+    },
+    {
+      "id": "SH2",
+      "source_file": "scripts/components/sheltered_replica.lua",
+      "file_sha256": "37bdbcc19ef10d45059575ace90a430abd0cf134b7165246c8d88836ce6ab131",
+      "line_start": 1,
+      "line_end": 80,
+      "range_sha256": "37bdbcc19ef10d45059575ace90a430abd0cf134b7165246c8d88836ce6ab131",
+      "symbols": [
+        "Initialize",
+        "StartSheltered",
+        "StopSheltered",
+        "IsSheltered",
+        "OnUpdate"
+      ]
+    },
+    {
+      "id": "SM1",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 8,
+      "line_end": 121,
+      "range_sha256": "092e3bf7dc448ee923d22fc34889fd87db82877294c3b4b1ee05c825dbcdfd73",
+      "symbols": [
+        "SourceModifierList",
+        "SetModifier",
+        "RemoveModifier",
+        "Get"
+      ]
+    },
+    {
+      "id": "HA1",
+      "source_file": "scripts/prefabs/healingsalve.lua",
+      "file_sha256": "2643c7ca5b061f31d7d8e901d14d22dc2355c2e3abbb0811fef2d1108ff2d18b",
+      "line_start": 99,
+      "line_end": 203,
+      "range_sha256": "94c38a1a74372d0bc2ef3fb505828871a1419f07f05d08d7312ac38ce083b9aa",
+      "symbols": [
+        "fumarole_OnHealFn",
+        "buff_Expire",
+        "buff_OnSave",
+        "buff_OnLoad",
+        "MakeHealingSalveBuff"
+      ]
+    },
+    {
+      "id": "HA2",
+      "source_file": "scripts/prefabs/healingsalve.lua",
+      "file_sha256": "2643c7ca5b061f31d7d8e901d14d22dc2355c2e3abbb0811fef2d1108ff2d18b",
+      "line_start": 233,
+      "line_end": 272,
+      "range_sha256": "612276d8d5bc18a12eb2112581d769fb01618c95dc16e4c7723107ae294af3a6",
+      "symbols": [
+        "fumarolebuff_OnAttached",
+        "fumarolebuff_OnDetached",
+        "FUMAROLEBUFF_DATA"
+      ]
+    },
+    {
+      "id": "DB1",
+      "source_file": "scripts/components/debuff.lua",
+      "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+      "line_start": 12,
+      "line_end": 57,
+      "range_sha256": "f3613b41754e1276df2c9eeba05eca266f772bfbc1644dec7dea8740e8b7f2ac",
+      "symbols": [
+        "SetAttachedFn",
+        "SetDetachedFn",
+        "SetExtendedFn",
+        "Stop",
+        "AttachTo",
+        "OnDetach",
+        "Extend"
+      ]
+    },
+    {
+      "id": "DB2",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 72,
+      "line_end": 149,
+      "range_sha256": "cedb6a7e54bd102c467c46cc77fb3f78cc5d33c39e3f2f734a3c7e2cfe17abed",
+      "symbols": [
+        "RegisterDebuff",
+        "AddDebuff",
+        "RemoveDebuff",
+        "OnSave",
+        "OnLoad"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "阴燃有热量又下雨时剩余时间如何变化，SmolderUpdate会按真实dt补算吗？",
+      "expected_entry_ids": [
+        "EXP-SURV-001"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "Propagator AddHeat Flash DefaultIgniteFn StartWildfire",
+      "expected_entry_ids": [
+        "EXP-SURV-001"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "阴燃对象离屏睡眠、长更新和树木读档能保留剩余秒数吗？",
+      "expected_entry_ids": [
+        "EXP-SURV-002"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "LongUpdate StopSmoldering OnEntitySleep SetOnSmolderingFn",
+      "expected_entry_ids": [
+        "EXP-SURV-002"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "背包里的保温装备会进入GetInsulation吗，风扇停止移动是否仍保持初始值？",
+      "expected_entry_ids": [
+        "EXP-SURV-003"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "Temperature:GetInsulation Beard:GetInsulation Insulator:GetInsulation",
+      "expected_entry_ids": [
+        "EXP-SURV-003"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "胡须技能和来源保温存档怎样恢复？",
+      "expected_entry_ids": [
+        "EXP-SURV-003",
+        "EXP-SURV-004"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "Sheltered:SetSheltered需要等阴影确认吗，mounted时level可以省略吗？",
+      "expected_entry_ids": [
+        "EXP-SURV-004"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "SetInsulationModifier RemoveInsulationModifier healingsalve_fumarolebuff",
+      "expected_entry_ids": [
+        "EXP-SURV-004"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "同来源modifier重复设置是否叠层，实体移除和字符串来源如何清理？",
+      "expected_entry_ids": [
+        "EXP-SURV-004"
+      ],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "客户端循环音效的SoundEmitter命名槽和网络FX挂接全流程",
+      "expected_entry_ids": [],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    },
+    {
+      "query": "饥荒冷暖衣物最优配装与角色强度排行",
+      "expected_entry_ids": [],
+      "purpose": "静态检索验收用例；未执行命中行为"
+    }
+  ],
+  "limitations": [
+    "合法本地760944/build26306684 ZIP静态Lua核读；research/restricted/hold，runtime_verified=false。",
+    "不刷新现有759671服务或其他历史记录来源身份，不授予Coding准入。",
+    "原文件SHA按ZIP member原字节；范围SHA按UTF-8-sig解码splitlines、LF连接、无尾LF。",
+    "输出只有原创机制说明与精确来源定位；没有原版Lua正文或私有机器路径。",
+    "补充旧EXP-TEMP-001与EXP-FIRE-001未展开的提供者/阴燃边界；交叉引用的既有基础仅作为必要上下文。",
+    "未执行Lua、游戏、专服、远端、真实任务/存读档/装备/天气或视觉验证；检索queries也未实测。"
+  ]
+}
