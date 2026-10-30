@@ -1,0 +1,1393 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "firefreeze",
+  "source_epoch": "760944",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "entries": [
+    {
+      "id": "EXP-FREEZE-001",
+      "title": "Freezable 三态、计时、SG消费及有限保存边界",
+      "aliases": [
+        "freezable",
+        "AddColdness",
+        "Freeze",
+        "Thaw",
+        "Unfreeze",
+        "Reset",
+        "冻结",
+        "解冻",
+        "nofreeze"
+      ],
+      "engineering_question": "寒冷累计何时进入冻结，融化中是否仍算冻结，组件移除与读档会恢复哪些状态？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "权威侧Freezable与grassgekko/SGgrassgekko；冻结组件状态和SG状态分别核验。",
+        "excluded": "不覆盖玩家温度低温、所有boss/自定义SG、native渲染同步或现实时间推进。"
+      },
+      "claims": [
+        {
+          "id": "EXP-FREEZE-001-C01",
+          "kind": "NSF",
+          "statement": "组件初态NORMAL、coldness=0、resistance=1、wearofftime=10、damagetobreak=0；构造监听attacked并加freezable标签。IsFrozen同时包含FROZEN和THAWING，IsThawing只匹配THAWING。attacked处理在冻结且实体有效时累计abs(data.damage)，达到阈值Unfreeze；默认阈值0故零伤害事件也可满足条件。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C02",
+          "kind": "NSF",
+          "statement": "AddColdness先调用redirectfn(inst,coldness,freezetime,nofreeze)，真值即整个返回；否则coldness钳至至少0。只有传入coldness>0才更新冻结状态：已冻则重调Freeze；未达有效抗性启动衰减；达到抗性时仅在sg存在且(nofreeze或sg有nofreeze标签)才抑制Freeze并钳到抗性。因此nofreeze参数并非无SG对象的统一禁冻开关，负寒冷不会自行解冻。",
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C03",
+          "kind": "NSF",
+          "statement": "Freeze只在entity可见且非health死亡时执行；onfreezefn先于state写入，随后设FROZEN、重排wearoff任务、更新色调、StopBrain(\"frozen\")、清combat目标并停locomotor；仅状态改变才发freeze并在diminishingreturns开启时增加额外抗性。Freeze不自行设置coldness为抗性，不检查nofreeze；重冻同FROZEN不再发freeze。",
+          "evidence_refs": [
+            "FF-S04"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C04",
+          "kind": "NSF",
+          "statement": "WearOff按FROZEN→Thaw、THAWING→Unfreeze、NORMAL且coldness>0→每次减1再视情况续排。Thaw保留IsFrozen为真，清coldness并发onthaw；其传入StartWearingOff的时间已经ResolveWearOffTime，而StartWearingOff内部再做一次同变换。Unfreeze清状态/寒冷/伤害累计，生成碎冰FX并更新色调；仅非死亡时RestartBrain(\"frozen\")、发unfreeze并BlankOutAttacks(.3)。Unfreeze/Reset未主动取消wearofftask；Reset只设NORMAL/coldness=0并更新色调，不发事件、不恢复Brain、不清damagetotal。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C05",
+          "kind": "NSF",
+          "statement": "CommonHandlers.OnFreeze要求health存在且未死，OnFreezeEx允许无health对象；两者都跳转frozen。CommonStates的frozen监听unfreeze/onthaw，thaw监听unfreeze；进态后复查组件当前状态以处理同帧排队事件。frozen退出仅在not statemem.thawing时清swap_frozen；onthaw先将statemem.thawing设true再进thaw，因此该转换保留symbol。thaw退出停止thawing声音并无条件清swap_frozen。grassgekko在master分界后装burnable/freezable及SG，其SG登记OnFreeze和AddFrozenStates。组件本身不添加实体frozen标签；不能把SG标签、实体标签和IsFrozen当同一查询。",
+          "evidence_refs": [
+            "FF-S05",
+            "FF-S06",
+            "FF-S07",
+            "FF-S08",
+            "FF-S09",
+            "FF-S01",
+            "FF-S04"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C06",
+          "kind": "NSF",
+          "statement": "Freezable:OnSave只在extraresist>0时返回向下取一位小数的extraresist，OnLoad只通过SetExtraResist恢复它；没有保存coldness/state/wearoff剩余时长。EntityScript收集组件OnSave的非空表，再调用prefab OnSave；加载对组件调用OnLoad后再调用prefab OnLoad，故本卡不排除其他prefab自定义恢复。OnRemoveFromEntity解绑attacked、去freezable标签并取消两类任务，但不调用Unfreeze/Reset、不清色调也不RestartBrain；RemoveComponent先移除组件索引再调该hook。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S21",
+            "FF-S22",
+            "FF-S23"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C07",
+          "kind": "REC",
+          "statement": "对仍保留的实体单独拆freezable时，不能假设移除hook完成解冻业务；需根据自己的Brain/SG/色调所有权安排显式退出。建议用AddColdness而非直调Freeze，以保留redirect/抗性/sg nofreeze分支。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02",
+            "FF-S04",
+            "FF-S06"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C08",
+          "kind": "NSF",
+          "statement": "实体Remove路径先移除事件回调并CancelAllPendingTasks，再遍历组件OnRemoveEntity；CancelAllPendingTasks逐个Cancel pendingtasks再清表。该实体级取消与RemoveComponent→OnRemoveFromEntity是不同路径；前者说明已登记实体任务的通用取消边界，不保证移除hook随后新建的任务也会再次自动取消。",
+          "evidence_refs": [
+            "FF-S26",
+            "FF-S27",
+            "FF-S21"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Freezable:AddColdness",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "coldness：可加减的数值；未做类型/有限性校验",
+            "freezetime：可选计时值",
+            "nofreeze：可选Lua真值；仅有sg分支处理"
+          ],
+          "returns": "无显式返回；redirect真值分支亦仅返回nil",
+          "preconditions": [
+            "有效组件及数值参数；redirectfn若安装须可调用"
+          ],
+          "side_effects": [
+            "改寒冷、可能计时/Freeze、更新色调"
+          ],
+          "lifecycle": [
+            "任务由StartWearingOff替换；组件移除取消"
+          ],
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Freeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "freezetime：可选时长，nil回退wearofftime"
+          ],
+          "returns": "无显式返回；不可见/死亡同样不返回成功标记",
+          "preconditions": [
+            "entity:IsVisible且无health死亡；不自行执行抗性或nofreeze门禁"
+          ],
+          "side_effects": [
+            "回调、三态、任务、色调、Brain/combat/locomotor和freeze事件"
+          ],
+          "lifecycle": [
+            "重排wearoff；同FROZEN不重复事件；onfreezefn没有本地异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Thaw",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "thawtime：可选时长"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen且非health死亡"
+          ],
+          "side_effects": [
+            "设THAWING/寒冷0，发onthaw并两次应用ResolveWearOffTime"
+          ],
+          "lifecycle": [
+            "重排wearoff最终进入Unfreeze"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02",
+            "FF-S03"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Unfreeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen才执行"
+          ],
+          "side_effects": [
+            "设NORMAL、清寒冷与伤害累计、碎冰/色调；活体恢复Brain和发事件"
+          ],
+          "lifecycle": [
+            "不主动取消wearofftask；死亡时跳过Brain恢复与事件"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Reset",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "只设NORMAL/coldness0并UpdateTint"
+          ],
+          "lifecycle": [
+            "不发事件、不取消任务、不重启Brain、不清damagetotal"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:OnSave",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "extraresist非nil且>0时返回{extraresist=math.floor(extraresist*10)*.1}，否则返回nil；小的正值量化后可以为0",
+          "preconditions": [
+            "有效组件；extraresist非nil时应为可比较和计算的数值；由EntityScript保存分派调用"
+          ],
+          "side_effects": [
+            "只读取当前extraresist并创建返回表；不改组件字段、不建撤任务"
+          ],
+          "lifecycle": [
+            "只保存量化extraresist，不保存state/coldness/wearoff倒计时；EntityScript只收集非空返回表，之后还可由prefab OnSave补充业务"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S22"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:OnLoad",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "data：保存表，直接读data.extraresist，未防nil；extraresist非nil时须可作数值clamp"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "有效组件和非nil data表；由EntityScript组件加载分派调用"
+          ],
+          "side_effects": [
+            "data.extraresist非nil才SetExtraResist；clamp到0..resistance*2.5；结果>0且无diminishingtask则建30秒周期任务，结果<=0且有任务则取消清handle"
+          ],
+          "lifecycle": [
+            "只恢复额外抗性与其衰减任务，不恢复冻结态/寒冷/wearoff；组件加载之后prefab OnLoad仍可追加业务；组件移除取消衰减任务"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S03",
+            "FF-S01",
+            "FF-S23"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master prefab安装组件、FX及SG。",
+          "evidence_refs": [
+            "FF-S07",
+            "FF-S10",
+            "FF-S11",
+            "FF-S08",
+            "FF-S09"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "AddColdness执行redirect/抗性/SG门禁；Freeze停Brain并发事件，由SG决定表现。",
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S04",
+            "FF-S05",
+            "FF-S06"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "wearoff推进Thaw/Unfreeze；伤害或外部热量也可直接Unfreeze。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S13"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "区分组件有限保存、prefab补充保存和拆组件不做业务恢复。",
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S21",
+            "FF-S22",
+            "FF-S23"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未实测单帧冻结/解冻事件排序、死亡/移除重入、任务到期误差、动画音效及远端客户端。",
+        "未扩展所有boss额外抗性配置与SG自定义恢复；只枚举所列消费者。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FF-S01",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S02",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S03",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S04",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S05",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S06",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S07",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S08",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S09",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S21",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S22",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S23",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S26",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S27",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S10",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S11",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S13",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "没有证明所有动态调用者、引擎native实现、全部prefab或模组兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FIRE-001",
+      "title": "传播火源的寒冷消除、跳过解冻阶段与融化事件消费者",
+      "aliases": [
+        "propagator",
+        "StartSpreading",
+        "StopSpreading",
+        "firemelt",
+        "stopfiremelt",
+        "热量解冻",
+        "融化",
+        "beeswax"
+      ],
+      "engineering_question": "点燃如何驱动附近解冻与蜂蜡融化，熄火和移除如何停止，是否按火源独立计数？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "所列Burnable→Propagator→Freezable/蜂蜡master链；显式区分heat、fire damage、melting事件。",
+        "excluded": "不重复BR-P01..P05的普通helper/烧毁存档条目，不覆盖全部融化prefab、native查找与网络表现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-FIRE-001-C01",
+          "kind": "NSF",
+          "statement": "Burnable Ignite在非已燃且无fireimmune时启动；完成点燃事件/回调与fuel后，若有propagator则StartSpreading(source)，再ExtendBurning。StartSpreading写source、spreading=true并建周期任务；任务间隔.5，初延迟含随机量。StopSpreading只清source/spreading，reset真时还重置currentheat和pauseheating，不直接取消周期任务；熄灭传参决定是否reset。",
+          "evidence_refs": [
+            "FF-S14",
+            "FF-S12",
+            "FF-S15"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C02",
+          "kind": "NSF",
+          "statement": "Propagator OnUpdate在spreading时于春季修正半径内查询、排除INLIMBO；对有效且非火源自身的freezable调用AddColdness(-.25*heatoutput*dt)，随后若IsFrozen且coldness<=0则直接Unfreeze，跳过Thaw。该寒冷消除没有heat距离衰减，也不以目标propagator/AcceptsHeat为前提，且不受isendothermic分支门禁；因此不能从冷火不融化实体标签推出它不操作freezable。",
+          "evidence_refs": [
+            "FF-S13",
+            "FF-S02",
+            "FF-S04"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C03",
+          "kind": "NSF",
+          "statement": "非endothermic火源对非自身且有实体frozen或meltable标签的目标发firemelt再加firemelt标签。StopSpreading只改source/spreading及可选reset字段，不创建也不直接取消周期任务；只有已有任务或外部显式调用实际促成后续OnUpdate，才执行非spreading分支。该分支仅在火源非endothermic时，对范围内带frozen或firemelt的实体发stopfiremelt并去标签，不检查其他火源；随后currentheat==0则StopUpdating，此条件不受heater门禁。OnRemoveFromEntity显式执行StopSpreading(true)+OnUpdate(0)并取消delay；OnRemoveEntity另在自身有效且非endothermic时查询并对有效目标发stopfiremelt/去标签。此协议没有每火源的所有权计数，不能宣称多火源不会互相停止融化任务。",
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C04",
+          "kind": "NSF",
+          "statement": "蜂蜡在SetPristine前加meltable；master侧监听firemelt/stopfiremelt及onputininventory。StartFireMelt只在无任务时排10秒，重复firemelt不续期；StopFireMelt取消并清handle。到期先清handle、解绑两个融化事件；未melted时若睡眠则Remove，否则设melted、persists=false、禁拾取、NOCLICK、播melt，并在animover或entitysleep移除。该prefab没有自定义OnSave/OnLoad，融化任务不在这份Lua保存。",
+          "evidence_refs": [
+            "FF-S17",
+            "FF-S22"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C05",
+          "kind": "NSF",
+          "statement": "在所读完整Burnable/Propagator组件中没有OnSave/OnLoad；不能将burning/currentheat/spreading/task推成组件自动持久化。grassgekko仅展示权威侧装两组件及freezable的消费者，其他prefab可自行保存烧毁终态或重启火源；这些额外规则不由本卡泛化。客户端共有网络实体和部分标签/动画配置，不证明客户端可调用组件方法，远端视觉仍未验证。",
+          "evidence_refs": [
+            "FF-S24",
+            "FF-S25",
+            "FF-S07",
+            "FF-S17",
+            "FF-S22",
+            "FF-S23"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C06",
+          "kind": "NSF",
+          "statement": "蜂蜡融化任务由inst:DoTaskInTime建立，实体Remove的一般路径在组件OnRemoveEntity前CancelAllPendingTasks。Burnable实体移除hook停止闷烧并KillFX，组件移除则Extinguish并清残余burn任务/标签；与Propagator自身停止融化事件的两个移除hook应分别核对，不能把拆组件、移除实体、熄火视为同一个操作。",
+          "evidence_refs": [
+            "FF-S17",
+            "FF-S26",
+            "FF-S27",
+            "FF-S24",
+            "FF-S16",
+            "FF-S12"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Propagator:StartSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "source：可选攻击来源实体，写入self.source"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "有效权威组件；本方法未验证source类型"
+          ],
+          "side_effects": [
+            "spreading=true；如无task启动周期OnUpdate"
+          ],
+          "lifecycle": [
+            "重复调用更新source但不重复建task；由StopSpreading后续更新/移除收尾"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Propagator:StopSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "reset：Lua真值，是否重置热量/暂停标志",
+            "heatpct：可选热量比例，非nil时参与随机表达式，非单纯剩余百分比"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "清source与spreading；reset才改currentheat/pauseheating；本身不创建也不直接取消task"
+          ],
+          "lifecycle": [
+            "仅当已有任务或外部显式调用实际促成后续OnUpdate时才执行非spreading分支；该更新仅在火源非endothermic时查询frozen/firemelt并推stopfiremelt、去标签；之后currentheat==0则StopUpdating，不受heater门禁"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Burnable:Extinguish",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "resetpropagator：可选Lua真值",
+            "heatpct：可选热量比例",
+            "smotherer：可选实体，finiteuses优先于stackable消费"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "方法可在未燃烧时调用；smotherer仍可能被消费"
+          ],
+          "side_effects": [
+            "先StopSmoldering：仅smoldering时且propagator存在才调用StopSpreading(true,heatpct)，该true不依赖Extinguish的resetpropagator实参；消费工具；燃烧时取消burn任务/监听，停止传播，清燃烧/FX/fuel，调回调再发onextinguish"
+          ],
+          "lifecycle": [
+            "不销毁主体；不等于StopUpdating；回调没有局部异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "StartFireMelt",
+          "source_file": "scripts/prefabs/beeswax.lua",
+          "visibility": "file-local; 蜂蜡prefab局部函数，仅所列master消费者通过firemelt事件调用，未导出，不是公共API",
+          "parameters": [
+            "inst：蜂蜡事件回调实体，拥有DoTaskInTime；有效终态消费者依赖inventoryitem/AnimState等已安装对象"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "所列蜂蜡master安装的firemelt事件消费者；非公共导出方法；仅firemelttask==nil时排任务"
+          ],
+          "side_effects": [
+            "无任务时建立10秒任务并保存firemelttask；任务回调携带StartFireMelt/StopFireMelt供解绑；重复开始不改变已有倒计时"
+          ],
+          "lifecycle": [
+            "stopfiremelt或onputininventory由StopFireMelt取消；到期先清handle并解绑两个融化事件，未melted时睡眠直接Remove，否则标melted、persists=false、禁拾取、NOCLICK、播放melt并在animover/entitysleep移除；无自定义任务保存恢复"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "StopFireMelt",
+          "source_file": "scripts/prefabs/beeswax.lua",
+          "visibility": "file-local; 蜂蜡prefab局部函数，仅所列master消费者通过stopfiremelt/onputininventory事件调用，未导出，不是公共API",
+          "parameters": [
+            "inst：蜂蜡事件回调实体；若firemelttask非nil，应为可Cancel的任务handle"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "所列蜂蜡master安装的stopfiremelt或onputininventory事件消费者；非公共导出方法"
+          ],
+          "side_effects": [
+            "仅有firemelttask时Cancel并清为nil；无任务时无操作"
+          ],
+          "lifecycle": [
+            "不解绑融化事件、不恢复melted/persists/拾取/动画；到期已经清handle后的调用不撤销已发生终态；无保存恢复动作"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "点燃由Burnable启动Propagator权威周期传播。",
+          "evidence_refs": [
+            "FF-S14",
+            "FF-S12"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "附近freezable减寒冷并可直接Unfreeze；非冷火另推实体融化事件。",
+          "evidence_refs": [
+            "FF-S13",
+            "FF-S02",
+            "FF-S04"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "蜂蜡事件建任务、取消或转不可持久化融化终态。",
+          "evidence_refs": [
+            "FF-S17"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "熄灭/组件移除/实体移除各有停止链，多火源行为不作所有权保证。",
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行多火源交错、同帧移除、入库竞态或endothermic/freezable组合；已识别共享事件协议不足以证明火源独立性。",
+        "引擎实体移除调度、子FX生命周期和远端画面未实测；不扩展propagator伤害/可控燃烧全部规则。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FF-S14",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S12",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S15",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S13",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S02",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S04",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S17",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S22",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S24",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S25",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S07",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S23",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S26",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S27",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S16",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "没有证明所有动态调用者、引擎native实现、全部prefab或模组兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FREEZE-002",
+      "title": "红蓝法杖攻击入口的熄火、解冻与事件次序",
+      "aliases": [
+        "icestaff",
+        "firestaff",
+        "staff_common",
+        "onattack_blue",
+        "onattack_red",
+        "冰杖灭火",
+        "火杖解冻"
+      ],
+      "engineering_question": "冰杖是否只加寒冷，火杖是否对冻结目标同次点燃，事件回调删除目标后还会继续吗？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "prefabs/staff.lua master安装的red/blue weapon攻击回调；从已进入回调开始。",
+        "excluded": "不覆盖发射物命中判定/耗耐久/所有武器变体/客户端预测；不把local回调当公共API。"
+      },
+      "claims": [
+        {
+          "id": "EXP-FREEZE-002-C01",
+          "kind": "NSF",
+          "statement": "staff.lua的red/blue_common在master分界后调用stafffns.red/blue；后者设置weapon伤害0、射程、攻击回调与投射物。onattack_blue先按skipsanity扣理智，可能播皮肤声音，再检查目标有效；醒睡眠、烧着则Extinguish()、仅闷烧则SmotherSmolder()，再SuggestTarget。仅target.sg存在且无frozen状态标签时才发damage=0的attacked，最后重新检查freezable及目标有效才AddColdness(icestaff_coldness or 1)并SpawnShatterFX。熄火不是加寒冷的隐式副作用，而是此入口额外的顺序步骤。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S20",
+            "FF-S15"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-002-C02",
+          "kind": "NSF",
+          "statement": "蓝杖燃烧分支Extinguish不传reset，闷烧分支SmotherSmolder则StopSmoldering(-1)，后者将传播器StopSpreading(true,-1)。AddColdness自身没有熄灭burnable调用。蓝杖末段对先前事件可能删除目标作有效性检查，但不构成任意第三方回调后所有中间访问均安全的通用保证。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S15",
+            "FF-S12",
+            "FF-S02"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-002-C03",
+          "kind": "NSF",
+          "statement": "红杖先扣理智并用attacker.SoundEmitter播声音，再查目标有效。仅在burnable存在且未烧着时进入点燃/加燃料分支：如freezable正冻结则先Unfreeze，并通过elseif跳过同次Ignite/加燃料；否则按fueled燃料类型、canlight或combat、accepting决定点燃或加草燃料。之后无论该分支是否执行，只要freezable存在就AddColdness(-1)且仍冻则Unfreeze；再醒睡眠、SuggestTarget并发damage=0的attacked。故不能推成火杖每次都点燃冻结目标或只要burnable就必定点燃。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S04",
+            "FF-S02"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-002-C04",
+          "kind": "EI",
+          "statement": "红杖回调虽在理智处理处允许attacker=nil，随后无条件用attacker.SoundEmitter；该局部函数不是接受任意nil attacker的安全通用入口。红杖初始有效性检查后未像蓝杖末段再检查；直接拼用这些本地消费者不能据此获得删除/重入安全。两者没有返回成功布尔值，状态/动画/多人表现及完整命中链仍需运行验证。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S19"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "onattack_blue",
+          "source_file": "scripts/prefabs/staff_common.lua",
+          "visibility": "file-local; prefab模块局部回调，仅所列master消费者由fns.blue安装给weapon，未导出，不是公共API",
+          "parameters": [
+            "inst：装备法杖实体，可有icestaff_coldness/skin_sound",
+            "attacker：攻击者；使用声音时须有SoundEmitter",
+            "target：目标实体；不能nil",
+            "skipsanity：真值跳过理智扣除"
+          ],
+          "returns": "无显式返回；初始失效目标提前返回nil",
+          "preconditions": [
+            "已由master weapon回调调用；相关可选组件在每分支检查"
+          ],
+          "side_effects": [
+            "按次序醒睡眠、熄火/灭闷烧、建议仇恨；仅target.sg存在且无frozen状态标签才发attacked；之后再次有效性检查、加寒冷/FX"
+          ],
+          "lifecycle": [
+            "仅单次攻击业务；冻结任务归freezable，传播停止归burnable/propagator；本回调不保存状态"
+          ],
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S20",
+            "FF-S15",
+            "FF-S02"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "onattack_red",
+          "source_file": "scripts/prefabs/staff_common.lua",
+          "visibility": "file-local; prefab模块局部回调，仅所列master消费者由fns.red安装给weapon，未导出，不是公共API",
+          "parameters": [
+            "inst：法杖实体",
+            "attacker：需SoundEmitter的攻击者",
+            "target：非nil实体",
+            "skipsanity：真值跳过理智扣除"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "合法master weapon攻击上下文；首个目标有效性检查在声音之后"
+          ],
+          "side_effects": [
+            "解冻优先或按条件点燃/加燃料，再减寒冷/解冻、醒睡眠、仇恨与attacked"
+          ],
+          "lifecycle": [
+            "组件状态任务由对应组件负责；初始有效性检查不保证回调后持续有效"
+          ],
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S20",
+            "FF-S14",
+            "FF-S02",
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master法杖factory装入共享模块的weapon攻击回调。",
+          "evidence_refs": [
+            "FF-S20",
+            "FF-S19"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "蓝杖先显式熄火，target.sg存在且无frozen状态标签才发攻击事件，重查有效后加寒冷。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S15",
+            "FF-S02"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "红杖冻结优先分支跳过当次点燃；尾部再减寒冷并强制解冻。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S04"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "保留组件自身计时/清理/有限保存边界，避免把武器一次性业务视为组件全局联动。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S12",
+            "FF-S15"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未验证投射物、weapon:OnAttack完整派发链、耐久与理智最终数值、特殊皮肤和其他模组覆盖。",
+        "未实测自定义事件删除目标、dedicated与远端客户端；静态次序不能替代运行结果。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FF-S19",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S20",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S15",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S12",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S02",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S18",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S04",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S14",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          },
+          {
+            "ref": "FF-S01",
+            "role": "该卡已枚举的静态定义/消费者/生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "没有证明所有动态调用者、引擎native实现、全部prefab或模组兼容闭包。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "FF-S01",
+      "source_file": "scripts/components/freezable.lua",
+      "file_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "line_start": 1,
+      "line_end": 79,
+      "range_sha256": "078e9142f0acc490dd5b0ace091d5e66c6d8dea122bc51693be014f1dd64d909",
+      "symbols": [
+        "Freezable",
+        "WearOff",
+        "OnAttacked",
+        "OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "FF-S02",
+      "source_file": "scripts/components/freezable.lua",
+      "file_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "line_start": 96,
+      "line_end": 168,
+      "range_sha256": "c004b6fd3a917fe0cf8231930e0c02d478babe46423c9d71c6b16555d26f9be9",
+      "symbols": [
+        "SpawnShatterFX",
+        "IsFrozen",
+        "IsThawing",
+        "AddColdness",
+        "StartWearingOff"
+      ]
+    },
+    {
+      "id": "FF-S03",
+      "source_file": "scripts/components/freezable.lua",
+      "file_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "line_start": 174,
+      "line_end": 245,
+      "range_sha256": "8331fb659334a38b10099e6b69e8c35b936e76d7d7b099c0faca93e0842b1e71",
+      "symbols": [
+        "UpdateTint",
+        "SetExtraResist",
+        "ResolveResistance",
+        "ResolveWearOffTime"
+      ]
+    },
+    {
+      "id": "FF-S04",
+      "source_file": "scripts/components/freezable.lua",
+      "file_sha256": "21d04672822d9e6609c218175dbba386f24b25ea61f89a4a6108c0b568f47288",
+      "line_start": 247,
+      "line_end": 334,
+      "range_sha256": "71fb168c41221b788e4341407a7c3bf6799ad79f7357767b4e36c34930671681",
+      "symbols": [
+        "Freeze",
+        "Unfreeze",
+        "Thaw",
+        "Reset",
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "FF-S05",
+      "source_file": "scripts/stategraphs/commonstates.lua",
+      "file_sha256": "a6c501ad56af9585b8c1b50b3d821851b30b31a58839aba020aac4e834e4d49f",
+      "line_start": 50,
+      "line_end": 72,
+      "range_sha256": "2679f88891dfdf9d94c1ca8a851246b0aa3b4802c1d988d0c78a65a5924660b6",
+      "symbols": [
+        "CommonHandlers.OnFreeze",
+        "CommonHandlers.OnFreezeEx"
+      ]
+    },
+    {
+      "id": "FF-S06",
+      "source_file": "scripts/stategraphs/commonstates.lua",
+      "file_sha256": "a6c501ad56af9585b8c1b50b3d821851b30b31a58839aba020aac4e834e4d49f",
+      "line_start": 1270,
+      "line_end": 1386,
+      "range_sha256": "e4c5cf6fbbaa9d249c1681b5f99e34c3087dc5de36875fd739c84115221ff1df",
+      "symbols": [
+        "CommonStates.AddFrozenStates",
+        "onenterfrozenpst",
+        "onenterthawpst"
+      ]
+    },
+    {
+      "id": "FF-S07",
+      "source_file": "scripts/prefabs/grassgekko.lua",
+      "file_sha256": "1b31cbc59da14c14206c8627238b0871bad4124a3cd11f07fb64129b6aadc3a9",
+      "line_start": 110,
+      "line_end": 176,
+      "range_sha256": "3bbad235fb421a923b112d794d9742ec52135477a540c0b8908e129998978396",
+      "symbols": [
+        "MakeSmallBurnableCharacter",
+        "MakeSmallFreezableCharacter",
+        "SGgrassgekko"
+      ]
+    },
+    {
+      "id": "FF-S08",
+      "source_file": "scripts/stategraphs/SGgrassgekko.lua",
+      "file_sha256": "8f41ede2d1dcf576e9f9cb8eedf1a0bfd46cd841ca4fd7fa15ff555be235059e",
+      "line_start": 1,
+      "line_end": 16,
+      "range_sha256": "27e2fe62a1c68c64bc8490992ea01ae4aa5740eff99f87ad476fd77975e94028",
+      "symbols": [
+        "CommonHandlers.OnFreeze"
+      ]
+    },
+    {
+      "id": "FF-S09",
+      "source_file": "scripts/stategraphs/SGgrassgekko.lua",
+      "file_sha256": "8f41ede2d1dcf576e9f9cb8eedf1a0bfd46cd841ca4fd7fa15ff555be235059e",
+      "line_start": 308,
+      "line_end": 322,
+      "range_sha256": "7e93b96709c8df3493791be993270a2aa0b2db613fa1cb29202049d67f50fd23",
+      "symbols": [
+        "CommonStates.AddFrozenStates"
+      ]
+    },
+    {
+      "id": "FF-S10",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 245,
+      "line_end": 256,
+      "range_sha256": "94194d6e6d69b71f431a4e5d5dd417edcfcdf323316e7efdc518fa855eb5d93f",
+      "symbols": [
+        "MakeSmallBurnableCharacter"
+      ]
+    },
+    {
+      "id": "FF-S11",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 323,
+      "line_end": 369,
+      "range_sha256": "43a190022e9f8da61934d6704462a029b0d62a095401ec92528bc812ea8d0e0b",
+      "symbols": [
+        "MakeSmallFreezableCharacter",
+        "MakeMediumFreezableCharacter"
+      ]
+    },
+    {
+      "id": "FF-S12",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 1,
+      "line_end": 111,
+      "range_sha256": "6a54600da943d69c273b5d61e54e6515cf3df78310d6bcff396b8d930ecdd86a",
+      "symbols": [
+        "Propagator",
+        "OnRemoveFromEntity",
+        "OnRemoveEntity",
+        "StartUpdating",
+        "StartSpreading",
+        "StopSpreading"
+      ]
+    },
+    {
+      "id": "FF-S13",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 174,
+      "line_end": 249,
+      "range_sha256": "d99e2ae2e240976cd3df0cae3623499a1d27a8487149c4cb54e4b51b8549b0de",
+      "symbols": [
+        "OnUpdate",
+        "AddColdness",
+        "firemelt",
+        "stopfiremelt"
+      ]
+    },
+    {
+      "id": "FF-S14",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 352,
+      "line_end": 415,
+      "range_sha256": "332b3b020f8c815a132af31f7f48060ac8e4e333a2b7e02354c4402574435d76",
+      "symbols": [
+        "Ignite",
+        "ExtendBurning",
+        "LongUpdate"
+      ]
+    },
+    {
+      "id": "FF-S15",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 417,
+      "line_end": 494,
+      "range_sha256": "e1eedaad811ae20dd4fccecdc555d319e06d36b3729d665f96530368dfc105a9",
+      "symbols": [
+        "SmotherSmolder",
+        "StopSmoldering",
+        "Extinguish"
+      ]
+    },
+    {
+      "id": "FF-S16",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 593,
+      "line_end": 606,
+      "range_sha256": "afb882599a5c5dab540e564ed84f0af72e1d26ffd2881e96ef43f4c4f2137ae8",
+      "symbols": [
+        "OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "FF-S17",
+      "source_file": "scripts/prefabs/beeswax.lua",
+      "file_sha256": "b9643c19fd895bbe0b03e44949c75ccaf45214617ab748f60986ebc8189eb429",
+      "line_start": 1,
+      "line_end": 78,
+      "range_sha256": "3d615205adeecb0412294c4993cfdd1e7f7be1bcf219d6fe87d7ad7b91ca199b",
+      "symbols": [
+        "StartFireMelt",
+        "StopFireMelt",
+        "_OnFireMelt"
+      ]
+    },
+    {
+      "id": "FF-S18",
+      "source_file": "scripts/prefabs/staff_common.lua",
+      "file_sha256": "22d04b8ba0c793bd08e4b4d649ab0ed2c80615b15951d8f609865f3f907bfa44",
+      "line_start": 55,
+      "line_end": 117,
+      "range_sha256": "043458e04cc4aeb601ca6ac1dd0234be42ff65440c1c1899aed9ce123135490a",
+      "symbols": [
+        "onattack_red"
+      ]
+    },
+    {
+      "id": "FF-S19",
+      "source_file": "scripts/prefabs/staff_common.lua",
+      "file_sha256": "22d04b8ba0c793bd08e4b4d649ab0ed2c80615b15951d8f609865f3f907bfa44",
+      "line_start": 141,
+      "line_end": 243,
+      "range_sha256": "eeda5f29f7f3f6c056a150c7bf3cd19e18109de859524afac84c78dbc1bebb01",
+      "symbols": [
+        "fns.red",
+        "fns.blue",
+        "onattack_blue"
+      ]
+    },
+    {
+      "id": "FF-S20",
+      "source_file": "scripts/prefabs/staff.lua",
+      "file_sha256": "9a9764308882c255edd0017745d19e47a95cdbe25dec2bb8c6931911ae511add",
+      "line_start": 117,
+      "line_end": 181,
+      "range_sha256": "e992b0035034aca0e2cc634916506c469b966dcd9726743fd74addc95985eddb",
+      "symbols": [
+        "red",
+        "blue_common",
+        "stafffns.red",
+        "stafffns.blue"
+      ]
+    },
+    {
+      "id": "FF-S21",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "FF-S22",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData"
+      ]
+    },
+    {
+      "id": "FF-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "FF-S24",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 1,
+      "line_end": 606,
+      "range_sha256": "520bd272ed6bae4d151929ca8cb47134067e58c9fb707c3d98cf9e1814fb4a64",
+      "symbols": [
+        "Burnable",
+        "OnRemoveEntity",
+        "SpawnFX",
+        "KillFX"
+      ]
+    },
+    {
+      "id": "FF-S25",
+      "source_file": "scripts/components/propagator.lua",
+      "file_sha256": "5a087ab9ab71fbaf97b55b71807179a7807f28dce12839091cadb72e2bf0c11a",
+      "line_start": 1,
+      "line_end": 255,
+      "range_sha256": "c86700b2b76acd66d6c015f2d0b9b1653db2d719e530339570f156a4f354b0fb",
+      "symbols": [
+        "Propagator"
+      ]
+    },
+    {
+      "id": "FF-S26",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1501,
+      "range_sha256": "a325a0b1f5b6632db2cae483f0881a99952a30a265bcf7e37a76b32b90283c06",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks"
+      ]
+    },
+    {
+      "id": "FF-S27",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1752,
+      "range_sha256": "51668de9aa8ac040c278e84513ada6f574d061bdda8a6ed8f3bd922cd479c37a",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "冻结中和解冻中 IsFrozen 都为真吗",
+      "expected_entry_ids": [
+        "EXP-FREEZE-001"
+      ],
+      "purpose": "中文/三态边界"
+    },
+    {
+      "query": "AddColdness nofreeze sg",
+      "expected_entry_ids": [
+        "EXP-FREEZE-001"
+      ],
+      "purpose": "符号/前置条件"
+    },
+    {
+      "query": "Reset 等于 Unfreeze 吗",
+      "expected_entry_ids": [
+        "EXP-FREEZE-001"
+      ],
+      "purpose": "歧义/生命周期"
+    },
+    {
+      "query": "freezable 读档恢复冻结剩余时间",
+      "expected_entry_ids": [
+        "EXP-FREEZE-001"
+      ],
+      "purpose": "负断言需读取保存边界"
+    },
+    {
+      "query": "Propagator:OnUpdate firemelt stopfiremelt",
+      "expected_entry_ids": [
+        "EXP-FIRE-001"
+      ],
+      "purpose": "符号/跨组件链"
+    },
+    {
+      "query": "冷火不融化所以不解冻吗",
+      "expected_entry_ids": [
+        "EXP-FIRE-001"
+      ],
+      "purpose": "歧义/不同分支"
+    },
+    {
+      "query": "蜂蜡多火源是否独立计时",
+      "expected_entry_ids": [
+        "EXP-FIRE-001"
+      ],
+      "purpose": "兼容性未知边界"
+    },
+    {
+      "query": "冰杖灭火后再冻结",
+      "expected_entry_ids": [
+        "EXP-FREEZE-002"
+      ],
+      "purpose": "中文/消费者"
+    },
+    {
+      "query": "onattack_red 冻结目标同次Ignite",
+      "expected_entry_ids": [
+        "EXP-FREEZE-002"
+      ],
+      "purpose": "符号/负断言"
+    },
+    {
+      "query": "火杖与附近火源解冻区别",
+      "expected_entry_ids": [
+        "EXP-FIRE-001",
+        "EXP-FREEZE-002"
+      ],
+      "purpose": "歧义/入口区分"
+    },
+    {
+      "query": "玩家冬季体温冻伤",
+      "expected_entry_ids": [],
+      "purpose": "负例：不覆盖temperature低温"
+    },
+    {
+      "query": "灭火器waterballoon全部范围公式",
+      "expected_entry_ids": [],
+      "purpose": "负例：未覆盖武器与prefab"
+    },
+    {
+      "query": "DefaultBurntStructureFn chest存档",
+      "expected_entry_ids": [],
+      "purpose": "负例：已有BR-P04/05，不重复登记"
+    }
+  ],
+  "limitations": [
+    "仅归档760944/build26306684的静态Lua研究，未运行游戏、专服或远端客户端。",
+    "范围hash仅证明精确文件范围身份；不提供原版Lua，不证明native与动态依赖闭包。",
+    "research/restricted/hold；需独立源码审阅绑定candidate SHA后才可由主代理决定登记，不授予Coding准入。",
+    "原版burnable基本安装/点燃/熄灭/烧毁/恢复已有BR-P01..P05；本批仅为跨组件火冰及新freezable链补充，引用共有组件契约而不重建旧知识身份。"
+  ]
+}

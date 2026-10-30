@@ -1,6 +1,6 @@
 # 源码更新与局部复核
 
-证据基线、目标游戏源码和派生缓存分别管理。`v2026.10.30.1` 保留唯一 `source_epoch=759671` 作为证据基线，以 760944 为本次核验的来源输入；不新增 760944 epoch，也不把历史 Scope 或全库结论升级为 760944。官方更新后，旧知识仍可按原 Scope 审阅，新 ZIP 可独立定位和比较。
+证据基线、目标游戏源码和派生缓存分别管理。`v2026.10.30.2` 的服务环境参数仍仅接受 `source_epoch=759671`，本次核验的来源输入为 760944。研究原子按各自文档保留证据身份：原 23 条为 759671，新 6 条为 760944；不新增可切换的服务环境，也不把历史 Scope 或全库结论升级为 760944。官方更新后，旧知识仍可按原 Scope 审阅，新 ZIP 可独立定位和比较。
 
 ## 本次目标与来源准备边界
 
@@ -9,7 +9,7 @@
 | 目标游戏版本 / Steam build | `760944 / 26306684` |
 | 目标 `scripts.zip` SHA-256 | `abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e` |
 | Lua 文件盘点 | 相对 760178：旧 4091、新 4095；4021 同字节、70 变化、4 新增、0 删除 |
-| 知识目录与准入 | 210 条，保留旧 187 条身份；23 条机制研究仍为 `research/restricted/hold` |
+| 知识目录与准入 | 216 条，保留旧 187 条身份；29 条机制研究仍为 `research/restricted/hold` |
 
 上述盘点是归档与文件字节对照，不是 70 个文件的行为兼容审查，更不是游戏实测。合法持有该目标 ZIP 的使用者可按 [安装说明](install-and-use.md) 准备来源；未来其他 ZIP 仍需核对核心必需范围，不能由本次支持推导全部可完整准备。
 
@@ -34,6 +34,7 @@
 python -B -X utf8 run_kb.py maintain-sources --help
 python -B -X utf8 run_kb.py maintain-sources locate --target "<new scripts.zip>" --symbol "Brain:OnStart"
 python -B -X utf8 run_kb.py maintain-sources assess --baseline "<evidence baseline scripts.zip>" --target "<new scripts.zip>" --candidate "<reviewed candidate.json>" --output "<new report.json>"
+python -B -X utf8 run_kb.py maintain-sources assess-registered --knowledge-root knowledge --target "<new scripts.zip>" --baseline "<optional evidence baseline scripts.zip>" --output "<new report outside knowledge root.json>"
 python -B -X utf8 run_kb.py maintain-sources legacy-inventory --knowledge-root knowledge --output "<new inventory.json>"
 ```
 
@@ -42,6 +43,28 @@ python -B -X utf8 run_kb.py maintain-sources legacy-inventory --knowledge-root k
 候选引用中的 `symbols` 也可以是带参数的调用描述。评估会保留这些提示，但只用严格 Lua 标识符做词法定位；非标识符提示不影响文件与范围哈希判断，也不会被猜测改写为另一符号。
 
 缺少旧源码时省略 `--baseline`：目标文件及范围与既有哈希完全相同，仍可确认该来源身份；已变化文件无法比较则报告 `unknown/missing_matching_old_source`。这时依然可以定位新版源码和阅读原版本知识。`--output` 只创建新文件，拒绝覆盖已有文件。工具不提取、输出或上传原版 Lua。
+
+### 按登记批量评估
+
+`assess-registered` 只读取 `FAMILY-REGISTRY.json` 中 `native_mechanism` 的候选，
+不扫描候选目录，也不把未登记文件加入结果。它核对包清单对 registry、CATALOG、
+候选、review 及 review dependencies 的 SHA-256 承诺，检查候选格式、entry 顺序及
+record hash，并要求 CATALOG 的机制研究条目与登记闭合。路径必须留在明确的 knowledge
+根目录内；登记损坏、漏项或 hash 不符会使本次评估失败，不生成部分报告。
+这些检查证明输入相对本地清单自洽，不是外部签名或新来源版本证明。
+
+输出是 `dst-registered-source-compatibility/1` JSON sidecar，包含逐候选、逐引用、
+claim / API contract / mechanism step 结果、`topic_summary` 与 `difference_summary`；
+保留原 Scope、unknowns、limitations、review 身份与三轴状态。登记 topic 短名与候选的
+`authored_topic` 描述分别保留。`archive_delta` 在提供旧 ZIP 时列出新增、删除、变化文件，
+不含 Lua 文本；缺旧 ZIP 时为 null，不据此宣称没有变化。
+
+`--output` 必填且必须在 knowledge 根目录外；完整评估及序列化成功后，工具在输出目录
+暂存并以不覆盖的原子硬链接发布新文件。文件系统不支持硬链接、发布失败或目标已存在时
+报错并清理暂存文件，不回退为部分写入。此命令不准备或安装来源、不改旧知识及 Scope，
+也不限制目标 ZIP 的版本。`--baseline` 可省略；单次只接受一份旧 ZIP，多归档候选中与其
+不匹配的引用保留 unknown，不猜测来源身份。匹配字节不消除动态/native/未枚举依赖的
+unknown，也不解除 Coding HOLD 或代表游戏行为验证。
 
 ## 报告的含义
 

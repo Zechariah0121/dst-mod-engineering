@@ -4,6 +4,7 @@ import sys
 from . import __version__
 from .config import KBError
 from .service import Service,MODE_TYPES,FILTERS
+from .native_mechanism import IDENTITY_KINDS
 from .source_epoch_runtime import resolve_epoch, bind_epoch
 
 STR={'type':'string'}
@@ -23,8 +24,12 @@ TOOLS=[
  tool('search_kb','Search a unified, ranked pool of Legacy, N001 and Native Core candidates for DST engineering. Deliver only whole original atoms admitted for this task and its positive/negative scope. Named samples require their own bounded original evidence and task relation under a fixed source version; relevance of the containing record alone is insufficient. Use projection=reviewer and view=decision for existing-code review or Native API research, then expand only useful IDs. Ranking explains relevance; it does not grant Coding admission or prove evidence. projection controls admission independently from view. Coding hold/prohibited remain excluded in every mode and view. scope_logic=and intersects filter dimensions; or unions them. Not for gameplay advice.',
       {'query':STR,'top_k':INT,'mode':{'type':'string','enum':list(MODE_TYPES)},'projection':PROJECTION,'view':DECISION_VIEW,
        'scope_logic':{'type':'string','enum':['and','or'],'default':'and'}}|{k:ARRAY for k in SEARCH_FILTERS}),
- tool('lookup_api','Navigate an exact declaration identity to mapped preserved typed claims; contract_delivery separates actual claim delivery, partial delivery and identity-only navigation. Use source_file to select the exact original scripts/...lua path when accepted physical declarations are ambiguous. Repeated records of one physical declaration do not create ambiguity. File-local declarations remain file-local. A catalog scope gap never establishes that the API is absent. Same-name methods of different owners do not substitute. Exact symbols alone are not method contracts. Defaults to projection=reviewer and compact view=decision; exact lookup is research navigation, not a Coding default or admission promotion. Inspect scope, corrections and current vanilla source; expand a selected ID only as needed.',
+ tool('lookup_api','Default family=legacy preserves the historical physical declaration lookup. Explicit family=native_mechanism requires projection=reviewer and returns whole research API atoms, Scope, unknowns and version locators under max_bytes. Research identity is authored, never a public/physical API guarantee; ambiguous owners, sources, visibility or evidence versions require explicit disambiguation. Bare leaf or exact qualified identities including require("module").field are supported; signatures and dynamic expressions are not. owner and identity_kind narrow only the research route. Navigate an exact declaration identity to mapped preserved typed claims; contract_delivery separates actual claim delivery, partial delivery and identity-only navigation. Use source_file to select the exact original scripts/...lua path when accepted physical declarations are ambiguous. Repeated records of one physical declaration do not create ambiguity. File-local declarations remain file-local. A catalog scope gap never establishes that the API is absent. Same-name methods of different owners do not substitute. Exact symbols alone are not method contracts. Defaults to projection=reviewer and compact view=decision; exact lookup is research navigation, not a Coding default or admission promotion. Inspect scope, corrections and current vanilla source; expand a selected ID only as needed.',
       {'symbol':STR,'top_k':INT,'projection':REVIEWER_PROJECTION,'view':DECISION_VIEW,
+       'family':{'type':'string','enum':['legacy','native_mechanism'],'default':'legacy'},
+       'owner':{'type':'string','maxLength':256},
+       'identity_kind':{'type':'string','enum':list(IDENTITY_KINDS)},
+       'max_bytes':{'type':'integer','minimum':1000,'maximum':64000,'default':24000},
        'source_file':{'type':'string','maxLength':512,
                       'description':'Optional exact original scripts/...lua path. Required when accepted same-name declarations belong to different sources; does not promote file-local declarations to public APIs.'}},['symbol']),
  tool('get_entry','Read one canonical knowledge ID. Omitting view preserves the legacy call shape; explicit view=decision is compact, reviewer adds research detail, evidence exposes evidence navigation. projection separately controls admission: selecting a view never bypasses Coding HOLD. For research use projection=reviewer, then resolve one exact evidence reference if necessary.',
@@ -100,7 +105,11 @@ class Server:
             if context is not None:context.assert_current()
             result=getattr(service,name)(**arguments)
         # Preserve the established omitted-view get_entry payload, notably N001's exact ten fields.
-        if context is not None and isinstance(result,dict) and not (name=='get_entry' and 'view' not in arguments):
+        # Research lookup already charges the complete environment. Re-attaching
+        # it after a budget withhold would exceed the caller's byte limit.
+        if context is not None and isinstance(result,dict) and not (
+                name=='get_entry' and 'view' not in arguments or
+                name=='lookup_api' and arguments.get('family')=='native_mechanism'):
             result={**result,'source_environment':context.metadata()}
         return result
     def handle(self,msg):

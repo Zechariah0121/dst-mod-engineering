@@ -158,7 +158,7 @@
     },
     {
       "name": "lookup_api",
-      "description": "Navigate an exact declaration identity to mapped preserved typed claims; contract_delivery separates actual claim delivery, partial delivery and identity-only navigation. Use source_file to select the exact original scripts/...lua path when accepted physical declarations are ambiguous. Repeated records of one physical declaration do not create ambiguity. File-local declarations remain file-local. A catalog scope gap never establishes that the API is absent. Same-name methods of different owners do not substitute. Exact symbols alone are not method contracts. Defaults to projection=reviewer and compact view=decision; exact lookup is research navigation, not a Coding default or admission promotion. Inspect scope, corrections and current vanilla source; expand a selected ID only as needed.",
+      "description": "Default family=legacy preserves the historical physical declaration lookup. Explicit family=native_mechanism requires projection=reviewer and returns whole research API atoms, Scope, unknowns and version locators under max_bytes. Research identity is authored, never a public/physical API guarantee; ambiguous owners, sources, visibility or evidence versions require explicit disambiguation. Bare leaf or exact qualified identities including require(\"module\").field are supported; signatures and dynamic expressions are not. owner and identity_kind narrow only the research route. Navigate an exact declaration identity to mapped preserved typed claims; contract_delivery separates actual claim delivery, partial delivery and identity-only navigation. Use source_file to select the exact original scripts/...lua path when accepted physical declarations are ambiguous. Repeated records of one physical declaration do not create ambiguity. File-local declarations remain file-local. A catalog scope gap never establishes that the API is absent. Same-name methods of different owners do not substitute. Exact symbols alone are not method contracts. Defaults to projection=reviewer and compact view=decision; exact lookup is research navigation, not a Coding default or admission promotion. Inspect scope, corrections and current vanilla source; expand a selected ID only as needed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -184,6 +184,37 @@
               "evidence"
             ],
             "default": "decision"
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "legacy",
+              "native_mechanism"
+            ],
+            "default": "legacy"
+          },
+          "owner": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "identity_kind": {
+            "type": "string",
+            "enum": [
+              "component_method",
+              "method",
+              "module_export",
+              "file_local",
+              "environment_member",
+              "global",
+              "qualified_member",
+              "unknown"
+            ]
+          },
+          "max_bytes": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 64000,
+            "default": 24000
           },
           "source_file": {
             "type": "string",

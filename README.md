@@ -1,18 +1,18 @@
 # DST Mod Engineering
 
-当前版本 `v2026.10.30.1` 共 210 条登记记录：保留旧 187 条，另有 23 条 native_mechanism 研究（Brain、世界生成、料理/调味、成长/再生）。数量由 `knowledge/FAMILY-REGISTRY.json` 生成 `CATALOG.counts`。研究族仅显式 Reviewer 审阅，保持 `research/restricted/hold`。详见 [机制研究族](docs/native-mechanisms.md)。
+当前版本 `v2026.10.30.2` 共 216 条登记记录：保留旧 187 条，另有 29 条 native_mechanism 研究（Brain、世界生成、料理/调味、成长/再生、温度/潮湿及冻结/火热交互）。数量由 `knowledge/FAMILY-REGISTRY.json` 生成 `CATALOG.counts`。研究族仅显式 Reviewer 审阅，保持 `research/restricted/hold`。详见 [机制研究族](docs/native-mechanisms.md)。
 
 面向《饥荒联机版》Mod 开发的工程 Skill 与知识库：按任务读取知识、核对当前源码，再设计、实现、审查和验证。[English README](README.en.md)
 
-公开知识库位于 `knowledge/`，包含 **210 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 23 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
+公开知识库位于 `knowledge/`，包含 **216 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 29 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
 
 ## 下载
 
-当前发行：[v2026.10.30.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.30.1)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
+当前发行：[v2026.10.30.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.30.2)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
 
 | 附件 | 包含内容与用途 |
 |---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.30.1/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 210 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务 |
+| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.30.2/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 216 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务 |
 
 下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
 
@@ -50,3 +50,5 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 ## 许可
 
 项目自有材料使用 [自定义非商业 LICENSE](LICENSE)，不是 MIT 或 OSI 开源许可。商业使用须另获书面授权；有效历史 MIT 授权与第三方权利仍按各自条款处理。见 [许可说明](docs/licensing.md)。
+
+本轮新增6条生存状态研究、显式研究API身份查询和登记驱动批量源码评估，见[阶段说明](docs/phase4-survival-api.md)。

@@ -20,7 +20,7 @@ def main(argv=None):
     if supplied and supplied[0] == 'maintain-sources':
         from scripts.source_compatibility import main as compatibility_main
         return compatibility_main(supplied[1:])
-    parser = argparse.ArgumentParser(description=__doc__, epilog='maintain-sources assess|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
+    parser = argparse.ArgumentParser(description=__doc__, epilog='maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
     parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources'])
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)

@@ -183,6 +183,21 @@ class PublicProtocolTests(unittest.TestCase):
         self.assertEqual(specs['lookup_api']['inputSchema']['properties']['projection']['default'], 'reviewer')
         self.assertEqual(replies[3]['result'], {})
 
+    def test_research_lookup_protocol_and_cli_budget(self):
+        args={'symbol':'UnregisteredResearchSymbol','family':'native_mechanism',
+              'projection':'reviewer','max_bytes':1000,'source_epoch':EPOCH}
+        value=self.payload('lookup_api',args)
+        self.assertEqual(value['results'],[])
+        self.assertLessEqual(len(json.dumps(value,ensure_ascii=False).encode()),1000)
+        env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1')
+        for key in ('DST_KB_PATH','DST_KB_INDEX','DST_KB_CONFIG'):env.pop(key,None)
+        run=subprocess.run([sys.executable,'-B','-X','utf8',str(SERVICE/'dst_kb_cli.py'),
+                            '--config',str(self.config),'call','--tool','lookup_api',
+                            '--arguments',json.dumps(args)],capture_output=True,text=True,
+                           encoding='utf-8',env=env,timeout=30)
+        self.assertEqual(run.returncode,0,run.stderr)
+        self.assertEqual(json.loads(run.stdout),value)
+
     def test_explicit_decision_view_preserves_exact_fact_and_original_scope(self):
         value = self.payload('get_entry', {'id': FACT, 'projection': 'reviewer',
                              'view': 'decision', 'source_epoch': EPOCH})

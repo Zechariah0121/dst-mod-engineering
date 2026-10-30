@@ -1,0 +1,1626 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "climate",
+  "source_epoch": "760944",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "entries": [
+    {
+      "id": "EXP-TEMP-001",
+      "title": "Temperature 权威温度、受潮热交换与恢复边界",
+      "aliases": [
+        "temperature",
+        "SetTemp",
+        "SetTemperature",
+        "DoDelta",
+        "SetTemperatureInBelly",
+        "GetMoisturePenalty",
+        "externalheaterpower",
+        "温度",
+        "过热",
+        "冻结"
+      ],
+      "engineering_question": "锁温、直接调温与自然更新有什么差异，潮湿如何改变热交换，温度保存与客户端读数是否等同权威值？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "原版 player_common 安装的 temperature/moisture 与 player_classified；限定温度更新和所列恢复消费者。",
+        "excluded": "不覆盖任意Mod覆盖、所有角色/物品、native调度精度、最终画面与联网实测。"
+      },
+      "claims": [
+        {
+          "id": "EXP-TEMP-001-C01",
+          "kind": "NSF",
+          "statement": "player_common 在 SetPristine 后非 master 返回，再安装 temperature 与 moisture；temperature 构造监听 sheltered、先 OnUpdate(0) 再 StartUpdatingComponent。current 属性回调在 player_classified 存在时调用其 SetTemperature。",
+          "evidence_refs": [
+            "P04",
+            "P05",
+            "T01"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C02",
+          "kind": "NSF",
+          "statement": "SetTemperature(value) 将值钳在 mintemp/maxtemp，按 current<0 与 current>overheattemp 的跨阈值变化发开始/停止事件，并无条件发 temperaturedelta(last,new,hasrate)。SetTemp(temp) 另保存 settemp；非nil时立即调 SetTemperature，nil只解除锁温。DoDelta(delta,skipinsulation) 在未跳过时对正增量用夏季、非正增量用冬季保温缩放，再调 SetTemperature；三者均无显式返回。",
+          "evidence_refs": [
+            "T03",
+            "T04",
+            "T02"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C03",
+          "kind": "NSF",
+          "statement": "OnUpdate 先归零 externalheaterpower/delta/rate；settemp非nil、传送中或 health:IsInvincible 时提前退出。正常分支使用环境温度、totalmodifiers 与 GetMoisturePenalty 的和减 current 作为初始delta；后者是 moisture百分比在0与maxmoisturepenalty之间插值再取负，无moisture返回0。保温不是直接提高固定目标温度，计算含环境冷暖与delta方向分支。",
+          "evidence_refs": [
+            "T05",
+            "T06",
+            "T09"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C04",
+          "kind": "NSF",
+          "statement": "所列更新还读取装备/背包/溢出容器/手持热源与食物腹部温度。附近heater经范围衰减与半径截断后，GetIsWet真时按heat正负乘/除WET_HEAT_FACTOR_PENALTY；放热源把heatfactor累加到externalheaterpower，即便本次warmingtemp未高于current。该缓存随后供moisture干燥率使用；不是简单“体温高就更快烘干”。",
+          "evidence_refs": [
+            "T07",
+            "T08",
+            "W04"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C05",
+          "kind": "NSF",
+          "statement": "OnUpdate 在算rate后按rate*dt调温；applyhealthdelta除显式false外默认允许，并在<0或>overheattemp时向health:DoDelta提交负值、overtime=true和cold/hot原因。Health可因nonlethal规则、redirect、无敌/传送等返回0或修改量，所以温度越界不保证实际扣去所请求血量。",
+          "evidence_refs": [
+            "T09",
+            "H01"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C06",
+          "kind": "NSF",
+          "statement": "OnSave只保存current和腹部温度delta/相对剩余时间。OnLoad先恢复腹部任务；非玩家恢复current后OnUpdate(0)，玩家则根据载入时current与世界温度有条件向已保存值收敛，可能不采用保存值；未保存settemp、普通modifier表或保温modifier。TransferComponent要求目标有temperature，转移current与仍有任务的腹部剩余时长，不是完整复制。",
+          "evidence_refs": [
+            "T03",
+            "T04",
+            "T09"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C07",
+          "kind": "EI",
+          "statement": "SetTemperatureInBelly覆盖delta/截止时间，取消旧任务并建新实体任务；ClearBellyTemperature清字段并取消任务。OnRemoveFromEntity先ClearBellyTemperature，再在classified非nil时访问isfreezing:set(false)，最后才移除sheltered监听。本归档player_classified整文件未出现isfreezing；若运行时也无该字段，此访问会中断后续清理。RemoveComponent先停更新并清组件槽，再直接调hook，无局部回滚；实体整体Remove另有事件和任务清理路径，不能将两类移除混同。",
+          "evidence_refs": [
+            "T02",
+            "C06",
+            "E02",
+            "E03"
+          ]
+        },
+        {
+          "id": "EXP-TEMP-001-C08",
+          "kind": "NSF",
+          "statement": "玩家GetTemperature/IsFreezing/IsOverheating优先用权威组件，缺少组件时读classified，缺classified回退起始温度/false。classified以net_byte编码温度，中段精度因子4、两侧因子1；客户端解码跨阈值时重发temperaturedelta及开始/停止事件，payload无服务器的hasrate。classified被设置为该玩家目标，不能假定任意远端玩家有精确完整温度状态。",
+          "evidence_refs": [
+            "P01",
+            "P02",
+            "P03",
+            "C01",
+            "C02",
+            "C03",
+            "C04",
+            "C05"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Temperature:SetTemperature(value)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "value:可用于math.clamp的数值"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "组件存在；同步事件监听可执行"
+          ],
+          "side_effects": [
+            "钳制current、属性同步；跨阈值事件与temperaturedelta；不设置锁温"
+          ],
+          "lifecycle": "直接调温；OnUpdate/读档/转移复用",
+          "evidence_refs": [
+            "T01",
+            "T03"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Temperature:SetTemp(temp)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "temp:数值或nil"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "非nil需适用于SetTemperature"
+          ],
+          "side_effects": [
+            "保存settemp；非nil立即设置温度；nil不立即重算温度"
+          ],
+          "lifecycle": "锁温/恢复更新；原版死亡与复活使用",
+          "evidence_refs": [
+            "T03",
+            "P06",
+            "P07"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Temperature:DoDelta(delta, skipinsulation)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "delta:数值；skipinsulation:真值跳过缩放"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "保温计算所依赖装备/世界状态可用"
+          ],
+          "side_effects": [
+            "按方向保温缩放后SetTemperature；本方法不检查settemp或无敌"
+          ],
+          "lifecycle": "显式调温，不等同自然OnUpdate",
+          "evidence_refs": [
+            "T02",
+            "T05",
+            "T03"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Temperature:SetTemperatureInBelly(delta, duration)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "delta:腹部温度偏移；duration:用于截止时间与任务的数值"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "有效实体提供DoTaskInTime；未在入口校验正时长或回调异常"
+          ],
+          "side_effects": [
+            "覆盖旧腹部字段、取消旧任务并排新任务"
+          ],
+          "lifecycle": "任务到时清理；OnLoad恢复剩余时长；OnRemove先清腹部任务",
+          "evidence_refs": [
+            "T02",
+            "T03"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Temperature:OnUpdate(dt, applyhealthdelta)",
+          "source_file": "scripts/components/temperature.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "dt:更新秒数；applyhealthdelta:仅false抑制本次健康提交"
+          ],
+          "returns": [
+            "nil，包括提前退出"
+          ],
+          "preconditions": [
+            "实体/世界、所走热源分支组件与回调满足读取；无事务保护"
+          ],
+          "side_effects": [
+            "重算缓存、更新温度、可提交cold/hot健康变化；早退时缓存仍清零"
+          ],
+          "lifecycle": "组件更新；构造/载入使用dt=0",
+          "evidence_refs": [
+            "T01",
+            "T06",
+            "T07",
+            "T08",
+            "T09",
+            "H01"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "在master侧安装组件，初始化current与更新监听。",
+          "evidence_refs": [
+            "P04",
+            "P05",
+            "T01"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "权威更新从moisture百分比和GetIsWet读取两类受潮信息，合并热源并产生externalheaterpower。",
+          "evidence_refs": [
+            "T05",
+            "T06",
+            "T07",
+            "T08",
+            "E01"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "更新rate与current并提交健康变化；同步用压缩classified传值，客户端自行重发事件。",
+          "evidence_refs": [
+            "T09",
+            "H01",
+            "C01",
+            "C02",
+            "C03",
+            "C04",
+            "P02"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "保存只保留有限字段；腹部任务可恢复；组件单独移除存在条件性清理风险。",
+          "evidence_refs": [
+            "T02",
+            "T03",
+            "C06",
+            "E02",
+            "E03"
+          ]
+        }
+      ],
+      "unknowns": [
+        "isfreezing的native/动态运行时注入未核实，所列条件性移除风险未在游戏重现。",
+        "未运行健康、腹部计时、死亡复活、存读档或远端事件；不据静态阈值声称实际冻伤/画面。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "P04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T06",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T09",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T07",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T08",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "H01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C06",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          }
+        ],
+        "unknowns": [
+          "枚举实际引用，不声称完整动态/native依赖闭包；新源码需逐引用复核。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-WET-001",
+      "title": "Moisture 降雨、装备、热源干燥与状态消费者",
+      "aliases": [
+        "moisture",
+        "GetMoistureRate",
+        "GetDryingRate",
+        "GetWaterproofness",
+        "GetEquippedMoistureRate",
+        "OnUpdate",
+        "潮湿",
+        "干燥",
+        "防水"
+      ],
+      "engineering_question": "降雨防水是否阻止所有受潮，烘干读取体温还是热源缓存，潮湿百分比与湿状态的消费者有何区别？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "原版玩家moisture/temperature、inventory调用接口与sanity消费；不展开全部装备/吸湿器实现。",
+        "excluded": "不覆盖任意Mod覆盖、所有角色/物品、native调度精度、最终画面与联网实测。"
+      },
+      "claims": [
+        {
+          "id": "EXP-WET-001-C01",
+          "kind": "NSF",
+          "statement": "构造默认maxmoisture=100、moisture=0、numSegs=5，配置防水和外部bonus SourceModifierList并启动组件更新；字段属性回调分别写classified数值/ratescale和replica湿布尔。GetMoisturePercent直接moisture/maxmoisture，没有零分母保护。",
+          "evidence_refs": [
+            "W01",
+            "W02",
+            "W07"
+          ]
+        },
+        {
+          "id": "EXP-WET-001-C02",
+          "kind": "NSF",
+          "statement": "GetMoistureRate优先在inventory:IsFloaterHeld或浴池占用时返回maxMoistureRate，否则未下雨返回0，再走降雨路径。降雨路径rainimmunity组件存在即返回0；把sheltered防水、inventory防水、inherentWaterproofness与modifiers相加，合计>=1返回0，否则以降水率easing.inSine乘(1-合计)。GetWaterproofness另一个入口不包含sheltered或rainimmunity，且钳在0..1；不可用它代替降雨路径或将防雨泛化为所有受潮免疫。",
+          "evidence_refs": [
+            "W03"
+          ]
+        },
+        {
+          "id": "EXP-WET-001-C03",
+          "kind": "NSF",
+          "statement": "GetDryingRate(moisturerate)在所传/计算受潮率>0时返回0；Lua中传0为真值，会明确覆盖自动GetMoistureRate。其余按temperature.externalheaterpower钳0..1、GetSegs档位、GetLocalTemperature和当前moisture组合easing并钳最终干燥率；没有temperature时热源功率为0，但其余项仍计算。这里GetLocalTemperature取实体位置后调用GetTemperatureAtXZ，优先在有效半径内选择距离最近的temperatureoverrider，再回退世界net上的fumarolelocaltemperature查询，最后TheWorld.state.temperature；不是读取temperature.current。",
+          "evidence_refs": [
+            "W04",
+            "V01"
+          ]
+        },
+        {
+          "id": "EXP-WET-001-C04",
+          "kind": "NSF",
+          "statement": "GetEquippedMoistureRate由inventory取得rate与max；达到装备上限且两者非0时以min(干燥率,rate)限制，绝对值<=.01视为0。OnUpdate优先采用非nil睡袋干燥率（GetSleepingBagDryingRate钳到>=0），此分支跳过降雨/装备/外部bonus合成；否则rate=降雨或浮具/浴池率+装备率-干燥率+外部bonus。之后有湿度或rate>0才询问moistureabsorberuser:GetBestAbsorberRate，再扣除该返回。",
+          "evidence_refs": [
+            "W04",
+            "W05"
+          ]
+        },
+        {
+          "id": "EXP-WET-001-C05",
+          "kind": "NSF",
+          "statement": "OnUpdate按rate阈值设置ratescale，最后DoDelta(rate*dt, IsInBathingPool())；ratescale取自试图变化的rate，不按边界钳制后的实际delta重新计算，湿度已为0或max仍可能显示非中立方向。LongUpdate仅调用一次OnUpdate(dt)，不是重放历史天气和逐帧热源变化。",
+          "evidence_refs": [
+            "W05",
+            "W02"
+          ]
+        },
+        {
+          "id": "EXP-WET-001-C06",
+          "kind": "EI",
+          "statement": "DoDelta钳湿度到0..max，GetSegs的第一返回为max(0,ceil(moisture/max*numSegs-1))，wet在该值>=2时为真。默认100/5时恰好40仍不湿，超过40才湿；no_announce仅跳过台词，仍发moisturedelta。Temperature:GetMoisturePenalty用连续百分比，附近热源湿惩罚用GetIsWet的布尔选择；sanity:Recalc另按moisture原值/上限算moisture_delta（可由no_moisture_penalty免除）并并入最终rate后DoDelta。",
+          "evidence_refs": [
+            "W02",
+            "T05",
+            "T08",
+            "E01",
+            "S01",
+            "S02"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Moisture:GetWaterproofness()",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [],
+          "returns": [
+            "数值，钳在0..1"
+          ],
+          "preconditions": [
+            "inventory可选；modifiers存在"
+          ],
+          "side_effects": [
+            "读取装备/固有/修饰防水；不计sheltered或rainimmunity"
+          ],
+          "lifecycle": "事件受潮调用接口，不能等同降雨总防水",
+          "evidence_refs": [
+            "W03"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:GetDryingRate(moisturerate)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "moisturerate:可选数值；nil/false自动查询，0明确不走自动查询"
+          ],
+          "returns": [
+            "数值；受潮率>0立即返回0"
+          ],
+          "preconditions": [
+            "GetLocalTemperature/easing可用；maxmoisture和相关参数合理"
+          ],
+          "side_effects": [
+            "读取缓存和环境；自身不修改moisture或消耗装备"
+          ],
+          "lifecycle": "OnUpdate正常合成与调试读取；缓存顺序不保证同帧",
+          "evidence_refs": [
+            "W04"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:DoDelta(num, no_announce)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "num:数值变化；no_announce:真值跳过台词"
+          ],
+          "returns": [
+            "nil；ForceDry时提前nil"
+          ],
+          "preconditions": [
+            "非强制干燥；maxmoisture>0用于分段；talker/监听由实际实体配置"
+          ],
+          "side_effects": [
+            "写moisture和wet、可能台词、发moisturedelta(old,new)；无回调回滚"
+          ],
+          "lifecycle": "显式变化、更新与SetPercent复用",
+          "evidence_refs": [
+            "W01",
+            "W02"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:OnUpdate(dt)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "dt:数值秒数"
+          ],
+          "returns": [
+            "nil；强制干燥提前返回"
+          ],
+          "preconditions": [
+            "所走分支inventory/睡袋/吸湿器等调用可用；无局部错误保护"
+          ],
+          "side_effects": [
+            "重算rate/ratescale；可能调用吸湿器接口；最终DoDelta"
+          ],
+          "lifecycle": "自动更新；LongUpdate仅转交一次",
+          "evidence_refs": [
+            "W04",
+            "W05",
+            "W02"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "根据浮具/浴池或降雨与防水决定环境受潮率。",
+          "evidence_refs": [
+            "W03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "读取temperature热源缓存与局部环境计算干燥，合并装备/bonus或采用睡袋覆盖。",
+          "evidence_refs": [
+            "W04",
+            "T08",
+            "W05"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "吸湿器接口提供额外扣率，按dt变化湿度；湿布尔、连续百分比、理智及HUD分别消费。",
+          "evidence_refs": [
+            "W05",
+            "W02",
+            "W07",
+            "T05",
+            "S01",
+            "S02",
+            "U01",
+            "U02"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未展开inventory全部防水/装备rate提供者、temperatureoverrider/fumarole内部温度来源与moistureabsorberuser消耗/选择算法；不声称这些依赖已闭包。",
+        "未确认组件同帧更新顺序，externalheaterpower是最后计算的缓存；未运行天气、浴池、睡袋或吸湿器。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "W01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W07",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "V01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T08",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "S01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "S02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          }
+        ],
+        "unknowns": [
+          "枚举实际引用，不声称完整动态/native依赖闭包；新源码需逐引用复核。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-WET-002",
+      "title": "Moisture 多来源强制干燥、读档与客户端可见边界",
+      "aliases": [
+        "ForceDry",
+        "SetMoistureLevel",
+        "SetPercent",
+        "OnLoad",
+        "TransferComponent",
+        "forcedrysources",
+        "moisture_replica",
+        "moisturedelta",
+        "强制干燥",
+        "潮湿存档"
+      ],
+      "engineering_question": "ForceDry解除一个来源是否足够恢复，读档会立刻重算湿布尔吗，客户端能读取其他玩家完整湿度吗？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "760944",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "权威moisture多来源控制、原版死亡/复活调用、保存/转移和玩家classified/通用湿布尔。",
+        "excluded": "不覆盖任意Mod覆盖、所有角色/物品、native调度精度、最终画面与联网实测。"
+      },
+      "claims": [
+        {
+          "id": "EXP-WET-002-C01",
+          "kind": "NSF",
+          "statement": "ForceDry(force,source)默认source=self.inst。首个真值来源先归零rate/ratescale，调用SetMoistureLevel(0)，停组件更新，再创建forcedrysources；增加其他来源不重复归零，重复来源提前返回。外部来源绑定onremove；撤销已登记来源先解绑该来源监听，再从集合删除，最后一个消失才清集合并StartUpdatingComponent。解除未知来源不改变状态。",
+          "evidence_refs": [
+            "W01"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C02",
+          "kind": "NSF",
+          "statement": "IsForceDry只判断forcedrysources非nil；DoDelta、SetMoistureLevel与OnUpdate均在此状态提前返回，LongUpdate也受OnUpdate保护。GetWaterproofInventory返回waterproofinventory或IsForceDry，但并未重写GetWaterproofness。强制干燥不是只加一次-湿度或只阻止雨水。",
+          "evidence_refs": [
+            "W01",
+            "W02",
+            "W03",
+            "W05"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C03",
+          "kind": "NSF",
+          "statement": "SetMoistureLevel(num)在非强制干燥时钳值、重算wet，再发moisturedelta；其payload的old和new均是更新后的moisture，不能靠该事件恢复旧值。SetPercent(per)通过DoDelta(maxmoisture*per-current)执行，使用DoDelta台词和事件路径。两者均无显式返回。",
+          "evidence_refs": [
+            "W02"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C04",
+          "kind": "NSF",
+          "statement": "OnSave只写moisture。OnLoad接受非nil data/moisture后直接赋moisture，触发数值属性回调但未调用SetMoistureLevel、未重算wet或ratescale、未发moisturedelta，也未恢复forcedrysources/bonus。后续非强制干燥的DoDelta/OnUpdate才可重算wet。TransferComponent要求新实体有moisture，通过目标SetPercent转移百分比；若目标ForceDry，DoDelta早退，不保证转移生效。",
+          "evidence_refs": [
+            "W01",
+            "W02",
+            "W05",
+            "W06"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C05",
+          "kind": "NSF",
+          "statement": "player_common_extensions的死亡公共路径对自身ForceDry(true,inst)，并在适用no_temperature条件下SetTemp(STARTING_TEMP)；CommonActualRez撤销自身ForceDry并以SetTemp(nil)恢复自然温度更新。若仍有其他强制干燥来源，自身撤销不恢复湿度更新。所列路径保留组件，不靠删除/重建temperature/moisture恢复。",
+          "evidence_refs": [
+            "P06",
+            "P07",
+            "W01",
+            "T03"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C06",
+          "kind": "EI",
+          "statement": "Moisture没有自定义OnRemoveFromEntity（本文件至return已覆盖）；ForceDry登记的外部onremove监听由source拥有者事件系统登记在inst上。通用RemoveComponent停更新并清组件槽但不会调用实体RemoveAllEventCallbacks，不能宣称单独移除moisture会自动解绑这些监听；后续source移除仍可能触发旧组件闭包。实体整体Remove另有RemoveAllEventCallbacks和CancelAllPendingTasks清理。",
+          "evidence_refs": [
+            "W08",
+            "W01",
+            "E02",
+            "E03"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C07",
+          "kind": "NSF",
+          "statement": "moisture_replica仅net_bool _iswet与SetIsWet/IsWet；GetIsWet按无效、wet标签、moistureimmunity标签优先判定，再优先inventoryitem replica否则moisture replica，最后世界湿/雨点许可或游泳回退，不等于直接读取moisture百分比。玩家GetMoisture/GetMaxMoisture/GetMoistureRateScale优先组件，缺组件则读classified，缺classified回退0/100/中立。",
+          "evidence_refs": [
+            "W07",
+            "E01",
+            "P01",
+            "P03"
+          ]
+        },
+        {
+          "id": "EXP-WET-002-C08",
+          "kind": "NSF",
+          "statement": "classified的moisture/maxmoisture是net_ushortint、ratescale是net_tinybyte；moisture与ratescale共用moisturedirty，客户端OnMoistureDirty可重发old==new的moisturedelta。StatusDisplays订阅owner事件并从owner读取上限和ratescale更新湿度表。classified目标设置为该玩家，所以远端可见湿布尔不意味着能读完整湿度、上限与变化率；没有验证实际复制延迟、初始UI或远端画面。",
+          "evidence_refs": [
+            "C03",
+            "C04",
+            "P02",
+            "U01",
+            "U02"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Moisture:ForceDry(force, source)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "force:真值添加来源，假值撤销来源；source:实体来源，nil默认为自身"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "外部source支持事件；调用方持有相同来源身份才能撤销自身请求"
+          ],
+          "side_effects": [
+            "首来源清湿停更新，外部监听onremove，多来源集合；最后来源撤销才恢复更新"
+          ],
+          "lifecycle": "死亡/复活；外部来源移除自动释放；组件单独移除无专用hook",
+          "evidence_refs": [
+            "W01",
+            "P06",
+            "P07",
+            "E02"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:SetMoistureLevel(num)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "num:数值目标湿度"
+          ],
+          "returns": [
+            "nil，包括ForceDry早退"
+          ],
+          "preconditions": [
+            "非强制干燥、maxmoisture用于分段有效"
+          ],
+          "side_effects": [
+            "钳值并更新wet；发old==new的新值事件；不播台词"
+          ],
+          "lifecycle": "直接设置，不等同DoDelta旧值语义",
+          "evidence_refs": [
+            "W02"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:OnLoad(data)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "data:可nil；非nil时读取moisture"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "有效保存数据；此方法不校验范围或类型"
+          ],
+          "side_effects": [
+            "直接赋moisture；属性回调可同步数值；不重算wet/率、不发moisturedelta"
+          ],
+          "lifecycle": "恢复有限持久字段，非完整瞬时状态",
+          "evidence_refs": [
+            "W01",
+            "W06"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        },
+        {
+          "symbol": "Moisture:TransferComponent(newinst)",
+          "source_file": "scripts/components/moisture.lua",
+          "visibility": "原版玩家在 master 分界后安装的权威组件方法；不保证客户端有该组件；静态声明不授予公共稳定 API 身份。",
+          "parameters": [
+            "newinst:目标实体，要求components.moisture"
+          ],
+          "returns": [
+            "nil，无显式返回"
+          ],
+          "preconditions": [
+            "源maxmoisture可作除数；目标组件有效；目标ForceDry可能拒绝变化"
+          ],
+          "side_effects": [
+            "目标SetPercent→DoDelta，可触发台词/事件；不复制来源/bonus"
+          ],
+          "lifecycle": "实体状态迁移，非完整组件复制",
+          "evidence_refs": [
+            "W06",
+            "W02"
+          ],
+          "unknowns": [
+            "未运行；自定义回调、native 引擎、远端时序与异常恢复不由本声明保证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "来源按实体身份加入强制干燥集合，首来源归零停更新。",
+          "evidence_refs": [
+            "W01",
+            "W02"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "自身死亡/复活路径仅添加/撤销自身来源，其他来源仍生效。",
+          "evidence_refs": [
+            "P06",
+            "P07",
+            "W01"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "保存只写数值；载入赋数值与后续wet重算分离，转移通过目标正常变化路径。",
+          "evidence_refs": [
+            "W06",
+            "W01",
+            "W02",
+            "W05"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "湿布尔走公共replica；数值/率走玩家classified→owner读法→HUD，单独组件移除还需自行处理外部监听风险。",
+          "evidence_refs": [
+            "W07",
+            "E01",
+            "P01",
+            "P02",
+            "C03",
+            "C04",
+            "U01",
+            "U02",
+            "E02",
+            "E03"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未执行ForceDry多来源/外部移除、单独组件移除残余监听、读档或目标ForceDry转移场景。",
+        "不把原版moistureimmunity/rainimmunity业务或全部角色复活实现视为本条覆盖；native复制和动态附加字段仍未知。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "W01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W05",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W06",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P06",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P07",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "T03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W08",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "W07",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "E01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C03",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "C04",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "P02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "U01",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          },
+          {
+            "ref": "U02",
+            "role": "本条局部定义或必要调用/消费/恢复/可见边界；详见claims与API引用"
+          }
+        ],
+        "unknowns": [
+          "枚举实际引用，不声称完整动态/native依赖闭包；新源码需逐引用复核。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "V01",
+      "source_file": "scripts/components/temperatureoverrider.lua",
+      "file_sha256": "271c286a7c08b787e0e2ceffd6ff2f213d2b37f448d17986e7056655d91a2ca8",
+      "line_start": 1,
+      "line_end": 37,
+      "range_sha256": "c0b8230954757a6ba356f60cd83bd291ac94a125450318e833e24a59b15f6c82",
+      "symbols": [
+        "GetLocalTemperature",
+        "GetTemperatureAtXZ"
+      ]
+    },
+    {
+      "id": "W08",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 1,
+      "line_end": 397,
+      "range_sha256": "b85fccee15804be619afa007417f93bd2150a68898226d6b25f0ff37887b053d",
+      "symbols": [
+        "Moisture",
+        "OnRemoveFromEntity absence"
+      ]
+    },
+    {
+      "id": "T01",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 7,
+      "line_end": 61,
+      "range_sha256": "777b86918bddb146e613239205f8db840abf1f21ca3753d6ecfd506c62746069",
+      "symbols": [
+        "Temperature",
+        "oncurrent",
+        "onsheltered"
+      ]
+    },
+    {
+      "id": "T02",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 71,
+      "line_end": 109,
+      "range_sha256": "8d5ab15f89033b0157678f2302f383dccca32ed654c765c91f56bc1296a53ba7",
+      "symbols": [
+        "Temperature:DoDelta",
+        "Temperature:SetTemperatureInBelly",
+        "Temperature:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "T03",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 119,
+      "line_end": 179,
+      "range_sha256": "cca14aed698ee8f09aec8c21ef106d327ba067523d173434fd0102f632757e54",
+      "symbols": [
+        "Temperature:OnSave",
+        "Temperature:OnLoad",
+        "Temperature:SetTemp",
+        "Temperature:SetTemperature"
+      ]
+    },
+    {
+      "id": "T04",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 190,
+      "line_end": 229,
+      "range_sha256": "f1c28fa1a78e63b0505431ebeb440cd05b6686931b6e12b5e91373f7b92f31d4",
+      "symbols": [
+        "Temperature:IsFreezing",
+        "Temperature:IsOverheating",
+        "Temperature:SetModifier",
+        "Temperature:RemoveModifier"
+      ]
+    },
+    {
+      "id": "T05",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 254,
+      "line_end": 307,
+      "range_sha256": "0862b68e09853adaaa8e2aaf3660e35f03eea431269f39abc7163e38e95e28d3",
+      "symbols": [
+        "Temperature:GetInsulation",
+        "Temperature:GetMoisturePenalty"
+      ]
+    },
+    {
+      "id": "T06",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 311,
+      "line_end": 367,
+      "range_sha256": "bfa0297f81955a13d3449d12708cc8d489dee0323c1d9f00cba97fa32340a69a",
+      "symbols": [
+        "Temperature:OnUpdate"
+      ]
+    },
+    {
+      "id": "T07",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 370,
+      "line_end": 430,
+      "range_sha256": "27d4612216cceac3325c3b279e81dadabb557e94dfab191f5cad443489d97025",
+      "symbols": [
+        "GetEquippedHeat",
+        "GetCarriedHeat",
+        "bellytemperaturedelta"
+      ]
+    },
+    {
+      "id": "T08",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 432,
+      "line_end": 483,
+      "range_sha256": "17ac8594e81203a241217febb2a632b5703f6f32aff75319016b8d864c789d7f",
+      "symbols": [
+        "GetIsWet",
+        "externalheaterpower",
+        "GetHeat"
+      ]
+    },
+    {
+      "id": "T09",
+      "source_file": "scripts/components/temperature.lua",
+      "file_sha256": "630be4b04b06c1e39123dcc56f77e0f262ce57cd49c7f482a1feff2152091741",
+      "line_start": 487,
+      "line_end": 537,
+      "range_sha256": "a6b1f40bde1b77be161ab9759c396d07003a8e34af8ca35de9d265b65599819e",
+      "symbols": [
+        "Temperature:OnUpdate",
+        "Temperature:TransferComponent"
+      ]
+    },
+    {
+      "id": "W01",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 1,
+      "line_end": 97,
+      "range_sha256": "d8273bc16f2b6848162034d3c358aa8e5c64836619ce9c3988a5d89c8fd532cd",
+      "symbols": [
+        "Moisture",
+        "Moisture:ForceDry",
+        "onwet"
+      ]
+    },
+    {
+      "id": "W02",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 118,
+      "line_end": 209,
+      "range_sha256": "faaf0870872bb46e5754a752a1adf2ba8b6f72e8f6dae7a86023d85150309327",
+      "symbols": [
+        "Moisture:DoDelta",
+        "Moisture:SetMoistureLevel",
+        "Moisture:GetSegs",
+        "Moisture:SetPercent"
+      ]
+    },
+    {
+      "id": "W03",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 211,
+      "line_end": 268,
+      "range_sha256": "9f50c424fa4528b70c098353440c4a6dc77cbe7dd9d07657329d3b5e7e4bac85",
+      "symbols": [
+        "Moisture:_GetMoistureRateAssumingRain",
+        "Moisture:GetWaterproofness",
+        "Moisture:GetMoistureRate"
+      ]
+    },
+    {
+      "id": "W04",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 270,
+      "line_end": 307,
+      "range_sha256": "5961aecfc88896aa5b35aa3267638954d5cdbfd2b396f87527685c28770d1e92",
+      "symbols": [
+        "Moisture:GetEquippedMoistureRate",
+        "Moisture:GetDryingRate",
+        "Moisture:GetSleepingBagDryingRate"
+      ]
+    },
+    {
+      "id": "W05",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 317,
+      "line_end": 376,
+      "range_sha256": "7e292334e5264be4e7f36190a3cd6e749d6a9cab610a34e86dd99c3208c3cc4c",
+      "symbols": [
+        "Moisture:OnUpdate",
+        "Moisture:LongUpdate",
+        "Moisture:GetDesiccantBonus"
+      ]
+    },
+    {
+      "id": "W06",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 378,
+      "line_end": 397,
+      "range_sha256": "87086246fa1fa704dc5473d9758c001ab7322c6391aa6b08d587de15355ba335",
+      "symbols": [
+        "Moisture:OnSave",
+        "Moisture:OnLoad",
+        "Moisture:TransferComponent"
+      ]
+    },
+    {
+      "id": "W07",
+      "source_file": "scripts/components/moisture_replica.lua",
+      "file_sha256": "cc9c67b40e3efe631aba0923d43eed977d1b297b78f7bdf57bc714daa59a7c36",
+      "line_start": 1,
+      "line_end": 15,
+      "range_sha256": "cc9c67b40e3efe631aba0923d43eed977d1b297b78f7bdf57bc714daa59a7c36",
+      "symbols": [
+        "Moisture:SetIsWet",
+        "Moisture:IsWet"
+      ]
+    },
+    {
+      "id": "P01",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 204,
+      "line_end": 262,
+      "range_sha256": "e392e5efd803b9b660830e10118d16433c0e990993fce3438fe128fec10a4760",
+      "symbols": [
+        "GetTemperature",
+        "IsFreezing",
+        "IsOverheating",
+        "GetMoisture",
+        "GetMaxMoisture",
+        "GetMoistureRateScale"
+      ]
+    },
+    {
+      "id": "P02",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1006,
+      "line_end": 1017,
+      "range_sha256": "6c4b74352f33247858412bd45b8beeda6b34be248d8b02465a911e7241758b03",
+      "symbols": [
+        "SetClassifiedTarget"
+      ]
+    },
+    {
+      "id": "P03",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2273,
+      "line_end": 2281,
+      "range_sha256": "b88e402c6f336d1be6c4d09a722da7af00b38fcec5bdd28acf695f17311495d8",
+      "symbols": [
+        "GetTemperature",
+        "GetMoisture"
+      ]
+    },
+    {
+      "id": "P04",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2611,
+      "line_end": 2615,
+      "range_sha256": "2487d4220248244af242f1b53a880adef4588a96b5e9477d5e1062599503f21d",
+      "symbols": [
+        "ismastersim",
+        "SetPristine"
+      ]
+    },
+    {
+      "id": "P05",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2731,
+      "line_end": 2738,
+      "range_sha256": "2b6a4ff719fd58b8733beb61487725f6b1ecba5ff2c52b0193366fc2433a1506",
+      "symbols": [
+        "temperature",
+        "moisture",
+        "sheltered"
+      ]
+    },
+    {
+      "id": "P06",
+      "source_file": "scripts/prefabs/player_common_extensions.lua",
+      "file_sha256": "ecb56d5f56c0a4da718e8da191bd894d5bbc50aaa5a502c59129b73caf51cd94",
+      "line_start": 267,
+      "line_end": 304,
+      "range_sha256": "f08bf5f14bcb3fd11f1253897a11d273451fe9264d13f99d1b629ea9548c779e",
+      "symbols": [
+        "CommonActualRez",
+        "ForceDry",
+        "SetTemp"
+      ]
+    },
+    {
+      "id": "P07",
+      "source_file": "scripts/prefabs/player_common_extensions.lua",
+      "file_sha256": "ecb56d5f56c0a4da718e8da191bd894d5bbc50aaa5a502c59129b73caf51cd94",
+      "line_start": 632,
+      "line_end": 671,
+      "range_sha256": "7a9c6bec0d639420f3ab66c5d15fd0576fa7dbec80ae447fecf1da5aff0b0488",
+      "symbols": [
+        "ForceDry",
+        "SetTemp"
+      ]
+    },
+    {
+      "id": "C01",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 196,
+      "line_end": 211,
+      "range_sha256": "2870933022f5864dbbe890951b2dd244a0236a414917de47f4de860b4d45b25e",
+      "symbols": [
+        "SetTemperature"
+      ]
+    },
+    {
+      "id": "C02",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 237,
+      "line_end": 245,
+      "range_sha256": "01db02542d442a7454d4c3da2a7666230908f5c30d527ea6405b0ab03aa05641",
+      "symbols": [
+        "DeserializeTemperature"
+      ]
+    },
+    {
+      "id": "C03",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 514,
+      "line_end": 557,
+      "range_sha256": "73fef310854c85dca0a35650e5aa2373501b55f2bb21834ee2cb517d9c31c1f6",
+      "symbols": [
+        "OnMoistureDirty",
+        "OnTemperatureDirty"
+      ]
+    },
+    {
+      "id": "C04",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1448,
+      "line_end": 1459,
+      "range_sha256": "d52cb886dfce4fc1cd2ca88b2d490fc8d30b9a887efdd1f73291ea5b5f63e7dd",
+      "symbols": [
+        "currenttemperaturedata",
+        "moisture",
+        "maxmoisture",
+        "moistureratescale"
+      ]
+    },
+    {
+      "id": "C05",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1660,
+      "line_end": 1677,
+      "range_sha256": "4772751066ddbb33303a11e155641777222d6275e8bd898a271df3ff25c24722",
+      "symbols": [
+        "ismastersim",
+        "SetTemperature",
+        "SetValue"
+      ]
+    },
+    {
+      "id": "E01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 793,
+      "line_end": 810,
+      "range_sha256": "b9173babad3467c6391f93a8d8b46d149e2af6cde1f64951f3896f4eb233c8f3",
+      "symbols": [
+        "EntityScript:GetIsWet"
+      ]
+    },
+    {
+      "id": "E02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "E03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1765,
+      "range_sha256": "92d4118d16a4c0ce9ada4b621b8cb38cc06bcb5c1d17ab59e7350453a2b0773f",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "H01",
+      "source_file": "scripts/components/health.lua",
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "line_start": 613,
+      "line_end": 648,
+      "range_sha256": "cad6df32cb157372f52be0c92f70c1b4f48715dfad90a24b59d8de44bd0bc92b",
+      "symbols": [
+        "Health:DoDelta"
+      ]
+    },
+    {
+      "id": "S01",
+      "source_file": "scripts/components/sanity.lua",
+      "file_sha256": "a6d6e16fc9010ce316995f242ef67c92bec6c0df6023642314358ef1b84745cb",
+      "line_start": 510,
+      "line_end": 526,
+      "range_sha256": "5227ab3dbc33004a7ff33a778c8e5ff0abc1b49ba325cccc9c708f0ff6adefcc",
+      "symbols": [
+        "Sanity:Recalc",
+        "moisture_delta"
+      ]
+    },
+    {
+      "id": "S02",
+      "source_file": "scripts/components/sanity.lua",
+      "file_sha256": "a6d6e16fc9010ce316995f242ef67c92bec6c0df6023642314358ef1b84745cb",
+      "line_start": 587,
+      "line_end": 610,
+      "range_sha256": "b5c9543dedd1211d640f437a29da9b7fd72b105f409907656b974e069b19fb6d",
+      "symbols": [
+        "Sanity:Recalc",
+        "Sanity:DoDelta"
+      ]
+    },
+    {
+      "id": "U01",
+      "source_file": "scripts/widgets/statusdisplays.lua",
+      "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+      "line_start": 40,
+      "line_end": 46,
+      "range_sha256": "621c7889246bcf2b471d5cacb1f59c899266402aeaaad19bbc2938147424fac4",
+      "symbols": [
+        "moisturedelta",
+        "GetMoisture"
+      ]
+    },
+    {
+      "id": "U02",
+      "source_file": "scripts/widgets/statusdisplays.lua",
+      "file_sha256": "088efe5f25a9b4cf4c088f423a605bde54c3e7e1b9bdf7b9e3ae7912a16be02e",
+      "line_start": 963,
+      "line_end": 969,
+      "range_sha256": "9ca83dcf79515e38dc4ab05a6791be7e10b96b6e8cde20da56a5b517fc32f1c1",
+      "symbols": [
+        "StatusDisplays:SetMoisturePercent",
+        "StatusDisplays:MoistureDelta"
+      ]
+    },
+    {
+      "id": "C06",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1,
+      "line_end": 1692,
+      "range_sha256": "440d174d607ee46dc3c6c39e31c4028bd779cd9050e33b71180c8f080d974f89",
+      "symbols": [
+        "player_classified",
+        "isfreezing absence"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "锁定体温、直接调温与自然温度更新有什么区别，存档会保留锁温吗？",
+      "expected_entry_ids": [
+        "EXP-TEMP-001"
+      ],
+      "purpose": "自然中文：温度状态与恢复"
+    },
+    {
+      "query": "Temperature SetTemp SetTemperature DoDelta SetTemperatureInBelly GetMoisturePenalty",
+      "expected_entry_ids": [
+        "EXP-TEMP-001"
+      ],
+      "purpose": "实际symbol：API与温度链"
+    },
+    {
+      "query": "温度低于零就一定扣血，客户端温度事件总带hasrate吗？",
+      "expected_entry_ids": [
+        "EXP-TEMP-001"
+      ],
+      "purpose": "边界负例：健康消费者与客户端payload"
+    },
+    {
+      "query": "防水已经百分之百，漂浮游泳或浴池还会增加潮湿吗？",
+      "expected_entry_ids": [
+        "EXP-WET-001"
+      ],
+      "purpose": "自然中文/负例：降雨与其他入水"
+    },
+    {
+      "query": "GetDryingRate GetMoistureRate externalheaterpower GetEquippedMoistureRate",
+      "expected_entry_ids": [
+        "EXP-WET-001",
+        "EXP-TEMP-001"
+      ],
+      "purpose": "实际symbol：双向跨组件链"
+    },
+    {
+      "query": "湿了要更热才能烘干吗，GetIsWet是否等于湿度大于零？",
+      "expected_entry_ids": [
+        "EXP-WET-001",
+        "EXP-WET-002",
+        "EXP-TEMP-001"
+      ],
+      "purpose": "歧义：连续湿度、湿布尔与热源缓存"
+    },
+    {
+      "query": "潮湿满了箭头就一定中立，长更新会重放历史雨天吗？",
+      "expected_entry_ids": [
+        "EXP-WET-001"
+      ],
+      "purpose": "边界负例：ratescale与LongUpdate"
+    },
+    {
+      "query": "两个来源强制干燥，撤销其中一个或读档会怎样？",
+      "expected_entry_ids": [
+        "EXP-WET-002"
+      ],
+      "purpose": "自然中文：来源恢复与持久化"
+    },
+    {
+      "query": "ForceDry forcedrysources SetMoistureLevel OnLoad TransferComponent moisture_replica",
+      "expected_entry_ids": [
+        "EXP-WET-002"
+      ],
+      "purpose": "实际symbol：生命周期与可见边界"
+    },
+    {
+      "query": "设置湿度事件的old一定是旧值，保存后读取wet会立刻一致吗？",
+      "expected_entry_ids": [
+        "EXP-WET-002"
+      ],
+      "purpose": "边界负例：payload与派生值"
+    },
+    {
+      "query": "远端看到角色湿了，就能读到该玩家准确温度和湿度吗？",
+      "expected_entry_ids": [
+        "EXP-TEMP-001",
+        "EXP-WET-002"
+      ],
+      "purpose": "端别歧义：public布尔与owner classified"
+    },
+    {
+      "query": "种植土壤moisturegrid与farming_manager营养网格怎样保存？",
+      "expected_entry_ids": [],
+      "purpose": "主题外负例：农田湿度并非角色潮湿"
+    },
+    {
+      "query": "如何制作温度保温石的配方和贴图？",
+      "expected_entry_ids": [],
+      "purpose": "主题外负例：不覆盖物品制作或资源"
+    }
+  ],
+  "limitations": [
+    "全部为合法本地归档760944/build26306684的静态Lua研究，research/restricted/hold；不刷新旧759671条目的来源身份。",
+    "未运行Lua、游戏、服务器、远端客户端、存读档、来源回调或健康消费者；runtime_verified=false。",
+    "仅输出原创说明与精确ZIP member/行范围/hash；不包含游戏Lua正文或机器绝对路径。",
+    "文件hash按ZIP原字节；范围hash按UTF-8-sig解码splitlines后以LF连接且无尾换行。",
+    "限定所列组件与实际调用链；局部环境温度下游、inventory装备接口、吸湿器和native复制等未作完整依赖闭包。",
+    "温度移除isfreezing缺口为静态条件性风险；未验证运行时是否另有native或动态注入，不宣称已重现崩溃。",
+    "现有库相邻知识涉及食物温度、MoistureImmunity、GetWetMultiplier等，本候选聚焦角色温度/潮湿更新与恢复，不赋予相邻历史记录新的epoch或Coding准入。"
+  ]
+}

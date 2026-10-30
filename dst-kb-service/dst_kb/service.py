@@ -835,9 +835,15 @@ class Service:
 
     @epoch_bound
     @analyzed_request
-    def lookup_api(self,symbol,top_k=5,projection='reviewer',view='decision',source_file=None):
+    def lookup_api(self,symbol,top_k=5,projection='reviewer',view='decision',source_file=None,
+                   family='legacy',owner=None,identity_kind=None,max_bytes=24000):
         self.ready();native.projection(projection)
         if view not in ['decision','reviewer','evidence']:raise KBError('INVALID_ARGUMENT','Unknown view')
+        if family not in ('legacy','native_mechanism'):raise KBError('INVALID_ARGUMENT','Unknown lookup family')
+        if family=='native_mechanism':
+            return self._lookup_mechanism_api(symbol,top_k,projection,view,source_file,owner,identity_kind,max_bytes)
+        if owner is not None or identity_kind is not None:
+            raise KBError('INVALID_ARGUMENT','owner/identity_kind require family=native_mechanism')
         if not isinstance(symbol,str) or len(symbol)>256 or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*(?:[.:][A-Za-z_][A-Za-z0-9_]*)*',symbol.strip()):raise KBError('INVALID_ARGUMENT','Use a bare or qualified API symbol without parameter signature')
         if type(top_k) is not int or not 1<=top_k<=30:raise KBError('INVALID_ARGUMENT','top_k must be 1..30')
         try:
@@ -856,6 +862,61 @@ class Service:
                     'full_method_contract_verified':False,'public_api_inferred':False,
                     'symbol_scope_notice':'Select an exact original source_file for same-name declarations. A catalog scope gap does not establish API absence. File-local declarations remain file-local; identity never proves behavior.'}
             return self._lookup_api_for_source(symbol,top_k,projection,view)
+
+    def _lookup_mechanism_api(self,symbol,top_k,projection,view,source_file,owner,identity_kind,maximum):
+        if projection!='reviewer':raise KBError('ADMISSION_DENIED','Mechanism API research requires explicit Reviewer role')
+        if not isinstance(symbol,str) or len(symbol)>256 or not (re.fullmatch(native_mechanism.NAME,symbol) or re.fullmatch(native_mechanism.MODULE,symbol)):
+            raise KBError('INVALID_ARGUMENT','Use an exact bare/qualified symbol or require("module").field without parameters')
+        if type(top_k) is not int or not 1<=top_k<=30:raise KBError('INVALID_ARGUMENT','top_k must be 1..30')
+        if type(maximum) is not int or not 1000<=maximum<=64000:raise KBError('INVALID_ARGUMENT','max_bytes must be 1000..64000')
+        if owner is not None and (not isinstance(owner,str) or len(owner)>256 or not owner):raise KBError('INVALID_ARGUMENT','owner must be a bounded nonempty string')
+        if identity_kind is not None and identity_kind not in native_mechanism.IDENTITY_KINDS:raise KBError('INVALID_ARGUMENT','Unknown identity_kind')
+        try:source_identity.validate_source_file(source_file)
+        except ValueError as exc:raise KBError('INVALID_ARGUMENT',str(exc)) from exc
+        # Normalize only module quote spelling. Case and owners stay exact.
+        module=re.fullmatch(native_mechanism.MODULE,symbol)
+        if module:symbol='require("'+module['module']+'").'+module['member']
+        matches=native_mechanism.api_matches(self._mechanisms(),symbol,source_file,owner,identity_kind)
+        groups={row[0] for row in matches};ambiguous=len(groups)>1
+        payload={'results':[],'declaration_candidates':[],'withheld_atoms':[],
+                 'symbol':symbol,'projection':'reviewer','view':view,'family':'native_mechanism',
+                 'contract_status':'RESEARCH_IDENTITY_AMBIGUOUS' if ambiguous else 'RESEARCH_SCOPE_GAP',
+                 'disambiguation_required':ambiguous,'total_identity_matches':len(groups),'total_matches':len(matches),
+                 'knowledge_gap':True,'public_api_inferred':False,'full_method_contract_verified':False,
+                 'coding_admission_granted':False,'restricted_research_explicitly_requested':True,
+                 'maximum_payload_bytes':maximum,'notice':native_mechanism.NOTICE,
+                 'candidate_list_truncated':False,'results_truncated':False}
+        if self.epoch_context is not None:payload['source_environment']=self.epoch_context.metadata()
+        def fits(candidate):return serialized_payload_cost(candidate)+100<=maximum
+        if not fits(payload):
+            return {'results':[],'withheld':True,'family':'native_mechanism','reason':'REQUIRED_CONTEXT_EXCEEDS_BUDGET','knowledge_gap':True,'public_api_inferred':False}
+        if ambiguous:
+            seen=set()
+            for key,record,pointer,identity in matches:
+                if key in seen:continue
+                seen.add(key)
+                candidate=dict(identity,id=record['entry']['id'],pointer=pointer)
+                proposed=dict(payload,declaration_candidates=payload['declaration_candidates']+[candidate])
+                if len(payload['declaration_candidates'])<top_k and fits(proposed):payload=proposed
+                else:payload['candidate_list_truncated']=True
+            return payload
+        for key,record,pointer,identity in matches:
+            # All views return the same original whole API atom with its complete
+            # required envelope; decision never summarizes away conditions.
+            atom=native_mechanism.envelope(record,pointer)
+            atom.update(api_identity=identity,whole_value_delivered=True)
+            proposed=dict(payload,results=payload['results']+[atom],knowledge_gap=False,
+                          contract_status='RESEARCH_CONTRACT_DELIVERED')
+            if len(payload['results'])<top_k and fits(proposed):payload=proposed
+            else:
+                payload['results_truncated']=True
+                deferred={'id':record['entry']['id'],'pointer':pointer,
+                          'reason':'TOP_K_LIMIT' if len(payload['results'])>=top_k else 'WHOLE_ATOM_AND_REQUIRED_CONTEXT_EXCEED_BUDGET',
+                          'followup':{'tool':'get_entry','id':record['entry']['id'],'pointer':pointer,'projection':'reviewer','max_bytes':64000}}
+                proposed=dict(payload,withheld_atoms=payload['withheld_atoms']+[deferred])
+                if fits(proposed):payload=proposed
+        if matches and payload['results_truncated']:payload['contract_status']='RESEARCH_CONTRACT_PARTIAL' if payload['results'] else 'RESEARCH_CONTRACT_WITHHELD'
+        return payload
 
     def _lookup_api_for_source(self,symbol,top_k=5,projection='reviewer',view='decision'):
         self.ready();native.projection(projection)

@@ -1,6 +1,6 @@
 # Skill 与知识库接入 / Skill and KB integration
 
-版本 `v2026.10.30.1` 将 Skill 与 210 条登记知识（旧 187 条 + 23 条独立机制研究）串联分发，默认知识目录为 `knowledge/`。同一发行包包含来源准备工具与 MCP 的目录模式、完整九工具模式；文件读取和 MCP 使用唯一 `knowledge/`，旧版由 Git 历史保留。
+版本 `v2026.10.30.2` 将 Skill 与 216 条登记知识（旧 187 条 + 29 条独立机制研究）串联分发，默认知识目录为 `knowledge/`。同一发行包包含来源准备工具与 MCP 的目录模式、完整九工具模式；文件读取和 MCP 使用唯一 `knowledge/`，旧版由 Git 历史保留。
 
 ## 不运行 MCP：按文件读取
 
@@ -11,7 +11,7 @@
 | 64 条基础知识 | `knowledge/data/entries.json` | 按统一目录的 `file`、`pointer` 读取指定条目及相关更正 |
 | 13 条 Native AI 知识 | `knowledge/data/native001/canonical-native001-ai-knowledge.json` | 按问题选择最多 5 条，Coding 默认只投影文件声明的十字段 |
 | 110 条 Native Core 知识及状态 | `knowledge/data/nativecore/native-core.json` | 先核对三轴状态与 Scope；保留 Core Coding HOLD，不当作可直接实现的通用契约 |
-| 23 条独立机制研究 | `knowledge/FAMILY-REGISTRY.json` 的 native_mechanism 登记 | 按目录 file/pointer 显式 Reviewer 审阅，保持 research/restricted/hold |
+| 29 条独立机制研究 | `knowledge/FAMILY-REGISTRY.json` 的 native_mechanism 登记 | 按目录 file/pointer 显式 Reviewer 审阅，保持 research/restricted/hold |
 
 用 JSON 解析或定向读取提取所需记录，报告“知识文件读取”及实际记录 ID，不把它写成 MCP 查询。不要把完整 JSON 或全库加入默认提示词。原条目的 NSF、RV、EI、REC、UNK 类型分别读取；公开隐藏的私有情境仍为 `UNK`，不能由标题或关联推回正文。
 

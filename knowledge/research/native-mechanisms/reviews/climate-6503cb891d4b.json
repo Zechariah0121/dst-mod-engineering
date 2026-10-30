@@ -1,0 +1,788 @@
+{
+  "schema": "dst-independent-climate-review/2",
+  "reviewer_window": "B",
+  "review_date": "2026-10-30",
+  "candidate_path": "05-research-history/native-expansion-20261030/climate/candidate.json",
+  "frozen_candidate_path": "05-research-history/native-expansion-20261030/windows/B/frozen-candidate-r2.json",
+  "candidate_sha256": "90b94d2f1fcfb15a5897b5aad232a673ffc44ca2beb11cc5afa1d342046aa046",
+  "source_epoch": "760944",
+  "preserved_service_evidence_epoch": "759671",
+  "archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "runtime_verified": false,
+  "decision": "approved_for_registration",
+  "registration_approved": true,
+  "approval_scope": "仅批准本精确SHA256候选以research/restricted/hold机制研究身份登记；不授予Coding、通用公开API稳定性或游戏运行通过身份。",
+  "summary": "唯一修订为EXP-WET-001机制步骤2追加W05，已独立确认局部来源闭合。其余语义树不变，R1的3个Scope与46单元语义审阅结论保留；46单元现均静态通过，无未解决发现。",
+  "previous_review": {
+    "path": "05-research-history/native-expansion-20261030/windows/B/review.json",
+    "sha256": "e75ae5784e649175e2fba921d4fba2a5577e59c0ff45744a26a55dd0f2f5bf8d",
+    "candidate_sha256": "10c23db7c3d9395fa3fc8098a2b7d21dc0284013bad926cc2b4e35ee0e6f93c9",
+    "decision": "revision_required_reference_only",
+    "preserved_unchanged": true
+  },
+  "revision_diff": {
+    "method": "解析JSON后构造唯一预期补丁并完整深比较，非仅依赖作者说明或hash",
+    "differences": [
+      {
+        "json_pointer": "/entries/1/mechanism_steps/1/evidence_refs",
+        "before": [
+          "W04",
+          "T08"
+        ],
+        "after": [
+          "W04",
+          "T08",
+          "W05"
+        ]
+      }
+    ],
+    "only_expected_change": true,
+    "author_revision_0_matches_B_frozen_R1": true,
+    "generator_only_expected_change": true
+  },
+  "checks": {
+    "ready_candidate_hash_match": true,
+    "archive_hash_match": true,
+    "all_39_reference_file_and_range_hashes": "passed_independent_recomputation",
+    "reference_checks": {
+      "path": "05-research-history/native-expansion-20261030/windows/B/reference-checks-r2.json",
+      "sha256": "cc283b0ad1bbe8c80a14497696ac06cb174209bc6585e3f8c19617568ea5cce8"
+    },
+    "current_repository_contract_validation": "passed",
+    "generator_python_AST": "passed",
+    "source_references_unchanged": true,
+    "scopes_and_governance_unchanged": true,
+    "runtime_test": "not_run",
+    "retrieval_query_behavior": "not_run"
+  },
+  "scope_decisions": [
+    {
+      "entry_id": "EXP-TEMP-001",
+      "json_pointer": "/entries/0/scope",
+      "decision": "supported_static_scope",
+      "rationale": "适用原版玩家master安装与所列组件/消费者；未扩张为任意物品、Mod或运行时闭包。",
+      "runtime_verified": false,
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      }
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "json_pointer": "/entries/1/scope",
+      "decision": "supported_static_scope",
+      "rationale": "适用玩家湿度、温度、装备调用接口与理智消费；inventory供应者、吸湿器内部及局部温度覆盖器内部未闭包。",
+      "runtime_verified": false,
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      }
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "json_pointer": "/entries/2/scope",
+      "decision": "supported_static_scope",
+      "rationale": "适用多来源ForceDry、所列公共死亡/复活、存档/转移及classified/replica；不覆盖相邻免疫业务与所有角色复活实现。",
+      "runtime_verified": false,
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      }
+    }
+  ],
+  "unit_decisions": [
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C01",
+      "json_pointer": "/entries/0/claims/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "P04",
+        "P05",
+        "T01"
+      ],
+      "rationale": "安装端别、构造顺序及classified写入符合P04/P05/T01。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C02",
+      "json_pointer": "/entries/0/claims/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T03",
+        "T04",
+        "T02"
+      ],
+      "rationale": "直接钳值、严格阈值、无条件温度事件及DoDelta方向保温已核实。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C03",
+      "json_pointer": "/entries/0/claims/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T05",
+        "T06",
+        "T09"
+      ],
+      "rationale": "缓存先归零、早退条件及非冰箱自然分支初始delta符合源码；不把摘要视作所有容器分支。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C04",
+      "json_pointer": "/entries/0/claims/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T07",
+        "T08",
+        "W04"
+      ],
+      "rationale": "装备/携带/腹部与附近热源路径成立；放热功率累加不要求本次提高温度。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C05",
+      "json_pointer": "/entries/0/claims/4",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T09",
+        "H01"
+      ],
+      "rationale": "伤害提交与Health消费者可拒绝/改量相符，未提升为实际伤害保证。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C06",
+      "json_pointer": "/entries/0/claims/5",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T03",
+        "T04",
+        "T09"
+      ],
+      "rationale": "玩家条件恢复、非玩家直接恢复和有限转移相符；未声称保存锁温或modifier。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C07",
+      "json_pointer": "/entries/0/claims/6",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T02",
+        "C06",
+        "E02",
+        "E03"
+      ],
+      "rationale": "组件移除的isfreezing访问与classified静态缺口成立；native/动态注入、触发及实际故障仍未知。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-TEMP-001-C08",
+      "json_pointer": "/entries/0/claims/7",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "P01",
+        "P02",
+        "P03",
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05"
+      ],
+      "rationale": "权威优先读法、量化编码、客户端事件payload与owner目标相符；temperaturedelta在解码值变化时产生，阈值决定开始/停止事件。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Temperature:SetTemperature(value)",
+      "json_pointer": "/entries/0/api_contracts/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T01",
+        "T03"
+      ],
+      "rationale": "参数需可钳制、nil返回、写值/事件及非锁温行为相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Temperature:SetTemp(temp)",
+      "json_pointer": "/entries/0/api_contracts/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T03",
+        "P06",
+        "P07"
+      ],
+      "rationale": "nil解除标记且不即时重算，非nil即时设置相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Temperature:DoDelta(delta, skipinsulation)",
+      "json_pointer": "/entries/0/api_contracts/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T02",
+        "T05",
+        "T03"
+      ],
+      "rationale": "保温方向、显式跳过以及不检查锁温/无敌相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Temperature:SetTemperatureInBelly(delta, duration)",
+      "json_pointer": "/entries/0/api_contracts/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T02",
+        "T03"
+      ],
+      "rationale": "覆盖字段、取消并重建任务及未校验时长相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Temperature:OnUpdate(dt, applyhealthdelta)",
+      "json_pointer": "/entries/0/api_contracts/4",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T01",
+        "T06",
+        "T07",
+        "T08",
+        "T09",
+        "H01"
+      ],
+      "rationale": "dt与仅false抑制健康提交、早退清缓存及正常更新副作用相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-1",
+      "json_pointer": "/entries/0/mechanism_steps/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "P04",
+        "P05",
+        "T01"
+      ],
+      "rationale": "master安装/构造链有局部证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-2",
+      "json_pointer": "/entries/0/mechanism_steps/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T05",
+        "T06",
+        "T07",
+        "T08",
+        "E01"
+      ],
+      "rationale": "连续百分比与通用湿布尔分别参与温度，产生热源缓存。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-3",
+      "json_pointer": "/entries/0/mechanism_steps/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T09",
+        "H01",
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "P02"
+      ],
+      "rationale": "权威温度/健康与压缩classified/客户端重发链有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-TEMP-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-4",
+      "json_pointer": "/entries/0/mechanism_steps/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "T02",
+        "T03",
+        "C06",
+        "E02",
+        "E03"
+      ],
+      "rationale": "有限保存、腹部恢复和条件性移除风险有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C01",
+      "json_pointer": "/entries/1/claims/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W02",
+        "W07"
+      ],
+      "rationale": "初始化、属性回调和直接除法已核实。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C02",
+      "json_pointer": "/entries/1/claims/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W03"
+      ],
+      "rationale": "浮具/浴池优先、降雨防水及GetWaterproofness差异相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C03",
+      "json_pointer": "/entries/1/claims/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W04",
+        "V01"
+      ],
+      "rationale": "零参数在Lua中保持显式覆盖；局部环境温度回退链与热源缓存相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C04",
+      "json_pointer": "/entries/1/claims/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W04",
+        "W05"
+      ],
+      "rationale": "装备上限限制、非nil睡袋覆盖和吸湿器额外扣率相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C05",
+      "json_pointer": "/entries/1/claims/4",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W05",
+        "W02"
+      ],
+      "rationale": "ratescale来自尝试rate，LongUpdate仅一次调用相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-001-C06",
+      "json_pointer": "/entries/1/claims/5",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W02",
+        "T05",
+        "T08",
+        "E01",
+        "S01",
+        "S02"
+      ],
+      "rationale": "默认分段边界40不湿、连续百分比/布尔/理智三种消费相符；EI未升级为运行时事实。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:GetWaterproofness()",
+      "json_pointer": "/entries/1/api_contracts/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W03"
+      ],
+      "rationale": "返回钳制防水数值与降雨接口差异相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:GetDryingRate(moisturerate)",
+      "json_pointer": "/entries/1/api_contracts/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W04"
+      ],
+      "rationale": "可选受潮率、正值早退、只读干燥计算相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:DoDelta(num, no_announce)",
+      "json_pointer": "/entries/1/api_contracts/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W02"
+      ],
+      "rationale": "ForceDry早退、旧值事件和可选台词相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:OnUpdate(dt)",
+      "json_pointer": "/entries/1/api_contracts/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W04",
+        "W05",
+        "W02"
+      ],
+      "rationale": "睡袋/正常合成、吸湿器、ratescale及最后DoDelta相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-1",
+      "json_pointer": "/entries/1/mechanism_steps/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W03"
+      ],
+      "rationale": "浮具/浴池或降雨分支有W03证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-2",
+      "json_pointer": "/entries/1/mechanism_steps/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W04",
+        "T08",
+        "W05"
+      ],
+      "rationale": "W05覆盖moisture.lua:338-355中非nil睡袋覆盖及normal分支装备/外部bonus合成；补入后该步骤的局部来源闭合。"
+    },
+    {
+      "entry_id": "EXP-WET-001",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-3",
+      "json_pointer": "/entries/1/mechanism_steps/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W05",
+        "W02",
+        "W07",
+        "T05",
+        "S01",
+        "S02",
+        "U01",
+        "U02"
+      ],
+      "rationale": "吸湿器接口、数值变化及分开的消费概述有列举证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C01",
+      "json_pointer": "/entries/2/claims/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01"
+      ],
+      "rationale": "来源集合去重、首来源清零停更新、外部移除监听与最后来源释放相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C02",
+      "json_pointer": "/entries/2/claims/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W02",
+        "W03",
+        "W05"
+      ],
+      "rationale": "强制干燥保护和旧防水库存接口差异相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C03",
+      "json_pointer": "/entries/2/claims/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W02"
+      ],
+      "rationale": "直接设置old==new事件与SetPercent复用DoDelta相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C04",
+      "json_pointer": "/entries/2/claims/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W02",
+        "W05",
+        "W06"
+      ],
+      "rationale": "读档不钳制/重算派生wet或率、有限持久化及目标ForceDry转移拒绝相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C05",
+      "json_pointer": "/entries/2/claims/4",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "P06",
+        "P07",
+        "W01",
+        "T03"
+      ],
+      "rationale": "所列公共死亡/复活只增删自身来源，no_temperature条件受源码约束。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C06",
+      "json_pointer": "/entries/2/claims/5",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W08",
+        "W01",
+        "E02",
+        "E03"
+      ],
+      "rationale": "整文件无移除hook及通用移除不清实体事件相符；旧闭包后续执行风险另由子审事件注册/更新登记证据支持。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C07",
+      "json_pointer": "/entries/2/claims/6",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W07",
+        "E01",
+        "P01",
+        "P03"
+      ],
+      "rationale": "公共湿布尔、GetIsWet优先级与玩家组件/classified回退读法相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "claims",
+      "unit_id": "EXP-WET-002-C08",
+      "json_pointer": "/entries/2/claims/7",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "C03",
+        "C04",
+        "P02",
+        "U01",
+        "U02"
+      ],
+      "rationale": "数值net类型、共用dirty、owner HUD消费与有限可见性相符；未证明实际复制/画面。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:ForceDry(force, source)",
+      "json_pointer": "/entries/2/api_contracts/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "P06",
+        "P07",
+        "E02"
+      ],
+      "rationale": "实体来源身份、首/末来源状态、无显式返回及移除边界相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:SetMoistureLevel(num)",
+      "json_pointer": "/entries/2/api_contracts/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W02"
+      ],
+      "rationale": "ForceDry保护、重算wet与old==new事件相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:OnLoad(data)",
+      "json_pointer": "/entries/2/api_contracts/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W06"
+      ],
+      "rationale": "nil数据保护与直接赋值/派生状态缺口相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "api_contracts",
+      "unit_id": "Moisture:TransferComponent(newinst)",
+      "json_pointer": "/entries/2/api_contracts/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W06",
+        "W02"
+      ],
+      "rationale": "目标组件前提、百分比经正常变化路径及ForceDry可能拒绝相符。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-1",
+      "json_pointer": "/entries/2/mechanism_steps/0",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W01",
+        "W02"
+      ],
+      "rationale": "按来源身份去重及首来源操作有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-2",
+      "json_pointer": "/entries/2/mechanism_steps/1",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "P06",
+        "P07",
+        "W01"
+      ],
+      "rationale": "公共死亡/复活只控制自身来源有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-3",
+      "json_pointer": "/entries/2/mechanism_steps/2",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W06",
+        "W01",
+        "W02",
+        "W05"
+      ],
+      "rationale": "保存数值、派生wet重算和目标变化路径分离有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    },
+    {
+      "entry_id": "EXP-WET-002",
+      "unit_kind": "mechanism_steps",
+      "unit_id": "step-4",
+      "json_pointer": "/entries/2/mechanism_steps/3",
+      "decision": "supported_static",
+      "evidence_refs_checked": [
+        "W07",
+        "E01",
+        "P01",
+        "P02",
+        "C03",
+        "C04",
+        "U01",
+        "U02",
+        "E02",
+        "E03"
+      ],
+      "rationale": "replica湿布尔与owner数值链、组件移除监听风险有证据。",
+      "review_basis": "R1逐单元语义审阅结论保留；独立结构差异核验确认本单元未改。"
+    }
+  ],
+  "resolved_findings": [
+    {
+      "id": "B-F01",
+      "status": "closed",
+      "json_pointer": "/entries/1/mechanism_steps/1/evidence_refs",
+      "fix": "追加W05",
+      "semantic_verification": "重新阅读scripts/components/moisture.lua:338-355，睡袋覆盖、GetRateBonus及正常合成分支均在W05:317-376范围内；W04/T08/W05共同支持该步骤。",
+      "evidence_ref": "W05",
+      "source_file": "scripts/components/moisture.lua",
+      "file_sha256": "06046db4c227fe04e7af1f17add1827d1595eac0ba52fda548f4ba5ea4caede5",
+      "line_start": 317,
+      "line_end": 376,
+      "range_sha256": "7e292334e5264be4e7f36190a3cd6e749d6a9cab610a34e86dd99c3208c3cc4c"
+    }
+  ],
+  "findings": [],
+  "unresolved_findings": [],
+  "uncovered_boundaries": [
+    "Lua/游戏/服务器/远端客户端均未运行；未实测天气、睡袋、浴池、健康、腹部任务、死亡复活、存读档或转移。",
+    "未验证组件同帧顺序、native复制/调度、isfreezing动态注入及实际温度组件移除故障。",
+    "未展开所有inventory防水/装备rate供应者、吸湿器选择/消耗、局部覆盖器内部、全部免疫与角色业务。",
+    "单独移除moisture的残留来源闭包风险有静态证据，未执行其实际重新登记或运行后果。",
+    "未覆盖任意Mod覆盖兼容、最终HUD画面或远端精确数值可见性。",
+    "现有服务759671历史身份保留；本次研究来源760944不能回填旧记录。"
+  ],
+  "review_method": "仅对针对性修订执行独立冻结、完整JSON树差异与W05语义复验，并重算全部来源hash及当前契约；未重复整套探索，未重新委派，未修改作者候选或覆盖R1。",
+  "final_candidate_rehash": {
+    "sha256": "90b94d2f1fcfb15a5897b5aad232a673ffc44ca2beb11cc5afa1d342046aa046",
+    "unchanged_since_R2_freeze": true
+  }
+}

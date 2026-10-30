@@ -11,10 +11,13 @@ import argparse
 from collections import Counter
 import difflib
 import hashlib
+import importlib.util
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import sys
+import tempfile
 import zipfile
 
 SCHEMA = "dst-source-compatibility/1"
@@ -440,6 +443,129 @@ def legacy_inventory(root):
             "canonical_modified": False, "coding_hold_changed": False, "runtime_verified": False}
 
 
+def registered_documents(root):
+    """Verify the registration closure, never discover candidates by directory scan.
+
+    Use the shipped source-free registry/contract helpers without starting a
+    service, preparing sources, or requiring a configured client environment.
+    Only native_mechanism documents are opened as candidate inputs.
+    """
+    modules = []
+    for name in ("family_registry", "mechanism_contract"):
+        helper = Path(__file__).resolve().parents[1] / "dst-kb-service" / "dst_kb" / (name + ".py")
+        spec = importlib.util.spec_from_file_location("_maintenance_" + name, helper)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        modules.append(module)
+    families, contract = modules
+    root = Path(root).resolve()
+    manifest = families.decode((root / "PACKAGE-MANIFEST.json").read_bytes())
+    commitments = {}
+    for row in manifest["files"]:
+        name, digest = row["path"], row["sha256"]
+        families.inside(root, name)
+        if name in commitments or not isinstance(digest, str) or not HASH.fullmatch(digest):
+            raise ValueError("Duplicate/invalid manifest commitment")
+        commitments[name] = digest
+
+    def committed(name, expected=None):
+        if name not in commitments or expected is not None and expected != commitments[name]:
+            raise ValueError("Registration differs from package commitment: " + str(name))
+        return families.read_committed(root, name, commitments[name])
+
+    registry = committed(families.FILE)
+    if registry.get("schema_version") != families.SCHEMA:
+        raise ValueError("Unsupported family registry")
+    names = [f["name"] for f in registry["families"]]
+    if (len(names) != len(set(names)) or set(names) != {*families.HISTORICAL, "native_mechanism"}):
+        raise ValueError("Incomplete/duplicate family registration")
+    documents, registrations, expected_rows = [], [], []
+    seen_paths, seen_ids = set(), set()
+    for family in registry["families"]:
+        if family["name"] != "native_mechanism":
+            continue
+        for row in family["documents"]:
+            path = families.inside(root, row["file"])
+            if path in seen_paths:
+                raise ValueError("Duplicate registered candidate path")
+            seen_paths.add(path)
+            doc = committed(row["file"], row["sha256"])
+            contract.validate(doc)
+            # Registration uses a navigation slug; authored topic can be a
+            # longer description (e.g. brain/cooking). Preserve both identities.
+            if not isinstance(row["topic"], str) or not row["topic"].strip():
+                raise ValueError("Invalid registered topic")
+            entries = doc["entries"]
+            ids = [e["id"] for e in entries]
+            if (ids != row["entry_ids"] or seen_ids.intersection(ids)
+                    or {e["id"]: families.digest(e) for e in entries} != row["record_sha256"]):
+                raise ValueError("Registered entry identity/body differs")
+            seen_ids.update(ids)
+            review = committed(row["review"]["file"], row["review"]["sha256"])
+            dependencies = row["review"].get("dependencies", [])
+            for dependency in dependencies:
+                committed(dependency["file"], dependency["sha256"])
+            prior = review.get("previous_review", {}).get("sha256")
+            if prior and not any(d["sha256"] == prior for d in dependencies):
+                raise ValueError("Missing exact prior review artifact")
+            if review.get("candidate_sha256") != row["sha256"] or review.get("runtime_verified") is not False:
+                raise ValueError("Review does not bind candidate/no-runtime boundary")
+            for i, entry in enumerate(entries):
+                expected_rows.append({"id": entry["id"], "title": entry["title"],
+                    "family": "native_mechanism", "file": row["file"], "pointer": "/entries/" + str(i),
+                    **{k: entry[k] for k in ("knowledge_status", "retrieval_status", "coding_status")}})
+            documents.append((path, doc))
+            registrations.append(row)
+    catalog = committed("CATALOG.json")
+    if ([r for r in catalog["entries"] if r["family"] == "native_mechanism"] != expected_rows
+            or catalog["counts"].get("native_mechanism") != len(seen_ids) or not documents):
+        raise ValueError("Catalog native_mechanism registration is incomplete")
+    return documents, registrations, {"registry_sha256": commitments[families.FILE],
+        "catalog_sha256": commitments["CATALOG.json"], "candidate_count": len(documents),
+        "entry_count": len(seen_ids), "unregistered_candidates_scanned": False}
+
+
+def assess_registered(root, old, new):
+    documents, registrations, registration = registered_documents(root)
+    result = assess(documents, old, new)
+    result["schema"] = "dst-registered-source-compatibility/1"
+    result["registration"] = registration
+    topics = []
+    for candidate, (_, document), row in zip(result["candidates"], documents, registrations):
+        candidate.update(topic=row["topic"], authored_topic=document["topic"], registered_file=row["file"],
+                         limitations=document["limitations"], review_record=row["review"])
+        for entry_result, entry in zip(candidate["entries"], document["entries"]):
+            entry_result.update(scope=entry["scope"], unknowns=entry["unknowns"])
+        units = [unit for entry in candidate["entries"] for key in
+                 ("claims", "api_contracts", "mechanism_steps") for unit in entry[key]]
+        topics.append({"topic": row["topic"], "authored_topic": document["topic"], "registered_file": row["file"],
+            "candidate_sha256": candidate["candidate_sha256"], "entry_count": len(candidate["entries"]),
+            "reference_status_counts": dict(sorted(Counter(r["status"] for r in candidate["reference_states"]).items())),
+            "unit_status_counts": dict(sorted(Counter(u["source_status"] for u in units).items())),
+            "dependency_status": "unknown", "runtime_verified": False})
+    result["topic_summary"] = topics
+    result["difference_summary"] = {"references_requiring_followup": sum(
+        n for status, n in result["reference_status_counts"].items() if status != "byte_identical"),
+        "entries_requiring_source_followup": sum(e["source_status"] != "byte_identical"
+            for c in result["candidates"] for e in c["entries"]),
+        "dependency_status": "unknown", "archive_delta_available": old is not None}
+    return result
+
+
+def publish_new_json(path, rendered):
+    """Stage a complete report, then atomically link without replacing a target."""
+    path = Path(path)
+    fd, temporary = tempfile.mkstemp(prefix=".source-assessment-", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as stream:
+            stream.write(rendered)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, path)  # Fails if another process created the output.
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
 def main(argv=None):
     supplied = list(sys.argv[1:] if argv is None else argv)
     if supplied and supplied[0] == "legacy-assess":
@@ -457,6 +583,12 @@ def main(argv=None):
     compare.add_argument("--target", type=Path, required=True)
     compare.add_argument("--target-label")
     compare.add_argument("--candidate", type=Path, action="append", required=True)
+    registered = sub.add_parser("assess-registered", help="Assess only manifest-committed native_mechanism candidates")
+    registered.add_argument("--knowledge-root", type=Path, required=True)
+    registered.add_argument("--target", type=Path, required=True)
+    registered.add_argument("--target-label")
+    registered.add_argument("--baseline", type=Path)
+    registered.add_argument("--output", type=Path, required=True, help="New JSON sidecar outside knowledge root")
     navigation = sub.add_parser("locate", help="Navigate any explicit target ZIP without an epoch allowlist")
     navigation.add_argument("--target", type=Path, required=True)
     navigation.add_argument("--target-label")
@@ -470,6 +602,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
     old = new = None
     try:
+        if args.command == "assess-registered":
+            if args.output.resolve().is_relative_to(args.knowledge_root.resolve()):
+                raise ValueError("Report must be outside the read-only knowledge root")
+            if args.output.exists() or args.output.is_symlink():
+                raise ValueError("Output already exists")
         if args.command == "legacy-inventory":
             result = legacy_inventory(args.knowledge_root)
         else:
@@ -481,16 +618,21 @@ def main(argv=None):
                           **locate(new, args.symbol, args.source_file, args.limit)}
             else:
                 old = Archive(args.baseline) if args.baseline else None
-                result = assess([(p, read_json(p)) for p in args.candidate], old, new)
+                result = (assess_registered(args.knowledge_root, old, new)
+                          if args.command == "assess-registered" else
+                          assess([(p, read_json(p)) for p in args.candidate], old, new))
         rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
         if args.output:
+            if args.command == "assess-registered":
+                publish_new_json(args.output, rendered)
+                return 0
             # No output may overwrite candidate, canonical or input archive.
             with args.output.open("x", encoding="utf-8", newline="\n") as stream:
                 stream.write(rendered)
         else:
             print(rendered, end="")
         return 0  # Complete assessment, not an assertion of compatibility.
-    except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as exc:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, zipfile.BadZipFile) as exc:
         print(json.dumps({"error": {"code": "COMPATIBILITY_INPUT_ERROR", "message": str(exc)},
                           "canonical_modified": False, "runtime_verified": False}, ensure_ascii=False), file=sys.stderr)
         return 2

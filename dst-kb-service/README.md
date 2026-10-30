@@ -1,6 +1,6 @@
 # 本地知识检索服务
 
-本服务随 `v2026.10.30.1` 分发，使用包内唯一 210 条登记知识（旧 187 条 + 23 条 `research/restricted/hold` 机制研究）。正常完整使用，在完整包根目录用一份合法持有的 `760944 / build 26306684 scripts.zip` 准备来源：
+本服务随 `v2026.10.30.2` 分发，使用包内唯一 216 条登记知识（旧 187 条 + 29 条 `research/restricted/hold` 机制研究）。正常完整使用，在完整包根目录用一份合法持有的 `760944 / build 26306684 scripts.zip` 准备来源：
 
 ```text
 python -B -X utf8 prepare_sources.py --source "<760944 scripts.zip>"

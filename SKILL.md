@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前版本：`v2026.10.30.1`；统一目录 210 条，其中独立机制研究族 23 条，保持 `research/restricted/hold`。
+当前版本：`v2026.10.30.2`；统一目录 216 条，其中独立机制研究族 29 条，保持 `research/restricted/hold`。
 
 面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 

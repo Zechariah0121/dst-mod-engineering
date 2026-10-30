@@ -216,3 +216,75 @@ def score(record, query):
     if requested is not None and not whole_identifier_hit:
         return 0
     return priority * 100 + min(relevance, 99)
+
+
+# Navigation syntax only. It never establishes a physical/public declaration.
+NAME = r'[A-Za-z_][A-Za-z0-9_]*(?:[.:][A-Za-z_][A-Za-z0-9_]*)*'
+MODULE = r'require\((?P<quote>["\'])(?P<module>[A-Za-z0-9_/-]+)(?P=quote)\)\.(?P<member>[A-Za-z_][A-Za-z0-9_]*)'
+IDENTITY_KINDS = ('component_method', 'method', 'module_export', 'file_local',
+                  'environment_member', 'global', 'qualified_member', 'unknown')
+
+
+def api_identity(api):
+    """Conservative authored identity, distinct from accepted legacy declarations.
+
+    A module export may have a local implementation; its export identity must
+    not collapse into a same-name file-local helper. Preserve visibility prose.
+    """
+    text = api['symbol'].strip()
+    visibility = api['visibility'].strip().lower()
+    explicit_local = visibility.startswith(('file-local', 'local function', '文件局部', '文件 local'))
+    not_exported = any(marker in visibility for marker in ('not exported', '未导出', '不导出'))
+    explicit_export = visibility.startswith(('module export', '模块导出', '模块返回表'))
+    module = re.fullmatch(MODULE + r'(?:\([^()]*\))?', text)
+    if module:
+        name = 'require("' + module['module'] + '").' + module['member']
+        owner, leaf = 'require("' + module['module'] + '")', module['member']
+        # A require-shaped name cannot override explicit local/negative metadata.
+        # Without an authored export statement its visibility remains unknown.
+        kind = 'file_local' if explicit_local else 'module_export' if explicit_export and not not_exported else 'unknown'
+    else:
+        match = re.fullmatch('(' + NAME + r')(?:\([^()]*\))?', text)
+        if match is None:
+            return None  # e.g. dynamic table indexing: no fabricated bare name
+        name = match[1]
+        parts = re.split('[.:]', name)
+        owner, leaf = (re.split(r'[.:][^.:]+$', name)[0], parts[-1]) if len(parts)>1 else (None, name)
+        if explicit_local:
+            kind = 'file_local'
+        elif not_exported:
+            kind = 'unknown'
+        elif explicit_export:
+            kind = 'module_export'
+        elif ':' in name:
+            kind = 'component_method' if api['source_file'].startswith('scripts/components/') else 'method'
+        elif name.startswith('env.'):
+            kind = 'environment_member'
+        elif visibility.startswith(('global ', 'raw global ', '原版全局', '全局原版')):
+            kind = 'global'
+        else:
+            kind = 'qualified_member' if owner else 'unknown'
+    return {'symbol': name, 'owner': owner, 'leaf': leaf, 'identity_kind': kind,
+            'source_file': api['source_file'], 'visibility': api['visibility'],
+            'identity_basis': 'AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION',
+            'public_api_inferred': False}
+
+
+def api_matches(records, symbol, source_file=None, owner=None, identity_kind=None):
+    # Only api_contracts participate; aliases and source_references.symbols do not.
+    matches = []
+    qualified = '.' in symbol or ':' in symbol or symbol.startswith('require(')
+    for identifier, record in sorted(records.items()):
+        for index, api in enumerate(record['entry']['api_contracts']):
+            identity = api_identity(api)
+            if identity is None or (identity['symbol'] if qualified else identity['leaf']) != symbol:
+                continue
+            if source_file is not None and identity['source_file'] != source_file:continue
+            if owner is not None and identity['owner'] != owner:continue
+            if identity_kind is not None and identity['identity_kind'] != identity_kind:continue
+            identity = dict(identity, source_epoch=record['document']['source_epoch'],
+                            archive_sha256=record['document']['archive_sha256'])
+            # Visibility and evidence version are not interchangeable identities.
+            key = tuple(identity[k] for k in ('symbol','source_file','visibility','source_epoch','archive_sha256'))
+            matches.append((key, record, '/api_contracts/' + str(index), identity))
+    return matches

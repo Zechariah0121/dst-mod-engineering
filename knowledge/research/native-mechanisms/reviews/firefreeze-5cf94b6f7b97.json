@@ -1,0 +1,825 @@
+{
+  "schema": "dst-independent-mechanism-revision-review/1",
+  "reviewer_window": "C",
+  "revision_review": 2,
+  "candidate": "05-research-history/native-expansion-20261030/firefreeze/candidate.json",
+  "candidate_sha256": "0f1c82143df4d290b4e710c693e312b143461c466f7923ab213d2f5a586a4d9a",
+  "frozen_input": "05-research-history/native-expansion-20261030/windows/C/frozen-candidate-r2.json",
+  "runtime_verified": false,
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "verdict": "approved_for_research_registration",
+  "registration_approved": true,
+  "registration_boundary": "Only these exact3 research/restricted/hold mechanism entries under the frozen hash; no Coding admission or runtime/public API verification. Integration/publishing remain coordinator-owned.",
+  "previous_review": {
+    "path": "05-research-history/native-expansion-20261030/windows/C/review.json",
+    "sha256": "5abd66d4fc124c34966dc533c7734516d3b82aa3f1411de1f23bac5fab13aae1",
+    "candidate_sha256": "ed43ec5d4dc330f62dc5bd65a64ee0ca9af8a7626b448711571e516c9fac0dd2",
+    "dependency": "Unchanged claims/API contracts/mechanism steps retain this full semantic review; current review verifies the complete delta and all new/split/modified API contracts. Previous verdict is preserved as historical changes_required."
+  },
+  "reviewed_delta": {
+    "path": "05-research-history/native-expansion-20261030/firefreeze/revision-delta.json",
+    "sha256": "335990ae583bf0e12ac026d803ff7e327e094b79b893780ec7703edc2fdac180",
+    "complete_reconstruction_verified": true,
+    "change_records": 11,
+    "method": "Verified each before/after pointer against frozen R1/R2, applied every declared replacement to old JSON, and required resulting full JSON equality with R2; then reviewed contents within the two replaced API arrays.",
+    "unlisted_changes": 0
+  },
+  "coverage": {
+    "entries": 3,
+    "claims": 18,
+    "nsf_claims": 16,
+    "api_contracts": 14,
+    "mechanism_steps": 12,
+    "source_references": 27,
+    "current_api_identity_checks": 14,
+    "direct_new_split_modified_api_semantic_reviews": 8,
+    "unchanged_api_semantics_inherited_and_bytecompared": 6,
+    "changed_claims_directly_reviewed": 3,
+    "changed_step_directly_reviewed": 1,
+    "all_other_units": "full prior review plus exact unchanged comparison"
+  },
+  "finding_resolutions": [
+    {
+      "id": "F01",
+      "status": "resolved",
+      "reason": "两个组合契约拆为4个分别编写的完整原子；2个法杖symbol去说明，4个local可见性规范化。14/14身份可解析，并用文件/身份kind限定各命中一次；4个local为file_local，public_api_inferred全false。",
+      "evidence": "review-r2-checks.json",
+      "direct_api_reviews": [
+        "Freezable:OnSave",
+        "Freezable:OnLoad",
+        "StartFireMelt",
+        "StopFireMelt",
+        "onattack_blue",
+        "onattack_red"
+      ]
+    },
+    {
+      "id": "F02",
+      "status": "resolved",
+      "reason": "EXP-FIRE-001-C03与StopSpreading契约都保留实际后续OnUpdate条件、非endothermic停止融化门禁及独立的currentheat==0 StopUpdating条件；已有来源完整支持。",
+      "evidence_refs": [
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "id": "F03",
+      "status": "resolved",
+      "reason": "EXP-FREEZE-001-C05准确保留frozen退出not statemem.thawing、onthaw标记转换保留symbol和thaw退出停声音/清symbol。",
+      "evidence_refs": [
+        "FF-S06"
+      ]
+    },
+    {
+      "id": "N01",
+      "status": "resolved",
+      "reason": "蓝杖claim、API side_effects与机制步骤2均明确sg存在且无frozen状态标签才发额外attacked。",
+      "evidence_refs": [
+        "FF-S19"
+      ]
+    },
+    {
+      "id": "N02",
+      "status": "resolved",
+      "reason": "Extinguish API现在明确StopSmoldering内部执行传播器reset的smoldering/组件存在条件，且true不依赖外层resetpropagator。",
+      "evidence_refs": [
+        "FF-S15"
+      ]
+    }
+  ],
+  "open_findings": [],
+  "api_reviews": [
+    {
+      "symbol": "Freezable:AddColdness",
+      "pointer": "/entries/0/api_contracts/0",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S02",
+        "FF-S03",
+        "FF-S04"
+      ]
+    },
+    {
+      "symbol": "Freezable:Freeze",
+      "pointer": "/entries/0/api_contracts/1",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S04",
+        "FF-S02"
+      ]
+    },
+    {
+      "symbol": "Freezable:Thaw",
+      "pointer": "/entries/0/api_contracts/2",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S04",
+        "FF-S02",
+        "FF-S03"
+      ]
+    },
+    {
+      "symbol": "Freezable:Unfreeze",
+      "pointer": "/entries/0/api_contracts/3",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S04"
+      ]
+    },
+    {
+      "symbol": "Freezable:Reset",
+      "pointer": "/entries/0/api_contracts/4",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S04"
+      ]
+    },
+    {
+      "symbol": "Freezable:OnSave",
+      "pointer": "/entries/0/api_contracts/5",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "无参数，仅读extraresist；非nil且>0才返回新表，向下量化可为0，否则nil；不建撤任务。保存分派与prefab补充边界单独保留。",
+      "evidence_refs": [
+        "FF-S04",
+        "FF-S22"
+      ]
+    },
+    {
+      "symbol": "Freezable:OnLoad",
+      "pointer": "/entries/0/api_contracts/6",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "非nil保存表直接读extraresist；非nil才SetExtraResist，clamp及30秒衰减任务建立/取消条件准确；nil返回，不恢复冻结态/寒冷/wearoff，移除取消任务。",
+      "evidence_refs": [
+        "FF-S04",
+        "FF-S03",
+        "FF-S01",
+        "FF-S23"
+      ]
+    },
+    {
+      "symbol": "Propagator:StartSpreading",
+      "pointer": "/entries/1/api_contracts/0",
+      "verdict": "supported_static",
+      "review_basis": "unchanged exact API object plus prior full review",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "与R1通过语义审阅的完整API对象相等；本轮另做身份和限定匹配检查。",
+      "evidence_refs": [
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "symbol": "Propagator:StopSpreading",
+      "pointer": "/entries/1/api_contracts/1",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "只改source/spreading/reset字段，不建或直接取消任务；确有后续非spreading OnUpdate才进行收尾，stopfiremelt分支有非endothermic门禁，currentheat==0取消任务不受heater门禁。",
+      "evidence_refs": [
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "symbol": "Burnable:Extinguish",
+      "pointer": "/entries/1/api_contracts/2",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "StopSmoldering调用始终在前；只有smoldering且传播器存在才传true，该true不依赖Extinguish reset参数；其余参数、工具消费、burning收尾与回调边界未变化。",
+      "evidence_refs": [
+        "FF-S15",
+        "FF-S16",
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "symbol": "StartFireMelt",
+      "pointer": "/entries/1/api_contracts/3",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "真实file-local，所列master事件安装；无任务才排10秒，重复不续期；到期handle/事件/睡眠移除或melt终态，以及入库停止均保留。参数、无返回、作用与生命周期独立完整。",
+      "evidence_refs": [
+        "FF-S17"
+      ]
+    },
+    {
+      "symbol": "StopFireMelt",
+      "pointer": "/entries/1/api_contracts/4",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "真实file-local，所列停止/入库事件；仅非nil handle才Cancel并清nil，无返回；不解绑事件或恢复已发生的终态，与Start不同，未复制组合契约。",
+      "evidence_refs": [
+        "FF-S17"
+      ]
+    },
+    {
+      "symbol": "onattack_blue",
+      "pointer": "/entries/2/api_contracts/0",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "symbol为准确单一local名，visibility file-local且未公共导出；attacked明确sg存在且无frozen状态标签；其余参数、声音、有效性、回调顺序及任务所有权未变化。",
+      "evidence_refs": [
+        "FF-S19",
+        "FF-S20",
+        "FF-S15",
+        "FF-S02"
+      ]
+    },
+    {
+      "symbol": "onattack_red",
+      "pointer": "/entries/2/api_contracts/1",
+      "verdict": "supported_static",
+      "review_basis": "direct current source recheck",
+      "fields_reviewed": [
+        "symbol",
+        "source_file",
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "reason": "symbol为准确单一local名，visibility file-local且未公共导出；其余参数、声音后首检、冻结优先分支、负冷量与显式Unfreeze及未知边界未变化。",
+      "evidence_refs": [
+        "FF-S18",
+        "FF-S20",
+        "FF-S14",
+        "FF-S02",
+        "FF-S04"
+      ]
+    }
+  ],
+  "claim_reviews": [
+    {
+      "id": "EXP-FREEZE-001-C01",
+      "pointer": "/entries/0/claims/0",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S02"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C02",
+      "pointer": "/entries/0/claims/1",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S02",
+        "FF-S03",
+        "FF-S04"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C03",
+      "pointer": "/entries/0/claims/2",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S04"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C04",
+      "pointer": "/entries/0/claims/3",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S02",
+        "FF-S03",
+        "FF-S04"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C05",
+      "pointer": "/entries/0/claims/4",
+      "verdict": "supported_static",
+      "review_basis": "direct changed statement recheck",
+      "reason": "EXP-FREEZE-001-C05准确保留frozen退出not statemem.thawing、onthaw标记转换保留symbol和thaw退出停声音/清symbol。",
+      "evidence_refs": [
+        "FF-S05",
+        "FF-S06",
+        "FF-S07",
+        "FF-S08",
+        "FF-S09",
+        "FF-S01",
+        "FF-S04"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C06",
+      "pointer": "/entries/0/claims/5",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S04",
+        "FF-S21",
+        "FF-S22",
+        "FF-S23"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C07",
+      "pointer": "/entries/0/claims/6",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S02",
+        "FF-S04",
+        "FF-S06"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-001-C08",
+      "pointer": "/entries/0/claims/7",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S26",
+        "FF-S27",
+        "FF-S21"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C01",
+      "pointer": "/entries/1/claims/0",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S14",
+        "FF-S12",
+        "FF-S15"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C02",
+      "pointer": "/entries/1/claims/1",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S13",
+        "FF-S02",
+        "FF-S04"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C03",
+      "pointer": "/entries/1/claims/2",
+      "verdict": "supported_static",
+      "review_basis": "direct changed statement recheck",
+      "reason": "EXP-FIRE-001-C03与StopSpreading契约都保留实际后续OnUpdate条件、非endothermic停止融化门禁及独立的currentheat==0 StopUpdating条件；已有来源完整支持。",
+      "evidence_refs": [
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C04",
+      "pointer": "/entries/1/claims/3",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S17",
+        "FF-S22"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C05",
+      "pointer": "/entries/1/claims/4",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S24",
+        "FF-S25",
+        "FF-S07",
+        "FF-S17",
+        "FF-S22",
+        "FF-S23"
+      ]
+    },
+    {
+      "id": "EXP-FIRE-001-C06",
+      "pointer": "/entries/1/claims/5",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S17",
+        "FF-S26",
+        "FF-S27",
+        "FF-S24",
+        "FF-S16",
+        "FF-S12"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-002-C01",
+      "pointer": "/entries/2/claims/0",
+      "verdict": "supported_static",
+      "review_basis": "direct changed statement recheck",
+      "reason": "蓝杖claim、API side_effects与机制步骤2均明确sg存在且无frozen状态标签才发额外attacked。",
+      "evidence_refs": [
+        "FF-S19",
+        "FF-S20",
+        "FF-S15"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-002-C02",
+      "pointer": "/entries/2/claims/1",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S19",
+        "FF-S15",
+        "FF-S12",
+        "FF-S02"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-002-C03",
+      "pointer": "/entries/2/claims/2",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S18",
+        "FF-S04",
+        "FF-S02"
+      ]
+    },
+    {
+      "id": "EXP-FREEZE-002-C04",
+      "pointer": "/entries/2/claims/3",
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审claim完整相等，依赖绑定的R1审阅。",
+      "evidence_refs": [
+        "FF-S18",
+        "FF-S19"
+      ]
+    }
+  ],
+  "mechanism_step_reviews": [
+    {
+      "entry_id": "EXP-FREEZE-001",
+      "step": 1,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S07",
+        "FF-S10",
+        "FF-S11",
+        "FF-S08",
+        "FF-S09"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-001",
+      "step": 2,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S02",
+        "FF-S04",
+        "FF-S05",
+        "FF-S06"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-001",
+      "step": 3,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S04",
+        "FF-S13"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-001",
+      "step": 4,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S04",
+        "FF-S21",
+        "FF-S22",
+        "FF-S23"
+      ]
+    },
+    {
+      "entry_id": "EXP-FIRE-001",
+      "step": 1,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S14",
+        "FF-S12"
+      ]
+    },
+    {
+      "entry_id": "EXP-FIRE-001",
+      "step": 2,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S13",
+        "FF-S02",
+        "FF-S04"
+      ]
+    },
+    {
+      "entry_id": "EXP-FIRE-001",
+      "step": 3,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S17"
+      ]
+    },
+    {
+      "entry_id": "EXP-FIRE-001",
+      "step": 4,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S15",
+        "FF-S16",
+        "FF-S12",
+        "FF-S13"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-002",
+      "step": 1,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S20",
+        "FF-S19"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-002",
+      "step": 2,
+      "verdict": "supported_static",
+      "review_basis": "direct changed statement recheck",
+      "reason": "蓝杖claim、API side_effects与机制步骤2均明确sg存在且无frozen状态标签才发额外attacked。",
+      "evidence_refs": [
+        "FF-S19",
+        "FF-S15",
+        "FF-S02"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-002",
+      "step": 3,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S18",
+        "FF-S04"
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-002",
+      "step": 4,
+      "verdict": "supported_static",
+      "review_basis": "exact unchanged plus prior full review",
+      "reason": "与前次已审步骤完整相等；F02相关步骤现与修正后的claim/API条件一致。",
+      "evidence_refs": [
+        "FF-S01",
+        "FF-S04",
+        "FF-S12",
+        "FF-S15"
+      ]
+    }
+  ],
+  "preservation": {
+    "document_source_epoch_archive_refs_queries_limitations": "unchanged, exact compared",
+    "all_entry_scope_governance_unknowns_compatibility": "unchanged, exact compared",
+    "historical_service_evidence_epoch": "759671 preserved; not relabelled to760944",
+    "candidate_not_modified": true,
+    "previous_review_and_frozen_input_preserved": true
+  },
+  "verification": {
+    "source_archive_sha256": "matched",
+    "all27_file_range_hashes": "matched",
+    "mechanism_contract": "passed",
+    "api_identity_and_bounded_matching": "14/14 parsed, each exact source/kind identity matched once;4 file_local",
+    "api_test_boundary": "Narrow current Python function execution; no live MCP end-to-end retrieval ranking or game runtime",
+    "public_artifacts": "No machine paths or original Lua bodies in report or candidate"
+  },
+  "remaining_limitations": [
+    "No game, dedicated server, client, Lua execution, save/reload or runtime timing verification.",
+    "No native FindEntities/visibility/animation/network internals or all-prefab/all-Mod dependency closure.",
+    "No tested multi-source overlap, event-driven removal/reentrancy, death/task races or endothermic/freezable runtime combinations.",
+    "Attack card begins at the named callback; full projectile/combat/weapon dispatch, durability/sanity outcomes, all variants and haunt callers are not newly claimed by this candidate.",
+    "API parser check is a narrow Python check of authored identity, not a live MCP end-to-end lookup or proof of physical/public declaration."
+  ],
+  "checks_artifact": {
+    "path": "05-research-history/native-expansion-20261030/windows/C/review-r2-checks.json",
+    "sha256": "d94552ef037bf9f1003d9924b78d24900c4dd02b3e03ba84633779a168a265a5"
+  },
+  "review_model": "gpt-6.1-sol/high current reviewer; no additional delegation for revision"
+}

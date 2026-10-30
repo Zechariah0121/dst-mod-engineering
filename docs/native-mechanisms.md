@@ -1,6 +1,6 @@
 # 独立原版机制研究族
 
-`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味与成长/再生，独立机制研究族共 23 条；与历史三族合计 210 条，实际登记数量读目录 counts。
+`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿与冻结/火热交互，独立机制研究族共 29 条；与历史三族合计 216 条，实际登记数量读目录 counts。
 
 新族始终为 `research/restricted/hold`。独立审阅记录绑定精确候选 SHA，但不是旧 Native Core 的 Gate A，不授予 Coding 或游戏实测状态。source_references 是限定归档的原始文件/行范围 hash 和定位，不是已交付 Lua；当前归档 hash 一致也不证明所有 native/dynamic 行为。
 
@@ -14,7 +14,19 @@
 {"id":"EXP-AI-003","projection":"reviewer","view":"reviewer","max_bytes":64000}
 ```
 
-上述是 `get_entry` 的完整条目读取参数。按原子读取可加 `pointer="/claims/0"`、`/api_contracts/0` 或 `/mechanism_steps/0`；新族的 max_bytes 可在 1000..64000 内显式选择。若请求 `/claims/0/statement`，服务会校验该指针后交付整个 `/claims/0`，避免把 statement 从 kind、条件和证据拆开。API 契约通过这一路读取；现有 `lookup_api` 继续使用旧物理声明/行为映射 guards，不会因为新研究 symbols 数组有同名字符串而授予公共 API 身份。
+上述是 `get_entry` 的完整条目读取参数。按原子读取可加 `pointer="/claims/0"`、`/api_contracts/0` 或 `/mechanism_steps/0`；新族的 max_bytes 可在 1000..64000 内显式选择。若请求 `/claims/0/statement`，服务会校验该指针后交付整个 `/claims/0`，避免把 statement 从 kind、条件和证据拆开。API 契约也可通过这一路读取。`lookup_api` 默认 `family="legacy"`，继续使用旧物理声明/行为映射 guards；只有显式选择 `family="native_mechanism"` 才查询研究 API 契约，且必须 `projection="reviewer"`。不会因为来源 symbols 数组有同名字符串而授予公共 API 身份。
+
+研究 API 身份入口示例（CLI 的 `call --tool lookup_api --arguments '<JSON>'` 使用同一参数）：
+
+```json
+{"symbol":"Growable:Pause","family":"native_mechanism","projection":"reviewer","max_bytes":24000}
+```
+
+研究入口仅从 `api_contracts` 声明导航，支持精确限定符号、裸叶名称，以及 `require("map/object_layout").Convert` 形式；查询不带参数，返回原子保留原来的完整签名。动态索引 `countprefabs[prefab]` 不伪装为可静态调用的全局 API，应按 ID/pointer 读取。匹配区分大小写和 owner，不从 aliases、依赖或引用 symbols 生成契约。`owner`、`identity_kind` 与精确 `source_file` 可显式缩小身份；支持 method、component_method、module_export、file_local、environment_member、global、qualified_member 和 unknown。类型只是保守的声明形态导航，原 visibility 原文仍是限制依据，既不证明物理声明也不证明公共 API。模块名称的单双引号必须配对；混配引号直接拒绝，不归一化成已有身份。明确 file-local 优先保留；明确未导出或 require 外观缺少作者导出声明时返回 unknown，不能凭名称形态覆盖局部限制。
+
+同名不同 owner、来源文件、visibility 或证据 epoch/archive 返回 `RESEARCH_IDENTITY_AMBIGUOUS` 和有界候选列表，不按排名或 top_k 自动选一个契约；列表截断仍保留总身份数和歧义标记。文件 local 实现与模块导出保持不同身份，重复记录的同一声明不制造歧义。没有命中只表示研究契约覆盖缺口，不表示 API 不存在；同文件仍有多个身份时需继续限定，不能自动合并。
+
+所有 view 均交付完整 `/api_contracts/N` 原子和完整 Scope、entry/API unknowns、顶层来源版本/limitations、实际引用、审阅记录、HOLD 与未实测声明；不会把 decision 压成省略条件的摘要。max_bytes 为 1000..64000（默认 24000），对最终 JSON 及来源环境一起计费，放不下整体 withheld，并尽量附精确 get_entry 跟进入口；必要环境本身超预算时只返回无事实的 withheld。top_k 只限制交付数量/候选列表，不消除歧义，结果/候选截断分别标明。`RESEARCH_CONTRACT_DELIVERED` 只表示本次原子完整交付，不表示运行验证、公共 API 保证或 Coding 准入。
 
 `resolve_evidence(id="EXP-AI-003", projection="reviewer", reference_index=0)` 返回该 entry 实际使用的 local source ref 完整定位，附必要 Scope/来源身份/limitations；不恢复 Lua。引用顺序是对 entry 内 evidence_refs/dependency_refs 递归去重的稳定次序，返回 reference_index 与实际 pointer；不假定它等于文件顶层 source_references 的数组顺序。
 
@@ -35,3 +47,5 @@
 完整来源准备对新族逐引用核对合法本地来源，区分 `EXACT_FILE_RANGE`、`RANGE_ONLY`、`CHANGED_UNKNOWN` 与 `MISSING`：文件整体变化但唯一原范围仍匹配时只确认范围，不确认原文件身份或行为；变化和缺失保留未知，不封锁其他研究条目的读取，也不授予 Coding 准入。范围哈希仍按 UTF-8 splitlines/LF 无尾换行计算，核验结果写入本地 receipt；声称提供原证据归档却违背其文件/范围承诺仍报完整性错误。完整 `get_entry` 将实际目标来源的 `source_input_assessment` 及逐引用结果与历史证据身份并列返回，继续保留 `LOCATOR_HASH_ONLY`、原 Scope 与 HOLD；未准备来源时只提供历史 locator，不伪造当前目标状态。所有恢复的旧 Lua 留在 `cache/runtime/`；发行生成器排除整个 cache，不包含游戏 Lua 文件。
 
 源码更新时，证据基线与当前目标分开。`run_kb.py maintain-sources locate --target <新版ZIP> --symbol <符号>` 可定位未登记的新归档；原正文和局部复核入口继续可读。核心必需证据恢复失败仍明确报错；机制研究的局部来源缺口单独报告，不能因此宣称库被删除或所有机制无效。具体差分维护见 [源码维护](source-compatibility.md)。
+
+本轮新增研究保留 `source_epoch=760944`，原 23 条研究继续保留 `759671`。服务的可选 source_epoch 参数仍选择历史证据运行环境759671；返回原子的 source_epoch 来自各自文档，不强制改标。新增覆盖、API入口和批量维护的验收范围见 [本阶段说明](phase4-survival-api.md)。

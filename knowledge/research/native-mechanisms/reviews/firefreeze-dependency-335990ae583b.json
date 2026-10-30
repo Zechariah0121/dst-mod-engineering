@@ -1,0 +1,673 @@
+{
+  "schema": "firefreeze-revision-delta/1",
+  "revision": 1,
+  "previous_candidate_sha256": "ed43ec5d4dc330f62dc5bd65a64ee0ca9af8a7626b448711571e516c9fac0dd2",
+  "candidate_sha256": "0f1c82143df4d290b4e710c693e312b143461c466f7923ab213d2f5a586a4d9a",
+  "independent_review_input": "windows/C/review.json",
+  "addressed": [
+    "F01",
+    "F02",
+    "F03",
+    "N01",
+    "N02"
+  ],
+  "review_recheck_pending": true,
+  "runtime_verified": false,
+  "unchanged": {
+    "source_epoch": true,
+    "archive_sha256": true,
+    "source_references": true,
+    "queries": true,
+    "limitations": true
+  },
+  "changes": [
+    {
+      "pointer": "/entries/0/claims/4/statement",
+      "before": "CommonHandlers.OnFreeze要求health存在且未死，OnFreezeEx允许无health对象；两者都跳转frozen。CommonStates的frozen监听unfreeze/onthaw，thaw监听unfreeze；进态后复查组件当前状态以处理同帧排队事件，退出清swap_frozen并在thaw退出停止声音。grassgekko在master分界后装burnable/freezable及SG，其SG登记OnFreeze和AddFrozenStates。组件本身不添加实体frozen标签；不能把SG标签、实体标签和IsFrozen当同一查询。",
+      "after": "CommonHandlers.OnFreeze要求health存在且未死，OnFreezeEx允许无health对象；两者都跳转frozen。CommonStates的frozen监听unfreeze/onthaw，thaw监听unfreeze；进态后复查组件当前状态以处理同帧排队事件。frozen退出仅在not statemem.thawing时清swap_frozen；onthaw先将statemem.thawing设true再进thaw，因此该转换保留symbol。thaw退出停止thawing声音并无条件清swap_frozen。grassgekko在master分界后装burnable/freezable及SG，其SG登记OnFreeze和AddFrozenStates。组件本身不添加实体frozen标签；不能把SG标签、实体标签和IsFrozen当同一查询。"
+    },
+    {
+      "pointer": "/entries/0/api_contracts",
+      "change": "array_replacement",
+      "before": [
+        {
+          "symbol": "Freezable:AddColdness",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "coldness：可加减的数值；未做类型/有限性校验",
+            "freezetime：可选计时值",
+            "nofreeze：可选Lua真值；仅有sg分支处理"
+          ],
+          "returns": "无显式返回；redirect真值分支亦仅返回nil",
+          "preconditions": [
+            "有效组件及数值参数；redirectfn若安装须可调用"
+          ],
+          "side_effects": [
+            "改寒冷、可能计时/Freeze、更新色调"
+          ],
+          "lifecycle": [
+            "任务由StartWearingOff替换；组件移除取消"
+          ],
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Freeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "freezetime：可选时长，nil回退wearofftime"
+          ],
+          "returns": "无显式返回；不可见/死亡同样不返回成功标记",
+          "preconditions": [
+            "entity:IsVisible且无health死亡；不自行执行抗性或nofreeze门禁"
+          ],
+          "side_effects": [
+            "回调、三态、任务、色调、Brain/combat/locomotor和freeze事件"
+          ],
+          "lifecycle": [
+            "重排wearoff；同FROZEN不重复事件；onfreezefn没有本地异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Thaw",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "thawtime：可选时长"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen且非health死亡"
+          ],
+          "side_effects": [
+            "设THAWING/寒冷0，发onthaw并两次应用ResolveWearOffTime"
+          ],
+          "lifecycle": [
+            "重排wearoff最终进入Unfreeze"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02",
+            "FF-S03"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Unfreeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen才执行"
+          ],
+          "side_effects": [
+            "设NORMAL、清寒冷与伤害累计、碎冰/色调；活体恢复Brain和发事件"
+          ],
+          "lifecycle": [
+            "不主动取消wearofftask；死亡时跳过Brain恢复与事件"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Reset",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "只设NORMAL/coldness0并UpdateTint"
+          ],
+          "lifecycle": [
+            "不发事件、不取消任务、不重启Brain、不清damagetotal"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:OnSave / OnLoad",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "OnSave无参数；OnLoad(data)要求表，未防nil"
+          ],
+          "returns": "OnSave返回{extraresist=量化值}或nil；OnLoad无显式返回",
+          "preconditions": [
+            "标准EntityScript保存/加载分派"
+          ],
+          "side_effects": [
+            "OnLoad若extraresist非nil则SetExtraResist，可能建/撤抗性衰减任务"
+          ],
+          "lifecycle": [
+            "仅额外抗性；不保存冻结态、寒冷或wearoff倒计时"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S03",
+            "FF-S22",
+            "FF-S23"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ],
+      "after": [
+        {
+          "symbol": "Freezable:AddColdness",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "coldness：可加减的数值；未做类型/有限性校验",
+            "freezetime：可选计时值",
+            "nofreeze：可选Lua真值；仅有sg分支处理"
+          ],
+          "returns": "无显式返回；redirect真值分支亦仅返回nil",
+          "preconditions": [
+            "有效组件及数值参数；redirectfn若安装须可调用"
+          ],
+          "side_effects": [
+            "改寒冷、可能计时/Freeze、更新色调"
+          ],
+          "lifecycle": [
+            "任务由StartWearingOff替换；组件移除取消"
+          ],
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Freeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "freezetime：可选时长，nil回退wearofftime"
+          ],
+          "returns": "无显式返回；不可见/死亡同样不返回成功标记",
+          "preconditions": [
+            "entity:IsVisible且无health死亡；不自行执行抗性或nofreeze门禁"
+          ],
+          "side_effects": [
+            "回调、三态、任务、色调、Brain/combat/locomotor和freeze事件"
+          ],
+          "lifecycle": [
+            "重排wearoff；同FROZEN不重复事件；onfreezefn没有本地异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Thaw",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "thawtime：可选时长"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen且非health死亡"
+          ],
+          "side_effects": [
+            "设THAWING/寒冷0，发onthaw并两次应用ResolveWearOffTime"
+          ],
+          "lifecycle": [
+            "重排wearoff最终进入Unfreeze"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02",
+            "FF-S03"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Unfreeze",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [
+            "IsFrozen才执行"
+          ],
+          "side_effects": [
+            "设NORMAL、清寒冷与伤害累计、碎冰/色调；活体恢复Brain和发事件"
+          ],
+          "lifecycle": [
+            "不主动取消wearofftask；死亡时跳过Brain恢复与事件"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:Reset",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "只设NORMAL/coldness0并UpdateTint"
+          ],
+          "lifecycle": [
+            "不发事件、不取消任务、不重启Brain、不清damagetotal"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:OnSave",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [],
+          "returns": "extraresist非nil且>0时返回{extraresist=math.floor(extraresist*10)*.1}，否则返回nil；小的正值量化后可以为0",
+          "preconditions": [
+            "有效组件；extraresist非nil时应为可比较和计算的数值；由EntityScript保存分派调用"
+          ],
+          "side_effects": [
+            "只读取当前extraresist并创建返回表；不改组件字段、不建撤任务"
+          ],
+          "lifecycle": [
+            "只保存量化extraresist，不保存state/coldness/wearoff倒计时；EntityScript只收集非空返回表，之后还可由prefab OnSave补充业务"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S22"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Freezable:OnLoad",
+          "source_file": "scripts/components/freezable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "data：保存表，直接读data.extraresist，未防nil；extraresist非nil时须可作数值clamp"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "有效组件和非nil data表；由EntityScript组件加载分派调用"
+          ],
+          "side_effects": [
+            "data.extraresist非nil才SetExtraResist；clamp到0..resistance*2.5；结果>0且无diminishingtask则建30秒周期任务，结果<=0且有任务则取消清handle"
+          ],
+          "lifecycle": [
+            "只恢复额外抗性与其衰减任务，不恢复冻结态/寒冷/wearoff；组件加载之后prefab OnLoad仍可追加业务；组件移除取消衰减任务"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S03",
+            "FF-S01",
+            "FF-S23"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "pointer": "/entries/1/claims/2/statement",
+      "before": "非endothermic火源对非自身且有实体frozen或meltable标签的目标发firemelt再加firemelt标签；停止spreading的更新则对范围内带frozen或firemelt的实体发stopfiremelt并去标签，不检查其他火源。OnRemoveFromEntity执行StopSpreading(true)+OnUpdate(0)并取消delay；OnRemoveEntity另在自身有效且非endothermic时查询并对有效目标发stopfiremelt/去标签。此协议没有每火源的所有权计数，不能宣称多火源不会互相停止融化任务。",
+      "after": "非endothermic火源对非自身且有实体frozen或meltable标签的目标发firemelt再加firemelt标签。StopSpreading只改source/spreading及可选reset字段，不创建也不直接取消周期任务；只有已有任务或外部显式调用实际促成后续OnUpdate，才执行非spreading分支。该分支仅在火源非endothermic时，对范围内带frozen或firemelt的实体发stopfiremelt并去标签，不检查其他火源；随后currentheat==0则StopUpdating，此条件不受heater门禁。OnRemoveFromEntity显式执行StopSpreading(true)+OnUpdate(0)并取消delay；OnRemoveEntity另在自身有效且非endothermic时查询并对有效目标发stopfiremelt/去标签。此协议没有每火源的所有权计数，不能宣称多火源不会互相停止融化任务。"
+    },
+    {
+      "pointer": "/entries/1/api_contracts",
+      "change": "array_replacement",
+      "before": [
+        {
+          "symbol": "Propagator:StartSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "source：可选攻击来源实体，写入self.source"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "有效权威组件；本方法未验证source类型"
+          ],
+          "side_effects": [
+            "spreading=true；如无task启动周期OnUpdate"
+          ],
+          "lifecycle": [
+            "重复调用更新source但不重复建task；由StopSpreading后续更新/移除收尾"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Propagator:StopSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "reset：Lua真值，是否重置热量/暂停标志",
+            "heatpct：可选热量比例，非nil时参与随机表达式，非单纯剩余百分比"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "清source与spreading；reset才改currentheat/pauseheating"
+          ],
+          "lifecycle": [
+            "不直接取消task；下次OnUpdate发停止融化，currentheat==0才StopUpdating"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Burnable:Extinguish",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "resetpropagator：可选Lua真值",
+            "heatpct：可选热量比例",
+            "smotherer：可选实体，finiteuses优先于stackable消费"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "方法可在未燃烧时调用；smotherer仍可能被消费"
+          ],
+          "side_effects": [
+            "先StopSmoldering(其propagator reset无条件true)；消费工具；燃烧时取消burn任务/监听，停止传播，清燃烧/FX/fuel，调回调再发onextinguish"
+          ],
+          "lifecycle": [
+            "不销毁主体；不等于StopUpdating；回调没有局部异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "StartFireMelt / StopFireMelt (beeswax local)",
+          "source_file": "scripts/prefabs/beeswax.lua",
+          "visibility": "prefab局部函数；通过firemelt/stopfiremelt/onputininventory事件调用",
+          "parameters": [
+            "事件回调inst：蜂蜡实体"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "仅master安装的本地事件消费者，非公共导出方法"
+          ],
+          "side_effects": [
+            "开始建一次10秒任务；停止取消任务"
+          ],
+          "lifecycle": [
+            "重复开始不重置时间；入库存放取消；到期解绑融化事件并进入移除流程；无保存恢复"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ],
+      "after": [
+        {
+          "symbol": "Propagator:StartSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "source：可选攻击来源实体，写入self.source"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "有效权威组件；本方法未验证source类型"
+          ],
+          "side_effects": [
+            "spreading=true；如无task启动周期OnUpdate"
+          ],
+          "lifecycle": [
+            "重复调用更新source但不重复建task；由StopSpreading后续更新/移除收尾"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Propagator:StopSpreading",
+          "source_file": "scripts/components/propagator.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "reset：Lua真值，是否重置热量/暂停标志",
+            "heatpct：可选热量比例，非nil时参与随机表达式，非单纯剩余百分比"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [],
+          "side_effects": [
+            "清source与spreading；reset才改currentheat/pauseheating；本身不创建也不直接取消task"
+          ],
+          "lifecycle": [
+            "仅当已有任务或外部显式调用实际促成后续OnUpdate时才执行非spreading分支；该更新仅在火源非endothermic时查询frozen/firemelt并推stopfiremelt、去标签；之后currentheat==0则StopUpdating，不受heater门禁"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "Burnable:Extinguish",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua组件方法；本卡仅所列master消费者，不授予通用客户端API身份",
+          "parameters": [
+            "resetpropagator：可选Lua真值",
+            "heatpct：可选热量比例",
+            "smotherer：可选实体，finiteuses优先于stackable消费"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "方法可在未燃烧时调用；smotherer仍可能被消费"
+          ],
+          "side_effects": [
+            "先StopSmoldering：仅smoldering时且propagator存在才调用StopSpreading(true,heatpct)，该true不依赖Extinguish的resetpropagator实参；消费工具；燃烧时取消burn任务/监听，停止传播，清燃烧/FX/fuel，调回调再发onextinguish"
+          ],
+          "lifecycle": [
+            "不销毁主体；不等于StopUpdating；回调没有局部异常回滚"
+          ],
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "StartFireMelt",
+          "source_file": "scripts/prefabs/beeswax.lua",
+          "visibility": "file-local; 蜂蜡prefab局部函数，仅所列master消费者通过firemelt事件调用，未导出，不是公共API",
+          "parameters": [
+            "inst：蜂蜡事件回调实体，拥有DoTaskInTime；有效终态消费者依赖inventoryitem/AnimState等已安装对象"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "所列蜂蜡master安装的firemelt事件消费者；非公共导出方法；仅firemelttask==nil时排任务"
+          ],
+          "side_effects": [
+            "无任务时建立10秒任务并保存firemelttask；任务回调携带StartFireMelt/StopFireMelt供解绑；重复开始不改变已有倒计时"
+          ],
+          "lifecycle": [
+            "stopfiremelt或onputininventory由StopFireMelt取消；到期先清handle并解绑两个融化事件，未melted时睡眠直接Remove，否则标melted、persists=false、禁拾取、NOCLICK、播放melt并在animover/entitysleep移除；无自定义任务保存恢复"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        },
+        {
+          "symbol": "StopFireMelt",
+          "source_file": "scripts/prefabs/beeswax.lua",
+          "visibility": "file-local; 蜂蜡prefab局部函数，仅所列master消费者通过stopfiremelt/onputininventory事件调用，未导出，不是公共API",
+          "parameters": [
+            "inst：蜂蜡事件回调实体；若firemelttask非nil，应为可Cancel的任务handle"
+          ],
+          "returns": "无显式返回",
+          "preconditions": [
+            "所列蜂蜡master安装的stopfiremelt或onputininventory事件消费者；非公共导出方法"
+          ],
+          "side_effects": [
+            "仅有firemelttask时Cancel并清为nil；无任务时无操作"
+          ],
+          "lifecycle": [
+            "不解绑融化事件、不恢复melted/persists/拾取/动画；到期已经清handle后的调用不撤销已发生终态；无保存恢复动作"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "unknowns": [
+            "未实际调用；native调度与联网表现未验证。"
+          ]
+        }
+      ]
+    },
+    {
+      "pointer": "/entries/2/claims/0/statement",
+      "before": "staff.lua的red/blue_common在master分界后调用stafffns.red/blue；后者设置weapon伤害0、射程、攻击回调与投射物。onattack_blue先按skipsanity扣理智，可能播皮肤声音，再检查目标有效；醒睡眠、烧着则Extinguish()、仅闷烧则SmotherSmolder()，再SuggestTarget。非frozen SG状态才发damage=0的attacked，最后重新检查freezable及目标有效才AddColdness(icestaff_coldness or 1)并SpawnShatterFX。熄火不是加寒冷的隐式副作用，而是此入口额外的顺序步骤。",
+      "after": "staff.lua的red/blue_common在master分界后调用stafffns.red/blue；后者设置weapon伤害0、射程、攻击回调与投射物。onattack_blue先按skipsanity扣理智，可能播皮肤声音，再检查目标有效；醒睡眠、烧着则Extinguish()、仅闷烧则SmotherSmolder()，再SuggestTarget。仅target.sg存在且无frozen状态标签时才发damage=0的attacked，最后重新检查freezable及目标有效才AddColdness(icestaff_coldness or 1)并SpawnShatterFX。熄火不是加寒冷的隐式副作用，而是此入口额外的顺序步骤。"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/0/symbol",
+      "before": "onattack_blue (staff_common local)",
+      "after": "onattack_blue"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/0/visibility",
+      "before": "prefab模块local回调；fns.blue安装给weapon，非公共直接导出",
+      "after": "file-local; prefab模块局部回调，仅所列master消费者由fns.blue安装给weapon，未导出，不是公共API"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/0/side_effects/0",
+      "before": "按次序醒睡眠、熄火/灭闷烧、建议仇恨、attacked、再次有效性检查、加寒冷/FX",
+      "after": "按次序醒睡眠、熄火/灭闷烧、建议仇恨；仅target.sg存在且无frozen状态标签才发attacked；之后再次有效性检查、加寒冷/FX"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/1/symbol",
+      "before": "onattack_red (staff_common local)",
+      "after": "onattack_red"
+    },
+    {
+      "pointer": "/entries/2/api_contracts/1/visibility",
+      "before": "prefab模块local回调；fns.red安装给weapon，非公共直接导出",
+      "after": "file-local; prefab模块局部回调，仅所列master消费者由fns.red安装给weapon，未导出，不是公共API"
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/1/description",
+      "before": "蓝杖先显式熄火再发攻击事件，重查有效后加寒冷。",
+      "after": "蓝杖先显式熄火，target.sg存在且无frozen状态标签才发攻击事件，重查有效后加寒冷。"
+    }
+  ],
+  "new_split_api_source_rechecked": [
+    {
+      "symbol": "Freezable:OnSave",
+      "source_file": "scripts/components/freezable.lua",
+      "line_start": 321,
+      "line_end": 326,
+      "fields": "parameters/returns/preconditions/side_effects/lifecycle/unknowns separately authored"
+    },
+    {
+      "symbol": "Freezable:OnLoad",
+      "source_file": "scripts/components/freezable.lua",
+      "line_start": 328,
+      "line_end": 332,
+      "dependencies": [
+        "SetExtraResist:219-229"
+      ],
+      "fields": "parameters/returns/preconditions/side_effects/lifecycle/unknowns separately authored"
+    },
+    {
+      "symbol": "StartFireMelt",
+      "source_file": "scripts/prefabs/beeswax.lua",
+      "line_start": 32,
+      "line_end": 36,
+      "dependencies": [
+        "_OnFireMelt:6-23",
+        "master event install:69-71"
+      ],
+      "fields": "parameters/returns/preconditions/side_effects/lifecycle/unknowns separately authored"
+    },
+    {
+      "symbol": "StopFireMelt",
+      "source_file": "scripts/prefabs/beeswax.lua",
+      "line_start": 25,
+      "line_end": 30,
+      "dependencies": [
+        "master event install:69-71"
+      ],
+      "fields": "parameters/returns/preconditions/side_effects/lifecycle/unknowns separately authored"
+    }
+  ]
+}

@@ -1,0 +1,865 @@
+{
+  "schema": "dst-independent-mechanism-review/1",
+  "reviewer_window": "C",
+  "candidate": "05-research-history/native-expansion-20261030/firefreeze/candidate.json",
+  "frozen_input": "05-research-history/native-expansion-20261030/windows/C/frozen-candidate.json",
+  "candidate_sha256": "ed43ec5d4dc330f62dc5bd65a64ee0ca9af8a7626b448711571e516c9fac0dd2",
+  "source_epoch": "760944",
+  "source_archive": "scripts.zip",
+  "source_archive_sha256": "abdbd017ad25e5020d74a401f76476ffe9e8cc5066159d499bec261f0ab1b51e",
+  "preserved_service_evidence_epoch": "759671",
+  "runtime_verified": false,
+  "verdict": "changes_required",
+  "registration_approved": false,
+  "coverage": {
+    "entries": 3,
+    "claims": 18,
+    "nsf_claims": 16,
+    "rec_claims": 1,
+    "ei_claims": 1,
+    "api_contracts": 12,
+    "mechanism_steps": 12,
+    "source_references": 27,
+    "all_claims_reviewed": true,
+    "all_api_contracts_reviewed": true,
+    "all_mechanism_steps_reviewed": true
+  },
+  "independence": {
+    "source_preread_before_candidate_content": true,
+    "prereview_record": "05-research-history/native-expansion-20261030/windows/C/independent-baseline.json",
+    "author_candidate_modified": false,
+    "child_scope": "EXP-FREEZE-002 and independent attack-entry pre-read; one delegation level",
+    "child_model_requested": "gpt-6.1-sol/high",
+    "root_key_evidence_rechecked": [
+      "staff.lua master guards and installs",
+      "staff_common.lua blue validity/sg event/coldness gate",
+      "staff_common.lua red frozen priority and explicit Unfreeze"
+    ]
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "priority": 2,
+      "blocking": true,
+      "category": "api_identity_integration",
+      "targets": [
+        "/entries/0/api_contracts/5",
+        "/entries/1/api_contracts/3",
+        "/entries/2/api_contracts/0",
+        "/entries/2/api_contracts/1"
+      ],
+      "finding": "4个symbol混合多个API或含说明文字，当前api_identity均返回None，因此这些作者声明API契约无法进入按单一身份的lookup_api匹配。",
+      "evidence": [
+        "05-research-history/native-expansion-20261030/windows/C/api-identities.json",
+        "02-repository/dst-mod-engineering-public/dst-kb-service/dst_kb/native_mechanism.py:235-258"
+      ],
+      "required_fix": [
+        "拆Freezable:OnSave与Freezable:OnLoad为各自完整原子，分别说明参数、返回和副作用，不复制一份组合描述。",
+        "拆beeswax的StartFireMelt与StopFireMelt，symbol使用单一准确名；visibility以file-local;开头，保留局部函数及事件调用说明。",
+        "两个法杖symbol分别为onattack_blue/onattack_red，文件仍为scripts/prefabs/staff_common.lua；括号说明移入visibility并以file-local;开头，保留非公共导出和所列master消费者限定。"
+      ],
+      "acceptance": "修后14个完整API原子都可解析；两个保存方法与两个融化方法分别可定位；4个local身份为file_local，不能宣称为物理/公共API声明；证据与Scope完整保留。",
+      "runtime_verified": false
+    },
+    {
+      "id": "F02",
+      "priority": 2,
+      "blocking": true,
+      "category": "missing_branch_condition",
+      "targets": [
+        "/entries/1/claims/2",
+        "/entries/1/api_contracts/1/lifecycle"
+      ],
+      "finding": "停止spreading后的OnUpdate发stopfiremelt/去标签受非endothermic条件限制；StopSpreading本身不创建task，只有确实发生后续OnUpdate才执行该分支。当前API“下次OnUpdate发停止融化”未保留门禁，C03也应明确这个停止分支条件。",
+      "source_evidence": [
+        {
+          "ref": "FF-S13",
+          "source_file": "scripts/components/propagator.lua",
+          "lines": [
+            237,
+            247
+          ]
+        },
+        {
+          "ref": "FF-S12",
+          "source_file": "scripts/components/propagator.lua",
+          "lines": [
+            92,
+            111
+          ]
+        }
+      ],
+      "required_fix": [
+        "写明StopSpreading只改字段；已有任务或外部显式调用促成后续OnUpdate。",
+        "后续非spreading更新仅在火源非endothermic时查询frozen/firemelt并推停止事件、去标签；currentheat==0的StopUpdating不受该heater门禁。"
+      ],
+      "acceptance": "C03与StopSpreading契约条件一致；保持非冷火融化与所有火源freezable负冷量为不同分支，且不增加运行已验证声明。",
+      "runtime_verified": false
+    },
+    {
+      "id": "F03",
+      "priority": 2,
+      "blocking": true,
+      "category": "lifecycle_condition_precision",
+      "targets": [
+        "/entries/0/claims/4"
+      ],
+      "finding": "“退出清swap_frozen”遗漏frozen退出的条件：仅not statemem.thawing才清；onthaw先标thawing再进thaw，因此frozen→thaw会保留到thaw阶段。thaw退出才停止thawing声音并无条件清symbol。",
+      "source_evidence": [
+        {
+          "ref": "FF-S06",
+          "source_file": "scripts/stategraphs/commonstates.lua",
+          "lines": [
+            1275,
+            1277
+          ]
+        },
+        {
+          "ref": "FF-S06",
+          "source_file": "scripts/stategraphs/commonstates.lua",
+          "lines": [
+            1308,
+            1340
+          ]
+        }
+      ],
+      "required_fix": [
+        "明确frozen退出与thaw退出的不同清理条件，不把所有退出压成统一清symbol。"
+      ],
+      "acceptance": "C05准确保留frozen→thaw例外，现有FF-S06已覆盖全部所需行，无需扩大Scope。",
+      "runtime_verified": false
+    }
+  ],
+  "nonblocking_notes": [
+    {
+      "id": "N01",
+      "blocking": false,
+      "target": "/entries/2/claims/0",
+      "suggestion": "把“非frozen SG状态才发attacked”写成“target.sg存在且无frozen状态标签才发damage=0的attacked”；机制步骤2可一并写“按条件发事件”。",
+      "evidence_ref": "FF-S19",
+      "source_lines": [
+        195,
+        197
+      ]
+    },
+    {
+      "id": "N02",
+      "blocking": false,
+      "target": "/entries/1/api_contracts/2/side_effects",
+      "suggestion": "“StopSmoldering(其propagator reset无条件true)”宜写成“仅smoldering时、且propagator存在，调用StopSpreading(true,heatpct)；该true不依赖Extinguish的resetpropagator实参”，避免读成每次Extinguish无条件重置传播热量。",
+      "evidence_ref": "FF-S15",
+      "source_lines": [
+        431,
+        455
+      ]
+    }
+  ],
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-FREEZE-001",
+      "scope_verdict": "pass",
+      "claims": [
+        {
+          "id": "EXP-FREEZE-001-C01",
+          "pointer": "/entries/0/claims/0",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "构造字段、attacked监听、abs伤害累计与默认0门槛，以及IsFrozen/IsThawing判定均匹配。零伤害结论限有效damage数值的attacked事件。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C02",
+          "pointer": "/entries/0/claims/1",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "redirect真值早退、负值钳0、仅正输入推进状态、已冻先走Freeze、阈值分支要求sg存在均吻合；没有把nofreeze误写为全对象硬门禁。",
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C03",
+          "pointer": "/entries/0/claims/2",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "Freeze可见/非死亡门禁、回调在先、计时与Brain/combat/locomotor、仅状态改变发事件和增加抗性均吻合；不赋coldness结论成立。",
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C04",
+          "pointer": "/entries/0/claims/3",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "逐一核对WearOff、Thaw的双重Resolve、Unfreeze死亡分支及未取消wearoff、Reset最小赋值；没有混淆业务退出和字段复位。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C05",
+          "pointer": "/entries/0/claims/4",
+          "kind": "NSF",
+          "verdict": "precision_fix_required",
+          "reason": "事件消费、进态复查、grassgekko master安装及实体标签区别均支持；但SG退出清swap_frozen需保留frozen→thaw的例外，见F03。",
+          "evidence_refs": [
+            "FF-S05",
+            "FF-S06",
+            "FF-S07",
+            "FF-S08",
+            "FF-S09",
+            "FF-S01",
+            "FF-S04"
+          ],
+          "findings": [
+            "F03"
+          ]
+        },
+        {
+          "id": "EXP-FREEZE-001-C06",
+          "pointer": "/entries/0/claims/5",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "仅extraresist量化保存、组件先于prefab保存/加载、移除索引先清及移除hook不恢复业务均匹配；允许prefab补充恢复的边界正确。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S21",
+            "FF-S22",
+            "FF-S23"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C07",
+          "pointer": "/entries/0/claims/6",
+          "kind": "REC",
+          "verdict": "supported_static",
+          "reason": "REC明确是建议；由拆组件未恢复Brain/色调及AddColdness门禁支持，未当作新的原版强制规则。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S02",
+            "FF-S04",
+            "FF-S06"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-001-C08",
+          "pointer": "/entries/0/claims/7",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "EntityScript移除回调后取消pendingtasks再逐组件OnRemoveEntity，任务逐个Cancel/清表；不保证hook随后新建任务再次取消的保守边界成立。",
+          "evidence_refs": [
+            "FF-S26",
+            "FF-S27",
+            "FF-S21"
+          ],
+          "findings": []
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Freezable:AddColdness",
+          "pointer": "/entries/0/api_contracts/0",
+          "verdict": "supported_static",
+          "reason": "数值/redirect前置、nil返回、寒冷/色调和替换任务副作用均支持。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S03",
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Freezable:Freeze",
+          "pointer": "/entries/0/api_contracts/1",
+          "verdict": "supported_static",
+          "reason": "可见/非死亡门禁、无成功返回、直接Freeze不走nofreeze及回调无局部回滚均支持。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Freezable:Thaw",
+          "pointer": "/entries/0/api_contracts/2",
+          "verdict": "supported_static",
+          "reason": "Thaw保留冻结语义、双重时间变换与替换任务支持；“最终Unfreeze”须与正常活体计时及未知竞态合读。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S02",
+            "FF-S03"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Freezable:Unfreeze",
+          "pointer": "/entries/0/api_contracts/3",
+          "verdict": "supported_static",
+          "reason": "仅IsFrozen执行、死亡跳过Brain恢复/事件、保留wearoff任务均支持。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Freezable:Reset",
+          "pointer": "/entries/0/api_contracts/4",
+          "verdict": "supported_static",
+          "reason": "Reset仅NORMAL/coldness/tint；不取消/发事件/恢复Brain/清伤害，支持。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Freezable:OnSave / OnLoad",
+          "pointer": "/entries/0/api_contracts/5",
+          "verdict": "changes_required",
+          "reason": "组合内容的保存/加载语义支持，但身份必须拆分，见F01。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S03",
+            "FF-S22",
+            "FF-S23"
+          ],
+          "findings": [
+            "F01"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/0/mechanism_steps/0",
+          "verdict": "supported_static",
+          "reason": "master prefab装组件/FX/SG证据覆盖实际分界与安装。",
+          "evidence_refs": [
+            "FF-S07",
+            "FF-S10",
+            "FF-S11",
+            "FF-S08",
+            "FF-S09"
+          ]
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/0/mechanism_steps/1",
+          "verdict": "supported_static",
+          "reason": "正冷量完整门禁→Freeze→SG消费证据闭合。",
+          "evidence_refs": [
+            "FF-S02",
+            "FF-S04",
+            "FF-S05",
+            "FF-S06"
+          ]
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/0/mechanism_steps/2",
+          "verdict": "supported_static",
+          "reason": "定时/受击/外部热量各自能进入退出链，未等同负冷量与Unfreeze。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S13"
+          ]
+        },
+        {
+          "step": 4,
+          "pointer": "/entries/0/mechanism_steps/3",
+          "verdict": "supported_static",
+          "reason": "保存、prefab额外恢复和拆组件业务边界相符。",
+          "evidence_refs": [
+            "FF-S04",
+            "FF-S21",
+            "FF-S22",
+            "FF-S23"
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-FIRE-001",
+      "scope_verdict": "pass",
+      "claims": [
+        {
+          "id": "EXP-FIRE-001-C01",
+          "pointer": "/entries/1/claims/0",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "Ignite到StartSpreading/ExtendBurning顺序、周期0.5及随机初延迟、StopSpreading不取消task均匹配；这是已有burnable契约在新消费者链的必要前提。",
+          "evidence_refs": [
+            "FF-S14",
+            "FF-S12",
+            "FF-S15"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FIRE-001-C02",
+          "pointer": "/entries/1/claims/1",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "OnUpdate的freezable分支独立于目标propagator/AcceptsHeat、距离热衰减与endothermic门禁，负冷量后显式Unfreeze均匹配；未泛化native查询边界。",
+          "evidence_refs": [
+            "FF-S13",
+            "FF-S02",
+            "FF-S04"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FIRE-001-C03",
+          "pointer": "/entries/1/claims/2",
+          "kind": "NSF",
+          "verdict": "precision_fix_required",
+          "reason": "firemelt/共享标签协议、移除hook和无每火源计数均支持；停止更新发stopfiremelt也有非endothermic门禁，表述/API须补全，见F02。",
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "findings": [
+            "F02"
+          ]
+        },
+        {
+          "id": "EXP-FIRE-001-C04",
+          "pointer": "/entries/1/claims/3",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "蜂蜡完整文件证明meltable/master事件、首次10秒任务、重复不续期、停止取消、到期解绑/移除/不可持久化终态，以及无自定义保存。",
+          "evidence_refs": [
+            "FF-S17",
+            "FF-S22"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FIRE-001-C05",
+          "pointer": "/entries/1/claims/4",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "完整组件声明扫描无OnSave/OnLoad；EntityScript仅分派已存在保存方法。master安装、共有标签不授予客户端组件API的限定正确，旧BR-P05不被改写。",
+          "evidence_refs": [
+            "FF-S24",
+            "FF-S25",
+            "FF-S07",
+            "FF-S17",
+            "FF-S22",
+            "FF-S23"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FIRE-001-C06",
+          "pointer": "/entries/1/claims/5",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "蜂蜡实体任务、通用Remove取消、Burnable实体/组件移除差异与Propagator两hook均匹配；没有把视觉引用清空声称为FX即时消失。",
+          "evidence_refs": [
+            "FF-S17",
+            "FF-S26",
+            "FF-S27",
+            "FF-S24",
+            "FF-S16",
+            "FF-S12"
+          ],
+          "findings": []
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Propagator:StartSpreading",
+          "pointer": "/entries/1/api_contracts/0",
+          "verdict": "supported_static",
+          "reason": "source原值保存、只在无task时建周期任务、重复调用仅更新来源，支持。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "Propagator:StopSpreading",
+          "pointer": "/entries/1/api_contracts/1",
+          "verdict": "changes_required",
+          "reason": "清source/spreading、reset条件及随机heatpct支持；后续停止融化缺条件，见F02。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S12",
+            "FF-S13"
+          ],
+          "findings": [
+            "F02"
+          ]
+        },
+        {
+          "symbol": "Burnable:Extinguish",
+          "pointer": "/entries/1/api_contracts/2",
+          "verdict": "supported_static",
+          "reason": "参数、无显式返回、smotherer在burning门禁前消费及清理次序支持；StopSmoldering条件宜用N02澄清。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ],
+          "findings": []
+        },
+        {
+          "symbol": "StartFireMelt / StopFireMelt (beeswax local)",
+          "pointer": "/entries/1/api_contracts/3",
+          "verdict": "changes_required",
+          "reason": "10秒一次任务/停止取消/入库事件/到期清理支持；开始/停止身份必须拆分，见F01。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S17"
+          ],
+          "findings": [
+            "F01"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/1/mechanism_steps/0",
+          "verdict": "supported_static",
+          "reason": "Burnable显式启动Propagator，端别由所列prefab安装约束。",
+          "evidence_refs": [
+            "FF-S14",
+            "FF-S12"
+          ]
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/1/mechanism_steps/1",
+          "verdict": "supported_static",
+          "reason": "负冷量/显式解冻与非冷火融化两分支摘要正确。",
+          "evidence_refs": [
+            "FF-S13",
+            "FF-S02",
+            "FF-S04"
+          ]
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/1/mechanism_steps/2",
+          "verdict": "supported_static",
+          "reason": "蜂蜡开始/停止/到期不可持久化终态证据闭合。",
+          "evidence_refs": [
+            "FF-S17"
+          ]
+        },
+        {
+          "step": 4,
+          "pointer": "/entries/1/mechanism_steps/3",
+          "verdict": "supported_static_with_linked_finding",
+          "reason": "各清理入口分别存在，共享协议无火源所有权保证；须与F02条件修正合读。",
+          "evidence_refs": [
+            "FF-S15",
+            "FF-S16",
+            "FF-S12",
+            "FF-S13"
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-FREEZE-002",
+      "scope_verdict": "pass",
+      "claims": [
+        {
+          "id": "EXP-FREEZE-002-C01",
+          "pointer": "/entries/2/claims/0",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "子审及主审关键行复核支持master安装、声音后首检、醒睡眠/灭火、仇恨、条件attacked与加寒前二检顺序；可明确sg存在，见N01。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S20",
+            "FF-S15"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-002-C02",
+          "pointer": "/entries/2/claims/1",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "蓝杖Extinguish无reset、阴燃StopSpreading(true,-1)、AddColdness无灭火及二检不能保护全部中间访问均成立。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S15",
+            "FF-S12",
+            "FF-S02"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-002-C03",
+          "pointer": "/entries/2/claims/2",
+          "kind": "NSF",
+          "verdict": "supported_static",
+          "reason": "未燃烧burnable外层、冻结优先与点燃/加燃料互斥、尾部负冷量及显式解冻顺序均成立；未承诺冻结目标同次点燃。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S04",
+            "FF-S02"
+          ],
+          "findings": []
+        },
+        {
+          "id": "EXP-FREEZE-002-C04",
+          "pointer": "/entries/2/claims/3",
+          "kind": "EI",
+          "verdict": "supported_static",
+          "reason": "EI依据明确：red声音无条件访问attacker、目标首检后无二检，回调无成功布尔值；未把缺少防御当已复现故障。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S19"
+          ],
+          "findings": []
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "onattack_blue (staff_common local)",
+          "pointer": "/entries/2/api_contracts/0",
+          "verdict": "changes_required",
+          "reason": "局部回调、目标/声音前置、nil返回、顺序和组件任务所有权支持；身份修复见F01。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S20",
+            "FF-S15",
+            "FF-S02"
+          ],
+          "findings": [
+            "F01"
+          ]
+        },
+        {
+          "symbol": "onattack_red (staff_common local)",
+          "pointer": "/entries/2/api_contracts/1",
+          "verdict": "changes_required",
+          "reason": "局部回调、SoundEmitter要求、声音后首检、nil返回和非重入保证支持；身份修复见F01。",
+          "reviewed_fields": [
+            "visibility",
+            "parameters",
+            "returns",
+            "preconditions",
+            "side_effects",
+            "lifecycle",
+            "evidence_refs",
+            "unknowns"
+          ],
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S20",
+            "FF-S14",
+            "FF-S02",
+            "FF-S04"
+          ],
+          "findings": [
+            "F01"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/2/mechanism_steps/0",
+          "verdict": "supported_static",
+          "reason": "主审关键行和子审均验证red/blue master边界及共享函数安装。",
+          "evidence_refs": [
+            "FF-S20",
+            "FF-S19"
+          ]
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/2/mechanism_steps/1",
+          "verdict": "supported_static",
+          "reason": "蓝杖显式熄火后按SG条件发事件、最终有效性复查后加寒；N01可使摘要更精确。",
+          "evidence_refs": [
+            "FF-S19",
+            "FF-S15",
+            "FF-S02"
+          ]
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/2/mechanism_steps/2",
+          "verdict": "supported_static",
+          "reason": "红杖外层burnable且未燃烧条件下冻结优先，尾部freezable仍冻才解冻。",
+          "evidence_refs": [
+            "FF-S18",
+            "FF-S04"
+          ]
+        },
+        {
+          "step": 4,
+          "pointer": "/entries/2/mechanism_steps/3",
+          "verdict": "supported_static",
+          "reason": "组件生命周期不被武器一次性业务替代，保存/退出边界支持。",
+          "evidence_refs": [
+            "FF-S01",
+            "FF-S04",
+            "FF-S12",
+            "FF-S15"
+          ]
+        }
+      ]
+    }
+  ],
+  "scope_review": {
+    "verdict": "pass_with_required_precision_fixes",
+    "governance": "All entries remain research/restricted/hold; all scope.runtime_verified false.",
+    "authority": "grassgekko and staff factories supply explicit mastersim boundaries; component declarations themselves do not promise client availability.",
+    "historical_preservation": "Current760944 evidence is separate from preserved759671 service baseline; existing BR-P01..P05 identities/old evidence are not relabelled.",
+    "nonduplication": "Existing BR-P01..P05 statements were read from registered native-core data. Shared Ignite/Extinguish/StopSpreading/save/RemoveComponent statements serve as prerequisites; new substance is freezable three states/SG, freezable heat branch, beeswax consumer, and ordered staff callbacks.",
+    "query_cases": "13 authored queries reviewed as navigation/evaluation expectations; no MCP retrieval ranking execution claimed.",
+    "limitations_preserved": true
+  },
+  "evidence_checks": "05-research-history/native-expansion-20261030/windows/C/source-checks.json",
+  "api_identity_checks": "05-research-history/native-expansion-20261030/windows/C/api-identities.json",
+  "uncovered_boundaries": [
+    "No game, dedicated server, client, Lua execution, save/reload or runtime timing verification.",
+    "No native FindEntities/visibility/animation/network internals or all-prefab/all-Mod dependency closure.",
+    "No tested multi-source overlap, event-driven removal/reentrancy, death/task races or endothermic/freezable runtime combinations.",
+    "Attack card begins at the named callback; full projectile/combat/weapon dispatch, durability/sanity outcomes, all variants and haunt callers are not newly claimed by this candidate.",
+    "API parser check is a narrow Python check of authored identity, not a live MCP end-to-end lookup or proof of physical/public declaration."
+  ],
+  "recheck_required": "After one consolidated author revision, freeze its new SHA and review the exact delta plus all new/split API contracts; this verdict never applies automatically to another hash.",
+  "artifact_bindings": {
+    "05-research-history/native-expansion-20261030/windows/C/independent-baseline.json": "590ac89ca44b598f38fcc3285f54590115077779088020d37e357b8dd790fab3",
+    "05-research-history/native-expansion-20261030/windows/C/source-checks.json": "edd2f82d5f75d50dd4956e10570a0b2353669e95f8718d4e872c8e43cb7e144e",
+    "05-research-history/native-expansion-20261030/windows/C/api-identities.json": "5ca9a060299017f0f7c5a1e77ec5e79d48944a85ac8f20bdd9873d674ebdd8d8",
+    "05-research-history/native-expansion-20261030/windows/C/subreview/attack-review.json": "8d12fe124911ba891d078270cfffab18b03e808f1f71a94d9a2aefaff3865ca5",
+    "05-research-history/native-expansion-20261030/windows/C/subreview/attack-candidate-review.json": "6915a09005319b6972304ff0b0f26b0f49c41a77b27b519dc5a17c8d6ae74824"
+  }
+}
