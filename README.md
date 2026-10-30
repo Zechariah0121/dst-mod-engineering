@@ -1,6 +1,6 @@
 # DST Mod Engineering
 
-当前版本 `v2026.10.30.2` 共 216 条登记记录：保留旧 187 条，另有 29 条 native_mechanism 研究（Brain、世界生成、料理/调味、成长/再生、温度/潮湿及冻结/火热交互）。数量由 `knowledge/FAMILY-REGISTRY.json` 生成 `CATALOG.counts`。研究族仅显式 Reviewer 审阅，保持 `research/restricted/hold`。详见 [机制研究族](docs/native-mechanisms.md)。
+当前版本 `v2026.10.31.1` 共 216 条登记记录：保留旧 187 条，另有 29 条 native_mechanism 研究（Brain、世界生成、料理/调味、成长/再生、温度/潮湿及冻结/火热交互）。数量由 `knowledge/FAMILY-REGISTRY.json` 生成 `CATALOG.counts`。研究族仅显式 Reviewer 审阅，保持 `research/restricted/hold`。详见 [机制研究族](docs/native-mechanisms.md)。
 
 面向《饥荒联机版》Mod 开发的工程 Skill 与知识库：按任务读取知识、核对当前源码，再设计、实现、审查和验证。[English README](README.en.md)
 
@@ -8,28 +8,28 @@
 
 ## 下载
 
-当前发行：[v2026.10.30.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.30.2)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
+当前发行：[v2026.10.31.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.1)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
 
 | 附件 | 包含内容与用途 |
 |---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.30.2/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 216 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务 |
+| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.31.1/dst-mod-engineering.zip) | 完整 Skill、唯一 `knowledge/` 中的 216 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务 |
 
 下载后对照发行页的 `SHA256SUMS.txt`。包中不含游戏 Lua 原文、第三方可执行工具或私人 Mod 工程。
 
-本版来源准备面向 `760944 / Steam build 26306684` 的合法 `scripts.zip`，无需旧版源码；`source_epoch=759671` 保留为证据基线，不代表目标输入仍是旧 ZIP，也不把全库事实升级为 760944。核心必需来源槽继续严格校验；独立机制研究按引用报告文件与范围是否匹配，变化或缺失保留未知，不解除 Coding HOLD。历史比较材料保留原版本与引用，按元数据阅读。检索不保证覆盖所有表达方式；空结果可按统一目录复查。具体范围见 [能力与限制](docs/public-limits.md) 和 [源码维护](docs/source-compatibility.md)。
+本版增加 Skill 驱动的源码更新助手：首次绑定已明确的合法 `scripts.zip`，以后查库前自动检查同一路径，尝试适配可恢复的来源。变化部分由 AI 按当前任务核对；既有知识保留原适用范围，不因游戏更新关闭全库。详见 [更新助手](references/source-update-assist.md) 和 [能力与限制](docs/public-limits.md)。
 
 ## 开始使用
 
 1. 完整解压，找到直接包含 `SKILL.md` 的目录。把该目录完整放入 Agent 支持的技能位置，例如 Codex 的 `.agents/skills/dst-mod-engineering/`；其他安装位置见 [安装说明](docs/install-and-use.md)。
 2. 调用 `dst-mod-engineering`，提供任务、Mod 目录、实际 DST 版本和合法本地 `scripts.zip` 位置。没有 MCP 也可按 [知识库接入](docs/knowledge-integration.md) 读取少量相关知识文件，不默认加载全库。
-3. 使用完整 MCP 时，在包根目录用当前支持的源码准备并生成客户端配置：
+3. 首次使用，在包根目录绑定明确的游戏源码并生成客户端配置：
 
 ```text
-python -B -X utf8 prepare_sources.py --source "<760944 scripts.zip>"
+python -B -X utf8 run_kb.py update-sources ensure --source "<scripts.zip绝对路径>"
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
 
-需要 Python 3.10+ 与 SQLite FTS5。将打印配置按客户端要求接入，并在客户端确认九工具与一次实际查询。已经连接目录模式的会话，准备成功后需重启才能切换工具集。配置打印不代表连接或查询成功，见 [安装与验证](docs/install-and-use.md)。
+绑定后由 Skill 在查库前调用 `update-sources ensure`，无需重复给路径；相同输入已检查时快返。需要 Python 3.10+ 与 SQLite FTS5。将打印配置按客户端要求接入，并在客户端确认九工具与一次实际查询。已经连接目录模式的会话，准备成功后需重启才能切换工具集。配置打印不代表连接或查询成功，见 [安装与验证](docs/install-and-use.md)。
 
 默认 `--mode auto` 在准备有效时启用完整模式；来源未准备或包升级造成 `PACKAGE_CHANGED` 时，校验公开知识清单后提供两工具审阅并报告原因。缓存损坏、无效激活和不可信公开文件仍报错。`--mode full` 保持严格，目录模式不提供 Coding 上下文或已恢复源码证据。新版源码导航及局部复核见 [源码维护](docs/source-compatibility.md)。
 
@@ -51,4 +51,4 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 
 项目自有材料使用 [自定义非商业 LICENSE](LICENSE)，不是 MIT 或 OSI 开源许可。商业使用须另获书面授权；有效历史 MIT 授权与第三方权利仍按各自条款处理。见 [许可说明](docs/licensing.md)。
 
-本轮新增6条生存状态研究、显式研究API身份查询和登记驱动批量源码评估，见[阶段说明](docs/phase4-survival-api.md)。
+此前生存状态研究与 API 入口范围见[阶段说明](docs/phase4-survival-api.md)；本版仍为 216 条记录。

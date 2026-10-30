@@ -1,6 +1,6 @@
 # DST Mod Engineering
 
-Version `v2026.10.30.2` contains 216 registered records: the preserved historical 187 and 29 native_mechanism research records covering Brain, world generation, cooking/seasoning, growth/regeneration, temperature/moisture and freezing/heat interactions. `FAMILY-REGISTRY` generates `CATALOG.counts`. Research remains `research/restricted/hold` with explicit Reviewer access. See [research-family integration](docs/native-mechanisms.md).
+Version `v2026.10.31.1` contains 216 registered records: the preserved historical 187 and 29 native_mechanism research records covering Brain, world generation, cooking/seasoning, growth/regeneration, temperature/moisture and freezing/heat interactions. `FAMILY-REGISTRY` generates `CATALOG.counts`. Research remains `research/restricted/hold` with explicit Reviewer access. See [research-family integration](docs/native-mechanisms.md).
 
 An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
 
@@ -8,15 +8,15 @@ The public KB is in `knowledge/`: **216 records comprising 64 foundation records
 
 ## Download
 
-Release: [v2026.10.30.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.30.2). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
+Release: [v2026.10.31.1](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.1). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
 
 | File | Contents |
 |---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.30.2/dst-mod-engineering.zip) | Complete Skill, 216 registered public records in one `knowledge/` tree, development helpers, local source preparation and MCP |
+| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.31.1/dst-mod-engineering.zip) | Complete Skill, 216 registered public records in one `knowledge/` tree, development helpers, local source preparation and MCP |
 
 Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
 
-Source preparation in this version targets an authorized `760944 / Steam build 26306684` archive without requiring older source. `source_epoch=759671` remains the evidence baseline; it neither identifies the new input as an old archive nor upgrades every claim to 760944. Required core payload ranges remain strict. Mechanism research reports file/range matches per reference; changed or missing references remain unknown and do not grant Coding admission. Historical comparisons preserve their original metadata. An empty search result does not establish a knowledge gap. See [capabilities and limits](docs/public-limits.md) and [source maintenance](docs/source-compatibility.md).
+This release adds a Skill-driven source update assistant. Bind an explicitly supplied authorized `scripts.zip` once; the Skill checks that same path before substantive KB use and attempts preparation where source ranges can be recovered. Changed source is reviewed for the current task, while historical Scope and admission stay intact. See [update workflow](references/source-update-assist.md) and [limits](docs/public-limits.md).
 
 ## Start
 
@@ -25,11 +25,11 @@ Extract the package completely and install the directory containing `SKILL.md` i
 For full MCP, run from the package root with Python 3.10+ and SQLite FTS5:
 
 ```text
-python -B -X utf8 prepare_sources.py --source "<760944 scripts.zip>"
+python -B -X utf8 run_kb.py update-sources ensure --source "<absolute path to scripts.zip>"
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
 
-Apply the printed configuration in your client and verify nine tools plus a real query. If a catalog session is already connected, restart it after preparation to switch tools. Printed configuration does not prove a successful connection or query. See [installation](docs/install-and-use.md).
+Later tasks use `run_kb.py update-sources ensure` with the remembered binding. Identical inputs return without rebuilding; unchanged failures are not retried automatically. The assistant does not edit client configuration or restart connections. Apply the printed configuration in your client and verify nine tools plus a real query. If a catalog session is already connected, restart it after preparation to switch tools. Printed configuration does not prove a successful connection or query. See [installation](docs/install-and-use.md).
 
 Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 760944 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
 
@@ -39,4 +39,4 @@ Use [SKILL.md](SKILL.md) for topic routing, [retrieval rules](references/kb-retr
 
 Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission. Valid historical MIT grants and third-party terms remain in force; see [licensing](docs/licensing.md).
 
-This release adds six survival-state research records, explicit research API identity lookup and registry-driven batch source assessment. See [phase notes](docs/phase4-survival-api.md). New research retains its 760944 evidence identity; historical research retains 759671.
+Earlier survival-state research, explicit research API lookup and registry-driven source assessment remain available; this version keeps 216 records. See [phase notes](docs/phase4-survival-api.md). New research retains its 760944 evidence identity; historical research retains 759671.

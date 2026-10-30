@@ -17,10 +17,13 @@ from prepare_sources import PreparationError, prepared_runtime
 
 def main(argv=None):
     supplied = list(sys.argv[1:] if argv is None else argv)
+    if supplied and supplied[0] == 'update-sources':
+        from scripts.update_sources import main as update_main
+        return update_main(supplied[1:])
     if supplied and supplied[0] == 'maintain-sources':
         from scripts.source_compatibility import main as compatibility_main
         return compatibility_main(supplied[1:])
-    parser = argparse.ArgumentParser(description=__doc__, epilog='maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
+    parser = argparse.ArgumentParser(description=__doc__, epilog='update-sources: check and prepare an explicitly bound local ZIP; run update-sources --help. maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
     parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources'])
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)

@@ -479,20 +479,71 @@ class Service:
         entry=native_mechanism.bounded(record,pointer,maximum-reserve)
         return dict(wrapper,entry=entry)
 
-    def _mechanism_matches(self,query,projection,mode,filters):
+    def _mechanism_matches(self,query,projection,mode,filters,scope_logic='and'):
         # An exact ID is an explicit request; general restricted/default browsing
         # and Coding never enter this path. Research is an explicit Reviewer mode.
         if not isinstance(query,str) or len(query)>4000:raise KBError('INVALID_ARGUMENT','query must be a bounded string')
         records=self._mechanisms()
         exact=query.strip().lower() in {identifier.lower() for identifier in records}
         if projection!='reviewer' or not query.strip() or not (exact or mode=='research'):return []
-        allowed={'entry_types','families','knowledge_statuses','retrieval_statuses','coding_statuses'}
-        if any(values for key,values in filters.items() if key not in allowed):return []
+        from .retrieval_v2 import intent
+        scope=intent(query)
+        positive=scope['original_positive']
         expected={'entry_types':native_mechanism.TYPE,'families':'native_mechanism',
                   'knowledge_statuses':'research','retrieval_statuses':'restricted','coding_statuses':'hold'}
-        if any(filters.get(key) and value not in filters[key] for key,value in expected.items()):return []
-        scored=[(native_mechanism.score(record,query),identifier,record) for identifier,record in records.items()]
-        return [record for score,_,record in sorted(scored,key=lambda row:(-row[0],row[1])) if score>0]
+        scored=[]
+        for identifier,record in records.items():
+            entry=record['entry']
+            checks=[]
+            for key,values in filters.items():
+                if not values:continue
+                got=([c['kind'] for c in entry['claims']] if key=='claim_types' else
+                     [expected[key]] if key in expected else [])
+                checks.append(any(value in got for value in values))
+            if checks and not (all(checks) if scope_logic=='and' else any(checks)):continue
+            # Whole mechanism entries carry all their atoms. If a negative
+            # clause matches one, defer the entry rather than leak excluded
+            # material in its otherwise complete envelope.
+            if any(native_mechanism.score(record,clause)>0 for clause in scope['negative_clauses']):continue
+            score=native_mechanism.score(record,positive)
+            if score>0:scored.append((score,identifier,record))
+        return [record for _,_,record in sorted(scored,key=lambda row:(-row[0],row[1]))]
+
+    def _research_navigation_rows(self,rows,mechanisms,query):
+        """One corpus/score for admitted research navigation, before top-k.
+
+        Existing record/task gates still govern Legacy/Core views. Mechanism
+        envelopes are research material, not Legacy/Core projections. Their
+        unrelated family scores must never be compared or concatenated top-k.
+        """
+        from .retrieval_v2 import words, extract_symbols, intent
+        ranker=self._ranker_v2()
+        documents={d['id']:d for d in ranker.documents}
+        for record in self._mechanisms().values():
+            entry=record['entry']
+            documents[entry['id']]={'id':entry['id'],'entry':entry,'family':'native_mechanism'}
+        fields={}
+        for identifier,d in documents.items():
+            entry=d['entry']
+            if d['family']=='native_mechanism':
+                body=' '.join(c['statement'] for c in entry['claims'])+' '+json.dumps(entry['api_contracts'],ensure_ascii=False)
+            else:body=d['body']
+            focus=' '.join([entry['title'],entry.get('engineering_question','')]+entry.get('aliases',[]))
+            fields[identifier]=(words(focus),words(body),extract_symbols(focus+' '+body))
+        df=Counter(term for focus,body,_ in fields.values() for term in focus|body)
+        idf={term:math.log(1+(len(fields)-n+.5)/(n+.5)) for term,n in df.items()}
+        positive=intent(query)['original_positive'];terms=words(positive);symbols=extract_symbols(positive)
+        candidates=list(rows)+[{'document':documents[r['entry']['id']],'mechanism_record':r} for r in mechanisms]
+        for row in candidates:
+            identifier=row['document']['id'];focus,body,names=fields[identifier]
+            score=(10000. if positive.strip().lower()==identifier.lower() else
+                   sum(sorted((idf[t]*(4 if t in focus else 1) for t in terms&(focus|body)),reverse=True)[:8])
+                   +20*len(symbols&names))
+            row['score']=round(score,5)
+            row['match_reason']={**row.get('match_reason',{}),
+                'cross_family_navigation':{'pipeline':'shared-corpus-navigation/1','score':row['score'],
+                    'corpus_size':len(fields),'ranking_only':True,'coding_admission_granted':False}}
+        return sorted(candidates,key=lambda row:(-row['score'],row['document']['id']))
 
     def _mechanism_results(self,records,query,count,maximum):
         payload={'results':[],'withheld_atoms':[],'query':query,'projection':'reviewer','family':'native_mechanism',
@@ -520,25 +571,9 @@ class Service:
         return payload
 
     def _mechanism_evidence(self,record,index,subpointer,maximum):
-        entry=record['entry'];doc=record['document']
-        refs={ref['id']:ref for ref in doc['source_references']}
-        ids=native_mechanism.local_refs(entry)
-        if index>=len(ids):raise KBError('INVALID_ARGUMENT','Mechanism reference index outside entry manifest')
-        ref=refs[ids[index]]
-        if subpointer:
-            try:nativecore.pointer(ref,subpointer)
-            except (ValueError,KeyError,IndexError,TypeError) as exc:raise KBError('INVALID_ARGUMENT','Invalid source locator subpointer') from exc
-        context=native_mechanism.envelope(record)
-        context.update(value=ref,source_references=[ref],pointer='/source_references/'+str(doc['source_references'].index(ref)),reference_index=index)
-        # Whole locator is retained even for a narrower request: hash/file/range
-        # cannot be stripped from one another by a subfield pointer.
-        context['artifact']['pointer']=context['pointer']
-        context['requested_subpointer']=subpointer
-        payload={'evidence':context,'projection':'reviewer'}
-        if self.epoch_context is not None:payload['source_environment']=self.epoch_context.metadata()
-        if len(json.dumps(payload,ensure_ascii=False).encode())>maximum:
-            return {'id':entry['id'],'bounded':True,'withheld_reason':'LOCATOR_AND_REQUIRED_SCOPE_EXCEED_BUDGET','value':None}
-        return payload
+        from .mechanism_evidence import resolve
+        return resolve(record,index,subpointer,maximum,
+                       self.epoch_context.metadata() if self.epoch_context is not None else None)
 
     def _ranker_v2(self):
         if getattr(self, '_retrieval_ranker', None) is None:
@@ -759,16 +794,23 @@ class Service:
         if scope_logic not in ['and','or']:raise KBError('INVALID_ARGUMENT','scope_logic must be and or or')
         for key,items in filters.items():
             if key not in FILTERS or not isinstance(items,list) or any(not isinstance(v,str) for v in items):raise KBError('INVALID_ARGUMENT','Invalid filter '+key)
-        mechanism_matches=self._mechanism_matches(query,projection,mode,filters)
-        if mechanism_matches:
-            return self._mechanism_results(mechanism_matches,query,top_k,64000)
+        mechanism_matches=self._mechanism_matches(query,projection,mode,filters,scope_logic)
         ranker=self._ranker_v2()
         rank_options={'view':view} if view!='decision' else {}
         rows,diagnosis=ranker.search(query,projection,max(top_k,len(ranker.documents)),filters,scope_logic,mode=mode,**rank_options)
+        if projection=='reviewer' and (mode=='research' or mechanism_matches):
+            rows=self._research_navigation_rows(rows,mechanism_matches,query)
+            diagnosis=dict(diagnosis,candidate_matches=len(rows))
         results=[]
         delivery_withheld=0
         subset_withheld=0
         for row in rows:
+            if 'mechanism_record' in row:
+                item=native_mechanism.envelope(row['mechanism_record'],assessment_detail=False)
+                item['expansion']={'reviewer':{'tool':'get_entry','id':item['id'],'projection':'reviewer'}}
+                results.append(item|{'score':row['score'],'match_reason':row['match_reason']})
+                if len(results)>=top_k and (_budget_wire or not mechanism_matches):break
+                continue
             record,family=row['document']['entry'],row['document']['family']
             # Bundle candidates are not delivered yet: its byte-aware accept
             # step applies this same cap, allowing rejected cards to be refilled.
@@ -805,7 +847,7 @@ class Service:
             results.append(item)
             dt.record(record['id'],'SERVICE_RESULT',result_position=len(results),service_top_k_status='DELIVERED')
             dt.terminal(record['id'],'SERVICE_RESULT','DELIVERED')
-            if len(results)>=top_k:
+            if len(results)>=top_k and (_budget_wire or not mechanism_matches):
                 dt.top_k_break(record['id'])
                 break
         if view=='decision':
@@ -826,11 +868,51 @@ class Service:
         payload['top_k_applies_to']='actual_task_admitted_views'
         if view=='decision':
             payload['results']=[project_l1_card(projection_v2.bundle_decision_card(item),public_contract=not _budget_wire) for item in results]
+        if mechanism_matches and self.epoch_context is not None:
+            payload['source_environment']=self.epoch_context.metadata()
+        if mechanism_matches and not _budget_wire:
+            # Allocate whole views first. Deferred navigation must never grow
+            # after a fit decision and push already accepted facts over budget.
+            candidates=payload['results'];payload['results']=[]
+            payload.update(maximum_payload_bytes=64000,withheld_atoms=[],
+                withheld_atoms_total_count=0,withheld_atoms_omitted_count=0,
+                withheld_navigation_followup='Use a narrower query or get_entry with an explicitly selected ID.',
+                restricted_research_explicitly_requested=True,notice=native_mechanism.NOTICE,
+                payload_bytes=0,estimated_tokens_bytes_div_4=0)
+            deferred=[]
+            for item in candidates:
+                if len(payload['results'])>=top_k:break
+                proposed=dict(payload,results=payload['results']+[item])
+                if serialized_payload_cost(proposed)+200<=64000:
+                    payload['results'].append(item)
+                else:
+                    deferred.append({'id':item['id'],
+                        'reason':'WHOLE_ENTRY_AND_REQUIRED_CONTEXT_EXCEED_BUDGET',
+                        'followup':{'tool':'get_entry','id':item['id'],'projection':'reviewer'}})
+            payload['results_truncated']=diagnosis['candidate_matches']>len(payload['results'])+delivery_withheld
+            payload['knowledge_gap']=not bool(payload['results'])
+            payload['withheld_atoms_total_count']=len(deferred)
+            payload['withheld_atoms_omitted_count']=len(deferred)
+            # Only complete deferred rows fit; omitted navigation is counted,
+            # not reported as delivered. All flags and metrics are reserved.
+            for row in deferred:
+                proposed=dict(payload,withheld_atoms=payload['withheld_atoms']+[row],
+                    withheld_atoms_omitted_count=payload['withheld_atoms_omitted_count']-1)
+                if serialized_payload_cost(proposed)+200<=64000:
+                    payload=proposed
         # Public searches retain their payload metrics. The in-process bundle
         # consumer does not use or serialize these intermediate metrics.
         if not _budget_wire:
             payload['payload_bytes']=len(json.dumps(payload,ensure_ascii=False).encode('utf-8'))
             payload['estimated_tokens_bytes_div_4']=round(payload['payload_bytes']/4)
+            if mechanism_matches:
+                for _ in range(4):
+                    cost=serialized_payload_cost(payload)
+                    if payload['payload_bytes']==cost and payload['estimated_tokens_bytes_div_4']==round(cost/4):break
+                    payload['payload_bytes']=cost
+                    payload['estimated_tokens_bytes_div_4']=round(cost/4)
+            if mechanism_matches and serialized_payload_cost(payload,64000,phase='final')>64000:
+                raise KBError('PAYLOAD_BUDGET_EXCEEDED','Required search metadata exceeds the complete payload budget; no facts delivered.')
         return payload
 
     @epoch_bound
@@ -1061,8 +1143,6 @@ class Service:
         if view not in ['decision','reviewer','evidence']:raise KBError('INVALID_ARGUMENT','Unknown view')
         if budget not in ['compact','normal','deep']:raise KBError('INVALID_ARGUMENT','Unknown budget')
         count,maximum={'compact':(5,16000),'normal':(8,32000),'deep':(12,64000)}[budget]
-        mechanism_matches=self._mechanism_matches(task_description,projection,mode,{})
-        if mechanism_matches:return self._mechanism_results(mechanism_matches,task_description,count,maximum)
         # The MCP adapter repeats this exact field after dispatch. Include it
         # before every fit decision so the declared complete-payload limit also
         # covers epoch identity; single-root callers retain their old shape.

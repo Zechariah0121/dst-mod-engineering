@@ -1,6 +1,6 @@
 # 能力与限制 / Capabilities and limits
 
-当前版本 `v2026.10.30.2` 带 216 条登记知识及 Skill（旧 187 条 + 29 条独立机制研究）。这表示可读取的知识范围，不代表全部已获 Coding 准入、源码证据全部随包或功能已实测；历史 187 条发行保留其原身份。
+当前版本 `v2026.10.31.1` 带 216 条登记知识及 Skill（旧 187 条 + 29 条独立机制研究）。这表示可读取的知识范围，不代表全部已获 Coding 准入、源码证据全部随包或功能已实测；历史 187 条发行保留其原身份。
 
 | 项目 | 实际边界 |
 |---|---|
@@ -8,6 +8,7 @@
 | 公开材料 | 仅提供经审原创知识及必要证据片段；3 项项目政策与 1 项 EI 的私有情境公开隐藏为 `UNK`，不补造泛化事实，其他 NSF 原值、ID 与 Scope 保留 |
 | Coding 准入 | 13 条 Native AI 默认十字段、任务子集最多 5 条；110 条 Core 与 29 条独立机制研究保留 Coding HOLD。文件可读、canonical 或可检索不解除限制 |
 | 目录模式 | 两工具只做全部登记记录（当前版本 216 条）的目录导航与公开材料审阅；正文读取只允许 `purpose="review"`，不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不表示运行验证。预算不足时不截断正文，应按提示选择 JSON Pointer |
+| 更新助手 | Skill 查库前检查一次明确绑定的 ZIP，尝试严格来源准备；相同输入快返、失败抑制重复尝试。不改游戏、客户端配置或现有连接，不保证任意更新兼容；失败后按当前任务核对新源码，旧知识按原 Scope 审阅 |
 | 游戏源码 | 不附游戏 Lua 原文；`$dst_source_payload_slot` 不是已读源码。完整模式需从合法本地来源恢复缺失载荷 |
 | 来源依赖 | 本版来源准备面向合法持有的 `760944 / build 26306684 scripts.zip`，不要求旧版源码；核心必需来源槽严格校验。机制研究按引用报告匹配、变化或缺失，缺口保留未知，不封锁其他研究条目或解除 HOLD。历史比较节点以 `metadata_only` 保留原来源信息 |
 | 启动与缓存 | `auto` 对来源未准备或 `PACKAGE_CHANGED` 核验公开文件清单后进入审阅并报告原因；缓存损坏、无效激活及公开文件不可信仍报错。显式 `--mode catalog` 可审阅公开材料；来源准备完成后须重启 MCP 会话才能切换为九工具 |
@@ -19,4 +20,6 @@
 
 来源准备生成的 `cache/runtime/` 含本地游戏源码片段，不能随公开包上传。知识检索仍受角色、预算、Scope、缺失/延期和 HOLD 约束，见 [接入说明](knowledge-integration.md) 与 [检索策略](../references/kb-retrieval.md)。具体工程验收见 [测试与交付](../references/testing-release.md)。
 
-Version `v2026.10.30.2` includes 216 registered records (historical 187 plus 29 restricted mechanism research records), without unrestricted Coding admission or complete original evidence. Published historical releases retain their own identity. Three project policies and one EI retain private context as `UNK`; other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five records; 110 Core records retain Coding HOLD. Source preparation targets an authorized `760944 / build 26306684 scripts.zip` without older source. `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report exact/range-only matches or unknown/missing source without blocking every other research record or granting Coding admission; historical comparisons retain original metadata as `metadata_only`, not restored current-source evidence. This does not upgrade every knowledge claim to current-version validation. Two catalog tools support public review without Coding context or restored source evidence. Default `auto` permits public review after manifest validation for missing preparation or PACKAGE_CHANGED with a visible reason; cache damage, invalid activation and untrusted public data remain errors. Restart a connected catalog session after preparation. Game Lua is excluded and restored caches stay local. Printed configuration or validation does not prove client connection or real queries. Future versions, remote clients, visuals and audio need separate evidence.
+Version `v2026.10.31.1` includes 216 registered records (historical 187 plus 29 restricted mechanism research records), without unrestricted Coding admission or complete original evidence. Published historical releases retain their own identity. Three project policies and one EI retain private context as `UNK`; other NSF values, IDs and Scope remain intact. Native AI Coding uses exactly ten fields and at most five records; 110 Core records retain Coding HOLD. Source preparation targets an authorized `760944 / build 26306684 scripts.zip` without older source. `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report exact/range-only matches or unknown/missing source without blocking every other research record or granting Coding admission; historical comparisons retain original metadata as `metadata_only`, not restored current-source evidence. This does not upgrade every knowledge claim to current-version validation. Two catalog tools support public review without Coding context or restored source evidence. Default `auto` permits public review after manifest validation for missing preparation or PACKAGE_CHANGED with a visible reason; cache damage, invalid activation and untrusted public data remain errors. Restart a connected catalog session after preparation. Game Lua is excluded and restored caches stay local. Printed configuration or validation does not prove client connection or real queries. Future versions, remote clients, visuals and audio need separate evidence.
+
+更新助手的绑定、缓存与复核 sidecar 均留本地。准备成功后仍须重连并验证实际工具/来源；来源缺口不能由旧缓存补成当前版本证明。步骤见 [更新助手](../references/source-update-assist.md)。

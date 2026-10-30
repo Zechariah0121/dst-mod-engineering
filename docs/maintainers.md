@@ -1,6 +1,6 @@
 # 维护与构建
 
-用户安装与使用见根 [README](../README.md)。当前版本 `v2026.10.30.2` 只有一个 `dst-mod-engineering.zip` 和配套 `SHA256SUMS.txt`，Skill、216 条登记知识和 MCP 共用唯一 `knowledge/`。`source_epoch=759671` 保留为证据基线，本次核验的来源输入为 `760944 / build 26306684`；历史版本在 Git 历史中保留。
+用户安装与使用见根 [README](../README.md)。当前版本 `v2026.10.31.1` 只有一个 `dst-mod-engineering.zip` 和配套 `SHA256SUMS.txt`，Skill、216 条登记知识和 MCP 共用唯一 `knowledge/`。`source_epoch=759671` 保留为证据基线，本次核验的来源输入为 `760944 / build 26306684`；历史版本在 Git 历史中保留。公开版更新助手见 [源码更新指引](../references/source-update-assist.md)。
 
 ```text
 python -B -m unittest discover -s tests -v
