@@ -1,10 +1,10 @@
 # 安装与使用 / Installation and use
 
-当前版本为 `v2026.10.31.2`，包含 224 条登记记录（旧 187 条 + 37 条机制研究）。新研究保持 `research/restricted/hold`；版本和数量以 `RELEASE-MANIFEST`、`FAMILY-REGISTRY` 和 `CATALOG` 为准。
+当前版本为 `v2026.10.31.3`，包含 227 条登记记录（旧 187 条 + 40 条机制研究）。新研究保持 `research/restricted/hold`；版本和数量以 `RELEASE-MANIFEST`、`FAMILY-REGISTRY` 和 `CATALOG` 为准。
 
 ## 下载与解压
 
-下载唯一发行包 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.31.2/dst-mod-engineering.zip)：包含完整 Skill、唯一 `knowledge/` 中的 224 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务。网页或离线阅读也使用同一包，按任务选择文件。
+下载唯一发行包 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.31.3/dst-mod-engineering.zip)：包含完整 Skill、唯一 `knowledge/` 中的 227 条登记知识、开发辅助脚本、来源准备工具与 MCP 服务。网页或离线阅读也使用同一包，按任务选择文件。
 
 对照同版 `SHA256SUMS.txt` 后完整解压。ZIP 顶层只有 `dst-mod-engineering/`，直接包含 `SKILL.md`。安装时保留整个目录，包括知识、MCP 服务、来源准备文件和许可证；不要只复制入口文件。包内 `RELEASE-MANIFEST.json` 记录逐文件 SHA-256 与相应登记目录计数；历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 仍为 187 条，不与本版混用。
 
@@ -37,10 +37,10 @@ python -B -X utf8 run_kb.py update-sources ensure --source "<scripts.zip绝对�
 
 ## 手动来源准备与完整九工具 MCP
 
-需要 Python 3.10+ 与 SQLite FTS5；MCP 与来源准备使用标准库，无需安装 `luaparser`。在包根目录运行，替换为自己合法持有的 `760944 / Steam build 26306684` 来源。本版保留 `source_epoch=759671` 作为证据基线：
+需要 Python 3.10+ 与 SQLite FTS5；MCP 与来源准备使用标准库，无需安装 `luaparser`。在包根目录运行，替换为自己合法持有的 `761239 / Steam build 26335394` 来源。本版保留 `source_epoch=759671` 作为证据基线：
 
 ```text
-python -B -X utf8 prepare_sources.py --source "<760944 scripts.zip>"
+python -B -X utf8 prepare_sources.py --source "<761239 scripts.zip>"
 python -B -X utf8 run_kb.py status --mode full
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
@@ -104,10 +104,10 @@ python -m venv .venv
 |---|---|
 | 找不到 Skill 或知识文件 | 检查目录层级、完整解压和实际加载路径；不要只复制 `SKILL.md` |
 | 找不到 `prepare_sources.py` / `run_kb.py` | 检查是否完整解压当前 `dst-mod-engineering.zip`，并在含 `SKILL.md` 的包根目录操作 |
-| 单份当前源码准备失败 | 核对输入是否为本版核验的 `760944 / build 26306684`、ZIP 是否完整及输出的必需范围/哈希要求；其他目标先做局部复核，旧版源码不是启动前提 |
+| 单份当前源码准备失败 | 核对输入是否为本版核验的 `761239 / build 26335394`、ZIP 是否完整及输出的必需范围/哈希要求；其他目标先做局部复核，旧版源码不是启动前提 |
 | `auto` 报缓存损坏，或报告包升级降级审阅 | 缓存损坏仍须修复；包升级可先用已校验公开资料审阅，再按 [源码维护](source-compatibility.md) 局部复核新版源码 |
 | 准备成功后仍只有两工具 | 重启 MCP 会话，工具集不会在已连接会话中自动切换 |
 | MCP 已配置但无工具或查询失败 | 核对当前 Python、包路径、启动模式、准备状态、stderr 与客户端会话 |
 | 网页 AI 无本地权限 | 提供必要材料；云端不能直接读取用户电脑的游戏和缓存 |
 
-Version `v2026.10.31.2` includes the Skill, 224 records and a source update assistant. Bind once with `update-sources ensure --source`, then let the Skill call `ensure` before KB use. It checks remembered inputs, attempts strict preparation and leaves client configuration/connections untouched. Reconnect and verify a real query after preparation; inspect changed current source for the task when preparation fails. Manual preparation remains available. Use one authorized `760944 / Steam build 26306684 scripts.zip`, then `mcp-config --mode full`; older source is not required. `source_epoch=759671` remains the evidence baseline, without relabeling historical claims or the new archive. Required core payload ranges stay strict. Mechanism research tracks exact file/range matches, range-only matches, changed/unknown or missing references; a research source gap does not block every other research record or grant Coding admission. Full mode needs Python 3.10+ and SQLite FTS5; verify nine tools and a real query in your client. Historical comparisons remain `metadata_only`. Restart connected catalog sessions after preparation. Default `auto` allows public review after manifest validation for missing preparation or PACKAGE_CHANGED; cache damage and untrusted public inputs remain errors. Restored Lua stays local. Source preparation and static checks do not prove game behavior; future archives, remote clients, visuals and audio require separate verification.
+Version `v2026.10.31.3` includes the Skill, 227 records and a source update assistant. Bind once with `update-sources ensure --source`, then let the Skill call `ensure` before KB use. It checks remembered inputs, attempts strict preparation and leaves client configuration/connections untouched. Reconnect and verify a real query after preparation; inspect changed current source for the task when preparation fails. Manual preparation remains available. Use one authorized `761239 / Steam build 26335394 scripts.zip`, then `mcp-config --mode full`; older source is not required. `source_epoch=759671` remains the evidence baseline, without relabeling historical claims or the new archive. Required core payload ranges stay strict. Mechanism research tracks exact file/range matches, range-only matches, changed/unknown or missing references; a research source gap does not block every other research record or grant Coding admission. Full mode needs Python 3.10+ and SQLite FTS5; verify nine tools and a real query in your client. Historical comparisons remain `metadata_only`. Restart connected catalog sessions after preparation. Default `auto` allows public review after manifest validation for missing preparation or PACKAGE_CHANGED; cache damage and untrusted public inputs remain errors. Restored Lua stays local. Source preparation and static checks do not prove game behavior; future archives, remote clients, visuals and audio require separate verification.

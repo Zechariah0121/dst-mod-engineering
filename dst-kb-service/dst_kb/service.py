@@ -523,27 +523,93 @@ class Service:
             entry=record['entry']
             documents[entry['id']]={'id':entry['id'],'entry':entry,'family':'native_mechanism'}
         fields={}
+        declared_by_id={}
         for identifier,d in documents.items():
             entry=d['entry']
             if d['family']=='native_mechanism':
-                body=' '.join(c['statement'] for c in entry['claims'])+' '+json.dumps(entry['api_contracts'],ensure_ascii=False)
-            else:body=d['body']
+                units=[c['statement'] for c in entry['claims']]
+                units += [json.dumps({k:a[k] for k in ('symbol','parameters','returns','preconditions','side_effects','lifecycle')},ensure_ascii=False) for a in entry['api_contracts']]
+                units += [step['description'] for step in entry.get('mechanism_steps',[])]
+            else:
+                units=[json.dumps(a['statement'],ensure_ascii=False) for a in projection_v2._atoms(entry,d['family'])
+                       if a.get('kind')!='PROJECT_POLICY']
+            body=' '.join(units)
             focus=' '.join([entry['title'],entry.get('engineering_question','')]+entry.get('aliases',[]))
-            fields[identifier]=(words(focus),words(body),extract_symbols(focus+' '+body))
-        df=Counter(term for focus,body,_ in fields.values() for term in focus|body)
+            declared_by_id[identifier]=({name.lower() for api in entry['api_contracts'] for name in declared_navigation_symbols(api)}
+                if d['family']=='native_mechanism' else set(d.get('contract_navigation',())))
+            fields[identifier]=(words(focus),words(body),extract_symbols(focus+' '+body),[words(u) for u in units])
+        df=Counter(term for focus,body,_,_ in fields.values() for term in focus|body)
         idf={term:math.log(1+(len(fields)-n+.5)/(n+.5)) for term,n in df.items()}
         positive=intent(query)['original_positive'];terms=words(positive);symbols=extract_symbols(positive)
         candidates=list(rows)+[{'document':documents[r['entry']['id']],'mechanism_record':r} for r in mechanisms]
         for row in candidates:
-            identifier=row['document']['id'];focus,body,names=fields[identifier]
+            identifier=row['document']['id'];focus,body,names,units=fields[identifier]
             score=(10000. if positive.strip().lower()==identifier.lower() else
-                   sum(sorted((idf[t]*(4 if t in focus else 1) for t in terms&(focus|body)),reverse=True)[:8])
-                   +20*len(symbols&names))
+                   sum(sorted((idf[t]*4 for t in terms&focus),reverse=True)[:3])
+                   +max((sum(sorted((idf[t] for t in terms&unit),reverse=True)[:5]) for unit in units),default=0.)
+                   +20*len(symbols&names)
+                   +60*len({name for name in symbols&declared_by_id[identifier] if ':' in name or '.' in name}))
             row['score']=round(score,5)
             row['match_reason']={**row.get('match_reason',{}),
                 'cross_family_navigation':{'pipeline':'shared-corpus-navigation/1','score':row['score'],
                     'corpus_size':len(fields),'ranking_only':True,'coding_admission_granted':False}}
-        return sorted(candidates,key=lambda row:(-row['score'],row['document']['id']))
+        return sorted((row for row in candidates if not positive.strip() or row['score']>0),
+                      key=lambda row:(-row['score'],row['document']['id']))
+
+    def _research_seed_view(self,card,query):
+        """A whole admitted atom with its own required closure, never prose slices."""
+        from .retrieval_v2 import words, intent
+        positive=intent(query)['original_positive'];terms=words(positive)
+        # Parse complete names before matching declarations. A shorter method
+        # is never an exact identity inside an extended name or another owner.
+        requested_names={m.group().lower() for m in re.finditer(
+            r'(?<![A-Za-z0-9_.:])'+native_mechanism.NAME+r'(?![A-Za-z0-9_.:])',positive)}
+        requested_names.update(('require("'+m['module']+'").'+m['member']).lower()
+            for m in re.finditer(native_mechanism.MODULE,positive))
+        if positive.strip().lower()==card['id'].lower():return card
+        if card.get('family')=='native_mechanism':
+            record=self._mechanisms()[card['id']]
+            choices=[]
+            for field in ('claims','api_contracts','mechanism_steps'):
+                for index,value in enumerate(record['entry'].get(field,[])):
+                    if field=='api_contracts':
+                        content={key:value[key] for key in
+                            ('symbol','parameters','returns','preconditions','side_effects','lifecycle')}
+                    else:content=value['statement' if field=='claims' else 'description']
+                    text=json.dumps(content,ensure_ascii=False)
+                    overlap=terms&words(text)
+                    if not overlap:continue
+                    # Exact declarations outrank incidental mentions; ranking
+                    # this original unit does not verify the task assertion.
+                    identity=native_mechanism.api_identity(value) if field=='api_contracts' else None
+                    declared=identity['symbol'].lower() if identity is not None else ''
+                    exact=declared in requested_names
+                    choices.append((not exact,-len(overlap),field,index))
+            if not choices:return card
+            _,_,field,index=min(choices)
+            atom=native_mechanism.envelope(record,'/'+field+'/'+str(index),assessment_detail=False)
+            return atom|{key:card[key] for key in ('score','match_reason','expansion') if key in card}
+        document=next((d for d in self._ranker_v2().documents if d['id']==card['id']),None)
+        if document is None:return card
+        record=document['entry']
+        options={'query':query}
+        registry=getattr(self,'_scope_navigation',None)
+        supplements=getattr(self,'_original_supplements',None)
+        if document['family']=='core':
+            if registry is not None:options['navigation_context']=registry.context_for(record)
+            if supplements is not None:options['supplement_context']=supplements.context_for(record)
+        try:
+            plan=projection_v2.atomic_delivery_plan(card,record,**options)
+            units=plan['units']
+            if not units:return card
+            atoms={a['record_pointer']:a for a in projection_v2._atoms(record,document['family'])}
+            best=max(units,key=lambda u:len(terms&words(json.dumps(
+                atoms.get(u['seed_record_pointer'],{}).get('statement',''),ensure_ascii=False))))
+            atom=projection_v2._atomic_subset_from_plan(card,record,[best['seed_record_pointer']],plan,**options)
+            return project_l1_card(projection_v2.bundle_decision_card(atom),public_contract=True)
+        except (ValueError,KeyError,TypeError,AttributeError):
+            # An unavailable closure plan is not permission to strip Scope.
+            return project_l1_card(projection_v2.bundle_decision_card(card),public_contract=True)
 
     def _mechanism_results(self,records,query,count,maximum):
         payload={'results':[],'withheld_atoms':[],'query':query,'projection':'reviewer','family':'native_mechanism',
@@ -874,6 +940,9 @@ class Service:
             # Allocate whole views first. Deferred navigation must never grow
             # after a fit decision and push already accepted facts over budget.
             candidates=payload['results'];payload['results']=[]
+            rich_by_id={item['id']:item for item in results}
+            seed_views={item['id']:self._research_seed_view(rich_by_id[item['id']],query)
+                        for item in candidates} if view=='decision' else {}
             payload.update(maximum_payload_bytes=64000,withheld_atoms=[],
                 withheld_atoms_total_count=0,withheld_atoms_omitted_count=0,
                 withheld_navigation_followup='Use a narrower query or get_entry with an explicitly selected ID.',
@@ -882,13 +951,22 @@ class Service:
             deferred=[]
             for item in candidates:
                 if len(payload['results'])>=top_k:break
-                proposed=dict(payload,results=payload['results']+[item])
+                seed=seed_views.get(item['id'],item)
+                proposed=dict(payload,results=payload['results']+[seed])
                 if serialized_payload_cost(proposed)+200<=64000:
-                    payload['results'].append(item)
+                    payload['results'].append(seed)
                 else:
                     deferred.append({'id':item['id'],
                         'reason':'WHOLE_ENTRY_AND_REQUIRED_CONTEXT_EXCEED_BUDGET',
                         'followup':{'tool':'get_entry','id':item['id'],'projection':'reviewer'}})
+            # Every record receives a first atom attempt before a whole-card
+            # refill. Keep the common navigation order and the same byte cap.
+            full_by_id={item['id']:item for item in candidates}
+            for position,item in enumerate(payload['results']):
+                full=full_by_id[item['id']]
+                proposed=dict(payload,results=payload['results'][:position]+[full]+payload['results'][position+1:])
+                if serialized_payload_cost(proposed)+200<=64000:payload=proposed
+            payload['partial_record_count']=sum(bool(item.get('pointer') or item.get('atomic_delivery',{}).get('withheld_atoms')) for item in payload['results'])
             payload['results_truncated']=diagnosis['candidate_matches']>len(payload['results'])+delivery_withheld
             payload['knowledge_gap']=not bool(payload['results'])
             payload['withheld_atoms_total_count']=len(deferred)

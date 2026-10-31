@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前版本：`v2026.10.31.2`；统一目录 224 条，其中独立机制研究族 37 条，保持 `research/restricted/hold`。
+当前版本：`v2026.10.31.3`；统一目录 227 条，其中独立机制研究族 40 条，保持 `research/restricted/hold`。
 
 面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
@@ -36,7 +36,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
 
-来源准备的已核验输入为 `760944 / build 26306684`；服务环境 `759671` 与研究原子的各自证据身份分别保留。匹配不代表行为兼容，历史 `metadata_only` 不作为当前源码证据。目录模式只提供导航与显式 review；完整模式保留来源与完整性校验，缓存损坏不静默降级。详见 [源码维护](docs/source-compatibility.md) 与 [检索策略](references/kb-retrieval.md)。更新助手只维护本地绑定和来源缓存；知识正文默认只读，canonical、Scope 与准入不自动更新。
+来源准备的已核验输入为 `761239 / build 26335394`；服务环境 `759671` 与研究原子的各自证据身份分别保留。匹配不代表行为兼容，历史 `metadata_only` 不作为当前源码证据。目录模式只提供导航与显式 review；完整模式保留来源与完整性校验，缓存损坏不静默降级。详见 [源码维护](docs/source-compatibility.md) 与 [检索策略](references/kb-retrieval.md)。更新助手只维护本地绑定和来源缓存；知识正文默认只读，canonical、Scope 与准入不自动更新。
 
 ## 按问题读取
 

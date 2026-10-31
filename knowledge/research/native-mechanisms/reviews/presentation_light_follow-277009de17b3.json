@@ -1,0 +1,127 @@
+{
+  "schema": "dst-independent-fx-delta-review/1",
+  "reviewer_window": "E",
+  "review_round": 2,
+  "date": "2026-10-31",
+  "candidate": "05-research-history/update-761239-20261031/coordinator/frozen/fx-r2/candidate.json",
+  "candidate_sha256": "b09d05ee7632565b0610663494daa7ebf95ae2e1dc22ce0977e392104ec03a8e",
+  "runtime_verified": false,
+  "source_epoch": "761239",
+  "source_archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+  "verdict": "approved_for_research_registration",
+  "registration_recommended": true,
+  "registration_approved": true,
+  "registration_boundary": "仅该精确R2 SHA的3卡可作为research/restricted/hold研究登记；不改历史Scope/原知识字节或HOLD，不证明游戏/客户端视听。",
+  "previous_review": {
+    "file": "05-research-history/update-761239-20261031/windows/E/review.json",
+    "sha256": "f742f8ae58e5f6f641bc21a100c477ac0e331dcbc415381153f7a168c2380580",
+    "candidate_sha256": "fd15dd2c496fe17d3b20f7aeef710b39d4b8eabb762a432d2aff5ab755463e0c",
+    "runtime_verified": false
+  },
+  "delta": {
+    "changed_reference_arrays": [
+      "/entries/1/claims/3/evidence_refs",
+      "/entries/1/compatibility/dependency_refs",
+      "/entries/1/mechanism_steps/1/evidence_refs",
+      "/entries/2/api_contracts/0/evidence_refs",
+      "/entries/2/claims/3/evidence_refs",
+      "/entries/2/compatibility/dependency_refs",
+      "/entries/2/mechanism_steps/0/evidence_refs"
+    ],
+    "added_source_reference_ids": [
+      "PF-S17",
+      "PF-S18"
+    ],
+    "changes_are_appends_only": true,
+    "removing_verified_additions_restores_exact_r1_json_value": true,
+    "all_claim_statements_api_contract_text_steps_scope_unknowns_queries_and_governance_unchanged": true
+  },
+  "finding_resolutions": [
+    {
+      "id": "E-F01",
+      "status": "resolved",
+      "entry_id": "EXP-PRES-006",
+      "evidence_refs": [
+        "PF-S06",
+        "PF-S17",
+        "PF-S08",
+        "PF-S01",
+        "PF-S04",
+        "PF-S05"
+      ],
+      "reason": "新增PF-S17核实Ignite在非已燃且无fireimmune的成功分支调用SpawnFX，补齐flyoff调用Ignite到成功生成/挂灯的中间边；相关claim、步骤和静态依赖已追加，不扩大为任意点火必生成。"
+    },
+    {
+      "id": "E-F02",
+      "status": "resolved",
+      "entry_id": "EXP-PRES-007",
+      "evidence_refs": [
+        "PF-S11",
+        "PF-S18",
+        "PF-S07",
+        "PF-S08"
+      ],
+      "reason": "新增PF-S18核实MakeSmallBurnable显式sym形参传入AddBurnFX；结合oceanvine传swap_fire并修改首登记prefab/followaschild，消费者follow链闭合。相关claim、SpawnFX API、步骤和依赖已追加。"
+    }
+  ],
+  "coverage": {
+    "entries": 3,
+    "claims": 16,
+    "api_contracts": 5,
+    "mechanism_steps": 9,
+    "source_references": 18,
+    "r1_semantic_dispositions_inherited": true,
+    "previous_approval_inherited": false,
+    "inheritance_boundary": "只继承精确R1审阅的未变单元静态语义、去重和限制；R1两项未通过finding由本轮独立关闭，不继承R1的否决或虚构先前批准。",
+    "new_references_semantically_read_and_hash_checked": 2,
+    "unchanged_reference_hash_checks_inherited": 16,
+    "game_started": false,
+    "stub_executed": false,
+    "retrieval_protocol_executed": false
+  },
+  "checks": {
+    "r1_r2_frozen_hashes": "matched before and after",
+    "previous_review_hash": "matched before and after",
+    "complete_structural_diff": "only seven citation/dependency arrays appended and two references added",
+    "local_reference_id_contract": "passed",
+    "new_consumer_edges": "independently verified in frozen archive",
+    "source_archive_fingerprint": "unchanged identity inherited from R1; full archive hash checked separately by coordinator",
+    "public_attachment": "relative paths, metadata and semantic conclusions only; no original Lua"
+  },
+  "additional_source_references_verified": [
+    {
+      "id": "PF-S17",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 352,
+      "line_end": 374,
+      "range_sha256": "54e0a1cdaa6ceb225ef28a8a71d1ea358a4809764c555df9618c2b47c0199db0",
+      "symbols": [
+        "Burnable:Ignite",
+        "Burnable:SpawnFX"
+      ]
+    },
+    {
+      "id": "PF-S18",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 164,
+      "line_end": 174,
+      "range_sha256": "9b1e12c471bd120712bf6d9207296ea976574c85736b8f6871bdca308c25221a",
+      "symbols": [
+        "MakeSmallBurnable",
+        "Burnable:AddBurnFX"
+      ]
+    }
+  ],
+  "open_findings": [],
+  "remaining_limitations": [
+    "未运行游戏、专服、客户端、stub或实际音画/网络验证，native参数效果、可见性和删除时序未知。",
+    "保留R1关于调度、睡醒、FMOD状态、相同prefab多登记、同parent偏移刷新、非法配置与动态/native/Mod依赖闭包的边界。",
+    "查询仅验证候选结构与预期ID；实际检索和完整包适配验收不属本轮定向复核。"
+  ],
+  "author_files_modified": false,
+  "delegation": {
+    "subagents": 0
+  }
+}

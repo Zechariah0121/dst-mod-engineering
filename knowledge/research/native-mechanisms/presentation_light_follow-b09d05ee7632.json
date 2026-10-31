@@ -1,0 +1,895 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "presentation-light-follow",
+  "source_epoch": "761239",
+  "archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+  "entries": [
+    {
+      "id": "EXP-PRES-005",
+      "title": "FireFX逐更新的时间闪动、昼夜参数缓存及覆盖次序",
+      "aliases": [
+        "FireFX:OnUpdate",
+        "usedayparamforsound",
+        "daytime",
+        "current_radius",
+        "campfirefire",
+        "闪动"
+      ],
+      "engineering_question": "dt是否驱动闪动，是否每帧重设daytime，睡醒会重发昼夜参数吗？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "普通非quagmire campfirefire master安装FireFX并启用day参数；组件OnUpdate声明和已读半径生产者。",
+        "excluded": "EXP-PRES-004已有SetLevel/睡醒/退场缓存；本卡只补OnUpdate增量，不重写旧Scope或证明原生声音实现。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-005-C01",
+          "kind": "NSF",
+          "statement": "campfirefire在共有AnimState/SoundEmitter/Network和SetPristine之后非master返回，master才装firefx、赋levels、SetLevel(1)，然后usedayparamforsound=true。FireFX构造时已注册组件更新；不把同名Network实体视为客户端也有此组件。quagmire另有扩展调用不在本卡消费者范围。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S03",
+            "PF-S14"
+          ]
+        },
+        {
+          "id": "EXP-PRES-005-C02",
+          "kind": "NSF",
+          "statement": "OnUpdate(dt)不读取dt，而取GetTime()*30为time，每次把独立light半径写成current_radius+.025+(sin(time)+sin(time+2)+sin(time+.7777))*.0125。这里30是公式倍率，不是已证明每秒30次更新；没有在此启用灯、改变current_radius或更新percent。",
+          "evidence_refs": [
+            "PF-S01"
+          ]
+        },
+        {
+          "id": "EXP-PRES-005-C03",
+          "kind": "NSF",
+          "statement": "仅usedayparamforsound为Lua真值且缓存isday不同于TheWorld.state.isday时，先保存isday再对宿主SoundEmitter的fire句柄设置daytime：day真值为1，否则2。本段不检查PlayingSound；关闭该开关不会清isday或重置既有参数。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S03"
+          ]
+        },
+        {
+          "id": "EXP-PRES-005-C04",
+          "kind": "NSF",
+          "statement": "SetLevel、UpdateRadius和SetPercentInLevel可改current_radius或直接写半径/强度；后续OnUpdate按当时current_radius再加闪动项覆盖半径。因此不能把一次SetRadius调用的值当永远固定的实际半径。OnEntityWake只恢复缓存声路径与intensity，没有重设daytime或清isday；同一昼夜缓存条件下不能从Lua推导wake必定重发daytime。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02"
+          ]
+        },
+        {
+          "id": "EXP-PRES-005-C05",
+          "kind": "NSF",
+          "statement": "此OnUpdate不建任务或独立listener；更新归构造的StartUpdatingComponent，拆组件先停止更新/清组件索引再调用light移除hook，实体Remove另清更新表并调组件hook。原生调度/睡眠是否推进及声音句柄状态不由声明保证。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S13",
+            "PF-S14",
+            "PF-S15"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FireFX:OnUpdate",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component method; 仅所列master消费者及声明局部契约，不授予通用客户端API",
+          "parameters": [
+            "dt：调度传入，本函数没有读取。"
+          ],
+          "returns": "无显式返回；不提供成功布尔值。",
+          "preconditions": [
+            "组件宿主/独立light/Light接口有效；current_radius为可运算数值；GetTime、世界isday和SoundEmitter可用；usedayparamforsound默认false。"
+          ],
+          "side_effects": [
+            "每次写闪动半径；仅开关真且day缓存变化时先更新isday，再SetParameter(fire,daytime,1或2)；未作正在播放检查。"
+          ],
+          "lifecycle": [
+            "不建task/listener，不改base radius/percent；半径生产和更新可能连续覆盖；拆组件/实体按既有组件生命周期收尾，不证明实际视听或回调频率。"
+          ],
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02",
+            "PF-S03",
+            "PF-S13",
+            "PF-S14",
+            "PF-S15"
+          ],
+          "unknowns": [
+            "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "普通campfirefire master安装组件并开启day参数。",
+          "evidence_refs": [
+            "PF-S03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "按GetTime计算闪动、按isday变化写daytime。",
+          "evidence_refs": [
+            "PF-S01"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "半径生产者、wake和移除边界分开。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02",
+            "PF-S13",
+            "PF-S15"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。",
+        "未验证FMOD参数跨睡醒保留策略、day/night同帧切换、暂停/长dt或远端听感。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PF-S01",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S03",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S14",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S02",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S13",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S15",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "未穷尽动态调用者/native实现/所有模组兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PRES-006",
+      "title": "浮灯火焰的延后光偏移：setter存值到改parent才应用",
+      "aliases": [
+        "FireFX:SetFxLightOffsetPosition",
+        "offset_fxlight_position",
+        "floatinglanternfire",
+        "AttachLightTo",
+        "光偏移"
+      ],
+      "engineering_question": "设置光偏移会立即移动灯吗，同一target再次Attach能刷新吗？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "floatinglantern master注册floatinglanternfire；成功SpawnFX后的FireFX挂灯路径；仅普通浮灯，不拓展相机淡出或飞行物理。",
+        "excluded": "不重复EXP-PRES-004的一般AttachLightTo与移除；补setter真正生效条件及浮灯消费者，不保证画面裁剪修复。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-006-C01",
+          "kind": "NSF",
+          "statement": "floatinglanternfire共有创建AnimState/SoundEmitter/Network，非dedicated另装OnPostUpdate淡出消费者；SetPristine后的master才装FireFX、SetLevel(1)，随后SetFxLightOffsetPosition传工厂闭包的Vector3(0,-6,0)。这只说明Lua传值，不证明裁剪/光照效果。",
+          "evidence_refs": [
+            "PF-S04"
+          ]
+        },
+        {
+          "id": "EXP-PRES-006-C02",
+          "kind": "NSF",
+          "statement": "SetFxLightOffsetPosition(off)只原样赋给offset_fxlight_position；没有复制off、访问其Get、移动light或触发Attach。nil只清存储字段，不把已有light位置归零；保存引用意味着应用时才读取该对象的Get结果。",
+          "evidence_refs": [
+            "PF-S02",
+            "PF-S01"
+          ]
+        },
+        {
+          "id": "EXP-PRES-006-C03",
+          "kind": "NSF",
+          "statement": "AttachLightTo只有旧parent不同target时才进入重挂分支，且该分支末尾offset字段为真值才SetPosition(offset:Get())。相同target重调完全跳过位置写入；单独改变setter不保证立即生效。目标onremove的挂回自身callback也没有调用offset:Get或重新SetPosition。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02"
+          ]
+        },
+        {
+          "id": "EXP-PRES-006-C04",
+          "kind": "NSF",
+          "statement": "浮灯master以AddBurnFX登记floatinglanternfire、flames_wide、followaschild=true、followlayered=true；flyoff在有燃料时调用Ignite。成功SpawnFX生成火焰后再调用其FireFX:AttachLightTo(浮灯)；FireFX构造light初始parent是FX，所以该正常首次挂向浮灯的路径满足parent改变条件，之后才应用存储偏移。FX跟随偏移和独立light的-6偏移属于两条不同调用链。",
+          "evidence_refs": [
+            "PF-S04",
+            "PF-S05",
+            "PF-S06",
+            "PF-S07",
+            "PF-S08",
+            "PF-S01",
+            "PF-S17"
+          ]
+        },
+        {
+          "id": "EXP-PRES-006-C05",
+          "kind": "NSF",
+          "statement": "firefx_light另有Network/Light，master设persists=false；FireFX移除hook显式Remove light。setter没有额外task/listener或OnSave字段实现；本卡不由persists=false推导完整宿主存档政策，不把偏移存储当已持久化。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02",
+            "PF-S16",
+            "PF-S13",
+            "PF-S15"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FireFX:SetFxLightOffsetPosition",
+          "source_file": "scripts/components/firefx.lua",
+          "visibility": "Lua component method; 仅所列master消费者及声明局部契约，不授予通用客户端API",
+          "parameters": [
+            "off：原样存储，可nil；以后若为Lua真值且发生重挂，须支持Get并提供Transform:SetPosition所需返回。"
+          ],
+          "returns": "无显式返回；不提供成功布尔值。",
+          "preconditions": [
+            "有效FireFX self；本调用自身没有对off类型/数值/有效性进行校验。light为构造生成的实例字段，不是额外调用参数。"
+          ],
+          "side_effects": [
+            "仅替换offset_fxlight_position字段；不复制对象、不重挂、不立刻设置坐标。"
+          ],
+          "lifecycle": [
+            "实际应用在以后AttachLightTo的parent变化分支；同target重调不刷新，nil不重置已应用位置；无新任务、监听或保存恢复动作。"
+          ],
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02",
+            "PF-S04",
+            "PF-S08"
+          ],
+          "unknowns": [
+            "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "浮灯master登记FX，FX master setter存偏移。",
+          "evidence_refs": [
+            "PF-S04",
+            "PF-S05"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "正常成功SpawnFX后挂light到不同parent时才读取off:Get。",
+          "evidence_refs": [
+            "PF-S08",
+            "PF-S01",
+            "PF-S02",
+            "PF-S17"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "setter、主体FollowSymbol、独立light坐标与移除责任分开。",
+          "evidence_refs": [
+            "PF-S01",
+            "PF-S02",
+            "PF-S08",
+            "PF-S16",
+            "PF-S13"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。",
+        "未执行同target/换target/改Vector对象/nil后的游戏验证；不证明native局部坐标、父级删除传播或远端画面。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PF-S04",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S02",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S01",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S05",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S06",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S07",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S08",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S16",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S13",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S15",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S17",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "未穷尽动态调用者/native实现/所有模组兼容闭包。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PRES-007",
+      "title": "Burnable FX登记到生成与FixFX的followaschild、缩放和偏移边界",
+      "aliases": [
+        "Burnable:SpawnFX",
+        "Burnable:FixFX",
+        "Burnable:SetFXOffset",
+        "followaschild",
+        "followlayered",
+        "scale",
+        "oceanvine",
+        "campfire"
+      ],
+      "engineering_question": "FollowSymbol是否同时AddChild，FixFX是否重新生成、缩放或刷新整个FX配置？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "campfire master AddBurnFX/firefx symbol并零秒OnInit FixFX；oceanvine master指定character_fire、followaschild及全局FX偏移；其余配置分支限Burnable声明局部。",
+        "excluded": "BR-P03已有fxchildren/KillFX退出框架，N005-UI-C05已有通用MakeFx proxy；不把这些重记为新发现，不覆盖皮肤/所有FX或native跟随矩阵。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PRES-007-C01",
+          "kind": "NSF",
+          "statement": "AddBurnFX把offset.x/y/z立即存为每条登记数据，followaschild/followlayered以or nil规范化，scale以or 1规范化；Lua的0不回退。SetFXOffset另设置统一fxoffset，数值x/y/z齐全时建Vector3，否则非nil x按x:Get复制，x=nil清空；setter本身不刷新已有实例。",
+          "evidence_refs": [
+            "PF-S07"
+          ]
+        },
+        {
+          "id": "EXP-PRES-007-C02",
+          "kind": "NSF",
+          "statement": "SpawnFX先沿既有KillFX协议收尾旧引用，再pairs遍历登记数据；prefab非nil且Spawn结果非nil才配置。可选build同时改bank/build，finaloffset非nil才设置；Transform:GetScale只接收首返回值，再按v.scale真值相乘，结果传给FX三轴SetScale。没有由此证明原生缩放几何或所有源实体非等比缩放被保留。",
+          "evidence_refs": [
+            "PF-S08"
+          ]
+        },
+        {
+          "id": "EXP-PRES-007-C03",
+          "kind": "NSF",
+          "statement": "每条x/y/z登记偏移与统一fxoffset相加。follow非nil时：followaschild真值才AddChild，然后AddFollower/FollowSymbol并传followlayered；follow=nil时总AddChild并SetPosition。FX设不保存并存入fxchildren，具有FireFX时另赋radius_levels/SetLevel/AttachLightTo。仅Follower与Lua children登记不是同一所有权保证。",
+          "evidence_refs": [
+            "PF-S08",
+            "PF-S12"
+          ]
+        },
+        {
+          "id": "EXP-PRES-007-C04",
+          "kind": "NSF",
+          "statement": "campfire master登记campfirefire跟随firefx且followaschild=true，构造末排0秒OnInit；OnInit只有burnable存在才FixFX。oceanvine master将首FX改为character_fire、followaschild=true并SetFXOffset(0,1,0)，作为明确跟随且Lua父子同时登记的消费者；不推测所有其他prefab配置。",
+          "evidence_refs": [
+            "PF-S09",
+            "PF-S10",
+            "PF-S11",
+            "PF-S07",
+            "PF-S18"
+          ]
+        },
+        {
+          "id": "EXP-PRES-007-C05",
+          "kind": "NSF",
+          "statement": "FixFX只ipairs遍历现有fxchildren，具有Follower才pairs遍历fxdata；匹配fx.prefab且follow非nil的首条配置就FollowSymbol并break。它不Spawn、不AddChild/重parent、不改scale/build/finaloffset、不重写firefx半径或挂light。多条同prefab配置的选取受pairs遍历与首匹配影响，不能当唯一映射保证。",
+          "evidence_refs": [
+            "PF-S08"
+          ]
+        },
+        {
+          "id": "EXP-PRES-007-C06",
+          "kind": "NSF",
+          "statement": "EntityScript:AddChild实际记录child.parent/self.children并SetParent；宿主Remove会遍历登记children调用Remove。KillFX持有引用即使退出动画延后也从fxchildren清除，属BR-P03已有退出协议；不能因引用清空就宣称FX从宿主children解绑或已经不可见。FixFX不创造额外任务，OnInit任务归campfire实体。",
+          "evidence_refs": [
+            "PF-S08",
+            "PF-S12",
+            "PF-S13",
+            "PF-S09",
+            "PF-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Burnable:SpawnFX",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua component method; 仅所列master消费者及声明局部契约，不授予通用客户端API",
+          "parameters": [
+            "immediate：透传给具有FireFX的实例SetLevel；不是本方法统一跳过生成的开关。"
+          ],
+          "returns": "无显式返回；不提供成功布尔值。",
+          "preconditions": [
+            "所列master Burnable、可遍历的fxdata登记表、fxchildren与可用Transform；每个有效登记项须有坐标与所需字段。nil fxdata分支虽赋flat表，但随后按v字段读取，本卡不把该分支宣称为安全健壮降级。"
+          ],
+          "side_effects": [
+            "先KillFX旧引用；成功Spawn才可选改bank/build/finaloffset、计算统一三轴scale和合成坐标；按follow/child分支挂接并登记fxchildren；可选配置FireFX。"
+          ],
+          "lifecycle": [
+            "无显式成功返回，失败Spawn被跳过；没有事件/回调异常后的统一回滚或有效性复核。已有KillFX回收与宿主children生命周期分别管理，FixFX仅后续重新绑定symbol。"
+          ],
+          "evidence_refs": [
+            "PF-S07",
+            "PF-S08",
+            "PF-S10",
+            "PF-S11",
+            "PF-S12",
+            "PF-S13",
+            "PF-S18"
+          ],
+          "unknowns": [
+            "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。"
+          ]
+        },
+        {
+          "symbol": "Burnable:FixFX",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua component method; 仅所列master消费者及声明局部契约，不授予通用客户端API",
+          "parameters": [],
+          "returns": "无显式返回；不提供成功布尔值。",
+          "preconditions": [
+            "所列master组件；fxchildren中的对象可读Follower/prefab；需匹配时fxdata为登记对象集合，坐标字段可相加。未为失效对象做统一IsValid检查。"
+          ],
+          "side_effects": [
+            "仅对已有Follower且首匹配prefab/非nil follow的条目再次FollowSymbol，传合成offset及followlayered。"
+          ],
+          "lifecycle": [
+            "不重新生成、缩放或改变parent，不刷新light；campfire用自身0秒OnInit调用，只有组件存在才调用；没有额外恢复任务或保存动作。"
+          ],
+          "evidence_refs": [
+            "PF-S08",
+            "PF-S09",
+            "PF-S10"
+          ],
+          "unknowns": [
+            "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。"
+          ]
+        },
+        {
+          "symbol": "Burnable:SetFXOffset",
+          "source_file": "scripts/components/burnable.lua",
+          "visibility": "Lua component method; 仅所列master消费者及声明局部契约，不授予通用客户端API",
+          "parameters": [
+            "x：nil、可Get向量或与y/z齐全的坐标；y/z：可选坐标。"
+          ],
+          "returns": "无显式返回；不提供成功布尔值。",
+          "preconditions": [
+            "有效self；非nil x且坐标不齐时直接x:Get，没有额外类型检查。"
+          ],
+          "side_effects": [
+            "x=nil清fxoffset；坐标齐全构造Vector3，其他非nil x按Get构造新Vector3；不立刻操作已有FX。"
+          ],
+          "lifecycle": [
+            "新Spawn和FixFX以后读此偏移；前者管整套生成，后者只处理已有follower；不同于FireFX light偏移setter，数值/向量分支在此会构造新向量。"
+          ],
+          "evidence_refs": [
+            "PF-S07",
+            "PF-S08",
+            "PF-S11"
+          ],
+          "unknowns": [
+            "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master prefab通过登记/字段配置确定跟随、child和偏移，campfire另排OnInit。",
+          "evidence_refs": [
+            "PF-S07",
+            "PF-S10",
+            "PF-S11",
+            "PF-S18"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "SpawnFX计算坐标/scale并区分Follower与children；成功FX再配置FireFX。",
+          "evidence_refs": [
+            "PF-S08",
+            "PF-S12"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "OnInit FixFX只重绑已有symbol，移除仍按独立引用/child协议。",
+          "evidence_refs": [
+            "PF-S09",
+            "PF-S08",
+            "PF-S13"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。",
+        "未证明重入生成异常、同prefab多登记实际pairs顺序、native FollowSymbol默认值/transform layering或父子销毁的所有引擎行为。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PF-S07",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S08",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S12",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S09",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S10",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S11",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S13",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          },
+          {
+            "ref": "PF-S18",
+            "role": "本卡所列定义、具体消费者、生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "未穷尽动态调用者/native实现/所有模组兼容闭包。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "PF-S01",
+      "source_file": "scripts/components/firefx.lua",
+      "file_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+      "line_start": 1,
+      "line_end": 86,
+      "range_sha256": "3ffdc5831b8472412189fd212ad4db4078368d367f68553c4d05647a07a1fc63",
+      "symbols": [
+        "FireFX:OnUpdate",
+        "FireFX:AttachLightTo",
+        "FireFX:UpdateRadius"
+      ]
+    },
+    {
+      "id": "PF-S02",
+      "source_file": "scripts/components/firefx.lua",
+      "file_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+      "line_start": 88,
+      "line_end": 174,
+      "range_sha256": "9dea6259eb59e4a6b1b7582e9b240085687e3096efb279ca3722b8d59b4a159c",
+      "symbols": [
+        "FireFX:SetLevel",
+        "FireFX:SetFxLightOffsetPosition",
+        "FireFX:OnEntityWake"
+      ]
+    },
+    {
+      "id": "PF-S03",
+      "source_file": "scripts/prefabs/campfirefire.lua",
+      "file_sha256": "f997cdcb185df03407534047f177604b955614b76e378d14bf445716b3fde049",
+      "line_start": 1,
+      "line_end": 85,
+      "range_sha256": "2114ae46d11492ef4496d8d9576f5fd4a04c2d9c0daa9f1b283d6912d6f14086",
+      "symbols": [
+        "MakeFire",
+        "usedayparamforsound"
+      ]
+    },
+    {
+      "id": "PF-S04",
+      "source_file": "scripts/prefabs/floatinglanternfire.lua",
+      "file_sha256": "f9faa943ac19f2579b50ebf0d5bb3295522874c8ad5675b1f46f3f9dccc1a8fe",
+      "line_start": 1,
+      "line_end": 79,
+      "range_sha256": "416fcd6dcabd895cc89256f2ee29018896454b61cd05bbd762dc744a8a16e2b5",
+      "symbols": [
+        "MakeFire",
+        "SetFxLightOffsetPosition"
+      ]
+    },
+    {
+      "id": "PF-S05",
+      "source_file": "scripts/prefabs/floatinglantern.lua",
+      "file_sha256": "3dfec8db952cc5ebdded7ba189c1cc9cb85339877d006fcc46e1b5378bf2cf43",
+      "line_start": 400,
+      "line_end": 453,
+      "range_sha256": "7dcc4771542a3cf64451f665bb2c7f9629a1313ece0b0c57ed4c355e1edfb5f2",
+      "symbols": [
+        "AddBurnFX",
+        "SetPristine"
+      ]
+    },
+    {
+      "id": "PF-S06",
+      "source_file": "scripts/prefabs/floatinglantern.lua",
+      "file_sha256": "3dfec8db952cc5ebdded7ba189c1cc9cb85339877d006fcc46e1b5378bf2cf43",
+      "line_start": 145,
+      "line_end": 150,
+      "range_sha256": "c622bcaae26e51c49b621441c14922c81d65dc2accc95a1d9643e9bdf773aa9a",
+      "symbols": [
+        "flyoff"
+      ]
+    },
+    {
+      "id": "PF-S07",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 128,
+      "line_end": 184,
+      "range_sha256": "56d3a915fc4425aad00afad5f8969f62d4f81fb86d9b0658769073fcff77634b",
+      "symbols": [
+        "Burnable:AddBurnFX",
+        "Burnable:SetFXOffset",
+        "Burnable:SetFXLevel"
+      ]
+    },
+    {
+      "id": "PF-S08",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 496,
+      "line_end": 573,
+      "range_sha256": "5ab9f612d3e0c70170ab26d92340a3f26b5c3813f56582773c0a890160ccc817",
+      "symbols": [
+        "Burnable:SpawnFX",
+        "Burnable:FixFX",
+        "Burnable:KillFX"
+      ]
+    },
+    {
+      "id": "PF-S09",
+      "source_file": "scripts/prefabs/campfire.lua",
+      "file_sha256": "e1a0bea94ff84a21342502fbb7f36bc68b9fd7763aee1d66712c209b3452976f",
+      "line_start": 112,
+      "line_end": 116,
+      "range_sha256": "eb46d4b3a05803981f6b4bb2736dfb70066e303d6d785bcfd602b4baff84f25d",
+      "symbols": [
+        "OnInit"
+      ]
+    },
+    {
+      "id": "PF-S10",
+      "source_file": "scripts/prefabs/campfire.lua",
+      "file_sha256": "e1a0bea94ff84a21342502fbb7f36bc68b9fd7763aee1d66712c209b3452976f",
+      "line_start": 150,
+      "line_end": 208,
+      "range_sha256": "0cffb6db4f71b884c078f4b1000b27f63c9fd2970e34207d4cb4375bacc13feb",
+      "symbols": [
+        "AddBurnFX",
+        "OnInit"
+      ]
+    },
+    {
+      "id": "PF-S11",
+      "source_file": "scripts/prefabs/oceanvine.lua",
+      "file_sha256": "6e0deb9271b5c8e1c60e230d9a8dbc4e3e2cc5e4e73d6dfa4ac71c2392e00702",
+      "line_start": 295,
+      "line_end": 323,
+      "range_sha256": "7bc09f76ec54923d2886888753b372bed05e014a3f324381cf4dedc54114f938",
+      "symbols": [
+        "followaschild",
+        "SetFXOffset"
+      ]
+    },
+    {
+      "id": "PF-S12",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 935,
+      "range_sha256": "a7c13cd2083fc0213528d405192cbdd1e89629a68884852a523c0d02cdab1731",
+      "symbols": [
+        "EntityScript:AddChild",
+        "EntityScript:RemoveChild"
+      ]
+    },
+    {
+      "id": "PF-S13",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "PF-S14",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 439,
+      "line_end": 478,
+      "range_sha256": "95c9a41ecfc3431935bebf3bc4485c3e328110e79c5d5581f3b74b4c243e720e",
+      "symbols": [
+        "EntityScript:StartUpdatingComponent",
+        "EntityScript:StopUpdatingComponent"
+      ]
+    },
+    {
+      "id": "PF-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "PF-S16",
+      "source_file": "scripts/prefabs/firefx_light.lua",
+      "file_sha256": "8e6a21a26d5f9fc78ad026b7cccda9aa50485f99f4c8e8a24362db54ae414173",
+      "line_start": 1,
+      "line_end": 21,
+      "range_sha256": "4a62b0941200d1f30ccedfba174a9dbf293212692394fce73744e6a91c7e09c0",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "PF-S17",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 352,
+      "line_end": 374,
+      "range_sha256": "54e0a1cdaa6ceb225ef28a8a71d1ea358a4809764c555df9618c2b47c0199db0",
+      "symbols": [
+        "Burnable:Ignite",
+        "Burnable:SpawnFX"
+      ]
+    },
+    {
+      "id": "PF-S18",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 164,
+      "line_end": 174,
+      "range_sha256": "9b1e12c471bd120712bf6d9207296ea976574c85736b8f6871bdca308c25221a",
+      "symbols": [
+        "MakeSmallBurnable",
+        "Burnable:AddBurnFX"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "FireFX OnUpdate dt闪动",
+      "expected_entry_ids": [
+        "EXP-PRES-005"
+      ],
+      "purpose": "时间与步长"
+    },
+    {
+      "query": "campfirefire daytime参数sleep wake",
+      "expected_entry_ids": [
+        "EXP-PRES-005"
+      ],
+      "purpose": "消费者与缓存"
+    },
+    {
+      "query": "SetFxLightOffsetPosition立即生效吗",
+      "expected_entry_ids": [
+        "EXP-PRES-006"
+      ],
+      "purpose": "setter负边界"
+    },
+    {
+      "query": "AttachLightTo相同target偏移刷新",
+      "expected_entry_ids": [
+        "EXP-PRES-006"
+      ],
+      "purpose": "门禁"
+    },
+    {
+      "query": "floatinglanternfire独立light -6",
+      "expected_entry_ids": [
+        "EXP-PRES-006"
+      ],
+      "purpose": "具体消费者"
+    },
+    {
+      "query": "Burnable SpawnFX followaschild scale",
+      "expected_entry_ids": [
+        "EXP-PRES-007"
+      ],
+      "purpose": "分支链"
+    },
+    {
+      "query": "FixFX会重新生成或缩放吗",
+      "expected_entry_ids": [
+        "EXP-PRES-007"
+      ],
+      "purpose": "负边界"
+    },
+    {
+      "query": "SetFXOffset和SetFxLightOffsetPosition区别",
+      "expected_entry_ids": [
+        "EXP-PRES-006",
+        "EXP-PRES-007"
+      ],
+      "purpose": "不同owner"
+    },
+    {
+      "query": "所有客户端看见正确火光",
+      "expected_entry_ids": [],
+      "purpose": "未验证native/远端"
+    },
+    {
+      "query": "MakeFx proxy一秒",
+      "expected_entry_ids": [],
+      "purpose": "已有N005-UI-C05"
+    }
+  ],
+  "limitations": [
+    "仅761239/build26335394静态Lua核读；未运行游戏/专服/客户端，native动画、光照、声音参数效果、复制可见性和删除时序未验证。",
+    "引用hash只绑定源码文件/行范围；不分发原版Lua，不自动重标760944或759671历史证据，不解除HOLD。",
+    "保留research/restricted/hold；需独立语义审阅绑定候选SHA，作者自检不等于登记或运行验收。"
+  ]
+}
