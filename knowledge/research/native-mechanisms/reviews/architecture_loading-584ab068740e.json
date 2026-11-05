@@ -1,0 +1,691 @@
+{
+  "schema": "dst-independent-loading-replica-semantic-review/1",
+  "reviewer_window": "E",
+  "review_round": 1,
+  "date": "2026-11-05",
+  "candidate": "05-research-history/architecture-native-20261105/coordinator/frozen/architecture_loading-8c467f36285a.json",
+  "candidate_sha256": "8c467f36285a44eb436825f30c16f7779820d3e6a127e5703bcd1f8f9c062b36",
+  "source_epoch": "761239",
+  "source_archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+  "source_build_label": "26335394",
+  "runtime_verified": false,
+  "verdict": "approved_for_research_registration",
+  "registration_recommended": true,
+  "registration_approved": true,
+  "registration_boundary": "仅该精确SHA的2条研究卡可按research/restricted/hold登记；不修改旧canonical/Scope/HOLD，不证明实际引擎版本再次校验、native网络总序或游戏运行；登记由总控执行。",
+  "coverage": {
+    "entries": 2,
+    "claims": 14,
+    "api_contracts": 3,
+    "mechanism_steps": 6,
+    "source_references": 26,
+    "all_units_semantically_reviewed": true,
+    "game_started": false,
+    "lua_contract_or_stub_executed": false,
+    "retrieval_protocol_executed": false
+  },
+  "checks": {
+    "candidate_hash_before_and_after": "matched",
+    "independent_current_archive_sha": "matched",
+    "shipped_contract": "passed",
+    "reference_file_and_range_hashes": "26/26 matched",
+    "local_reference_ids_and_dependencies": "closed",
+    "caller_callee_consumer_semantics": "independently read",
+    "entry_deduplication": "two concrete increments; inherited general rules explicitly identified",
+    "API_parameter_owner_return_lifecycle": "three Lua methods, implicit self/context distinguished from explicit business arguments",
+    "scope_governance_unknowns": "preserved",
+    "public_attachment_privacy": "relative paths only; no original Lua"
+  },
+  "prior_knowledge_comparison": [
+    {
+      "id": "EXP-WG-001",
+      "file": "research/native-mechanisms/worldgen-0c7772f40b77.json",
+      "pointer": "/entries/0",
+      "record_sha256": "4cfc0e310dff9cc31829995554b045038dddedd2590cbdb14eb2b934009487e5",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    },
+    {
+      "id": "N007-MC-04",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/43",
+      "record_sha256": "e7bc666cec2aaf7cd4e93b044c1908a79db48d0f3a18ebc3a358843eb303e7bd",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    },
+    {
+      "id": "AI-N001-10",
+      "file": "data/native001/canonical-native001-ai-knowledge.json",
+      "pointer": "/entries/9",
+      "record_sha256": "09ea2f3f44619538596c1068e555acf19c50e318328352fb4d8b3ecb999b461a",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    },
+    {
+      "id": "NC-N002-FINAL-04",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/3",
+      "record_sha256": "b0a247fbcd3aa5fe6bfe8b33090f5174faecf064144e621b2d9de34010c531e9",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    },
+    {
+      "id": "NC-N002-FINAL-05",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/4",
+      "record_sha256": "0c59630332d4c390af69a8ff0fc1d02739d3bc1faa3b9343967f65542d93f1e6",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    },
+    {
+      "id": "N006-READY-F03",
+      "file": "data/nativecore/native-core.json",
+      "pointer": "/entries/36",
+      "record_sha256": "551191c09968d48174ab2488a7d03b0dc9aa35f413122378579daddcd90d33a4",
+      "read_mode": "file_read_semantic_claims_and_scope_boundaries",
+      "historical_scope_modified": false
+    }
+  ],
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-ARCH-003",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "761239静态Lua有界消费者；research/restricted/hold和所列unknowns保留，不扩大为native就绪/网络/Mod生态保证。",
+      "deduplication": {
+        "prior_ids": [
+          "EXP-WG-001",
+          "N007-MC-04",
+          "N006-READY-F03"
+        ],
+        "increment": "Redux触发的前端双env、环境局部Hook登记不自动进入运行期收集集合，以及safe之后moderror可再抛错的精确分支。",
+        "inherited_background": "CreateEnvironment、modimport、worldgen/main入口和一般PostInit阶段沿用旧知识；路径恢复只作有正常后续前提的范围细化。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-ARCH-003-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AL-S11",
+            "AL-S12",
+            "AL-S02"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "Redux启用与切槽的调用顺序、两个独立环境及modinfo深拷贝/引用区别吻合。"
+        },
+        {
+          "id": "EXP-ARCH-003-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AL-S01",
+            "AL-S02",
+            "AL-S06",
+            "AL-S07"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "isfrontend只控制所列前端闭包；isworldgen早退仍独立存在，没有把前端与运行期API可用性混为一项。"
+        },
+        {
+          "id": "EXP-ARCH-003-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "FrontendLoadMod仅运行两个safe入口并未把临时env加入运行期列表；普通LoadMods另建并排序登记env，差异有完整引用。"
+        },
+        {
+          "id": "EXP-ARCH-003-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AL-S08",
+            "AL-S09",
+            "AL-S10",
+            "AL-S14",
+            "AL-S02",
+            "AL-S03"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "登记保存在所属env；GetPostInitFns经enabledmods/GetMod收集运行期env，消费链不自动合并前端临时Hook表。"
+        },
+        {
+          "id": "EXP-ARCH-003-C05",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "入口缺失/加载字符串错误/不兼容/执行成功各返回准确；status失败的moderror可再抛错，正常后续清理不构成finally。"
+        },
+        {
+          "id": "EXP-ARCH-003-C06",
+          "kind": "EI",
+          "evidence_refs": [
+            "AL-S01",
+            "AL-S02",
+            "AL-S03",
+            "AL-S04",
+            "AL-S13"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "EI仅据局部env数据流推断登记未自动转移，同时保留全局/共享模块等外部副作用可能性，未扩大成无副作用保证。"
+        },
+        {
+          "id": "EXP-ARCH-003-C07",
+          "kind": "REC",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03",
+            "AL-S08",
+            "AL-S10"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "REC按env/存储/消费者评审，不引入强制Installer、导入风格或通用架构约束。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "ModWrangler:FrontendLoadMod(modname)",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S01",
+            "AL-S06",
+            "AL-S11",
+            "AL-S12",
+            "AL-S04",
+            "AL-S13"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "单例上Lua方法的身份、modname与隐含self明确；无显式成功返回。正常path恢复与异常不能保证清理准确，不伪造环境导出API。"
+        },
+        {
+          "index": 1,
+          "symbol": "ModWrangler:InitializeModMain(modname, env, mainfile, safe)",
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02",
+            "AL-S03"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "真实modname/env/mainfile/safe参数与out-reference环境、true/false/nil及再抛错分支准确；不返回入口业务结果或承诺事务。"
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "AL-S11",
+            "AL-S12",
+            "AL-S02",
+            "AL-S01",
+            "AL-S06",
+            "AL-S07"
+          ],
+          "verdict": "supported",
+          "reason": "Redux实际caller到两个env/注入分支闭合。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03",
+            "AL-S08",
+            "AL-S09",
+            "AL-S10",
+            "AL-S14"
+          ],
+          "verdict": "supported",
+          "reason": "临时env登记与运行期enabledmods/GetMod/消费闭合。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02"
+          ],
+          "verdict": "supported",
+          "reason": "status处理、moderror和正常后续清理逐分支闭合。"
+        }
+      ]
+    },
+    {
+      "entry_id": "EXP-ARCH-004",
+      "verdict": "supported_with_stated_scope",
+      "scope_review": "761239静态Lua有界消费者；research/restricted/hold和所列unknowns保留，不扩大为native就绪/网络/Mod生态保证。",
+      "deduplication": {
+        "prior_ids": [
+          "AI-N001-10",
+          "NC-N002-FINAL-04",
+          "NC-N002-FINAL-05",
+          "N006-READY-F03"
+        ],
+        "increment": "container_classified暂存与replica构造交接清理、两向Attach链和_slottasks门禁下InitializeSlots/WidgetSetup窗口。",
+        "inherited_background": "ReplicateEntity局部次序、公开标签过滤、raw附着和分层ready原则不计为新机制。"
+      },
+      "claim_reviews": [
+        {
+          "id": "EXP-ARCH-004-C01",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AR-S01",
+            "AR-S02",
+            "AR-S03"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "GUID bridge、标签遍历/构造/rawset及本实体回调顺序准确，明确不证明跨实体到达总序。"
+        },
+        {
+          "id": "EXP-ARCH-004-C02",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AR-S09",
+            "AR-S05",
+            "AR-S02"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "classified有parent时尝试raw replica附着，失败才暂存并安装清字段移除hook；无parent只打印，未声称自动重试。"
+        },
+        {
+          "id": "EXP-ARCH-004-C03",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AR-S04",
+            "AR-S05",
+            "AR-S06",
+            "AR-S11",
+            "AR-S12"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "client构造先widgetsetup/槽数生产，再消费暂存classified并清其旧移除hook和parent字段；另一方向直接Attach，未假设固定一帧。"
+        },
+        {
+          "id": "EXP-ARCH-004-C04",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S07",
+            "AR-S10"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "Attach先写引用/回调/监听再InitializeSlots；Detach解绑并清字段；重复绑定和初始化失败无本函数回滚的负边界准确。"
+        },
+        {
+          "id": "EXP-ARCH-004-C05",
+          "kind": "NSF",
+          "evidence_refs": [
+            "AR-S09",
+            "AR-S08",
+            "AR-S07",
+            "AR-S10"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "构造初始化池及_slottasks=nil；延后listener先置表，InitializeSlots先assert窗口，WidgetSetup有classified时亦调用；非任意时点幂等API。"
+        },
+        {
+          "id": "EXP-ARCH-004-C06",
+          "kind": "EI",
+          "evidence_refs": [
+            "AR-S02",
+            "AR-S04",
+            "AR-S05",
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S09"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "EI只概括显式补接形状，不把parent、raw replica、附着、监听或slot状态等同all-ready；异常及缺parent界限完整。"
+        },
+        {
+          "id": "EXP-ARCH-004-C07",
+          "kind": "REC",
+          "evidence_refs": [
+            "AR-S04",
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S10"
+          ],
+          "verdict": "supported_as_typed",
+          "reason": "REC约束重复WidgetSetup/InitializeSlots风险，内部暂存字段未推荐为Mod公共写入口；重试设计仍交具体项目验证。"
+        }
+      ],
+      "api_reviews": [
+        {
+          "index": 0,
+          "symbol": "Container:AttachClassified(classified)",
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S04",
+            "AR-S05",
+            "AR-S07",
+            "AR-S09",
+            "AR-S10",
+            "AR-S11",
+            "AR-S12"
+          ],
+          "verdict": "supported_with_stated_scope",
+          "reason": "container replica方法的classified形参与隐含self清楚；真实GetNumSlots生产链、InitializeSlots窗口、写入/监听先于可抛错步骤和Detach生命周期完整。"
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "evidence_refs": [
+            "AR-S01",
+            "AR-S02",
+            "AR-S03"
+          ],
+          "verdict": "supported",
+          "reason": "全局GUID到标签/replica构造/本实体复制回调闭合。"
+        },
+        {
+          "step": 2,
+          "evidence_refs": [
+            "AR-S02",
+            "AR-S04",
+            "AR-S05",
+            "AR-S06"
+          ],
+          "verdict": "supported",
+          "reason": "有raw replica直附着和暂存后构造消费两向链闭合。"
+        },
+        {
+          "step": 3,
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S09",
+            "AR-S10"
+          ],
+          "verdict": "supported",
+          "reason": "字段/监听先写、槽初始化断言与延后listener窗口闭合。"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "id": "AL-S01",
+      "source_file": "scripts/mods.lua",
+      "line_start": 258,
+      "line_end": 320,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S02",
+      "source_file": "scripts/mods.lua",
+      "line_start": 374,
+      "line_end": 411,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "23fab79c80030ccb7bbe530d3a4a84a6700c7446bf7c4368cd22c8b4b9722c1f",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S03",
+      "source_file": "scripts/mods.lua",
+      "line_start": 431,
+      "line_end": 548,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "b9124c62150f8073d13e25ab8e068b2719b4e04bd5b08fafd3c578a8bd4101f0",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S04",
+      "source_file": "scripts/mods.lua",
+      "line_start": 550,
+      "line_end": 582,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "84d4505ceebf6baeb65c09806afdfcc248ac9a44f942879e53c86b9edb4739ff",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S05",
+      "source_file": "scripts/util.lua",
+      "line_start": 788,
+      "line_end": 796,
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S06",
+      "source_file": "scripts/modutil.lua",
+      "line_start": 178,
+      "line_end": 209,
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "range_sha256": "888ffc3e5c9f694473f8d7f49cea434c4db047661c4183a612d4984b3ff6a67d",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S07",
+      "source_file": "scripts/modutil.lua",
+      "line_start": 430,
+      "line_end": 438,
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S08",
+      "source_file": "scripts/modutil.lua",
+      "line_start": 592,
+      "line_end": 599,
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "range_sha256": "ecfb11dd2ee872cc22dd6b5092d436120a0e37ca123e5307542a42b825399411",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S09",
+      "source_file": "scripts/mods.lua",
+      "line_start": 228,
+      "line_end": 234,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "aff5ebd289d6f87ee92539266de2bf0b67228a1d152940878b14fd519ddbf02b",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S10",
+      "source_file": "scripts/mods.lua",
+      "line_start": 818,
+      "line_end": 838,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S11",
+      "source_file": "scripts/widgets/redux/modstab.lua",
+      "line_start": 974,
+      "line_end": 984,
+      "file_sha256": "aa9cd0470370379affb820e99211c92d0c28a2e7b1fe68f2865ce3216b2102db",
+      "range_sha256": "a95aa4e8f5b581d252e83c6cc7cd89d5dbbfcc7eb51f2011649d933795e109d9",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S12",
+      "source_file": "scripts/widgets/redux/modstab.lua",
+      "line_start": 1557,
+      "line_end": 1568,
+      "file_sha256": "aa9cd0470370379affb820e99211c92d0c28a2e7b1fe68f2865ce3216b2102db",
+      "range_sha256": "ffe343aae8e28bd6a7a558d6586b26d0b23cda3f8a50f83233c03327035f46cf",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S13",
+      "source_file": "scripts/modutil.lua",
+      "line_start": 105,
+      "line_end": 118,
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "range_sha256": "e61c3fb7c44cd84d25ded2f58cbc2ed7040c0a1c4b1ad06db662a40eb363bf95",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AL-S14",
+      "source_file": "scripts/mainfunctions.lua",
+      "line_start": 373,
+      "line_end": 423,
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "range_sha256": "c1421b2760c7f1c1b8c7b28eb4d16d746cb429f705d320560e18421299c30958",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S01",
+      "source_file": "scripts/mainfunctions.lua",
+      "line_start": 840,
+      "line_end": 854,
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "range_sha256": "42e290c16f1d0c61d8353b4a2417223ff3e017a5eadef04520db6ca8bda64edc",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S02",
+      "source_file": "scripts/entityreplica.lua",
+      "line_start": 5,
+      "line_end": 100,
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "range_sha256": "d10dd5f3fab42425e5f1c97aca55dbeeefdb1db4386daa28ddb5756f9fed2394",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S03",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 208,
+      "line_end": 213,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "368c8618d6a385582e295a3d3b42d77c4d3f5af24159b55c4f78d77ad775a7d5",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S04",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 1,
+      "line_end": 62,
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "range_sha256": "3c604ffa87746503dfe8cd9cc388119df4a2fd889f38eb9d1b6def84d726d455",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S05",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 62,
+      "line_end": 76,
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S06",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 153,
+      "line_end": 166,
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "range_sha256": "72fe5380672d2ccb4b3c3e8cd6d464d896b80976f44522720dc7f0b092e25787",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S07",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 8,
+      "line_end": 22,
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "range_sha256": "972c7b059a4c13d2d02247100b5193543b86ae0b020f61e0e1895e8cfede5fbf",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S08",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 407,
+      "line_end": 429,
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "range_sha256": "daa2e718562f22ad4efe4c084dda762269849bed510f44c2e8b89f51df063955",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S09",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 1050,
+      "line_end": 1108,
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "range_sha256": "09bf1238131bdb0b9eba80707ca018db45394a2b1649d4046fdd20970bbeb8dc",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S10",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 232,
+      "line_end": 259,
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "range_sha256": "91445a2184711b15d39667cc143be7db7ae9d447be85bcc6fbb0e2e3893f0d11",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S11",
+      "source_file": "scripts/containers.lua",
+      "line_start": 9,
+      "line_end": 17,
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "range_sha256": "6dae530848ce47618c3d63aba208e034938089c205c78a6b2b920554ce14bafc",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    },
+    {
+      "id": "AR-S12",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 269,
+      "line_end": 275,
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "range_sha256": "cc7d8ca5f91acdca1482b9284013fc0c91f5d5120d96b5b1362c7aba39ff30b5",
+      "hash_result": "matched",
+      "semantic_read": "independent_static_read"
+    }
+  ],
+  "open_findings": [],
+  "remaining_limitations": [
+    "未运行Lua合同、stub、游戏、专服、前端交互或真实客户端；没有网络跨实体到达/parent/零秒任务总序实测。",
+    "Native require/kleiloadlua缓存、路径安全、复制/反序列化、资源可见性与副作用持久化未穷尽。",
+    "保护调用不证明事务；异常/重复Attach、InitializeSlots窗口失败后恢复、缺parent和回调重入实际行为未验证。",
+    "两卡只支持所列前端Redux及container消费者，不是通用all-ready框架、强制Installer或任意Mod热加载合同。",
+    "候选queries仅按机制契约检查结构与预期ID；实际检索与完整集成验收由总控执行。"
+  ],
+  "author_files_modified": false,
+  "installed_runtime_modified": false,
+  "delegation": {
+    "subagents": 0
+  }
+}

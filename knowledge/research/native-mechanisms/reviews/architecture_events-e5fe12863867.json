@@ -1,0 +1,949 @@
+{
+  "schema": "dst-independent-mechanism-review/1",
+  "date": "2026-11-05",
+  "reviewer": "D",
+  "candidate": "architecture_events-e9026d0a3b42.json",
+  "candidate_sha256": "e9026d0a3b425c46d9d515f5717a2681d076a2979484060a0933269e44ee99d1",
+  "runtime_verified": false,
+  "verdict": "accept_for_restricted_static_research",
+  "blocking_count": 0,
+  "blocking": [],
+  "nonblocking": [],
+  "summary": {
+    "entries": 2,
+    "claims_reviewed": 13,
+    "apis_reviewed": 4,
+    "steps_reviewed": 6,
+    "references_reviewed": 19,
+    "source_files": 6,
+    "candidate_hash_verified": true,
+    "source_archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+    "all_file_range_hashes_match": true,
+    "no_runtime_or_coding_admission": true
+  },
+  "entries": [
+    {
+      "id": "EXP-ARCH-001",
+      "verdict": "accept_for_restricted_static_research",
+      "runtime_verified": false,
+      "scope_verdict": "明确本地Lua/枚举原生消费者与未知，不从露露方案推原生事实，不授予跨端或Runtime保证。",
+      "claims": [
+        {
+          "id": "EXP-ARCH-001-C01",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S03"
+          ],
+          "rationale": "AddListener双向索引与table.insert无去重、复制纯函数快照、回调实参source/data及忽略返回值均有直接定义支持；未把listener对象当self。"
+        },
+        {
+          "id": "EXP-ARCH-001-C02",
+          "kind": "EI",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03"
+          ],
+          "rationale": "解绑只改索引，不修改已生成tocall；新增回调不追加入本轮快照。嵌套调用正常返回才继续外层，异常无pcall隔离，EI限定成立。"
+        },
+        {
+          "id": "EXP-ARCH-001-C03",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "rationale": "EntityScript在普通listener后实际读取self.sg，再在SG阶段后读取self.brain。Immediate绕过SG监听/登记门禁，普通路径需两项满足。Brain.PushEvent直接handler(data)，不证明其业务不再发异步任务。"
+        },
+        {
+          "id": "EXP-ARCH-001-C04",
+          "kind": "EI",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13",
+            "AE-S17"
+          ],
+          "rationale": "不复制data及SG.PushEvent写原表state支持别名推导；nil时SG新表是callee局部赋值，不改变Brain收到的原nil；普通listener读取早于该层SG写入，嵌套层/其他回调仍可能另行改表。"
+        },
+        {
+          "id": "EXP-ARCH-001-C05",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S10"
+          ],
+          "rationale": "UpdateEvents只换haveEvents集合，HandleEvents保留buff_events引用并ipairs；只有入场有效性检查，事件返回后检查表身份，正常尾部清表；RemoveInstance的清缓冲覆盖完整。"
+        },
+        {
+          "id": "EXP-ARCH-001-C06",
+          "kind": "EI",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S06",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11"
+          ],
+          "rationale": "连续原数组追加有机会同次被ipairs遍历，不是固定下一帧；ClearBufferedEvents换表才使外层提前返回，GoToState不清队列。没有泛化跨图顺序或保证递归终止。"
+        },
+        {
+          "id": "EXP-ARCH-001-C07",
+          "kind": "REC",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11",
+            "AE-S13"
+          ],
+          "rationale": "阶段、尝试身份与payload所有权建议由上述反例支撑，保留REC而非原生取消/回滚保证。"
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/0/api_contracts/0",
+          "symbol": "EntityScript:PushEvent",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S04",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "rationale": "参数event原样索引、truthy data需可写state、无成功返回、监听/SG/Brain阶段与错误传播均闭合；生命周期描述同时对比Immediate，没有误认网络广播。"
+        },
+        {
+          "pointer": "/entries/0/api_contracts/1",
+          "symbol": "EntityScript:PushEventImmediate",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S04",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "rationale": "与普通监听共享快照，SG直接HandleEvent且未先查注册/监听；Brain仍在后。没有绕过普通listener本身，只有SG路径的门禁差别。"
+        },
+        {
+          "pointer": "/entries/0/api_contracts/2",
+          "symbol": "StateGraphInstance:HandleEvents",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S18"
+          ],
+          "rationale": "assert currentstate、入口inst:IsValid、ipairs原表及换表提前return、正常尾部清缓冲、Stop调用排空后RemoveInstance均有定义与caller支持；不作原子排空或持久化保证。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03"
+          ],
+          "rationale": "双向登记→纯fn快照→同步普通listener顺序成立。"
+        },
+        {
+          "step": 2,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "rationale": "普通listener之后才选择当时SG路径，之后Brain同步调用成立。"
+        },
+        {
+          "step": 3,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S07",
+            "AE-S10",
+            "AE-S18"
+          ],
+          "rationale": "交换的是manager待处理SG集合；每图仍读原缓冲数组，追加/换表边界成立。"
+        }
+      ],
+      "compatibility": {
+        "verdict": "adequate_for_enumerated_claims",
+        "all_atom_refs_in_dependency_list": true,
+        "all_dependency_refs_used": true,
+        "dependency_results": [
+          {
+            "ref": "AE-S01",
+            "verdict": "supported_dependency",
+            "role": "AddListener/EntityScript:ListenForEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C01",
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S02",
+            "verdict": "supported_dependency",
+            "role": "RemoveListener/EntityScript:RemoveEventCallback/EntityScript:RemoveAllEventCallbacks",
+            "claim_ids": [
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S03",
+            "verdict": "supported_dependency",
+            "role": "EntityScript:PushEvent_Internal/EntityScript:PushEvent/EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-ARCH-001-C01",
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S04",
+            "verdict": "supported_dependency",
+            "role": "SGManager:OnEnterNewState/StateGraphWrangler:OnPushEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S05",
+            "verdict": "supported_dependency",
+            "role": "StateGraphWrangler:RemoveInstance/StateGraphWrangler:AddInstance",
+            "claim_ids": [
+              "EXP-ARCH-001-C05"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S06",
+            "verdict": "supported_dependency",
+            "role": "StateGraphWrangler:Update/StateGraphWrangler:UpdateEvents",
+            "claim_ids": [
+              "EXP-ARCH-001-C05",
+              "EXP-ARCH-001-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S07",
+            "verdict": "supported_dependency",
+            "role": "State:HandleEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S09",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:PushEvent/StateGraphInstance:IsListeningForEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S10",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:HandleEvent/StateGraphInstance:HandleEvents/StateGraphInstance:ClearBufferedEvents",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C05",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S11",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:GoToState",
+            "claim_ids": [
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S13",
+            "verdict": "supported_dependency",
+            "role": "Brain:PushEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C07"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S17",
+            "verdict": "supported_dependency",
+            "role": "EntityScript:SetStateGraph/EntityScript:ClearStateGraph",
+            "claim_ids": [
+              "EXP-ARCH-001-C04"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S18",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:Start/StateGraphInstance:Stop",
+            "claim_ids": [],
+            "note": "claim_ids为空者由API/step消费，未遗漏；不当成整包白名单。"
+          }
+        ],
+        "limit": "未穷尽constructionsite业务、idle全部后继态、引擎tag回调、任意Mod Hook；这些未被候选用作普遍效果保证。"
+      }
+    },
+    {
+      "id": "EXP-ARCH-002",
+      "verdict": "accept_for_restricted_static_research",
+      "runtime_verified": false,
+      "scope_verdict": "明确本地Lua/枚举原生消费者与未知，不从露露方案推原生事实，不授予跨端或Runtime保证。",
+      "claims": [
+        {
+          "id": "EXP-ARCH-002-C01",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S08",
+            "AE-S11",
+            "AE-S12"
+          ],
+          "rationale": "目标捕获、旧onexit、新statemem/tags/端别预测字段、timeout/currentstate/timelineindex与onenter顺序吻合；mem不重建；基础顺序承认旧知识。"
+        },
+        {
+          "id": "EXP-ARCH-002-C02",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11"
+          ],
+          "rationale": "尾部newstate使用该层形参statename，之后才清lasttags、写时间戳和通知manager；没有currentstate或statemem保持检查。"
+        },
+        {
+          "id": "EXP-ARCH-002-C03",
+          "kind": "EI",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11"
+          ],
+          "rationale": "onexit内层返回后外层仍安装早先捕获state，laststate读取内层留下值；onenter内层返回后只续尾部、不再由该层赋回currentstate。newstate普通listener亦可再入；作为EI且限定正常返回准确。"
+        },
+        {
+          "id": "EXP-ARCH-002-C04",
+          "kind": "NSF",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S07",
+            "AE-S10",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15",
+            "AE-S19"
+          ],
+          "rationale": "构筑onexit→StopConstruction→PushEventImmediate→旧状态handler置stoppedconstruction→嵌套GoToState链闭合；旧statemem.constructing为假且旧statemem.stoppedconstruction为假才再次StopConstruction，字段名已澄清。idle仍可按条件再切态，未声称最终业务态。",
+          "delta_reconfirmed": true
+        },
+        {
+          "id": "EXP-ARCH-002-C05",
+          "kind": "EI",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S11",
+            "AE-S16"
+          ],
+          "rationale": "newstate同步监听在该层刷新时间戳前执行；OnNewState在server预测开启/dirty时登记，读取inst.sg.currentstate，源码注释已有反序警告。稿承认旧发现，仅补完整尾部依赖与观察窗口。"
+        },
+        {
+          "id": "EXP-ARCH-002-C06",
+          "kind": "REC",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15",
+            "AE-S16"
+          ],
+          "rationale": "按尝试身份和阶段处理失权、使用点重读状态的REC不等于原生重入锁；没有把方法nil返回解释成统一失败或成功。"
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/1/api_contracts/0",
+          "symbol": "StateGraphInstance:GoToState",
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S08",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11",
+            "AE-S12",
+            "AE-S14",
+            "AE-S15",
+            "AE-S16"
+          ],
+          "rationale": "caller/consumer包含constructing、idle.onenter和server OnNewState；参数/两种nil返回、目标捕获、端别tag与预测字段、onenter/newstate后续尾部、无通用资源/保存清理均与定义一致。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S07",
+            "AE-S10",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15"
+          ],
+          "rationale": "捕获目标后旧onexit的构筑停止即时递归路径可达，正常返回假设明确。"
+        },
+        {
+          "step": 2,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S08",
+            "AE-S11",
+            "AE-S12",
+            "AE-S19"
+          ],
+          "rationale": "外层恢复后覆盖内层目标并再建mem/onenter；idle提供onenter继续切态的直接原生消费者。"
+        },
+        {
+          "step": 3,
+          "verdict": "supported_with_scope",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11",
+            "AE-S16"
+          ],
+          "rationale": "各层onenter后分别通知；同步监听早于该层时间戳刷新，使用当时SG与旧payload不等价。"
+        }
+      ],
+      "compatibility": {
+        "verdict": "adequate_for_enumerated_claims",
+        "all_atom_refs_in_dependency_list": true,
+        "all_dependency_refs_used": true,
+        "dependency_results": [
+          {
+            "ref": "AE-S03",
+            "verdict": "supported_dependency",
+            "role": "EntityScript:PushEvent_Internal/EntityScript:PushEvent/EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03",
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S04",
+            "verdict": "supported_dependency",
+            "role": "SGManager:OnEnterNewState/StateGraphWrangler:OnPushEvent",
+            "claim_ids": [
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S07",
+            "verdict": "supported_dependency",
+            "role": "State:HandleEvent",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S08",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance",
+            "claim_ids": [
+              "EXP-ARCH-002-C01"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S09",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:PushEvent/StateGraphInstance:IsListeningForEvent",
+            "claim_ids": [],
+            "note": "claim_ids为空者由API/step消费，未遗漏；不当成整包白名单。"
+          },
+          {
+            "ref": "AE-S10",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:HandleEvent/StateGraphInstance:HandleEvents/StateGraphInstance:ClearBufferedEvents",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S11",
+            "verdict": "supported_dependency",
+            "role": "StateGraphInstance:GoToState",
+            "claim_ids": [
+              "EXP-ARCH-002-C01",
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03",
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S12",
+            "verdict": "supported_dependency",
+            "role": "SGTagsToEntTags",
+            "claim_ids": [
+              "EXP-ARCH-002-C01"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S14",
+            "verdict": "supported_dependency",
+            "role": "ConstructionBuilder:StopConstruction",
+            "claim_ids": [
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S15",
+            "verdict": "supported_dependency",
+            "role": "constructing/stopconstruction/onexit",
+            "claim_ids": [
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S16",
+            "verdict": "supported_dependency",
+            "role": "OnNewState/PlayerController:OnRemoteToggleMovementPrediction",
+            "claim_ids": [
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          },
+          {
+            "ref": "AE-S19",
+            "verdict": "supported_dependency",
+            "role": "idle.onenter",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ],
+            "note": "所列claim指向有效，同ref角色与定义/调用/清理范围相符。"
+          }
+        ],
+        "limit": "未穷尽constructionsite业务、idle全部后继态、引擎tag回调、任意Mod Hook；这些未被候选用作普遍效果保证。"
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "AE-S01",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1198,
+      "line_end": 1229,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1231,
+      "line_end": 1288,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "541906991ed8deb2f50421810d42e5f3468cf396f898b1cbab488a0b42782740",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S03",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1312,
+      "line_end": 1349,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S04",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 27,
+      "line_end": 45,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "a10a54228638d4bc9684ea97fb3bf8a416a6f798c5d13526ae628383270e6fb7",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S05",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 82,
+      "line_end": 107,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "3ff75dda78882f3b60ef49573aa6fa95555eaeb60cb8f2e4ba97ef6920b3612c",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S06",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 109,
+      "line_end": 157,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "38e3f2a55d1c009f262e222a88daeb3da69ac8c258c4904eb881eec711a46069",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S07",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 264,
+      "line_end": 272,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "8ccc25b305e56c623694a80e2a4de51c6c8606b9f8a17190ed669bc6d7678375",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S08",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 332,
+      "line_end": 345,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "769fb95298b2f539b94801be9d3351532514528b4bfac8194da8e93f2242631c",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S09",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 392,
+      "line_end": 403,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "68739d56d9710664687056403ae7154a1662903f7c90ecb03b11995fe559d31f",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S10",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 463,
+      "line_end": 494,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "caf5a8bb91a965728497497ea6b0e1f0c5a6875a367229ddf88ed5563c18999b",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S11",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 529,
+      "line_end": 600,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S12",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 500,
+      "line_end": 523,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "5a0c56f9adaa09984a57409c5fb6d453ff3d1becc95b318e44f178eaa5322104",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S13",
+      "source_file": "scripts/brain.lua",
+      "line_start": 261,
+      "line_end": 267,
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "range_sha256": "c5b4927e438517f3f7b400650597596171562b25d290c887d284fdd0be2e8011",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S14",
+      "source_file": "scripts/components/constructionbuilder.lua",
+      "line_start": 80,
+      "line_end": 108,
+      "file_sha256": "543d8b781a6c2c6c6d0cab897e37c31b2b488b1d03082a9e40b2fab7a33c2177",
+      "range_sha256": "dc5fcc19545b8365aca2733d501a001c008ecd4ba5fdc8ddcb6ea876cbd5faa4",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S15",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 20011,
+      "line_end": 20061,
+      "file_sha256": "7b381c15992c5001e6d84329ee8e961b6f5f9db573e0f24ab3b7a61d859270a6",
+      "range_sha256": "fabc02e8f95f05eb8afa233bd9234d7fced95bafaae719d652fdd53dbc3d129a",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S16",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 5912,
+      "line_end": 5941,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "1c6a8fb4907cd51a596395230610d761ff8e528393f13ab40def7b792da87e15",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S17",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1174,
+      "line_end": 1196,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "8309154ad545d1bae01d4a051b337781688ca94635a9872f6c6445516c78f937",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S18",
+      "source_file": "scripts/stategraph.lua",
+      "line_start": 709,
+      "line_end": 731,
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "range_sha256": "9374efa11bec9ad0f9ab8abc9b3568bbc4f30993c06ac391ec8dbef417522db9",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    },
+    {
+      "id": "AE-S19",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 4197,
+      "line_end": 4352,
+      "file_sha256": "7b381c15992c5001e6d84329ee8e961b6f5f9db573e0f24ab3b7a61d859270a6",
+      "range_sha256": "57c690b7ce06ae0cf8cf9012287a9d1bbe63a2e0438cf9624cb2a86337bd083c",
+      "file_hash_match": true,
+      "range_hash_match": true,
+      "semantic_read": true,
+      "verdict": "source_identity_and_enclosure_confirmed"
+    }
+  ],
+  "deduplication": {
+    "verdict": "useful_incremental_closure_not_first_discovery",
+    "dedup_document": "windows/B/DEDUP.md",
+    "dedup_sha256": "b27f192ffcafa37d986bfa4df03cdcf15ac354525e071d1729568252e5097bf1",
+    "prior_records": [
+      "NC-N003-INT-04",
+      "NC-N003-INT-05",
+      "NC-N003-INT-06",
+      "NC-N003-INT-07",
+      "EXP-AI-007"
+    ],
+    "read_boundary": "准备阶段已按文件读NC-N003-INT-04相关Scope/claim与06/07 Scope/claims及EXP-AI-007；本轮定向确认旧staging C11与W27/8；未重审旧条目全部历史依赖，不因读取重标旧Scope。",
+    "direct_old_evidence": [
+      {
+        "file": "knowledge/research/native-core/sources/689635242bbaa6d0-n003-staging.json",
+        "sha256": "c35c57b0531771d675766ebbb140f51a67a38c0fb79d42faca5c7657738c09e7",
+        "assessment": "N003-C11-NSF02原子已记录OnNewState不用payload与链式切态反序；不计本轮新发现。"
+      },
+      {
+        "file": "knowledge/research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+        "sha256": "1b9cda619e402240b9bc433a5e2b809140f227e42708b8046333360c98bae123",
+        "assessment": "facts/8已含listener复制、普通/Immediate分流和stoppedconstruction；候选贡献是完整续行/别名/排空边界，不宣称最早发现。"
+      }
+    ],
+    "increment": [
+      "001补双向监听/纯函数快照的取消边界、阶段间接收器重读、payload别名到Brain、manager集合与SG原数组的区别。",
+      "002补onexit嵌套返回的外层覆盖、onenter/newstate内层返回后的尾部续行、时间戳观察窗口及具体constructing→idle可再切态链。"
+    ],
+    "preserved": [
+      "基本真值消费、状态名过滤、同名重入与新statemem不作为新发现。",
+      "既有OnNewState反序警告、构筑flag与复制监听已在DEDUP承认。",
+      "227基线、canonical、历史Scope与HOLD身份不因本审查改变。"
+    ]
+  },
+  "negative_cases": [
+    {
+      "case": "回调解绑/新增/嵌套发布",
+      "result": "快照取消不追溯；新调用另建快照；异常可截断外层；非故障隔离。"
+    },
+    {
+      "case": "同一data重复入队或nil payload",
+      "result": "普通SG写state与后续修改可别名影响；nil新表只在callee局部，Brain仍收nil。"
+    },
+    {
+      "case": "同次SG处理追加或清缓冲",
+      "result": "连续数组可同次读到追加项；换表令旧排空提前返回；不能保证下一帧或跨实体顺序。"
+    },
+    {
+      "case": "onexit/onenter/newstate内层切态",
+      "result": "onexit正常返回外层仍赋捕获目标；onenter/newstate正常返回外层续尾部；无统一失权检查/事务补偿。"
+    },
+    {
+      "case": "构筑局部flag",
+      "result": "只抑制该旧statemem上的StopConstruction递归，不是全局状态锁，也不证明idle最终静止。"
+    },
+    {
+      "case": "任意移除宿主/替换SG/抛错",
+      "result": "候选保留未知和正常返回条件，不能承诺全部回调继续、安全清理或回滚。"
+    }
+  ],
+  "query_and_limits_review": {
+    "verdict": "appropriate",
+    "queries": "9项为检索设计含2项负例，无实际查询命中或Runtime测试PASS声明。",
+    "limitations": "source_epoch=761239及逐引用源身份清楚；research/restricted/hold且Runtime=false；无原版Lua正文或本机私密路径；不提供分布式消息保证。"
+  },
+  "validation_performed": [
+    "r1已完成：封存候选、原生ZIP与19引用哈希、13claim/4API/6step的静态语义审阅；详见原review.json。",
+    "r2新核：旧/新SHA、UTF-8单一替换且其余字节不变、JSON单字段变化、AE-S15文件/范围SHA及20054/20056两层条件。"
+  ],
+  "unverified": [
+    "未执行作者生成脚本、Lua行为夹具、游戏、专服、真实远端客户端。",
+    "native帧频、跨实体pairs顺序、引擎标签回调、递归终止性、异常后的业务一致性与任意Hook未运行验证。",
+    "constructionsite回调和idle后继态仅按候选明确范围作为分支消费者，不保证其最终业务效果。"
+  ],
+  "publication_boundary": "本r2 review只含相对定位、hash和原创评价；仅绑定所列r2候选SHA，runtime_verified=false、research/restricted/hold不变。",
+  "nonblocking_count": 0,
+  "revision": "r2",
+  "delta_review": {
+    "previous_candidate": "architecture_events-59ba97fe1ff2.json",
+    "previous_candidate_sha256": "59ba97fe1ff2dd94b911c5c43f33efd370a09c2c5ea7371ab250d63f71f3aa09",
+    "previous_review": "review.json",
+    "previous_review_sha256": "c6f4657825a1903af23ba995d503c1cd4fdb5001ab70ee5f23fc4da8c80e8cb9",
+    "intake": "B-r2-intake.json",
+    "intake_sha256": "573f4f9302ac6aec6c16f1e7ef252cf73705f6275066b23b247da7f6c273d4c3",
+    "changed_pointer": "/entries/1/claims/3/statement",
+    "old_phrase": "SGwilson constructing.onexit在非constructing且未stoppedconstruction时",
+    "new_phrase": "SGwilson constructing.onexit在旧statemem.constructing为假且旧statemem.stoppedconstruction为假时",
+    "exact_single_utf8_substitution_verified": true,
+    "other_bytes_unchanged": true,
+    "other_json_values_unchanged": true,
+    "source_condition_confirmed": {
+      "ref": "AE-S15",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "condition_lines": [
+        20054,
+        20056
+      ],
+      "file_sha256": "7b381c15992c5001e6d84329ee8e961b6f5f9db573e0f24ab3b7a61d859270a6",
+      "range_sha256": "fabc02e8f95f05eb8afa233bd9234d7fced95bafaae719d652fdd53dbc3d129a"
+    },
+    "resolved_note": "AE-NB-01",
+    "closed": true,
+    "scope": "本轮仅复核单一措辞delta与两层statemem条件；完整原子审阅结果从绑定旧SHA的review.json沿用，未重复探索或运行行为。",
+    "runtime_verified": false
+  }
+}

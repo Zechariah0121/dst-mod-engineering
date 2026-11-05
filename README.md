@@ -1,14 +1,14 @@
 # DST Mod Engineering
 
-当前版本 `v2026.10.31.3` 共 227 条登记记录：保留旧 187 条，另有 40 条 native_mechanism 研究（Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充及表现机制）。数量由 `knowledge/FAMILY-REGISTRY.json` 生成 `CATALOG.counts`。研究族仅显式 Reviewer 审阅，保持 `research/restricted/hold`。详见 [机制研究族](docs/native-mechanisms.md)。
+当前开发候选 `v2026.11.05.1` 共 231 条登记记录，尚未公开发行。新增[复杂 Mod 架构指南](references/complex-mod-architecture.md)及事件、状态机、前端加载与容器 Replica 研究，让 AI 更准确地划分模块职责、处理回调重入与初始化时序。详见[本阶段内容](docs/phase7-architecture-native.md)。
 
 面向《饥荒联机版》Mod 开发的工程 Skill 与知识库：按任务读取知识、核对当前源码，再设计、实现、审查和验证。[English README](README.en.md)
 
-公开知识库位于 `knowledge/`，包含 **227 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 40 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
+公开知识库位于 `knowledge/`，包含 **231 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 44 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
 
 ## 下载
 
-当前发行：[v2026.10.31.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.3)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
+已公开发行（227 条）：[v2026.10.31.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.3)。下载唯一完整发行包即可安装 Skill、阅读知识或接入 MCP。历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 保留其 187 条发行身份。
 
 | 附件 | 包含内容与用途 |
 |---|---|

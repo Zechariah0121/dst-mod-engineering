@@ -1,0 +1,828 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "architecture_loading",
+  "source_epoch": "761239",
+  "archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+  "entries": [
+    {
+      "id": "EXP-ARCH-003",
+      "title": "前端双环境的登记归属与入口失败传播边界",
+      "aliases": [
+        "FrontendLoadMod",
+        "modservercreationmain.lua",
+        "frontend_env",
+        "InitializeModMain",
+        "前端登记"
+      ],
+      "engineering_question": "前端载入的Hook会进入游戏期登记集合吗，safe入口失败是否保证后续入口与环境清理继续？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Redux ModsTab启用/切槽消费者，FrontendLoadMod双env与普通LoadMods登记作有界对照；不研究配置持久化及所有前端消费者。",
+        "excluded": "复用EXP-WG-001/N007-MC-04的导入与worldgen规则；增量只限前端env未进入运行期列表的局部数据流，以及safe失败可再抛错的分支。",
+        "update_policy": "逐source reference/claim/API/step核对；archive身份只作本候选基线，不作整库白名单或停用条件。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ARCH-003-C01",
+          "kind": "NSF",
+          "statement": "Redux ModsTab启用未启用Mod时先Enable再FrontendLoadMod；切到不同slot时先FrontendUnloadMod(nil)，加载该slot启用列表，再逐名FrontendLoadMod。FrontendLoadMod本体检查Mod是否存在，准备配置后独立CreateEnvironment两次，普通env.modinfo为deepcopy(initenv)，frontend_env.modinfo直接引用initenv。",
+          "evidence_refs": [
+            "AL-S11",
+            "AL-S12",
+            "AL-S02"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C02",
+          "kind": "NSF",
+          "statement": "两个env均以self.worldgen传isworldgen，仅第二个传isfrontend=true；CreateEnvironment各建env.env与modimport闭包。InsertPostInitFunctions各建postinitfns/postinitdata，isfrontend真时才增加读取该env.FrontEndAssets的ReloadFrontEndAssets闭包；后段API是否注入仍受isworldgen提前return控制。不能把frontend一词等同所有runtime API必定有或必定无。",
+          "evidence_refs": [
+            "AL-S01",
+            "AL-S02",
+            "AL-S06",
+            "AL-S07"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C03",
+          "kind": "NSF",
+          "statement": "FrontendLoadMod依次用frontend_env执行modservercreationmain、普通env执行modworldgenmain，二者safe=true；不调用modmain，也不将这两个env插入self.mods/enabledmods。普通LoadMods另建env并插入self.mods，后按已排序列表将modname插入enabledmods，再执行worldgenmain和非worldgen的modmain。",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C04",
+          "kind": "NSF",
+          "statement": "env.AddPrefabPostInit只追加到所属env.postinitfns。GetPostInitFns遍历enabledmods，GetMod从self.mods按名找env，再收集该env表；SpawnPrefabFromSim的PrefabPostInitAny消费者通过GetPostInitFns读取。上述链没有把FrontendLoadMod两个临时env的postinitfns合并到后来LoadMods的env。",
+          "evidence_refs": [
+            "AL-S08",
+            "AL-S09",
+            "AL-S10",
+            "AL-S14",
+            "AL-S02",
+            "AL-S03"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C05",
+          "kind": "NSF",
+          "statement": "InitializeModMain不兼容时无值返回；加载结果是错误字符串时记failedmods并false，缺fn时true；有fn时RunInEnvironment或Safe均setfenv后xpcall，status真返回true。status=false先调moderror；其配置开启错误时再次error，关闭时print并返回，后者才继续记failedmods并false。FrontendLoadMod不检查两次InitializeModMain的返回值，其恢复package.path/assetpath/currentlyloadingmod的代码在正常后续语句，不是finally。",
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C06",
+          "kind": "EI",
+          "statement": "前端env内字段或仅本env表上的Hook登记不能仅靠同一Mod名视为已转交运行期；但脚本对共享模块、全局、资源或其他持有者的副作用可能另行保留，不能反向宣称前端加载完全无影响。safe使用xpcall也不等于后续moderror不会抛错或副作用自动回滚。",
+          "evidence_refs": [
+            "AL-S01",
+            "AL-S02",
+            "AL-S03",
+            "AL-S04",
+            "AL-S13"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-003-C07",
+          "kind": "REC",
+          "statement": "评审跨入口模块时分别列执行env、注册存储位置及实际消费者；按原项目依赖决定是否分别安装。不要用前端加载成功布尔值证明游戏期Hook已登记，也不将require/modimport选择或Installer风格改写成新强制架构。",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03",
+            "AL-S08",
+            "AL-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ModWrangler:FrontendLoadMod(modname)",
+          "source_file": "scripts/mods.lua",
+          "visibility": "本地ModWrangler单例的方法，由所列Redux ModsTab调用；不是CreateEnvironment向Mod注入的同名公开API。",
+          "parameters": [
+            "self：原版ModManager；modname：已知模组标识。"
+          ],
+          "returns": "无显式成功返回；不存在Mod时直接return。",
+          "preconditions": [
+            "KnownModIndex、依赖模块与package表已初始化；isworldgen取self.worldgen原值。"
+          ],
+          "side_effects": [
+            "准备配置、创建独立env、临时prepend搜索路径/assetpath、设置currentlyloadingmod，并依次尝试两个safe入口。"
+          ],
+          "lifecycle": [
+            "正常到达末尾恢复path、移除末项assetpath并清currentlyloadingmod；不登记到self.mods/enabledmods，不保证抛错清理。"
+          ],
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S01",
+            "AL-S06",
+            "AL-S11",
+            "AL-S12",
+            "AL-S04",
+            "AL-S13"
+          ],
+          "unknowns": [
+            "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。"
+          ]
+        },
+        {
+          "symbol": "ModWrangler:InitializeModMain(modname, env, mainfile, safe)",
+          "source_file": "scripts/mods.lua",
+          "visibility": "原版loader内部方法；由FrontendLoadMod/LoadMods调用，不是模块返回API约定。",
+          "parameters": [
+            "modname/mainfile：拼出模组入口路径；env：待绑定的输出引用；safe：选择错误处理器的Lua真值。"
+          ],
+          "returns": [
+            "不兼容：nil；缺入口：true；正常xpcall成功：true；加载错误字符串：false。执行失败经moderror可重新抛错，只有其返回后才记失败并false。"
+          ],
+          "preconditions": [
+            "KnownModIndex与kleiloadlua可用；有fn时env可setfenv；无统一参数类型校验。"
+          ],
+          "side_effects": [
+            "运行入口对env产生副作用；失败可能写failedmods或抛错；不把入口return当业务接口返回。"
+          ],
+          "lifecycle": [
+            "safe仅换xpcall处理器，不提供事务或finally；原调用者不消费返回值，不保证下一个入口必执行。"
+          ],
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02",
+            "AL-S03"
+          ],
+          "unknowns": [
+            "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "已读Redux消费者触发前端部分加载，各env独立绑定并选择阶段注入。",
+          "evidence_refs": [
+            "AL-S11",
+            "AL-S12",
+            "AL-S02",
+            "AL-S01",
+            "AL-S06",
+            "AL-S07"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "入口env的Hook表和真正运行期登记集合沿已读GetPostInitFns消费者分开。",
+          "evidence_refs": [
+            "AL-S02",
+            "AL-S03",
+            "AL-S08",
+            "AL-S09",
+            "AL-S10",
+            "AL-S14"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "逐分支判断入口返回/再抛错和正常后续清理，不能靠safe命名推断恢复。",
+          "evidence_refs": [
+            "AL-S04",
+            "AL-S05",
+            "AL-S13",
+            "AL-S02"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。",
+        "未执行前端Enable/切槽/错误配置组合；外部require缓存、共享模块副作用和前端资源卸载内部行为没有穷尽。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AL-S01",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S02",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S03",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S04",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S05",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S06",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S07",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S08",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S09",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S10",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S11",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S12",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S13",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AL-S14",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "仅枚举本卡静态依赖，未穷尽所有动态调用者/原生实现/Mod生态；不据此封闭全局兼容集合。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ARCH-004",
+      "title": "Container replica与classified的双向补接及槽初始化窗口",
+      "aliases": [
+        "container_classified",
+        "AttachClassified",
+        "container_classified pending",
+        "InitializeSlots",
+        "RegisterNetListeners"
+      ],
+      "engineering_question": "容器replica先建或classified先到时如何补接，何时再次初始化槽会直接触发断言？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "普通container_replica客户端构造与container_classified的OnEntityReplicated/延后listener分支；只观察已读Lua握接，不假定实际网络两种顺序都已实测。",
+        "excluded": "NC-N002-FINAL-04及AI-N001-10已有复制回调顺序与分层可用性；本卡增量是container的暂存字段、交接清理和InitializeSlots窗口，不重建通用ready框架。",
+        "update_policy": "逐引用复核，旧Scope及准入不改；不以整包SHA匹配替代语义适配。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ARCH-004-C01",
+          "kind": "NSF",
+          "statement": "mainfunctions.ReplicateEntity按GUID取inst并调其ReplicateEntity；实体方法遍历已登记名称，以_或__construction tag决定构造replica，之后才调用该实体OnEntityReplicated。ReplicateComponent先构造cmp(self)，再rawset到底层表；public replica读取另经_<name>标签过滤。这里没有证明不同实体之间的引擎到达顺序。",
+          "evidence_refs": [
+            "AR-S01",
+            "AR-S02",
+            "AR-S03"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C02",
+          "kind": "NSF",
+          "statement": "container_classified客户端安装OnEntityReplicated；回调从原生parent取得_parent，无parent只输出消息；有parent则TryAttachClassifiedToReplicaComponent。该helper直接取parent底层replica，存在便调用AttachClassified并true，不存在false；false分支把inst暂存在parent.container_classified，并安装清除该字段的OnRemoveEntity。",
+          "evidence_refs": [
+            "AR-S09",
+            "AR-S05",
+            "AR-S02"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C03",
+          "kind": "NSF",
+          "statement": "Container客户端构造先containers.widgetsetup(self)；该helper在有匹配配置时复制其字段并按widget.numslots或slotpos长度SetNumSlots。若self.classified仍nil而inst.container_classified存在，取走该引用、清classified.OnRemoveEntity、清inst.container_classified，再AttachClassified。由此构造后有replica的直接附着与构造时消费暂存字段形成两条补接路径；不是依赖固定一帧重试。",
+          "evidence_refs": [
+            "AR-S04",
+            "AR-S05",
+            "AR-S06",
+            "AR-S11",
+            "AR-S12"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C04",
+          "kind": "NSF",
+          "statement": "Container:AttachClassified先写self.classified，建立onremove闭包并在classified上监听，然后以当前GetNumSlots调用classified.InitializeSlots；DetachClassified移除该监听并清两个字段。此方法没有先解绑旧classified或去重已有Attach。若后面的槽初始化抛错，前述字段及listener已写，未见本方法回滚。",
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S07",
+            "AR-S10"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C05",
+          "kind": "NSF",
+          "statement": "container_classified构造把_slottasks置nil并准备items池，客户端另排DoStaticTaskInTime(0, RegisterNetListeners)。RegisterNetListeners先将_slottasks赋表，再刷新和装各item dirty监听；InitializeSlots第一步assert(_slottasks==nil)，之后仅在_items与_itemspool间移动条目。Container:WidgetSetup在classified存在时也会调用InitializeSlots，故listener登记后再次调用到该分支将触发断言；这不是任意时刻可重复的幂等初始化API。",
+          "evidence_refs": [
+            "AR-S09",
+            "AR-S08",
+            "AR-S07",
+            "AR-S10"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C06",
+          "kind": "EI",
+          "statement": "parent的OnEntityReplicated已经返回、底层replica存在、classified附着、slot listener登记是不同状态；本地补接分支只覆盖它显式处理的缺对象形状。没有parent的分支未安排重试，Attach异常未回滚，不能推出all-ready或任意顺序自动恢复。",
+          "evidence_refs": [
+            "AR-S02",
+            "AR-S04",
+            "AR-S05",
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S09"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-004-C07",
+          "kind": "REC",
+          "statement": "需要扩展容器规则时先定位具体replica与classified阶段；仅改接纳谓词的任务不要为等到replica而重复WidgetSetup/InitializeSlots。若研究自己的重试或补装，按真实持有对象判幂等，另测缺parent、重复Attach、callback异常与移除，不能把原版内部暂存字段当推荐公共写入口。",
+          "evidence_refs": [
+            "AR-S04",
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Container:AttachClassified(classified)",
+          "source_file": "scripts/components/container_replica.lua",
+          "visibility": "原版container replica Lua方法，供已读构造/内部复制交接链使用；非通用Mod就绪或可重入保证。",
+          "parameters": [
+            "self：有效container replica；classified：支持InitializeSlots的classified实体。"
+          ],
+          "returns": "无显式返回值；初始化窗口断言失败可抛错，不能以nil作失败码。",
+          "preconditions": [
+            "self.inst可监听事件；GetNumSlots已由容器设置；classified._slottasks必须仍nil，items池已构造；本函数未校验重复绑定。"
+          ],
+          "side_effects": [
+            "先写引用、保存ondetachclassified并监听classified onremove，再按当前槽数InitializeSlots。"
+          ],
+          "lifecycle": [
+            "classified onremove回调走DetachClassified解除监听并清引用；函数本身不去重、不替换前清理、不在InitializeSlots失败后回滚。"
+          ],
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S04",
+            "AR-S05",
+            "AR-S07",
+            "AR-S09",
+            "AR-S10",
+            "AR-S11",
+            "AR-S12"
+          ],
+          "unknowns": [
+            "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。",
+            "正常引擎调度怎样确保首次附着位于listener窗口内，及异常/重复Attach的实际listener行为未实测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "原生GUID入口转发，construction tags先建具体replica再调本实体复制回调；不推出跨实体总序。",
+          "evidence_refs": [
+            "AR-S01",
+            "AR-S02",
+            "AR-S03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "classified在有底层replica时直接Attach；没有时写parent暂存，replica构造消费并解除暂存移除hook。",
+          "evidence_refs": [
+            "AR-S02",
+            "AR-S04",
+            "AR-S05",
+            "AR-S06"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "Attach先建立引用/监听再初始化槽；延后listener任务关闭该初始化窗口，重复WidgetSetup不能作为补接。",
+          "evidence_refs": [
+            "AR-S06",
+            "AR-S07",
+            "AR-S08",
+            "AR-S09",
+            "AR-S10"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。",
+        "未核验native parent复制完整性、不同实体回调与0秒静态任务的实际总序、真实远端/重连、重复Attach或失败后恢复。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AR-S01",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S02",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S03",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S04",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S05",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S06",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S07",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S08",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S09",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S10",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S11",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          },
+          {
+            "ref": "AR-S12",
+            "role": "本卡已列caller/callee/consumer或局部生命周期依赖"
+          }
+        ],
+        "unknowns": [
+          "仅枚举本卡静态依赖，未穷尽所有动态调用者/原生实现/Mod生态；不据此封闭全局兼容集合。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "AL-S01",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 258,
+      "line_end": 320,
+      "range_sha256": "048519eb5ab2699360e8cfc3f8989392afffdf3d264bd56d57f0fa5a4d8bac9f",
+      "symbols": [
+        "CreateEnvironment",
+        "env.modimport"
+      ]
+    },
+    {
+      "id": "AL-S02",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 374,
+      "line_end": 411,
+      "range_sha256": "23fab79c80030ccb7bbe530d3a4a84a6700c7446bf7c4368cd22c8b4b9722c1f",
+      "symbols": [
+        "ModWrangler:FrontendLoadMod"
+      ]
+    },
+    {
+      "id": "AL-S03",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 431,
+      "line_end": 548,
+      "range_sha256": "b9124c62150f8073d13e25ab8e068b2719b4e04bd5b08fafd3c578a8bd4101f0",
+      "symbols": [
+        "ModWrangler:LoadMods"
+      ]
+    },
+    {
+      "id": "AL-S04",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 550,
+      "line_end": 582,
+      "range_sha256": "84d4505ceebf6baeb65c09806afdfcc248ac9a44f942879e53c86b9edb4739ff",
+      "symbols": [
+        "ModWrangler:InitializeModMain"
+      ]
+    },
+    {
+      "id": "AL-S05",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 788,
+      "line_end": 796,
+      "range_sha256": "87b79c2a9e4741becc47ba08b30331bd9fb4382401f3d74d417ff2e640d0f9d0",
+      "symbols": [
+        "RunInEnvironment",
+        "RunInEnvironmentSafe"
+      ]
+    },
+    {
+      "id": "AL-S06",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 178,
+      "line_end": 209,
+      "range_sha256": "888ffc3e5c9f694473f8d7f49cea434c4db047661c4183a612d4984b3ff6a67d",
+      "symbols": [
+        "InsertPostInitFunctions",
+        "env.ReloadFrontEndAssets"
+      ]
+    },
+    {
+      "id": "AL-S07",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 430,
+      "line_end": 438,
+      "range_sha256": "4f7cbe2ab620ade26393e2d74e512aec92c1a83b35d45e05cf5b5faf523b3dca",
+      "symbols": [
+        "InsertPostInitFunctions"
+      ]
+    },
+    {
+      "id": "AL-S08",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 592,
+      "line_end": 599,
+      "range_sha256": "ecfb11dd2ee872cc22dd6b5092d436120a0e37ca123e5307542a42b825399411",
+      "symbols": [
+        "env.AddPrefabPostInit"
+      ]
+    },
+    {
+      "id": "AL-S09",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 228,
+      "line_end": 234,
+      "range_sha256": "aff5ebd289d6f87ee92539266de2bf0b67228a1d152940878b14fd519ddbf02b",
+      "symbols": [
+        "ModWrangler:GetMod"
+      ]
+    },
+    {
+      "id": "AL-S10",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 818,
+      "line_end": 838,
+      "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb",
+      "symbols": [
+        "ModWrangler:GetPostInitFns"
+      ]
+    },
+    {
+      "id": "AL-S11",
+      "source_file": "scripts/widgets/redux/modstab.lua",
+      "file_sha256": "aa9cd0470370379affb820e99211c92d0c28a2e7b1fe68f2865ce3216b2102db",
+      "line_start": 974,
+      "line_end": 984,
+      "range_sha256": "a95aa4e8f5b581d252e83c6cc7cd89d5dbbfcc7eb51f2011649d933795e109d9",
+      "symbols": [
+        "ModsTab:OnConfirmEnable"
+      ]
+    },
+    {
+      "id": "AL-S12",
+      "source_file": "scripts/widgets/redux/modstab.lua",
+      "file_sha256": "aa9cd0470370379affb820e99211c92d0c28a2e7b1fe68f2865ce3216b2102db",
+      "line_start": 1557,
+      "line_end": 1568,
+      "range_sha256": "ffe343aae8e28bd6a7a558d6586b26d0b23cda3f8a50f83233c03327035f46cf",
+      "symbols": [
+        "ModsTab:SetDataForSlot"
+      ]
+    },
+    {
+      "id": "AL-S13",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 105,
+      "line_end": 118,
+      "range_sha256": "e61c3fb7c44cd84d25ded2f58cbc2ed7040c0a1c4b1ad06db662a40eb363bf95",
+      "symbols": [
+        "moderror"
+      ]
+    },
+    {
+      "id": "AL-S14",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 373,
+      "line_end": 423,
+      "range_sha256": "c1421b2760c7f1c1b8c7b28eb4d16d746cb429f705d320560e18421299c30958",
+      "symbols": [
+        "SpawnPrefabFromSim"
+      ]
+    },
+    {
+      "id": "AR-S01",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 840,
+      "line_end": 854,
+      "range_sha256": "42e290c16f1d0c61d8353b4a2417223ff3e017a5eadef04520db6ca8bda64edc",
+      "symbols": [
+        "ReplicateEntity"
+      ]
+    },
+    {
+      "id": "AR-S02",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 5,
+      "line_end": 100,
+      "range_sha256": "d10dd5f3fab42425e5f1c97aca55dbeeefdb1db4386daa28ddb5756f9fed2394",
+      "symbols": [
+        "EntityScript:ReplicateEntity",
+        "EntityScript:ReplicateComponent",
+        "EntityScript:TryAttachClassifiedToReplicaComponent"
+      ]
+    },
+    {
+      "id": "AR-S03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 208,
+      "line_end": 213,
+      "range_sha256": "368c8618d6a385582e295a3d3b42d77c4d3f5af24159b55c4f78d77ad775a7d5",
+      "symbols": [
+        "replica_mt"
+      ]
+    },
+    {
+      "id": "AR-S04",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 1,
+      "line_end": 62,
+      "range_sha256": "3c604ffa87746503dfe8cd9cc388119df4a2fd889f38eb9d1b6def84d726d455",
+      "symbols": [
+        "Container constructor"
+      ]
+    },
+    {
+      "id": "AR-S05",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 62,
+      "line_end": 76,
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "symbols": [
+        "OnEntityReplicated",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "AR-S06",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 153,
+      "line_end": 166,
+      "range_sha256": "72fe5380672d2ccb4b3c3e8cd6d464d896b80976f44522720dc7f0b092e25787",
+      "symbols": [
+        "Container:AttachClassified",
+        "Container:DetachClassified"
+      ]
+    },
+    {
+      "id": "AR-S07",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 8,
+      "line_end": 22,
+      "range_sha256": "972c7b059a4c13d2d02247100b5193543b86ae0b020f61e0e1895e8cfede5fbf",
+      "symbols": [
+        "InitializeSlots"
+      ]
+    },
+    {
+      "id": "AR-S08",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 407,
+      "line_end": 429,
+      "range_sha256": "daa2e718562f22ad4efe4c084dda762269849bed510f44c2e8b89f51df063955",
+      "symbols": [
+        "RegisterNetListeners"
+      ]
+    },
+    {
+      "id": "AR-S09",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 1050,
+      "line_end": 1108,
+      "range_sha256": "09bf1238131bdb0b9eba80707ca018db45394a2b1649d4046fdd20970bbeb8dc",
+      "symbols": [
+        "fn",
+        "OnEntityReplicated",
+        "RegisterNetListeners"
+      ]
+    },
+    {
+      "id": "AR-S10",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 232,
+      "line_end": 259,
+      "range_sha256": "91445a2184711b15d39667cc143be7db7ae9d447be85bcc6fbb0e2e3893f0d11",
+      "symbols": [
+        "Container:WidgetSetup"
+      ]
+    },
+    {
+      "id": "AR-S11",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 9,
+      "line_end": 17,
+      "range_sha256": "6dae530848ce47618c3d63aba208e034938089c205c78a6b2b920554ce14bafc",
+      "symbols": [
+        "containers.widgetsetup"
+      ]
+    },
+    {
+      "id": "AR-S12",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 269,
+      "line_end": 275,
+      "range_sha256": "cc7d8ca5f91acdca1482b9284013fc0c91f5d5120d96b5b1362c7aba39ff30b5",
+      "symbols": [
+        "Container:SetNumSlots",
+        "Container:GetNumSlots"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "前端Mod入口的Hook为什么没有进入游戏期，safe是否保证继续加载",
+      "expected_entry_ids": [
+        "EXP-ARCH-003"
+      ],
+      "purpose": "定位两env/登记集合与错误传播的有界增量"
+    },
+    {
+      "query": "容器classified先到如何补接，重复WidgetSetup为什么InitializeSlots断言",
+      "expected_entry_ids": [
+        "EXP-ARCH-004"
+      ],
+      "purpose": "定位container两向交接与listener窗口"
+    }
+  ],
+  "limitations": [
+    "仅761239归档的静态Lua核读；未运行Lua合同、游戏、专服或真实客户端，不证明native实现、网络到达总序或模组兼容性。",
+    "本文各条保持research/restricted/hold；登记与独立审阅状态以FAMILY-REGISTRY及关联审阅记录为准，不因文件可读而改变canonical、旧Scope或Coding准入。",
+    "文件SHA基于ZIP原字节；范围SHA基于UTF8 decode后splitlines，以LF join且无尾换行；只交定位与论述，不复制Lua。",
+    "761239/build26335394为既有来源准备身份，本轮独立核的是实际ZIP SHA，不宣称再次校验可执行程序版本。",
+    "所有引擎回调总序、原生序列化、缓存与真实画面都保留未知；不把露露实现作为原生API证据。",
+    "archive SHA只绑定本轮研究，未来按具体引用与语义检查兼容；不设置整包白名单，不因版本不同全局关闭旧知识。"
+  ]
+}

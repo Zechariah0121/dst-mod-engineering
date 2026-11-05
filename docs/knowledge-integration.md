@@ -1,8 +1,8 @@
 # Skill 与知识库接入 / Skill and KB integration
 
-版本 `v2026.10.31.3` 将 Skill 与 227 条登记知识（旧 187 条 + 40 条独立机制研究）串联分发，默认知识目录为 `knowledge/`。同一发行包包含来源准备工具与 MCP 的目录模式、完整九工具模式；文件读取和 MCP 使用唯一 `knowledge/`，旧版由 Git 历史保留。
+版本 `v2026.11.05.1` 将 Skill 与 231 条登记知识（旧 187 条 + 44 条独立机制研究）串联分发，默认知识目录为 `knowledge/`。同一发行包包含来源准备工具与 MCP 的目录模式、完整九工具模式；文件读取和 MCP 使用唯一 `knowledge/`，旧版由 Git 历史保留。
 
-2026-11-05 补充的 [露露工程案例](../references/lulu-case-index.md) 由 Skill 按问题读取，覆盖 12 个案例主题。它们是有条件的工程参考，不计入上述 227 条登记记录；案例编号不能作为 MCP ID，历史验证与项目方案各保留其范围。
+2026-11-05 补充的 [露露工程案例](../references/lulu-case-index.md) 由 Skill 按问题读取，覆盖 12 个案例主题。它们是有条件的工程参考，不计入登记记录；案例编号不能作为 MCP ID，历史验证与项目方案各保留其范围。
 
 ## 不运行 MCP：按文件读取
 
@@ -13,7 +13,7 @@
 | 64 条基础知识 | `knowledge/data/entries.json` | 按统一目录的 `file`、`pointer` 读取指定条目及相关更正 |
 | 13 条 Native AI 知识 | `knowledge/data/native001/canonical-native001-ai-knowledge.json` | 按问题选择最多 5 条，Coding 默认只投影文件声明的十字段 |
 | 110 条 Native Core 知识及状态 | `knowledge/data/nativecore/native-core.json` | 先核对三轴状态与 Scope；保留 Core Coding HOLD，不当作可直接实现的通用契约 |
-| 40 条独立机制研究 | `knowledge/FAMILY-REGISTRY.json` 的 native_mechanism 登记 | 按目录 file/pointer 显式 Reviewer 审阅，保持 research/restricted/hold |
+| 44 条独立机制研究 | `knowledge/FAMILY-REGISTRY.json` 的 native_mechanism 登记 | 按目录 file/pointer 显式 Reviewer 审阅，保持 research/restricted/hold |
 
 用 JSON 解析或定向读取提取所需记录，报告“知识文件读取”及实际记录 ID，不把它写成 MCP 查询。不要把完整 JSON 或全库加入默认提示词。原条目的 NSF、RV、EI、REC、UNK 类型分别读取；公开隐藏的私有情境仍为 `UNK`，不能由标题或关联推回正文。
 
@@ -38,3 +38,5 @@ The single complete distribution includes the registered public records in one `
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 
 独立原版机制研究族使用 `research/restricted/hold`，仅显式 Reviewer 研究请求或 ID 展开；Coding/default restricted 路径不注入。原子读取保留完整 Scope、顶层来源身份/limitations 与局部证据闭合，超过预算整体 withheld。登记、来源验证及参数见 [机制研究族](native-mechanisms.md)。
+
+复杂系统设计从[架构指南](../references/complex-mod-architecture.md)进入；配套原版研究见[阶段说明](phase7-architecture-native.md)。

@@ -1,0 +1,944 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "architecture_events",
+  "source_epoch": "761239",
+  "archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+  "entries": [
+    {
+      "id": "EXP-ARCH-001",
+      "title": "实体事件监听快照到SG缓冲与Brain的同步边界",
+      "engineering_question": "移除监听能取消本轮回调吗，普通事件是否整条异步，回调中切态/清队列会影响哪段执行？",
+      "aliases": [
+        "EntityScript:PushEvent",
+        "EntityScript:PushEventImmediate",
+        "StateGraphInstance:HandleEvents",
+        "tocall",
+        "bufferedevents",
+        "监听快照",
+        "同步重入"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "EntityScript普通Lua监听、存在且有currentstate的SG实例及可选Brain；SGManager登记/事件排空路径。构筑停止消费者仅作即时重入证据，不覆盖建筑业务。",
+        "excluded": "NC-N003-INT-06/07及旧W27已有基本SG队列/真值消费/构筑flag；本条新增监听快照、阶段间可变接收器与数据别名、同次排空可追加事件的完整依赖链；不覆盖所有事件生产者。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ARCH-001-C01",
+          "kind": "NSF",
+          "statement": "ListenForEvent把fn分别追加到source.event_listeners[event][listener]与listener.event_listening[event][source]，source默认listener；没有重复fn去重。PushEvent_Internal先按pairs(listener)/ipairs(fns)收集纯函数快照，再逐个fn(source,data)，丢弃返回值；传入的是事件源，不是登记listener。快照阶段后没有每个callback的有效性检查或pcall。",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S03"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C02",
+          "kind": "EI",
+          "statement": "因此回调内RemoveEventCallback/RemoveAllEventCallbacks不撤回已复制进本轮tocall的函数；新登记函数不加入已经形成的本轮快照。嵌套PushEvent会重新取当时监听表形成另一快照并同步返回；外层仍继续原快照。跨listener的pairs不保证注册先后；同一listener函数列表的相对顺序来自ipairs。异常若向外抛出，会中断尚未执行的外层后续阶段；这不是故障隔离事件总线。",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C03",
+          "kind": "NSF",
+          "statement": "普通监听全部正常返回后才读取当时self.sg。immediate直接sg:HandleEvent，不先查IsListeningForEvent或SGManager登记；普通分支只有当时SG监听该事件且OnPushEvent确认已在instances中才追加SG缓冲。随后再读取当时self.brain并调用其PushEvent；Brain声明直接调用events[event](data)，不由本函数转为延迟任务。普通监听返回true不阻止SG或Brain。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C04",
+          "kind": "EI",
+          "statement": "同一实体事件的后续SG接收器/当前态可能已被普通listener替换或切换；不是发布开始时冻结的接收器。EntityScript不复制data，SG普通PushEvent对truthy data原表写state，故调用者、稍后Brain及排空时SG可以看见同一表后续变更；普通listener最初读取data时该次SG写state尚未发生。nil数据仅在SG队列中被换为新表，Brain仍收原nil；即时HandleEvent的data-or-{}同样只改其局部变量。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13",
+            "AE-S17"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C05",
+          "kind": "NSF",
+          "statement": "SGManager:Update先更新updaters再UpdateEvents；UpdateEvents只交换haveEvents集合，不快照每个SG.bufferedevents。HandleEvents在入场检查inst有效后，ipairs遍历当时bufferedevents原表；每个HandleEvent返回后仅以缓冲表身份是否改变决定提前return，正常尾部ClearBufferedEvents。ClearBufferedEvents仅非空时换新表；RemoveInstance会调用它再清管理索引。",
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S10"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C06",
+          "kind": "EI",
+          "statement": "在同一SG的HandleEvents循环中，handler经合格普通PushEvent追加到仍相同且连续的缓冲数组，ipairs可能在该次排空继续处理新元素；不能把普通事件统一承诺为下一帧，也不能把haveEvents交换当冻结每个事件批次。显式清空导致表身份变化后旧排空停止；单纯GoToState不清缓冲。状态内data.state过滤及全局真值回退沿用旧合同，不能据切态推导整个事件已消费。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S06",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-001-C07",
+          "kind": "REC",
+          "statement": "把普通监听、SG即时处理、SG缓冲处理、Brain同步接收作为独立执行阶段审查；需本次尝试身份时自行保存并验证，不以监听解绑、返回true、切态或普通事件名充当全链取消。嵌套发事件时先明确允许的重入与payload所有权；本建议不提供通用防重入或原子回滚保证。",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11",
+            "AE-S13"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:PushEvent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua实例方法；本卡描述本地Lua执行，不授予跨端消息或服务端权限",
+          "parameters": [
+            "event：原样用于监听/SG/Brain索引，本包装不转换大小写或验证类型。",
+            "data：原样共享；nil允许。若普通SG入队被接纳且data为真值，必须支持.state写入（通常为table）；本包装不作类型保护。"
+          ],
+          "returns": "无显式返回；listener/SG/Brain返回值不向调用者提供消费或成功证明；错误可向上抛出。",
+          "preconditions": [
+            "有效EntityScript self及已安装的接收器接口；有SG时须有合法currentstate。",
+            "各普通listener正常返回，后续阶段才会执行；data和回调业务前置条件由其消费者决定。"
+          ],
+          "side_effects": [
+            "同步复制并调用当时普通listener函数，顺序只保证同一listener数组内相对顺序；每个fn收事件源self和同一data引用，返回值忽略。",
+            "普通监听后重新读取self.sg：IsListeningForEvent且SGManager:OnPushEvent成功才入SG缓冲，并可能改共享data.state。",
+            "之后重新读取self.brain并同步转交原data；可发生任意业务mutation、嵌套事件或切态，不自动回滚。"
+          ],
+          "lifecycle": [
+            "自身不登记新listener/task或持久化状态；快照已含的回调不能靠中途解绑取消。",
+            "普通SG缓冲由manager及HandleEvents处理；即时SG在本调用栈执行。两种入口都不提供跨客户端/分片复制。"
+          ],
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S04",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "unknowns": [
+            "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+            "未穷尽回调移除宿主/换SG/抛错的业务结果或第三方Hook；Lua层未提供统一重入锁。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:PushEventImmediate",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua实例方法；本卡描述本地Lua执行，不授予跨端消息或服务端权限",
+          "parameters": [
+            "event：原样用于监听/SG/Brain索引，本包装不转换大小写或验证类型。",
+            "data：原样共享；nil允许。即时SG路径不在此写data.state；具体handler所需结构另查。"
+          ],
+          "returns": "无显式返回；listener/SG/Brain返回值不向调用者提供消费或成功证明；错误可向上抛出。",
+          "preconditions": [
+            "有效EntityScript self及已安装的接收器接口；有SG时须有合法currentstate。",
+            "各普通listener正常返回，后续阶段才会执行；data和回调业务前置条件由其消费者决定。"
+          ],
+          "side_effects": [
+            "同步复制并调用当时普通listener函数，顺序只保证同一listener数组内相对顺序；每个fn收事件源self和同一data引用，返回值忽略。",
+            "普通监听后重新读取self.sg：直接HandleEvent，绕过普通监听资格和SGManager入队门禁。",
+            "之后重新读取self.brain并同步转交原data；可发生任意业务mutation、嵌套事件或切态，不自动回滚。"
+          ],
+          "lifecycle": [
+            "自身不登记新listener/task或持久化状态；快照已含的回调不能靠中途解绑取消。",
+            "普通SG缓冲由manager及HandleEvents处理；即时SG在本调用栈执行。两种入口都不提供跨客户端/分片复制。"
+          ],
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03",
+            "AE-S04",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ],
+          "unknowns": [
+            "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+            "未穷尽回调移除宿主/换SG/抛错的业务结果或第三方Hook；Lua层未提供统一重入锁。"
+          ]
+        },
+        {
+          "symbol": "StateGraphInstance:HandleEvents",
+          "source_file": "scripts/stategraph.lua",
+          "visibility": "Lua SG实例事件排空方法；由已读SGManager与Stop消费者调用，不代表可任意跨端调用",
+          "parameters": "无显式参数；读self.inst、currentstate、bufferedevents。",
+          "returns": "无显式值；缓冲表被替换时提前return，不能当所有业务成功。",
+          "preconditions": [
+            "currentstate非nil，否则assert；inst提供IsValid。",
+            "缓冲事件符合name/data结构，事件handler自行满足业务输入。"
+          ],
+          "side_effects": [
+            "inst在入场有效才对原缓冲表ipairs逐个HandleEvent；每次先当前State局部处理，假值才回退定义全局handler。",
+            "原表同次追加可能进入同一循环；回调换表则提前return，不清新表；正常尾部仅非空时用新表清旧队列。"
+          ],
+          "lifecycle": [
+            "不是队列持久化或固定下一帧契约；manager先交换haveEvents再调用；Stop先HandleEvents再OnStop/RemoveInstance，RemoveInstance另清缓冲。",
+            "没有逐事件pcall、回滚或统一attempt身份校验。"
+          ],
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S07",
+            "AE-S09",
+            "AE-S10",
+            "AE-S18"
+          ],
+          "unknowns": [
+            "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+            "不保证跨实体pairs顺序、native帧调用频率、任意递归/重入终止性；局部事件真值消费沿用旧合同。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "登记双向监听索引；发布时先复制普通fn列表，再同步回调。",
+          "evidence_refs": [
+            "AE-S01",
+            "AE-S02",
+            "AE-S03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "普通listener返回后决定当时SG的即时/合格入队路径，之后再同步Brain。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S09",
+            "AE-S10",
+            "AE-S13"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "manager排空的是集合快照；SG缓冲原表可在处理中追加或被替换。",
+          "evidence_refs": [
+            "AE-S05",
+            "AE-S06",
+            "AE-S07",
+            "AE-S10",
+            "AE-S18"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+        "回调内替换SG/Brain后的具体业务与native生命周期未实测；相同数组追加的结论只限本卡所读无洞ipairs路径，不是所有队列或所有引擎事件的调度保证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AE-S01",
+            "role": "AddListener/EntityScript:ListenForEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C01",
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S02",
+            "role": "RemoveListener/EntityScript:RemoveEventCallback/EntityScript:RemoveAllEventCallbacks",
+            "claim_ids": [
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S03",
+            "role": "EntityScript:PushEvent_Internal/EntityScript:PushEvent/EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-ARCH-001-C01",
+              "EXP-ARCH-001-C02",
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S04",
+            "role": "SGManager:OnEnterNewState/StateGraphWrangler:OnPushEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C06"
+            ]
+          },
+          {
+            "ref": "AE-S05",
+            "role": "StateGraphWrangler:RemoveInstance/StateGraphWrangler:AddInstance",
+            "claim_ids": [
+              "EXP-ARCH-001-C05"
+            ]
+          },
+          {
+            "ref": "AE-S06",
+            "role": "StateGraphWrangler:Update/StateGraphWrangler:UpdateEvents",
+            "claim_ids": [
+              "EXP-ARCH-001-C05",
+              "EXP-ARCH-001-C06"
+            ]
+          },
+          {
+            "ref": "AE-S07",
+            "role": "State:HandleEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C06"
+            ]
+          },
+          {
+            "ref": "AE-S09",
+            "role": "StateGraphInstance:PushEvent/StateGraphInstance:IsListeningForEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S10",
+            "role": "StateGraphInstance:HandleEvent/StateGraphInstance:HandleEvents/StateGraphInstance:ClearBufferedEvents",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C05",
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S11",
+            "role": "StateGraphInstance:GoToState",
+            "claim_ids": [
+              "EXP-ARCH-001-C06",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S13",
+            "role": "Brain:PushEvent",
+            "claim_ids": [
+              "EXP-ARCH-001-C03",
+              "EXP-ARCH-001-C04",
+              "EXP-ARCH-001-C07"
+            ]
+          },
+          {
+            "ref": "AE-S17",
+            "role": "EntityScript:SetStateGraph/EntityScript:ClearStateGraph",
+            "claim_ids": [
+              "EXP-ARCH-001-C04"
+            ]
+          },
+          {
+            "ref": "AE-S18",
+            "role": "StateGraphInstance:Start/StateGraphInstance:Stop",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "逐引用依赖列出已读定义、调用方、消费者与清理入口；未穷尽native回调/动态Hook/所有状态定义，不是整包兼容白名单。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ARCH-002",
+      "title": "GoToState同步重入后的外层续行与newstate观察边界",
+      "engineering_question": "onexit/onenter中再次切态会取消外层切换吗，newstate.statename一定是当前态吗，入态时间戳何时刷新？",
+      "aliases": [
+        "StateGraphInstance:GoToState",
+        "newstate",
+        "onexit重入",
+        "onenter链式切态",
+        "lasttags",
+        "statestarttime"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "761239",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "合法StateGraphInstance GoToState定义及本地事件链；SGwilson constructing停止路径与idle.onenter的转态语句、server PlayerController预测监听是具体消费者。",
+        "excluded": "旧NC-N003-INT-05/07已含onexit→statemem→onenter及同名重入，旧N003-C11-NSF02已有newstate反序警告；这里只新增外层续行/时间戳与onexit同步重入的闭合合同，不重标旧Scope。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ARCH-002-C01",
+          "kind": "NSF",
+          "statement": "GoToState先以参数statename查局部state；无目标仅打印返回。有目标先调用当时旧currentstate.onexit(inst,statename)，正常返回后才新建statemem、保存lasttags引用并复制目标tags、同步白名单实体标签和预测字段，清timeout，设置laststate/currentstate/timeinstate及timelineindex，再调用新onenter(inst,params)。无同名跳过、重入锁、pcall或onexit后重查目标；mem不在本函数重建。这些既有顺序是本条续行分析的必要依赖。",
+          "evidence_refs": [
+            "AE-S08",
+            "AE-S11",
+            "AE-S12"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-002-C02",
+          "kind": "NSF",
+          "statement": "onenter正常返回后仍发布普通实体newstate事件，data.statename用该层GoToState的形参；然后才清lasttags、重写lastupdatetime=GetTime、statestarttime=lastupdatetime并通知SGManager:OnEnterNewState。newstate经普通实体listener同步调用；这段尾部没有检查currentstate仍等于该层目标，也没有因内层已切态而提前退出。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-002-C03",
+          "kind": "EI",
+          "statement": "若onexit内部通过即时事件或直接调用嵌套GoToState并正常返回，外层仍继续，以先前捕获的state覆盖currentstate并再次重建statemem；laststate此时读取的是嵌套调用留下的currentstate。若onenter内部链式切态，外层不会再把currentstate设回目标，但仍发外层目标名newstate并改时间戳/lasttags。任一层newstate普通listener也可同步再切态，之后该层尾部仍继续；不据方法返回nil认定切换失败或最终仍在指定态。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-002-C04",
+          "kind": "NSF",
+          "statement": "构筑停止提供实际onexit重入链：SGwilson constructing.onexit在旧statemem.constructing为假且旧statemem.stoppedconstruction为假时调StopConstruction；该组件清理构筑对象/站点后PushEventImmediate(stopconstruction)。局部handler先在旧statemem置stoppedconstruction，再GoToState(idle,true)，内层再次进入旧constructing.onexit时flag使其不再调StopConstruction。此flag限制这条递归，并非全局GoToState重入锁。idle.onenter自身还有按溺水/骑乘/装备等条件发起新GoToState并return的分支，不能把调用idle视为静态最终态。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S07",
+            "AE-S10",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15",
+            "AE-S19"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-002-C05",
+          "kind": "EI",
+          "statement": "由于newstate普通listener在本层末尾刷新时间戳之前执行，监听中观察statestarttime/lastupdatetime不等于本层最终完成后的值；嵌套层可能已先写它们。可把newstate视作一次转态尝试尾部的通知，不把形参statename、尚未刷新时间戳和此刻currentstate当作共同原子快照。PlayerController的OnNewState刻意读取inst.sg.currentstate而不取data.statename，直接源码注释已有链式onenter反序边界。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S11",
+            "AE-S16"
+          ]
+        },
+        {
+          "id": "EXP-ARCH-002-C06",
+          "kind": "REC",
+          "statement": "执行标记/退出清理以拥有的尝试身份和明确阶段为准；需要当前态时在使用点重新读SG，而不是相信旧newstate payload。把onexit/onenter/事件listener视为可同步重入的用户代码边界；需排队或抑制重复时按具体业务设计，不假定原版GoToState原子、不可重入或自动补偿。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15",
+            "AE-S16"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "StateGraphInstance:GoToState",
+          "source_file": "scripts/stategraph.lua",
+          "visibility": "Lua SG实例方法；服务端及客户端SG各自执行，不是客户端获授服务端状态权威",
+          "parameters": [
+            "statename：以self.sg.states精确索引目标；onexit第二参及newstate payload沿用此形参，不随嵌套切态重算。",
+            "params：只传给onenter(inst,params)，不自动复制或保存。"
+          ],
+          "returns": "成功路径无显式返回；缺失目标打印并return，同为nil。用户回调异常可向上抛出，不能用nil区分结果。",
+          "preconditions": [
+            "self.sg.states存在；有效目标State和inst接口、TheWorld/GetTime/SGManager可用。",
+            "旧onexit、标签操作、新onenter及newstate监听正常返回，才继续相应后续阶段；本函数不保证这些回调的业务合法性。"
+          ],
+          "side_effects": [
+            "捕获目标后onexit；然后重建statemem/实例tags、按SGTagsToEntTags且master或无Network才写实体tags；master写no_predict_fastforward，client按旧态forward_server_states选择server_states。",
+            "清timeout，laststate取调用点currentstate，currentstate=捕获目标，timeinstate=0，timeline存在则index=1否则nil；onenter之后发布普通newstate。",
+            "newstate普通listener后清lasttags、重写两个时间戳并唤回manager updaters（仅已登记实例）；不重建mem/不清bufferedevents。"
+          ],
+          "lifecycle": [
+            "同名状态照常onexit/重建/onenter；onexit发生在旧statemem仍当前时，onenter发生在新表成为当前之后。",
+            "无重入锁和state保持断言：onexit内层返回后外层可覆盖内层态；onenter/普通newstate监听内层返回后外层尾部仍执行。",
+            "不负责通用任务/listener/外部资源解绑或存档；构筑flag只是所列消费者的局部递归抑制。"
+          ],
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S08",
+            "AE-S09",
+            "AE-S10",
+            "AE-S11",
+            "AE-S12",
+            "AE-S14",
+            "AE-S15",
+            "AE-S16"
+          ],
+          "unknowns": [
+            "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+            "未证明无限重入可终止、Hook抛错可回滚、native标签回调时序或客户端画面；idle及构筑的具体业务效果不作为本条普遍API保证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "捕获目标后执行旧onexit；构筑onexit可经即时事件同步进入第二层GoToState。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S07",
+            "AE-S10",
+            "AE-S11",
+            "AE-S14",
+            "AE-S15"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "旧onexit返回后外层新建statemem/安装捕获态并onenter；onenter可再链式切态。",
+          "evidence_refs": [
+            "AE-S08",
+            "AE-S11",
+            "AE-S12",
+            "AE-S19"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "各层onenter后分别发newstate，普通listener执行后才刷新时间戳及manager；读取当时SG区别于旧payload。",
+          "evidence_refs": [
+            "AE-S03",
+            "AE-S04",
+            "AE-S11",
+            "AE-S16"
+          ]
+        }
+      ],
+      "unknowns": [
+        "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+        "只证明可达同步调用与无防护续行；未穷尽所有idle后继态、构筑站点回调、预测层或Mod混合链，不宣称特定业务最终状态或运行安全。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AE-S03",
+            "role": "EntityScript:PushEvent_Internal/EntityScript:PushEvent/EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03",
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ]
+          },
+          {
+            "ref": "AE-S04",
+            "role": "SGManager:OnEnterNewState/StateGraphWrangler:OnPushEvent",
+            "claim_ids": [
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03"
+            ]
+          },
+          {
+            "ref": "AE-S07",
+            "role": "State:HandleEvent",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ]
+          },
+          {
+            "ref": "AE-S08",
+            "role": "StateGraphInstance",
+            "claim_ids": [
+              "EXP-ARCH-002-C01"
+            ]
+          },
+          {
+            "ref": "AE-S09",
+            "role": "StateGraphInstance:PushEvent/StateGraphInstance:IsListeningForEvent",
+            "claim_ids": []
+          },
+          {
+            "ref": "AE-S10",
+            "role": "StateGraphInstance:HandleEvent/StateGraphInstance:HandleEvents/StateGraphInstance:ClearBufferedEvents",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ]
+          },
+          {
+            "ref": "AE-S11",
+            "role": "StateGraphInstance:GoToState",
+            "claim_ids": [
+              "EXP-ARCH-002-C01",
+              "EXP-ARCH-002-C02",
+              "EXP-ARCH-002-C03",
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ]
+          },
+          {
+            "ref": "AE-S12",
+            "role": "SGTagsToEntTags",
+            "claim_ids": [
+              "EXP-ARCH-002-C01"
+            ]
+          },
+          {
+            "ref": "AE-S14",
+            "role": "ConstructionBuilder:StopConstruction",
+            "claim_ids": [
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C06"
+            ]
+          },
+          {
+            "ref": "AE-S15",
+            "role": "constructing/stopconstruction/onexit",
+            "claim_ids": [
+              "EXP-ARCH-002-C04",
+              "EXP-ARCH-002-C06"
+            ]
+          },
+          {
+            "ref": "AE-S16",
+            "role": "OnNewState/PlayerController:OnRemoteToggleMovementPrediction",
+            "claim_ids": [
+              "EXP-ARCH-002-C05",
+              "EXP-ARCH-002-C06"
+            ]
+          },
+          {
+            "ref": "AE-S19",
+            "role": "idle.onenter",
+            "claim_ids": [
+              "EXP-ARCH-002-C04"
+            ]
+          }
+        ],
+        "unknowns": [
+          "逐引用依赖列出已读定义、调用方、消费者与清理入口；未穷尽native回调/动态Hook/所有状态定义，不是整包兼容白名单。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "AE-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1229,
+      "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+      "symbols": [
+        "AddListener",
+        "EntityScript:ListenForEvent"
+      ]
+    },
+    {
+      "id": "AE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1231,
+      "line_end": 1288,
+      "range_sha256": "541906991ed8deb2f50421810d42e5f3468cf396f898b1cbab488a0b42782740",
+      "symbols": [
+        "RemoveListener",
+        "EntityScript:RemoveEventCallback",
+        "EntityScript:RemoveAllEventCallbacks"
+      ]
+    },
+    {
+      "id": "AE-S03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent",
+        "EntityScript:PushEventImmediate"
+      ]
+    },
+    {
+      "id": "AE-S04",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 27,
+      "line_end": 45,
+      "range_sha256": "a10a54228638d4bc9684ea97fb3bf8a416a6f798c5d13526ae628383270e6fb7",
+      "symbols": [
+        "SGManager:OnEnterNewState",
+        "StateGraphWrangler:OnPushEvent"
+      ]
+    },
+    {
+      "id": "AE-S05",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 82,
+      "line_end": 107,
+      "range_sha256": "3ff75dda78882f3b60ef49573aa6fa95555eaeb60cb8f2e4ba97ef6920b3612c",
+      "symbols": [
+        "StateGraphWrangler:RemoveInstance",
+        "StateGraphWrangler:AddInstance"
+      ]
+    },
+    {
+      "id": "AE-S06",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 109,
+      "line_end": 157,
+      "range_sha256": "38e3f2a55d1c009f262e222a88daeb3da69ac8c258c4904eb881eec711a46069",
+      "symbols": [
+        "StateGraphWrangler:Update",
+        "StateGraphWrangler:UpdateEvents"
+      ]
+    },
+    {
+      "id": "AE-S07",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 264,
+      "line_end": 272,
+      "range_sha256": "8ccc25b305e56c623694a80e2a4de51c6c8606b9f8a17190ed669bc6d7678375",
+      "symbols": [
+        "State:HandleEvent"
+      ]
+    },
+    {
+      "id": "AE-S08",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 332,
+      "line_end": 345,
+      "range_sha256": "769fb95298b2f539b94801be9d3351532514528b4bfac8194da8e93f2242631c",
+      "symbols": [
+        "StateGraphInstance"
+      ]
+    },
+    {
+      "id": "AE-S09",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 392,
+      "line_end": 403,
+      "range_sha256": "68739d56d9710664687056403ae7154a1662903f7c90ecb03b11995fe559d31f",
+      "symbols": [
+        "StateGraphInstance:PushEvent",
+        "StateGraphInstance:IsListeningForEvent"
+      ]
+    },
+    {
+      "id": "AE-S10",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 463,
+      "line_end": 494,
+      "range_sha256": "caf5a8bb91a965728497497ea6b0e1f0c5a6875a367229ddf88ed5563c18999b",
+      "symbols": [
+        "StateGraphInstance:HandleEvent",
+        "StateGraphInstance:HandleEvents",
+        "StateGraphInstance:ClearBufferedEvents"
+      ]
+    },
+    {
+      "id": "AE-S11",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 529,
+      "line_end": 600,
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "symbols": [
+        "StateGraphInstance:GoToState"
+      ]
+    },
+    {
+      "id": "AE-S12",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 500,
+      "line_end": 523,
+      "range_sha256": "5a0c56f9adaa09984a57409c5fb6d453ff3d1becc95b318e44f178eaa5322104",
+      "symbols": [
+        "SGTagsToEntTags"
+      ]
+    },
+    {
+      "id": "AE-S13",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 261,
+      "line_end": 267,
+      "range_sha256": "c5b4927e438517f3f7b400650597596171562b25d290c887d284fdd0be2e8011",
+      "symbols": [
+        "Brain:PushEvent"
+      ]
+    },
+    {
+      "id": "AE-S14",
+      "source_file": "scripts/components/constructionbuilder.lua",
+      "file_sha256": "543d8b781a6c2c6c6d0cab897e37c31b2b488b1d03082a9e40b2fab7a33c2177",
+      "line_start": 80,
+      "line_end": 108,
+      "range_sha256": "dc5fcc19545b8365aca2733d501a001c008ecd4ba5fdc8ddcb6ea876cbd5faa4",
+      "symbols": [
+        "ConstructionBuilder:StopConstruction"
+      ]
+    },
+    {
+      "id": "AE-S15",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "7b381c15992c5001e6d84329ee8e961b6f5f9db573e0f24ab3b7a61d859270a6",
+      "line_start": 20011,
+      "line_end": 20061,
+      "range_sha256": "fabc02e8f95f05eb8afa233bd9234d7fced95bafaae719d652fdd53dbc3d129a",
+      "symbols": [
+        "constructing",
+        "stopconstruction",
+        "onexit"
+      ]
+    },
+    {
+      "id": "AE-S16",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5912,
+      "line_end": 5941,
+      "range_sha256": "1c6a8fb4907cd51a596395230610d761ff8e528393f13ab40def7b792da87e15",
+      "symbols": [
+        "OnNewState",
+        "PlayerController:OnRemoteToggleMovementPrediction"
+      ]
+    },
+    {
+      "id": "AE-S17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1174,
+      "line_end": 1196,
+      "range_sha256": "8309154ad545d1bae01d4a051b337781688ca94635a9872f6c6445516c78f937",
+      "symbols": [
+        "EntityScript:SetStateGraph",
+        "EntityScript:ClearStateGraph"
+      ]
+    },
+    {
+      "id": "AE-S18",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 709,
+      "line_end": 731,
+      "range_sha256": "9374efa11bec9ad0f9ab8abc9b3568bbc4f30993c06ac391ec8dbef417522db9",
+      "symbols": [
+        "StateGraphInstance:Start",
+        "StateGraphInstance:Stop"
+      ]
+    },
+    {
+      "id": "AE-S19",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "7b381c15992c5001e6d84329ee8e961b6f5f9db573e0f24ab3b7a61d859270a6",
+      "line_start": 4197,
+      "line_end": 4352,
+      "range_sha256": "57c690b7ce06ae0cf8cf9012287a9d1bbe63a2e0438cf9624cb2a86337bd083c",
+      "symbols": [
+        "idle.onenter"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "移除事件监听后本轮回调还执行吗",
+      "expected_entry_ids": [
+        "EXP-ARCH-001"
+      ],
+      "purpose": "普通listener快照边界"
+    },
+    {
+      "query": "PushEvent普通事件都是下一帧吗",
+      "expected_entry_ids": [
+        "EXP-ARCH-001"
+      ],
+      "purpose": "区分同步普通listener/Brain及SG队列追加"
+    },
+    {
+      "query": "callback里切态会改变本次SG事件接收器吗",
+      "expected_entry_ids": [
+        "EXP-ARCH-001"
+      ],
+      "purpose": "发布阶段间非快照"
+    },
+    {
+      "query": "同一个data表多次PushEvent state会被覆盖吗",
+      "expected_entry_ids": [
+        "EXP-ARCH-001"
+      ],
+      "purpose": "payload别名不是预留快照"
+    },
+    {
+      "query": "onexit里GoToState会取消外层切换吗",
+      "expected_entry_ids": [
+        "EXP-ARCH-002"
+      ],
+      "purpose": "外层续行"
+    },
+    {
+      "query": "newstate statename与currentstate不同 时间戳",
+      "expected_entry_ids": [
+        "EXP-ARCH-002"
+      ],
+      "purpose": "链式切态尾部观察"
+    },
+    {
+      "query": "constructionbuilder stopconstruction同步重入",
+      "expected_entry_ids": [
+        "EXP-ARCH-002"
+      ],
+      "purpose": "实际原生调用链"
+    },
+    {
+      "query": "PushEvent保证跨分片exactly once",
+      "expected_entry_ids": [],
+      "purpose": "未提供分布式消息保证"
+    },
+    {
+      "query": "GoToState已在真实客户端运行验证",
+      "expected_entry_ids": [],
+      "purpose": "拒绝运行证据提升"
+    }
+  ],
+  "limitations": [
+    "仅761239安装ZIP的静态Lua查证；未运行游戏、Lua行为夹具、专服、远端客户端或网络/引擎实验；不解除research/restricted/hold。",
+    "research/restricted/hold保持不变，登记及独立审阅状态以FAMILY-REGISTRY为准；不修改canonical、历史Scope及HOLD。旧NC-N003-INT-05/06/07等只作去重依赖，不因本轮761239重新读取而重标旧记录。",
+    "不分发原版Lua；file_sha256取ZIP成员原始字节，range_sha256取UTF-8解码splitlines后选闭区间以LF join且无尾换行。",
+    "推导明确标EI/建议REC；同步Lua路径不代表跨端消息、任意回调安全、固定帧延迟或原子事务。"
+  ]
+}

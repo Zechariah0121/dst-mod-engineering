@@ -1,14 +1,14 @@
 # DST Mod Engineering
 
-Version `v2026.10.31.3` contains 227 registered records: the preserved historical 187 and 40 native_mechanism research records covering Brain, world generation, cooking/seasoning, growth/regeneration, temperature/moisture, freezing/heat interactions, survival completion and presentation mechanisms. `FAMILY-REGISTRY` generates `CATALOG.counts`. Research remains `research/restricted/hold` with explicit Reviewer access. See [research-family integration](docs/native-mechanisms.md).
+Development candidate `v2026.11.05.1` contains 231 records and is not published yet. The new [complex Mod architecture guide](references/complex-mod-architecture.md) and native event, stategraph, frontend-loading and container-replica research help AI reason about ownership, reentrancy and initialization. See [this phase](docs/phase7-architecture-native.md).
 
 An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
 
-The public KB is in `knowledge/`: **227 records comprising 64 foundation records, 13 Native AI records, 110 Native Core records and 40 mechanism research records**. One complete distribution includes the Skill, public knowledge data, development helpers, source preparation and MCP. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
+The public KB is in `knowledge/`: **231 records comprising 64 foundation records, 13 Native AI records, 110 Native Core records and 44 mechanism research records**. One complete distribution includes the Skill, public knowledge data, development helpers, source preparation and MCP. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
 
 ## Download
 
-Release: [v2026.10.31.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.3). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
+Published release (227 records): [v2026.10.31.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.3). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
 
 | File | Contents |
 |---|---|

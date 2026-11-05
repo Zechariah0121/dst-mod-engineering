@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前版本：`v2026.10.31.3`；案例参考修订：`2026-11-05`；统一目录 227 条，其中独立机制研究族 40 条，保持 `research/restricted/hold`。
+当前候选版本：`v2026.11.05.1`（尚未公开发行）；统一目录 231 条，其中独立机制研究族 44 条，保持 `research/restricted/hold`。
 
 面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
@@ -51,6 +51,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
 | 首次定位游戏、当前源码、Python、工具版本 | [environment-tools.md](references/environment-tools.md) |
+| 复杂 Mod 分层、模块依赖、状态归属、接口与失败恢复 | [complex-mod-architecture.md](references/complex-mod-architecture.md) |
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](references/entities-components.md) |
 | 角色、Brain、Stategraph、自定义生物 | [characters-brains-stategraphs.md](references/characters-brains-stategraphs.md) |

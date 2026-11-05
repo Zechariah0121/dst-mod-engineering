@@ -75,3 +75,5 @@ Buff 的 `persists=false` 不等于一定不存档：当前 `debuffable:OnSave` 
 相关工程案例：[同步回调后执行权、已提交业务的表现尾段](lulu-clocks-sound.md)，按其中的项目条件与验证范围使用。
 
 涉及唯一物品预约与实体化后的失败恢复，另读 [事务与配料案例](lulu-transactions-crafting.md)；其中替身协议测试不证明真实双分片恰好一次。
+
+跨多个子系统设计职责、状态归属和恢复路径时，先看[复杂 Mod 架构指南](complex-mod-architecture.md)；局部修复按本专题处理，无需全局重构。
