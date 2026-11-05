@@ -80,3 +80,5 @@ upvalue 是函数捕获的词法局部变量，可能是数据而不只是函数
 - `prefabs/abigail_flower.lua:311-358`；`components/aoespell.lua:11-70`；`components/spellbook.lua:80-105`；`componentactions.lua:1990-2017`：轮盘、权限和动作注册。
 
 Lua 契约测试可验证调用顺序、清理和 preview 回调次数；不能证明实际传输或动画。发布前按改动覆盖主机/远端、预测开关、重连/幽灵进入、鼠标/手柄、窗口与 HUD scale、目标在动画中被删、服务器拒绝和重复打开关闭。
+
+相关工程案例：[父控件输入转发与 InventoryBar 重建案例](lulu-entry-ui-network.md)，按其中的项目条件与验证范围使用。

@@ -100,3 +100,5 @@ Brain 的行为节点选择目标
 - `entityscript.lua:PerformBufferedAction` / `PerformPreviewBufferedAction`，`bufferedaction.lua:Do`，`behaviours/doaction.lua`：动作结果是否真的执行。
 - `brain.lua:_Start_Internal`、`entityscript.lua:StopBrain` / `RestartBrain` / `SetBrain`、`behaviourtree.lua:PriorityNode:Visit`：树重建与优先级。
 - 服务端自动测试覆盖动作结算、形态中断、存档与重建；真实客户端另验输入、动画、幽灵 HUD、远程预测和双人互相观察。未运行的层级在报告中明确列出。
+
+相关工程案例：[动作局部时钟、动画与真实时间任务的边界](lulu-clocks-sound.md)，按其中的项目条件与验证范围使用。

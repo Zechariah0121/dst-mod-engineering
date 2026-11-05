@@ -84,3 +84,5 @@ end)
 ## 759671：玩家 classified 上的吞食声音状态
 
 吞食声音从旧玩家 `_wormdigestionsound` 搬到 `player.player_classified.wormdigestionsound`。新 `prefabs/player_classified.lua:1088–1104,1274,1650–1651` 定义 dirty 处理、监听与 net_bool；生产方为 `worm_boss_util.lua:290–296`，SGwilson `:14814–14816` 退出清理。使用时处理 classified 尚未附着/已经移除，事件监听对象及声音/DSP恢复按新链核对；客户端分支需要 parent 与 HUD。沿用当前原版角色工厂和SG时不必自行重建该 netvar。这一迁移不代表所有 Mod RPC 或 netvar 契约改变。
+
+相关工程案例：[Replica 幂等补装、RPC 根因未定与 toggle 重试](lulu-entry-ui-network.md)，按其中的项目条件与验证范围使用。

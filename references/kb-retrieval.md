@@ -4,7 +4,7 @@
 
 ## 按任务读取文件
 
-1. 从 `knowledge/CATALOG.json` 的统一登记目录找相关记录 ID，按其 `file`（相对 `knowledge/`）和 JSON `pointer` 定向读取。目录覆盖 64 基础、13 Native AI、110 Core 和 29 条独立机制研究；目录命中只用于导航，仍需读实际正文、状态与证据。
+1. 从 `knowledge/CATALOG.json` 的统一登记目录找相关记录 ID，按其 `file`（相对 `knowledge/`）和 JSON `pointer` 定向读取。目录覆盖 64 基础、13 Native AI、110 Core 和独立机制研究（数量以 CATALOG.counts 为准）；目录命中只用于导航，仍需读实际正文、状态与证据。
 2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
 3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
 
@@ -31,7 +31,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 目录审阅不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不冒称运行验证，也不放松 Scope、类型、三轴状态或 Core Coding HOLD。若所选正文超过预算，服务不截断正文；按响应提示选择较小 `pointer` 再读。不要把目录摘要当作事实投影或完整证据。
 
-正常完整使用先按 [安装说明](../docs/install-and-use.md) 用一份合法持有的 `760944 / build 26306684 scripts.zip` 准备来源，不需要旧版源码。`source_epoch=759671` 保留为证据基线，不表示目标输入或全部事实属于同一新版本。核心必需来源槽严格校验；机制研究按引用报告文件/范围匹配与未知缺口，缺口不封锁其他研究条目的阅读，也不解除 HOLD。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为已读当前源码证据。两种模式的工具集均在启动时固定；准备成功后重启已连接的目录会话，再在客户端核对下列九工具：
+正常完整使用先按 [安装说明](../docs/install-and-use.md) 用一份合法持有的 `761239 / build 26335394 scripts.zip` 准备来源，不需要旧版源码。`source_epoch=759671` 保留为证据基线，不表示目标输入或全部事实属于同一新版本。核心必需来源槽严格校验；机制研究按引用报告文件/范围匹配与未知缺口，缺口不封锁其他研究条目的阅读，也不解除 HOLD。历史比较节点以 `metadata_only` 保留原快照、哈希、行范围与上游引用，不作为已读当前源码证据。两种模式的工具集均在启动时固定；准备成功后重启已连接的目录会话，再在客户端核对下列九工具：
 
 | 工具 | 用途 |
 |---|---|
@@ -49,7 +49,7 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 ## 完整模式的版本、角色与预算
 
-- 服务证据环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；760944 是本次核验的来源输入，服务不提供环境切换。返回研究原子的 source_epoch 按文档保留：原 23 条为 759671，新 6 条为 760944。条目保留各自证据和适用范围，不能把历史知识改名为当前源码事实；目标游戏仍需单独核对。
+- 服务证据环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；761239 是本次核验的来源输入，服务不提供环境切换。返回研究原子的 source_epoch 按文档保留：23 条为 759671、14 条为 760944、3 条为 761239。条目保留各自证据和适用范围，不能把历史知识改名为当前源码事实；目标游戏仍需单独核对。
 - 仅 `lookup_api` 另接受 `source_file`，使用精确相对路径，如 `scripts/components/combat.lua`；不传绝对路径、通配符或 `..`。同名多来源先消歧。声明存在、文件局部函数或 API 导航不能直接推广为公共行为契约。
 - Native AI Coding 保持十字段、最多五条。研究展开需显式 reviewer；`mode=review/research` 不授予角色权限、不解除 Core Coding HOLD。分别读取三轴状态与排除范围。
 - `compact` 最多 5 条/16000 字节，`normal` 最多 8 条/32000 字节，`deep` 最多 12 条/64000 字节；按完整 structured payload 的普通 UTF-8 JSON 计费，包含来源环境。同记录多个行为原子合为一张卡，不拆卡绕过条数限制。
@@ -66,8 +66,12 @@ NSF 是限定快照源码事实，RV 仅支持注明的历史运行场景，EI �
 
 搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-The single complete package contains the registered records for file reading and MCP; historical 64/13/110 identities are preserved. This version targets one authorized `760944 / build 26306684 scripts.zip` for source preparation without older source. The sole `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report matching or unknown/missing source individually, without granting Coding admission. Historical comparisons remain `metadata_only`, preserving their original metadata without becoming restored current-source evidence. Default `auto` permits public catalog review for missing preparation or PACKAGE_CHANGED only after public-manifest validation, reporting the cause; cache corruption, invalid activation and untrusted public files remain errors. Explicit `catalog` provides public review without Coding context, restored source evidence or original Source/Identity Guards. `search_catalog` has a default limit of 5 and maximum of 20; `read_public_entry` requires `purpose="review"`, optional record-relative JSON Pointer, and a default 12000 / maximum 24000 byte budget. Oversized content is withheld rather than truncated; select a smaller pointer. Restart a connected catalog session after preparation to obtain nine tools. Native AI Coding uses exactly ten fields and at most five records; Core Coding HOLD remains binding. Future versions need separate source comparison. A slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
+The single complete package contains the registered records for file reading and MCP; historical 64/13/110 identities are preserved. This version targets one authorized `761239 / build 26335394 scripts.zip` for source preparation without older source. The sole `source_epoch=759671` remains the evidence baseline. Required core ranges stay strict; mechanism references report matching or unknown/missing source individually, without granting Coding admission. Historical comparisons remain `metadata_only`, preserving their original metadata without becoming restored current-source evidence. Default `auto` permits public catalog review for missing preparation or PACKAGE_CHANGED only after public-manifest validation, reporting the cause; cache corruption, invalid activation and untrusted public files remain errors. Explicit `catalog` provides public review without Coding context, restored source evidence or original Source/Identity Guards. `search_catalog` has a default limit of 5 and maximum of 20; `read_public_entry` requires `purpose="review"`, optional record-relative JSON Pointer, and a default 12000 / maximum 24000 byte budget. Oversized content is withheld rather than truncated; select a smaller pointer. Restart a connected catalog session after preparation to obtain nine tools. Native AI Coding uses exactly ten fields and at most five records; Core Coding HOLD remains binding. Future versions need separate source comparison. A slot, declaration, hit, test suggestion or public excerpt does not prove complete evidence or runtime success.
 
 文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
 
 独立原版机制研究族使用 `research/restricted/hold`，仅显式 Reviewer 研究请求或 ID 展开；Coding/default restricted 路径不注入。原子读取保留完整 Scope、顶层来源身份/limitations 与局部证据闭合，超过预算整体 withheld。登记、来源验证及参数见 [机制研究族](../docs/native-mechanisms.md)。
+
+## 条件化工程案例
+
+[露露案例索引](lulu-case-index.md) 提供 Skill 文件参考；LULU 编号不在 MCP 目录中，不向 get_entry/lookup_api 传入这些编号，也不计为新的原版 API 契约。按任务读一篇相关专题并核对当前实现；已有登记知识的 Scope、HOLD 与 Reviewer 边界继续适用。

@@ -146,3 +146,5 @@ local assets = {
 - 混合模式、泛光和 shader 需以当前资产及客户端效果验证；专服 PASS 不证明有画面。需要截图/视频验收时明确抽检的实例、时段和机位，不声称看过未播放素材。
 
 源码核对入口：`prefabs/cane_candy_fx.lua:16-42,49-65,68-131`、`components/health.lua:590`、`components/dynamicmusic.lua` 的绑定/解绑；参数参考随工具提供的《FMOD Designer 2010》80、142、152-157、205 页。行号与工具文档有各自版本范围；现代 FMOD Studio 文档可帮助理解概念，不能代替目标 DST 版本的实际验证。
+
+相关工程案例：[同步换态后的声音重启与消费末段清理](lulu-clocks-sound.md)，按其中的项目条件与验证范围使用。

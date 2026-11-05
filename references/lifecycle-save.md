@@ -71,3 +71,7 @@ Buff 的 `persists=false` 不等于一定不存档：当前 `debuffable:OnSave` 
 - `util/sourcemodifierlist.lua:64-121`：按 source/key 管理、实体来源移除的自动清理。
 - `components/teleporter.lua:325-347,349-423`；`prefabs/pocketwatch_portal.lua:157-163`：在途计数、配对和保存、延后关闭。
 - `components/timer.lua`、`components/entitytracker.lua`：剩余时间及存档引用范例。
+
+相关工程案例：[同步回调后执行权、已提交业务的表现尾段](lulu-clocks-sound.md)，按其中的项目条件与验证范围使用。
+
+涉及唯一物品预约与实体化后的失败恢复，另读 [事务与配料案例](lulu-transactions-crafting.md)；其中替身协议测试不证明真实双分片恰好一次。

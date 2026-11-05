@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前版本：`v2026.10.31.3`；统一目录 227 条，其中独立机制研究族 40 条，保持 `research/restricted/hold`。
+当前版本：`v2026.10.31.3`；案例参考修订：`2026-11-05`；统一目录 227 条，其中独立机制研究族 40 条，保持 `research/restricted/hold`。
 
 面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
 
@@ -69,6 +69,8 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | 音效、FMOD 与粒子 | [audio-particles.md](references/audio-particles.md) |
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](references/testing-release.md) |
 | 资料来历、旧规则纠错与可信度 | [sources-and-corrections.md](references/sources-and-corrections.md) |
+
+涉及回调重入、动作时钟、消费后的声音收尾、唯一物品事务、配料域或 UI 重建时，按 [露露案例索引](references/lulu-case-index.md) 选择相关专题。该补充是条件化案例知识，不是新增 MCP 契约；先核对当前项目条件、原版调用链和证据能力，再决定是否采用。
 
 ## 技术边界
 

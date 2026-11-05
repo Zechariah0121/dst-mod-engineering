@@ -128,3 +128,5 @@ end
 `components/inventoryitem.lua:501–506` 的 `GetGrandOwner` 沿 owner 的 inventoryitem 向上递归；递归结果为 nil 时回退本层 owner，无直接 owner 时返回 nil；地面容器本身可以成为返回值。因此 `GetGrandOwner() ~= nil` 不等于玩家持有，访问 combat/inventory 前要判断实际实体及组件，不能与只检查直接 owner 的 `IsHeld` 互换。地面容器、套娃容器与真实玩家场景仍需复验。
 
 `constructionbuilder:StopConstruction` 在 `:107` 改为 `PushEventImmediate("stopconstruction")`；SGwilson `constructing` 的 `:19941–19957` 使用 `statemem.stoppedconstruction` 避免退出时再次停止。包装该方法或复制 onexit 时保留新重入/退出边界。这是 constructionbuilder 的链路，不能泛化成普通 builder API 全部改版。
+
+相关工程案例：[配料查询和消耗范围一致、保留原物品身份](lulu-transactions-crafting.md)，按其中的项目条件与验证范围使用。
