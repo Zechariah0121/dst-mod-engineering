@@ -11,7 +11,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 1. 确认任务、实际 Mod 副本、源码版本和触发环境；接手项目先读入口、配置与交接说明。
 2. 按问题查库并核对当前原版的定义、调用方、端别、初始化、退出和保存，优先复用已有机制。
-3. 先建立“需求 → Mod 实现 → 原版契约 → 验证方法”，再做最小完整改动。玩法数值、效果与补偿取舍按项目约定；已有授权的必要步骤继续执行。
+3. 先建立“需求 → Mod 实现 → 原版契约 → 验证方法”，优先用现有入口、直接调用和局部函数完成。新增抽象或防护需对应当前依赖、合法缺省或可达时序。玩法数值、效果与补偿取舍按项目约定；已有授权的必要步骤继续执行。
 4. 覆盖本次涉及的取消、移除、死亡、重连和读档路径，保留协作者改动。验证后交付文件、依据、实际结果和待验项。
 
 ## 查库与来源
@@ -39,7 +39,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
 | 首次定位游戏、当前源码、Python、工具版本 | [environment-tools.md](references/environment-tools.md) |
-| 复杂 Mod 分层、模块依赖、状态归属、接口与失败恢复 | [complex-mod-architecture.md](references/complex-mod-architecture.md) |
+| 入口封装、架构简化、复杂 Mod 分层、状态归属与失败恢复 | [complex-mod-architecture.md](references/complex-mod-architecture.md) |
 | 可取消交互的输入、预测、权威结算与表现退出 | [action-lifecycle-architecture.md](references/action-lifecycle-architecture.md) |
 | 事件订阅身份、解绑、Replica 构造/附着/移除 | [event-replica-lifecycle.md](references/event-replica-lifecycle.md) |
 | 组件安装/卸载、更新登记、定时任务与资源归属 | [component-task-ownership.md](references/component-task-ownership.md) |
@@ -67,6 +67,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 
 ## 实施要点
 
+- **实现复杂度**：一次性注册先用直接登记；返回接口、跨环境复用按真实消费者选择。简化时追到最终执行点，删除无用转发、状态及旧路径；判断是否保留按[真实边界](references/core-lua-hooks.md#判断写在真实边界)核对。结构收益与性能收益按[优化验收](references/testing-release.md#架构简化与性能优化)分别验证。
 - **端别与状态**：权威状态由服务器决定，客户端输入、预测和显示沿实际链路接入；分别核对 Component、Replica 与本地玩家上下文。
 - **资源归属**：任务、监听、修改器、Widget 和子实体各有所有者与退出入口；恢复共享字段前确认仍由本功能持有。
 - **资产接线**：分别核对文件、prefab、bank、build、symbol 与动画名，按实际资产类型检查依赖。

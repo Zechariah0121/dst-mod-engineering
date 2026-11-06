@@ -18,7 +18,7 @@
 
 **源码事实。** 当前 `FrontendLoadMod` 创建两个环境并显式加载 `modservercreationmain.lua` 和 `modworldgenmain.lua`；常规 `LoadMods` 在非 worldgen 时加载 `modmain.lua`（N01）。露露前端入口加载 tuning/frontend，游戏入口加载 tuning/strings/assets/game，game 排除 dedicated 的 UI 导入（M01–M03）。这足以反驳“建服入口已被 modmain 自动代替”，不能推广为每个 Mod 必须双入口。
 
-**工程建议。** 先列入口、环境、消费者和登记副作用，再决定文件拆分。`modimport` 是向绑定环境执行脚本的包装，当前包装丢弃返回值；需要返回 API 的消费者按其 `require` 合同接入（N01）。回调需要的局部表必须由合法作用域持有。保持项目既有顺序，对可多次到达的安装目标另核对幂等性。
+**工程建议。** 先列入口、环境、消费者和登记副作用，再决定文件拆分。`modimport` 是向绑定环境执行脚本的包装，当前包装丢弃返回值；需要返回 API 的消费者按其 `require` 合同接入（N01）。回调需要的局部表必须由合法作用域持有。保持项目既有顺序；一次性注册可直接登记，同一缓存模块向不同 env 安装时则保留显式连接。只对确实可多次到达的同一安装目标核对去重，具体选择见[架构指南](complex-mod-architecture.md#注册脚本与可复用模块分别选择)。
 
 **证据。** T01 的脚本只比较同一批业务模块的前后入口登记；T02 保存六组 identical。它依赖未附的 `entry_before` 与 `trace_entry.py`，完整业务模块也未全部附入；本轮未复跑。最强现有行为证据是这份历史替身结果，真实前端选角、画面、混合加载仍未验证。
 
