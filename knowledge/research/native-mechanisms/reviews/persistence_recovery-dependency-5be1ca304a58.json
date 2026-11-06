@@ -1,0 +1,1371 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "persistence_recovery",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-SAVE-001",
+      "title": "旧 GUID 引用的记录标记、渐进映射与嵌套 postpass 接线",
+      "aliases": [
+        "保存 refs 不强制保存目标",
+        "saved.id 与 newents",
+        "嵌套 SpawnSaveRecord postpass"
+      ],
+      "engineering_question": "GetSaveRecord 返回的 refs 怎样使目标记录带旧 ID，OnLoad 何时能解引用，嵌套保存是否自动获得同一 postpass？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "source_identity": "冻结源码包身份由本批任务提供；已复核 archive/file/range SHA256，不由文件名推断实际可执行程序版本",
+        "evidence_mode": "frozen_zip_direct_static_source",
+        "sides": "SaveGame 服务端分支、PopulateWorld 具名恢复路径及具名 prefab master 分支",
+        "runtime_verified": false,
+        "focus": "围绕旧 GUID→新实体映射展开保存方、重建方和具名消费者；既有遍历/阶段知识仅作本条前置，不替换其历史 Scope。",
+        "exclusions": [
+          "跨分片 GUID 协议",
+          "玩家 session 通用引用修复",
+          "强制保存 refs 目标",
+          "固定 pairs 顺序",
+          "Lua callback 异常原子性"
+        ]
+      },
+      "claims": [
+        {
+          "id": "SAVE-001-C01",
+          "kind": "NSF",
+          "statement": "GetSaveRecord 组装 prefab、位置和皮肤等字段，通过 GetPersistData 得到 record.data 与独立第二返回 refs；本函数没有把当前 GUID 自动写成 record.id。GetPersistData 只采纳组件返回的非空 table，并分别汇总组件第二返回与 prefab OnSave 返回的 refs。",
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02"
+          ]
+        },
+        {
+          "id": "SAVE-001-C02",
+          "kind": "NSF",
+          "statement": "SaveGame 先筛选 persists、有 prefab/Transform、无原生父实体且有效的顶层实体，记录进 saved_ents；GetSaveRecord 第二返回非 nil 时同时把保存者自身 GUID 与返回 refs 纳入 references（空 refs 表也满足条件）。最后只对 saved_ents 中已有记录写 id，缺失则打印 Missing reference。GetPersistData 有非空数据时即便无外部 refs 也返回空 references 表；refs 在此不递归 Spawn、不强制持久化、不为任意嵌套 record 自动补 id。",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S12"
+          ]
+        },
+        {
+          "id": "SAVE-001-C03",
+          "kind": "NSF",
+          "statement": "SpawnSaveRecord 在构造与放置成功后、SetPersistData 之前登记 newents：有 saved.id 则用旧 ID，否则以新 inst table 为键，值为 entity/data；newents 未传则不登记。该函数调用 SetPersistData 但不调用 LoadPostPass，返回的是重建实例而非恢复图已完成的凭据。",
+          "evidence_refs": [
+            "SAVE-S05"
+          ]
+        },
+        {
+          "id": "SAVE-001-C04",
+          "kind": "NSF",
+          "statement": "SetPersistData 先处理标记式缺组件补建，再 prefab OnPreLoad、pairs(data) 下匹配组件 OnLoad(v,newents)、prefab OnLoad；旧格式还可在逐键过程中补建。PopulateWorld 的共享 newents 在实体遍历时逐渐形成，全部 SpawnSaveRecord 后才遍历映射调实体 LoadPostPass，随后调 world LoadPostPass。world 的早期 SetPersistData 没有传 newents。",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S09",
+            "SAVE-S10"
+          ]
+        },
+        {
+          "id": "SAVE-001-C05",
+          "kind": "NSF",
+          "statement": "EntityScript:LoadPostPass 仅对 savedata 中有键且当前组件仍存在的 LoadPostPass 调用(newents,v)，最后调 prefab OnLoadPostPass(newents,savedata)。EntityTracker 保存 name/GUID 并返回 refs，postpass 只接回映射中存在的对象，TrackEntity 同时重建 onremove 监听；缺失目标被跳过。",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S11"
+          ]
+        },
+        {
+          "id": "SAVE-001-C06",
+          "kind": "NSF",
+          "statement": "Container 汇总槽物品 GetSaveRecord 的第二返回 refs，并在 OnLoad 向 SpawnSaveRecord 传递同一个 newents，令嵌套项也登记进随后由 PopulateWorld 遍历的表。Debuffable 则忽略第二返回，并调用不带 newents 的 SpawnSaveRecord；这两条嵌套调用的引用/postpass 能力不同，不能只凭都调用 GetSaveRecord 判等。",
+          "evidence_refs": [
+            "SAVE-S05",
+            "SAVE-S10",
+            "SAVE-S12",
+            "SAVE-S13"
+          ]
+        },
+        {
+          "id": "SAVE-001-C07",
+          "kind": "EI",
+          "statement": "无 saved.id 的嵌套项仍可因 inst-key 映射得到该路径的 postpass，但外部保存的旧 GUID 不会因此变成可解析键。目标若自身已有 persistdata，可能已因第二返回非 nil 被标记旧 id，故遗漏 refs 不必然立即表现为缺映射；但仅将 GUID 写入业务表不能保证任意目标可解析。refs 指向未被顶层保存的对象时也可能缺映射，这不是目标已永久销毁的证明。",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S05",
+            "SAVE-S06",
+            "SAVE-S08",
+            "SAVE-S11",
+            "SAVE-S12"
+          ]
+        },
+        {
+          "id": "SAVE-001-C08",
+          "kind": "REC",
+          "statement": "先按实际调用方判定是否提供共享映射与后续 postpass。对依赖引用的业务，构造默认值、标量恢复和依赖齐备后的接线分开；缺目标按该业务既定政策降级/阻止继续，不能据缺映射自动补发唯一实体。",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S04",
+            "SAVE-S05",
+            "SAVE-S10",
+            "SAVE-S11",
+            "SAVE-S13"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:GetSaveRecord()",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "self 为带当前 prefab/Transform 的实体；玩家/临时平台位置分支还读取 Network、平台与世界地图。"
+          ],
+          "returns": [
+            "record table 与 references 第二返回；record.data/references 可为 nil；不自动赋 record.id。"
+          ],
+          "preconditions": [
+            "组件 OnSave 和 prefab OnSave 已安装；直接调用本方法本身不检查 persists/顶层资格，筛选属于 SaveGame 等调用方。"
+          ],
+          "side_effects": [
+            "同步调用保存回调；量化位置；平台快照分支可能清空 self._snapshot_platform；非生产环境坏数值可 error。"
+          ],
+          "lifecycle": [
+            "仅生成内存记录；GetPersistData 汇总组件 payload 与 refs；是否写盘由外层调用路径决定。"
+          ],
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02",
+            "SAVE-S06"
+          ],
+          "unknowns": [
+            "原生 serializer 的磁盘 durability 与回调异常后的恢复不由本方法规定。"
+          ]
+        },
+        {
+          "symbol": "SpawnSaveRecord(saved, newents)",
+          "source_file": "scripts/mainfunctions.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "saved 含 prefab、位置及可选 data/id/skin 字段。",
+            "newents 可省略；传入时须为本次恢复使用的映射表。"
+          ],
+          "returns": [
+            "构造成功且放置后有效则返回 inst；放置后无效返回 nil；SpawnPrefab 无实例分支打印失败并返回该无实例值。"
+          ],
+          "preconditions": [
+            "prefab 构造及 ResolveSaveRecordPosition 依赖已就绪；不得把此局部检查等同 SpawnPrefab 对任意原生错误都返回 nil。"
+          ],
+          "side_effects": [
+            "构造实体、放置、登记映射、按需添加 scenariorunner，再同步调 SetPersistData。"
+          ],
+          "lifecycle": [
+            "映射登记早于当前实例的 OnPreLoad/OnLoad；此时其他实例可能尚未构造。",
+            "函数不自动调用 LoadPostPass；调用方需安排，PopulateWorld 是一个具名安排者。"
+          ],
+          "evidence_refs": [
+            "SAVE-S05",
+            "SAVE-S10"
+          ],
+          "unknowns": [
+            "Hook/OnLoad 抛错后已创建实体与映射的回收保证未知。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:SetPersistData(data, newents)",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "data 可以 nil；非 nil 时须满足按保存键寻组件的结构。",
+            "newents 原样交给 prefab OnPreLoad、组件 OnLoad(v,newents)、prefab OnLoad，可为 nil/部分表。"
+          ],
+          "returns": [
+            "无显式返回；正常返回仅表示本次同步分发已走完。"
+          ],
+          "preconditions": [
+            "prefab/组件的默认状态在构造时建立；缺数据键不会统一补调 OnLoad(nil)。"
+          ],
+          "side_effects": [
+            "标记式 AddComponent；按所载顺序执行回调；回调可修改数据、组件或业务状态，分发没有逐组件 pcall。"
+          ],
+          "lifecycle": [
+            "预补组件→prefab OnPreLoad→pairs(data) 逐组件 OnLoad（兼容分支可补组件）→prefab OnLoad。",
+            "不执行 postpass，也不规定组件之间总序。"
+          ],
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S05",
+            "SAVE-S09"
+          ],
+          "unknowns": [
+            "所有 Mod hook 的重入/错误隔离、自动迁移和依赖满足均无保证。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:LoadPostPass(newents, savedata)",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "newents 由调用方提供；预期值可为 {entity=新实例,data=保存数据}。",
+            "savedata 可 nil；组件参数顺序是 (newents,组件数据)，prefab 是 (inst,newents,savedata)。"
+          ],
+          "returns": [
+            "无显式返回。"
+          ],
+          "preconditions": [
+            "引用图是否完整取决于调用方；PopulateWorld 在其顶层实体重建循环完成后调用。"
+          ],
+          "side_effects": [
+            "按 savedata 键对当前仍存在的组件回调，再调 prefab；会重建监听/所有权等副作用。"
+          ],
+          "lifecycle": [
+            "不隐式创造缺失映射，不对组件 postpass 排固定顺序；prefab 回调晚于本宿主本轮所有匹配组件回调。"
+          ],
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S11",
+            "SAVE-S32"
+          ],
+          "unknowns": [
+            "不保证其他实体的 prefab postpass 已完成；不能推广为全服 ready。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "保存组件 payload 和显式 refs，外层只标记已被保存的顶层记录旧 ID。",
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "重建调用方传递映射；SpawnSaveRecord 先登记再恢复当前实例，组件 OnLoad 不把部分映射当全图。",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S05",
+            "SAVE-S10"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "具名世界加载路径在创建循环后分发 postpass；嵌套路径是否加入取决于它是否传递映射。",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S12",
+            "SAVE-S13"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "EntityTracker 由旧 GUID 找新实体并重建监听；无映射时保留缺失事实而非猜测销毁。",
+          "evidence_refs": [
+            "SAVE-S11"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未展开所有嵌套保存调用方；Container 与 Debuffable 不是全库分类。",
+        "world_network/shard_network 的所有后续阶段未枚举；这里只记录其早期 SetPersistData 调用。",
+        "未验证磁盘重启、真实账号重连、跨分片迁移、独立回滚或 Mod 冲突。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "SAVE-S02",
+            "role": "保存聚合定义"
+          },
+          {
+            "ref": "SAVE-S06",
+            "role": "顶层保存筛选调用方"
+          },
+          {
+            "ref": "SAVE-S08",
+            "role": "refs 标记记录消费方"
+          },
+          {
+            "ref": "SAVE-S05",
+            "role": "映射生产与 OnLoad 调用方"
+          },
+          {
+            "ref": "SAVE-S10",
+            "role": "postpass 外层调度者"
+          },
+          {
+            "ref": "SAVE-S11",
+            "role": "引用消费与监听重建"
+          },
+          {
+            "ref": "SAVE-S12",
+            "role": "透传映射的嵌套消费者"
+          },
+          {
+            "ref": "SAVE-S13",
+            "role": "不透传映射的对照"
+          },
+          {
+            "ref": "SAVE-S09",
+            "role": "world 早期恢复边界"
+          }
+        ],
+        "unknowns": [
+          "仅列本条实际展开的静态依赖；不表示所有 prefab、Mod hook 或引擎实现已枚举。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-SAVE-002",
+      "title": "Mermhouse 缺字段修复在子引用恢复后执行，false 与 nil 分流",
+      "aliases": [
+        "Mermummy reload retrofit",
+        "HN_OnLoadPostPass",
+        "恢复随机构造态与已存状态"
+      ],
+      "engineering_question": "构造时随机初始化的房屋类型怎样与已有子实体和旧存档兼容，为什么不能把缺字段、false 和新生成路径混用？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "source_identity": "冻结源码包身份由本批任务提供；已复核 archive/file/range SHA256，不由文件名推断实际可执行程序版本",
+        "evidence_mode": "frozen_zip_direct_static_source",
+        "sides": "SaveGame 服务端分支、PopulateWorld 具名恢复路径及具名 prefab master 分支",
+        "runtime_verified": false,
+        "focus": "762172 的 mermhouse/merm 具名主模拟恢复消费者，含 ChildSpawner 引用恢复与烧毁时组件移除。",
+        "exclusions": [
+          "全体 Mermummy 重复生成的运行复现/修复证明",
+          "公告等同 Lua 根因证明",
+          "不同实体 postpass 固定总序",
+          "任意缺字段统一迁移框架"
+        ]
+      },
+      "claims": [
+        {
+          "id": "SAVE-002-C01",
+          "kind": "NSF",
+          "statement": "MakeMermHouse 的 master 构造先设置 ChildSpawner 与生成回调；节日启用时随机初始化 ismummyhouse，绑定 onsave/onload；普通 mermhouse 的 OnPreLoad 经 WorldSettings_ChildSpawner_PreLoad 转换旧 timer 数据，组件恢复随后发生。构造初始化不是已经读取保存字段。",
+          "evidence_refs": [
+            "SAVE-S28",
+            "SAVE-S29",
+            "SAVE-S38",
+            "SAVE-S03"
+          ]
+        },
+        {
+          "id": "SAVE-002-C02",
+          "kind": "NSF",
+          "statement": "当前 onsave 在 inst.ismummyhouse 非 nil 时写 ismummyhouse or wasmummyhouse or false。onload 对保存字段用 ~= nil 判断：有字段且节日启用则恢复 ismummyhouse，否则写 wasmummyhouse；仅当字段缺失且当前随机得到真值时安装 HN_OnLoadPostPass。显式 false 因而不会误进缺字段分支。",
+          "evidence_refs": [
+            "SAVE-S27"
+          ]
+        },
+        {
+          "id": "SAVE-002-C03",
+          "kind": "NSF",
+          "statement": "ChildSpawner:OnSave 保存外部孩子 GUID 并返回 refs，OnLoad 恢复数量/计时等字段而不在该函数接回外部实体；LoadPostPass 以 newents 查孩子，有则 TakeOwnership，重建 home/监听，最后安排组件更新。EntityScript 先分发组件 postpass 再 prefab postpass，所以房屋本宿主的 HN 回调可在 ChildSpawner 引用接回后检查。",
+          "evidence_refs": [
+            "SAVE-S30",
+            "SAVE-S31",
+            "SAVE-S32",
+            "SAVE-S04"
+          ]
+        },
+        {
+          "id": "SAVE-002-C04",
+          "kind": "NSF",
+          "statement": "HN_OnLoadPostPass 先检查当前 childspawner 是否存在，再 CountChildrenOutside；对有效普通外部孩子，若当前房屋仍为 mummy 且孩子有 inventory 并 HasAnyEquipment，则清成 false。CountChildrenOutside 只遍历普通 childrenoutside，并过滤无效对象；该回调不遍历 emergencychildrenoutside，不生成孩子，也不因映射缺失自动补发。",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39"
+          ]
+        },
+        {
+          "id": "SAVE-002-C05",
+          "kind": "NSF",
+          "statement": "onload 的 burnt 分支先调 burnable.onburnt；构造绑定的 DefaultBurntStructureFn 会停止并移除 ChildSpawner，故本轮随后 prefab postpass 不能假设该组件仍在。HN 回调对此有存在性检查。另一个 merm prefab 的 OnPreLoad 恢复 mummy 状态，当前绑定的 OnLoadPostPass 在 mummy 为真时 DropEquipped，后者遍历 equipslots 并 DropItem。",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S36",
+            "SAVE-S37",
+            "SAVE-S34",
+            "SAVE-S35",
+            "SAVE-S40"
+          ]
+        },
+        {
+          "id": "SAVE-002-C06",
+          "kind": "EI",
+          "statement": "这里的安全阶段是“本宿主组件引用接回后”，不是所有其他实体的 postpass 均已结束。房屋对孩子装备的观察仍受实际已恢复状态和其他副作用约束；不能从此推出固定实体顺序或全局幂等迁移保证。",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S27",
+            "SAVE-S32",
+            "SAVE-S34"
+          ]
+        },
+        {
+          "id": "SAVE-002-C07",
+          "kind": "REC",
+          "statement": "采用该例的做法前先核对自己的三态字段与真实依赖：新建默认/随机值由构造提供；已存 false 必须保留；旧档缺字段的修正只在满足前提时执行；依赖当前组件时在回调入口重新取组件并检查。规则针对本项目实际字段，不要求新增统一迁移服务。",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S04",
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S36"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "onload(inst, data)",
+          "source_file": "scripts/prefabs/mermhouse.lua",
+          "visibility": "文件局部函数；由 MakeMermHouse 的 master 构造绑定为 inst.OnLoad，再由 EntityScript:SetPersistData 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+          "parameters": [
+            "inst 为 MakeMermHouse 的 master 实例；data 可 nil，data.burnt 和 data.ismummyhouse 位于 prefab 数据层。"
+          ],
+          "returns": [
+            "无显式返回。"
+          ],
+          "preconditions": [
+            "由 EntityScript:SetPersistData 在本宿主各匹配组件 OnLoad 后调用；构造已绑定 burnable.onburnt 与 ChildSpawner。"
+          ],
+          "side_effects": [
+            "burnt 为真时调用烧毁函数，可移除 ChildSpawner；恢复字段或安装 inst.OnLoadPostPass。",
+            "显式 false 与缺键分开，不在函数内生成新孩子。"
+          ],
+          "lifecycle": [
+            "节日启用且字段存在：赋 ismummyhouse；节日不启用且字段存在：赋 wasmummyhouse。",
+            "只有字段缺失且当前 ismummyhouse 为真时，设置 HN_OnLoadPostPass；data=nil 则不处理。"
+          ],
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S03",
+            "SAVE-S36",
+            "SAVE-S37"
+          ],
+          "unknowns": [
+            "其他 Hook 覆盖 OnLoadPostPass、异常与动态节日变化的完整行为未验。"
+          ]
+        },
+        {
+          "symbol": "HN_OnLoadPostPass(inst)",
+          "source_file": "scripts/prefabs/mermhouse.lua",
+          "visibility": "文件局部函数；仅在 onload 的缺字段且当前 ismummyhouse 为真分支条件绑定为 inst.OnLoadPostPass，再由 EntityScript:LoadPostPass 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+          "parameters": [
+            "inst 为因旧字段缺失而安装本回调的房屋；忽略 EntityScript 传入的 newents/data。"
+          ],
+          "returns": [
+            "无显式返回。"
+          ],
+          "preconditions": [
+            "由本宿主 EntityScript:LoadPostPass 在组件回调之后调用；childspawner 可以已经因 burnt 被移除。"
+          ],
+          "side_effects": [
+            "若 childspawner 存在则遍历其有效普通外部孩子；遇装备中的孩子可将 ismummyhouse 置 false。"
+          ],
+          "lifecycle": [
+            "不修复 refs、不补生成、不撤销随机生成器，也不覆盖父加载调度；只消费本宿主已接回的子引用。"
+          ],
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39",
+            "SAVE-S04",
+            "SAVE-S32"
+          ],
+          "unknowns": [
+            "缺失/无效孩子与没有 inventory 的孩子不能作为普通房屋的充分证据；真实多次 reload 未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造定义生成策略与节日默认值，prefab OnPreLoad 做具名旧 timer 表转换。",
+          "evidence_refs": [
+            "SAVE-S28",
+            "SAVE-S29",
+            "SAVE-S38"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "组件 OnLoad 恢复数量/时间；prefab OnLoad 读取三态字段，burnt 可改变组件集合。",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S27",
+            "SAVE-S31",
+            "SAVE-S36"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "ChildSpawner postpass 用旧 GUID 重新取得孩子、home 与监听。",
+          "evidence_refs": [
+            "SAVE-S30",
+            "SAVE-S32"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "本宿主 prefab HN postpass 检查当前组件和有效孩子；只按有证据的条件修正类型。",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本条静态分支可解释字段/阶段差异，不证明公告涉及的全部重载缺陷都源于这些分支或已在游戏中修复。",
+        "mermhouse 的 HasAnyEquipment 检查与另一个 merm 实体的 DropEquipped postpass 先后未知；不能声称房屋必然观察卸装前或卸装后状态。所有 Merm 家族分支、装备 Hook 及异常路径未枚举。",
+        "子对象缺失的业务补偿、未知未来 schema 和动态节日迁移未由此例规定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "SAVE-S28",
+            "role": "构造与回调安装者"
+          },
+          {
+            "ref": "SAVE-S29",
+            "role": "OnPreLoad 旧表转换入口"
+          },
+          {
+            "ref": "SAVE-S38",
+            "role": "外部 world settings timer 消费"
+          },
+          {
+            "ref": "SAVE-S03",
+            "role": "OnLoad 实际分发"
+          },
+          {
+            "ref": "SAVE-S04",
+            "role": "本宿主组件到 prefab 阶段屏障"
+          },
+          {
+            "ref": "SAVE-S30",
+            "role": "子引用保存"
+          },
+          {
+            "ref": "SAVE-S32",
+            "role": "引用恢复和监听重建"
+          },
+          {
+            "ref": "SAVE-S33",
+            "role": "有效普通孩子枚举"
+          },
+          {
+            "ref": "SAVE-S36",
+            "role": "烧毁移除组件"
+          },
+          {
+            "ref": "SAVE-S37",
+            "role": "烧毁函数绑定"
+          },
+          {
+            "ref": "SAVE-S34",
+            "role": "另一个 prefab 的装备恢复副作用"
+          },
+          {
+            "ref": "SAVE-S40",
+            "role": "DropEquipped 实际消费者"
+          }
+        ],
+        "unknowns": [
+          "仅列本条实际展开的静态依赖；不表示所有 prefab、Mod hook 或引擎实现已枚举。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-SAVE-003",
+      "title": "世界表序列化到原生会话写入的分界，玩家保存另行委托",
+      "aliases": [
+        "OnSave 不是落盘确认",
+        "SaveGame callback continuation",
+        "player save ignores refs"
+      ],
+      "engineering_question": "OnSave、SaveGame 回调、玩家 session 与原生 SerializeWorldSession 各能证明到哪一步，何时不能宣称持久提交或跨分片恰好一次？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "source_identity": "冻结源码包身份由本批任务提供；已复核 archive/file/range SHA256，不由文件名推断实际可执行程序版本",
+        "evidence_mode": "frozen_zip_direct_static_source",
+        "sides": "SaveGame 服务端分支、PopulateWorld 具名恢复路径及具名 prefab master 分支",
+        "runtime_verified": false,
+        "focus": "冻结 Lua 中 SaveGame→SerializeWorldSession→原生调用及回调后续；玩家 session 为具名对照，原生实现不在此 Lua 证据内。",
+        "exclusions": [
+          "操作系统 fsync/durability",
+          "原生压缩/写盘错误语义",
+          "玩家与世界原子快照",
+          "跨分片共同提交/重试送达",
+          "独立回滚下 exactly-once"
+        ]
+      },
+      "claims": [
+        {
+          "id": "SAVE-003-C01",
+          "kind": "NSF",
+          "statement": "SaveGame 客户端分支打印禁用并可调用 cb(true) 后返回；服务器分支先 StartWorldSave，再聚合实体和 world/net/shard persistdata，随后逐玩家调用 SerializeUserSession。组件/prefab OnSave 属于内存表收集阶段，不直接在这些回调内完成本函数的世界会话写入。",
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S02"
+          ]
+        },
+        {
+          "id": "SAVE-003-C02",
+          "kind": "NSF",
+          "statement": "SerializeUserSession 在账号与端别条件满足时调用玩家 GetSaveRecord，但明确忽略 refs 第二返回，DataDumper 后独立委托 TheNet:SerializeUserSession。ResumeExistingUserSession 和 RestoreSnapshotUserSession 的具名路径仅传 data 给玩家 SetPersistData，没有传世界共享 newents，也没有在这两个函数内调用 LoadPostPass。",
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S25",
+            "SAVE-S26"
+          ]
+        },
+        {
+          "id": "SAVE-003-C03",
+          "kind": "NSF",
+          "statement": "SaveGame 将 save 各部分与按 prefab 分组的实体表分别 DataDumper，并作具名坏数值字符串检查，然后调用 SerializeWorldSession(data,session_identifier,callback,metadataStr)。Lua 包装器只转调 TheNet:SerializeWorldSession(data,session_identifier,ENCODE_SAVES,callback,metadataStr or 空字符串)。",
+          "evidence_refs": [
+            "SAVE-S23",
+            "SAVE-S24",
+            "SAVE-S22"
+          ]
+        },
+        {
+          "id": "SAVE-003-C04",
+          "kind": "NSF",
+          "statement": "传给原生的世界保存 callback 中依次做快照截断条件/IncrementSnapshot，更新 override，等 ShardGameIndex:Save 与 WriteTimeFile 的回调后 EndWorldSave，再调用用户 cb()。这段 Lua 续行没有逐项接收/判断成功状态；客户端分支的 cb(true) 不能解释为服务端磁盘成功标志。",
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S24"
+          ]
+        },
+        {
+          "id": "SAVE-003-C05",
+          "kind": "EI",
+          "statement": "从这些 Lua 定义能建立“保存表生成→原生调用委托→回调后续”的观察层次，无法推出原生回调对应 fsync、世界与玩家原子提交或多个 shard 同一提交点。玩家 refs 被忽略的路径也不能照搬 PopulateWorld 的全图 postpass 协议。",
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S24",
+            "SAVE-S25",
+            "SAVE-S26",
+            "SAVE-S10"
+          ]
+        },
+        {
+          "id": "SAVE-003-C06",
+          "kind": "REC",
+          "statement": "把 Mod 对外承诺限定到可观察层：OnSave 已纳入数据、原生回调已到达、独立进程重启后值/引用实际存在应分别报告；跨分片重试与独立回滚需单独设计并实测，不能因 journal/outbox 被 OnSave 保存就称每次内存写入已持久提交。",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S22",
+            "SAVE-S24"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SaveGame(isshutdown, cb)",
+          "source_file": "scripts/mainfunctions.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "isshutdown 表示玩家已走 OnDespawn 清理且保存后 sim 将关闭的入口约定。",
+            "cb 可 nil；客户端禁用分支以 true 调用；服务器具名完成续行以无参数调用。"
+          ],
+          "returns": [
+            "无显式结果返回；调用方不能用返回值确认持久化。"
+          ],
+          "preconditions": [
+            "服务器正常分支要求 TheWorld、map、world_network、session/meta 等断言和 serializer 依赖成立。"
+          ],
+          "side_effects": [
+            "StartWorldSave，读取并同步执行保存回调，玩家 session 独立委托，标记 refs，DataDumper，委托原生世界保存。",
+            "原生 callback 后还有快照/override/index/timefile 回调链，最后 EndWorldSave 与 cb。"
+          ],
+          "lifecycle": [
+            "Lua 保存回调发生在 SerializeWorldSession 之前；不含跨分片原子事务。",
+            "客户端分支不做上述保存，只调用可选 cb(true) 并返回。"
+          ],
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S23",
+            "SAVE-S24",
+            "SAVE-S22"
+          ],
+          "unknowns": [
+            "原生错误回调、callback 恰好调用次数、崩溃时磁盘持久性及各后续 I/O 的失败语义未由该 Lua 证明。"
+          ]
+        },
+        {
+          "symbol": "SerializeWorldSession(data, session_identifier, callback, metadataStr)",
+          "source_file": "scripts/networking.lua",
+          "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+          "parameters": [
+            "data 为 SaveGame 已分片 DataDumper 的保存内容；session_identifier 为保存目标会话。",
+            "callback 原样透传；metadataStr 缺省为空字符串；ENCODE_SAVES 为包装器附加原生参数。"
+          ],
+          "returns": [
+            "Lua 包装器无显式返回。"
+          ],
+          "preconditions": [
+            "TheNet 原生 SerializeWorldSession 可用；包装器本身不筛服务器或校验 payload。"
+          ],
+          "side_effects": [
+            "只委托 TheNet:SerializeWorldSession；原生序列化/压缩/写盘实现不在该函数中。"
+          ],
+          "lifecycle": [
+            "SaveGame 在表生成和坏数值检查后调用；callback 后续由传入闭包决定。"
+          ],
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S23",
+            "SAVE-S24"
+          ],
+          "unknowns": [
+            "不能从透传参数推断磁盘原子性、fsync、原生回调状态约定或跨分片提交。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "服务器 SaveGame 收集组件/实体及 world 数据；玩家 session 走单独委托。",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S22"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "把内存表 DataDumper，检查具名坏数值文本，传入 Lua 世界会话包装器。",
+          "evidence_refs": [
+            "SAVE-S23",
+            "SAVE-S24"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "包装器调用原生 TheNet；Lua 证据在接口处停止，原生完成 callback 的 durability 不在源码中。",
+          "evidence_refs": [
+            "SAVE-S22"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "回调后的 override/index/timefile 链结束才 EndWorldSave 并调用用户 cb；此观察仍需与真实重启结果区别。",
+          "evidence_refs": [
+            "SAVE-S24"
+          ]
+        }
+      ],
+      "unknowns": [
+        "没有原生引擎实现、操作系统写入屏障、断电/进程崩溃注入或真实重启结果。",
+        "未枚举全部保存触发、用户 session 的原生调用者与跨分片协调；不证明保存期间世界完全冻结。",
+        "旧 Lua 内存状态与其他 shard 的旧/新保存各自可回滚，不能靠可回滚 generation 自动获得单调性。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "SAVE-S06",
+            "role": "SaveGame 端别分支与聚合入口"
+          },
+          {
+            "ref": "SAVE-S02",
+            "role": "组件/prefab 表聚合"
+          },
+          {
+            "ref": "SAVE-S22",
+            "role": "原生桥接及玩家对照"
+          },
+          {
+            "ref": "SAVE-S23",
+            "role": "表转字符串消费"
+          },
+          {
+            "ref": "SAVE-S24",
+            "role": "原生调用及回调后续"
+          },
+          {
+            "ref": "SAVE-S25",
+            "role": "真实 session 恢复调用者"
+          },
+          {
+            "ref": "SAVE-S26",
+            "role": "快照玩家恢复调用者"
+          }
+        ],
+        "unknowns": [
+          "仅列本条实际展开的静态依赖；不表示所有 prefab、Mod hook 或引擎实现已枚举。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "SAVE-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 248,
+      "line_end": 316,
+      "range_sha256": "9d481040bf0dbaead41c3af063852d8a1a469462d12207da61de1b5fdeea7715",
+      "symbols": [
+        "EntityScript:GetSaveRecord"
+      ]
+    },
+    {
+      "id": "SAVE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData",
+        "Component:OnSave",
+        "Prefab.OnSave"
+      ]
+    },
+    {
+      "id": "SAVE-S03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData",
+        "Prefab.OnPreLoad",
+        "Component:OnLoad",
+        "Prefab.OnLoad"
+      ]
+    },
+    {
+      "id": "SAVE-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1964,
+      "line_end": 1977,
+      "range_sha256": "d5d3d49922fdd678ef58ec530bee7bfaaaf7ba7b11538f99230541bc0073b210",
+      "symbols": [
+        "EntityScript:LoadPostPass",
+        "Component:LoadPostPass",
+        "Prefab.OnLoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S05",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "symbols": [
+        "SpawnSaveRecord"
+      ]
+    },
+    {
+      "id": "SAVE-S06",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1094,
+      "line_end": 1133,
+      "range_sha256": "7df653127e3676aa8891a582b34c245f980962a7c3a5493f6bce386bcfae10fc",
+      "symbols": [
+        "SaveGame",
+        "saved_ents",
+        "references"
+      ]
+    },
+    {
+      "id": "SAVE-S07",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1142,
+      "line_end": 1192,
+      "range_sha256": "48517faa35dc6435106cf617b7c2cba0422c13f52a16146273363686292980ad",
+      "symbols": [
+        "SaveGame world/world_network/shard_network persistdata"
+      ]
+    },
+    {
+      "id": "SAVE-S08",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1194,
+      "line_end": 1213,
+      "range_sha256": "b2797628b9e1fb5951524a1a25dc43c7b06e274449d0e2bad381cf4dcb6f34f6",
+      "symbols": [
+        "SerializeUserSession caller",
+        "SaveGame saved_ents id assignment"
+      ]
+    },
+    {
+      "id": "SAVE-S09",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 579,
+      "line_end": 592,
+      "range_sha256": "2ef8143d50bed9d557945895cccec497d7970fc03f3e505411ffd0e842f25558",
+      "symbols": [
+        "PopulateWorld world/network SetPersistData"
+      ]
+    },
+    {
+      "id": "SAVE-S10",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 629,
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "symbols": [
+        "PopulateWorld SpawnSaveRecord and LoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S11",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 20,
+      "line_end": 64,
+      "range_sha256": "fbe0447d9fba7263f4fd79c8f0646959407807a20a46f42babf0dc7c0decda02",
+      "symbols": [
+        "EntityTracker:TrackEntity",
+        "EntityTracker:OnSave",
+        "EntityTracker:LoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S12",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 979,
+      "line_end": 1005,
+      "range_sha256": "e1f65b8c2310dd8db5eec4fa690e90c8bf96ff6da8d3dac57b2b0bc0d7f43716",
+      "symbols": [
+        "Container:OnSave",
+        "Container:OnLoad"
+      ]
+    },
+    {
+      "id": "SAVE-S13",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 126,
+      "line_end": 150,
+      "range_sha256": "07ae368e7f852d18f79369b8abf12061f640bdbc34e8bbb5f9ee696cb697568c",
+      "symbols": [
+        "Debuffable:OnSave",
+        "Debuffable:OnLoad"
+      ]
+    },
+    {
+      "id": "SAVE-S14",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 1,
+      "line_end": 12,
+      "range_sha256": "67d95384337cde2d375ad7e6107ccb02a4bd82242b5c51973e31d55c7e78d697",
+      "symbols": [
+        "Timer constructor",
+        "Timer:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "SAVE-S15",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 66,
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "symbols": [
+        "Timer:StartTimer",
+        "OnTimerDone",
+        "Timer:StopTimer"
+      ]
+    },
+    {
+      "id": "SAVE-S16",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 95,
+      "line_end": 142,
+      "range_sha256": "f2823fd89ca4b1afc4290afc940b082bb867328a72218d537eaeb1ea7ab622d2",
+      "symbols": [
+        "Timer:GetTimeLeft",
+        "Timer:OnSave",
+        "Timer:OnLoad"
+      ]
+    },
+    {
+      "id": "SAVE-S17",
+      "source_file": "scripts/prefabs/bootleg.lua",
+      "file_sha256": "36ba1d6b33ac7ae4cd016191523c3974d8b9df785122e2486af051fead125d71",
+      "line_start": 11,
+      "line_end": 21,
+      "range_sha256": "b4adaf5c488c968d5381cca4aeddeebc0a7cefc2e129cfeb99e826a560f66ca7",
+      "symbols": [
+        "CreateOceanWhirlportal"
+      ]
+    },
+    {
+      "id": "SAVE-S18",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 54,
+      "line_end": 80,
+      "range_sha256": "e55135251078dae7c80b596179566b10fd463875580376ca4ea7784a05d0d35a",
+      "symbols": [
+        "SetExit",
+        "CheckForBoatsTick missing exit/blocker"
+      ]
+    },
+    {
+      "id": "SAVE-S19",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 177,
+      "line_end": 195,
+      "range_sha256": "fcd712945847e1b23c85f61293340b23a2eac02056e355330e2529fdb034798c",
+      "symbols": [
+        "ontimerdone",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "SAVE-S20",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 224,
+      "line_end": 261,
+      "range_sha256": "9e0a92d50592ca33a4bcd789ee001dfb2089758392b8c6494ebf7dd23db120fc",
+      "symbols": [
+        "fn master branch",
+        "timerdone registration",
+        "periodic task reconstruction"
+      ]
+    },
+    {
+      "id": "SAVE-S21",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1752,
+      "range_sha256": "51668de9aa8ac040c278e84513ada6f574d061bdda8a6ed8f3bd922cd479c37a",
+      "symbols": [
+        "EntityScript:Remove task/event cleanup"
+      ]
+    },
+    {
+      "id": "SAVE-S22",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 303,
+      "line_end": 330,
+      "range_sha256": "cd582be273c7d40d694b29b3424424ca487ad8441bb65a3c45175b0e66b6c1aa",
+      "symbols": [
+        "SerializeUserSession",
+        "SerializeWorldSession"
+      ]
+    },
+    {
+      "id": "SAVE-S23",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1236,
+      "line_end": 1264,
+      "range_sha256": "045fde43a466dda94a9b69212c00b6e73625dda3224c054d44c6e478efeed828",
+      "symbols": [
+        "SaveGame DataDumper and corruption checks"
+      ]
+    },
+    {
+      "id": "SAVE-S24",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1267,
+      "line_end": 1300,
+      "range_sha256": "7e37a101f01ab633e1286f893e73578cb83b1c1eb7f0688b8ab6520f7cb472a8",
+      "symbols": [
+        "SaveGame native callback continuation",
+        "SerializeWorldSession caller"
+      ]
+    },
+    {
+      "id": "SAVE-S25",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2100,
+      "line_end": 2128,
+      "range_sha256": "da10c4e7a195a0206b06da3bb587f299250bd7339e13eadb4d38fa6524c69b76",
+      "symbols": [
+        "ResumeExistingUserSession"
+      ]
+    },
+    {
+      "id": "SAVE-S26",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2130,
+      "line_end": 2163,
+      "range_sha256": "51f419718c411363b79f47d5f82dcb20aa6f7d10be7843a109271124b9e88c61",
+      "symbols": [
+        "RestoreSnapshotUserSession"
+      ]
+    },
+    {
+      "id": "SAVE-S27",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 122,
+      "line_end": 198,
+      "range_sha256": "a0af6205d5c4a46ae90425f47a7d1e6f6f91f8441da05d6d763a7e8d2950c54f",
+      "symbols": [
+        "StartSpawning",
+        "OnSpawned",
+        "OnGoHome",
+        "onsave",
+        "onload",
+        "HN_OnLoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S28",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 260,
+      "line_end": 310,
+      "range_sha256": "3d69d938ee8edfce1eafa18c727f51fc34e1173675bce91260668f2a08593109",
+      "symbols": [
+        "MakeMermHouse master construction",
+        "ismummyhouse initialization",
+        "OnSave/OnLoad bindings"
+      ]
+    },
+    {
+      "id": "SAVE-S29",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 325,
+      "line_end": 345,
+      "range_sha256": "70aaa0500907091b8b9a7a61b15f29b3aeff1ad221182598c0e69cf821fb43c2",
+      "symbols": [
+        "OnPreLoad",
+        "mermhouse_master"
+      ]
+    },
+    {
+      "id": "SAVE-S30",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 332,
+      "line_end": 378,
+      "range_sha256": "57a76f689feb632acb13e9ca6f371c4064d2cbfcc22f9c62449c25b868d201f1",
+      "symbols": [
+        "ChildSpawner:OnSave"
+      ]
+    },
+    {
+      "id": "SAVE-S31",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 407,
+      "line_end": 455,
+      "range_sha256": "5930b3545b7b030b5764693643e73a7a5dcadb688933d7cdc503772478afede7",
+      "symbols": [
+        "ChildSpawner:OnLoad"
+      ]
+    },
+    {
+      "id": "SAVE-S32",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 457,
+      "line_end": 503,
+      "range_sha256": "aa1aae94e0e62676b00c0b0c79e1ae23b6fdfa876aaaf66e8a5aa78a932809be",
+      "symbols": [
+        "ChildSpawner:DoTakeOwnership",
+        "ChildSpawner:LoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S33",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 305,
+      "line_end": 313,
+      "range_sha256": "fc3b2067e0b8f8ceb8ff41029599a7b469573d40294e04068f61fbed81384aec",
+      "symbols": [
+        "ChildSpawner:CountChildrenOutside"
+      ]
+    },
+    {
+      "id": "SAVE-S34",
+      "source_file": "scripts/prefabs/merm.lua",
+      "file_sha256": "0db64eb3e86d728f48a6469946a020003729f2117c32579d75a61b50bdc10e88",
+      "line_start": 717,
+      "line_end": 734,
+      "range_sha256": "a8d86c3edfd95c8dc189ce5b72847119c81ded543f7132379bdb58f13ab462c9",
+      "symbols": [
+        "OnPreLoad",
+        "OnLoadPostPass"
+      ]
+    },
+    {
+      "id": "SAVE-S35",
+      "source_file": "scripts/prefabs/merm.lua",
+      "file_sha256": "0db64eb3e86d728f48a6469946a020003729f2117c32579d75a61b50bdc10e88",
+      "line_start": 1098,
+      "line_end": 1102,
+      "range_sha256": "c195d72acb1b51c643ec77b8d407b2254876ad531526d57299f06d613791e251",
+      "symbols": [
+        "OnPreLoad/OnLoadPostPass bindings"
+      ]
+    },
+    {
+      "id": "SAVE-S36",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 52,
+      "line_end": 75,
+      "range_sha256": "4b2c97a6a2de26b0953a6d5c3acb4d9c89bdf8d1d4be36c2964b46b5fae0a624",
+      "symbols": [
+        "DefaultBurntStructureFn childspawner removal"
+      ]
+    },
+    {
+      "id": "SAVE-S37",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 176,
+      "line_end": 185,
+      "range_sha256": "d0e132fae655e268e16c3194d56d3ec30ab0e7823c47dd1a7ab2a969094ff120",
+      "symbols": [
+        "MakeMediumBurnable structure callback binding"
+      ]
+    },
+    {
+      "id": "SAVE-S38",
+      "source_file": "scripts/worldsettingsutil.lua",
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "line_start": 71,
+      "line_end": 121,
+      "range_sha256": "1aebefaddaf4a7f5a6e7f49aad07199d2e20705ae38ea2978e0b9c7003521660",
+      "symbols": [
+        "WorldSettings_ChildSpawner_PreLoad",
+        "WorldSettings_ChildSpawner_SpawnPeriod",
+        "WorldSettings_ChildSpawner_RegenPeriod"
+      ]
+    },
+    {
+      "id": "SAVE-S39",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 364,
+      "line_end": 366,
+      "range_sha256": "9c3f0ef9d4f02d2e0dedce55dccbeedaa3e5c51905ce9b1e7dbe0ad6ab99088d",
+      "symbols": [
+        "Inventory:HasAnyEquipment"
+      ]
+    },
+    {
+      "id": "SAVE-S40",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1919,
+      "line_end": 1927,
+      "range_sha256": "26dad2790c9b4952d9e129cae87f8fb5bb3cb7e077e8e6cb6a7e4b7a68909441",
+      "symbols": [
+        "Inventory:DropEquipped"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "refs 返回了为什么 newents[saved_guid] 仍然 nil？保存引用会自动保存目标吗？",
+      "expected_entry_ids": [
+        "EXP-SAVE-001"
+      ],
+      "purpose": "定位记录 id 标记与目标保存资格，不把缺引用判为永久销毁。"
+    },
+    {
+      "query": "SpawnSaveRecord 与嵌套 Container/Debuffable 何时调用 LoadPostPass？",
+      "expected_entry_ids": [
+        "EXP-SAVE-001"
+      ],
+      "purpose": "核查真实调用方是否传递映射并安排后续阶段。"
+    },
+    {
+      "query": "762172 mermhouse 的 ismummyhouse=false 与旧档缺字段为何走不同恢复分支？",
+      "expected_entry_ids": [
+        "EXP-SAVE-002"
+      ],
+      "purpose": "以具名热修消费者说明三态与本宿主引用恢复阶段。"
+    },
+    {
+      "query": "OnLoad 期间烧毁移除 childspawner，postpass 还能直接用组件吗？",
+      "expected_entry_ids": [
+        "EXP-SAVE-002"
+      ],
+      "purpose": "复核恢复副作用改变组件集合的实际分支。"
+    },
+    {
+      "query": "OnSave 返回或 SaveGame cb(true) 能证明世界玩家和两个 shard 都落盘了吗？",
+      "expected_entry_ids": [
+        "EXP-SAVE-003"
+      ],
+      "purpose": "区分内存表、原生委托、回调续行与未知 durability。"
+    },
+    {
+      "query": "复杂 Mod 的配对传送口如何恢复出口引用、关闭倒计时与巡检任务？",
+      "expected_entry_ids": [
+        "EXP-SAVE-001",
+        "EXP-SAVE-003"
+      ],
+      "purpose": "结合架构专题的原版 oceanwhirlportal 贯穿例；Timer 通用契约沿用既有 Core。"
+    }
+  ],
+  "limitations": [
+    "本文件为 research/restricted/hold 机制研究，不解除历史 canonical/Core 的 Scope 或 Coding HOLD；登记/审阅进度以 FAMILY-REGISTRY 和关联审阅记录为准。",
+    "本批直接核对冻结 ZIP 的 Lua 字节；版本/build 为给定来源身份，不证明当前安装可执行程序相同。引用仅含符号、范围和 SHA256，不分发原版 Lua。",
+    "所有结论限具名静态定义、调用方和消费者；runtime_verified=false，没有游戏启动、磁盘重启、真实账号/远端客户端或跨 shard 验收。",
+    "保存字段、组件间 pairs 顺序、其他实体 postpass、零延迟任务和引擎写盘是不同边界；不提供固定全局总序、原生磁盘提交或 independent rollback exactly-once 保证。",
+    "Mermhouse 分支只作具体恢复消费者；不把更新公告或源码差异当作全部 bug 的唯一根因与运行修复证明。",
+    "架构建议必须按目标 Mod 的所有者、玩法保留策略与既有 schema 采用；不默认引入统一迁移框架或复制露露事务状态机。"
+  ]
+}

@@ -1,0 +1,1739 @@
+{
+  "schema_version": "independent-review-dedup-dependencies/1",
+  "repository_commit": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "catalog_file": "knowledge/CATALOG.json",
+  "catalog_sha256": "ef7aa69c42f85f17c6e62556f3fbab9b7dede88e9692238a090a6fd140452be9",
+  "runtime_verified": false,
+  "purpose": "Exact selected historical public atoms with Scope/status/provenance for audit and dedup; no old record is substituted for current frozen Lua evidence.",
+  "units": [
+    {
+      "id": "FACT-DST-008",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/entries.json",
+      "original_file_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "catalog_pointer": "/entries/7",
+      "catalog_record": {
+        "id": "FACT-DST-008",
+        "title": "实体删除与组件单独卸载不同",
+        "family": "legacy",
+        "file": "data/entries.json",
+        "pointer": "/entries/7",
+        "status": "supported_by_klei"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "0.1.1"
+      },
+      "complete_entry": {
+        "schema_version": "0.1.1",
+        "entry_type": "source_fact",
+        "id": "FACT-DST-008",
+        "title": "实体删除与组件单独卸载不同",
+        "summary": "Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。",
+        "knowledge_kind": "Klei Fact",
+        "tags": [
+          "dst"
+        ],
+        "scope": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+        "evidence_level": "E3",
+        "confidence": "Very High",
+        "sources": [
+          {
+            "source_id": "KLEI-LOCAL-20260928",
+            "role": "direct_evidence",
+            "locator": "648 起；1705–1726；Remove / RemoveComponent",
+            "locator_structured": [
+              {
+                "type": "file",
+                "file": "entityscript.lua"
+              },
+              {
+                "type": "source_symbol",
+                "file": "entityscript.lua",
+                "symbol": "Remove"
+              },
+              {
+                "type": "source_symbol",
+                "file": "entityscript.lua",
+                "symbol": "RemoveComponent"
+              },
+              {
+                "type": "source_lines",
+                "file": "entityscript.lua",
+                "start_line": 1705,
+                "end_line": 1726
+              }
+            ],
+            "note": "源文件身份为直接原版依据；既有报告记录了对照过程。本轮未重新解读源码，源文件不随包。"
+          },
+          {
+            "source_id": "REPORT-R4",
+            "locator": "13 注销、重复注册与清理",
+            "note": "",
+            "role": "supplementary_interpretation",
+            "locator_structured": [
+              {
+                "type": "report_section",
+                "section": "13 注销、重复注册与清理"
+              }
+            ]
+          }
+        ],
+        "related": [
+          "ARP-DST-001"
+        ],
+        "status": "supported_by_klei",
+        "created_from_case": [
+          "CASE-001"
+        ],
+        "version": "0.1.1",
+        "details": {
+          "api_mechanism": "实体删除与组件单独卸载不同",
+          "observed_behaviour": "Entity Remove 清监听、world state watcher、pending tasks；RemoveComponent 先从 components 清键，再调用旧组件的 OnRemoveFromEntity。",
+          "source_file": [
+            "vanilla-snapshot/scripts/entityscript.lua"
+          ],
+          "relevant_function": "Remove / RemoveComponent",
+          "source_locator": "648 起；1705–1726",
+          "version_context": "KLEI-LOCAL-20260928；原版发行 build 未记录；前轮对照本机 scripts.zip，非最新版本承诺。",
+          "implication": "卸载回调应使用自身引用，不能假定 inst.components[name] 仍在；长命 Owner 的任务不会随短命业务对象自动取消。",
+          "do_not_infer": "不能把完整世界销毁的清理外推为任意独立服务注销均安全。"
+        },
+        "scope_text": "CASE-001 静态证据及其原版快照；迁移到其他 Mod/游戏版本须重新确认适用条件。",
+        "scope_structured": {
+          "game": "Don't Starve Together",
+          "cases": [
+            "CASE-001"
+          ],
+          "domains": [
+            "lifecycle"
+          ],
+          "evidence_modes": [
+            "vanilla_source",
+            "static_analysis"
+          ],
+          "runtime_environments": [],
+          "sides": []
+        },
+        "typed_relations": []
+      }
+    },
+    {
+      "id": "AI-N001-09",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "original_file_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "catalog_pointer": "/entries/8",
+      "catalog_record": {
+        "id": "AI-N001-09",
+        "title": "Task、Listener、组件卸载各有真实Owner",
+        "family": "native_ai",
+        "file": "data/native001/canonical-native001-ai-knowledge.json",
+        "pointer": "/entries/8",
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "coding_default"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "native-ai-1.0",
+        "track_id": "NATIVE-001",
+        "version": "1.0.0",
+        "evidence_class_contract": {
+          "NSF": "Snapshot-scoped native Lua source fact.",
+          "RV": "Only explicitly scoped historical runtime observation, never whole-entry promotion.",
+          "EI": "Engineering inference; separate from native fact.",
+          "REC": "Conditional recommendation, not Klei best practice.",
+          "UNK": "Unknown / engine boundary; no guessed engine mechanism.",
+          "KNOWLEDGE_PRODUCT_EVALUATION": "Pilot coding-product evaluation; never RV."
+        }
+      },
+      "complete_entry": {
+        "id": "AI-N001-09",
+        "title": "Task、Listener、组件卸载各有真实Owner",
+        "engineering_question": "为什么player离开后资源还在执行？",
+        "native_fact": {
+          "claim_type": "NSF",
+          "statement": "实体task helpers登记调用实体pendingtasks；TheWorld拥有的task捕获player也不会成为player-owned。ListenForEvent维护source与listener双索引；Entity Remove清理本实体任务/事件边，RemoveComponent仅执行自己的卸载路径而非整实体清理。"
+        },
+        "scope": {
+          "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+          "version": "756039 / installed 2026-10-04, not rechecked this round",
+          "sides": "仅限已查源码的各自端别和分支，不推为所有端一致",
+          "runtime_environments": "仅引用既有单账号Listen/Dedicated Remote场景的局部范围，不构成整条知识的Runtime验证",
+          "exclusions": [
+            "native内部总序/持久化保证",
+            "多shard全链",
+            "全部角色/插件",
+            "当前安装是否仍为该快照"
+          ]
+        },
+        "ai_coding_impact": {
+          "claim_type": "REC / EI",
+          "decisions": [
+            "列出每项task、listener、modifier、widget的创建owner和退场/卸载路径；为长寿命owner持有的短寿命引用保留handle并主动释放。",
+            "解绑时保留同一callback/source；组件被移除也要取消组件自己仍在宿主或world上的工作。",
+            "不要在teardown中新建未经管理的任务；取消与状态检查解决不同问题。"
+          ]
+        },
+        "common_ai_failure": [
+          "把World task捕获player视为player Remove会自动取消。",
+          "RemoveComponent后期望宿主全部pendingtasks/events自动清空。",
+          "用新匿名函数解绑旧listener。"
+        ],
+        "recommended_reasoning": {
+          "claim_type": "REC",
+          "steps": [
+            "先按原注册owner和listener/source关系定位，再决定取消/解绑位置。",
+            "判定外部强引用仍存在与原实体仍有效是两回事；实际资源所有权决定清理，不靠万能退出event。"
+          ]
+        },
+        "does_not_mean": [
+          "每个World-sourced listener都会泄漏",
+          "原版Retire调用证明全部外部资源/C++内存马上回收"
+        ],
+        "evidence_strength": {
+          "native_fact": "DIRECT_STATIC_SOURCE_IN_EXISTING_SNAPSHOT",
+          "engineering_recommendation": "BOUNDED_REASONING_FROM_SOURCE_AND_TASK_REQUIREMENTS",
+          "effect_on_AI_quality": "PER_ENTRY_CAUSAL_EFFECT_NOT_ESTABLISHED"
+        },
+        "typical_mod_tasks": [
+          "player cleanup leak",
+          "custom player component",
+          "equipment/player modifier"
+        ],
+        "retrieval_triggers": [
+          "pendingtasks",
+          "RemoveComponent",
+          "OnRemoveFromEntity",
+          "ListenForEvent",
+          "RemoveEventCallback",
+          "World task",
+          "cleanup leak"
+        ],
+        "knowledge_role": "CORE_AI_ENGINEERING",
+        "coverage_status": "BOUNDED_PLAYER_LIFECYCLE",
+        "related_native_facts": [
+          "AI-N001-07",
+          "AI-N001-12"
+        ],
+        "typed_relations": [
+          {
+            "type": "related",
+            "target": "AI-N001-07"
+          },
+          {
+            "type": "related",
+            "target": "AI-N001-12"
+          }
+        ],
+        "research_evidence_refs": [
+          "AI-N001-09"
+        ]
+      }
+    },
+    {
+      "id": "NC-N004-FINAL-07",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/nativecore/native-core.json",
+      "original_file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "catalog_pointer": "/entries/23",
+      "catalog_record": {
+        "id": "NC-N004-FINAL-07",
+        "title": "Timer/Cooldown 的重复、加载与玩家寿命",
+        "family": "native_core",
+        "file": "data/nativecore/native-core.json",
+        "pointer": "/entries/23",
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "native-core-governance/1",
+        "version": "1.1.1"
+      },
+      "parent_context": {
+        "id": "NC-N004-FINAL-07",
+        "title": "Timer/Cooldown 的重复、加载与玩家寿命",
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold",
+        "scope": {
+          "statement": "刷新定时状态、冷却读档重复奖励、死亡/变鬼/换角/reroll 后状态不符。",
+          "source_scope": {
+            "dot_source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+            "dot_snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+            "dot_game_build": null,
+            "main_targeted_snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "builder_file_hash_relation": {
+              "main_file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "dot_file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+              "same_file_bytes_reported_by_inputs": true,
+              "does_not_establish": "整个installed snapshot与Dot提交或当前executable等价"
+            },
+            "N001_link_scope": "已给canonical IDs核对存在；链接只复用其自身范围，不证明跨快照API一致。",
+            "citation_integrity": "COPY_VERBATIM_FROM_SUPPLIED_RESEARCH_NOT_REHASHED_AGAINST_NEW_LUA",
+            "hash_conventions": {
+              "reused_baseline": "LF-joined-lines-no-trailing-newline",
+              "dot_supplementary": "exact source line bytes including original line endings (each original citation retains its own field)",
+              "main_targeted": "raw splitlines keepends; whole lines629..839 covering digest"
+            }
+          },
+          "scope_refs": [
+            {
+              "artifact_path": "research/native-core/sources/91572d3443ad94bb-n004-final-staging.json",
+              "sha256": "0bbb136e4dafd6712734111297be0fddf3088d033d0cb1c13f051f40517556b3",
+              "pointer": "/source_scope"
+            },
+            {
+              "artifact_path": "research/native-core/sources/91572d3443ad94bb-n004-final-staging.json",
+              "sha256": "0bbb136e4dafd6712734111297be0fddf3088d033d0cb1c13f051f40517556b3",
+              "pointer": "/entries/6"
+            }
+          ],
+          "proves": "Selected original source fact statements and exact cited branches; original facts/citations are preserved without editorial rewrite.",
+          "recommendation_conditions": [
+            "功能确需持久化或玩家替换。",
+            "项目已经选择这些阶段的保留/重置/暂停政策。"
+          ],
+          "related_entry_ids": [
+            "NC-N004-FINAL-06",
+            "NC-N004-FINAL-11",
+            "AI-N001-06",
+            "AI-N001-07",
+            "AI-N001-09",
+            "AI-N001-11",
+            "AI-N001-12",
+            "AI-N001-13",
+            "NC-N003-INT-05"
+          ],
+          "reviewer_profiles": [
+            "N004-RP-TIMER-VARIANTS"
+          ],
+          "runtime_verified": false,
+          "does_not_prove_runtime": "No real-client behavior, native physics/scheduler/removal ordering, callback exception guarantees, Runtime, or AI causal benefit.",
+          "installed_snapshot_locator_refs": [
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/snapshot_id"
+            },
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/archive_sha256"
+            },
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/freshness"
+            }
+          ]
+        },
+        "does_not_prove": [
+          "Dot source commit does not identify a current executable/game build; equal Builder file hashes do not establish whole-snapshot equivalence.",
+          "Coding Eval is historical product evidence, not Runtime or whole-entry correctness.",
+          "Recommendations apply only under the preserved recommendation conditions and named caller branches."
+        ],
+        "correction_refs": []
+      },
+      "complete_claims": [
+        {
+          "pointer": "/entries/23/claims/0",
+          "atom": {
+            "kind": "NSF",
+            "statement": "Timer:StartTimer 若同名 timer 已存在则打印并返回，不替换；正常开始时登记任务、timeleft、end_time、initial_time 和 paused。OnTimerDone 先 StopTimer 删除记录，再推送 timerdone，事件数据包含 name。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/57/original"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/57/original/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/source_scope"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/0/citations/0"
+              }
+            ]
+          }
+        },
+        {
+          "pointer": "/entries/23/claims/1",
+          "atom": {
+            "kind": "NSF",
+            "statement": "StopTimer 取消任务并删除名字；PauseTimer 更新剩余时间、标记 paused 并取消任务，但保留记录；ResumeTimer 按保存的 timeleft 重新安排任务。StopTimer 本身不推送 timerdone。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/58/original"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/58/original/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/source_scope"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/1/citations/0"
+              }
+            ]
+          }
+        },
+        {
+          "pointer": "/entries/23/claims/2",
+          "atom": {
+            "kind": "NSF",
+            "statement": "Timer:OnSave 保存剩余时间、暂停状态和 initial_time；OnLoad 对保存的同名记录先 StopTimer 再 StartTimer。TransferComponent 对目标 timer 调用 StartTimer，却没有在此函数中停止来源记录或预先清除目标同名记录。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/59/original"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/59/original/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/59/original/citations/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/source_scope"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/2"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/2/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/2/citations/1"
+              }
+            ]
+          }
+        },
+        {
+          "pointer": "/entries/23/claims/3",
+          "atom": {
+            "kind": "NSF",
+            "statement": "普通 Timer:LongUpdate 对所有已登记名字执行 SetTimeLeft(GetTimeLeft(name)-dt)，没有跳过 paused；SetTimeLeft 对暂停计时器直接改剩余时间并下限钳制为 0，对运行中计时器则暂停、改值、恢复。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/60/original"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/60/original/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/facts/60/original/citations/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/6c4aef23c1b59b65-n004-evidence-map.json",
+                "sha256": "2c1cbb01c4759b1f89796f34d52311a2d3ae7e974c97f512c2acf3c3c4055766",
+                "pointer": "/source_scope"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/3"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/3/citations/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/013974fde0b5839c-n004-provisional.json",
+                "sha256": "78c99ce88cb83b7648cf06ca4b694f1d3d20c66e84f81923e4b5b01142a4b7e1",
+                "pointer": "/entries/6/native_facts/3/citations/1"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "NC-N002-FINAL-04",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/nativecore/native-core.json",
+      "original_file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "catalog_pointer": "/entries/3",
+      "catalog_record": {
+        "id": "NC-N002-FINAL-04",
+        "title": "Component、Replica、字段载体与消费接口形成显式契约",
+        "family": "native_core",
+        "file": "data/nativecore/native-core.json",
+        "pointer": "/entries/3",
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "native-core-governance/1",
+        "version": "1.1.1"
+      },
+      "parent_context": {
+        "id": "NC-N002-FINAL-04",
+        "title": "Component、Replica、字段载体与消费接口形成显式契约",
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold",
+        "scope": {
+          "statement": "Only the cited Lua branches of this frozen N002 final unit. Research canonical admission leaves Coding HOLD in place.",
+          "original_scope": {
+            "snapshot_id": "KLEI-INSTALLED-20261004-f8d7cff2",
+            "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+            "source_scope": "仅精确所引Lua范围，不代表全部原生Networking",
+            "coverage_status": "BOUNDED_STATIC_SUFFICIENT",
+            "lifecycle_reuse": [
+              "AI-N001-09",
+              "AI-N001-10",
+              "AI-N001-13"
+            ]
+          },
+          "scope_refs": [
+            {
+              "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+              "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+              "pointer": "/entries/3/scope"
+            }
+          ],
+          "original_runtime_status": "NOT_RUN",
+          "source_equivalence": "Matching cited file bytes do not establish complete snapshot or executable equivalence.",
+          "proves": "Named visible Lua dispatch, request, replica, consumer or shard behavior in the preserved original fact statements.",
+          "does_not_prove_runtime": "No Runtime, native authentication/transport reliability, full reconnect behavior, or AI causal benefit.",
+          "installed_snapshot_locator_refs": [
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/snapshot_id"
+            },
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/archive_sha256"
+            },
+            {
+              "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+              "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+              "pointer": "/freshness"
+            }
+          ],
+          "source_scopes": [
+            {
+              "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+              "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+              "source_commit": null,
+              "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+              "game_version": "759671",
+              "steam_buildid": "26148036",
+              "scope_ref": {
+                "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+                "sha256": "1b9cda619e402240b9bc433a5e2b809140f227e42708b8046333360c98bae123",
+                "pointer": "/source_scope"
+              },
+              "runtime_verified": false,
+              "applies_to": "Only new or replaced claim pointers referencing this source artifact; legacy scopes retain their original identities."
+            },
+            {
+              "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+              "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+              "source_commit": null,
+              "game_version": "759671",
+              "steam_buildid": "26148036",
+              "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+              "scope_ref": {
+                "artifact_path": "research/native-core/sources/e5d1ce11f3fd2433-whole-claims-759671-declaration-enclosure.json",
+                "sha256": "b5b5217924d52d8f887da4ec2ad1b8b0f4ce9650a9e42ae0a250de91f772e659",
+                "pointer": "/source_scope"
+              },
+              "runtime_verified": false,
+              "applies_to": "Only exact current claims referencing the whole fact nodes in this artifact."
+            }
+          ]
+        },
+        "does_not_prove": [
+          "非nil replica和hunger getter默认100/1不能单独证明收到当前权威值。",
+          "所有replica都由player_classified承载，或classified对任意旁观者可读。",
+          "SetClassifiedTarget不能据Lua片段证明加密/完整保密。"
+        ],
+        "correction_refs": []
+      },
+      "complete_claims": [
+        {
+          "pointer": "/entries/3/claims/0",
+          "atom": {
+            "kind": "NSF",
+            "statement": "AddReplicableComponent 只登记名称；ReplicateComponent 对已登记名称 require components/<name>_replica 并构造。EntityScript:AddComponent 在实际 component 构造和写入之前调用 ReplicateComponent。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/0/source_refs/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/0/source_refs/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/0/source_refs/2"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/scope"
+              }
+            ]
+          }
+        },
+        {
+          "pointer": "/entries/3/claims/1",
+          "atom": {
+            "kind": "NSF",
+            "statement": "客户端根据初始标签构造 replica 后调用 OnEntityReplicated；公开 inst.replica[name] 读取受 _<name> 标签限制，而 TryAttachClassifiedToReplicaComponent 直接访问底层 replica 并支持 pre/unreplicated 情形。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1/source_refs/0"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1/source_refs/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1/source_refs/2"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1/source_refs/3"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/native_fact/atoms/1/source_refs/4"
+              },
+              {
+                "artifact_path": "research/native-core/sources/d889aa7fe1564a3a-native002-final-staging.json",
+                "sha256": "663aa9efd43ccc17f15ca1dac0417e999300202607a1e46bd8fc632f34aa3350",
+                "pointer": "/entries/3/scope"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "N006-READY-F02",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/nativecore/native-core.json",
+      "original_file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "catalog_pointer": "/entries/35",
+      "catalog_record": {
+        "id": "N006-READY-F02",
+        "title": "WorldState 的精确回调接收者、函数身份与已有键恢复",
+        "family": "native_core",
+        "file": "data/nativecore/native-core.json",
+        "pointer": "/entries/35",
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "native-core-governance/1",
+        "version": "1.1.1"
+      },
+      "parent_context": {
+        "id": "N006-READY-F02",
+        "title": "WorldState 的精确回调接收者、函数身份与已有键恢复",
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold",
+        "scope": {
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "source_repository": "Zechariah0121/dst-scripts",
+          "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "evidence_modes": [
+            "preserved_snapshot_static_source",
+            "source_artifact_integration_audit"
+          ],
+          "runtime_environments": [],
+          "runtime_tested_this_sprint": false,
+          "original_source_scope": {
+            "track": "N006 World/Shard/ModRuntime practical static scope-to-ready",
+            "accepted_questions": [
+              "W01",
+              "W02",
+              "W03",
+              "W04",
+              "W05",
+              "W06",
+              "W07",
+              "W08"
+            ],
+            "in_scope": "Audit existing substantive eight questions, reverify named consumer interfaces and supply narrow original implementation examples",
+            "excluded": "whole-track catalog expansion, spatial helper batch, unrelated mod configuration, native engines, runtime acceptance and canonical integration"
+          },
+          "original_projection": {
+            "id": "N006-READY-F02",
+            "title": "WorldState 的精确回调接收者、函数身份与已有键恢复",
+            "questions": [
+              "W02",
+              "W06"
+            ],
+            "load_when": "观察季节/昼夜/天气状态，或初始化自定义已有键时",
+            "source_contract": [
+              "inst:WatchWorldState(var, fn) 登记 (var, inst, fn, target=inst)；组件 WatchWorldState(var, fn) 登记 (var, component.inst, fn, target=component)。相应 Stop 方法传入同一 target。",
+              "AddWatcher(var, inst, fn, target) 追加 {fn, target}，注册时不调用 fn。普通更新调用 fn(target, val)；明确 togglename 的 start/stop 更新调用 fn(target)，不传 val。",
+              "SetVariable 仅在 val ~= nil 且不同于当前 data[var] 时更新。直接 state 赋值绕过这个局部函数。并非每个变量都有 toggle producer。",
+              "RemoveWatcher(var, inst, fn, target) 在 fn 非 nil 时删除函数身份匹配项；target 非 nil 时还要求 target 相同。fn=nil 则删除该变量下整个实体分组。",
+              "OnSave 浅拷贝当前 self.data 全部键。OnLoad 仅接受当前 self.data[k] ~= nil 的键，直接赋值而不调用 watcher；false 是已存在，nil 不是。",
+              "AddComponentPostInit(\"worldstate\", fn) 在 AddComponent 内运行，早于 MakeWorld 的 inst.state = inst.components.worldstate.data。该 Hook 应使用 loadedcmp.data；稍后的 prefab Hook 才能使用别名。"
+            ],
+            "positive_result": "符合条件的 producer 变化会调用 handler，并传入选定实体/组件 target。当前值初始化需显式执行；预先建立的自定义键可恢复，但不会因此获得 producer 或 shard 传输。",
+            "branches": [
+              "注册时不立即回调",
+              "相同值或 val=nil 不触发更新回调",
+              "普通与 start/stop 回调参数形状不同",
+              "只移除组件时调用 OnRemoveFromEntity，没有通用 watcher 全量清理",
+              "整个实体 Remove 先 StopAllWatchingWorldStates，再组件 OnRemoveEntity"
+            ],
+            "evidence_ids": [
+              "E02",
+              "E03",
+              "E10",
+              "E11",
+              "E12",
+              "E13",
+              "E14",
+              "E15",
+              "E16",
+              "E17"
+            ],
+            "reuse_ids": [
+              "VANILLA-HOOK-008",
+              "N006-WR-002",
+              "N006-WR-003"
+            ],
+            "recommendation": "Stop 保留原函数对象与原 receiver；组件可独立拆除时，在 OnRemoveFromEntity 成对撤销。按照真实依赖已就绪的阶段显式应用一次当前状态。",
+            "recommendation_kind": "EngineeringRecommendation_NotEngineFact"
+          },
+          "projection_preserved_exact_as_json_value": true,
+          "selected_questions": [
+            "W02",
+            "W06"
+          ],
+          "original_positive_result": "符合条件的 producer 变化会调用 handler，并传入选定实体/组件 target。当前值初始化需显式执行；预先建立的自定义键可恢复，但不会因此获得 producer 或 shard 传输。",
+          "original_branches": [
+            "注册时不立即回调",
+            "相同值或 val=nil 不触发更新回调",
+            "普通与 start/stop 回调参数形状不同",
+            "只移除组件时调用 OnRemoveFromEntity，没有通用 watcher 全量清理",
+            "整个实体 Remove 先 StopAllWatchingWorldStates，再组件 OnRemoveEntity"
+          ],
+          "whole_N006_ready": false,
+          "original_examples_are_REC_only": true,
+          "original_predecessor_projections": [
+            {
+              "id": "N006-WC-02",
+              "title": "WorldState 作为观察入口，初始化当前值另做",
+              "question_ids": [
+                "W02"
+              ],
+              "kind": "EngineeringRecommendation",
+              "recommendation": "使用 WatchWorldState(var, fn) 观察已有生产者；按 hook/load 阶段读取当前 TheWorld.state[var] 并初始化一次，保留同一 fn identity 以 StopWatchingWorldState(var, fn) 清理。Mod 自己的真值优先写到有显式 OnSave/OnLoad 的组件，并另设计通知与跨 shard mirror。",
+              "reviewer_fact_ids": [
+                "N006-WR-002",
+                "N006-WR-003"
+              ],
+              "reuse_ids": [
+                "VANILLA-HOOK-008"
+              ],
+              "code_critical": "entity watcher 回调 target 是 entity；component watcher target 是 component。普通 fn(target, val)，start/stop fn(target)。注册不会立即回调；OnLoad 直接赋值也不回放 watcher。",
+              "avoid": "给 state[key] 赋值就期待 watcher、netvar 或跨 shard 自动通知；说所有额外键都绝对无法恢复。"
+            }
+          ]
+        },
+        "does_not_prove": [
+          "本轮只做已提供材料的静态治理整合；没有执行游戏、Lua Runtime、MicroEval 或新 Deep Dive。",
+          "NSF 仅指所载 snapshot/commit、具名调用者和实际端别；不声称当前安装版与所载快照相同。",
+          "canonical 是有界研究知识接纳；coding_status=hold，不进入默认 Coding。",
+          "建议、原创样例、历史评测标签和静态审核通过都不等于 Runtime 行为。",
+          "world/writer 本地保存入口不等于全服权威、原生送达或磁盘事务。"
+        ],
+        "correction_refs": []
+      },
+      "complete_claims": [
+        {
+          "pointer": "/entries/35/claims/5",
+          "atom": {
+            "kind": "NSF",
+            "statement": "AddComponentPostInit(\"worldstate\", fn) 在 AddComponent 内运行，早于 MakeWorld 的 inst.state = inst.components.worldstate.data。该 Hook 应使用 loadedcmp.data；稍后的 prefab Hook 才能使用别名。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/coding_facets/1/source_contract/5"
+              },
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/citations/E02"
+              },
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/citations/E03"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "N006-READY-F03",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/data/nativecore/native-core.json",
+      "original_file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "catalog_pointer": "/entries/36",
+      "catalog_record": {
+        "id": "N006-READY-F03",
+        "title": "按明确依赖选择 world Hook 与加载阶段",
+        "family": "native_core",
+        "file": "data/nativecore/native-core.json",
+        "pointer": "/entries/36",
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "native-core-governance/1",
+        "version": "1.1.1"
+      },
+      "parent_context": {
+        "id": "N006-READY-F03",
+        "title": "按明确依赖选择 world Hook 与加载阶段",
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold",
+        "scope": {
+          "snapshot_id": "sha256:95441ea7453492f08e02aab6331f057ef66e351901c786b87229f0f25669e918",
+          "source_repository": "Zechariah0121/dst-scripts",
+          "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+          "evidence_modes": [
+            "preserved_snapshot_static_source",
+            "source_artifact_integration_audit"
+          ],
+          "runtime_environments": [],
+          "runtime_tested_this_sprint": false,
+          "original_source_scope": {
+            "track": "N006 World/Shard/ModRuntime practical static scope-to-ready",
+            "accepted_questions": [
+              "W01",
+              "W02",
+              "W03",
+              "W04",
+              "W05",
+              "W06",
+              "W07",
+              "W08"
+            ],
+            "in_scope": "Audit existing substantive eight questions, reverify named consumer interfaces and supply narrow original implementation examples",
+            "excluded": "whole-track catalog expansion, spatial helper batch, unrelated mod configuration, native engines, runtime acceptance and canonical integration"
+          },
+          "original_projection": {
+            "id": "N006-READY-F03",
+            "title": "按明确依赖选择 world Hook 与加载阶段",
+            "questions": [
+              "W03",
+              "W06"
+            ],
+            "load_when": "安装 world 组件，或读取地图、已保存实体引用、net/shard 数据、快照玩家时",
+            "source_contract": [
+              "AddPrefabPostInit(prefab, fn) 登记 fn(inst)。SpawnPrefabFromSim 调用 prefab.fn(TheSim) 后，先实际名专属 Hook，再在名称不同时调用请求名专属 Hook，最后 PrefabPostInitAny；所示路径没有 mastersim 筛选。",
+              "AddComponentPostInit(component, fn) 在新组件构造后、AddComponent 返回前调用 fn(loadedcmp, inst)。AddPlayerPostInit(fn) 包装 PrefabPostInitAny，只检查 inst 非 nil 与 player 标签。AddClassPostConstruct(package, postfn) require 出 class table 后替换 _ctor，先调用原 constructor(self, ...)，再 postfn(self, ...)；不重访已有实例。",
+              "MakeWorld 将实际 prefab 名设置为 world。forest 请求因此可能在同一实例上触发 world 与 forest 两套回调。这是两个匹配名称，不是两个世界 ready 阶段。",
+              "PopulateWorld 先创建 world，之后 map:SetSize；worldmapsetsize 携带 {width, height}。map.persistdata 的恢复早于 mastersim world_network/shard_network 的创建与恢复。",
+              "全部 SpawnSaveRecord 后，先实体 LoadPostPass，再 world:LoadPostPass(newents, map.persistdata)。无 global_error_widget 的正常分支中，ModManager:SimPostInit(nil) 早于 TheWorld:PostInit，随后才恢复快照玩家。",
+              "World PostInit 先在 net 存在时调用 net:PostInit，再 LongUpdate(0)，再以 pairs 调 world 组件 OnPostInit；没有规定组件总序。",
+              "shard_network 独立安排 DoTaskInTime(0, PostInit)。其回调先 LongUpdate(0)、FlushLocalDirtyNetVars，再以 pairs 调组件 OnPostInit；World:PostInit 不直接调用它。"
+            ],
+            "positive_result": "world prefab Hook 可及时安装组件，使其进入所观察的恢复路径。地图/引用/world-network/player 等依赖需要各自真实阶段，不能推断统一 global-ready。",
+            "branches": [
+              "mastersim-only 安装是 Mod 决策，不是 PrefabPostInit 内建过滤",
+              "map persistdata 可能不存在，届时跳过 OnLoad",
+              "所示路径仅在 world.ismastersim 下创建 net/shard",
+              "SimPostInit 的参数为 nil，且仅处于无错误分支",
+              "零延时 task 是延期执行，不属于同一调用栈"
+            ],
+            "evidence_ids": [
+              "E18",
+              "E19",
+              "E20",
+              "E21",
+              "E22",
+              "E41",
+              "E42",
+              "E43",
+              "E44",
+              "E45",
+              "E46"
+            ],
+            "reuse_ids": [
+              "VANILLA-HOOK-001",
+              "VANILLA-HOOK-002",
+              "VANILLA-HOOK-003",
+              "VANILLA-HOOK-006",
+              "VANILLA-WORLD-002",
+              "N006-WR-008",
+              "N006-WR-009"
+            ],
+            "recommendation": "在所需构造 Hook 安装一次，只按真实依赖推迟工作。需要时检查依赖是否存在或明确协调即可；本 facet 不默认要求 ready-ack/token 框架。",
+            "recommendation_kind": "EngineeringRecommendation_NotEngineFact"
+          },
+          "projection_preserved_exact_as_json_value": true,
+          "selected_questions": [
+            "W03",
+            "W06"
+          ],
+          "original_positive_result": "world prefab Hook 可及时安装组件，使其进入所观察的恢复路径。地图/引用/world-network/player 等依赖需要各自真实阶段，不能推断统一 global-ready。",
+          "original_branches": [
+            "mastersim-only 安装是 Mod 决策，不是 PrefabPostInit 内建过滤",
+            "map persistdata 可能不存在，届时跳过 OnLoad",
+            "所示路径仅在 world.ismastersim 下创建 net/shard",
+            "SimPostInit 的参数为 nil，且仅处于无错误分支",
+            "零延时 task 是延期执行，不属于同一调用栈"
+          ],
+          "whole_N006_ready": false,
+          "original_examples_are_REC_only": true,
+          "original_predecessor_projections": [
+            {
+              "id": "N006-WC-03",
+              "title": "安装器幂等与 teardown 按真实生命周期写",
+              "question_ids": [
+                "W06"
+              ],
+              "kind": "EngineeringRecommendation",
+              "recommendation": "先按所需实例/组件/class 阶段选 Hook，再把安装 guard 放到实际持有对象上；同一实例多个安装机会用明确 guard，记录 listener/world watcher/task identity，组件移除与实体移除各写匹配的清理入口。包装方法必须保存旧方法、保留原参数/返回值，选择真实运行入口而非假设某个 Hook 等于该方法执行。",
+              "reviewer_fact_ids": [
+                "N006-WR-007",
+                "N006-WR-008"
+              ],
+              "reuse_ids": [
+                "VANILLA-HOOK-001",
+                "VANILLA-HOOK-002",
+                "VANILLA-HOOK-003",
+                "VANILLA-HOOK-004",
+                "VANILLA-HOOK-005",
+                "VANILLA-HOOK-006",
+                "VANILLA-HOOK-007"
+              ],
+              "code_critical": "AddPrefabPostInit(prefab, fn); AddComponentPostInit(component, fn) 执行 fn(loadedcmp, inst); AddPlayerPostInit(fn) 仅 player tag；AddClassPostConstruct(package, postfn) 先旧 ctor 后 postfn。RemoveComponent→OnRemoveFromEntity，Entity Remove→组件 OnRemoveEntity，不是同名入口。",
+              "avoid": "重复注册依赖框架去重；world 与 forest 同安装器无 guard；ClassPostConstruct 假装修改已有实例或包裹未来任意方法调用。"
+            },
+            {
+              "id": "N006-WC-04",
+              "title": "把 world 构造、恢复与完成初始化分开",
+              "question_ids": [
+                "W03",
+                "W06"
+              ],
+              "kind": "EngineeringRecommendation",
+              "recommendation": "PrefabPostInit 用于实例构造后的接入；需要 map 尺寸/已恢复 entity refs/其他组件状态时使用目标 world/component 明确阶段，不假设构造 hook 已经 LoadPostPass/World:PostInit。依赖顺序用显式协议，而非 pairs 总序；shard_network 有独立零延时 PostInit 任务。",
+              "reviewer_fact_ids": [
+                "N006-WR-008",
+                "N006-WR-009"
+              ],
+              "reuse_ids": [
+                "VANILLA-WORLD-002",
+                "VANILLA-HOOK-006"
+              ],
+              "code_critical": "OnLoad 不是 LoadPostPass；World 组件 OnPostInit 按 pairs 调用。DoTaskInTime(0, fn) 在后续 tick，不是同步 fn。",
+              "avoid": "把晚安装 AddPrefabPostInit 当现有 world 扫描/补初始化。"
+            }
+          ],
+          "source_scopes": [
+            {
+              "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+              "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+              "source_commit": null,
+              "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+              "game_version": "759671",
+              "steam_buildid": "26148036",
+              "scope_ref": {
+                "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+                "sha256": "1b9cda619e402240b9bc433a5e2b809140f227e42708b8046333360c98bae123",
+                "pointer": "/source_scope"
+              },
+              "runtime_verified": false,
+              "applies_to": "Only new or replaced claim pointers referencing this source artifact; legacy scopes retain their original identities."
+            },
+            {
+              "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+              "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+              "source_commit": null,
+              "game_version": "759671",
+              "steam_buildid": "26148036",
+              "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+              "scope_ref": {
+                "artifact_path": "research/native-core/sources/e5d1ce11f3fd2433-whole-claims-759671-declaration-enclosure.json",
+                "sha256": "b5b5217924d52d8f887da4ec2ad1b8b0f4ce9650a9e42ae0a250de91f772e659",
+                "pointer": "/source_scope"
+              },
+              "runtime_verified": false,
+              "applies_to": "Only exact current claims referencing the whole fact nodes in this artifact."
+            }
+          ]
+        },
+        "does_not_prove": [
+          "本轮只做已提供材料的静态治理整合；没有执行游戏、Lua Runtime、MicroEval 或新 Deep Dive。",
+          "NSF 仅指所载 snapshot/commit、具名调用者和实际端别；不声称当前安装版与所载快照相同。",
+          "canonical 是有界研究知识接纳；coding_status=hold，不进入默认 Coding。",
+          "建议、原创样例、历史评测标签和静态审核通过都不等于 Runtime 行为。",
+          "world/writer 本地保存入口不等于全服权威、原生送达或磁盘事务。"
+        ],
+        "correction_refs": [
+          {
+            "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+            "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+            "pointer": "/sample_execution_context_revision"
+          },
+          {
+            "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+            "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+            "pointer": "/reviewer_evidence/6"
+          },
+          {
+            "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+            "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+            "pointer": "/reviewer_evidence/7"
+          }
+        ]
+      },
+      "complete_claims": [
+        {
+          "pointer": "/entries/36/claims/1",
+          "atom": {
+            "kind": "NSF",
+            "statement": "AddComponentPostInit(component, fn) 在新组件构造后、AddComponent 返回前调用 fn(loadedcmp, inst)。AddPlayerPostInit(fn) 包装 PrefabPostInitAny，只检查 inst 非 nil 与 player 标签。AddClassPostConstruct(package, postfn) require 出 class table 后替换 _ctor，先调用原 constructor(self, ...)，再 postfn(self, ...)；不重访已有实例。",
+            "evidence_refs": [
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/coding_facets/2/source_contract/1"
+              },
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/citations/E03"
+              },
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/citations/E22"
+              },
+              {
+                "artifact_path": "research/native-core/sources/8d8aaf29f290b94b-world-ready-research.json",
+                "sha256": "5850bb36fa23fa4e9b73e865af10934605ac741b129e954d863f42dbd73dfcc6",
+                "pointer": "/citations/E46"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "EXP-COOK-004",
+      "purpose": "historical_dedup_only_not_current_source_evidence",
+      "original_file": "knowledge/research/native-mechanisms/cooking-39f19e255b6d.json",
+      "original_file_sha256": "39f19e255b6daa103177ef8d3bea5cf4d556beee4efe1509ee95dfdd408c323b",
+      "catalog_pointer": "/entries/3",
+      "catalog_record": {
+        "id": "EXP-COOK-004",
+        "title": "Stewer 收获、停止、烧毁与组件移除边界",
+        "family": "native_mechanism",
+        "file": "research/native-mechanisms/cooking-39f19e255b6d.json",
+        "pointer": "/entries/3",
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      },
+      "top_identity_and_limitations": {
+        "schema_version": "dst-mechanism-research/1",
+        "source_epoch": "759671",
+        "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+        "limitations": [
+          "所有条目research/restricted/hold，NOT_RUN；候选格式/哈希通过不授予Coding，不等同语义审查或游戏运行。",
+          "759671绑定本轮证据。文件哈希对ZIP成员原始字节，行段按UTF-8 splitlines/含两端/LF拼接/无末尾LF计算。没有复制完整游戏Lua。",
+          "只闭合cooking/stewer与原版cookpot、portablespicer、preparedfoods的所引链，meatballs及其spice_salt为具名消费者；不穷举菜谱，不扩成完整eater/edible系统。",
+          "local GetIngredientValues、dostew/dospoil、MakePreparedFood、MakeSpice及prefab回调不是Mod公共API。由模块返回表显式导出的local实现按module export标明；modutil env包装与原始全局注册函数分开。",
+          "未知native：定时任务/睡眠/长更新时间顺序、SpawnPrefab资源、网络RPC/客户端、物理/音效/动画；buff叠加/持续/存档/清理不在本候选闭环。",
+          "逐claim/API/step有本文件引用。compatibility只枚举直接引用，dependency_coverage=unknown，不伪称静态传递/native依赖完整。新ZIP compare/list/show不因版本不同关闭阅读或定位。",
+          "盐读取链只证明当前HEALTH加法系数和腐败规则，不保证最终生命变化；eater吸收、custom_stats_mod_fn与健康状态仍可改变实际结果。",
+          "工具边界用原创合成Lua测试，不是料理Lua或游戏运行；自然语言/符号/负例查询为候选预期，不宣称已接入安装MCP或实测检索召回。",
+          "技能已按任务查MCP reviewer compact bundle，实际返回no_admitted_catalog_match；该检索缺口不证明全库无知识，也未借未读旧记录给新声明背书。事实来自合法本地ZIP核对。"
+        ]
+      },
+      "complete_entry": {
+        "id": "EXP-COOK-004",
+        "title": "Stewer 收获、停止、烧毁与组件移除边界",
+        "aliases": [
+          "Stewer:Harvest",
+          "Stewer:StopCooking",
+          "OnRemoveFromEntity",
+          "DefaultBurntStructureFn",
+          "learncookbookrecipe",
+          "收获失败清理"
+        ],
+        "engineering_question": "完成品何时真正生成，生成失败会不会留在锅里；停止/烧毁/移除是否退款并恢复容器？",
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold",
+        "scope": {
+          "source_epoch": "759671",
+          "runtime_status": "not_run",
+          "side": "基础数据函数无统一端别防护；所引锅/调味站/产品组件在mastersim构造；UI含客户端提示/RPC分支，未验证联网",
+          "bounds": [
+            "stewer Harvest/StopCooking/OnRemoveFromEntity完整方法，cookpot/spicer具名烧毁/锤击/拆卸消费者。",
+            "不推广到所有结构或把EntityScript.RemoveComponent视为通用资源取消；只陈述所引Lua显式清理。",
+            "GetRecipe所得stacksize/perish等需要实际成品相应组件，未研究全部产品/背包溢出行为。"
+          ]
+        },
+        "claims": [
+          {
+            "id": "EXP-COOK-004-NSF-01",
+            "kind": "NSF",
+            "statement": "Harvest只在done truthy时运行，先onharvest，再为非nil product SpawnPrefab；生成成功才查询recipe、图鉴条件、堆叠、新鲜度和交付。即使SpawnPrefab返回nil，仍清product，取消task/清计时与done并开放container，最后return true；未done则无显式返回。",
+            "evidence_refs": [
+              "COOK-S021"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-NSF-02",
+            "kind": "NSF",
+            "statement": "成功生成后，recipe.stacksize>1时直接调用loot.components.stackable:SetStackSize；有spoiltime且产物perishable时设百分比product_spoilage*(GetTimeToSpoil()/spoiltime)并StartPerishing。harvester有inventory则GiveItem，否则LaunchAt。图鉴事件还要求chef_id匹配harvester.userid且对应category/product已在cookbook_recipes。",
+            "evidence_refs": [
+              "COOK-S005",
+              "COOK-S016",
+              "COOK-S021"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-NSF-03",
+            "kind": "NSF",
+            "statement": "StopCooking取消task；product非nil且reason恰为'fire'时尝试生成当前product并定位、安排0时刻StopProductPhysics，不要求done且不带入product_spoilage/stacksize。随后清product/product_spoilage/spoiltime/targettime/done；不开放container，也不调用onharvest或退原料，chef/ingredient元数据未清。",
+            "evidence_refs": [
+              "COOK-S018"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-NSF-04",
+            "kind": "NSF",
+            "statement": "Stewer.OnRemoveFromEntity只移除stewer/donecooking/readytocook三个标签，没有Cancel task或RemoveEventCallback。所引EntityScript.RemoveComponent会停止组件更新、从components表取下并调用OnRemoveFromEntity、移除replica/actions，未显式取消该实例DoTaskInTime任务或上述实体事件监听。",
+            "evidence_refs": [
+              "COOK-S013",
+              "COOK-S017",
+              "COOK-S053"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-NSF-05",
+            "kind": "NSF",
+            "statement": "cookpot用MakeMediumBurnable(...,structure=true)接DefaultBurntStructureFn；该函数先Drop/Close并移除container，再StopCooking('fire')并移除stewer。spicer.OnBurnt也调用此默认函数，再处理碰撞/灰烬/拆卸组件和退场。普通锅锤击与spicer.ChangeToItem仅在product非nil且done时Harvest；烹饪中不走该收获条件。",
+            "evidence_refs": [
+              "COOK-S018",
+              "COOK-S026",
+              "COOK-S027",
+              "COOK-S031",
+              "COOK-S032",
+              "COOK-S042",
+              "COOK-S044",
+              "COOK-S045",
+              "COOK-S052"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-EI-01",
+            "kind": "EI",
+            "statement": "Harvest的true表示走完完成状态清理，不证明实际产物生成/进入背包或图鉴解锁；StopCooking也不是退款/重置容器的总开关。任意直接移除stewer不能借原版烧毁先Stop的顺序推为已安全取消。",
+            "evidence_refs": [
+              "COOK-S013",
+              "COOK-S018",
+              "COOK-S021",
+              "COOK-S031",
+              "COOK-S053"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-REC-01",
+            "kind": "REC",
+            "statement": "自定义取消/换组件先明确产品丢弃、原料补偿、任务、事件和容器恢复的所有者；按实际所持任务/状态清理，验证生成失败、坏stacksize、烧毁与收获回调重入，不直接把Harvest真当发奖成功。",
+            "evidence_refs": [
+              "COOK-S013",
+              "COOK-S017",
+              "COOK-S018",
+              "COOK-S021",
+              "COOK-S023",
+              "COOK-S031",
+              "COOK-S053"
+            ]
+          },
+          {
+            "id": "EXP-COOK-004-UNK-01",
+            "kind": "UNK",
+            "statement": "SpawnPrefab失败后的native资源、GiveItem背包满的后续处理、LaunchAt物理、实体销毁自动任务处理和onharvest重入均未游戏验证；不承诺烧毁生成品的画面或每种食物资产/Physics存在。",
+            "evidence_refs": [
+              "COOK-S018",
+              "COOK-S021",
+              "COOK-S031",
+              "COOK-S042",
+              "COOK-S044",
+              "COOK-S052",
+              "COOK-S053"
+            ]
+          }
+        ],
+        "api_contracts": [
+          {
+            "symbol": "Stewer:Harvest",
+            "source_file": "scripts/components/stewer.lua",
+            "visibility": "Lua method; no stable external API guarantee",
+            "parameters": {
+              "receiver": "components.stewer（原版mastersim组件）",
+              "arguments": {
+                "harvester": "可nil；有inventory则给物品，否则抛出；userid还参与chef匹配"
+              }
+            },
+            "returns": "done truthy分支末尾true，即使product为空或SpawnPrefab失败；未done返回nil。",
+            "preconditions": "完成状态；stacksize>1需生成物有stackable；保鲜路径需有效product_spoilage/spoiltime；相关回调不得破坏后续假设。",
+            "side_effects": "onharvest先调用；SpawnPrefab后可图鉴事件/堆叠/新鲜度/交付；清产品、取消task、清状态并开放container。",
+            "lifecycle": {
+              "sequence": "消耗完成品状态；不会重建原料；未清chef_id/ingredient_prefabs。",
+              "failure_and_cleanup": "Spawn失败仍清空成功返回；回调/组件缺失/算术错误无回滚，GiveItem结果未检查。"
+            },
+            "evidence_refs": [
+              "COOK-S005",
+              "COOK-S016",
+              "COOK-S021"
+            ],
+            "unknowns": [
+              "背包溢出、重入、资源与联网未运行。"
+            ]
+          },
+          {
+            "symbol": "Stewer:StopCooking",
+            "source_file": "scripts/components/stewer.lua",
+            "visibility": "Lua method; no stable external API guarantee",
+            "parameters": {
+              "receiver": "components.stewer",
+              "arguments": {
+                "reason": "只有字面值'fire'会尝试生成当前产品；其他值只停/清"
+              }
+            },
+            "returns": "无显式返回。",
+            "preconditions": "任务如有需支持Cancel；fire产品应可Spawn且具Transform/Physics供后续函数使用。",
+            "side_effects": "取消task；fire可Spawn当前产品；清主要烹饪/保鲜字段。",
+            "lifecycle": {
+              "sequence": "既可停烹饪也可停完成品腐败；不要求done，不重开container，不清chef元数据。",
+              "failure_and_cleanup": "fire生成失败继续清空；不退款、不恢复显示/容器；异步StopProductPhysics假设Physics。"
+            },
+            "evidence_refs": [
+              "COOK-S018",
+              "COOK-S031"
+            ],
+            "unknowns": [
+              "所有自定义产品及火灾时序未运行。"
+            ]
+          },
+          {
+            "symbol": "Stewer:OnRemoveFromEntity",
+            "source_file": "scripts/components/stewer.lua",
+            "visibility": "component lifecycle hook, not a complete cancellation API",
+            "parameters": {
+              "receiver": "被EntityScript取下的Stewer实例",
+              "arguments": {}
+            },
+            "returns": "无显式返回。",
+            "preconditions": "由RemoveComponent生命周期调用；inst仍可RemoveTag。",
+            "side_effects": "仅移除stewer/donecooking/readytocook标签。",
+            "lifecycle": {
+              "sequence": "不等同StopCooking；不显式取消task或移除构造时注册的事件。",
+              "failure_and_cleanup": "不能据此保证无悬挂定时任务/事件；原版烧毁是先Stop再Remove。"
+            },
+            "evidence_refs": [
+              "COOK-S013",
+              "COOK-S017",
+              "COOK-S031",
+              "COOK-S053"
+            ],
+            "unknowns": [
+              "实体native销毁自动清理与任意直接移除组件未运行。"
+            ]
+          }
+        ],
+        "mechanism_steps": [
+          {
+            "step": 1,
+            "description": "完成品仅作为product字符串保留在组件；Harvest在done时才生成实体并处理元数据。",
+            "evidence_refs": [
+              "COOK-S015",
+              "COOK-S021"
+            ]
+          },
+          {
+            "step": 2,
+            "description": "新鲜度/堆叠/图鉴各有前提，生成失败仍会清空完成状态；交付成功需另查。",
+            "evidence_refs": [
+              "COOK-S005",
+              "COOK-S016",
+              "COOK-S021"
+            ]
+          },
+          {
+            "step": 3,
+            "description": "StopCooking取消任务和主要状态；fire分支另外生成当前product，不退原料/不重开容器。",
+            "evidence_refs": [
+              "COOK-S018"
+            ]
+          },
+          {
+            "step": 4,
+            "description": "原版烧毁先移容器再Stop/移stewer，OnRemoveFromEntity自身只清标签；不能外推任意移组件安全。",
+            "evidence_refs": [
+              "COOK-S013",
+              "COOK-S026",
+              "COOK-S027",
+              "COOK-S031",
+              "COOK-S032",
+              "COOK-S044",
+              "COOK-S045",
+              "COOK-S053"
+            ]
+          }
+        ],
+        "unknowns": [
+          "EXP-COOK-004-UNK-01"
+        ],
+        "compatibility": {
+          "dependency_coverage": "unknown",
+          "dependency_refs": [
+            {
+              "ref": "COOK-S005",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-02"
+              ]
+            },
+            {
+              "ref": "COOK-S013",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-04",
+                "EXP-COOK-004-EI-01",
+                "EXP-COOK-004-REC-01"
+              ]
+            },
+            {
+              "ref": "COOK-S015",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": []
+            },
+            {
+              "ref": "COOK-S016",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-02"
+              ]
+            },
+            {
+              "ref": "COOK-S017",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-04",
+                "EXP-COOK-004-REC-01"
+              ]
+            },
+            {
+              "ref": "COOK-S018",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-03",
+                "EXP-COOK-004-NSF-05",
+                "EXP-COOK-004-EI-01",
+                "EXP-COOK-004-REC-01",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S021",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-01",
+                "EXP-COOK-004-NSF-02",
+                "EXP-COOK-004-EI-01",
+                "EXP-COOK-004-REC-01",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S023",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-REC-01"
+              ]
+            },
+            {
+              "ref": "COOK-S026",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05"
+              ]
+            },
+            {
+              "ref": "COOK-S027",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05"
+              ]
+            },
+            {
+              "ref": "COOK-S031",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05",
+                "EXP-COOK-004-EI-01",
+                "EXP-COOK-004-REC-01",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S032",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05"
+              ]
+            },
+            {
+              "ref": "COOK-S042",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S044",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S045",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05"
+              ]
+            },
+            {
+              "ref": "COOK-S052",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-05",
+                "EXP-COOK-004-UNK-01"
+              ]
+            },
+            {
+              "ref": "COOK-S053",
+              "role": "direct cited Lua evidence; transitive/native closure unknown",
+              "claim_ids": [
+                "EXP-COOK-004-NSF-04",
+                "EXP-COOK-004-EI-01",
+                "EXP-COOK-004-REC-01",
+                "EXP-COOK-004-UNK-01"
+              ]
+            }
+          ],
+          "unknowns": [
+            "直接来源关联不等于传递依赖枚举完整；版本变化逐引用/逐单元待复核，保留知识阅读和新源码导航。"
+          ]
+        }
+      },
+      "used_old_reference_metadata": [
+        {
+          "id": "COOK-S005",
+          "source_file": "scripts/cooking.lua",
+          "file_sha256": "40d5710ff004973841fa482637a55b10cd9ee81d72d1fe771cbe0767a74d7063",
+          "line_start": 217,
+          "line_end": 236,
+          "range_sha256": "2f21349be4b3acb7abcdfcdb482e41cedd31aaa2edfb11867bf07287ae5701d6",
+          "symbols": [
+            "GetIngredientValues",
+            "GetRecipe"
+          ]
+        },
+        {
+          "id": "COOK-S013",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 3,
+          "line_end": 63,
+          "range_sha256": "b79e95fbf4dc171fdd519677860a8008d032c439a891857dd9de70e2d7e10e42",
+          "symbols": [
+            "ondone",
+            "oncheckready",
+            "onnotready",
+            "Stewer",
+            "Stewer:OnRemoveFromEntity"
+          ]
+        },
+        {
+          "id": "COOK-S015",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 75,
+          "line_end": 100,
+          "range_sha256": "7cfa1fdc9e9eb3ff37b9ed4bac5a06e8b9130535edc815ded864de035c4ef0c2",
+          "symbols": [
+            "dostew"
+          ]
+        },
+        {
+          "id": "COOK-S016",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 102,
+          "line_end": 128,
+          "range_sha256": "f3af6eb3c50c0c497105550967ac2155fec149ff7cd9c327f3d0a7ada5b808a2",
+          "symbols": [
+            "Stewer:IsDone",
+            "Stewer:IsSpoiling",
+            "Stewer:IsCooking",
+            "Stewer:GetTimeToCook",
+            "Stewer:GetTimeToSpoil",
+            "Stewer:CanCook",
+            "Stewer:GetRecipeForProduct"
+          ]
+        },
+        {
+          "id": "COOK-S017",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 130,
+          "line_end": 178,
+          "range_sha256": "66eff349a69ae0366a036b0f9e5e15dde545ca998dccf298870544599369b75e",
+          "symbols": [
+            "Stewer:StartCooking"
+          ]
+        },
+        {
+          "id": "COOK-S018",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 180,
+          "line_end": 201,
+          "range_sha256": "c7a975159732ba5addb0f6d835c6b5b66f474be88091dd8ae0f1b25103d9c5f2",
+          "symbols": [
+            "StopProductPhysics",
+            "Stewer:StopCooking"
+          ]
+        },
+        {
+          "id": "COOK-S021",
+          "source_file": "scripts/components/stewer.lua",
+          "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+          "line_start": 276,
+          "line_end": 330,
+          "range_sha256": "e2875714f1eba1aee1a5eaf0533691ae0cfa61bb89c0f96098174ccead01dd6d",
+          "symbols": [
+            "Stewer:Harvest"
+          ]
+        },
+        {
+          "id": "COOK-S023",
+          "source_file": "scripts/components/container.lua",
+          "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+          "line_start": 330,
+          "line_end": 342,
+          "range_sha256": "8a244963cb45e4cd66ba7951933b78aa09458cc269591635d4f1071c1932f552",
+          "symbols": [
+            "Container:DestroyContents"
+          ]
+        },
+        {
+          "id": "COOK-S026",
+          "source_file": "scripts/prefabs/cookpot.lua",
+          "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+          "line_start": 301,
+          "line_end": 322,
+          "range_sha256": "7997091cc0a37b08296a2f8c42b4836cc4726f2771ade572a0d9ec2faa08afaa",
+          "symbols": [
+            "MakeCookPot"
+          ]
+        },
+        {
+          "id": "COOK-S027",
+          "source_file": "scripts/prefabs/cookpot.lua",
+          "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+          "line_start": 342,
+          "line_end": 361,
+          "range_sha256": "b3a9e3a8f914f29af87cd1b2a63e2f2684b76644f4d9873264ed5afebc8240aa",
+          "symbols": [
+            "MakeCookPot"
+          ]
+        },
+        {
+          "id": "COOK-S031",
+          "source_file": "scripts/standardcomponents.lua",
+          "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+          "line_start": 52,
+          "line_end": 130,
+          "range_sha256": "d95151b75ef7829798dda58de98ef81ca6fcbac7f9254e20c910e8d787cdfb57",
+          "symbols": [
+            "DefaultBurntStructureFn"
+          ]
+        },
+        {
+          "id": "COOK-S032",
+          "source_file": "scripts/standardcomponents.lua",
+          "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+          "line_start": 176,
+          "line_end": 186,
+          "range_sha256": "4f0986c776c3ef7d23947a012910385addafa77a64de342cacb3a63dd8e12c7c",
+          "symbols": [
+            "MakeMediumBurnable"
+          ]
+        },
+        {
+          "id": "COOK-S042",
+          "source_file": "scripts/prefabs/portablespicer.lua",
+          "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+          "line_start": 38,
+          "line_end": 66,
+          "range_sha256": "db1bb99fef9d359bfe7618bade5fd2bf7d1c82b6be7dbbe77a9a286d2ee432ef",
+          "symbols": [
+            "ChangeToItem",
+            "onhammered"
+          ]
+        },
+        {
+          "id": "COOK-S044",
+          "source_file": "scripts/prefabs/portablespicer.lua",
+          "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+          "line_start": 200,
+          "line_end": 232,
+          "range_sha256": "b65424749df6df65509461be6f39b063e56d0d6e2336a0367e2f210ce9c2a007",
+          "symbols": [
+            "onsave",
+            "onload",
+            "OnDismantle",
+            "OnBurnt"
+          ]
+        },
+        {
+          "id": "COOK-S045",
+          "source_file": "scripts/prefabs/portablespicer.lua",
+          "file_sha256": "ef026e8b5f460e9ac02127dcc64c04c38f31f46fb4530c511219554974872e5c",
+          "line_start": 234,
+          "line_end": 310,
+          "range_sha256": "8f3ee0f05747e0074c3765be6dcab639d272a3a42afdcf6b379e1c504eb63748",
+          "symbols": [
+            "fn"
+          ]
+        },
+        {
+          "id": "COOK-S052",
+          "source_file": "scripts/prefabs/cookpot.lua",
+          "file_sha256": "01b937baa7ef0c797cf3e4ea69c92718fbf1e939a72d0ec7a2f0d3348abc12fd",
+          "line_start": 36,
+          "line_end": 51,
+          "range_sha256": "3cdec63c5a0f8feb2a924544c5db3707ccdbaab48ee6fd9d71a8f37a91eff468",
+          "symbols": [
+            "onhammered"
+          ]
+        },
+        {
+          "id": "COOK-S053",
+          "source_file": "scripts/entityscript.lua",
+          "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+          "line_start": 648,
+          "line_end": 663,
+          "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+          "symbols": [
+            "EntityScript:RemoveComponent"
+          ]
+        }
+      ]
+    }
+  ],
+  "not_relieved": [
+    "Core Coding HOLD",
+    "research/restricted/hold",
+    "original snapshot identities",
+    "native and runtime unknowns"
+  ],
+  "old_review_artifacts_relied_on": [],
+  "excluded_partial_read": [
+    "EXP-GROW-001 oversized/truncated response is not relied on as a complete delivered old atom."
+  ]
+}

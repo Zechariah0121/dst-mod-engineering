@@ -1,0 +1,82 @@
+{
+  "schema_version": "independent-native-delta-review/1",
+  "campaign": "major-phase-20261106",
+  "reviewer_window": "D",
+  "revision": "final",
+  "candidate_artifact": "coordinator/frozen/event_replica_lifecycle-d095aaa0a869.json",
+  "candidate_sha256": "d095aaa0a869a52fe0fc51ebf72b0094d65ba685ba0c83114cdf916e7e678892",
+  "previous_review": {
+    "path": "windows/D/review.json",
+    "sha256": "8ca4c361f6139f442b0e24890c2cf04370e0c2a4ceb76675ac88b9250ad4905a",
+    "candidate_path": "coordinator/frozen/event_replica_lifecycle-4fdc3ea43ef0.json",
+    "candidate_sha256": "4fdc3ea43ef03d38371fd287528189f7a53c1f35f83d95ce31bab95996c0790d",
+    "original_bytes_preserved": true
+  },
+  "review_dependencies": [
+    {
+      "path": "windows/D/review.json",
+      "sha256": "8ca4c361f6139f442b0e24890c2cf04370e0c2a4ceb76675ac88b9250ad4905a",
+      "role": "完整初审；逐claim/API/step/ref及说明文档一致性结论由此继承"
+    },
+    {
+      "path": "windows/D/review-plan.json",
+      "sha256": "0b89ea28482ec15a5bfe8473f5374d4aa33fd94efa6dfcf741c4bf7ce1d9fbb8",
+      "role": "冻结独立准备计划；由初审显式绑定，依赖链保留"
+    }
+  ],
+  "verdict": "accept_for_restricted_static_research",
+  "runtime_verified": false,
+  "blockers": [],
+  "blocker_count": 0,
+  "nonblocking_findings": [],
+  "nonblocking_count": 0,
+  "delta_review": {
+    "status": "pass",
+    "method": "核验新旧候选与初审精确SHA；递归比较全部JSON键、类型、数组长度及值；另核原字节一次短语替换完全等于新候选。",
+    "recursive_diff": [
+      {
+        "pointer": "/entries/0/claims/2/statement",
+        "old": "同一个新闭包、错误listener或错误source不能替代原登记身份；没有异常回滚及对已快照调用的撤回。",
+        "new": "新建的同形闭包、错误listener或错误source不能替代原登记身份；没有异常回滚及对已快照调用的撤回。"
+      }
+    ],
+    "changed_json_atom_count": 1,
+    "single_raw_utf8_replacement_equals_new_candidate": true,
+    "finding_resolution": {
+      "id": "EL-NB-01",
+      "status": "closed",
+      "rationale": "新表述明确指新建而非原函数身份的同形闭包，消除初审指出的歧义；沿用已核RemoveListener/RemoveByValue按函数值匹配的源码依据。",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S03"
+      ]
+    },
+    "candidate_other_content_unchanged": true,
+    "new_native_reads_or_runtime_checks": "none; no new semantic dependency introduced"
+  },
+  "inherited_review_scope": {
+    "claims": 17,
+    "api_contracts": 8,
+    "mechanism_steps": 9,
+    "source_references": 25,
+    "inheritance": "继承初审在旧精确候选上的完整静态结论；唯一变更的EXP-LIFE-001-C03在本轮改为pass，原非阻断措辞问题关闭。",
+    "changed_claim": {
+      "id": "EXP-LIFE-001-C03",
+      "pointer": "/entries/0/claims/2",
+      "status": "pass",
+      "rationale": "新建的同形闭包仍不是原登记函数；错误listener/source及快照撤回限制均未改变。"
+    },
+    "governance": "所有research/restricted/hold、Scope、unknowns及runtime false均未变。",
+    "document_review": "仅继承初审绑定SHA为14a4ee9b9f17bc334d51dadd98597d4ae27f6806e58f2129eafd075e93aeb158的说明文档事实结论；本轮不声称复核后续链接或正文改动。"
+  },
+  "packaging_requirements": [
+    "本最终审阅依赖精确初审与计划；总控打包时保留其原字节及hash绑定。",
+    "保留旧/新候选或以精确SHA及本次唯一差异记录保证修订可追溯；不覆盖初审。",
+    "继续遵守初审的源码定位、旧知识Scope与说明文档版本边界；不交付原版Lua或私人机器路径。"
+  ],
+  "limitations": [
+    "本轮仅做精确候选diff与措辞delta审查；未重复整套原生研究或25段范围哈希循环。",
+    "接受限受限静态研究；不授予Coding默认准入、公共API稳定性或游戏/网络验证。"
+  ]
+}

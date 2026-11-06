@@ -1,0 +1,1126 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "event_replica_lifecycle",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-LIFE-001",
+      "title": "监听归属与按函数解绑的完整入口合同",
+      "aliases": [
+        "ListenForEvent",
+        "RemoveEventCallback",
+        "双向索引",
+        "重复订阅"
+      ],
+      "engineering_question": "谁拥有跨实体监听；重复登记如何解绑，错误身份/缺参数与当前派发边界是什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "仅逐引用Lua入口与列举调用者/消费者/清理链；非完整引擎或所有Mod合同。",
+        "excluded": "EXP-ARCH-001的PushEvent/SG/Brain合同不重写；双索引与快照只作为已有结论的依赖。新增两入口的参数/返回/重复与异常合同。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-001-C01",
+          "kind": "NSF",
+          "statement": "ListenForEvent无订阅句柄及fn校验，依次写两向列表；RemoveEventCallback先断言fn为function再对两向调用RemoveListener。",
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-001-C02",
+          "kind": "NSF",
+          "statement": "RemoveListener的RemoveByValue倒序移除全部等值函数；一次解绑可清除同一归属列表内的全部重复登记，而不是只消耗一次登记。",
+          "evidence_refs": [
+            "EL-S02",
+            "EL-S03"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-001-C03",
+          "kind": "EI",
+          "statement": "新建的同形闭包、错误listener或错误source不能替代原登记身份；没有异常回滚及对已快照调用的撤回。",
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S02",
+            "EL-S05"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-001-C04",
+          "kind": "NSF",
+          "statement": "container的Attach保存ondetachclassified闭包，以classified为source登记；Detach用相同身份移除，再清本地字段。",
+          "evidence_refs": [
+            "EL-S08"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-001-C05",
+          "kind": "REC",
+          "statement": "保存实际订阅身份并按拥有者清理；重复绑定若是错误，应在自己的生命周期入口防止，不能把解绑次数当引用计数。",
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S02",
+            "EL-S03",
+            "EL-S08"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:ListenForEvent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua方法；本范围见原版跨对象调用，不以冒号声明推导稳定公共API或所有端通用保证。",
+          "parameters": [
+            "self为监听归属实体；event为事件键；fn应是后续可调用且需保存身份的函数。",
+            "source可省略；Lua source or self也把false当缺省，源与监听者可为同一对象。"
+          ],
+          "returns": "没有显式return，Lua返回nil；不返回订阅句柄。",
+          "preconditions": [
+            "依赖实体可写监听表及合法事件键；入口没有fn类型断言，也没有IsValid检查。",
+            "非函数/损坏索引不是支持的输入；不能把未即时报错当可用。"
+          ],
+          "side_effects": [
+            "向源event_listeners[event][self]和self.event_listening[event][source]各追加fn；无去重。",
+            "两个写入非事务；第二步异常时未见第一步回滚。"
+          ],
+          "lifecycle": [
+            "解绑需原listener、相同event/fn/source身份；重新创建外观相同的闭包不是相同fn。",
+            "源的PushEvent消费者收到fn(source,data)，不是fn(listener,data)。",
+            "重复绑定积累重复调用；实例移除或RemoveAll清理归属关系，已快照调用边界复用EXP-ARCH-001。"
+          ],
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S02",
+            "EL-S04",
+            "EL-S05",
+            "EL-S08"
+          ],
+          "unknowns": [
+            "不证明事件名合法集合或跨端网络事件传播。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:RemoveEventCallback",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua方法；本范围见原版跨对象调用，不以冒号声明推导稳定公共API或所有端通用保证。",
+          "parameters": [
+            "self为原listener；event、fn、source对应原登记；source or self默认规则与登记一致。"
+          ],
+          "returns": "无显式return，Lua返回nil；不能用返回值判断是否找到订阅。",
+          "preconditions": [
+            "先assert(type(fn)==function)；缺fn或非函数会在修改前报错。",
+            "源/监听表结构必须保持原版形状；无源IsValid检查。"
+          ],
+          "side_effects": [
+            "两向调用RemoveListener；表/事件/归属节点缺失时该侧无动作。",
+            "RemoveByValue从尾到头删除全部相同fn，随后收缩空的归属与event节点；顶层表仍可保留空表。",
+            "错误listener/source/event或另一个函数身份通常匹配不到原订阅；不提供全局按函数搜索。"
+          ],
+          "lifecycle": [
+            "合法函数的重复解绑在未重绑定时无动作；一次解绑清除同一归属列表中全部重复fn。",
+            "移除关系不撤销旧PushEvent快照；源移除时onremove回调仍可能进入本方法。",
+            "Container把闭包保存在ondetachclassified并以classified作source；这是身份消费者实例，不另写其Attach合同。"
+          ],
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S02",
+            "EL-S03",
+            "EL-S05",
+            "EL-S08"
+          ],
+          "unknowns": [
+            "没有引用计数订阅或单次登记令牌语义；快照机制详见EXP-ARCH-001。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "登记将listener与source两个角色分别索引。",
+          "evidence_refs": [
+            "EL-S01"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "源派发按旧EXP-ARCH-001快照规则消费函数；本批只绑定依赖。",
+          "evidence_refs": [
+            "EL-S05"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "同身份解绑清匹配函数；container展示实际闭包保存与释放。",
+          "evidence_refs": [
+            "EL-S02",
+            "EL-S03",
+            "EL-S08"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "EL-S01",
+            "role": "entry / dual-owner writer"
+          },
+          {
+            "ref": "EL-S02",
+            "role": "entry / cleanup"
+          },
+          {
+            "ref": "EL-S03",
+            "role": "callee / equality and duplicate removal"
+          },
+          {
+            "ref": "EL-S05",
+            "role": "consumer / existing snapshot boundary"
+          },
+          {
+            "ref": "EL-S08",
+            "role": "bounded caller-consumer / classified cleanup"
+          },
+          {
+            "ref": "EL-S04",
+            "role": "whole-owner cleanup"
+          }
+        ],
+        "unknowns": [
+          "仅枚举所述静态合同所需边界；原生实现、任意Mod覆写和其他callee未覆盖。",
+          "移植须逐引用复核整文件与范围身份；归档SHA不授予整体兼容。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行重复绑定、错误闭包、回调内解绑及实体移除的游戏验证。"
+      ]
+    },
+    {
+      "id": "EXP-LIFE-002",
+      "title": "整实体事件清理的双向责任与析构位置",
+      "aliases": [
+        "RemoveAllEventCallbacks",
+        "onremove",
+        "listener/source removal"
+      ],
+      "engineering_question": "RemoveAllEventCallbacks是否只停自己订阅；它与onremove、任务、component/replica清理是什么关系？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "仅逐引用Lua入口与列举调用者/消费者/清理链；非完整引擎或所有Mod合同。",
+        "excluded": "不新增EntityScript:Remove或PushEvent API合同；仅以其作为RemoveAll调用者，复用EXP-ARCH-001派发快照边界。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-002-C01",
+          "kind": "NSF",
+          "statement": "RemoveAllEventCallbacks先清自己作为listener的跨源归属，再清自己作为source的外部listener归属，最后各将自己的顶层表置nil；不深度裁剪对方空表。",
+          "evidence_refs": [
+            "EL-S04"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-002-C02",
+          "kind": "EI",
+          "statement": "无新登记且结构有效时重复清理无动作；函数没有永久关闭标记，清理后仍可ListenForEvent重新建表。",
+          "evidence_refs": [
+            "EL-S01",
+            "EL-S04"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-002-C03",
+          "kind": "NSF",
+          "statement": "EntityScript:Remove先调全局Lua OnRemoveEntity，再发onremove；之后StopAllWatchingWorldStates、RemoveAllEventCallbacks、CancelAllPendingTasks，随后component及raw replica的OnRemoveEntity，末尾实体自定义钩子与Retire。",
+          "evidence_refs": [
+            "EL-S06",
+            "EL-S07",
+            "EL-S22",
+            "EL-S23"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-002-C04",
+          "kind": "EI",
+          "statement": "onremove先于事件表整清；监听回调抛错能越过后续清理。RemoveAll本身不调用业务回调，也不等价于任务取消或资源析构；完整Remove无本地重入保护，不能据整清可重复推导完整析构幂等。",
+          "evidence_refs": [
+            "EL-S04",
+            "EL-S05",
+            "EL-S06"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-002-C05",
+          "kind": "REC",
+          "statement": "把局部订阅释放、任务取消和具体资源销毁分别归责；只解除本模块订阅时不使用整实体清理接口。",
+          "evidence_refs": [
+            "EL-S02",
+            "EL-S04",
+            "EL-S06"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:RemoveAllEventCallbacks",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua方法；本范围见原版跨对象调用，不以冒号声明推导稳定公共API或所有端通用保证。",
+          "parameters": [
+            "仅self；无事件或源过滤参数。"
+          ],
+          "returns": "无显式return，Lua返回nil。",
+          "preconditions": [
+            "以原版双向表结构为前提；没有IsValid、已移除或正在派发检查。"
+          ],
+          "side_effects": [
+            "先遍历self.event_listening，将各source.event_listeners[event][self]置nil，再清self.event_listening。",
+            "再遍历self.event_listeners，将各listener.event_listening[event][self]置nil，再清self.event_listeners。",
+            "删除整个对应归属块，不逐fn调用RemoveEventCallback；不递归裁剪其他实体残留的空event表。"
+          ],
+          "lifecycle": [
+            "在没有新绑定且表结构有效时再次调用无动作；清理过程中不主动调用业务回调。",
+            "既清本实体作为listener的外向订阅，也清其他listener对本实体作为source的订阅；不只是停止自己听别人。",
+            "EntityScript:Remove在onremove之后调用本方法，再CancelAllPendingTasks，再components与底层replica的OnRemoveEntity。",
+            "本方法本身不取消任务、不移除worldstate watcher、不释放任意组件资源；这些由Remove其他步骤负责。",
+            "没有撤销已形成的派发快照；清理后新登记仍可建立表，没有永久关闭标记。"
+          ],
+          "evidence_refs": [
+            "EL-S04",
+            "EL-S05",
+            "EL-S06",
+            "EL-S22",
+            "EL-S23",
+            "EL-S18"
+          ],
+          "unknowns": [
+            "异常或onremove重入下完整Remove链是否完成不保证；不作为可重入析构器合同。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Remove发onremove，尚未进行双向整清；全局OnRemoveEntity为Lua函数，不误称原生钩子。",
+          "evidence_refs": [
+            "EL-S06",
+            "EL-S07"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "整清逐对端抹归属块，再清本地两表。",
+          "evidence_refs": [
+            "EL-S04"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "后续由Remove取消任务、调用component与raw replica清理；不由RemoveAll代办。",
+          "evidence_refs": [
+            "EL-S06",
+            "EL-S22",
+            "EL-S23",
+            "EL-S18"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "EL-S04",
+            "role": "entry / bilateral cleanup"
+          },
+          {
+            "ref": "EL-S01",
+            "role": "re-registration boundary"
+          },
+          {
+            "ref": "EL-S05",
+            "role": "consumer / callback exception and snapshot"
+          },
+          {
+            "ref": "EL-S06",
+            "role": "caller / ordered destruction sites"
+          },
+          {
+            "ref": "EL-S07",
+            "role": "callee boundary / Lua global removal hook"
+          },
+          {
+            "ref": "EL-S22",
+            "role": "sibling cleanup / worldstate watcher"
+          },
+          {
+            "ref": "EL-S23",
+            "role": "sibling cleanup / pending tasks"
+          },
+          {
+            "ref": "EL-S18",
+            "role": "bounded replica cleanup consumer"
+          }
+        ],
+        "unknowns": [
+          "仅枚举所述静态合同所需边界；原生实现、任意Mod覆写和其他callee未覆盖。",
+          "移植须逐引用复核整文件与范围身份；归档SHA不授予整体兼容。"
+        ]
+      },
+      "unknowns": [
+        "全局OnRemoveEntity的BrainManager/SGManager/KillTasks内部语义只作为未展开边界；本卡不声明其完整效果。",
+        "实体Retire原生实现、递归Remove和异常后的实机可恢复性未知。"
+      ]
+    },
+    {
+      "id": "EXP-LIFE-003",
+      "title": "Replica入口重放、保留与附着返回值的合同",
+      "aliases": [
+        "ReplicateEntity",
+        "ReplicateComponent",
+        "UnreplicateComponent",
+        "TryAttachClassifiedToReplicaComponent",
+        "ThePlayer seamless swap"
+      ],
+      "engineering_question": "重复复制会复用还是替换；取消复制是否析构；附着true代表什么；入口异常留下什么状态？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "仅逐引用Lua入口与列举调用者/消费者/清理链；非完整引擎或所有Mod合同。",
+        "excluded": "NC-N002-FINAL-04与AI-N001-10已有分层可用性，EXP-ARCH-004已有container补接；本条不把这些机制重新作为新发现。增量为五个完整API合同、重复/无效/异常分支及清理差异。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-003-C01",
+          "kind": "NSF",
+          "statement": "全局ReplicateEntity不检查Ents[guid]缺失；seamless目标临时替换ThePlayer，正常尾部只在保存旧值truthy时恢复，调用异常没有恢复保护。",
+          "evidence_refs": [
+            "EL-S09"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C02",
+          "kind": "NSF",
+          "statement": "ReplicateComponent未登记时无动作；master遇__name时改标签后早退，其余已有raw对象只警告而继续构造替换。cmp(self)完成后才写raw，master标签修改在构造前。",
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S11"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C03",
+          "kind": "NSF",
+          "statement": "UnreplicateComponent只在master且有raw对象时改_name/__name标签；不销毁raw或调用replica卸载钩子。RemoveComponent调用的是component.OnRemoveFromEntity，完整实体Remove另遍历raw replica.OnRemoveEntity。",
+          "evidence_refs": [
+            "EL-S12",
+            "EL-S15",
+            "EL-S06"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C04",
+          "kind": "NSF",
+          "statement": "实体ReplicateEntity对注册表pairs遍历，选中构造全部正常完成才调用后置回调；未带幂等标记或每项异常隔离。",
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S11",
+            "EL-S13"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C05",
+          "kind": "NSF",
+          "statement": "TryAttach直接查raw，callee正常返回后一律true，丢弃其返回值；不存在才false，异常不转false。pending保存/清理由container_classified调用者及container构造消费者实施。",
+          "evidence_refs": [
+            "EL-S13",
+            "EL-S16",
+            "EL-S17"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C06",
+          "kind": "EI",
+          "statement": "手动重放入口可能重复或替换对象、绕过旧对象清理并留下部分标签/引用；true不保证callee业务成功、netvar fresh或consumer ready。container的Attach在InitializeSlots断言前已写引用和监听，异常未回滚。",
+          "evidence_refs": [
+            "EL-S09",
+            "EL-S11",
+            "EL-S13",
+            "EL-S08",
+            "EL-S19",
+            "EL-S20"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-003-C07",
+          "kind": "REC",
+          "statement": "诊断时分别核对注册、标签、raw对象、具体附着与consumer；不要用手调ReplicateEntity或固定一帧重试代替具体生命周期合同。",
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S11",
+            "EL-S12",
+            "EL-S13",
+            "EL-S16",
+            "EL-S17"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ReplicateEntity",
+          "source_file": "scripts/mainfunctions.lua",
+          "visibility": "全局Lua复制回调入口；本轮未证明原生调用者或公共Mod调用约定。",
+          "parameters": [
+            "guid用于Ents[guid]查找；需对应实体。"
+          ],
+          "returns": "无显式return；不转发实体方法返回值。",
+          "preconditions": [
+            "查找后立即访问inst.isseamlessswaptarget；缺Ents项没有nil保护。",
+            "依赖ThePlayer及实体ReplicateEntity方法；不是供无上下文构造的通用工厂。"
+          ],
+          "side_effects": [
+            "isseamlessswaptarget真时保存原ThePlayer并临时设为inst，再同步调用inst:ReplicateEntity。",
+            "仅当保存的_ThePlayer为truthy时恢复；原ThePlayer为nil/false时正常返回也不会恢复。",
+            "调用不是pcall/finally；抛错越过恢复分支，临时ThePlayer可能留下。"
+          ],
+          "lifecycle": [
+            "不是幂等入口；重复调用会再执行实体复制循环及OnEntityReplicated。",
+            "不等待classified/dirty/HUD；调用期间的全局上下文影响需按实际消费者审查。"
+          ],
+          "evidence_refs": [
+            "EL-S09",
+            "EL-S13"
+          ],
+          "unknowns": [
+            "原生触发顺序、seamless swap实际前置条件及异常实机表现未验证。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:ReplicateEntity",
+          "source_file": "scripts/entityreplica.lua",
+          "visibility": "原版复制生命周期内部Lua方法；仅静态研究，不建议Mod手动重放，不承诺稳定公共API。",
+          "parameters": [
+            "仅self；遍历当前REPLICATABLE_COMPONENTS，而非传入组件列表。"
+          ],
+          "returns": "无显式return；OnEntityReplicated返回值被丢弃。",
+          "preconditions": [
+            "源码注释界定客户端construction tags初次反序列化后触发；函数本身不检查ismastersim。",
+            "依赖实例replica容器、HasTag及注册名称；不是任意阶段的安全初始化重试器。"
+          ],
+          "side_effects": [
+            "pairs遍历注册表中truthy名称，_name或__name任一标签存在便调用ReplicateComponent。",
+            "所有选中项正常完成后才调用当时非nil的self.OnEntityReplicated(self)；没有队列屏障、异常隔离或回滚。"
+          ],
+          "lifecycle": [
+            "pairs不承诺不同组件构造顺序；中途构造异常可留下前面已完成的replica并跳过后置回调。",
+            "重复调用可替换现有底层replica并再调用回调；不是完成状态的幂等查询。",
+            "后置回调的局部container消费者仍需查parent和附着，不代表跨实体all-ready。"
+          ],
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S11",
+            "EL-S13",
+            "EL-S16",
+            "EL-S21"
+          ],
+          "unknowns": [
+            "其他实体网络到达顺序、所有Mod注册表变动与native总序不在本合同。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:ReplicateComponent",
+          "source_file": "scripts/entityreplica.lua",
+          "visibility": "原版复制生命周期内部Lua方法；仅静态研究，不建议Mod手动重放，不承诺稳定公共API。",
+          "parameters": [
+            "self为实体；name为精确登记键，未在此处lowercase。"
+          ],
+          "returns": "所有正常路径均无显式值，Lua nil；不是返回新replica的工厂接口。",
+          "preconditions": [
+            "未登记或登记值为false/nil时立即return；已登记时依赖TheWorld、replica._及对应components/name_replica模块。",
+            "模块需可调用并能构造；require失败/assert/构造异常直接外抛。"
+          ],
+          "side_effects": [
+            "master先AddTag(_name)；若原有__name则RemoveTag(__name)并立即return，不重新构造。",
+            "其余分支即使底层已存在也只打印警告后继续；缓存require结果，再计算cmp(self)，成功后才rawset到底层。",
+            "客户端没有master的标签写入/快速返回；重复调用可能替换原对象，未见自动清理被替换对象。"
+          ],
+          "lifecycle": [
+            "AddComponent在实际component构造与写入前调用；replica构造期间不能由此保证对应component已存在。",
+            "master构造异常前已可能改标签，底层写入则尚未发生；无事务回滚。",
+            "Unreplicate保留对象并改__标签后，master再次Replicate走复用分支；不要把复用分支推广到不存在raw对象的损坏状态。",
+            "完整实体Remove仍遍历底层对象的OnRemoveEntity，包括公有访问被标签隐藏的对象。"
+          ],
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S11",
+            "EL-S12",
+            "EL-S14",
+            "EL-S15",
+            "EL-S06"
+          ],
+          "unknowns": [
+            "模块Class构造器副作用依具体replica；不能由通用入口保证无泄漏或可重复Attach。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:UnreplicateComponent",
+          "source_file": "scripts/entityreplica.lua",
+          "visibility": "原版复制生命周期内部Lua方法；仅静态研究，不建议Mod手动重放，不承诺稳定公共API。",
+          "parameters": [
+            "self为实体；name为底层replica键。"
+          ],
+          "returns": "无显式return，Lua nil。",
+          "preconditions": [
+            "底层replica._表需存在；仅raw对象非nil且TheWorld.ismastersim时进入修改分支。"
+          ],
+          "side_effects": [
+            "master移除_name并加__name；没有rawset(nil)、析构、解绑classified或调用replica.OnRemoveFromEntity。",
+            "客户端或raw对象缺失时不改标签；public replica[name]经ValidateReplicaComponent依_name过滤。"
+          ],
+          "lifecycle": [
+            "RemoveComponent先清component表、调用component.OnRemoveFromEntity，再调用此方法；不是调用replica同名钩子。",
+            "Prereplicate先Replicate再Unreplicate；底层存活与公有可见是不同条件。",
+            "重复调用仍可能再次调用标签方法，最终标签形状相同；不承诺底层native标签操作的幂等成本。",
+            "最终实体Remove走底层replica.OnRemoveEntity；这与移除component是不同清理阶段。"
+          ],
+          "evidence_refs": [
+            "EL-S10",
+            "EL-S12",
+            "EL-S14",
+            "EL-S15",
+            "EL-S06",
+            "EL-S18"
+          ],
+          "unknowns": [
+            "标签的网络送达时间、不同replica各自保留的资源与重新附着安全性未由本方法证明。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:TryAttachClassifiedToReplicaComponent",
+          "source_file": "scripts/entityreplica.lua",
+          "visibility": "原版复制生命周期内部Lua方法；仅静态研究，不建议Mod手动重放，不承诺稳定公共API。",
+          "parameters": [
+            "self为parent实体；classified为传给replica.AttachClassified的对象；name为底层replica键。"
+          ],
+          "returns": [
+            "raw replica truthy时同步调用cmp:AttachClassified(classified)，正常返回后true；忽略AttachClassified返回值。",
+            "raw replica不存在/false时false；Attach方法缺失或异常不会转换成false。"
+          ],
+          "preconditions": [
+            "依赖replica._；有raw对象时需其AttachClassified可调用，classified有效性由具体callee负责。",
+            "不检查_name标签，不验证classified.parent/target或已有附着。"
+          ],
+          "side_effects": [
+            "helper自身只查raw表和转发；不登记重试、不创建replica、不保存pending、不自动解绑旧对象。",
+            "container具体callee先写引用与onremove监听，再InitializeSlots；后者assert失败会外抛，helper未回滚这些已发生写入。"
+          ],
+          "lifecycle": [
+            "允许查到pre/unreplicated底层对象；返回true只表明该次callee正常返回，不检查其业务结果或全部数据fresh。",
+            "重复调用会重复进入callee，没有自带幂等门。",
+            "container_classified的false分支由调用者暂存并装移除回调，replica构造消费时清该回调和pending字段；这些责任不在helper。",
+            "已附着container以同一listener/fn/source三元关系解绑；完整补接及槽窗口继续复用EXP-ARCH-004。"
+          ],
+          "evidence_refs": [
+            "EL-S13",
+            "EL-S16",
+            "EL-S17",
+            "EL-S08",
+            "EL-S19",
+            "EL-S20",
+            "EL-S21",
+            "EL-S24",
+            "EL-S25"
+          ],
+          "unknowns": [
+            "不推广container的pending字段、InitializeSlots断言或清理到其他replica；跨实体顺序未实测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "全局GUID入口提供临时玩家上下文，实体方法选取注册标签并构造。",
+          "evidence_refs": [
+            "EL-S09",
+            "EL-S10",
+            "EL-S11",
+            "EL-S13"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Add/RemoveComponent提供另一路构造与保留调用；public访问与raw保留分开。",
+          "evidence_refs": [
+            "EL-S12",
+            "EL-S14",
+            "EL-S15"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "后置classified回调转发附着或由调用者暂存；callee失败及整实体清理各按自己的合同。",
+          "evidence_refs": [
+            "EL-S13",
+            "EL-S16",
+            "EL-S17",
+            "EL-S08",
+            "EL-S19",
+            "EL-S20",
+            "EL-S06",
+            "EL-S18"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "EL-S09",
+            "role": "global caller / temporary ThePlayer context"
+          },
+          {
+            "ref": "EL-S10",
+            "role": "registration selection / public visibility filter"
+          },
+          {
+            "ref": "EL-S11",
+            "role": "constructor callee / require cache / raw write"
+          },
+          {
+            "ref": "EL-S12",
+            "role": "tag-only cleanup and prereplication caller"
+          },
+          {
+            "ref": "EL-S13",
+            "role": "entries / callback dispatch and raw attachment helper"
+          },
+          {
+            "ref": "EL-S14",
+            "role": "replica container and public access consumer"
+          },
+          {
+            "ref": "EL-S15",
+            "role": "component lifecycle callers"
+          },
+          {
+            "ref": "EL-S16",
+            "role": "bounded classified caller / pending cleanup"
+          },
+          {
+            "ref": "EL-S17",
+            "role": "bounded pending consumer / ownership transfer"
+          },
+          {
+            "ref": "EL-S08",
+            "role": "bounded attachment callee / event cleanup"
+          },
+          {
+            "ref": "EL-S19",
+            "role": "callee / initialization assertion"
+          },
+          {
+            "ref": "EL-S20",
+            "role": "later consumer / slot task state"
+          },
+          {
+            "ref": "EL-S21",
+            "role": "classified callback installation / initial state"
+          },
+          {
+            "ref": "EL-S24",
+            "role": "constructor callee / slot config"
+          },
+          {
+            "ref": "EL-S25",
+            "role": "slot-count callee"
+          },
+          {
+            "ref": "EL-S06",
+            "role": "final raw replica cleanup caller"
+          },
+          {
+            "ref": "EL-S18",
+            "role": "bounded final replica cleanup"
+          }
+        ],
+        "unknowns": [
+          "仅枚举所述静态合同所需边界；原生实现、任意Mod覆写和其他callee未覆盖。",
+          "移植须逐引用复核整文件与范围身份；归档SHA不授予整体兼容。"
+        ]
+      },
+      "unknowns": [
+        "原生construction反序列化顺序、网络fresh、其他replica构造器与Mod覆盖未验证。",
+        "没有运行seamless swap、构造异常、重复复制或客户端缺parent分支。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "EL-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1229,
+      "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+      "symbols": [
+        "AddListener",
+        "EntityScript:ListenForEvent"
+      ]
+    },
+    {
+      "id": "EL-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1231,
+      "line_end": 1256,
+      "range_sha256": "6adc48eea088a0757e8527f1372ebd3467c870374f1819df7ded7d3e8f28f138",
+      "symbols": [
+        "RemoveListener",
+        "EntityScript:RemoveEventCallback"
+      ]
+    },
+    {
+      "id": "EL-S03",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 238,
+      "line_end": 246,
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "symbols": [
+        "RemoveByValue"
+      ]
+    },
+    {
+      "id": "EL-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1258,
+      "line_end": 1288,
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "symbols": [
+        "EntityScript:RemoveAllEventCallbacks"
+      ]
+    },
+    {
+      "id": "EL-S05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal"
+      ]
+    },
+    {
+      "id": "EL-S06",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "EL-S07",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 558,
+      "range_sha256": "491f8979034df61bdf405826e10974fde3b85a664e00938da22f4e177820c56f",
+      "symbols": [
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "EL-S08",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 153,
+      "line_end": 166,
+      "range_sha256": "72fe5380672d2ccb4b3c3e8cd6d464d896b80976f44522720dc7f0b092e25787",
+      "symbols": [
+        "Container:AttachClassified",
+        "Container:DetachClassified"
+      ]
+    },
+    {
+      "id": "EL-S09",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 840,
+      "line_end": 854,
+      "range_sha256": "42e290c16f1d0c61d8353b4a2417223ff3e017a5eadef04520db6ca8bda64edc",
+      "symbols": [
+        "ReplicateEntity"
+      ]
+    },
+    {
+      "id": "EL-S10",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 5,
+      "line_end": 32,
+      "range_sha256": "8a8cb16671e23da9a91b0574ffaa2738f60c87bdbff29d9a2606e4b91a4924ac",
+      "symbols": [
+        "REPLICATABLE_COMPONENTS",
+        "EntityScript:ValidateReplicaComponent"
+      ]
+    },
+    {
+      "id": "EL-S11",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 34,
+      "line_end": 60,
+      "range_sha256": "0153887cd885a8718155ea4047625cef3c1f977c917192424bc2451f7a4181f5",
+      "symbols": [
+        "EntityScript:ReplicateComponent"
+      ]
+    },
+    {
+      "id": "EL-S12",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 62,
+      "line_end": 72,
+      "range_sha256": "7a554b79662a6acc4ed770c5c7089f881d1395610f5bda50de83056431568d6a",
+      "symbols": [
+        "EntityScript:UnreplicateComponent",
+        "EntityScript:PrereplicateComponent"
+      ]
+    },
+    {
+      "id": "EL-S13",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 74,
+      "line_end": 100,
+      "range_sha256": "170f9992ad0af008ed284bc0e3f3e3b28e8240c370ca6f2fb82fd042cb9e84d0",
+      "symbols": [
+        "EntityScript:ReplicateEntity",
+        "EntityScript:TryAttachClassifiedToReplicaComponent",
+        "AddReplicableComponent"
+      ]
+    },
+    {
+      "id": "EL-S14",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 208,
+      "line_end": 246,
+      "range_sha256": "a0da72ce87c8f4139cdf1cf1ad0504e5184a1207ab5c9696411a56deb28fe995",
+      "symbols": [
+        "replica_mt",
+        "EntityScript"
+      ]
+    },
+    {
+      "id": "EL-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 632,
+      "line_end": 685,
+      "range_sha256": "ab938e47edb98506a108ab8c140077839339c101ce9adf7701d6e9763410b814",
+      "symbols": [
+        "EntityScript:AddComponent",
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "EL-S16",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 62,
+      "line_end": 76,
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "symbols": [
+        "OnEntityReplicated",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "EL-S17",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 1,
+      "line_end": 62,
+      "range_sha256": "3c604ffa87746503dfe8cd9cc388119df4a2fd889f38eb9d1b6def84d726d455",
+      "symbols": [
+        "Container"
+      ]
+    },
+    {
+      "id": "EL-S18",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 111,
+      "line_end": 125,
+      "range_sha256": "0549a07f09bf0c52ba9e5c019a449da0c2678656d7ba121af742605ab8da99db",
+      "symbols": [
+        "Container:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "EL-S19",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 8,
+      "line_end": 22,
+      "range_sha256": "972c7b059a4c13d2d02247100b5193543b86ae0b020f61e0e1895e8cfede5fbf",
+      "symbols": [
+        "InitializeSlots"
+      ]
+    },
+    {
+      "id": "EL-S20",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 407,
+      "line_end": 457,
+      "range_sha256": "847847f534dfeaaba15ed1bfaa3d6f267e281dd92142c84d55fcf2f5ecdfd10d",
+      "symbols": [
+        "RegisterNetListeners"
+      ]
+    },
+    {
+      "id": "EL-S21",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 1031,
+      "line_end": 1109,
+      "range_sha256": "12b0ac62b9488b04a179bc43bb69ee8dea2fc786cf7987cab95a239e75847cdd",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "EL-S22",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1300,
+      "line_end": 1310,
+      "range_sha256": "08b58a9cd7444b431ba9386eeea1439356fd9d1d05f14baf838df21bf5eef61e",
+      "symbols": [
+        "EntityScript:StopAllWatchingWorldStates"
+      ]
+    },
+    {
+      "id": "EL-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1501,
+      "range_sha256": "a325a0b1f5b6632db2cae483f0881a99952a30a265bcf7e37a76b32b90283c06",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks"
+      ]
+    },
+    {
+      "id": "EL-S24",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 9,
+      "line_end": 17,
+      "range_sha256": "6dae530848ce47618c3d63aba208e034938089c205c78a6b2b920554ce14bafc",
+      "symbols": [
+        "containers.widgetsetup"
+      ]
+    },
+    {
+      "id": "EL-S25",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 269,
+      "line_end": 275,
+      "range_sha256": "cc7d8ca5f91acdca1482b9284013fc0c91f5d5120d96b5b1362c7aba39ff30b5",
+      "symbols": [
+        "Container:SetNumSlots",
+        "Container:GetNumSlots"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "ListenForEvent 参数 返回值 监听归属",
+      "expected_entry_ids": [
+        "EXP-LIFE-001"
+      ],
+      "purpose": "full API identity"
+    },
+    {
+      "query": "RemoveEventCallback 重复函数一次全删 source身份",
+      "expected_entry_ids": [
+        "EXP-LIFE-001"
+      ],
+      "purpose": "duplicate and invalid-input boundary"
+    },
+    {
+      "query": "RemoveAllEventCallbacks 两向 清理 不是取消任务",
+      "expected_entry_ids": [
+        "EXP-LIFE-002"
+      ],
+      "purpose": "full API and cleanup ownership"
+    },
+    {
+      "query": "onremove 解绑顺序 listener source removal",
+      "expected_entry_ids": [
+        "EXP-LIFE-002"
+      ],
+      "purpose": "destruction caller boundary"
+    },
+    {
+      "query": "ReplicateEntity guid ThePlayer 恢复 异常",
+      "expected_entry_ids": [
+        "EXP-LIFE-003"
+      ],
+      "purpose": "global versus EntityScript identity"
+    },
+    {
+      "query": "ReplicateComponent 已有对象 __标签 重复构造",
+      "expected_entry_ids": [
+        "EXP-LIFE-003"
+      ],
+      "purpose": "construct/reuse failure boundary"
+    },
+    {
+      "query": "UnreplicateComponent 是否销毁 replica",
+      "expected_entry_ids": [
+        "EXP-LIFE-003"
+      ],
+      "purpose": "cleanup distinction"
+    },
+    {
+      "query": "TryAttachClassifiedToReplicaComponent true false 异常",
+      "expected_entry_ids": [
+        "EXP-LIFE-003"
+      ],
+      "purpose": "callee result and pending ownership"
+    }
+  ],
+  "limitations": [
+    "仅冻结762172/build26474873的静态Lua研究，runtime_verified:false；保留research/restricted/hold。",
+    "全局ReplicateEntity与EntityScript:ReplicateEntity为不同API身份；不据名称/方法形式宣称公共接口。",
+    "只补完整入口合同，不重写EXP-ARCH-001/004、NC-N002-FINAL-04或AI-N001-10既有机制和历史Scope。",
+    "range SHA使用UTF8解码、splitlines、LF连接且无末尾换行；file SHA使用ZIP成员原字节。",
+    "候选不注册、不安装、不修改默认检索和Coding准入；EXP-LIFE-004保留未用，待协调者复核。"
+  ]
+}

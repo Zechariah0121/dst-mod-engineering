@@ -88,3 +88,5 @@ end)
 相关工程案例：[Replica 幂等补装、RPC 根因未定与 toggle 重试](lulu-entry-ui-network.md)，按其中的项目条件与验证范围使用。
 
 跨多个子系统设计职责、状态归属和恢复路径时，先看[复杂 Mod 架构指南](complex-mod-architecture.md)；局部修复按本专题处理，无需全局重构。
+
+事件订阅身份、Replica 重放、附着返回值与退出清理，进一步读[事件与 Replica 生命周期](event-replica-lifecycle.md)；具体 ready 条件仍按消费者核对。

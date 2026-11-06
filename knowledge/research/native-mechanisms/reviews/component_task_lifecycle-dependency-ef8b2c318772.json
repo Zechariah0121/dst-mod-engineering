@@ -1,0 +1,46 @@
+{
+  "schema_version": "independent-review-plan/1",
+  "reviewer": "lifecycle_reviewer",
+  "topic": "component_task_lifecycle",
+  "frozen_before_candidate_read": true,
+  "candidate_read": false,
+  "repository_commit": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "baseline_catalog": {"entries": 231, "mechanisms": 44},
+  "source_epoch": "762172",
+  "archive_name": "scripts-762172.zip",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "allowed_candidate_ids": ["EXP-LIFE005", "EXP-LIFE006", "EXP-LIFE007"],
+  "ceilings": {"new_mechanisms": 3, "api_contracts": 8},
+  "access": {"repository": "read_only", "source": "zip_read_only", "candidate": "await_exact_path_and_sha256", "game_execution": "prohibited", "registration_and_config": "no_changes", "delegation": "none"},
+  "knowledge_read_method": "file_reading; catalog is navigation only",
+  "old_knowledge_dedup": [
+    {"id": "FACT-DST-008", "pointer": "/entries/7", "file": "knowledge/data/entries.json", "delivery": "complete_entry", "boundary": "Entity removal versus component unload is already recorded; refresh alone is not a novel mechanism."},
+    {"id": "AI-N001-09", "pointer": "/entries/8", "file": "knowledge/data/native001/canonical-native001-ai-knowledge.json", "delivery": "complete_entry_with_top_scope", "boundary": "Task/listener owner and component unload mismatch already recorded in a historical snapshot."},
+    {"id": "NC-N004-FINAL-07", "pointers": ["/entries/23/claims/0", "/entries/23/claims/1", "/entries/23/claims/2", "/entries/23/claims/3"], "file": "knowledge/data/nativecore/native-core.json", "delivery": "four_complete_claims_with_parent_scope_and_statuses", "boundary": "Timer duplicate names, stop/pause/resume, save/load/transfer and LongUpdate are existing facts; canonical/reviewer_default/hold remains unchanged."},
+    {"id": "EXP-COOK-004", "pointer": "/entries/3", "file": "knowledge/research/native-mechanisms/cooking-39f19e255b6d.json", "delivery": "complete_entry_with_top_identity_limitations_and_used_source_refs", "boundary": "Stewer unload hook omits timer/listener cleanup; default burned path stops before unload. Existing research/restricted/hold remains unchanged."},
+    {"id": "EXP-GROW-001", "pointer": "/entries/0", "file": "knowledge/research/native-mechanisms/growth-06fcb280862d.json", "delivery": "entry_read; first oversized response was truncated, not counted as complete evidence delivery", "boundary": "Growable explicit stop and unload alias are already recorded; independently checked current source."}
+  ],
+  "review_axes": [
+    "Bind exact candidate bytes/SHA and frozen source identity before semantic review.",
+    "Check each claim, API, mechanism step and source reference, including evidence range hash and exact file member bytes.",
+    "Distinguish ctor from postinit and actions registration; check failure windows and lack of local rollback without claiming global exception behavior.",
+    "Distinguish RemoveComponent, OnRemoveFromEntity, Remove, OnRemoveEntity, Lua registry cleanup and native Retire/IsValid boundaries.",
+    "Trace task helper -> scheduler -> Periodic cancellation/finish; do not equate coroutine tasks or KillTasks with pending timed callbacks.",
+    "Check ownership of callback captures separately from task registration owner and validity of each referenced object.",
+    "Check update registration, NewUpdatingEnts and deferred stop; compare static and wall paths only where explicitly sourced.",
+    "Check callback reentry, self-cancel, remove/re-add and unload during callback; never promise callback rollback or deterministic pairs iteration order.",
+    "Compare Timer, Growable and Stewer cleanup as named consumers; do not generalize one component's cleanup to all components.",
+    "Trace persistence through explicit component data, not serialization of generic task handles or assumed real-time expiry.",
+    "Reject unbounded cross-side/native/concurrency claims; retain research/restricted/hold, runtime_verified:false and dependency_coverage bounds.",
+    "Check novelty versus read old atoms and distinguish an added mechanism chain from restated rules or snapshot refresh."
+  ],
+  "verdict_policy": {
+    "pass_static": "Every claimed contract is accurately bounded and supported; no blocking defects remain; runtime remains unverified.",
+    "request_changes": "At least one substantive unsupported, incorrect, overbroad, missing-evidence or non-novel addition remains.",
+    "reject": "Candidate cannot be reviewed as bound or materially violates source/distribution/governance scope.",
+    "no_silent_rewrite": "Reviewer reports precise defects; author owns candidate edits."
+  },
+  "planned_outputs": ["review-plan.json", "independent-observations.json", "candidate-review-<sha-prefix>.json"],
+  "distribution_constraints": ["No private absolute paths", "No original Lua source text", "Only relative source identifiers, hashes, line locators and original analysis", "Necessary old public review dependencies may be packaged with provenance"]
+}

@@ -1,0 +1,262 @@
+{
+  "schema_version": "independent-source-observations/1",
+  "reviewer": "lifecycle_reviewer",
+  "topic": "component_task_lifecycle",
+  "created_at_utc": "2026-11-06T10:31:05.209711+00:00",
+  "candidate_read": false,
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "repository_commit": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "observations": [
+    {
+      "id": "LIFE-O01",
+      "kind": "NSF/EI",
+      "statement": "AddComponent replicates before calling the constructor, publishes the resulting component and lowercase shadow before ComponentPostInit callbacks, and registers component actions afterwards. These calls have no local protected call or rollback. Constructor failure can leave earlier replication or constructor side effects; postinit failure can leave a published component without reaching actions registration. This does not establish outer engine exception handling.",
+      "evidence_refs": [
+        "LIFE-R01"
+      ]
+    },
+    {
+      "id": "LIFE-O02",
+      "kind": "NSF/EI",
+      "statement": "RemoveComponent requests update stop, immediately clears the component table/shadow, calls the old component OnRemoveFromEntity, then unreplicates and unregisters actions. It does not cancel the host pending tasks/listeners wholesale. A hook error interrupts later local cleanup; a reentrant replacement is not identity-checked before the outer unreplicate/unregister operations.",
+      "evidence_refs": [
+        "LIFE-R01"
+      ]
+    },
+    {
+      "id": "LIFE-O03",
+      "kind": "NSF/UNK",
+      "statement": "Remove calls the Lua OnRemoveEntity hook first, emits onremove, clears watchers/event callbacks/pending tasks, calls component OnRemoveEntity rather than OnRemoveFromEntity, cleans update registries and children, then calls entity Retire. Lua OnRemoveEntity kills coroutine tasks through KillTasks, separately from timed pending tasks. IsValid delegates to the native entity. Native retirement timing, memory reclamation and complete host ordering remain unknown.",
+      "evidence_refs": [
+        "LIFE-R05",
+        "LIFE-R18",
+        "LIFE-R19",
+        "LIFE-R08"
+      ]
+    },
+    {
+      "id": "LIFE-O04",
+      "kind": "NSF/EI",
+      "statement": "Entity timed helpers record handles in the calling host pendingtasks; the scheduler stores that host as callback argument and GUID identity. Capturing a component or a different entity does not move task ownership. Periodic Cancel removes scheduling state and calls onfinish(false); it neither unwinds nor rolls back a callback already entered. OnTick directly invokes callbacks before reschedule/finish bookkeeping. No general same-tick ordering or transactional error guarantee follows.",
+      "evidence_refs": [
+        "LIFE-R04",
+        "LIFE-R06",
+        "LIFE-R07",
+        "LIFE-R08"
+      ]
+    },
+    {
+      "id": "LIFE-O05",
+      "kind": "NSF/EI",
+      "statement": "StartUpdatingComponent guards host IsValid, creates the host update registry and NewUpdatingEnts, clears its own pending stop mark, and records component name by identity with a generic fallback. StopUpdatingComponent marks global deferred stop; Update checks that marker before each OnUpdate and later applies physical removal. Already-entered OnUpdate continues unless its own code exits. Wall stop removes immediately and is a distinct path. Static pause-path consumption is separately bounded.",
+      "evidence_refs": [
+        "LIFE-R02",
+        "LIFE-R03",
+        "LIFE-R09",
+        "LIFE-R10",
+        "LIFE-R11"
+      ]
+    },
+    {
+      "id": "LIFE-O06",
+      "kind": "NSF/EI",
+      "statement": "Timer creates host-owned timed callbacks; completion stops/deletes the timer before timerdone. Its unload hook cancels existing timer handles without deleting the timers table/records. Growable unload aliases StopGrowing, which clears time fields and cancels/clears its handle. Stewer unload only removes tags, while StopCooking explicitly cancels its handle. These are named differences, not a universal component cleanup contract.",
+      "evidence_refs": [
+        "LIFE-R12",
+        "LIFE-R13",
+        "LIFE-R14",
+        "LIFE-R15",
+        "LIFE-R16"
+      ]
+    },
+    {
+      "id": "LIFE-O07",
+      "kind": "NSF/UNK",
+      "statement": "Generic persistence invokes each installed component OnSave/OnLoad, not generic pending-task serialization. Timer saves remaining duration, pause and initial duration, then stops/restarts loaded names; transfer starts target names without stopping source or replacing target duplicates. LongUpdate subtracts dt even for paused records. Native elapsed-clock semantics, arbitrary consumer policy and runtime behavior are not established. Most of these Timer facts already exist in NC-N004-FINAL-07 and cannot alone justify a new mechanism.",
+      "evidence_refs": [
+        "LIFE-R12",
+        "LIFE-R17"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "LIFE-R01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 632,
+      "line_end": 685,
+      "range_sha256": "ab938e47edb98506a108ab8c140077839339c101ce9adf7701d6e9763410b814",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 439,
+      "line_end": 502,
+      "range_sha256": "58d20417ea105764d7a1995331008f2ed6c0ff879fe1c1dbbdfae27821ffbf0d",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 504,
+      "line_end": 544,
+      "range_sha256": "ff124844a828610f557a15a09f9a258bb7c46802c13184566f3a7c143921c977",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1801,
+      "range_sha256": "71d3faab59887eeb3ed6b3a4708d8bb7944b4f0d05504a8b609f81a31cca8100",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R06",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 45,
+      "line_end": 95,
+      "range_sha256": "c42df9745caa288c40ad937be16360bf31f654179cb5ea432f96b0741849fed2",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R07",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 164,
+      "line_end": 216,
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R08",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 276,
+      "line_end": 314,
+      "range_sha256": "bb72d74c79fa67c4d738ffa2bc564eaeda2ebd6f6632141642ad95b6501bc01d",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R09",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 224,
+      "line_end": 298,
+      "range_sha256": "2b69986879999b3f39411f78f2edac1bd1e81c84f374edbe825b2323c0517ddb",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R10",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 169,
+      "line_end": 220,
+      "range_sha256": "78b11ab375fddc37f4713be6fc04871dd57610da80f2325e08b447b9125b7de1",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R11",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 53,
+      "line_end": 69,
+      "range_sha256": "ed99e6c51c989a3deb769549c29bb0a3700717e7d3e2fbe898a720a282cab072",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R12",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 1,
+      "line_end": 159,
+      "range_sha256": "3055ff67888b9996450eb4690e35050765e78be965e825251c9f4cbbc499c940",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R13",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 23,
+      "line_end": 100,
+      "range_sha256": "4a610e564d3a300ec5d0194a879aab2708430d5f9910a45a52c9b9636749af82",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R14",
+      "source_file": "scripts/components/stewer.lua",
+      "file_sha256": "4d1baeaa7ee3cdcccefebc9ac6a60a0523043f28cafa5c064bb2bce336458a39",
+      "line_start": 184,
+      "line_end": 201,
+      "range_sha256": "f92c9cadfc624b3f2f7b8f629bad9c0ab93497a5f3976a993a2b954db821b104",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R15",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 1,
+      "line_end": 89,
+      "range_sha256": "5893e067c6ee028b25926a3e607a263960ecb8f4ceaed9d8959526f408f1a1aa",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R16",
+      "source_file": "scripts/components/growable.lua",
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "line_start": 365,
+      "line_end": 365,
+      "range_sha256": "12b13fdf16ec32448384666156b900f3db66d781bfe307247fbfce7650336758",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 2014,
+      "range_sha256": "e8b5d0d5a7e909beece094aa298671ce52af9e2e585979ab749a5fa49557b471",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R18",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 558,
+      "range_sha256": "491f8979034df61bdf405826e10974fde3b85a664e00938da22f4e177820c56f",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    },
+    {
+      "id": "LIFE-R19",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1091,
+      "line_end": 1097,
+      "range_sha256": "2122ae6655889f5882f58baf7966b7ffcfd1010794a5fb3b4b2e031eff3844b1",
+      "range_hash_convention": "UTF8 splitlines; inclusive; LF joined; no trailing LF"
+    }
+  ],
+  "limitations": [
+    "Independent static reading only; no game, scheduler execution or fabricated runtime result.",
+    "No source Lua reproduced. No native concurrency, retirement, precision or serialization guarantee is inferred.",
+    "Candidate not yet received/read. These observations guide review, not candidate authorship."
+  ]
+}

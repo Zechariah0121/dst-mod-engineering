@@ -77,3 +77,5 @@ Buff 的 `persists=false` 不等于一定不存档：当前 `debuffable:OnSave` 
 涉及唯一物品预约与实体化后的失败恢复，另读 [事务与配料案例](lulu-transactions-crafting.md)；其中替身协议测试不证明真实双分片恰好一次。
 
 跨多个子系统设计职责、状态归属和恢复路径时，先看[复杂 Mod 架构指南](complex-mod-architecture.md)；局部修复按本专题处理，无需全局重构。
+
+组件任务取消与实际消费者见[资源归属](component-task-ownership.md)；旧 GUID 接线、嵌套保存和恢复副作用见[保存与恢复架构](save-recovery-architecture.md)。

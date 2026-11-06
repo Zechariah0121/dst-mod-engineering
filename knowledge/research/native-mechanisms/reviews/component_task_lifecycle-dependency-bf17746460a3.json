@@ -1,0 +1,1050 @@
+{
+  "schema_version": "independent-mechanism-review/1",
+  "reviewer": "lifecycle_reviewer",
+  "created_at_utc": "2026-11-06T10:40:30.309475+00:00",
+  "topic": "component_task_lifecycle",
+  "candidate_path": "coordinator/frozen/component_task_lifecycle-4ec1535558a9.json",
+  "candidate_sha256": "4ec1535558a98f7d6794d8cead6a38680ad8afdee7dd74eba40ece45b42661f8",
+  "repository_commit": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "source_epoch": "762172",
+  "archive_name": "scripts-762172.zip",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "verdict": "pass_static",
+  "blockers": [],
+  "counts": {
+    "mechanisms": 3,
+    "claims": 25,
+    "api_contracts": 8,
+    "mechanism_steps": 10,
+    "source_references": 29
+  },
+  "method": [
+    "Plan and observations frozen before candidate read; exact candidate SHA checked.",
+    "Each whole claim/API/step read with source identity, scope, limits and all locally cited source ranges.",
+    "29 references semantically read and member/range fingerprints independently matched; no complete root preparation pipeline repeated.",
+    "No game, installation, registration or repository/config/candidate modification; no subagents."
+  ],
+  "entry_results": [
+    {
+      "entry_id": "EXP-LIFE-005",
+      "verdict": "pass_static",
+      "runtime_verified": false,
+      "claims": [
+        {
+          "id": "EXP-LIFE-005-C01",
+          "pointer": "/entries/0/claims/0",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S01"
+          ],
+          "reason": "Lowercase duplicate guard and original-name loading are explicit; duplicate path returns before construction and hooks."
+        },
+        {
+          "id": "EXP-LIFE-005-C02",
+          "pointer": "/entries/0/claims/1",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S01",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S08"
+          ],
+          "reason": "Installation slot and shadow publication occurs after ctor, before wrapped postinit and actions."
+        },
+        {
+          "id": "EXP-LIFE-005-C03",
+          "pointer": "/entries/0/claims/2",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S02"
+          ],
+          "reason": "GetPostInitFns and runmodfn explicitly support ordering and original callback xpcall boundary."
+        },
+        {
+          "id": "EXP-LIFE-005-C04",
+          "pointer": "/entries/0/claims/3",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S03",
+            "CTL-S04",
+            "CTL-S06",
+            "CTL-S08"
+          ],
+          "reason": "Inference correctly distinguishes caught original mod failure from whole-install rollback and postinit removal reentry."
+        },
+        {
+          "id": "EXP-LIFE-005-C05",
+          "pointer": "/entries/0/claims/4",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11"
+          ],
+          "reason": "Exact-key unload, deferred normal/static stop, immediate wall removal and distinct hook names verified."
+        },
+        {
+          "id": "EXP-LIFE-005-C06",
+          "pointer": "/entries/0/claims/5",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07"
+          ],
+          "reason": "Slot is cleared before hook; after hook outer code still unreplicates/unregisters by old name without identity check."
+        },
+        {
+          "id": "EXP-LIFE-005-C07",
+          "pointer": "/entries/0/claims/6",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S14",
+            "CTL-S02"
+          ],
+          "reason": "Start uses object keys and generic diagnostic fallback; FireFX ctor is a named direct caller."
+        },
+        {
+          "id": "EXP-LIFE-005-C08",
+          "pointer": "/entries/0/claims/7",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S10",
+            "CTL-S12",
+            "CTL-S13"
+          ],
+          "reason": "Stop marker producer, normal consumer merge/removal and paused static path all match source."
+        },
+        {
+          "id": "EXP-LIFE-005-C09",
+          "pointer": "/entries/0/claims/8",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S10",
+            "CTL-S12",
+            "CTL-S13"
+          ],
+          "reason": "No current-stack interruption or universal first-update-frame guarantee is claimed; false/nil does not erase static registration."
+        },
+        {
+          "id": "EXP-LIFE-005-C10",
+          "pointer": "/entries/0/claims/9",
+          "kind": "REC",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S03",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S09",
+            "CTL-S10"
+          ],
+          "reason": "Recommendation is conditional and grounded in distinct installation/update/business ownership."
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:AddComponent",
+          "pointer": "/entries/0/api_contracts/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S01",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S08"
+          ],
+          "reason": "Return is local constructed/old instance, not continued slot membership; wrapper and rollback limits are accurate."
+        },
+        {
+          "symbol": "EntityScript:RemoveComponent",
+          "pointer": "/entries/0/api_contracts/1",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07"
+          ],
+          "reason": "Exact-key lookup, void/no-op return, hook error propagation and update-wall distinction are accurate."
+        },
+        {
+          "symbol": "EntityScript:StartUpdatingComponent",
+          "pointer": "/entries/0/api_contracts/2",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S12",
+            "CTL-S13",
+            "CTL-S14"
+          ],
+          "reason": "Object identity, truthy static option, IsValid early return and deferred consumers are accurately bounded."
+        },
+        {
+          "symbol": "EntityScript:StopUpdatingComponent",
+          "pointer": "/entries/0/api_contracts/3",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S10",
+            "CTL-S09",
+            "CTL-S12",
+            "CTL-S13",
+            "CTL-S03",
+            "CTL-S11"
+          ],
+          "reason": "Only stop marker is written; restart can revoke it; no timed-task or wall-update cancellation promise."
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/0/mechanism_steps/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S01",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S08"
+          ],
+          "reason": "Duplicate/load/replica/ctor/publication/postinit/actions chain closes."
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/0/mechanism_steps/1",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S14",
+            "CTL-S12",
+            "CTL-S13"
+          ],
+          "reason": "FireFX links ctor registration to actual normal/static consumers."
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/0/mechanism_steps/2",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07",
+            "CTL-S12",
+            "CTL-S13"
+          ],
+          "reason": "Referenced method is RemoveComponent; its stop/clear/hook/unreplicate/unregister and delayed stop consumption close."
+        }
+      ],
+      "compatibility": {
+        "verdict": "pass_static",
+        "dependency_coverage": "enumerated_static",
+        "reason": "Used static reference IDs and per-claim associations are enumerated; native/all-mod transitive closure and runtime remain expressly unknown."
+      }
+    },
+    {
+      "entry_id": "EXP-LIFE-006",
+      "verdict": "pass_static",
+      "runtime_verified": false,
+      "claims": [
+        {
+          "id": "EXP-LIFE-006-C01",
+          "pointer": "/entries/1/claims/0",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S17"
+          ],
+          "reason": "Host GUID/first callback argument/pending handle/onfinish and static shared ownership verified."
+        },
+        {
+          "id": "EXP-LIFE-006-C02",
+          "pointer": "/entries/1/claims/1",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20"
+          ],
+          "reason": "One-shot limit=1, periodic nil limit and initialdelay-or-period/tick ceiling verified; numeric domains stay bounded."
+        },
+        {
+          "id": "EXP-LIFE-006-C03",
+          "pointer": "/entries/1/claims/2",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ],
+          "reason": "Callback precedes limit bookkeeping; Cancel and Cleanup notification differences are explicit."
+        },
+        {
+          "id": "EXP-LIFE-006-C04",
+          "pointer": "/entries/1/claims/3",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S19",
+            "CTL-S18"
+          ],
+          "reason": "Self-cancel changes subsequent bookkeeping and clears host ownership, without unwinding current callback or component fields."
+        },
+        {
+          "id": "EXP-LIFE-006-C05",
+          "pointer": "/entries/1/claims/4",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S15",
+            "CTL-S17",
+            "CTL-S16",
+            "CTL-S03",
+            "CTL-S21"
+          ],
+          "reason": "Host-wide ordinary/static cancellation and Remove ordering are verified; RemoveComponent lacks host-wide cancellation."
+        },
+        {
+          "id": "EXP-LIFE-006-C06",
+          "pointer": "/entries/1/claims/5",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S03",
+            "CTL-S21",
+            "CTL-S20"
+          ],
+          "reason": "Cross-host ownership inference is bounded to listed Lua paths; native Retire outcomes are expressly unknown."
+        },
+        {
+          "id": "EXP-LIFE-006-C07",
+          "pointer": "/entries/1/claims/6",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ],
+          "reason": "Direct fn/onfinish calls have no local protected cleanup; outer engine recovery is not inferred."
+        },
+        {
+          "id": "EXP-LIFE-006-C08",
+          "pointer": "/entries/1/claims/7",
+          "kind": "REC",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S18",
+            "CTL-S03",
+            "CTL-S21"
+          ],
+          "reason": "Recommendation matches per-business handles and identity checks, without adding gameplay policy."
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:DoTaskInTime",
+          "pointer": "/entries/1/api_contracts/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ],
+          "reason": "Periodic handle return, preserved callback host argument, deferred tick and no fn-result return verified."
+        },
+        {
+          "symbol": "EntityScript:DoPeriodicTask",
+          "pointer": "/entries/1/api_contracts/1",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S03"
+          ],
+          "reason": "Nil limit repeats; callback return is ignored; phase has no wrapper randomization; zero/negative runtime domains unverified."
+        },
+        {
+          "symbol": "EntityScript:CancelAllPendingTasks",
+          "pointer": "/entries/1/api_contracts/2",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S15",
+            "CTL-S16",
+            "CTL-S17",
+            "CTL-S18",
+            "CTL-S19",
+            "CTL-S21"
+          ],
+          "reason": "Host-wide shared table cancellation and callback/onfinish replacement or reentry caveats are accurate."
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/1/mechanism_steps/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S17",
+            "CTL-S15",
+            "CTL-S20"
+          ],
+          "reason": "Producer/helper/host ownership and completion callback all close."
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/1/mechanism_steps/1",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ],
+          "reason": "Callback then requeue/finish and in-callback Cancel relation close."
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/1/mechanism_steps/2",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S15",
+            "CTL-S21"
+          ],
+          "reason": "Component business cleanup versus host-wide cancellation and entity removal order close."
+        }
+      ],
+      "compatibility": {
+        "verdict": "pass_static",
+        "dependency_coverage": "enumerated_static",
+        "reason": "Used static reference IDs and per-claim associations are enumerated; native/all-mod transitive closure and runtime remain expressly unknown."
+      }
+    },
+    {
+      "entry_id": "EXP-LIFE-007",
+      "verdict": "pass_static",
+      "runtime_verified": false,
+      "claims": [
+        {
+          "id": "EXP-LIFE-007-C01",
+          "pointer": "/entries/2/claims/0",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24"
+          ],
+          "reason": "Timer assert, eight matching listener identities, non-nil guard and Stop order verified."
+        },
+        {
+          "id": "EXP-LIFE-007-C02",
+          "pointer": "/entries/2/claims/1",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S27",
+            "CTL-S16"
+          ],
+          "reason": "Seeking registers exact callback and random initial phase; success starts Timer then cancels its periodic handle before state update."
+        },
+        {
+          "id": "EXP-LIFE-007-C03",
+          "pointer": "/entries/2/claims/2",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ],
+          "reason": "Cancel inside periodic callback clears three ownership layers; true return is unused by scheduler."
+        },
+        {
+          "id": "EXP-LIFE-007-C04",
+          "pointer": "/entries/2/claims/3",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29"
+          ],
+          "reason": "Timer first removes old name; SaltLicker checks target validity/finiteuses, then environment and rediscovery."
+        },
+        {
+          "id": "EXP-LIFE-007-C05",
+          "pointer": "/entries/2/claims/4",
+          "kind": "EI",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ],
+          "reason": "Old handle cancellation happens before synchronous listener execution; tail Cleanup acts on old handle, not new timer name."
+        },
+        {
+          "id": "EXP-LIFE-007-C06",
+          "pointer": "/entries/2/claims/5",
+          "kind": "NSF",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S24",
+            "CTL-S25",
+            "CTL-S26"
+          ],
+          "reason": "Pause/resume guards, unload Stop, change-only saltchange and existing-Timer LoadPostPass path verified."
+        },
+        {
+          "id": "EXP-LIFE-007-C07",
+          "pointer": "/entries/2/claims/6",
+          "kind": "REC",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S25",
+            "CTL-S26",
+            "CTL-S27",
+            "CTL-S28",
+            "CTL-S29"
+          ],
+          "reason": "Recommendation retains exact listener identity and observable Stop side effects; no universal reentry safety promise."
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SaltLicker:SetUp",
+          "pointer": "/entries/2/api_contracts/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24",
+            "CTL-S23",
+            "CTL-S26",
+            "CTL-S27",
+            "CTL-S16",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S28",
+            "CTL-S29",
+            "CTL-S03",
+            "CTL-S21"
+          ],
+          "reason": "SetUp uses non-nil configuration, Stop-first ordering, eight listeners and immediate restore; component-slot consumer precondition and synchronous reentry caveat are explicit."
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "pointer": "/entries/2/mechanism_steps/0",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24",
+            "CTL-S23",
+            "CTL-S16"
+          ],
+          "reason": "SetUp/TryUnpause/immediate search and no-target resource creation close."
+        },
+        {
+          "step": 2,
+          "pointer": "/entries/2/mechanism_steps/1",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S27",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S26"
+          ],
+          "reason": "Periodic callback success transitions to Timer and cancels itself before state change."
+        },
+        {
+          "step": 3,
+          "pointer": "/entries/2/mechanism_steps/2",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29",
+            "CTL-S19",
+            "CTL-S18"
+          ],
+          "reason": "Timer name release to synchronous event and consumer rebuild close."
+        },
+        {
+          "step": 4,
+          "pointer": "/entries/2/mechanism_steps/3",
+          "verdict": "pass_static",
+          "evidence_refs": [
+            "CTL-S24",
+            "CTL-S25",
+            "CTL-S26",
+            "CTL-S28",
+            "CTL-S03"
+          ],
+          "reason": "Pause, business Stop, unload and persisted Timer-state consumption close; all-resource wording is contextual to matching exits."
+        }
+      ],
+      "compatibility": {
+        "verdict": "pass_static",
+        "dependency_coverage": "enumerated_static",
+        "reason": "Used static reference IDs and per-claim associations are enumerated; native/all-mod transitive closure and runtime remain expressly unknown."
+      }
+    }
+  ],
+  "source_reference_results": [
+    {
+      "id": "CTL-S01",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 52,
+      "line_end": 60,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "a4dcd8e6a054e5f89f39bd306621ad4698b0c9aceda007c1ec761d4f462ed048",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Original-name class cache/require/assert and injected watcher helpers."
+    },
+    {
+      "id": "CTL-S02",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 632,
+      "line_end": 668,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "f1923cbc36685515f5746fea72085f8e95792112c741bdb9aa213254757a2881",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Case-insensitive duplicate guard and staged installation order."
+    },
+    {
+      "id": "CTL-S03",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 670,
+      "line_end": 685,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Exact-key component unload and post-hook operations."
+    },
+    {
+      "id": "CTL-S04",
+      "source_file": "scripts/entityreplica.lua",
+      "line_start": 30,
+      "line_end": 67,
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "range_sha256": "e867870ca23384d4ad78f69c1c9dc0e37125ff4ae747ece864b1bd3be90bf3e3",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Replica public tag gate, conditional replication and unreplicate retaining raw object."
+    },
+    {
+      "id": "CTL-S05",
+      "source_file": "scripts/mods.lua",
+      "line_start": 818,
+      "line_end": 838,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "PostInit collection wraps callbacks in enabledmods/modfns order."
+    },
+    {
+      "id": "CTL-S06",
+      "source_file": "scripts/mods.lua",
+      "line_start": 153,
+      "line_end": 166,
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Original modfn xpcall and RemoveBadMod/DisplayBadMods boundary."
+    },
+    {
+      "id": "CTL-S07",
+      "source_file": "scripts/componentactions.lua",
+      "line_start": 3152,
+      "line_end": 3168,
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "range_sha256": "e74d33e53d1c9e67ef8323fa4e24476defb0946c18b3bb31231ce11c52f29d0e",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Mod action ID lookup and warning dependency of unregister."
+    },
+    {
+      "id": "CTL-S08",
+      "source_file": "scripts/componentactions.lua",
+      "line_start": 3183,
+      "line_end": 3234,
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "range_sha256": "9f5f7500a4408483912bf4d4c8c69f324165ea93c337d263a46663b3d7917458",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Actions insertion and first-matching-index removal; no slot identity check."
+    },
+    {
+      "id": "CTL-S09",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 439,
+      "line_end": 473,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "43819b4a55a8951755b73c76c00cb9ed9a0f053f292c958eeb475ab5f6dbf911",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Update-object producer, validity guard and matching stop-marker revocation."
+    },
+    {
+      "id": "CTL-S10",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 475,
+      "line_end": 502,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "c6c225173d8064010a98f1897934343e4ca35da6bea42fad72c3f6ec4930d4ab",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Stop marker producer and deferred ordinary/static object/index removal."
+    },
+    {
+      "id": "CTL-S11",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 527,
+      "line_end": 544,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "f2f94a72c3e9c5c23b2cfffeb9401f479388fe10bb3493890008e3fae9ae01e3",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Separate immediate wall-update removal path."
+    },
+    {
+      "id": "CTL-S12",
+      "source_file": "scripts/update.lua",
+      "line_start": 224,
+      "line_end": 298,
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "range_sha256": "2b69986879999b3f39411f78f2edac1bd1e81c84f374edbe825b2323c0517ddb",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Normal scheduler before component loop, stop check, new-entity merge and deferred consumer."
+    },
+    {
+      "id": "CTL-S13",
+      "source_file": "scripts/update.lua",
+      "line_start": 169,
+      "line_end": 220,
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "range_sha256": "78b11ab375fddc37f4713be6fc04871dd57610da80f2325e08b447b9125b7de1",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Paused static consumer uses normal component map, OnStaticUpdate(0), same stop table."
+    },
+    {
+      "id": "CTL-S14",
+      "source_file": "scripts/components/firefx.lua",
+      "line_start": 1,
+      "line_end": 25,
+      "file_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+      "range_sha256": "887953457490ada77f5a76cf198d2461e7e03e95819b6bffa914745f899ff74a",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Concrete FireFX constructor calls StartUpdatingComponent before ctor returns."
+    },
+    {
+      "id": "CTL-S15",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1494,
+      "line_end": 1510,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "2d04eb0a077057d94233c5a5a16d12a546ccbb8ed10677f7b027932804d88d97",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Host-wide pending cancellation and host-only task_finish removal."
+    },
+    {
+      "id": "CTL-S16",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1537,
+      "line_end": 1555,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "74015930d04315d9f9b790f2bc61edd9756ce3df2fb7973577961875978f87f7",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Ordinary task helpers supply host GUID/first argument and retain handle."
+    },
+    {
+      "id": "CTL-S17",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1512,
+      "line_end": 1535,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "f324a19f35c1f8487adee83c2013e386553f8ad2a11dc569a65175eb2eb2e09c",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Static helpers use staticScheduler but same host pendingtasks."
+    },
+    {
+      "id": "CTL-S18",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 45,
+      "line_end": 95,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "c42df9745caa288c40ad937be16360bf31f654179cb5ea432f96b0741849fed2",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Periodic fields, Cancel(false finish) and Cleanup(no notification)."
+    },
+    {
+      "id": "CTL-S19",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 164,
+      "line_end": 216,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Direct callback call before limit/reschedule/finish and old-handle cleanup."
+    },
+    {
+      "id": "CTL-S20",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 276,
+      "line_end": 301,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "668d7ce5cd699d740a0022774d27c7e2d984826a4f266a5e489f0788b23207be",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "One-shot specialization, tick ceiling/nexttick guard and initial-delay choice."
+    },
+    {
+      "id": "CTL-S21",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1730,
+      "line_end": 1797,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Entity removal uses its own event/cancel/OnRemoveEntity sequence and native Retire boundary."
+    },
+    {
+      "id": "CTL-S22",
+      "source_file": "scripts/components/saltlicker.lua",
+      "line_start": 71,
+      "line_end": 87,
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "range_sha256": "e962349e50005f7bb2d6858c9259adc38a71c17e7705c07f3fbfc3f162252dbb",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "SaltLicker Timer assertion and business-field initialization."
+    },
+    {
+      "id": "CTL-S23",
+      "source_file": "scripts/components/saltlicker.lua",
+      "line_start": 1,
+      "line_end": 69,
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "range_sha256": "7ac2bf07eca88a2007a46a4a3c54716bfac98b6ff14da7a078b17797e6421bea",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Seeking producer/cancel pair, concrete self-cancel path and timerdone consumer."
+    },
+    {
+      "id": "CTL-S24",
+      "source_file": "scripts/components/saltlicker.lua",
+      "line_start": 89,
+      "line_end": 108,
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "range_sha256": "061cd8175771f92f28ff61da56d188491a83064154fe6a3e00d42616ab31b5a7",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Pause/unpause/death dispatch guards and component-slot reads."
+    },
+    {
+      "id": "CTL-S25",
+      "source_file": "scripts/components/saltlicker.lua",
+      "line_start": 110,
+      "line_end": 147,
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "range_sha256": "686069fe6be7a266729d3facf71a12fb4d475c6bce96065a26e34322700964d5",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "SetUp/Stop eight exact listener pairs and unload hook."
+    },
+    {
+      "id": "CTL-S26",
+      "source_file": "scripts/components/saltlicker.lua",
+      "line_start": 149,
+      "line_end": 167,
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "range_sha256": "7c549549086a1a6005c25ebc69a094d88f58ff3b68aaa03053fab26c5343050c",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Change-only state publication, save marker and existing-Timer load consumption."
+    },
+    {
+      "id": "CTL-S27",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 27,
+      "line_end": 66,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Timer name/handle lifecycle: duplicate guard, start, stop-before-event completion."
+    },
+    {
+      "id": "CTL-S28",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1214,
+      "line_end": 1256,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "de73c910b3a85eba96d71364761402a5c89b5d8d245939bdeea9fa921e71ef72",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Listener registration and exact callback/source removal."
+    },
+    {
+      "id": "CTL-S29",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1312,
+      "line_end": 1345,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "verdict": "pass_static",
+      "semantic_read": true,
+      "reason": "Snapshot collection and synchronous ordinary callbacks before SG/Brain continuation."
+    }
+  ],
+  "novelty_results": [
+    {
+      "entry_id": "EXP-LIFE-005",
+      "verdict": "bounded_new_mechanism_chain",
+      "existing_overlap": [
+        "FACT-DST-008",
+        "AI-N001-09",
+        "NC-N002-FINAL-04 claims 0..1",
+        "N006-READY-F02 claim 5",
+        "N006-READY-F03 claim 1"
+      ],
+      "increment": "Full install-publication/action tail and wrapped-mod failure boundary, unload remove/re-add identity hazard, update-stop producer/consumers and restart revocation. Basic replica-before-component, hook timing or unload distinction alone is not counted as novel."
+    },
+    {
+      "entry_id": "EXP-LIFE-006",
+      "verdict": "bounded_new_mechanism_chain",
+      "existing_overlap": [
+        "FACT-DST-008",
+        "AI-N001-09",
+        "EXP-COOK-004"
+      ],
+      "increment": "Concrete helper -> Periodic -> OnTick closure establishes callback-time pending ownership, self-cancel limit bookkeeping, no current-stack rollback and stale business-field boundary. Basic owner rule is a dependency."
+    },
+    {
+      "entry_id": "EXP-LIFE-007",
+      "verdict": "bounded_new_named_consumer",
+      "existing_overlap": [
+        "NC-N004-FINAL-07 claims 0..3",
+        "EXP-COOK-004"
+      ],
+      "increment": "SaltLicker provides a distinct named three-resource cycle and actual self-cancel consumer, including same-stack Timer name release/restart. Basic Timer methods or generic cleanup advice alone is not counted as novel."
+    }
+  ],
+  "nonblocking_notes": [
+    {
+      "pointer": "/entries/0/mechanism_steps/2/description",
+      "kind": "editorial_precision",
+      "statement": "The shorthand Remove denotes RemoveComponent in this step, as unambiguously fixed by CTL-S03 and the surrounding entry. Expanding the name would improve isolated step reading; this is not treated as a contradictory EntityScript:Remove claim."
+    }
+  ],
+  "independent_observation_refinements": [
+    {
+      "observation_id": "LIFE-O01",
+      "reason": "Pre-candidate observation described AddComponent local call/rollback structure but had not expanded runmodfn. Original mod callback errors are xpcall-caught by that wrapper; only propagating ctor/association/wrapper-handler errors stop the outer local path. Candidate C03/C04 correctly supplies this necessary distinction."
+    }
+  ],
+  "plan_notation": "Frozen plan used EXP-LIFE005..007 suffix shorthand; reviewed candidate IDs use existing repository style EXP-LIFE-005..007. Scope and count ceiling are unchanged.",
+  "explicit_dependencies": [
+    {
+      "path": "agents/independent_review/lifecycle/review-plan.json",
+      "sha256": "ef8b2c318772aa815a3b8a31fc95ba9c06355db0429890e85431bd35e115e536",
+      "purpose": "frozen independent plan/observations"
+    },
+    {
+      "path": "agents/independent_review/lifecycle/plan-freeze.json",
+      "sha256": "bd3e20ebe20ee9003bedf42fc1b3373effa951d4f681b8ab54de6da042f4adc9",
+      "purpose": "frozen independent plan/observations"
+    },
+    {
+      "path": "agents/independent_review/lifecycle/independent-observations.json",
+      "sha256": "26f0bd69a9c50d104cf6aa0458641cd5bd003cda62af97b74cd8563f54713f22",
+      "purpose": "frozen independent plan/observations"
+    },
+    {
+      "path": "agents/independent_review/lifecycle/old-knowledge-review-dependencies.json",
+      "sha256": "92cc962f2fbfffa4a2169ecdd05030a2d2cd43234cc542ec4b41cdbfb436afd5",
+      "purpose": "exact selected old public dedup atoms"
+    },
+    {
+      "path": "windows/B/DEDUP.md",
+      "sha256": "fa8adfb707eb1efe7f7620dda9c35b5fdf2d7fa9be7ba91679fa71eee5beb48e",
+      "purpose": "author supporting narrative; independently checked, not substituted for frozen source"
+    },
+    {
+      "path": "windows/B/component-task-ownership.md",
+      "sha256": "cf9a31f8e0d951a3dad187996169b24a5e6c16eac6dfb8996c788ff22e8c9a17",
+      "purpose": "author supporting narrative; independently checked, not substituted for frozen source"
+    }
+  ],
+  "old_review_artifacts_relied_on": [],
+  "limitations": [
+    "Static acceptance is limited to exact candidate SHA and listed frozen Lua branches.",
+    "No runtime, real client/server, native retirement, callback exception recovery, all-Mod compatibility or numeric-domain assurance.",
+    "Research/restricted/hold and historical Core Coding HOLD remain unchanged.",
+    "No original Lua text or private absolute paths included in review artifacts. Old public atoms retain original scopes and are used only for dedup."
+  ]
+}

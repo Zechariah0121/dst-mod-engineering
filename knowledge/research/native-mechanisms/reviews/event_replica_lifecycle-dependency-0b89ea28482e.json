@@ -1,0 +1,953 @@
+{
+  "schema_version": "independent-native-review-plan/1",
+  "campaign": "major-phase-20261106",
+  "reviewer_window": "D",
+  "review_target": "A frozen candidate only",
+  "stage": "prepared_without_candidate_access",
+  "candidate_sha256": null,
+  "runtime_verified": false,
+  "repository": {
+    "baseline_commit": "4edc5d8f840934d7f18114113b19663083d81f97",
+    "counts": {
+      "total": 231,
+      "legacy": 64,
+      "native_ai": 13,
+      "native_core": 110,
+      "native_mechanism": 44
+    },
+    "access": "read_only"
+  },
+  "source_identity": {
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "version_basis": "版本/build身份由总控冻结材料提供；D独立核ZIP原字节SHA，未启动或检查可执行程序。",
+    "file_hash_method": "SHA256 of original ZIP member bytes",
+    "range_hash_method": "UTF8 decode, splitlines, LF join, no trailing newline; SHA256"
+  },
+  "governance": {
+    "new_research_states": {
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold"
+    },
+    "canonical_and_old_scope": "unchanged",
+    "native_source_payload": "not_copied",
+    "private_paths": "not_included",
+    "game_or_lua_runtime": "not_run",
+    "registration_install_publication": "not_performed",
+    "delegation": "none"
+  },
+  "preparation_protocol_artifacts": [
+    {
+      "artifact": "dst-kb-service/dst_kb/mechanism_contract.py",
+      "sha256": "6b74b73c905b12ac9b69043f3379164dfe269947f6cb3ddd08f07860210009bd"
+    },
+    {
+      "artifact": "docs/native-mechanisms.md",
+      "sha256": "d95b12519ed0d137f7278da4dda0c460113fa883fce16906736d41d0a1df267e"
+    },
+    {
+      "artifact": "knowledge/CATALOG.json",
+      "sha256": "ef7aa69c42f85f17c6e62556f3fbab9b7dede88e9692238a090a6fd140452be9"
+    }
+  ],
+  "dedup_reads": [
+    {
+      "entry_id": "NC-N002-FINAL-04",
+      "artifact": "knowledge/data/nativecore/native-core.json",
+      "artifact_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/3",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖登记名称、AddComponent先复制后构造、raw/public标签过滤、classified附着与具体getter；仅再次描述这些基础不构成增量。"
+    },
+    {
+      "entry_id": "NC-N002-FINAL-05",
+      "artifact": "knowledge/data/nativecore/native-core.json",
+      "artifact_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/4",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖初始化与后续dirty分离，以及同一owner/source/function解绑建议；不能包装成新就绪保证。"
+    },
+    {
+      "entry_id": "AI-N001-09",
+      "artifact": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "artifact_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "pointer": "/entries/8",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "coding_default"
+      },
+      "dedup_boundary": "已覆盖实体task owner、事件双索引与组件卸载不是整实体清理，以及teardown中新建工作的风险；后续需证明更具体且有用的分支差异。"
+    },
+    {
+      "entry_id": "AI-N001-10",
+      "artifact": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "artifact_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "pointer": "/entries/9",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "coding_default"
+      },
+      "dedup_boundary": "已覆盖raw/public replica、classified、netvar和HUD分层可用；不得把原始表访问当推荐公共接口。"
+    },
+    {
+      "entry_id": "EXP-ARCH-001",
+      "artifact": "knowledge/research/native-mechanisms/architecture_events-e9026d0a3b42.json",
+      "artifact_sha256": "e9026d0a3b425c46d9d515f5717a2681d076a2979484060a0933269e44ee99d1",
+      "pointer": "/entries/0",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖双索引、重复登记、快照、解绑不取消当前快照、阶段间接收器变化；本轮需与解除身份、双向清边及实体退场阶段作增量区分。"
+    },
+    {
+      "entry_id": "EXP-ARCH-004",
+      "artifact": "knowledge/research/native-mechanisms/architecture_loading-8c467f36285a.json",
+      "artifact_sha256": "8c467f36285a44eb436825f30c16f7779820d3e6a127e5703bcd1f8f9c062b36",
+      "pointer": "/entries/1",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖Container双向补接、暂存交接、Attach先写字段/监听后初始化与非幂等窗口；只新增版本号或重复补接流程不够。"
+    },
+    {
+      "entry_id": "RULE-LIFE-001",
+      "artifact": "knowledge/data/entries.json",
+      "artifact_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "pointer": "/entries/26",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "status": "candidate"
+      },
+      "dedup_boundary": "CASE-001范围的既有owner工程建议；不是任意组件/原生资源销毁的事实保证。"
+    }
+  ],
+  "historical_locator_comparison": [
+    {
+      "entry_id": "EXP-ARCH-001",
+      "historical_source_epoch": "761239",
+      "historical_archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+      "target_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+      "reference_count": 13,
+      "results": [
+        {
+          "ref": "AE-S01",
+          "source_file": "scripts/entityscript.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S02",
+          "source_file": "scripts/entityscript.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S03",
+          "source_file": "scripts/entityscript.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S04",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S05",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S06",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S07",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S09",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S10",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S11",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S13",
+          "source_file": "scripts/brain.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S17",
+          "source_file": "scripts/entityscript.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AE-S18",
+          "source_file": "scripts/stategraph.lua",
+          "file_match": true,
+          "range_match": true
+        }
+      ],
+      "meaning": "逐引用字节身份核对；不把旧Scope改写为762172，不代替尚未执行的全依赖行为复核。"
+    },
+    {
+      "entry_id": "EXP-ARCH-004",
+      "historical_source_epoch": "761239",
+      "historical_archive_sha256": "fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76",
+      "target_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+      "reference_count": 12,
+      "results": [
+        {
+          "ref": "AR-S01",
+          "source_file": "scripts/mainfunctions.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S02",
+          "source_file": "scripts/entityreplica.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S03",
+          "source_file": "scripts/entityscript.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S04",
+          "source_file": "scripts/components/container_replica.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S05",
+          "source_file": "scripts/prefabs/container_classified.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S06",
+          "source_file": "scripts/components/container_replica.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S07",
+          "source_file": "scripts/prefabs/container_classified.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S08",
+          "source_file": "scripts/prefabs/container_classified.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S09",
+          "source_file": "scripts/prefabs/container_classified.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S10",
+          "source_file": "scripts/components/container_replica.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S11",
+          "source_file": "scripts/containers.lua",
+          "file_match": true,
+          "range_match": true
+        },
+        {
+          "ref": "AR-S12",
+          "source_file": "scripts/components/container_replica.lua",
+          "file_match": true,
+          "range_match": true
+        }
+      ],
+      "meaning": "逐引用字节身份核对；不把旧Scope改写为762172，不代替尚未执行的全依赖行为复核。"
+    }
+  ],
+  "source_references": [
+    {
+      "id": "D-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1229,
+      "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+      "symbols": [
+        "AddListener",
+        "EntityScript:ListenForEvent"
+      ],
+      "review_role": "registration",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1231,
+      "line_end": 1288,
+      "range_sha256": "541906991ed8deb2f50421810d42e5f3468cf396f898b1cbab488a0b42782740",
+      "symbols": [
+        "RemoveListener",
+        "EntityScript:RemoveEventCallback",
+        "EntityScript:RemoveAllEventCallbacks"
+      ],
+      "review_role": "removal",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S03",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 235,
+      "line_end": 246,
+      "range_sha256": "94ffa8625e05df09f222b2ed9ce01fd69359aa1490669da1ff01d6cfe0c3415e",
+      "symbols": [
+        "RemoveByValue"
+      ],
+      "review_role": "callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent",
+        "EntityScript:PushEventImmediate"
+      ],
+      "review_role": "dispatch_consumer",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1801,
+      "range_sha256": "71d3faab59887eeb3ed6b3a4708d8bb7944b4f0d05504a8b609f81a31cca8100",
+      "symbols": [
+        "EntityScript:Remove",
+        "EntityScript:IsValid"
+      ],
+      "review_role": "entity_teardown",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S06",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 577,
+      "range_sha256": "90a743b498c232721d62154f6352bf425666ed6a2f81319baf682e4f42830337",
+      "symbols": [
+        "OnRemoveEntity",
+        "RemoveEntity",
+        "PushEntityEvent"
+      ],
+      "review_role": "caller_and_teardown_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S07",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 951,
+      "range_sha256": "56009cc854663597b00e8f0856e3b2032c3b296cf139bf1f65da69a1040a817c",
+      "symbols": [
+        "EntityScript:RemoveChild",
+        "EntityScript:AddChild",
+        "EntityScript:RemovePlatformFollower"
+      ],
+      "review_role": "teardown_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S08",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1290,
+      "line_end": 1310,
+      "range_sha256": "325f8dd7533a652c7237f8d6e36445949b8db834f9368627c64720775f9ac469",
+      "symbols": [
+        "EntityScript:WatchWorldState",
+        "EntityScript:StopWatchingWorldState",
+        "EntityScript:StopAllWatchingWorldStates"
+      ],
+      "review_role": "teardown_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S09",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 281,
+      "line_end": 325,
+      "range_sha256": "1da56332c3d479999eab54808551b86aad389b35efb18df6f7f71c836f9c96a3",
+      "symbols": [
+        "AddWatcher",
+        "RemoveWatcher"
+      ],
+      "review_role": "worldstate_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S10",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish",
+        "EntityScript:DoStaticPeriodicTask",
+        "EntityScript:DoStaticTaskInTime",
+        "EntityScript:DoPeriodicTask",
+        "EntityScript:DoTaskInTime"
+      ],
+      "review_role": "task_owner_and_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S11",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1091,
+      "line_end": 1097,
+      "range_sha256": "2122ae6655889f5882f58baf7966b7ffcfd1010794a5fb3b4b2e031eff3844b1",
+      "symbols": [
+        "EntityScript:KillTasks",
+        "EntityScript:StartThread"
+      ],
+      "review_role": "teardown_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S12",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 45,
+      "line_end": 95,
+      "range_sha256": "c42df9745caa288c40ad937be16360bf31f654179cb5ea432f96b0741849fed2",
+      "symbols": [
+        "Periodic",
+        "Periodic:Cancel",
+        "Periodic:Cleanup"
+      ],
+      "review_role": "periodic_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S13",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 276,
+      "line_end": 314,
+      "range_sha256": "bb72d74c79fa67c4d738ffa2bc564eaeda2ebd6f6632141642ad95b6501bc01d",
+      "symbols": [
+        "Scheduler:ExecuteInTime",
+        "Scheduler:GetListForTimeFromNow",
+        "Scheduler:ExecutePeriodic",
+        "Scheduler:KillTasksWithID"
+      ],
+      "review_role": "scheduler_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S14",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 427,
+      "line_end": 430,
+      "range_sha256": "3d7ae4ff6af65702b1b225d7f412cc8037e2da48fec98e084cffdbc5ded1a57c",
+      "symbols": [
+        "KillThreadsWithID"
+      ],
+      "review_role": "thread_cleanup_bridge",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S15",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 12,
+      "line_end": 17,
+      "range_sha256": "95c43f7b7143b0038880a198c553faa29b25fcab4bf2d8d57f9008da71872a12",
+      "symbols": [
+        "BrainWrangler:OnRemoveEntity"
+      ],
+      "review_role": "teardown_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S16",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 39,
+      "line_end": 54,
+      "range_sha256": "b9a68596a41c03eb41464e702f40cb3d131e0b4ea69a3b960ca406d04285d820",
+      "symbols": [
+        "BrainWrangler:SendToList"
+      ],
+      "review_role": "manager_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S17",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 89,
+      "line_end": 98,
+      "range_sha256": "dc49dd075ec827fff26d025df1e875cf76b752487dbe7b253d5ed8328808e627",
+      "symbols": [
+        "BrainWrangler:RemoveInstance"
+      ],
+      "review_role": "manager_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S18",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 246,
+      "line_end": 267,
+      "range_sha256": "9427b7a96141a39f05b03bd155892f26fab0da38954dc68160e98ae560b66dab",
+      "symbols": [
+        "Brain:_Stop_Internal",
+        "Brain:PushEvent"
+      ],
+      "review_role": "comparison_and_dispatch_consumer",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S19",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 13,
+      "line_end": 45,
+      "range_sha256": "bb8e752439adb553141f1063ae31a6ea99892562338b9fb808c01a8b3aba41e5",
+      "symbols": [
+        "StateGraphWrangler:SendToList",
+        "SGManager:OnEnterNewState",
+        "StateGraphWrangler:OnSetTimeout",
+        "StateGraphWrangler:OnPushEvent"
+      ],
+      "review_role": "manager_gate",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S20",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 76,
+      "line_end": 107,
+      "range_sha256": "a6cdbbb5652c0be87d30180d80f8380e3d4609fe3f73a704bb3ad6f944a6fb60",
+      "symbols": [
+        "StateGraphWrangler:OnRemoveEntity",
+        "StateGraphWrangler:RemoveInstance",
+        "StateGraphWrangler:AddInstance"
+      ],
+      "review_role": "manager_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S21",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 709,
+      "line_end": 731,
+      "range_sha256": "9374efa11bec9ad0f9ab8abc9b3568bbc4f30993c06ac391ec8dbef417522db9",
+      "symbols": [
+        "StateGraphInstance:Start",
+        "StateGraphInstance:Stop"
+      ],
+      "review_role": "comparison_only",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S22",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 1,
+      "line_end": 100,
+      "range_sha256": "8b0bdc85a2e8e4ed3686ff6b4ddc82db9f6c131c866f056b1fa3a4e04f9d9b57",
+      "symbols": [
+        "EntityScript:ValidateReplicaComponent",
+        "EntityScript:ReplicateComponent",
+        "EntityScript:UnreplicateComponent",
+        "EntityScript:PrereplicateComponent",
+        "EntityScript:ReplicateEntity",
+        "EntityScript:TryAttachClassifiedToReplicaComponent",
+        "AddReplicableComponent"
+      ],
+      "review_role": "complete_file",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 208,
+      "line_end": 246,
+      "range_sha256": "a0da72ce87c8f4139cdf1cf1ad0504e5184a1207ab5c9696411a56deb28fe995",
+      "symbols": [
+        "replica_mt",
+        "EntityScript"
+      ],
+      "review_role": "raw_storage_and_public_consumer",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 618,
+      "line_end": 685,
+      "range_sha256": "6017f2111d6a34c03a2d5ba6ade81ab9b58163db2796195b58eebd0087b57362",
+      "symbols": [
+        "EntityScript:AddComponent",
+        "EntityScript:RemoveComponent"
+      ],
+      "review_role": "replica_callers",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S25",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 52,
+      "line_end": 60,
+      "range_sha256": "a4dcd8e6a054e5f89f39bd306621ad4698b0c9aceda007c1ec761d4f462ed048",
+      "symbols": [
+        "LoadComponent"
+      ],
+      "review_role": "component_loader_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S26",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 439,
+      "line_end": 544,
+      "range_sha256": "40a71790c334c46b96e32063d2f94706ea4f50abd9652d4895cfc79a33e99770",
+      "symbols": [
+        "EntityScript:StartUpdatingComponent",
+        "EntityScript:StopUpdatingComponent",
+        "EntityScript:StopUpdatingComponent_Deferred",
+        "EntityScript:StartWallUpdatingComponent",
+        "EntityScript:StopWallUpdatingComponent"
+      ],
+      "review_role": "component_update_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S27",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 3183,
+      "line_end": 3234,
+      "range_sha256": "9f5f7500a4408483912bf4d4c8c69f324165ea93c337d263a46663b3d7917458",
+      "symbols": [
+        "EntityScript:RegisterComponentActions",
+        "EntityScript:UnregisterComponentActions"
+      ],
+      "review_role": "component_action_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S28",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 840,
+      "line_end": 854,
+      "range_sha256": "42e290c16f1d0c61d8353b4a2417223ff3e017a5eadef04520db6ca8bda64edc",
+      "symbols": [
+        "ReplicateEntity"
+      ],
+      "review_role": "replication_caller",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S29",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 1,
+      "line_end": 62,
+      "range_sha256": "3c604ffa87746503dfe8cd9cc388119df4a2fd889f38eb9d1b6def84d726d455",
+      "symbols": [
+        "Container constructor"
+      ],
+      "review_role": "concrete_replica_constructor",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S30",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 76,
+      "line_end": 125,
+      "range_sha256": "921e021e6f096e1f9c0855b9984f232d5bcddaf4deb21b6d5430359c85b9465b",
+      "symbols": [
+        "Container:OnRemoveEntity",
+        "commented Container:OnRemoveFromEntity"
+      ],
+      "review_role": "concrete_cleanup_and_inactive_code_boundary",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S31",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 153,
+      "line_end": 189,
+      "range_sha256": "61a83caf4ec7bbcddc87f666d3137601cac6d523dd943138505ee4db59396c80",
+      "symbols": [
+        "Container:AttachClassified",
+        "Container:DetachClassified",
+        "Container:AttachOpener",
+        "Container:DetachOpener"
+      ],
+      "review_role": "concrete_attachment_and_cleanup",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S32",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 62,
+      "line_end": 76,
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "symbols": [
+        "OnRemoveEntity",
+        "OnEntityReplicated"
+      ],
+      "review_role": "concrete_attachment_caller",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S33",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 8,
+      "line_end": 22,
+      "range_sha256": "972c7b059a4c13d2d02247100b5193543b86ae0b020f61e0e1895e8cfede5fbf",
+      "symbols": [
+        "InitializeSlots"
+      ],
+      "review_role": "concrete_attachment_callee",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S34",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 232,
+      "line_end": 275,
+      "range_sha256": "69701885bbf76b96a83ce31d679984617390192ae8881a026e5b7b52d96d4f13",
+      "symbols": [
+        "Container:WidgetSetup",
+        "Container:SetNumSlots",
+        "Container:GetNumSlots"
+      ],
+      "review_role": "concrete_attachment_consumer",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S35",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 1050,
+      "line_end": 1108,
+      "range_sha256": "09bf1238131bdb0b9eba80707ca018db45394a2b1649d4046fdd20970bbeb8dc",
+      "symbols": [
+        "fn",
+        "OnEntityReplicated",
+        "RegisterNetListeners"
+      ],
+      "review_role": "concrete_client_initialization",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    },
+    {
+      "id": "D-S36",
+      "source_file": "scripts/prefabs/flotationcushion.lua",
+      "file_sha256": "59e4ba969b35253a27f9eff6352f81e1e4de8a038e62edd2c665bd4a6c4ffa9f",
+      "line_start": 28,
+      "line_end": 74,
+      "range_sha256": "01c070254ebd470de898e6cb034cdeab096347c35a8e9d2654dae3266ba1579e",
+      "symbols": [
+        "fn",
+        "EntityScript:PrereplicateComponent"
+      ],
+      "review_role": "prereplication_callsite_only",
+      "reviewed": "static_lua_semantic_read_with_named_dependency_boundary"
+    }
+  ],
+  "independent_checkpoints": [
+    {
+      "area": "event_registration_and_unbinding",
+      "refs": [
+        "D-S01",
+        "D-S02",
+        "D-S03",
+        "D-S04"
+      ],
+      "observations": [
+        "登记分别追加双向数组且不去重；解除按listener、event、source、同一函数身份定位，source缺省self。",
+        "RemoveByValue在数组从后向前删除所有相同值；一次RemoveEventCallback不是只删除一次重复登记。",
+        "RemoveEventCallback要求函数类型；新匿名函数或错误source不等于原注册身份。",
+        "RemoveAllEventCallbacks双向移除自身边并清自身两张表，不保证把对端留下的全部空内层表都归零。",
+        "发布中的纯函数快照已经属于EXP-ARCH-001；正常解绑不提供当前派发撤回。"
+      ]
+    },
+    {
+      "area": "entity_remove_order",
+      "refs": [
+        "D-S05",
+        "D-S06",
+        "D-S07",
+        "D-S08",
+        "D-S09",
+        "D-S10",
+        "D-S11",
+        "D-S12",
+        "D-S13",
+        "D-S14",
+        "D-S15",
+        "D-S16",
+        "D-S17",
+        "D-S18",
+        "D-S19",
+        "D-S20",
+        "D-S21"
+      ],
+      "observations": [
+        "Remove先处理parent/platform，再调用全局OnRemoveEntity；全局移出Brain/SG管理索引、按GUID杀线程、移除Ents及更新集合。",
+        "全局OnRemoveEntity不是实体最后的同名实例hook；之后才同步PushEvent onremove，再清worldstate、事件边、pendingtasks。",
+        "按GUID的KillTasks/线程路径与pendingtasks的Periodic:Cancel是不同入口；不把前者说成已取消所有定时回调。",
+        "之后按pairs调用components及raw replica表中的OnRemoveEntity，再清更新表、递归children、清platformfollowers，调用实体OnRemoveEntity，最终persists=false并Retire。",
+        "Brain/SG manager移除不等于调用Stop或清inst.brain/inst.sg；ordinary SG入队通常已受manager门禁，普通listener可重入并改变后续接收器。",
+        "Remove未建立通用重入锁、pcall或finally；先清过事件/任务后，后续hook新建的工作没有本方法第二遍清理保证。",
+        "Ents移出、原生IsValid与Retire是不同观察点，不从Lua顺序推断C++立刻回收或onremove前已无效。"
+      ]
+    },
+    {
+      "area": "replica_construction_and_visibility",
+      "refs": [
+        "D-S22",
+        "D-S23",
+        "D-S24",
+        "D-S25",
+        "D-S28",
+        "D-S36"
+      ],
+      "observations": [
+        "AddComponent先LoadComponent，再ReplicateComponent，实际component构造返回后才写components和lower shadow，之后postinit及actions。",
+        "ReplicateComponent有登记门禁；master先加公开标签，已有双下划线标签时移除此标签并提前返回，使用已保留replica。",
+        "普通构造分支缓存require结果；重复底层replica只打印提示，并不return或先清旧对象；构造成功返回后rawset替换。构造失败不会提供事务回滚。",
+        "UnreplicateComponent仅在master且底层对象存在时切换两类标签，不删除底层replica或自动调用其卸载hook；client调用该函数不执行此标签切换。",
+        "public replica读取经单下划线标签过滤；TryAttach直接读raw表，并在Attach正常返回后返回true，不检查公开标签。",
+        "ReplicateEntity按登记名与初始两类标签构造后调用本实体OnEntityReplicated；不证明跨实体引擎复制总序。",
+        "flotationcushion仅作PrereplicateComponent的具名callsite，不扩展其装备玩法或native复制承诺。"
+      ]
+    },
+    {
+      "area": "component_and_replica_cleanup",
+      "refs": [
+        "D-S05",
+        "D-S22",
+        "D-S24",
+        "D-S26",
+        "D-S27",
+        "D-S29",
+        "D-S30",
+        "D-S31",
+        "D-S32",
+        "D-S33",
+        "D-S34",
+        "D-S35"
+      ],
+      "observations": [
+        "RemoveComponent先停止更新并移出components/lower shadow，调用实际component.OnRemoveFromEntity，再Unreplicate并解除actions；没有整体任务/事件清理，也没有框架调用replica.OnRemoveFromEntity。",
+        "实际component卸载hook抛错可阻断后续Unreplicate/actions；不能宣称全链必然清完。",
+        "Entity Remove遍历raw replica表，故隐藏于public accessor之外的保留replica仍在具名OnRemoveEntity遍历范围。",
+        "Container的OnRemoveFromEntity示例整体在注释中，不能据此声称实际卸载方法存在；其有效OnRemoveEntity按master/client分支处理classified/openers。",
+        "Container补接、Attach的局部先写后断言与重复初始化窗口已属EXP-ARCH-004；本轮仅作为caller/callee/cleanup条件，不预先授予新卡身份。"
+      ]
+    }
+  ],
+  "candidate_review_protocol": [
+    "仅接受总控给出的精确冻结candidate路径与SHA；读取前独立校验原字节SHA，保存每轮候选身份。A未冻结草稿不读取，不代写正文。",
+    "逐entry保留Scope/unknowns/三轴状态；逐claim核NSF直接证据、EI推论边界和REC适用条件，逐API核visibility、参数、返回、异常与生命周期，逐step核执行顺序。",
+    "逐source_ref核archive、文件及指定算法范围hash；回到完整具名声明、caller/callee/consumer/cleanup及兼容依赖读语义。hash一致不单独当语义通过。",
+    "具体replica/component、ModManager Hook和action consumer若出现在候选实质声明中，继续读取其当前完整函数；本计划不预先声称全部动态构造器和第三方Hook已核。",
+    "去重以本计划已读原子为起点；候选触及其他旧机制时定向补读。只重述Owner、分层ready、快照或Container窗口应指出重复，避免按数目凑卡。",
+    "新研究只允许research/restricted/hold及runtime_verified:false。声明形态与公共稳定承诺分开，内部raw访问/局部函数不因可定位变成公共保证。",
+    "审阅JSON绑定精确候选SHA；每条问题保留claim/API/step/ref位置、依据、影响及是否阻断。接受结论只限已读静态证据边界。",
+    "修订不得覆盖初审或旧候选；每轮保留旧/新候选SHA、初审文件SHA、差异核验、继承与重新核读范围，全部依赖采用可打包相对路径与hash，不依赖私人机器路径。"
+  ],
+  "limitations": [
+    "这是冻结候选前的独立准备计划，不是对A的审阅结论，不承诺待到达候选的内容正确或有增量。",
+    "只核冻结762172 ZIP的具名Lua范围；未运行Lua行为夹具、游戏、专服或真实远端，不证明native生命周期、网络或Mod兼容性。",
+    "旧canonical/Scope/HOLD及旧证据版本保持原样；旧引用与新ZIP字节一致仅是该引用的局部事实。",
+    "历史Core仅定向读取Scope、状态及全部claim陈述；未把所有嵌套历史证据源或旧评测重新审计。",
+    "事件任意回调、动态组件构造器、全部原生方法、全部第三方Hook未穷尽；后续审阅按候选声称的依赖逐项补齐。",
+    "准备完成后交回总控；不自行轮询A草稿，不运行等待死循环。"
+  ]
+}

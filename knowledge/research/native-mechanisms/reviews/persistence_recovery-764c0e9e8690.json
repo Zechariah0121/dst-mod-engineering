@@ -1,0 +1,2142 @@
+{
+  "schema_version": "dst-independent-mechanism-review/1",
+  "reviewer": "E",
+  "candidate_path": "05-research-history/major-phase-20261106/coordinator/frozen/persistence_recovery-c9ceaf8c5538.json",
+  "candidate_sha256": "c9ceaf8c5538f494a1a1748c87621eb0f578d45d7481f553996aef6f3717dfd7",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "repository_baseline": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "verdict": "pass_static",
+  "registration_recommended": true,
+  "registration_approved": true,
+  "runtime_verified": false,
+  "summary": "原审阅两项补证阻断均闭合；最终候选3条/21 claims/8 API/12 steps维持原语义，46/46来源引用hash及契约通过。允许按research/restricted/hold研究登记，非运行或持久化成功证明。",
+  "review_dependencies": [
+    {
+      "path": "05-research-history/major-phase-20261106/windows/E/review-plan.json",
+      "sha256": "e2a60ee5172ce73ce022b45684bdf9a37285d709a50d3f3bc28a11f63a4846d9",
+      "role": "pre-candidate independent frozen plan"
+    },
+    {
+      "path": "05-research-history/major-phase-20261106/windows/E/review-r1.json",
+      "sha256": "b4fa809e78424abe3fb59c224dbaa599327828def483e16365ba9671fea65b32",
+      "role": "complete initial 071b candidate unit/source review"
+    },
+    {
+      "path": "05-research-history/major-phase-20261106/windows/E/review.json",
+      "sha256": "6bc781777ee33e7da4058279d23ee867b8d1c040746ebcadf78c3b54b7168be6",
+      "role": "complete 5be candidate review and exact four-field local API delta; preservation baseline for this follow-up"
+    }
+  ],
+  "method": {
+    "independent_source_read": true,
+    "author_unfrozen_drafts_read": false,
+    "candidate_modified": false,
+    "lua_or_game_executed": false,
+    "schema_validation": "PASS",
+    "reference_hash_validation": "46/46 PASS",
+    "json_format": "UTF8 no BOM LF",
+    "unit_counts": {
+      "claims": 21,
+      "api_contracts": 8,
+      "mechanism_steps": 12
+    },
+    "revision_approach": "仅复核变更与原02/03闭合，不重复未变化链；原审阅以精确依赖保留"
+  },
+  "blockers": [],
+  "entry_reviews": [
+    {
+      "id": "EXP-SAVE-001",
+      "claims": [
+        {
+          "pointer": "/entries/0/claims/0",
+          "unit": "SAVE-001-C01",
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "记录外壳与data/refs分离成立；GetSaveRecord不自行写当前GUID为id；组件非空table过滤不丢弃独立refs。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/1",
+          "unit": "SAVE-001-C02",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S12"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "完整筛选与空refs分支成立；第二返回非nil会标记保存者；id只写已入saved_ents的记录，不递归收目标。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/2",
+          "unit": "SAVE-001-C03",
+          "evidence_refs": [
+            "SAVE-S05"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "映射先于SetPersistData，旧id或inst键、未传表、不主动postpass及返回实例边界均成立。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/3",
+          "unit": "SAVE-001-C04",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S09",
+            "SAVE-S10"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "预补组件/兼容补建、preload、pairs组件load、prefab load顺序成立；世界newents渐进形成，world早期恢复不传表。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/4",
+          "unit": "SAVE-001-C05",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S11"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "按保存键匹配当前组件，随后prefab；tracker缺映射跳过并经TrackEntity重建监听成立。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/5",
+          "unit": "SAVE-001-C06",
+          "evidence_refs": [
+            "SAVE-S05",
+            "SAVE-S10",
+            "SAVE-S12",
+            "SAVE-S13"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "Container透传refs和newents，Debuffable均不透传；该路径对照成立，未泛化全部嵌套系统。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/6",
+          "unit": "SAVE-001-C07",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S05",
+            "SAVE-S06",
+            "SAVE-S08",
+            "SAVE-S11",
+            "SAVE-S12"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "inst键使对象可进postpass但不能按旧GUID反查；目标自身非空数据可能使顶层记录已有id，推导限定充分。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/claims/7",
+          "unit": "SAVE-001-C08",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S04",
+            "SAVE-S05",
+            "SAVE-S10",
+            "SAVE-S11",
+            "SAVE-S13"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "按实际caller选择阶段、缺目标遵循业务政策是建议；没有将缺映射解释为销毁或授权补发。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/0/api_contracts/0",
+          "unit": "EntityScript:GetSaveRecord()",
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02",
+            "SAVE-S06"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "实体方法身份与隐式self上下文正确；record/refs可能nil、无id与内存记录边界成立。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "EntityScript:GetSaveRecord",
+            "owner": "EntityScript",
+            "leaf": "GetSaveRecord",
+            "identity_kind": "method",
+            "source_file": "scripts/entityscript.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/api_contracts/1",
+          "unit": "SpawnSaveRecord(saved, newents)",
+          "evidence_refs": [
+            "SAVE-S05",
+            "SAVE-S10"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "全局Lua定义、saved/newents形参、nil/inst返回和先映射后load正确；不保证所有SpawnPrefab错误都返回nil。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "SpawnSaveRecord",
+            "owner": null,
+            "leaf": "SpawnSaveRecord",
+            "identity_kind": "unknown",
+            "source_file": "scripts/mainfunctions.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/api_contracts/2",
+          "unit": "EntityScript:SetPersistData(data, newents)",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S05",
+            "SAVE-S09"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "nil data与部分newents、回调参数顺序、无显式返回和无逐组件错误隔离正确。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "EntityScript:SetPersistData",
+            "owner": "EntityScript",
+            "leaf": "SetPersistData",
+            "identity_kind": "method",
+            "source_file": "scripts/entityscript.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/api_contracts/3",
+          "unit": "EntityScript:LoadPostPass(newents, savedata)",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S11",
+            "SAVE-S32"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "本宿主组件先于prefab，不保证另一实体已postpass；savedata=nil仍可调用prefab。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "EntityScript:LoadPostPass",
+            "owner": "EntityScript",
+            "leaf": "LoadPostPass",
+            "identity_kind": "method",
+            "source_file": "scripts/entityscript.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "pointer": "/entries/0/mechanism_steps/0",
+          "unit": 1,
+          "evidence_refs": [
+            "SAVE-S01",
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S08"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "聚合payload/refs与外层顶层id标记完整。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/mechanism_steps/1",
+          "unit": 2,
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S05",
+            "SAVE-S10"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "重建先登记映射再恢复；部分映射不应当全图是正确阶段约束。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/mechanism_steps/2",
+          "unit": 3,
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S12",
+            "SAVE-S13"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "世界循环结束后postpass，嵌套能力由caller透传决定。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/0/mechanism_steps/3",
+          "unit": 4,
+          "evidence_refs": [
+            "SAVE-S11"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "tracker查旧GUID后重建监听，缺失不等于销毁。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "scope_governance_unknowns_result": "PASS",
+      "compatibility_result": "PASS_NAMED_STATIC_SCOPE"
+    },
+    {
+      "id": "EXP-SAVE-002",
+      "claims": [
+        {
+          "pointer": "/entries/1/claims/0",
+          "unit": "SAVE-002-C01",
+          "evidence_refs": [
+            "SAVE-S28",
+            "SAVE-S29",
+            "SAVE-S38",
+            "SAVE-S03",
+            "SAVE-S41"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "原构造/恢复语义不变；SAVE-S41现明确普通mermhouse最终绑定mermhouse_master，区别crafted。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/1",
+          "unit": "SAVE-002-C02",
+          "evidence_refs": [
+            "SAVE-S27"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "外层必须ismummyhouse非nil才保存，表达式可写false；load用~=nil，data=nil不处理，字段存在不进缺失分支。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/2",
+          "unit": "SAVE-002-C03",
+          "evidence_refs": [
+            "SAVE-S30",
+            "SAVE-S31",
+            "SAVE-S32",
+            "SAVE-S04",
+            "SAVE-S42",
+            "SAVE-S43",
+            "SAVE-S44"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "普通/紧急子引用postpass接回及本宿主屏障成立；SAVE-S42..44闭合监听建立/移除、组件退出和更新生命周期。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/3",
+          "unit": "SAVE-002-C04",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "CountChildrenOutside只枚举有效普通childrenoutside；装备条件清false、无inventory/缺对象不提供充分反证。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/4",
+          "unit": "SAVE-002-C05",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S36",
+            "SAVE-S37",
+            "SAVE-S34",
+            "SAVE-S35",
+            "SAVE-S40",
+            "SAVE-S42",
+            "SAVE-S43",
+            "SAVE-S44",
+            "SAVE-S45",
+            "SAVE-S46"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "burnt与另一个merm卸装语义不变；S42..46补齐onburnt包装、组件移除分发及ChildSpawner对称清理。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/5",
+          "unit": "SAVE-002-C06",
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S10",
+            "SAVE-S27",
+            "SAVE-S32",
+            "SAVE-S34"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "跨实体pairs无总序；房屋装备观察与merm DropEquipped先后未知，推导未承诺全服ready或全局幂等。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/claims/6",
+          "unit": "SAVE-002-C07",
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S04",
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S36"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "三态、缺字段前提与回调重取组件是限定建议；不擅定迁移/补发政策。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/1/api_contracts/0",
+          "unit": "onload(inst, data)",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S28",
+            "SAVE-S03",
+            "SAVE-S36",
+            "SAVE-S37",
+            "SAVE-S41",
+            "SAVE-S43",
+            "SAVE-S45",
+            "SAVE-S46"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "onload file-local绑定保持；S41/43/45/46现闭合普通工厂与burnt组件退出依赖。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "onload",
+            "owner": null,
+            "leaf": "onload",
+            "identity_kind": "file_local",
+            "source_file": "scripts/prefabs/mermhouse.lua",
+            "visibility": "文件局部函数；由 MakeMermHouse 的 master 构造绑定为 inst.OnLoad，再由 EntityScript:SetPersistData 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/api_contracts/1",
+          "unit": "HN_OnLoadPostPass(inst)",
+          "evidence_refs": [
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39",
+            "SAVE-S04",
+            "SAVE-S32",
+            "SAVE-S42",
+            "SAVE-S43",
+            "SAVE-S44",
+            "SAVE-S45"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "HN file-local条件绑定保持；S42..45闭合其消费前已接回对象和组件已移除的生命周期边界。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "HN_OnLoadPostPass",
+            "owner": null,
+            "leaf": "HN_OnLoadPostPass",
+            "identity_kind": "file_local",
+            "source_file": "scripts/prefabs/mermhouse.lua",
+            "visibility": "文件局部函数；仅在 onload 的缺字段且当前 ismummyhouse 为真分支条件绑定为 inst.OnLoadPostPass，再由 EntityScript:LoadPostPass 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "pointer": "/entries/1/mechanism_steps/0",
+          "unit": 1,
+          "evidence_refs": [
+            "SAVE-S28",
+            "SAVE-S29",
+            "SAVE-S38",
+            "SAVE-S41"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "构造与preload顺序不变，S41补齐普通prefab工厂入口。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/mechanism_steps/1",
+          "unit": 2,
+          "evidence_refs": [
+            "SAVE-S03",
+            "SAVE-S27",
+            "SAVE-S31",
+            "SAVE-S36",
+            "SAVE-S37",
+            "SAVE-S43",
+            "SAVE-S44",
+            "SAVE-S45",
+            "SAVE-S46"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "组件/三态恢复顺序不变，新增refs补齐burnt包装与组件移除清理。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/mechanism_steps/2",
+          "unit": 3,
+          "evidence_refs": [
+            "SAVE-S30",
+            "SAVE-S32",
+            "SAVE-S42",
+            "SAVE-S44"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "旧GUID接回home/监听不变，S42/44补齐监听实现和更新callee。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/1/mechanism_steps/3",
+          "unit": 4,
+          "evidence_refs": [
+            "SAVE-S04",
+            "SAVE-S27",
+            "SAVE-S33",
+            "SAVE-S39",
+            "SAVE-S43",
+            "SAVE-S45"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "本宿主组件早于HN且有组件存在检查不变；S43/45补齐组件退出路径。",
+          "finding_ids": [],
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        }
+      ],
+      "scope_governance_unknowns_result": "PASS",
+      "compatibility_result": "PASS_NAMED_STATIC_SCOPE"
+    },
+    {
+      "id": "EXP-SAVE-003",
+      "claims": [
+        {
+          "pointer": "/entries/2/claims/0",
+          "unit": "SAVE-003-C01",
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S02"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "客户端可cb(true)早退，服务器StartWorldSave和数据收集顺序成立；OnSave仅属本函数收集阶段。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/claims/1",
+          "unit": "SAVE-003-C02",
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S25",
+            "SAVE-S26"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "玩家serializer忽略第二返回，两个具名恢复函数不传world映射/不调postpass；没有泛化所有重连入口。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/claims/2",
+          "unit": "SAVE-003-C03",
+          "evidence_refs": [
+            "SAVE-S23",
+            "SAVE-S24",
+            "SAVE-S22"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "按save分段及按prefab实体集合dump和坏数字字符串检查成立；包装器只附ENCODE_SAVES并委托native。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/claims/3",
+          "unit": "SAVE-003-C04",
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S24"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "闭包续行顺序及无参数接收成功码成立；cb(true)仅客户端禁用分支，不是durability标志。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/claims/4",
+          "unit": "SAVE-003-C05",
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S24",
+            "SAVE-S25",
+            "SAVE-S26",
+            "SAVE-S10"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "原生回调不推出fsync、玩家/世界原子性或跨shard共同提交；EI与原生未知边界一致。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/claims/5",
+          "unit": "SAVE-003-C06",
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S22",
+            "SAVE-S24"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "分层报告和跨分片独立实测属于REC；未把OnSave中的journal状态当逐次持久提交。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/2/api_contracts/0",
+          "unit": "SaveGame(isshutdown, cb)",
+          "evidence_refs": [
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S23",
+            "SAVE-S24",
+            "SAVE-S22"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "无显式返回及client cb(true)/server cb()语义不变；扩展S06覆盖isshutdown入口注释约定。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "SaveGame",
+            "owner": null,
+            "leaf": "SaveGame",
+            "identity_kind": "unknown",
+            "source_file": "scripts/mainfunctions.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "DIRECT_REVISION_RECHECK_AND_PRIOR_EXACT_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/api_contracts/1",
+          "unit": "SerializeWorldSession(data, session_identifier, callback, metadataStr)",
+          "evidence_refs": [
+            "SAVE-S22",
+            "SAVE-S23",
+            "SAVE-S24"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "Lua包装器形参、附加ENCODE_SAVES、metadata缺省、无返回和原生未知正确；data描述限本卡SaveGame caller。",
+          "finding_ids": [],
+          "navigation_identity": {
+            "symbol": "SerializeWorldSession",
+            "owner": null,
+            "leaf": "SerializeWorldSession",
+            "identity_kind": "unknown",
+            "source_file": "scripts/networking.lua",
+            "visibility": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+            "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+            "public_api_inferred": false
+          },
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "pointer": "/entries/2/mechanism_steps/0",
+          "unit": 1,
+          "evidence_refs": [
+            "SAVE-S02",
+            "SAVE-S06",
+            "SAVE-S07",
+            "SAVE-S08",
+            "SAVE-S22"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "server收集与玩家独立session委托成立。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/mechanism_steps/1",
+          "unit": 2,
+          "evidence_refs": [
+            "SAVE-S23",
+            "SAVE-S24"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "dump和具名文本检查先于包装器。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/mechanism_steps/2",
+          "unit": 3,
+          "evidence_refs": [
+            "SAVE-S22"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "native接口是Lua证据能力边界。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        },
+        {
+          "pointer": "/entries/2/mechanism_steps/3",
+          "unit": 4,
+          "evidence_refs": [
+            "SAVE-S24"
+          ],
+          "semantic_result": "SUPPORTED_WITH_STATED_LIMITS",
+          "result": "PASS",
+          "note": "回调续行与重启持久结果分层成立。",
+          "finding_ids": [],
+          "review_basis": "UNCHANGED_UNIT_INHERITED_FROM_HASH_BOUND_INITIAL_REVIEW"
+        }
+      ],
+      "scope_governance_unknowns_result": "PASS",
+      "compatibility_result": "PASS_NAMED_STATIC_SCOPE"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "SAVE-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 248,
+      "line_end": 316,
+      "range_sha256": "9d481040bf0dbaead41c3af063852d8a1a469462d12207da61de1b5fdeea7715",
+      "symbols": [
+        "EntityScript:GetSaveRecord"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "记录外壳、量化坐标与data/refs返回。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData",
+        "Component:OnSave",
+        "Prefab.OnSave"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "组件与prefab保存签名及空表/refs负边界。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData",
+        "Prefab.OnPreLoad",
+        "Component:OnLoad",
+        "Prefab.OnLoad"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "预补组件、preload、组件load、prefab load。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1964,
+      "line_end": 1977,
+      "range_sha256": "d5d3d49922fdd678ef58ec530bee7bfaaaf7ba7b11538f99230541bc0073b210",
+      "symbols": [
+        "EntityScript:LoadPostPass",
+        "Component:LoadPostPass",
+        "Prefab.OnLoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "本宿主组件postpass后prefab。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S05",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "symbols": [
+        "SpawnSaveRecord"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "构造/有效性/映射登记早于当前load，无自动postpass。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S06",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1092,
+      "line_end": 1133,
+      "range_sha256": "25efa898439d66e64edacfa9c6605b88e83ed17081a9f8f1358cefd6d9a9a88c",
+      "symbols": [
+        "SaveGame",
+        "saved_ents",
+        "references"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "扩展覆盖shutdown入口注释；不把约定误写成函数自动清理玩家。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S07",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1142,
+      "line_end": 1192,
+      "range_sha256": "48517faa35dc6435106cf617b7c2cba0422c13f52a16146273363686292980ad",
+      "symbols": [
+        "SaveGame world/world_network/shard_network persistdata"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "world/net/shard数据与refs入口。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S08",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1194,
+      "line_end": 1213,
+      "range_sha256": "b2797628b9e1fb5951524a1a25dc43c7b06e274449d0e2bad381cf4dcb6f34f6",
+      "symbols": [
+        "SerializeUserSession caller",
+        "SaveGame saved_ents id assignment"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "玩家独立保存、已选record的id标记。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S09",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 579,
+      "line_end": 592,
+      "range_sha256": "2ef8143d50bed9d557945895cccec497d7970fc03f3e505411ffd0e842f25558",
+      "symbols": [
+        "PopulateWorld world/network SetPersistData"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "world/net/shard早期load无共享映射。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S10",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 629,
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "symbols": [
+        "PopulateWorld SpawnSaveRecord and LoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "world构造循环后postpass再world postpass。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S11",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 20,
+      "line_end": 64,
+      "range_sha256": "fbe0447d9fba7263f4fd79c8f0646959407807a20a46f42babf0dc7c0decda02",
+      "symbols": [
+        "EntityTracker:TrackEntity",
+        "EntityTracker:OnSave",
+        "EntityTracker:LoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "tracker name/GUID/refs及缺失跳过和监听重建。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S12",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 979,
+      "line_end": 1005,
+      "range_sha256": "e1f65b8c2310dd8db5eec4fa690e90c8bf96ff6da8d3dac57b2b0bc0d7f43716",
+      "symbols": [
+        "Container:OnSave",
+        "Container:OnLoad"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "Container子记录/refs及共享映射透传。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S13",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 126,
+      "line_end": 150,
+      "range_sha256": "07ae368e7f852d18f79369b8abf12061f640bdbc34e8bbb5f9ee696cb697568c",
+      "symbols": [
+        "Debuffable:OnSave",
+        "Debuffable:OnLoad"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "Debuffable忽略refs且无映射重建。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S14",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 1,
+      "line_end": 12,
+      "range_sha256": "67d95384337cde2d375ad7e6107ccb02a4bd82242b5c51973e31d55c7e78d697",
+      "symbols": [
+        "Timer constructor",
+        "Timer:OnRemoveFromEntity"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "Timer组件移除取消持有任务。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S15",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 66,
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "symbols": [
+        "Timer:StartTimer",
+        "OnTimerDone",
+        "Timer:StopTimer"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "同名拒绝、Stop后timerdone。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S16",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 95,
+      "line_end": 142,
+      "range_sha256": "f2823fd89ca4b1afc4290afc940b082bb867328a72218d537eaeb1ea7ab622d2",
+      "symbols": [
+        "Timer:GetTimeLeft",
+        "Timer:OnSave",
+        "Timer:OnLoad"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "剩余值/暂停/initial保存与保存名字替换。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S17",
+      "source_file": "scripts/prefabs/bootleg.lua",
+      "file_sha256": "36ba1d6b33ac7ae4cd016191523c3974d8b9df785122e2486af051fead125d71",
+      "line_start": 11,
+      "line_end": 21,
+      "range_sha256": "b4adaf5c488c968d5381cca4aeddeebc0a7cefc2e129cfeb99e826a560f66ca7",
+      "symbols": [
+        "CreateOceanWhirlportal"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "bootleg显式建立两个方向。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S18",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 54,
+      "line_end": 80,
+      "range_sha256": "e55135251078dae7c80b596179566b10fd463875580376ca4ea7784a05d0d35a",
+      "symbols": [
+        "SetExit",
+        "CheckForBoatsTick missing exit/blocker"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "exit缺失返回、blocker检查。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S19",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 177,
+      "line_end": 195,
+      "range_sha256": "fcd712945847e1b23c85f61293340b23a2eac02056e355330e2529fdb034798c",
+      "symbols": [
+        "ontimerdone",
+        "OnRemoveEntity"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "关闭时取消巡检、persists=false、动画后remove及声音清理。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S20",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 224,
+      "line_end": 261,
+      "range_sha256": "9e0a92d50592ca33a4bcd789ee001dfb2089758392b8c6494ebf7dd23db120fc",
+      "symbols": [
+        "fn master branch",
+        "timerdone registration",
+        "periodic task reconstruction"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "mastersim后创建组件、关闭timer、事件监听与巡检。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S21",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1752,
+      "range_sha256": "51668de9aa8ac040c278e84513ada6f574d061bdda8a6ed8f3bd922cd479c37a",
+      "symbols": [
+        "EntityScript:Remove task/event cleanup"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "实体移除清监听/任务并通知组件。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S22",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 303,
+      "line_end": 330,
+      "range_sha256": "cd582be273c7d40d694b29b3424424ca487ad8441bb65a3c45175b0e66b6c1aa",
+      "symbols": [
+        "SerializeUserSession",
+        "SerializeWorldSession"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "玩家与世界serializer的Lua/native边界。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S23",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1236,
+      "line_end": 1264,
+      "range_sha256": "045fde43a466dda94a9b69212c00b6e73625dda3224c054d44c6e478efeed828",
+      "symbols": [
+        "SaveGame DataDumper and corruption checks"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "逐段dump、实体分组dump与坏数值检查。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S24",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1267,
+      "line_end": 1300,
+      "range_sha256": "7e37a101f01ab633e1286f893e73578cb83b1c1eb7f0688b8ab6520f7cb472a8",
+      "symbols": [
+        "SaveGame native callback continuation",
+        "SerializeWorldSession caller"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "native调用和闭包后续索引/timefile链。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S25",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2100,
+      "line_end": 2128,
+      "range_sha256": "da10c4e7a195a0206b06da3bb587f299250bd7339e13eadb4d38fa6524c69b76",
+      "symbols": [
+        "ResumeExistingUserSession"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "普通玩家resume无world映射/postpass。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S26",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2130,
+      "line_end": 2163,
+      "range_sha256": "51f419718c411363b79f47d5f82dcb20aa6f7d10be7843a109271124b9e88c61",
+      "symbols": [
+        "RestoreSnapshotUserSession"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "快照恢复具名函数无world映射/postpass。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S27",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 122,
+      "line_end": 198,
+      "range_sha256": "a0af6205d5c4a46ae90425f47a7d1e6f6f91f8441da05d6d763a7e8d2950c54f",
+      "symbols": [
+        "StartSpawning",
+        "OnSpawned",
+        "OnGoHome",
+        "onsave",
+        "onload",
+        "HN_OnLoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "房屋三态、HN、burnt与运行回调。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S28",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 260,
+      "line_end": 310,
+      "range_sha256": "3d69d938ee8edfce1eafa18c727f51fc34e1173675bce91260668f2a08593109",
+      "symbols": [
+        "MakeMermHouse master construction",
+        "ismummyhouse initialization",
+        "OnSave/OnLoad bindings"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "master构造、随机字段和回调绑定。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S29",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 325,
+      "line_end": 345,
+      "range_sha256": "70aaa0500907091b8b9a7a61b15f29b3aeff1ad221182598c0e69cf821fb43c2",
+      "symbols": [
+        "OnPreLoad",
+        "mermhouse_master"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "普通房屋master与preload定义；最终工厂现由SAVE-S41另行闭合。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S30",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 332,
+      "line_end": 378,
+      "range_sha256": "57a76f689feb632acb13e9ca6f371c4064d2cbfcc22f9c62449c25b868d201f1",
+      "symbols": [
+        "ChildSpawner:OnSave"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "普通/紧急孩子GUID与refs保存。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S31",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 407,
+      "line_end": 455,
+      "range_sha256": "5930b3545b7b030b5764693643e73a7a5dcadb688933d7cdc503772478afede7",
+      "symbols": [
+        "ChildSpawner:OnLoad"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "数量计时恢复，外部实体不在此接回。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S32",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 457,
+      "line_end": 503,
+      "range_sha256": "aa1aae94e0e62676b00c0b0c79e1ae23b6fdfa876aaaf66e8a5aa78a932809be",
+      "symbols": [
+        "ChildSpawner:DoTakeOwnership",
+        "ChildSpawner:LoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "所有权/home/监听与postpass；helper和组件退出现由S42..44另行闭合。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S33",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 305,
+      "line_end": 313,
+      "range_sha256": "fc3b2067e0b8f8ceb8ff41029599a7b469573d40294e04068f61fbed81384aec",
+      "symbols": [
+        "ChildSpawner:CountChildrenOutside"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "有效普通孩子枚举。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S34",
+      "source_file": "scripts/prefabs/merm.lua",
+      "file_sha256": "0db64eb3e86d728f48a6469946a020003729f2117c32579d75a61b50bdc10e88",
+      "line_start": 717,
+      "line_end": 734,
+      "range_sha256": "a8d86c3edfd95c8dc189ce5b72847119c81ded543f7132379bdb58f13ab462c9",
+      "symbols": [
+        "OnPreLoad",
+        "OnLoadPostPass"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "merm preload及mummy DropEquipped。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S35",
+      "source_file": "scripts/prefabs/merm.lua",
+      "file_sha256": "0db64eb3e86d728f48a6469946a020003729f2117c32579d75a61b50bdc10e88",
+      "line_start": 1098,
+      "line_end": 1102,
+      "range_sha256": "c195d72acb1b51c643ec77b8d407b2254876ad531526d57299f06d613791e251",
+      "symbols": [
+        "OnPreLoad/OnLoadPostPass bindings"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "merm实例保存/加载回调绑定。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S36",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 52,
+      "line_end": 75,
+      "range_sha256": "4b2c97a6a2de26b0953a6d5c3acb4d9c89bdf8d1d4be36c2964b46b5fae0a624",
+      "symbols": [
+        "DefaultBurntStructureFn childspawner removal"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "burnt停止与RemoveComponent调用。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S37",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 176,
+      "line_end": 185,
+      "range_sha256": "d0e132fae655e268e16c3194d56d3ec30ab0e7823c47dd1a7ab2a969094ff120",
+      "symbols": [
+        "MakeMediumBurnable structure callback binding"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "structure=true选择burnt回调；字段包装现由SAVE-S46闭合。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S38",
+      "source_file": "scripts/worldsettingsutil.lua",
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "line_start": 71,
+      "line_end": 121,
+      "range_sha256": "1aebefaddaf4a7f5a6e7f49aad07199d2e20705ae38ea2978e0b9c7003521660",
+      "symbols": [
+        "WorldSettings_ChildSpawner_PreLoad",
+        "WorldSettings_ChildSpawner_SpawnPeriod",
+        "WorldSettings_ChildSpawner_RegenPeriod"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "旧timer数据转换与external timer安装。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S39",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 364,
+      "line_end": 366,
+      "range_sha256": "9c3f0ef9d4f02d2e0dedce55dccbeedaa3e5c51905ce9b1e7dbe0ad6ab99088d",
+      "symbols": [
+        "Inventory:HasAnyEquipment"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "equipment表非空判断。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S40",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1919,
+      "line_end": 1927,
+      "range_sha256": "26dad2790c9b4952d9e129cae87f8fb5bb3cb7e077e8e6cb6a7e4b7a68909441",
+      "symbols": [
+        "Inventory:DropEquipped"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "equip遍历DropItem，无参数时不保留背包/防卸装项。",
+      "review_basis": "UNCHANGED_SEMANTICS_FROM_INITIAL_REVIEW_HASH_RECHECKED"
+    },
+    {
+      "id": "SAVE-S41",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 440,
+      "line_end": 442,
+      "range_sha256": "3924252334ae5760e311225716987f5013f26b8a5c0ef98f202a44bba3cd9e99",
+      "symbols": [
+        "MakeMermHouse ordinary/crafted factory bindings"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "普通与crafted工厂参数绑定，支持C01/API0/step1。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S42",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 38,
+      "line_end": 50,
+      "range_sha256": "0d8c773a991c5c98df88691b047d401982f33ed8b6e49de0679c576fb87079ac",
+      "symbols": [
+        "AddChildListeners",
+        "RemoveChildListeners"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "四种孩子事件的同source/同callback建立与移除。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S43",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 121,
+      "line_end": 132,
+      "range_sha256": "937cd6099ca0e5d43efdf8693c29d99bf5acf10749e7fd8c60b0e01fa426c0ca",
+      "symbols": [
+        "ChildSpawner:OnRemoveFromEntity"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "组件退出时解绑普通/紧急孩子并取消自身task。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S44",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 234,
+      "line_end": 275,
+      "range_sha256": "9d8ed04bfcb52db82e6690956bd516700b00a8d49049afa25a007760c4bccb55",
+      "symbols": [
+        "ChildSpawner:StartUpdate",
+        "ChildSpawner:TryStopUpdate",
+        "ChildSpawner:StartSpawning",
+        "ChildSpawner:StopSpawning"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "postpass更新callee按外部timer/自持task分流；Start/TryStop/StopSpawning未承诺总有活动task。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S45",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent",
+        "Component:OnRemoveFromEntity dispatch"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "先从组件表清除，再对旧组件OnRemoveFromEntity，随后撤replica/action。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    },
+    {
+      "id": "SAVE-S46",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 90,
+      "line_end": 104,
+      "range_sha256": "5057d861f62cc05c1f369cd8b743cd7670cc4017b1893eb2c5c22d855ac8964f",
+      "symbols": [
+        "Burnable:SetOnBurntFn",
+        "onburnt wrapper"
+      ],
+      "hash_result": "PASS",
+      "semantic_result": "READ_AND_CHECKED",
+      "note": "setter安装onburnt包装，先调用已选择的fn，实例有效再做内部收尾。",
+      "review_basis": "DIRECT_REVISION_SOURCE_RECHECK"
+    }
+  ],
+  "independent_supplementary_evidence": [
+    {
+      "id": "E-SUP-01",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1092,
+      "line_end": 1093,
+      "range_sha256": "4cbfdb64bb8847db4258c3dee1fabe288b6af0979e24773606158617ceb0a3bc",
+      "note": "shutdown参数的入口注释约定"
+    },
+    {
+      "id": "E-SUP-02",
+      "source_file": "scripts/prefabs/mermhouse.lua",
+      "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+      "line_start": 440,
+      "line_end": 442,
+      "range_sha256": "3924252334ae5760e311225716987f5013f26b8a5c0ef98f202a44bba3cd9e99",
+      "note": "普通mermhouse最终绑定mermhouse_master，区分crafted"
+    },
+    {
+      "id": "E-SUP-03",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 38,
+      "line_end": 50,
+      "range_sha256": "0d8c773a991c5c98df88691b047d401982f33ed8b6e49de0679c576fb87079ac",
+      "note": "子对象四类监听建立与对称移除helper"
+    },
+    {
+      "id": "E-SUP-04",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 121,
+      "line_end": 132,
+      "range_sha256": "937cd6099ca0e5d43efdf8693c29d99bf5acf10749e7fd8c60b0e01fa426c0ca",
+      "note": "组件移除解绑普通/紧急孩子并取消task"
+    },
+    {
+      "id": "E-SUP-05",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 234,
+      "line_end": 275,
+      "range_sha256": "9d8ed04bfcb52db82e6690956bd516700b00a8d49049afa25a007760c4bccb55",
+      "note": "postpass更新调用的实际外部timer/周期任务分支与停止"
+    },
+    {
+      "id": "E-SUP-06",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "note": "RemoveComponent先清表再回调组件清理"
+    },
+    {
+      "id": "E-SUP-07",
+      "source_file": "scripts/components/burnable.lua",
+      "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+      "line_start": 90,
+      "line_end": 104,
+      "range_sha256": "5057d861f62cc05c1f369cd8b743cd7670cc4017b1893eb2c5c22d855ac8964f",
+      "note": "SetOnBurntFn写onburnt包装，先调用传入fn再内部处理"
+    },
+    {
+      "id": "E-SUP-08",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 68,
+      "line_end": 93,
+      "range_sha256": "6bd46425803587e781703d9f73c767d0e97be6a2406e691f9c25f5b004726891",
+      "note": "暂停恢复的callee负边界"
+    },
+    {
+      "id": "E-SUP-09",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 144,
+      "line_end": 148,
+      "range_sha256": "dd8b8abb8b0d1bb84a519706aaed64b957678a2e64605910548f3f0347f7534d",
+      "note": "LongUpdate主动扣dt不同于OnLoad恢复"
+    }
+  ],
+  "prior_records_compared": [
+    {
+      "id": "FACT-DST-001",
+      "file": "knowledge/data/entries.json",
+      "pointer": "/entries/0",
+      "file_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "41a2a70dddd316e0685479c243c31104e028b57997c64c76c7ecf237c2573f63",
+      "comparison": "已有组件表OnSave/OnLoad遍历事实；当前范围/版本不能改标；仅重述不构成新增机制。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "FACT-DST-002",
+      "file": "knowledge/data/entries.json",
+      "pointer": "/entries/1",
+      "file_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "0e82822ada2cd826d9cdfe09591ebc9c5ca9405269c1854f1abec31f2cde0131",
+      "comparison": "已有Container嵌套GetSaveRecord/SpawnSaveRecord；不能从世界平铺refs协议泛化所有嵌套物品。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "AI-N001-06",
+      "file": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "pointer": "/entries/5",
+      "file_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "7be9487a4120868557ea7d873217682247289e364d717cabfa743942f0ff21bb",
+      "comparison": "已有world refs不强制收目标、Player session丢弃refs、普通Resume缺world newents/postpass及runtime对象不可直接持久化边界。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "NC-N004-FINAL-07",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "pointer": "/entries/23",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "66f027d1755436599bacb05a1b586c99c72f7f264fca771d1afc60734a9e8f2b",
+      "comparison": "已有普通Timer重复名、save/load替换、LongUpdate/transfer和清理，以及Cooldown/WorldSettingsTimer/Debuffable差异；旧canonical与HOLD不变。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "AI-N001-07",
+      "file": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "pointer": "/entries/6",
+      "file_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "c3392fbc405b3ea0770a7aa14f1febebeb46e69268e7fc9765a045ce2863caa8",
+      "comparison": "已有默认缺键、组件分发顺序和无逐组件pcall；本批仅作基础，不计新增。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "N006-READY-F03",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "pointer": "/entries/36",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "551191c09968d48174ab2488a7d03b0dc9aa35f413122378579daddcd90d33a4",
+      "comparison": "已有世界实体postpass后world postpass与独立ready层次；本批不重标历史版本。",
+      "scope_and_governance_read": true
+    }
+  ],
+  "dedup_assessment": [
+    {
+      "id": "EXP-SAVE-001",
+      "result": "BOUNDED_INCREMENT",
+      "new_scope": "empty refs给保存者标id、saved.id/inst键映射、Container与Debuffable透传差异及真实tracker消费闭环；一般refs不强制保存/组件阶段沿用旧知识。"
+    },
+    {
+      "id": "EXP-SAVE-002",
+      "result": "BOUNDED_NEW_CONSUMER",
+      "new_scope": "当前mermhouse三态缺字段、ChildSpawner接回后HN与burnt组件移除、另一merm DropEquipped跨实体总序未知。"
+    },
+    {
+      "id": "EXP-SAVE-003",
+      "result": "BOUNDED_INCREMENT",
+      "new_scope": "client cb(true)与server cb()、原生世界委托后override/index/timefile续行；玩家忽略refs与通用不承诺durability沿用旧边界。"
+    }
+  ],
+  "architecture_document_review": {
+    "path": "05-research-history/major-phase-20261106/windows/C/save-recovery-architecture.md",
+    "sha256": "da19f15a6e38f0dc50c6f3a885a76158227e0207f5ca0067615915aea6078dcb",
+    "result": "FACT_INFERENCE_RECOMMENDATION_BOUNDARIES_PASS_CANDIDATE_EVIDENCE_CLOSURE_COMPLETE",
+    "notes": [
+      "bootleg双向SetExit、portal权威组件/巡检重建/关闭清理已直接核对。",
+      "Timer OnLoad仅替换保存名字；恢复剩余值不等于LongUpdate主动扣dt或现实离线补偿。",
+      "房屋HasAnyEquipment与另一merm DropEquipped的先后明确未知；本宿主组件→prefab未冒充跨实体屏障。",
+      "保存字段外层非nil条件存在；明确false未冒充缺字段。",
+      "建议不授权唯一实体补发或统一迁移框架；未把journal/outbox内存状态称为落盘提交。",
+      "文稿链接由总控处理，本审阅不修改链接。"
+    ],
+    "note": "文稿按初审所绑定精确SHA保留结论；本次未扩大对新文稿版本的审阅范围。"
+  },
+  "limitations": [
+    "静态源码/hash/契约和研究导航函数检查，不是Lua运行/游戏/磁盘重启/真实客户端测试。",
+    "native写盘原子性、fsync、回调错误语义、调度tick、跨shard共同提交及第三方Hook保持未知。",
+    "旧canonical、Scope、Core HOLD与新research/restricted/hold保持不变。"
+  ],
+  "final_status": "FINAL_STATIC_REVIEW_OF_FROZEN_c9ceaf_CANDIDATE_PASS",
+  "prior_revision_delta_review": {
+    "original_candidate_path": "05-research-history/major-phase-20261106/coordinator/frozen/persistence_recovery-071b53379f28.json",
+    "original_candidate_sha256": "071b53379f28911aa963e62aaae23cb263dac1aa6275d73a64dbb2ec8427264b",
+    "changes": [
+      {
+        "pointer": "/entries/1/api_contracts/0/symbol",
+        "old": "mermhouse.lua: onload(inst, data) [local; inst.OnLoad]",
+        "new": "onload(inst, data)"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/0/visibility",
+        "old": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+        "new": "文件局部函数；由 MakeMermHouse 的 master 构造绑定为 inst.OnLoad，再由 EntityScript:SetPersistData 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/symbol",
+        "old": "mermhouse.lua: HN_OnLoadPostPass(inst) [local; conditional inst.OnLoadPostPass]",
+        "new": "HN_OnLoadPostPass(inst)"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/visibility",
+        "old": "Lua 定义；仅在具名调用路径和下述端别/阶段下成立，不是磁盘或网络原生 ABI 保证",
+        "new": "文件局部函数；仅在 onload 的缺字段且当前 ismummyhouse 为真分支条件绑定为 inst.OnLoadPostPass，再由 EntityScript:LoadPostPass 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。"
+      }
+    ],
+    "result": "EXACTLY_FOUR_AUTHORIZED_FIELDS_CHANGED",
+    "new_local_api_identities": [
+      {
+        "symbol": "onload",
+        "owner": null,
+        "leaf": "onload",
+        "identity_kind": "file_local",
+        "source_file": "scripts/prefabs/mermhouse.lua",
+        "visibility": "文件局部函数；由 MakeMermHouse 的 master 构造绑定为 inst.OnLoad，再由 EntityScript:SetPersistData 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+        "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+        "public_api_inferred": false
+      },
+      {
+        "symbol": "HN_OnLoadPostPass",
+        "owner": null,
+        "leaf": "HN_OnLoadPostPass",
+        "identity_kind": "file_local",
+        "source_file": "scripts/prefabs/mermhouse.lua",
+        "visibility": "文件局部函数；仅在 onload 的缺字段且当前 ismummyhouse 为真分支条件绑定为 inst.OnLoadPostPass，再由 EntityScript:LoadPostPass 分发；未导出，不可通过 require 直接调用，不扩大为公共 API。",
+        "identity_basis": "AUTHORED_RESEARCH_CONTRACT_NOT_PHYSICAL_DECLARATION",
+        "public_api_inferred": false
+      }
+    ],
+    "all_other_json_values_unchanged": true,
+    "schema_rechecked": "PASS",
+    "all_source_refs_rechecked": "40/40 PASS"
+  },
+  "revision_delta_review": {
+    "from_candidate_path": "05-research-history/major-phase-20261106/coordinator/frozen/persistence_recovery-5be1ca304a58.json",
+    "from_candidate_sha256": "5be1ca304a588bb8bd0cab758d138bc9b533f1663ae52fd231703790b136e0c8",
+    "to_candidate_sha256": "c9ceaf8c5538f494a1a1748c87621eb0f578d45d7481f553996aef6f3717dfd7",
+    "recursive_leaf_change_count": 41,
+    "grouped_change_count": 23,
+    "grouping": "2 existing ref scalar changes + 6 appended source refs + 9 changed evidence arrays + 6 appended compatibility dependencies",
+    "changed_evidence_arrays": [
+      "/entries/1/claims/0/evidence_refs",
+      "/entries/1/claims/2/evidence_refs",
+      "/entries/1/claims/4/evidence_refs",
+      "/entries/1/api_contracts/0/evidence_refs",
+      "/entries/1/api_contracts/1/evidence_refs",
+      "/entries/1/mechanism_steps/0/evidence_refs",
+      "/entries/1/mechanism_steps/1/evidence_refs",
+      "/entries/1/mechanism_steps/2/evidence_refs",
+      "/entries/1/mechanism_steps/3/evidence_refs"
+    ],
+    "full_recursive_delta": [
+      {
+        "pointer": "/entries/1/claims/0/evidence_refs/4",
+        "added": "SAVE-S41"
+      },
+      {
+        "pointer": "/entries/1/claims/2/evidence_refs/4",
+        "added": "SAVE-S42"
+      },
+      {
+        "pointer": "/entries/1/claims/2/evidence_refs/5",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/claims/2/evidence_refs/6",
+        "added": "SAVE-S44"
+      },
+      {
+        "pointer": "/entries/1/claims/4/evidence_refs/7",
+        "added": "SAVE-S42"
+      },
+      {
+        "pointer": "/entries/1/claims/4/evidence_refs/8",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/claims/4/evidence_refs/9",
+        "added": "SAVE-S44"
+      },
+      {
+        "pointer": "/entries/1/claims/4/evidence_refs/10",
+        "added": "SAVE-S45"
+      },
+      {
+        "pointer": "/entries/1/claims/4/evidence_refs/11",
+        "added": "SAVE-S46"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/0/evidence_refs/5",
+        "added": "SAVE-S41"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/0/evidence_refs/6",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/0/evidence_refs/7",
+        "added": "SAVE-S45"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/0/evidence_refs/8",
+        "added": "SAVE-S46"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/evidence_refs/5",
+        "added": "SAVE-S42"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/evidence_refs/6",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/evidence_refs/7",
+        "added": "SAVE-S44"
+      },
+      {
+        "pointer": "/entries/1/api_contracts/1/evidence_refs/8",
+        "added": "SAVE-S45"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/0/evidence_refs/3",
+        "added": "SAVE-S41"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/1/evidence_refs/4",
+        "added": "SAVE-S37"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/1/evidence_refs/5",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/1/evidence_refs/6",
+        "added": "SAVE-S44"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/1/evidence_refs/7",
+        "added": "SAVE-S45"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/1/evidence_refs/8",
+        "added": "SAVE-S46"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/2/evidence_refs/2",
+        "added": "SAVE-S42"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/2/evidence_refs/3",
+        "added": "SAVE-S44"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/3/evidence_refs/4",
+        "added": "SAVE-S43"
+      },
+      {
+        "pointer": "/entries/1/mechanism_steps/3/evidence_refs/5",
+        "added": "SAVE-S45"
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/12",
+        "added": {
+          "ref": "SAVE-S41",
+          "role": "普通 mermhouse 最终工厂到 mermhouse_master 的绑定；与 crafted 分支区分",
+          "claim_ids": [
+            "SAVE-002-C01"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/13",
+        "added": {
+          "ref": "SAVE-S42",
+          "role": "孩子四类事件监听建立与对称移除 helper",
+          "claim_ids": [
+            "SAVE-002-C03",
+            "SAVE-002-C05"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/14",
+        "added": {
+          "ref": "SAVE-S43",
+          "role": "组件移除时解绑普通/紧急孩子监听并取消自身 task",
+          "claim_ids": [
+            "SAVE-002-C03",
+            "SAVE-002-C05"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/15",
+        "added": {
+          "ref": "SAVE-S44",
+          "role": "postpass 更新与 StopSpawning 的外部 timer/周期任务分支及停止",
+          "claim_ids": [
+            "SAVE-002-C03",
+            "SAVE-002-C05"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/16",
+        "added": {
+          "ref": "SAVE-S45",
+          "role": "RemoveComponent 清组件表后分发旧组件 OnRemoveFromEntity",
+          "claim_ids": [
+            "SAVE-002-C05"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/1/compatibility/dependency_refs/17",
+        "added": {
+          "ref": "SAVE-S46",
+          "role": "SetOnBurntFn 安装 onburnt 包装并调用所选烧毁函数",
+          "claim_ids": [
+            "SAVE-002-C05"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/5/line_start",
+        "old": 1094,
+        "new": 1092
+      },
+      {
+        "pointer": "/source_references/5/range_sha256",
+        "old": "7df653127e3676aa8891a582b34c245f980962a7c3a5493f6bce386bcfae10fc",
+        "new": "25efa898439d66e64edacfa9c6605b88e83ed17081a9f8f1358cefd6d9a9a88c"
+      },
+      {
+        "pointer": "/source_references/40",
+        "added": {
+          "id": "SAVE-S41",
+          "source_file": "scripts/prefabs/mermhouse.lua",
+          "file_sha256": "5920463b4795223809268c272edc6162ae18e4f1958fdde263ef9ac9ad386c90",
+          "line_start": 440,
+          "line_end": 442,
+          "range_sha256": "3924252334ae5760e311225716987f5013f26b8a5c0ef98f202a44bba3cd9e99",
+          "symbols": [
+            "MakeMermHouse ordinary/crafted factory bindings"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/41",
+        "added": {
+          "id": "SAVE-S42",
+          "source_file": "scripts/components/childspawner.lua",
+          "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+          "line_start": 38,
+          "line_end": 50,
+          "range_sha256": "0d8c773a991c5c98df88691b047d401982f33ed8b6e49de0679c576fb87079ac",
+          "symbols": [
+            "AddChildListeners",
+            "RemoveChildListeners"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/42",
+        "added": {
+          "id": "SAVE-S43",
+          "source_file": "scripts/components/childspawner.lua",
+          "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+          "line_start": 121,
+          "line_end": 132,
+          "range_sha256": "937cd6099ca0e5d43efdf8693c29d99bf5acf10749e7fd8c60b0e01fa426c0ca",
+          "symbols": [
+            "ChildSpawner:OnRemoveFromEntity"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/43",
+        "added": {
+          "id": "SAVE-S44",
+          "source_file": "scripts/components/childspawner.lua",
+          "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+          "line_start": 234,
+          "line_end": 275,
+          "range_sha256": "9d8ed04bfcb52db82e6690956bd516700b00a8d49049afa25a007760c4bccb55",
+          "symbols": [
+            "ChildSpawner:StartUpdate",
+            "ChildSpawner:TryStopUpdate",
+            "ChildSpawner:StartSpawning",
+            "ChildSpawner:StopSpawning"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/44",
+        "added": {
+          "id": "SAVE-S45",
+          "source_file": "scripts/entityscript.lua",
+          "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+          "line_start": 670,
+          "line_end": 685,
+          "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+          "symbols": [
+            "EntityScript:RemoveComponent",
+            "Component:OnRemoveFromEntity dispatch"
+          ]
+        }
+      },
+      {
+        "pointer": "/source_references/45",
+        "added": {
+          "id": "SAVE-S46",
+          "source_file": "scripts/components/burnable.lua",
+          "file_sha256": "2053b970e62a74f538b6514d92ee0d1f99b9246c01b70adebe9c860eaf6661ae",
+          "line_start": 90,
+          "line_end": 104,
+          "range_sha256": "5057d861f62cc05c1f369cd8b743cd7670cc4017b1893eb2c5c22d855ac8964f",
+          "symbols": [
+            "Burnable:SetOnBurntFn",
+            "onburnt wrapper"
+          ]
+        }
+      }
+    ],
+    "all_other_json_values_unchanged": true,
+    "claim_api_step_statement_scope_unknowns_governance_unchanged": true,
+    "schema_validation": "PASS",
+    "reference_hash_validation": "46/46 PASS",
+    "local_navigation_check": "2/2 file_local; public_api_inferred=false"
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "E-SAVE-R1-01",
+      "severity": "blocking_navigation_contract",
+      "entry_ids": [
+        "EXP-SAVE-002"
+      ],
+      "pointers": [
+        "/entries/1/api_contracts/0",
+        "/entries/1/api_contracts/1"
+      ],
+      "issue": "两个file-local契约symbol含文件名和注释装饰，api_identity返回None，不能进入研究API导航。",
+      "required_change": "symbol分别规范为onload(inst, data)、HN_OnLoadPostPass(inst)，visibility以文件局部或local function开头，保留条件绑定与非public限制。",
+      "source_refs": [
+        "SAVE-S27",
+        "SAVE-S28"
+      ],
+      "status": "closed",
+      "resolution": "两个local API最终导航格式保持，重新检查仍为file_local/public_api_inferred=false。",
+      "closure_result": "CLOSED_IN_PRIOR_5be_REVISION",
+      "closure_evidence_refs": [
+        "SAVE-S27",
+        "SAVE-S28"
+      ]
+    },
+    {
+      "id": "E-SAVE-R1-02",
+      "severity": "blocking_evidence_gap",
+      "entry_ids": [
+        "EXP-SAVE-003"
+      ],
+      "pointers": [
+        "/entries/2/api_contracts/0/parameters/0",
+        "/source_references/5"
+      ],
+      "issue": "isshutdown意味着玩家已经OnDespawn且sim保存后关闭，是1092..1093入口注释约定；当前所有绑定范围从1094或更后开始，未覆盖该说明。该说明是入口约定，不是SaveGame验证这些前提。",
+      "required_change": "将SAVE-S06起始扩至1092并重算范围SHA，或另加1092..1093 ref且绑定该API。无需改动正确的参数语义。",
+      "source_refs": [
+        "SAVE-S06"
+      ],
+      "independent_supplement_refs": [
+        "E-SUP-01"
+      ],
+      "status": "closed",
+      "closure_result": "CLOSED_THIS_REVISION",
+      "closure_evidence_refs": [
+        "SAVE-S06"
+      ],
+      "resolution": "SAVE-S06已扩为1092..1133，raw/range hash核对通过且原SaveGame API仍绑定S06；参数说明准确保留为入口约定，不声称函数验证或执行OnDespawn。"
+    },
+    {
+      "id": "E-SAVE-R1-03",
+      "severity": "blocking_dependency_closure",
+      "entry_ids": [
+        "EXP-SAVE-002"
+      ],
+      "pointers": [
+        "/entries/1/claims/0",
+        "/entries/1/claims/2",
+        "/entries/1/claims/4",
+        "/entries/1/compatibility/dependency_refs"
+      ],
+      "issue": "本批要求声明/caller/callee/consumer/清理完整绑定。现refs有mermhouse_master定义与调用master_postinit，却漏最终普通mermhouse工厂绑定；ChildSpawner只引AddChildListeners调用，漏监听实现和组件移除解绑；烧毁路径漏SetOnBurntFn到onburnt字段包装及RemoveComponent到OnRemoveFromEntity的关键接线。独立补查支持现有语义，但候选兼容依赖未闭合。",
+      "required_change": "补入E-SUP-02..07对应当前来源定位/hash，并按实际用途绑定相关claim/API/step及EXP-SAVE-002 compatibility；至少覆盖普通prefab工厂、监听建立/移除、postpass更新生命周期、burnable包装和组件移除分发。无需把这些补证扩写为新玩法或运行保证。",
+      "source_refs": [
+        "SAVE-S28",
+        "SAVE-S29",
+        "SAVE-S32",
+        "SAVE-S36",
+        "SAVE-S37"
+      ],
+      "independent_supplement_refs": [
+        "E-SUP-02",
+        "E-SUP-03",
+        "E-SUP-04",
+        "E-SUP-05",
+        "E-SUP-06",
+        "E-SUP-07"
+      ],
+      "status": "closed",
+      "closure_result": "CLOSED_THIS_REVISION",
+      "closure_evidence_refs": [
+        "SAVE-S41",
+        "SAVE-S42",
+        "SAVE-S43",
+        "SAVE-S44",
+        "SAVE-S45",
+        "SAVE-S46"
+      ],
+      "resolution": "普通prefab工厂、四种监听建立/移除、组件清理和更新生命周期、RemoveComponent清表后清理、burnable回调包装均补齐；相关3 claim/2 API/4 step和6 compatibility依赖已逐项验证绑定。"
+    }
+  ]
+}

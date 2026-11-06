@@ -1,0 +1,1302 @@
+{
+  "schema_version": "independent-native-review/1",
+  "campaign": "major-phase-20261106",
+  "reviewer_window": "D",
+  "revision": "r1",
+  "candidate_artifact": "coordinator/frozen/event_replica_lifecycle-4fdc3ea43ef0.json",
+  "candidate_sha256": "4fdc3ea43ef03d38371fd287528189f7a53c1f35f83d95ce31bab95996c0790d",
+  "verdict": "accept_for_restricted_static_research_with_nonblocking_note",
+  "runtime_verified": false,
+  "blockers": [],
+  "blocker_count": 0,
+  "nonblocking_findings": [
+    {
+      "id": "EL-NB-01",
+      "severity": "editorial",
+      "pointer": "/entries/0/claims/2/statement",
+      "claim_id": "EXP-LIFE-001-C03",
+      "finding": "“同一个新闭包”容易与“同一函数身份”混淆；源码按函数值匹配，而说明文档已明确写另建的同形闭包不能解绑原函数。",
+      "suggestion": "可改成“新建的同形闭包、错误listener或错误source不能替代原登记身份”。",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S03"
+      ],
+      "blocking": false
+    }
+  ],
+  "summary": {
+    "entries": 3,
+    "claims": 17,
+    "api_contracts": 8,
+    "mechanism_steps": 9,
+    "source_references": 25,
+    "source_files": 7,
+    "all_atoms_reviewed": true,
+    "all_candidate_file_and_range_hashes_match": true,
+    "factual_blockers_found": false,
+    "research_states_preserved": true
+  },
+  "source_identity": {
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "independently_verified_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "version_basis": "epoch/build由冻结任务标识；D核ZIP SHA及具名Lua，不声称检查可执行程序。",
+    "file_hash_method": "ZIP member original bytes",
+    "range_hash_method": "UTF8 splitlines then LF join without trailing newline"
+  },
+  "review_dependencies": [
+    {
+      "artifact": "windows/D/review-plan.json",
+      "sha256": "0b89ea28482ec15a5bfe8473f5374d4aa33fd94efa6dfcf741c4bf7ce1d9fbb8",
+      "role": "冻结独立准备计划及额外具名源码依赖定位；本审阅引用并继承其中已读静态边界",
+      "must_retain_for_packaging": true
+    },
+    {
+      "artifact": "dst-kb-service/dst_kb/mechanism_contract.py",
+      "artifact_root": "repository",
+      "sha256": "6b74b73c905b12ac9b69043f3379164dfe269947f6cb3ddd08f07860210009bd",
+      "role": "独立执行已核代码的validate函数；通过文档/entry/claim/API/step/ref与治理结构校验"
+    },
+    {
+      "artifact": "windows/A/event-replica-lifecycle.md",
+      "sha256": "14a4ee9b9f17bc334d51dadd98597d4ae27f6806e58f2129eafd075e93aeb158",
+      "role": "按此字节版本完成附加事实一致性审查；链接集成尚由总控处理",
+      "must_retain_for_packaging_if_review_is_cited_as_document_review": true
+    }
+  ],
+  "historical_dedup_dependencies": [
+    {
+      "entry_id": "NC-N002-FINAL-04",
+      "artifact": "knowledge/data/nativecore/native-core.json",
+      "artifact_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/3",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "reviewer_default",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖登记名称、AddComponent先复制后构造、raw/public标签过滤、classified附着与具体getter；仅再次描述这些基础不构成增量。"
+    },
+    {
+      "entry_id": "NC-N002-FINAL-05",
+      "artifact": "knowledge/data/nativecore/native-core.json",
+      "artifact_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/4",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖初始化与后续dirty分离，以及同一owner/source/function解绑建议；不能包装成新就绪保证。"
+    },
+    {
+      "entry_id": "AI-N001-09",
+      "artifact": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "artifact_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "pointer": "/entries/8",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "coding_default"
+      },
+      "dedup_boundary": "已覆盖实体task owner、事件双索引与组件卸载不是整实体清理，以及teardown中新建工作的风险；后续需证明更具体且有用的分支差异。"
+    },
+    {
+      "entry_id": "AI-N001-10",
+      "artifact": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "artifact_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "pointer": "/entries/9",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "canonical",
+        "retrieval_status": "task_conditional",
+        "coding_status": "coding_default"
+      },
+      "dedup_boundary": "已覆盖raw/public replica、classified、netvar和HUD分层可用；不得把原始表访问当推荐公共接口。"
+    },
+    {
+      "entry_id": "EXP-ARCH-001",
+      "artifact": "knowledge/research/native-mechanisms/architecture_events-e9026d0a3b42.json",
+      "artifact_sha256": "e9026d0a3b425c46d9d515f5717a2681d076a2979484060a0933269e44ee99d1",
+      "pointer": "/entries/0",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖双索引、重复登记、快照、解绑不取消当前快照、阶段间接收器变化；本轮需与解除身份、双向清边及实体退场阶段作增量区分。"
+    },
+    {
+      "entry_id": "EXP-ARCH-004",
+      "artifact": "knowledge/research/native-mechanisms/architecture_loading-8c467f36285a.json",
+      "artifact_sha256": "8c467f36285a44eb436825f30c16f7779820d3e6a127e5703bcd1f8f9c062b36",
+      "pointer": "/entries/1",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "knowledge_status": "research",
+        "retrieval_status": "restricted",
+        "coding_status": "hold"
+      },
+      "dedup_boundary": "已覆盖Container双向补接、暂存交接、Attach先写字段/监听后初始化与非幂等窗口；只新增版本号或重复补接流程不够。"
+    },
+    {
+      "entry_id": "RULE-LIFE-001",
+      "artifact": "knowledge/data/entries.json",
+      "artifact_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "pointer": "/entries/26",
+      "read_boundary": "完整entry正文/Scope/unknown或does_not_mean；Core读取Scope、全部claim statement、状态，未重新核历史全部嵌套source artifacts。",
+      "preserved_states": {
+        "status": "candidate"
+      },
+      "dedup_boundary": "CASE-001范围的既有owner工程建议；不是任意组件/原生资源销毁的事实保证。"
+    }
+  ],
+  "dedup_review": [
+    {
+      "entry_id": "EXP-LIFE-001",
+      "status": "bounded_increment_accepted",
+      "prior_entries": [
+        "AI-N001-09",
+        "NC-N002-FINAL-05",
+        "EXP-ARCH-001",
+        "EXP-ARCH-004"
+      ],
+      "already_known": "Owner/原函数source身份、双索引、重复追加及快照；Container闭包例也属既有依赖。",
+      "increment": "完整Listen/Remove入口参数与nil返回、函数断言、RemoveByValue一次全删重复及异常/错误身份的限定；不是新事件总线机制。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "status": "bounded_increment_accepted",
+      "prior_entries": [
+        "AI-N001-09",
+        "RULE-LIFE-001",
+        "EXP-ARCH-001"
+      ],
+      "already_known": "整实体与组件卸载不同，任务/监听各有owner，快照不撤销。",
+      "increment": "具名RemoveAll完整API、两向归属块清理及对端空表、可重建而非永久关闭、与onremove/后续hook位置及完整Remove非幂等推论的区分。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "status": "bounded_increment_accepted",
+      "prior_entries": [
+        "NC-N002-FINAL-04",
+        "AI-N001-10",
+        "EXP-ARCH-004"
+      ],
+      "already_known": "登记/构造、公有标签过滤、分层可用、Container补接和先写后断言。",
+      "increment": "两个ReplicateEntity API身份和ThePlayer异常恢复边界；重复raw替换、master __早退、Unreplicate保留/最终raw清理；helper固定true不采用callee返回。"
+    }
+  ],
+  "governance_review": [
+    {
+      "entry_id": "EXP-LIFE-001",
+      "status": "pass",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "runtime_verified": false,
+      "scope_assessment": "只限冻结归档具名Lua与列举依赖；旧canonical/Scope不改；未知边界明确，不授予原生/联网/Mod保证。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "status": "pass",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "runtime_verified": false,
+      "scope_assessment": "只限冻结归档具名Lua与列举依赖；旧canonical/Scope不改；未知边界明确，不授予原生/联网/Mod保证。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "status": "pass",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "runtime_verified": false,
+      "scope_assessment": "只限冻结归档具名Lua与列举依赖；旧canonical/Scope不改；未知边界明确，不授予原生/联网/Mod保证。"
+    }
+  ],
+  "claim_reviews": [
+    {
+      "id": "EXP-LIFE-001-C01",
+      "pointer": "/entries/0/claims/0",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02"
+      ],
+      "rationale": "完整读取两个入口及AddListener；无return/句柄、无fn校验、双向追加与解除前函数断言均直接成立。"
+    },
+    {
+      "id": "EXP-LIFE-001-C02",
+      "pointer": "/entries/0/claims/1",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S02",
+        "EL-S03"
+      ],
+      "rationale": "RemoveListener调用的RemoveByValue完整倒序遍历数组并删除全部等值元素；不是单次订阅令牌或引用计数。"
+    },
+    {
+      "id": "EXP-LIFE-001-C03",
+      "pointer": "/entries/0/claims/2",
+      "kind": "EI",
+      "status": "pass_with_nonblocking_editorial_note",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S05"
+      ],
+      "rationale": "按新建同形闭包的读法，fn等值匹配、错误归属不作全局搜索和既有快照不可撤回均有依据；原句“同一个新闭包”有歧义，见EL-NB-01。"
+    },
+    {
+      "id": "EXP-LIFE-001-C04",
+      "pointer": "/entries/0/claims/3",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S08"
+      ],
+      "rationale": "Container Attach保存闭包、listener为self.inst、source为classified，Detach以相同字段调用RemoveEventCallback后清字段；不授予重复Attach安全性。"
+    },
+    {
+      "id": "EXP-LIFE-001-C05",
+      "pointer": "/entries/0/claims/4",
+      "kind": "REC",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S03",
+        "EL-S08"
+      ],
+      "rationale": "由双索引身份和一次删除全部相同fn推出的有界工程建议；没有伪装成原生句柄/次数协议。"
+    },
+    {
+      "id": "EXP-LIFE-002-C01",
+      "pointer": "/entries/1/claims/0",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S04"
+      ],
+      "rationale": "完整RemoveAll先处理event_listening并清自身表，再处理event_listeners并清自身表；对端只删归属键而不深裁空事件节点。"
+    },
+    {
+      "id": "EXP-LIFE-002-C02",
+      "pointer": "/entries/1/claims/1",
+      "kind": "EI",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S04"
+      ],
+      "rationale": "原版结构且无新登记时两顶层表已nil，因此重复调用无业务动作；ListenForEvent可重新建表，无永久closed标记。"
+    },
+    {
+      "id": "EXP-LIFE-002-C03",
+      "pointer": "/entries/1/claims/2",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S06",
+        "EL-S07",
+        "EL-S22",
+        "EL-S23"
+      ],
+      "rationale": "完整Remove与全局Lua OnRemoveEntity顺序吻合。此陈述是具名步骤的先后关系，未声称省略的parent/platform、更新表、children等步骤不存在或相邻。"
+    },
+    {
+      "id": "EXP-LIFE-002-C04",
+      "pointer": "/entries/1/claims/3",
+      "kind": "EI",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S04",
+        "EL-S05",
+        "EL-S06"
+      ],
+      "rationale": "onremove派发位于整清前且无pcall/finally；回调错误会阻断后续清理。整清不主动调用业务fn，完整Remove无重入锁；未将此写成原生回收或异常恢复保证。"
+    },
+    {
+      "id": "EXP-LIFE-002-C05",
+      "pointer": "/entries/1/claims/4",
+      "kind": "REC",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S02",
+        "EL-S04",
+        "EL-S06"
+      ],
+      "rationale": "整清会删其他模块关系，因此局部模块按原身份释放是有界REC；任务和具体资源另有清理入口。"
+    },
+    {
+      "id": "EXP-LIFE-003-C01",
+      "pointer": "/entries/2/claims/0",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S09"
+      ],
+      "rationale": "完整全局GUID入口直接解引用查找结果；seamless分支保存并替换ThePlayer，尾部恢复以保存值truthy为门禁，无受保护的恢复路径。"
+    },
+    {
+      "id": "EXP-LIFE-003-C02",
+      "pointer": "/entries/2/claims/1",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S11"
+      ],
+      "rationale": "未登记return、master先改标签并在__分支return、重复raw对象仅警告、缓存模块以及构造返回后rawset均为直接Lua事实。"
+    },
+    {
+      "id": "EXP-LIFE-003-C03",
+      "pointer": "/entries/2/claims/2",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S12",
+        "EL-S15",
+        "EL-S06"
+      ],
+      "rationale": "Unreplicate不删除raw对象或调用replica卸载；RemoveComponent调用实际component.OnRemoveFromEntity，整实体Remove另从raw表枚举OnRemoveEntity，三条链区别明确。"
+    },
+    {
+      "id": "EXP-LIFE-003-C04",
+      "pointer": "/entries/2/claims/3",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S11",
+        "EL-S13"
+      ],
+      "rationale": "完整实体复制方法按pairs选有构造标签的登记键，同步调用全部选中入口正常返回后才调当前后置回调；无幂等门/逐项pcall。"
+    },
+    {
+      "id": "EXP-LIFE-003-C05",
+      "pointer": "/entries/2/claims/4",
+      "kind": "NSF",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S13",
+        "EL-S16",
+        "EL-S17"
+      ],
+      "rationale": "helper对truthy raw对象转发Attach，正常返回后固定true，不采用callee返回值；false/pending的具体调用者与构造消费者均完整读取。"
+    },
+    {
+      "id": "EXP-LIFE-003-C06",
+      "pointer": "/entries/2/claims/5",
+      "kind": "EI",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S09",
+        "EL-S11",
+        "EL-S13",
+        "EL-S08",
+        "EL-S19",
+        "EL-S20"
+      ],
+      "rationale": "重复构造不清旧raw对象、master构造前改标签及Attach先写引用/事件后调用InitializeSlots，足以支撑可能部分状态的EI；不据此宣称正常流程必泄漏或所有callee失败。"
+    },
+    {
+      "id": "EXP-LIFE-003-C07",
+      "pointer": "/entries/2/claims/6",
+      "kind": "REC",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S11",
+        "EL-S12",
+        "EL-S13",
+        "EL-S16",
+        "EL-S17"
+      ],
+      "rationale": "按登记/标签/raw/具体附着/consumer分层诊断是上述边界的有界建议；未制造统一ready或固定一帧协议。"
+    }
+  ],
+  "api_reviews": [
+    {
+      "entry_id": "EXP-LIFE-001",
+      "symbol": "EntityScript:ListenForEvent",
+      "source_file": "scripts/entityscript.lua",
+      "pointer": "/entries/0/api_contracts/0",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S04",
+        "EL-S05",
+        "EL-S08"
+      ],
+      "rationale": "双向追加和source假值缺省；不返回句柄，无fn/IsValid断言，回调第一参数为source。",
+      "necessary_qualification": "输入须满足原版表形状和可调用fn；第二向写失败无回滚是局部异常推论。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-001",
+      "symbol": "EntityScript:RemoveEventCallback",
+      "source_file": "scripts/entityscript.lua",
+      "pointer": "/entries/0/api_contracts/1",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S01",
+        "EL-S02",
+        "EL-S03",
+        "EL-S05",
+        "EL-S08"
+      ],
+      "rationale": "修改前断言函数；按同一归属两向删除所有等值fn；正常nil不证明曾找到。",
+      "necessary_qualification": "重复解绑无动作只限合法结构、原函数且未新绑定；并不撤回旧快照。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "symbol": "EntityScript:RemoveAllEventCallbacks",
+      "source_file": "scripts/entityscript.lua",
+      "pointer": "/entries/1/api_contracts/0",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S04",
+        "EL-S05",
+        "EL-S06",
+        "EL-S22",
+        "EL-S23",
+        "EL-S18"
+      ],
+      "rationale": "清双向归属块、自身两顶层表；不做其他模块过滤，不主动调用业务fn。",
+      "necessary_qualification": "可重复仅指无新登记的整清函数；完整Remove的回调错误和重入完成性未知。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "symbol": "ReplicateEntity",
+      "source_file": "scripts/mainfunctions.lua",
+      "pointer": "/entries/2/api_contracts/0",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S09",
+        "EL-S13"
+      ],
+      "rationale": "全局GUID查找/临时ThePlayer/恢复门禁与实体方法身份明确分开，丢弃方法返回。",
+      "necessary_qualification": "临时上下文只在seamless truthy分支提供；原ThePlayer假值或方法抛错时无恢复保证，不证明引擎入口总序。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "symbol": "EntityScript:ReplicateEntity",
+      "source_file": "scripts/entityreplica.lua",
+      "pointer": "/entries/2/api_contracts/1",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S11",
+        "EL-S13",
+        "EL-S16",
+        "EL-S21"
+      ],
+      "rationale": "当前登记表与构造标签选择、每项同步调用、末尾回调及其返回值丢弃均吻合。",
+      "necessary_qualification": "源码注释的客户端初次construction语境保留；函数无自身端别门禁，不保证全字段或跨实体ready。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "symbol": "EntityScript:ReplicateComponent",
+      "source_file": "scripts/entityreplica.lua",
+      "pointer": "/entries/2/api_contracts/2",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S11",
+        "EL-S12",
+        "EL-S14",
+        "EL-S15",
+        "EL-S06"
+      ],
+      "rationale": "登记门禁、master先改标签、__分支早退、重复对象警告后替换、模块缓存与延后rawset逐一吻合。",
+      "necessary_qualification": "复用推断限定有效已保留raw对象；模块可调用性/构造器副作用取决于具体replica，master错误前可能已改标签。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "symbol": "EntityScript:UnreplicateComponent",
+      "source_file": "scripts/entityreplica.lua",
+      "pointer": "/entries/2/api_contracts/3",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S10",
+        "EL-S12",
+        "EL-S14",
+        "EL-S15",
+        "EL-S06",
+        "EL-S18"
+      ],
+      "rationale": "只在raw非nil且master时切两类标签，无raw删除或replica卸载；public accessor另由标签过滤。",
+      "necessary_qualification": "RemoveComponent实际组件hook与最终raw清理分开；不将标签方法的调用成本或网络送达写成幂等/即时保证。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "symbol": "EntityScript:TryAttachClassifiedToReplicaComponent",
+      "source_file": "scripts/entityreplica.lua",
+      "pointer": "/entries/2/api_contracts/4",
+      "status": "pass",
+      "fields_reviewed": [
+        "visibility",
+        "parameters",
+        "returns",
+        "preconditions",
+        "side_effects",
+        "lifecycle",
+        "evidence_refs",
+        "unknowns"
+      ],
+      "evidence_refs": [
+        "EL-S13",
+        "EL-S16",
+        "EL-S17",
+        "EL-S08",
+        "EL-S19",
+        "EL-S20",
+        "EL-S21",
+        "EL-S24",
+        "EL-S25"
+      ],
+      "rationale": "raw查找、truthy转发、callee正常返回后true、false缺失与异常外抛均吻合。",
+      "necessary_qualification": "true只说明callee正常返回；Container暂存/交接/初始化断言是具体消费者条件，未推广给其他replica。",
+      "visibility_assessment": "原文保守区分声明形态/生命周期入口与公共稳定承诺；本审阅不升级API身份。"
+    }
+  ],
+  "mechanism_step_reviews": [
+    {
+      "entry_id": "EXP-LIFE-001",
+      "step": 1,
+      "pointer": "/entries/0/mechanism_steps/0",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S01"
+      ],
+      "rationale": "双索引登记的角色和写入顺序成立。"
+    },
+    {
+      "entry_id": "EXP-LIFE-001",
+      "step": 2,
+      "pointer": "/entries/0/mechanism_steps/1",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S05"
+      ],
+      "rationale": "仅复用既有快照边界，不将其算本批新调度机制。"
+    },
+    {
+      "entry_id": "EXP-LIFE-001",
+      "step": 3,
+      "pointer": "/entries/0/mechanism_steps/2",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S02",
+        "EL-S03",
+        "EL-S08"
+      ],
+      "rationale": "等值全删及Container身份实例成立，不要求重新登记或重放初始化。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "step": 1,
+      "pointer": "/entries/1/mechanism_steps/0",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S06",
+        "EL-S07"
+      ],
+      "rationale": "全局Lua OnRemoveEntity在先、onremove事件在后、整清尚未发生；不是将全局函数称为native实现。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "step": 2,
+      "pointer": "/entries/1/mechanism_steps/1",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S04"
+      ],
+      "rationale": "两向归属块与本地表清理成立。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "step": 3,
+      "pointer": "/entries/1/mechanism_steps/2",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S06",
+        "EL-S22",
+        "EL-S23",
+        "EL-S18"
+      ],
+      "rationale": "pending取消及component/raw replica清理由调用者后续执行；不承诺错误后的必然完成。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "step": 1,
+      "pointer": "/entries/2/mechanism_steps/0",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S09",
+        "EL-S10",
+        "EL-S11",
+        "EL-S13"
+      ],
+      "rationale": "临时玩家上下文按全局入口的seamless条件理解，随后实体选标签同步复制。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "step": 2,
+      "pointer": "/entries/2/mechanism_steps/1",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S12",
+        "EL-S14",
+        "EL-S15"
+      ],
+      "rationale": "Add/RemoveComponent具名调用点、raw保留及public过滤成立。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "step": 3,
+      "pointer": "/entries/2/mechanism_steps/2",
+      "status": "pass",
+      "evidence_refs": [
+        "EL-S13",
+        "EL-S16",
+        "EL-S17",
+        "EL-S08",
+        "EL-S19",
+        "EL-S20",
+        "EL-S06",
+        "EL-S18"
+      ],
+      "rationale": "后置回调、具名pending交接及最终raw清理是不同阶段；无全链原子性或跨实体总序推断。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "EL-S01",
+      "pointer": "/source_references/0",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1229,
+      "range_sha256": "55092cbb89ffd09450367a219a4d459287554fd5c3e51c9c827691eae4be4ec3",
+      "semantic_review": "完整AddListener及ListenForEvent；双向角色、追加、缺省与无校验/return。"
+    },
+    {
+      "id": "EL-S02",
+      "pointer": "/source_references/1",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1231,
+      "line_end": 1256,
+      "range_sha256": "6adc48eea088a0757e8527f1372ebd3467c870374f1819df7ded7d3e8f28f138",
+      "semantic_review": "完整RemoveListener及RemoveEventCallback；断言、双向调用及空节点收缩。"
+    },
+    {
+      "id": "EL-S03",
+      "pointer": "/source_references/2",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 238,
+      "line_end": 246,
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "semantic_review": "完整RemoveByValue；倒序全部删除而非单次。"
+    },
+    {
+      "id": "EL-S04",
+      "pointer": "/source_references/3",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1258,
+      "line_end": 1288,
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "semantic_review": "完整RemoveAll；双向清边、对端空表与可重新登记。"
+    },
+    {
+      "id": "EL-S05",
+      "pointer": "/source_references/4",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "semantic_review": "完整PushEvent wrappers/internal；快照函数消费、错误外抛、后续接收器。"
+    },
+    {
+      "id": "EL-S06",
+      "pointer": "/source_references/5",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "semantic_review": "完整Remove；先后关系与raw清理，未把省略阶段说成不存在。"
+    },
+    {
+      "id": "EL-S07",
+      "pointer": "/source_references/6",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 558,
+      "range_sha256": "491f8979034df61bdf405826e10974fde3b85a664e00938da22f4e177820c56f",
+      "semantic_review": "完整全局OnRemoveEntity；区别于实例hook；内部manager/thread效果不冒充本卡全面展开。"
+    },
+    {
+      "id": "EL-S08",
+      "pointer": "/source_references/7",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 153,
+      "line_end": 166,
+      "range_sha256": "72fe5380672d2ccb4b3c3e8cd6d464d896b80976f44522720dc7f0b092e25787",
+      "semantic_review": "完整Container Attach/DetachClassified；身份保存、先写引用/监听再调用初始化。"
+    },
+    {
+      "id": "EL-S09",
+      "pointer": "/source_references/8",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 840,
+      "line_end": 854,
+      "range_sha256": "42e290c16f1d0c61d8353b4a2417223ff3e017a5eadef04520db6ca8bda64edc",
+      "semantic_review": "完整全局ReplicateEntity；nil缺失、seamless暂存与恢复门禁。"
+    },
+    {
+      "id": "EL-S10",
+      "pointer": "/source_references/9",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 5,
+      "line_end": 32,
+      "range_sha256": "8a8cb16671e23da9a91b0574ffaa2738f60c87bdbff29d9a2606e4b91a4924ac",
+      "semantic_review": "完整登记表与ValidateReplicaComponent；public过滤条件。"
+    },
+    {
+      "id": "EL-S11",
+      "pointer": "/source_references/10",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 34,
+      "line_end": 60,
+      "range_sha256": "0153887cd885a8718155ea4047625cef3c1f977c917192424bc2451f7a4181f5",
+      "semantic_review": "完整ReplicateComponent；门禁、标签分支、缓存、重复、构造与raw提交。"
+    },
+    {
+      "id": "EL-S12",
+      "pointer": "/source_references/11",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 62,
+      "line_end": 72,
+      "range_sha256": "7a554b79662a6acc4ed770c5c7089f881d1395610f5bda50de83056431568d6a",
+      "semantic_review": "完整Unreplicate及Prereplicate；保留raw和标签阶段。"
+    },
+    {
+      "id": "EL-S13",
+      "pointer": "/source_references/12",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 74,
+      "line_end": 100,
+      "range_sha256": "170f9992ad0af008ed284bc0e3f3e3b28e8240c370ca6f2fb82fd042cb9e84d0",
+      "semantic_review": "完整实体ReplicateEntity、TryAttach及登记入口；固定true与callee返回分离。"
+    },
+    {
+      "id": "EL-S14",
+      "pointer": "/source_references/13",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 208,
+      "line_end": 246,
+      "range_sha256": "a0da72ce87c8f4139cdf1cf1ad0504e5184a1207ab5c9696411a56deb28fe995",
+      "semantic_review": "完整replica_mt及EntityScript构造；raw/public容器关系。"
+    },
+    {
+      "id": "EL-S15",
+      "pointer": "/source_references/14",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 632,
+      "line_end": 685,
+      "range_sha256": "ab938e47edb98506a108ab8c140077839339c101ce9adf7701d6e9763410b814",
+      "semantic_review": "完整AddComponent/RemoveComponent；实际组件与replica时序及错误无保护。"
+    },
+    {
+      "id": "EL-S16",
+      "pointer": "/source_references/15",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 62,
+      "line_end": 76,
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "semantic_review": "完整classified复制/移除回调；无parent与pending分支。"
+    },
+    {
+      "id": "EL-S17",
+      "pointer": "/source_references/16",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 1,
+      "line_end": 62,
+      "range_sha256": "3c604ffa87746503dfe8cd9cc388119df4a2fd889f38eb9d1b6def84d726d455",
+      "semantic_review": "完整Container构造；master classified与client pending交接分支。"
+    },
+    {
+      "id": "EL-S18",
+      "pointer": "/source_references/17",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 111,
+      "line_end": 125,
+      "range_sha256": "0549a07f09bf0c52ba9e5c019a449da0c2678656d7ba121af742605ab8da99db",
+      "semantic_review": "完整Container OnRemoveEntity；master/client具体差异，不读注释方法为生效卸载。"
+    },
+    {
+      "id": "EL-S19",
+      "pointer": "/source_references/18",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 8,
+      "line_end": 22,
+      "range_sha256": "972c7b059a4c13d2d02247100b5193543b86ae0b020f61e0e1895e8cfede5fbf",
+      "semantic_review": "完整InitializeSlots；断言先于槽池搬运。"
+    },
+    {
+      "id": "EL-S20",
+      "pointer": "/source_references/19",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 407,
+      "line_end": 457,
+      "range_sha256": "847847f534dfeaaba15ed1bfaa3d6f267e281dd92142c84d55fcf2f5ecdfd10d",
+      "semantic_review": "完整RegisterNetListeners；先设_slottasks，再Refresh/监听及后续局部消费；不承诺Refresh必成功。"
+    },
+    {
+      "id": "EL-S21",
+      "pointer": "/source_references/20",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 1031,
+      "line_end": 1109,
+      "range_sha256": "12b0ac62b9488b04a179bc43bb69ee8dea2fc786cf7987cab95a239e75847cdd",
+      "semantic_review": "完整classified prefab构造；初始化字段、接口安装与客户端静态任务。"
+    },
+    {
+      "id": "EL-S22",
+      "pointer": "/source_references/21",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1300,
+      "line_end": 1310,
+      "range_sha256": "08b58a9cd7444b431ba9386eeea1439356fd9d1d05f14baf838df21bf5eef61e",
+      "semantic_review": "完整StopAllWatchingWorldStates；具名RemoveWatcher调用边界。"
+    },
+    {
+      "id": "EL-S23",
+      "pointer": "/source_references/22",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1501,
+      "range_sha256": "a325a0b1f5b6632db2cae483f0881a99952a30a265bcf7e37a76b32b90283c06",
+      "semantic_review": "完整CancelAllPendingTasks；遍历Cancel后清字段，错误完成性不保证。"
+    },
+    {
+      "id": "EL-S24",
+      "pointer": "/source_references/23",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 9,
+      "line_end": 17,
+      "range_sha256": "6dae530848ce47618c3d63aba208e034938089c205c78a6b2b920554ce14bafc",
+      "semantic_review": "完整containers.widgetsetup；具体配置复制与SetNumSlots调用。"
+    },
+    {
+      "id": "EL-S25",
+      "pointer": "/source_references/24",
+      "status": "pass",
+      "identity_status": "EXACT_FILE_RANGE",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 269,
+      "line_end": 275,
+      "range_sha256": "cc7d8ca5f91acdca1482b9284013fc0c91f5d5120d96b5b1362c7aba39ff30b5",
+      "semantic_review": "完整Container Set/GetNumSlots；调用与返回闭合。"
+    }
+  ],
+  "compatibility_review": [
+    {
+      "entry_id": "EXP-LIFE-001",
+      "status": "pass_bounded_enumerated_static",
+      "declared_dependency_refs": [
+        {
+          "ref": "EL-S01",
+          "role": "entry / dual-owner writer"
+        },
+        {
+          "ref": "EL-S02",
+          "role": "entry / cleanup"
+        },
+        {
+          "ref": "EL-S03",
+          "role": "callee / equality and duplicate removal"
+        },
+        {
+          "ref": "EL-S05",
+          "role": "consumer / existing snapshot boundary"
+        },
+        {
+          "ref": "EL-S08",
+          "role": "bounded caller-consumer / classified cleanup"
+        },
+        {
+          "ref": "EL-S04",
+          "role": "whole-owner cleanup"
+        }
+      ],
+      "assessment": "已核候选具名声明、调用、消费及清理定位；枚举是本卡静态范围，不是穷尽动态调用者/全部native/Mod依赖。"
+    },
+    {
+      "entry_id": "EXP-LIFE-002",
+      "status": "pass_bounded_enumerated_static",
+      "declared_dependency_refs": [
+        {
+          "ref": "EL-S04",
+          "role": "entry / bilateral cleanup"
+        },
+        {
+          "ref": "EL-S01",
+          "role": "re-registration boundary"
+        },
+        {
+          "ref": "EL-S05",
+          "role": "consumer / callback exception and snapshot"
+        },
+        {
+          "ref": "EL-S06",
+          "role": "caller / ordered destruction sites"
+        },
+        {
+          "ref": "EL-S07",
+          "role": "callee boundary / Lua global removal hook"
+        },
+        {
+          "ref": "EL-S22",
+          "role": "sibling cleanup / worldstate watcher"
+        },
+        {
+          "ref": "EL-S23",
+          "role": "sibling cleanup / pending tasks"
+        },
+        {
+          "ref": "EL-S18",
+          "role": "bounded replica cleanup consumer"
+        }
+      ],
+      "assessment": "已核候选具名声明、调用、消费及清理定位；枚举是本卡静态范围，不是穷尽动态调用者/全部native/Mod依赖。"
+    },
+    {
+      "entry_id": "EXP-LIFE-003",
+      "status": "pass_bounded_enumerated_static",
+      "declared_dependency_refs": [
+        {
+          "ref": "EL-S09",
+          "role": "global caller / temporary ThePlayer context"
+        },
+        {
+          "ref": "EL-S10",
+          "role": "registration selection / public visibility filter"
+        },
+        {
+          "ref": "EL-S11",
+          "role": "constructor callee / require cache / raw write"
+        },
+        {
+          "ref": "EL-S12",
+          "role": "tag-only cleanup and prereplication caller"
+        },
+        {
+          "ref": "EL-S13",
+          "role": "entries / callback dispatch and raw attachment helper"
+        },
+        {
+          "ref": "EL-S14",
+          "role": "replica container and public access consumer"
+        },
+        {
+          "ref": "EL-S15",
+          "role": "component lifecycle callers"
+        },
+        {
+          "ref": "EL-S16",
+          "role": "bounded classified caller / pending cleanup"
+        },
+        {
+          "ref": "EL-S17",
+          "role": "bounded pending consumer / ownership transfer"
+        },
+        {
+          "ref": "EL-S08",
+          "role": "bounded attachment callee / event cleanup"
+        },
+        {
+          "ref": "EL-S19",
+          "role": "callee / initialization assertion"
+        },
+        {
+          "ref": "EL-S20",
+          "role": "later consumer / slot task state"
+        },
+        {
+          "ref": "EL-S21",
+          "role": "classified callback installation / initial state"
+        },
+        {
+          "ref": "EL-S24",
+          "role": "constructor callee / slot config"
+        },
+        {
+          "ref": "EL-S25",
+          "role": "slot-count callee"
+        },
+        {
+          "ref": "EL-S06",
+          "role": "final raw replica cleanup caller"
+        },
+        {
+          "ref": "EL-S18",
+          "role": "bounded final replica cleanup"
+        }
+      ],
+      "assessment": "已核候选具名声明、调用、消费及清理定位；枚举是本卡静态范围，不是穷尽动态调用者/全部native/Mod依赖。"
+    }
+  ],
+  "supplemental_dependency_boundary": {
+    "plan_dependency_refs_used": [
+      "D-S03",
+      "D-S09",
+      "D-S10",
+      "D-S11",
+      "D-S12",
+      "D-S13",
+      "D-S14",
+      "D-S15",
+      "D-S16",
+      "D-S17",
+      "D-S18",
+      "D-S19",
+      "D-S20",
+      "D-S21",
+      "D-S25",
+      "D-S26",
+      "D-S27",
+      "D-S30",
+      "D-S31"
+    ],
+    "meaning": "准备计划补充了RemoveByValue、watcher、任务、manager、组件更新/actions及Container清理等具名静态实现；候选不宣称这些所有内部效果，本审阅也不以额外核读升级候选未知边界。",
+    "not_proven": [
+      "所有replica构造器副作用及全部业务consumer",
+      "完整global OnRemoveEntity的原生销毁效果",
+      "任意回调异常后的恢复与资源释放完整性",
+      "跨实体/网络总序或全部netvar fresh",
+      "任意Mod/元表覆写兼容"
+    ]
+  },
+  "document_review": {
+    "artifact": "windows/A/event-replica-lifecycle.md",
+    "sha256": "14a4ee9b9f17bc334d51dadd98597d4ae27f6806e58f2129eafd075e93aeb158",
+    "status": "factually_consistent_with_frozen_candidate",
+    "sections": [
+      {
+        "section": "订阅归谁，解绑就由谁持有身份",
+        "status": "pass",
+        "candidate_entries": [
+          "EXP-LIFE-001"
+        ],
+        "note": "双索引、fn/source身份、nil返回、一次全删重复及快照限定一致；关于新闭包的表述比候选C03更清楚。"
+      },
+      {
+        "section": "局部解绑与整实体析构分开",
+        "status": "pass",
+        "candidate_entries": [
+          "EXP-LIFE-002",
+          "EXP-LIFE-003"
+        ],
+        "note": "onremove/清理先后和回调抛错阻断一致；表述“后续实体清理”未遗漏成不存在其他步骤。"
+      },
+      {
+        "section": "Replica存在、可见、附着与退出分别审查",
+        "status": "pass",
+        "candidate_entries": [
+          "EXP-LIFE-003"
+        ],
+        "note": "五入口身份、ThePlayer恢复条件、重复构造、raw保留与固定true含义一致；正常__分支复用不外推损坏标签状态。"
+      },
+      {
+        "section": "待验证和未知边界",
+        "status": "pass",
+        "note": "保持静态、HOLD和待运行；未制造统一ready、稳定公共API或固定一帧恢复承诺。"
+      }
+    ],
+    "link_integration": "按任务指示留给总控；本次接受不表示文档相对链接已修复，也不将candidate.json路径视为最终打包路径。",
+    "later_edits": "若最终仅改链接，需记录本SHA到最终文档的差异与新SHA；事实改动应重新核对应原子。"
+  },
+  "checks": {
+    "mechanism_contract_validate": "passed",
+    "candidate_utf8_lf_no_bom": true,
+    "review_utf8_lf_no_bom": true,
+    "native_file_and_range_hashes": "25/25 passed independently",
+    "old_dedup_artifact_hashes": "all 7 plan bindings unchanged",
+    "runtime_game_or_lua_fixture": "not_run",
+    "repository_candidate_or_config_mutations": "none",
+    "subagents_or_new_chats": "none"
+  },
+  "packaging_requirements": [
+    "保留精确候选SHA和本review原字节；按总控流程保存冻结独立计划及其SHA。",
+    "review-plan的repository相对旧知识依赖均已有包内路径和hash；冻结源码只交成员定位/hash，不复制Lua或私人机器路径。",
+    "本review引用说明文档的精确SHA；如将说明文档审阅作为最终凭据，保留原输入或以link-only差异记录连到最终文档。",
+    "任一候选修订保留本初审及旧候选，不覆盖；新审阅应绑定新SHA并明确变化/继承范围。"
+  ],
+  "limitations": [
+    "接受只限此精确候选的静态研究用途；保留research/restricted/hold，不能用于声称游戏验证或Coding默认准入。",
+    "旧Scope、canonical和历史证据版本不改；未重审历史全部嵌套证据、产品评分或运行记录。",
+    "未执行游戏、专服、远端、Lua行为夹具；当前归档文件匹配不构成引擎/网络行为兼容证明。",
+    "源码原生方法、所有动态回调、其他replica模块和第三方Hook未穷尽；候选已保留未知，不作全局兼容或完整析构保证。"
+  ]
+}

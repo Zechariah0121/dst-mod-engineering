@@ -144,3 +144,5 @@
 | `scripts/components/timer.lua` | `ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b` |
 
 更新后重新定位本文所依赖的声明、调用方和清理/加载分支，逐引用区分相同字节、行号移动、语义变化与未知。整包SHA只用于来源身份；它变化不自动停用其他知识，也不能靠新增整包白名单跳过语义核对。露露案例维持其自身代码/运行身份和未验证范围。
+
+深化接入按问题选择：[事件与 Replica 生命周期](event-replica-lifecycle.md)、[组件与任务归属](component-task-ownership.md)、[保存与恢复架构](save-recovery-architecture.md)。这些专题依据 762172 的独立研究，原文中的 761239 证据身份保持不变。

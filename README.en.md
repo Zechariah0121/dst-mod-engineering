@@ -1,10 +1,10 @@
 # DST Mod Engineering
 
-Development candidate `v2026.11.05.1` contains 231 records and is not published yet. The new [complex Mod architecture guide](references/complex-mod-architecture.md) and native event, stategraph, frontend-loading and container-replica research help AI reason about ownership, reentrancy and initialization. See [this phase](docs/phase7-architecture-native.md).
+Development candidate `v2026.11.06.1` contains 240 records and is not published yet. It prepares sources from hotfix 762172 and adds event/replica, component/task and save/recovery contracts with architecture guides, helping AI reason about unbinding, cleanup and restoration. See [this phase](docs/phase8-lifecycle-persistence.md).
 
 An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
 
-The public KB is in `knowledge/`: **231 records comprising 64 foundation records, 13 Native AI records, 110 Native Core records and 44 mechanism research records**. One complete distribution includes the Skill, public knowledge data, development helpers, source preparation and MCP. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
+The public KB is in `knowledge/`: **240 records comprising 64 foundation records, 13 Native AI records, 110 Native Core records and 53 mechanism research records**. One complete distribution includes the Skill, public knowledge data, development helpers, source preparation and MCP. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
 
 ## Download
 
@@ -31,7 +31,7 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 
 Later tasks use `run_kb.py update-sources ensure` with the remembered binding. Identical inputs return without rebuilding; unchanged failures are not retried automatically. The assistant does not edit client configuration or restart connections. Apply the printed configuration in your client and verify nine tools plus a real query. If a catalog session is already connected, restart it after preparation to switch tools. Printed configuration does not prove a successful connection or query. See [installation](docs/install-and-use.md).
 
-Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 761239 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
+Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 762172 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
 
 Prepared `cache/runtime/` contains locally restored game source excerpts and must stay local. A `$dst_source_payload_slot` in public JSON is a missing local-source slot, not source already read or behavioral evidence. Public evidence consists of reviewed excerpts, not complete original research; withheld private context remains `UNK`.
 
@@ -39,4 +39,4 @@ Use [SKILL.md](SKILL.md) for topic routing, [retrieval rules](references/kb-retr
 
 Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission. Valid historical MIT grants and third-party terms remain in force; see [licensing](docs/licensing.md).
 
-This release supports source preparation for 761239, improves research retrieval and adds fire/FX mechanism contracts. See [phase notes](docs/phase6-retrieval-fx.md). New research retains 761239 evidence; historical records keep their original identities.
+Earlier fire/FX work is described in [phase 6](docs/phase6-retrieval-fx.md); module design starts with the [architecture guide](references/complex-mod-architecture.md).

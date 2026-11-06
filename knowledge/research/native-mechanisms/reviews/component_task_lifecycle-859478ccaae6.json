@@ -1,0 +1,48 @@
+{
+  "schema_version": "independent-mechanism-delta-review/1",
+  "reviewer": "lifecycle_reviewer",
+  "topic": "component_task_lifecycle",
+  "candidate_path": "coordinator/frozen/component_task_lifecycle-5f01617bcbb0.json",
+  "candidate_sha256": "5f01617bcbb06fdfcad64a632fda62d8ea63139bfcf697630af63c4d51de7dc9",
+  "previous_candidate": {
+    "path": "coordinator/frozen/component_task_lifecycle-4ec1535558a9.json",
+    "sha256": "4ec1535558a98f7d6794d8cead6a38680ad8afdee7dd74eba40ece45b42661f8"
+  },
+  "previous_review": {
+    "path": "agents/independent_review/lifecycle/review.json",
+    "sha256": "bf17746460a330330520aad2fb0080141a73f55c6c57305e8073104322c07a59",
+    "verdict": "pass_static"
+  },
+  "runtime_verified": false,
+  "verdict": "pass_static",
+  "blockers": [],
+  "review_scope": "Recursive structural JSON diff of the two exact candidate hashes, followed only by semantic review of the sole changed description. No source validation or full research was repeated.",
+  "recursive_diff": {
+    "verified_change_count": 1,
+    "added_or_removed_keys": false,
+    "changed_list_lengths": false,
+    "changes": [
+      {
+        "pointer": "/entries/0/mechanism_steps/2/description",
+        "before": "Remove提交停止、清槽、直接清理钩子，再处理replica及动作；更新循环后段消费停止。",
+        "after": "RemoveComponent提交停止、清槽、直接清理钩子，再处理replica及动作；更新循环后段消费停止。",
+        "verdict": "pass_static",
+        "reason": "Expanding the method name resolves the initial nonblocking isolated-step ambiguity. The unchanged CTL-S03 reference names EntityScript:RemoveComponent, and the described stop/slot-clear/hook/replica/actions sequence remains the exact sequence accepted in the previous review.",
+        "evidence_refs": ["CTL-S03", "CTL-S10", "CTL-S11", "CTL-S04", "CTL-S08", "CTL-S07", "CTL-S12", "CTL-S13"]
+      }
+    ]
+  },
+  "inherited_review": {
+    "counts": {"mechanisms": 3, "claims": 25, "api_contracts": 8, "mechanism_steps": 10, "source_references": 29},
+    "scope": "All unchanged claims, APIs, steps, references, scopes, compatibility, novelty assessments and limitations inherit the exact SHA-bound previous review. The changed step inherits its unchanged evidence references and source assessment, with only the description wording reassessed here.",
+    "resolved_note": "/nonblocking_notes/0 of previous review",
+    "dependency_closure": "Previous review and all of its explicit dependencies remain required audit artifacts. This delta review does not replace or silently reverify them.",
+    "runtime_verified": false
+  },
+  "limitations": [
+    "Static acceptance is bound to the exact new candidate hash and the inherited previous review scope.",
+    "Research/restricted/hold and historical Core Coding HOLD remain unchanged.",
+    "No game, install, registration, repository/config modification, source revalidation or subagent work was performed.",
+    "No private absolute paths or original Lua source text are included."
+  ]
+}

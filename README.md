@@ -1,10 +1,10 @@
 # DST Mod Engineering
 
-当前开发候选 `v2026.11.05.1` 共 231 条登记记录，尚未公开发行。新增[复杂 Mod 架构指南](references/complex-mod-architecture.md)及事件、状态机、前端加载与容器 Replica 研究，让 AI 更准确地划分模块职责、处理回调重入与初始化时序。详见[本阶段内容](docs/phase7-architecture-native.md)。
+当前开发候选 `v2026.11.06.1` 共 240 条登记记录，尚未公开发行。适配 762172 热修，新增事件与复制、组件任务、存档恢复研究及架构接入参考，让 AI 更准确地处理解绑、清理和读档。详见[本阶段内容](docs/phase8-lifecycle-persistence.md)。
 
 面向《饥荒联机版》Mod 开发的工程 Skill 与知识库：按任务读取知识、核对当前源码，再设计、实现、审查和验证。[English README](README.en.md)
 
-公开知识库位于 `knowledge/`，包含 **231 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 44 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
+公开知识库位于 `knowledge/`，包含 **240 条记录：64 条基础知识、13 条 Native AI 知识、110 条 Native Core 知识和 53 条独立机制研究**。同一完整发行包包含 Skill、当前知识、开发辅助脚本、来源准备工具与只读 MCP 服务。记录数量不代表全部可用于 Coding，原有 Scope、类型、版本、更正和 HOLD 仍有效。
 
 ## 下载
 
@@ -51,4 +51,4 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 
 项目自有材料使用 [自定义非商业 LICENSE](LICENSE)，不是 MIT 或 OSI 开源许可。商业使用须另获书面授权；有效历史 MIT 授权与第三方权利仍按各自条款处理。见 [许可说明](docs/licensing.md)。
 
-适配 761239，改善相关知识检索，补充火焰更新与特效挂接 API。详见[本阶段说明](docs/phase6-retrieval-fx.md)。
+此前的火焰与特效研究见[上一阶段](docs/phase6-retrieval-fx.md)，复杂 Mod 分层设计见[架构指南](references/complex-mod-architecture.md)。

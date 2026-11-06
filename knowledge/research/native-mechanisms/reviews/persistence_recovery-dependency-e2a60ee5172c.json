@@ -1,0 +1,556 @@
+{
+  "schema_version": "dst-independent-review-plan/1",
+  "reviewer": "E",
+  "status": "frozen_pre_candidate_independent_preparation",
+  "created_at_utc": "2026-11-06T10:30:07.372388+00:00",
+  "candidate_sha256": null,
+  "candidate_inspected": false,
+  "author_unfrozen_drafts_read": false,
+  "source_epoch": "762172",
+  "build_label": "26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "repository_baseline": "4edc5d8f840934d7f18114113b19663083d81f97",
+  "catalog_counts": {
+    "total": 231,
+    "legacy": 64,
+    "native_ai": 13,
+    "native_core": 110,
+    "native_mechanism": 44
+  },
+  "runtime_verified": false,
+  "governance": {
+    "knowledge_status": "research",
+    "retrieval_status": "restricted",
+    "coding_status": "hold",
+    "legacy_canonical_scope_hold_unchanged": true
+  },
+  "instructions": {
+    "no_subagents": true,
+    "no_new_chats": true,
+    "write_scope": "05-research-history/major-phase-20261106/windows/E",
+    "repository_read_only": true,
+    "no_game_execution_registration_install_or_publish": true
+  },
+  "method": "先于候选读取独立核验当前源码与少量旧知识。收到根提供的冻结候选精确SHA后逐原子审阅；机械hash/契约通过不替代语义审查。",
+  "hash_conventions": {
+    "archive_and_file": "SHA256 original bytes",
+    "source_range": "UTF8 decode then splitlines; LF join selected inclusive lines with no trailing newline",
+    "json_output": "UTF8 no BOM; LF newline; terminal LF; hash actual written bytes"
+  },
+  "contract_inputs": [
+    {
+      "file": "dst-kb-service/dst_kb/mechanism_contract.py",
+      "sha256": "6b74b73c905b12ac9b69043f3379164dfe269947f6cb3ddd08f07860210009bd"
+    },
+    {
+      "file": "docs/native-mechanisms.md",
+      "sha256": "d95b12519ed0d137f7278da4dda0c460113fa883fce16906736d41d0a1df267e"
+    },
+    {
+      "file": "knowledge/research/native-mechanisms/architecture_loading-8c467f36285a.json",
+      "sha256": "8c467f36285a44eb436825f30c16f7779820d3e6a127e5703bcd1f8f9c062b36"
+    }
+  ],
+  "review_checks": [
+    {
+      "id": "E-CHECK-01",
+      "area": "identity",
+      "requirement": "冻结候选原字节SHA、762172归档SHA与基线；不把新来源当旧知识自动兼容。"
+    },
+    {
+      "id": "E-CHECK-02",
+      "area": "contract",
+      "requirement": "独立运行当前mechanism_contract.validate；精确字段、ID、路径、治理、refs与compatibility完整性。"
+    },
+    {
+      "id": "E-CHECK-03",
+      "area": "hashes",
+      "requirement": "每个ref独立核文件原字节SHA与UTF8 splitlines/LF无尾换行范围SHA；检查行号/符号/语义而非只验hash。"
+    },
+    {
+      "id": "E-CHECK-04",
+      "area": "units",
+      "requirement": "对每claim、API、step建立pointer、证据和逐项结论；NSF/EI/REC/UNK不得互相冒充。"
+    },
+    {
+      "id": "E-CHECK-05",
+      "area": "dedup",
+      "requirement": "逐项比较已读旧知识，保留原ID/Scope/canonical/HOLD；新增研究须有独立增量而非仅重列旧事实。"
+    },
+    {
+      "id": "E-CHECK-06",
+      "area": "save_data",
+      "requirement": "区分组件OnSave返回data/refs、prefab OnSave传入data返回refs与record外壳；nil/空表/refs-only负边界。"
+    },
+    {
+      "id": "E-CHECK-07",
+      "area": "world_selection",
+      "requirement": "筛选persists/prefab/Transform/无parent/valid；主动GetSaveRecord和嵌套保存不能套用同一筛选。"
+    },
+    {
+      "id": "E-CHECK-08",
+      "area": "guid_refs",
+      "requirement": "refs标记已选记录的旧id；不强迫目标保存、不等同运行GUID不变或网络GUID协议。"
+    },
+    {
+      "id": "E-CHECK-09",
+      "area": "spawn",
+      "requirement": "SpawnSaveRecord的newents建立时点、saved.id缺省键、invalid/missing prefab与OnLoad异常路径。"
+    },
+    {
+      "id": "E-CHECK-10",
+      "area": "load_order",
+      "requirement": "标志补组件、preload、无固定pairs组件顺序、prefab load、整批postpass；newents在单对象OnLoad时并非整批已齐。"
+    },
+    {
+      "id": "E-CHECK-11",
+      "area": "postpass",
+      "requirement": "组件只按保存键调用，prefab hook边界、world特殊阶段、网络实体不凭名字推定完整postpass。"
+    },
+    {
+      "id": "E-CHECK-12",
+      "area": "real_consumer",
+      "requirement": "真实引用恢复/Timer事件消费者、注册与清理绑定；不只函数声明自证链路。"
+    },
+    {
+      "id": "E-CHECK-13",
+      "area": "timer",
+      "requirement": "仅恢复保存中的名字；未保存构造期名字不自动全部删除；任务重建而非原handle，callback与暂停/LongUpdate区别。"
+    },
+    {
+      "id": "E-CHECK-14",
+      "area": "storage",
+      "requirement": "区分Lua数据生成、native序列化调用、后续索引/timefile回调、磁盘成功及重启恢复；无实测不宣称后两者。"
+    },
+    {
+      "id": "E-CHECK-15",
+      "area": "player",
+      "requirement": "玩家session与world集合/postpass不同；只对核到的Resume caller下结论，不泛化跨shard/快照/换角。"
+    },
+    {
+      "id": "E-CHECK-16",
+      "area": "failure",
+      "requirement": "局部assert/返回/抛错与native未知明确；无证据不授予pcall/finally/原子提交/异常回滚或恰好一次。"
+    },
+    {
+      "id": "E-CHECK-17",
+      "area": "api_identity",
+      "requirement": "self与真实形参/返回值分开；EntityScript方法、组件方法、global wrapper、file-local、native方法保守署名/visibility。"
+    },
+    {
+      "id": "E-CHECK-18",
+      "area": "dependencies",
+      "requirement": "声明、直接caller/callee/consumer、组件注入、清理与compatibility依赖绑定；enumerated_static不是全局穷尽。"
+    },
+    {
+      "id": "E-CHECK-19",
+      "area": "limits",
+      "requirement": "server/client/mastersim/persistence层次、动态hook/Mod与native未知、版本、restricted/hold与runtime_verified:false保持。"
+    },
+    {
+      "id": "E-CHECK-20",
+      "area": "privacy",
+      "requirement": "交付JSON仅项目相对路径、定位/hash和语义笔记；无Lua原文、私人机器路径或归档副本；UTF8/LF。"
+    }
+  ],
+  "prior_records_read": [
+    {
+      "id": "FACT-DST-001",
+      "file": "knowledge/data/entries.json",
+      "pointer": "/entries/0",
+      "file_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "41a2a70dddd316e0685479c243c31104e028b57997c64c76c7ecf237c2573f63",
+      "comparison": "已有组件表OnSave/OnLoad遍历事实；当前范围/版本不能改标；仅重述不构成新增机制。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "FACT-DST-002",
+      "file": "knowledge/data/entries.json",
+      "pointer": "/entries/1",
+      "file_sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "0e82822ada2cd826d9cdfe09591ebc9c5ca9405269c1854f1abec31f2cde0131",
+      "comparison": "已有Container嵌套GetSaveRecord/SpawnSaveRecord；不能从世界平铺refs协议泛化所有嵌套物品。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "AI-N001-06",
+      "file": "knowledge/data/native001/canonical-native001-ai-knowledge.json",
+      "pointer": "/entries/5",
+      "file_sha256": "bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "7be9487a4120868557ea7d873217682247289e364d717cabfa743942f0ff21bb",
+      "comparison": "已有world refs不强制收目标、Player session丢弃refs、普通Resume缺world newents/postpass及runtime对象不可直接持久化边界。",
+      "scope_and_governance_read": true
+    },
+    {
+      "id": "NC-N004-FINAL-07",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "pointer": "/entries/23",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "record_sha256_convention": "UTF8 json.dumps ensure_ascii=False sort_keys=True separators comma-colon",
+      "record_sha256": "66f027d1755436599bacb05a1b586c99c72f7f264fca771d1afc60734a9e8f2b",
+      "comparison": "已有普通Timer重复名、save/load替换、LongUpdate/transfer和清理，以及Cooldown/WorldSettingsTimer/Debuffable差异；旧canonical与HOLD不变。",
+      "scope_and_governance_read": true
+    }
+  ],
+  "independently_read_source_ranges": [
+    {
+      "id": "E-PREP-01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 248,
+      "line_end": 316,
+      "range_sha256": "9d481040bf0dbaead41c3af063852d8a1a469462d12207da61de1b5fdeea7715",
+      "review_focus": "GetSaveRecord：空间/外观元数据、GetPersistData与第二返回值；自身不筛选persists，也不落盘",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "review_focus": "组件OnSave的非空table过滤，refs独立合并，prefab OnSave的不同签名，空集合返回边界",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1964,
+      "line_end": 1977,
+      "range_sha256": "d5d3d49922fdd678ef58ec530bee7bfaaaf7ba7b11538f99230541bc0073b210",
+      "review_focus": "组件postpass按savedata键查对象，prefab postpass即使savedata为nil仍可调用",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "review_focus": "新增组件标志的前置/兼容分支，OnPreLoad、pairs组件OnLoad、prefab OnLoad；无内部pcall或回滚",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 648,
+      "line_end": 668,
+      "range_sha256": "edc60ebe5eb495efe1ea834cc76d18058b22b83d984a8391979f5972eeaa4510",
+      "review_focus": "AddComponent构造、replica与postinit副作用，加载期间补组件并非纯数据写入",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-06",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "review_focus": "组件移除清表后调用OnRemoveFromEntity，不等同实体移除",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-07",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1501,
+      "range_sha256": "a325a0b1f5b6632db2cae483f0881a99952a30a265bcf7e37a76b32b90283c06",
+      "review_focus": "宿主pendingtasks取消",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-08",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1547,
+      "line_end": 1555,
+      "range_sha256": "c409a574a3a3aea78daf6a3d5f8a1f03e53e4a2a6d5d22edfcf679bacf0a164e",
+      "review_focus": "Timer任务挂到实体pendingtasks；底层scheduler内部时序不由此证明",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-09",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1758,
+      "range_sha256": "b11cf40d855c88bf4c923e47527b2281650d2b38893d01bc40f3a7ab20a58476",
+      "review_focus": "实体移除onremove、监听与pendingtasks清理以及组件OnRemoveEntity",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-10",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 450,
+      "line_end": 461,
+      "range_sha256": "0018fa3123bf530da2cb6d5ac7036b6dfd92d2de413730e4da0f51964da7a52d",
+      "review_focus": "存档平台位置解析的可用性与绝对坐标退路",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-11",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "review_focus": "SpawnPrefab、有效性检查、newents映射先于SetPersistData；失败返回与无异常事务承诺",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-12",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1094,
+      "line_end": 1133,
+      "range_sha256": "7df653127e3676aa8891a582b34c245f980962a7c3a5493f6bce386bcfae10fc",
+      "review_focus": "SaveGame服务端门禁与世界实体筛选；收集record与refs",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-13",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1142,
+      "line_end": 1192,
+      "range_sha256": "48517faa35dc6435106cf617b7c2cba0422c13f52a16146273363686292980ad",
+      "review_focus": "世界、world_network、可选shard_network数据和refs入口",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-14",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1194,
+      "line_end": 1213,
+      "range_sha256": "b2797628b9e1fb5951524a1a25dc43c7b06e274449d0e2bad381cf4dcb6f34f6",
+      "review_focus": "独立玩家序列化；refs仅给已入选实体写旧id，缺失只打印",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-15",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1215,
+      "line_end": 1264,
+      "range_sha256": "ddd531ccbbede0526e13eee00c073ad513824863cf98bcb46c31f2c3c68f9f39",
+      "review_focus": "map断言、逐段DataDumper与NaN/inf检查；序列化错误可中断",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-16",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1267,
+      "line_end": 1300,
+      "range_sha256": "7e37a101f01ab633e1286f893e73578cb83b1c1eb7f0688b8ab6520f7cb472a8",
+      "review_focus": "SerializeWorldSession回调后快照、覆盖配置、ShardIndex、timefile、EndWorldSave链；native磁盘保证未知",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-17",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 303,
+      "line_end": 320,
+      "range_sha256": "0a7152e7088c5d3c6d50a2397049ec3c4af96f8821228a8e2c1813ef805601fe",
+      "review_focus": "玩家session只取GetSaveRecord首返回；native SerializeUserSession边界",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-18",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 328,
+      "line_end": 330,
+      "range_sha256": "a7abf70c2454e6f1a0e9f08421a3b4940c8bc5ff7f39270c9975f95bb8fe77bc",
+      "review_focus": "全局SerializeWorldSession包装器直接调用TheNet native方法",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-19",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2100,
+      "line_end": 2128,
+      "range_sha256": "da10c4e7a195a0206b06da3bb587f299250bd7339e13eadb4d38fa6524c69b76",
+      "review_focus": "普通玩家Resume仅SetPersistData无world newents或LoadPostPass；限定此caller",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-20",
+      "source_file": "scripts/shardindex.lua",
+      "file_sha256": "fb7eb3495069de0ad5a91d9312a89a06d310f39a2aaa935fdde8e3608973ad4b",
+      "line_start": 19,
+      "line_end": 69,
+      "range_sha256": "5b02c2744b4130ef221c65068095ed1af870c62593c869ad83547f7a75d4adfe",
+      "review_focus": "索引与时间文件的native写入callback；Lua包装不校验统一成功结果，不承诺原子性",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-21",
+      "source_file": "scripts/shardindex.lua",
+      "file_sha256": "fb7eb3495069de0ad5a91d9312a89a06d310f39a2aaa935fdde8e3608973ad4b",
+      "line_start": 196,
+      "line_end": 243,
+      "range_sha256": "4710365046d1a6d609019f36d3a979776fc79ca40fee4606d14215e2e63fb653",
+      "review_focus": "world session文件分支、native读取与RunInSandbox/断言；读取失败并非恢复成功",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-22",
+      "source_file": "scripts/shardindex.lua",
+      "file_sha256": "fb7eb3495069de0ad5a91d9312a89a06d310f39a2aaa935fdde8e3608973ad4b",
+      "line_start": 307,
+      "line_end": 320,
+      "range_sha256": "d04439ec47d3e4cb32821fe37c40bf5954618f510d23f1022f26529bd20d4a8d",
+      "review_focus": "SaveCurrent客户端早退、磁盘空间与world前提、调用SaveGame",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-23",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 1035,
+      "line_end": 1057,
+      "range_sha256": "9052188f07bf9b6a9b6b051df2f5f7442572ca598d080f918a3745c1c09d3f4e",
+      "review_focus": "世界文件/槽位读取后UpgradeSaveFile、LoadAssets、DoInitGame",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-24",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 924,
+      "line_end": 933,
+      "range_sha256": "aec3b98430c548e07f1e098b777e63fcf4a2251d199b10eba5b7fb881d6f13b5",
+      "review_focus": "DoInitGame到PopulateWorld的实际caller",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-25",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 359,
+      "line_end": 395,
+      "range_sha256": "355ca47f0e414760820963e55087192d64907d5be32fa6fbed15490e72577c07",
+      "review_focus": "PopulateWorld入口与world prefab构造",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-26",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 517,
+      "line_end": 524,
+      "range_sha256": "312922b664c7b7cfd9f88e96e9a9deee8a71a9acd09b0c23fb0bf5ba21c607d5",
+      "review_focus": "实体实例化前存档retrofit与worldentities修改入口",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-27",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 579,
+      "line_end": 593,
+      "range_sha256": "2a811699ca8bdc8125941bb291765cd732a9d21d8131e9b38a732bfdd1d7a662",
+      "review_focus": "world及网络实体SetPersistData先于普通实体集合构造；不共享后建newents",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-28",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 640,
+      "range_sha256": "63f70d042139dbc9df41af9b7d704666b66ecc5101770621a8cb8e3d77d19f86",
+      "review_focus": "集合SpawnSaveRecord完成后postpass、world postpass、scenario消费与Mod记录",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-29",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 1,
+      "line_end": 66,
+      "range_sha256": "79e5e9e14c819fb3e71ddb2018ce6aab95ab82a46d15ec3d62b6225428ad0fe4",
+      "review_focus": "保存GUID+refs；postpass缺失跳过，TrackEntity重建onremove监听；Forget/组件移除清理",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-30",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 1,
+      "line_end": 54,
+      "range_sha256": "10a047fbaf3dc209fd24aa26435c29f339c1b0188d8911434a843bf6e673141a",
+      "review_focus": "任务表与重复名字拒绝、timerdone前StopTimer；暂停开始先排程再取消",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-31",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 56,
+      "line_end": 120,
+      "range_sha256": "82c83fe2982d8b1722cc0227f99a1271a6c4b05e31b58a100ae04aa5d8c01b6d",
+      "review_focus": "Stop/Pause/Resume、剩余时间计算与SetTimeLeft下限；只有Resume有显式true分支",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-32",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 122,
+      "line_end": 159,
+      "range_sha256": "1dd6c2c0a39b7725dfa0fd391a724086a9ae7eb9ee4f4ac833fc39a147e1014a",
+      "review_focus": "OnSave/OnLoad仅替换保存中名字，LongUpdate与Transfer；非现实离线补算证明",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-33",
+      "source_file": "scripts/prefabs/leafpile.lua",
+      "file_sha256": "93cf547867ffbbb23ca6f30778fa72e8b403322a0fb59da629a6b3f4743166bf",
+      "line_start": 386,
+      "line_end": 443,
+      "range_sha256": "193eaefa89e35b0f7f6cfc37cb96c14196d1c6b86dd2ef0e70c503cc800f900a",
+      "review_focus": "grow消费链，最大阶段StopTimer，重排只在名字缺失时启动，timerdone按名字增长",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-34",
+      "source_file": "scripts/prefabs/leafpile.lua",
+      "file_sha256": "93cf547867ffbbb23ca6f30778fa72e8b403322a0fb59da629a6b3f4743166bf",
+      "line_start": 464,
+      "line_end": 478,
+      "range_sha256": "93ff4af07f55f9d1caa373b3dd12f3c9b7a9a290efeed4cdb01476b2c807c014",
+      "review_focus": "prefab OnSave仅存叶堆形态与build，OnLoad恢复；不是整个Timer存档实现",
+      "read_mode": "direct_static_source_no_lua_copied"
+    },
+    {
+      "id": "E-PREP-35",
+      "source_file": "scripts/prefabs/leafpile.lua",
+      "file_sha256": "93cf547867ffbbb23ca6f30778fa72e8b403322a0fb59da629a6b3f4743166bf",
+      "line_start": 482,
+      "line_end": 550,
+      "range_sha256": "a7d684f3735a7a7c4b6e9ba0cdeef3ebb938b93c06033895060ca3fa4e7bda81",
+      "review_focus": "pristine/mastersim门禁、构造期Timer组件和事件监听、初始RescheduleGrow",
+      "read_mode": "direct_static_source_no_lua_copied"
+    }
+  ],
+  "limitations": [
+    "全部为当前冻结Lua源码静态阅读；未启动游戏、未执行Lua或模拟存取档。",
+    "未证明native磁盘原子性/写入失败语义、真实重启恢复、调度tick、现实离线补偿、跨shard总序或第三方Mod兼容。",
+    "准备范围不预先批准未知候选；冻结后按实际候选内容补查必要证据。"
+  ],
+  "next_gate": "等待根发C精确候选路径与SHA；当前不循环等待、不读作者未冻结草稿。"
+}
