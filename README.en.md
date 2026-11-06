@@ -1,42 +1,32 @@
 # DST Mod Engineering
 
-Development candidate `v2026.11.06.1` contains 240 records and is not published yet. It prepares sources from hotfix 762172 and adds event/replica, component/task and save/recovery contracts with architecture guides, helping AI reason about unbinding, cleanup and restoration. See [this phase](docs/phase8-lifecycle-persistence.md).
+`v2026.11.06.2` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
 
-An engineering Skill and knowledge base for Don't Starve Together mod development: retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文 README](README.md)
+The package has **244 registered records: 64 foundation, 13 Native AI, 110 Native Core and 57 mechanism research records**. Recent work adds event/task/save contracts, action execution chains, architecture guides and Lulu case studies, with improved retrieval and source updating. See [phase 9](docs/phase9-action-closure.md). Detailed technical guides are mainly in Chinese.
 
-The public KB is in `knowledge/`: **240 records comprising 64 foundation records, 13 Native AI records, 110 Native Core records and 53 mechanism research records**. One complete distribution includes the Skill, public knowledge data, development helpers, source preparation and MCP. Scope, claim types, versions, corrections and Coding HOLD remain binding; record availability does not grant Coding admission.
+## Download and setup
 
-## Download
+Download [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.06.2/dst-mod-engineering.zip) from [v2026.11.06.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.11.06.2) and compare it with that release's `SHA256SUMS.txt`. Extract the complete directory containing `SKILL.md`; install it in your agent's supported skill location. See [installation](docs/install-and-use.md).
 
-Published release (227 records): [v2026.10.31.3](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.31.3). Download the single complete package for Skill installation, file reading or MCP. Historical [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) retains its original 187-record release identity.
-
-| File | Contents |
-|---|---|
-| [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.10.31.3/dst-mod-engineering.zip) | Complete Skill, 227 registered public records in one `knowledge/` tree, development helpers, local source preparation and MCP |
-
-Check downloads against the release's `SHA256SUMS.txt`. No game Lua source, third-party executables or private mod projects are bundled. Most detailed references are in Chinese.
-
-This release adds a Skill-driven source update assistant. Bind an explicitly supplied authorized `scripts.zip` once; the Skill checks that same path before substantive KB use and attempts preparation where source ranges can be recovered. Changed source is reviewed for the current task, while historical Scope and admission stay intact. See [update workflow](references/source-update-assist.md) and [limits](docs/public-limits.md).
-
-## Start
-
-Extract the package completely and install the directory containing `SKILL.md` in a supported agent skill location. Invoke `dst-mod-engineering` with your task, mod directory, actual game version and authorized local source. Without MCP, read a small relevant subset from the knowledge files. See [installation](docs/install-and-use.md) and [KB integration](docs/knowledge-integration.md).
-
-For full MCP, run from the package root with Python 3.10+ and SQLite FTS5:
+Invoke `dst-mod-engineering` with the task, mod directory and authorized game source. For full MCP, use Python 3.10+ with SQLite FTS5 and run from the package root:
 
 ```text
 python -B -X utf8 run_kb.py update-sources ensure --source "<absolute path to scripts.zip>"
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
 
-Later tasks use `run_kb.py update-sources ensure` with the remembered binding. Identical inputs return without rebuilding; unchanged failures are not retried automatically. The assistant does not edit client configuration or restart connections. Apply the printed configuration in your client and verify nine tools plus a real query. If a catalog session is already connected, restart it after preparation to switch tools. Printed configuration does not prove a successful connection or query. See [installation](docs/install-and-use.md).
+Apply the printed configuration in your client, then check nine tools and a real query. The Skill calls `update-sources ensure` before substantive KB use, reusing the remembered path; identical successful inputs return quickly. Follow `reconnect_required` when activation changes. The assistant maintains local bindings/cache; client configuration and live connections stay under your control. See the [update workflow](references/source-update-assist.md).
 
-Default `--mode auto` uses full mode when preparation is valid. Missing preparation or PACKAGE_CHANGED permits public review after public-manifest validation, with the reason reported. Damaged cache, invalid activation and public-file mismatch remain errors; explicit full stays strict. Use `run_kb.py maintain-sources --help` for independent target-source navigation and local review. The assessed 762172 input does not imply automatic full-mode support or behavioral compatibility with every future DST archive.
+## Knowledge and evidence
 
-Prepared `cache/runtime/` contains locally restored game source excerpts and must stay local. A `$dst_source_payload_slot` in public JSON is a missing local-source slot, not source already read or behavioral evidence. Public evidence consists of reviewed excerpts, not complete original research; withheld private context remains `UNK`.
+Without MCP, select IDs from `knowledge/CATALOG.json` and read their `file` and JSON `pointer`; report this as file access. Full MCP offers nine tools. Default `auto` permits two public review tools after manifest validation when preparation is missing or the package changed; damaged caches and untrusted public files remain errors. Explicit `catalog` is public review, while `full` requires prepared sources.
 
-Use [SKILL.md](SKILL.md) for topic routing, [retrieval rules](references/kb-retrieval.md) for Scope and admission, and [testing](references/testing-release.md) for validation. Real game, remote-client, visual, audio and cross-version behavior need separate evidence; see [limits](docs/public-limits.md).
+Read Scope, claim type, version, corrections and admission together. Native AI Coding uses its ten-field projection and at most five records per task. Core retains Coding HOLD; mechanism research remains research/restricted/hold and needs explicit Reviewer access. A declaration or search hit is navigation; read the relevant contract and evidence before using it. Private context marked `UNK` remains unknown. Exact parameters, budgets and identity rules are in [retrieval](references/kb-retrieval.md); source identities and compatibility states are in [source maintenance](docs/source-compatibility.md).
 
-Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission. Valid historical MIT grants and third-party terms remain in force; see [licensing](docs/licensing.md).
+The package excludes game Lua, private projects and third-party executables. Restored source excerpts and machine-specific state stay in local `cache/`. Public `$dst_source_payload_slot` values mark source to restore locally.
 
-Earlier fire/FX work is described in [phase 6](docs/phase6-retrieval-fx.md); module design starts with the [architecture guide](references/complex-mod-architecture.md).
+Report static checks, scoped dedicated-server behavior and real-client results separately. This release has bounded server event/task and save/recovery observations; actual remote input, prediction, RPC delivery, replication, visuals and audio remain separate validation work. See [testing](references/testing-release.md), [phase 9](docs/phase9-action-closure.md) and [limits](docs/public-limits.md).
+
+Use [SKILL.md](SKILL.md) for topic routing, [module architecture](references/complex-mod-architecture.md) for ownership and [action integration](references/action-lifecycle-architecture.md) for cancellable interactions.
+
+Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission; valid historical MIT grants and third-party terms remain in force. See [licensing](docs/licensing.md).

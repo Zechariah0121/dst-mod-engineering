@@ -1,0 +1,1060 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "entity_removal",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-LIFE-008",
+      "title": "实体Remove的完整退出合同与分阶段清理边界",
+      "aliases": [
+        "EntityScript:Remove",
+        "实体删除",
+        "onremove",
+        "OnRemoveEntity",
+        "Retire",
+        "RemoveEntity",
+        "KillTasks",
+        "删除重入",
+        "执行中回调",
+        "子实体与平台跟随者"
+      ],
+      "engineering_question": "直接Remove按什么顺序释放哪些资源；与全局RemoveEntity/OnRemoveEntity、组件卸载有何区别，重入/异常和正在运行的回调如何界定？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "标准EntityScript:Remove及列举的全局、manager、watcher、事件、调度器与NIS/container样本闭包；原生边界只记录调用。",
+        "excluded": "复用EXP-LIFE-001/002/003/005/006和EXP-ARCH-001已有局部合同；新增独立Remove完整API和总清理责任闭包，不修改旧正文/Scope/HOLD。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-008-C01",
+          "kind": "NSF",
+          "statement": "EntityScript:Remove不接收显式参数、没有显式返回值；先解除self.parent和self.platform关系，再调用全局Lua OnRemoveEntity(self.GUID)，随后同步PushEvent(onremove)。入口没有IsValid、ismastersim、已移除或正在移除标记检查。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S04",
+            "ER-S14"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C02",
+          "kind": "NSF",
+          "statement": "全局OnRemoveEntity先清PhysicsCollisionCallbacks[guid]；Ents中有实体才清debug引用、调用BrainManager/SGManager移除入口、KillTasks、递减NumEnts并清Ents项和既有普通/static/wall更新索引。此全局函数与实体末尾self:OnRemoveEntity()不是同一调用。",
+          "evidence_refs": [
+            "ER-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C03",
+          "kind": "NSF",
+          "statement": "BrainManager路径移除已登记brain的管理列表/索引；SGManager路径清已登记sg的缓冲及管理索引。这两条路径不调用Brain:_Stop_Internal或SG:Stop，也没有在此把实体brain/sg字段置nil。",
+          "evidence_refs": [
+            "ER-S05",
+            "ER-S06",
+            "ER-S07",
+            "ER-S08",
+            "ER-S09"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C04",
+          "kind": "NSF",
+          "statement": "EntityScript:KillTasks转发KillThreadsWithID(self.GUID)，后者对普通和static调度器按id从协程tasks/hibernating/running/waking/waitingfortick列表移键；它不遍历定时器attime。Remove稍后另用CancelAllPendingTasks取消宿主pendingtasks中的普通/static句柄。",
+          "evidence_refs": [
+            "ER-S10",
+            "ER-S11",
+            "ER-S12",
+            "ER-S13",
+            "ER-S20",
+            "ER-S21"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C05",
+          "kind": "NSF",
+          "statement": "onremove正常返回后，Remove依次StopAllWatchingWorldStates、RemoveAllEventCallbacks、CancelAllPendingTasks。worldstate路径按本实体登记的变量名删除worldstate中以self为owner的整块watcher；事件路径清listener/source双向归属；任务路径清当前宿主集合。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S15",
+            "ER-S16",
+            "ER-S17",
+            "ER-S19",
+            "ER-S20"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C06",
+          "kind": "NSF",
+          "statement": "接着Remove以pairs遍历当时components，再遍历rawget(self.replica,_)；只对truthy、type为table且OnRemoveEntity字段truthy的值直接调用其方法，不检查该字段确为function，也不调用RemoveComponent/OnRemoveFromEntity或逐项清components/replica槽。公开replica标签过滤不参与raw遍历。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S24",
+            "ER-S25",
+            "ER-S26"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C07",
+          "kind": "NSF",
+          "statement": "组件及raw replica钩子之后，Remove清自身普通/static/wall更新表及对应现有/新建索引；普通更新表存在时另有num_updating_ents递减语句。随后对子实体children键逐个先清child.parent再child:Remove；platformfollowers键则只清follower.platform。最后直接调用可选self:OnRemoveEntity()，置persists=false并调用self.entity:Retire()。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C08",
+          "kind": "EI",
+          "statement": "同一组钩子按pairs遍历且无快照，不能依赖组件之间、replica之间或children之间的特定顺序，也不能把遍历中任意增删条目的结果当保证。全局清理与后续本地更新表清理是不同代码阶段，不据此推导计数不变量或native更新终止时点。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C09",
+          "kind": "EI",
+          "statement": "Remove及这些具名Lua清理调用没有包住整条链的pcall/finally、回滚或重入锁；任一直接调用抛错会跳过该栈后续阶段。onremove或清理钩子重入同一实体Remove时，本方法不因Ents项已清就早退，可能再次进入事件/钩子/Retire调用；完整删除不能按局部清理可重复推成幂等。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S04",
+            "ER-S14",
+            "ER-S19",
+            "ER-S20",
+            "ER-S21"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C10",
+          "kind": "EI",
+          "statement": "在普通事件、worldstate watcher、定时任务或协程回调内调用Remove，不会仅凭这些清理动作中断已进入的Lua回调；正常返回后原栈仍可继续。事件旧快照、worldstate正在遍历的函数表与调度器持有的当前回调引用也不等同于宿主字段清空。协程清队列不是主动终止当前coroutine的原语；其后yield/重排的实际结果需另验。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S11",
+            "ER-S12",
+            "ER-S14",
+            "ER-S18",
+            "ER-S20",
+            "ER-S21",
+            "ER-S22",
+            "ER-S23"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C11",
+          "kind": "EI",
+          "statement": "全局manager清理与worldstate/事件/pendingtasks整清均早于组件、raw replica、子实体和末尾实体钩子；这些后段若新登记任务/监听/watcher或其他manager资源，Remove没有统一第二轮扫除。由别的存活宿主拥有的任务、任意全局处理器和模块字段也不在本方法通用扫描范围。此为Lua路径边界，不断言Retire之后它们必然执行或泄漏。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S16",
+            "ER-S19",
+            "ER-S20",
+            "ER-S27",
+            "ER-S28",
+            "ER-S29"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C12",
+          "kind": "NSF",
+          "statement": "NIS构造从TheInput:AddControlHandler取得独立处理器句柄，NIS:OnRemoveEntity逐个Remove；Input转发EventProcessor，句柄Remove删除对应processor的handler键。NIS:OnFinish作为调用者直接Remove宿主。Container replica的OnRemoveEntity另按master/client分支处理classified/opener；container_classified末尾实体钩子则可清parent暂存字段。它们说明模块资源由具体钩子处理，不是Remove自动发现任意字段。",
+          "evidence_refs": [
+            "ER-S27",
+            "ER-S28",
+            "ER-S29",
+            "ER-S30",
+            "ER-S31",
+            "ER-S32"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C13",
+          "kind": "NSF",
+          "statement": "全局RemoveEntity(guid)包装先查Ents，缺项无动作；delayclientdespawn真时只置delayclientdespawn_attempted并返回，否则调用inst:Remove。EntityScript:Remove自身不执行这个延迟分支，两个入口的参数、缺项与重复行为不可混同。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S03"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-008-C14",
+          "kind": "REC",
+          "statement": "审查实体删除时按父/平台关系、全局登记、onremove、watcher/事件/任务、组件/replica钩子、children/followers及末尾实体钩子列清责任。局部功能退出使用自身匹配的释放入口；若业务回调删除实体后还会继续副作用，在调用方核对当前对象/业务身份。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S04",
+            "ER-S14",
+            "ER-S16",
+            "ER-S19",
+            "ER-S20",
+            "ER-S24",
+            "ER-S27",
+            "ER-S31",
+            "ER-S32"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:Remove",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua实例方法；已观察全局RemoveEntity包装及NIS:OnFinish调用；端别权限和原生复制效果由调用环境决定。",
+          "parameters": [
+            "隐式self为待移除EntityScript；无显式参数，不按GUID接收实体。"
+          ],
+          "returns": "没有显式return，正常完成返回nil；不转发Retire或各钩子的返回值，不提供删除成功布尔值。直接调用报错会沿当前Lua栈外抛。",
+          "preconditions": [
+            "依赖标准实体字段与关联接口：父/平台对象、全局manager/索引、components、replica._及entity；watcher存在时依赖TheWorld.components.worldstate。",
+            "钩子及递归子实体需满足各自前置条件；truthy的OnRemoveEntity字段会被直接调用。",
+            "入口不检查IsValid、ismastersim、已移除/正在移除状态或delayclientdespawn；调用方须选择合适对象和入口。"
+          ],
+          "side_effects": [
+            "先从父实体或平台解绑；RemovePlatformFollower可同步调用平台的OnRemovePlatformFollower。",
+            "调用全局Lua OnRemoveEntity：清GUID碰撞回调；实体仍在Ents时移除Brain/SG管理登记、按GUID移除协程队列、清Ents与既有更新索引及计数。",
+            "同步发布onremove；正常返回后整清本实体worldstate watcher、两向事件归属、普通/static pendingtasks。",
+            "依次遍历components与raw replica调用table值上的OnRemoveEntity；不委托RemoveComponent，也不自动调用OnRemoveFromEntity或清安装槽。",
+            "清自身普通/static/wall更新表及新旧索引；递归Remove children，清platformfollowers的Lua platform引用。",
+            "最后调用实体自身OnRemoveEntity，设置persists=false，再调用entity:Retire；Retire是本卡Lua证据的原生边界。"
+          ],
+          "lifecycle": [
+            "全局函数OnRemoveEntity、事件onremove、component/replica.OnRemoveEntity、实体自身OnRemoveEntity是四类不同入口，顺序以本合同为准；组内pairs顺序不保证。",
+            "onremove开始前Ents项已被前述全局路径清掉，但不能因此断言原生IsValid已经为false；IsValid直接委托entity:IsValid。",
+            "不终止正在执行的回调或撤回已有事件快照；原回调正常返回前仍可能执行后续业务语句。",
+            "无全链回滚、重入锁或重复删除保护；异常留下此前已发生的更改，可能跳过Retire。",
+            "清理后段创建的新资源没有统一二次清理；另一个存活宿主的任务或外部处理器由具体业务所有者/钩子负责。",
+            "父子递归仅指本地children表；platformfollowers分支不调用follower:Remove。原生父子/平台联动与网络送达需分开验证。",
+            "Global RemoveEntity(guid)的缺项和delayclientdespawn守卫不属于直接调用本方法；RemoveComponent、UnreplicateComponent也不等价删除实体。"
+          ],
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S03",
+            "ER-S04",
+            "ER-S05",
+            "ER-S06",
+            "ER-S07",
+            "ER-S08",
+            "ER-S09",
+            "ER-S10",
+            "ER-S11",
+            "ER-S12",
+            "ER-S13",
+            "ER-S14",
+            "ER-S15",
+            "ER-S16",
+            "ER-S17",
+            "ER-S18",
+            "ER-S19",
+            "ER-S20",
+            "ER-S21",
+            "ER-S22",
+            "ER-S23",
+            "ER-S24",
+            "ER-S25",
+            "ER-S26",
+            "ER-S27",
+            "ER-S28",
+            "ER-S29",
+            "ER-S30",
+            "ER-S31",
+            "ER-S32"
+          ],
+          "unknowns": [
+            "原生SetParent/SetPlatform、entity:IsValid和Retire的内部行为、回调重入、资源释放时点及跨端传播未由Lua实现证明。",
+            "第三方覆写、各组件/replica/实体自定义钩子及遍历中修改集合的具体结果需按实例审查；本卡只闭合列出的原版样本。",
+            "尚未运行游戏；当前回调自删后yield、重入/异常、延迟客户端despawn及原生Retire后新资源的结果未实测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "解除父/平台关系，调用全局Lua移除入口，移除Ents及管理登记。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S02",
+            "ER-S04",
+            "ER-S05",
+            "ER-S06",
+            "ER-S07",
+            "ER-S08",
+            "ER-S09",
+            "ER-S10",
+            "ER-S11",
+            "ER-S12",
+            "ER-S13"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "同步onremove；正常返回后清worldstate watcher、事件归属与pendingtasks。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S14",
+            "ER-S15",
+            "ER-S16",
+            "ER-S17",
+            "ER-S19",
+            "ER-S20",
+            "ER-S21"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "调用component与raw replica钩子，清更新表，再处理children与platformfollowers。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S24",
+            "ER-S25",
+            "ER-S26",
+            "ER-S27",
+            "ER-S28",
+            "ER-S29",
+            "ER-S31"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "实体自身OnRemoveEntity后置persists=false并调用原生Retire；按具名回调界定重入、异常与原栈继续。",
+          "evidence_refs": [
+            "ER-S01",
+            "ER-S14",
+            "ER-S18",
+            "ER-S20",
+            "ER-S21",
+            "ER-S22",
+            "ER-S23",
+            "ER-S32"
+          ]
+        }
+      ],
+      "unknowns": [
+        "原生SetParent/SetPlatform、entity:IsValid和Retire的内部行为、回调重入、资源释放时点及跨端传播未由Lua实现证明。",
+        "第三方覆写、各组件/replica/实体自定义钩子及遍历中修改集合的具体结果需按实例审查；本卡只闭合列出的原版样本。",
+        "尚未运行游戏；当前回调自删后yield、重入/异常、延迟客户端despawn及原生Retire后新资源的结果未实测。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ER-S01",
+            "role": "API定义 / 全链顺序、更新索引、children/followers、实体钩子、native边界",
+            "claim_ids": [
+              "EXP-LIFE-008-C01",
+              "EXP-LIFE-008-C05",
+              "EXP-LIFE-008-C06",
+              "EXP-LIFE-008-C07",
+              "EXP-LIFE-008-C08",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C10",
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C13",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S02",
+            "role": "全局callee / Ents、manager、协程与现有更新索引",
+            "claim_ids": [
+              "EXP-LIFE-008-C01",
+              "EXP-LIFE-008-C02",
+              "EXP-LIFE-008-C07",
+              "EXP-LIFE-008-C08",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S03",
+            "role": "caller / GUID与delayclientdespawn包装",
+            "claim_ids": [
+              "EXP-LIFE-008-C13"
+            ]
+          },
+          {
+            "ref": "ER-S04",
+            "role": "callee / 父子与平台关系及可重入平台钩子",
+            "claim_ids": [
+              "EXP-LIFE-008-C01",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S05",
+            "role": "callee / brain管理移除入口",
+            "claim_ids": [
+              "EXP-LIFE-008-C03"
+            ]
+          },
+          {
+            "ref": "ER-S06",
+            "role": "brain列表移除依赖",
+            "claim_ids": [
+              "EXP-LIFE-008-C03"
+            ]
+          },
+          {
+            "ref": "ER-S07",
+            "role": "brain索引清理",
+            "claim_ids": [
+              "EXP-LIFE-008-C03"
+            ]
+          },
+          {
+            "ref": "ER-S08",
+            "role": "callee / SG索引和缓冲清理",
+            "claim_ids": [
+              "EXP-LIFE-008-C03"
+            ]
+          },
+          {
+            "ref": "ER-S09",
+            "role": "SG缓冲callee",
+            "claim_ids": [
+              "EXP-LIFE-008-C03"
+            ]
+          },
+          {
+            "ref": "ER-S10",
+            "role": "callee / GUID协程清理与生产者",
+            "claim_ids": [
+              "EXP-LIFE-008-C04"
+            ]
+          },
+          {
+            "ref": "ER-S11",
+            "role": "协程队列移键callee",
+            "claim_ids": [
+              "EXP-LIFE-008-C04",
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S12",
+            "role": "协程队列owner-id过滤",
+            "claim_ids": [
+              "EXP-LIFE-008-C04",
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S13",
+            "role": "普通/static双调度器分发",
+            "claim_ids": [
+              "EXP-LIFE-008-C04"
+            ]
+          },
+          {
+            "ref": "ER-S14",
+            "role": "consumer / onremove与执行中普通事件",
+            "claim_ids": [
+              "EXP-LIFE-008-C01",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C10",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S15",
+            "role": "worldstate owner索引生产者",
+            "claim_ids": [
+              "EXP-LIFE-008-C05"
+            ]
+          },
+          {
+            "ref": "ER-S16",
+            "role": "callee / watcher退出入口",
+            "claim_ids": [
+              "EXP-LIFE-008-C05",
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S17",
+            "role": "watcher登记与按owner移除callee",
+            "claim_ids": [
+              "EXP-LIFE-008-C05"
+            ]
+          },
+          {
+            "ref": "ER-S18",
+            "role": "consumer / 执行中的worldstate回调",
+            "claim_ids": [
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S19",
+            "role": "callee / listener/source双向清理",
+            "claim_ids": [
+              "EXP-LIFE-008-C05",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S20",
+            "role": "callee / pendingtasks、完成与普通/static生产者",
+            "claim_ids": [
+              "EXP-LIFE-008-C04",
+              "EXP-LIFE-008-C05",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C10",
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S21",
+            "role": "callee / 句柄取消和引用清理",
+            "claim_ids": [
+              "EXP-LIFE-008-C04",
+              "EXP-LIFE-008-C09",
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S22",
+            "role": "consumer / 执行中定时回调",
+            "claim_ids": [
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S23",
+            "role": "consumer / 执行中协程",
+            "claim_ids": [
+              "EXP-LIFE-008-C10"
+            ]
+          },
+          {
+            "ref": "ER-S24",
+            "role": "相邻API区分 / component卸载",
+            "claim_ids": [
+              "EXP-LIFE-008-C06",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S25",
+            "role": "public replica过滤边界",
+            "claim_ids": [
+              "EXP-LIFE-008-C06"
+            ]
+          },
+          {
+            "ref": "ER-S26",
+            "role": "相邻API区分 / 标签式取消复制",
+            "claim_ids": [
+              "EXP-LIFE-008-C06"
+            ]
+          },
+          {
+            "ref": "ER-S27",
+            "role": "具体component清理消费者 / 外部输入句柄",
+            "claim_ids": [
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C12",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S28",
+            "role": "外部资源生产者 / 输入转发",
+            "claim_ids": [
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C12"
+            ]
+          },
+          {
+            "ref": "ER-S29",
+            "role": "外部资源callee / handler释放",
+            "claim_ids": [
+              "EXP-LIFE-008-C11",
+              "EXP-LIFE-008-C12"
+            ]
+          },
+          {
+            "ref": "ER-S30",
+            "role": "具体调用者 / NIS结束删除宿主",
+            "claim_ids": [
+              "EXP-LIFE-008-C12"
+            ]
+          },
+          {
+            "ref": "ER-S31",
+            "role": "具体raw replica清理消费者",
+            "claim_ids": [
+              "EXP-LIFE-008-C12",
+              "EXP-LIFE-008-C14"
+            ]
+          },
+          {
+            "ref": "ER-S32",
+            "role": "具体实体末尾钩子 / pending字段释放",
+            "claim_ids": [
+              "EXP-LIFE-008-C12",
+              "EXP-LIFE-008-C14"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举所述Lua合同所用入口、callee、consumer与cleanup；不以整ZIP哈希充当所有原版/Mod的兼容白名单。",
+          "没有展开native Retire或全部自定义钩子；跨版本需逐引用复核，旧Scope和准入不变。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "ER-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1801,
+      "range_sha256": "71d3faab59887eeb3ed6b3a4708d8bb7944b4f0d05504a8b609f81a31cca8100",
+      "symbols": [
+        "EntityScript:Remove",
+        "EntityScript:IsValid"
+      ]
+    },
+    {
+      "id": "ER-S02",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 558,
+      "range_sha256": "491f8979034df61bdf405826e10974fde3b85a664e00938da22f4e177820c56f",
+      "symbols": [
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "ER-S03",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 560,
+      "line_end": 570,
+      "range_sha256": "793d98eb66a59913369df47b3aafe15f6b23e587149295d7e99b5af2302485a6",
+      "symbols": [
+        "RemoveEntity"
+      ]
+    },
+    {
+      "id": "ER-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 951,
+      "range_sha256": "56009cc854663597b00e8f0856e3b2032c3b296cf139bf1f65da69a1040a817c",
+      "symbols": [
+        "EntityScript:RemoveChild",
+        "EntityScript:AddChild",
+        "EntityScript:RemovePlatformFollower"
+      ]
+    },
+    {
+      "id": "ER-S05",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 12,
+      "line_end": 17,
+      "range_sha256": "95c43f7b7143b0038880a198c553faa29b25fcab4bf2d8d57f9008da71872a12",
+      "symbols": [
+        "BrainWrangler:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "ER-S06",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 39,
+      "line_end": 54,
+      "range_sha256": "b9a68596a41c03eb41464e702f40cb3d131e0b4ea69a3b960ca406d04285d820",
+      "symbols": [
+        "BrainWrangler:SendToList"
+      ]
+    },
+    {
+      "id": "ER-S07",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 89,
+      "line_end": 98,
+      "range_sha256": "dc49dd075ec827fff26d025df1e875cf76b752487dbe7b253d5ed8328808e627",
+      "symbols": [
+        "BrainWrangler:RemoveInstance"
+      ]
+    },
+    {
+      "id": "ER-S08",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 76,
+      "line_end": 103,
+      "range_sha256": "eb8e9801391c87e79bd2788d4307bc7af91d185a8d725d4c0813eee8f5ebf78c",
+      "symbols": [
+        "StateGraphWrangler:OnRemoveEntity",
+        "StateGraphWrangler:RemoveInstance"
+      ]
+    },
+    {
+      "id": "ER-S09",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 490,
+      "line_end": 494,
+      "range_sha256": "9d634886662766ddf223f9c9f6d6515366764ab2cf5d6dee8fe841738e7c0fc9",
+      "symbols": [
+        "StateGraphInstance:ClearBufferedEvents"
+      ]
+    },
+    {
+      "id": "ER-S10",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1091,
+      "line_end": 1097,
+      "range_sha256": "2122ae6655889f5882f58baf7966b7ffcfd1010794a5fb3b4b2e031eff3844b1",
+      "symbols": [
+        "EntityScript:KillTasks",
+        "EntityScript:StartThread"
+      ]
+    },
+    {
+      "id": "ER-S11",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 268,
+      "line_end": 274,
+      "range_sha256": "95e180e856a611766510ea0071766c6a269679568dfbca787255b76fe1394bd7",
+      "symbols": [
+        "removeif"
+      ]
+    },
+    {
+      "id": "ER-S12",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 303,
+      "line_end": 314,
+      "range_sha256": "1541b4fdc5e5dd036f0bf67e255f252c1ce801b1efee2f891fb9b3295395b5f1",
+      "symbols": [
+        "Scheduler:KillTasksWithID"
+      ]
+    },
+    {
+      "id": "ER-S13",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 427,
+      "line_end": 430,
+      "range_sha256": "3d7ae4ff6af65702b1b225d7f412cc8037e2da48fec98e084cffdbc5ded1a57c",
+      "symbols": [
+        "KillThreadsWithID"
+      ]
+    },
+    {
+      "id": "ER-S14",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "ER-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 11,
+      "line_end": 45,
+      "range_sha256": "db1c956d6c965feba59a6357f8fbbd0003773b05ca74acd3232069f23066562f",
+      "symbols": [
+        "EntityWatchWorldState",
+        "ComponentWatchWorldState"
+      ]
+    },
+    {
+      "id": "ER-S16",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1290,
+      "line_end": 1310,
+      "range_sha256": "325f8dd7533a652c7237f8d6e36445949b8db834f9368627c64720775f9ac469",
+      "symbols": [
+        "EntityScript:WatchWorldState",
+        "EntityScript:StopAllWatchingWorldStates"
+      ]
+    },
+    {
+      "id": "ER-S17",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 281,
+      "line_end": 325,
+      "range_sha256": "1da56332c3d479999eab54808551b86aad389b35efb18df6f7f71c836f9c96a3",
+      "symbols": [
+        "worldstate:AddWatcher",
+        "worldstate:RemoveWatcher"
+      ]
+    },
+    {
+      "id": "ER-S18",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 24,
+      "line_end": 48,
+      "range_sha256": "7043370e28f552c6e57a6ef92b69bc59d7bd2fc95919007d0c5464d6a9869427",
+      "symbols": [
+        "SetVariable"
+      ]
+    },
+    {
+      "id": "ER-S19",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1258,
+      "line_end": 1288,
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "symbols": [
+        "EntityScript:RemoveAllEventCallbacks"
+      ]
+    },
+    {
+      "id": "ER-S20",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish",
+        "EntityScript:DoTaskInTime",
+        "EntityScript:DoPeriodicTask",
+        "EntityScript:DoStaticTaskInTime",
+        "EntityScript:DoStaticPeriodicTask"
+      ]
+    },
+    {
+      "id": "ER-S21",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 56,
+      "line_end": 95,
+      "range_sha256": "7052ec2a86dd95c53f0457fc49f54ebe47e04279f6c238b72357931ce6c94fcc",
+      "symbols": [
+        "Periodic:Cancel",
+        "Periodic:Cleanup"
+      ]
+    },
+    {
+      "id": "ER-S22",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 164,
+      "line_end": 216,
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "symbols": [
+        "Scheduler:OnTick"
+      ]
+    },
+    {
+      "id": "ER-S23",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 218,
+      "line_end": 256,
+      "range_sha256": "2e26d30766d0ed0a14eda1b9ab3164d4ffaaa7e86175e3f5e550290ffdf8d15f",
+      "symbols": [
+        "Scheduler:Run"
+      ]
+    },
+    {
+      "id": "ER-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "ER-S25",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 30,
+      "line_end": 32,
+      "range_sha256": "35b18cf2eb85edd7918074cd89f5b0dfa5de1cf0f129f08e6c108a4bb9ef6e5c",
+      "symbols": [
+        "EntityScript:ValidateReplicaComponent"
+      ]
+    },
+    {
+      "id": "ER-S26",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 62,
+      "line_end": 67,
+      "range_sha256": "bb54e5a0870289cd08051d5b011e6a57ee3f4cd5e2d4f1fe3353a075bc17f89c",
+      "symbols": [
+        "EntityScript:UnreplicateComponent"
+      ]
+    },
+    {
+      "id": "ER-S27",
+      "source_file": "scripts/components/nis.lua",
+      "file_sha256": "9b0459472c5e960afe403208f93a47607f10d8ca44023e792277be47bb88012c",
+      "line_start": 1,
+      "line_end": 21,
+      "range_sha256": "93c9715bcf7beb01b18c088f57a4643b1e88124e70c5ef365550a3220e3c0804",
+      "symbols": [
+        "NIS",
+        "NIS:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "ER-S28",
+      "source_file": "scripts/input.lua",
+      "file_sha256": "b7b49c5711ab942019ef9d8805ead469884727f7df6a6280789bd9a0c41d72b0",
+      "line_start": 139,
+      "line_end": 141,
+      "range_sha256": "3b6f21826253a9573dac9309cfd20d60490fc1866d984626baa4592b93db72ce",
+      "symbols": [
+        "Input:AddControlHandler"
+      ]
+    },
+    {
+      "id": "ER-S29",
+      "source_file": "scripts/events.lua",
+      "file_sha256": "6bff572b49698466311e5db92de287720fb0df515c1a325496d4046bbe1fc61c",
+      "line_start": 1,
+      "line_end": 36,
+      "range_sha256": "fc296b9f7f7ec8de1d2dcb43216b0024eef3ef225939959523ff72aa5e08e7ba",
+      "symbols": [
+        "EventHandler:Remove",
+        "EventProcessor:AddEventHandler",
+        "EventProcessor:RemoveHandler"
+      ]
+    },
+    {
+      "id": "ER-S30",
+      "source_file": "scripts/components/nis.lua",
+      "file_sha256": "9b0459472c5e960afe403208f93a47607f10d8ca44023e792277be47bb88012c",
+      "line_start": 40,
+      "line_end": 57,
+      "range_sha256": "9be4a4adbf024576f62fbaf9fd35ae2dc137088088939e618db8dd2483a72201",
+      "symbols": [
+        "NIS:OnFinish",
+        "NIS:Cancel"
+      ]
+    },
+    {
+      "id": "ER-S31",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 111,
+      "line_end": 125,
+      "range_sha256": "0549a07f09bf0c52ba9e5c019a449da0c2678656d7ba121af742605ab8da99db",
+      "symbols": [
+        "Container:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "ER-S32",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 62,
+      "line_end": 76,
+      "range_sha256": "777d7cb9e6d8b880ba4ab63589a92d82253f505a32a7d6f0c65d763458517c87",
+      "symbols": [
+        "OnRemoveEntity",
+        "OnEntityReplicated"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "EntityScript:Remove 完整参数 返回 前置 副作用 生命周期",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "独立完整API"
+    },
+    {
+      "query": "Remove OnRemoveEntity onremove Retire 调用顺序",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "区分全局/事件/组件与实体钩子"
+    },
+    {
+      "query": "Remove KillTasks CancelAllPendingTasks 协程 定时任务",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "区分两类调度清理"
+    },
+    {
+      "query": "实体Remove 执行中的callback 自删除 重入 异常",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "当前调用栈与部分清理"
+    },
+    {
+      "query": "RemoveComponent Remove OnRemoveFromEntity 区别",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "相邻入口合同"
+    },
+    {
+      "query": "Remove children platformfollowers 父子 平台跟随者",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "不同集合的处理差异"
+    },
+    {
+      "query": "Remove 别的宿主任务 输入处理器 清理钩子 新任务",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "资源归属及后段新建资源"
+    },
+    {
+      "query": "RemoveEntity delayclientdespawn EntityScript:Remove GUID",
+      "expected_entry_ids": [
+        "EXP-LIFE-008"
+      ],
+      "purpose": "包装与直接方法身份"
+    }
+  ],
+  "limitations": [
+    "762172/build26474873冻结ZIP的静态Lua研究，runtime_verified:false，research/restricted/hold。",
+    "仅登记一个完整EntityScript:Remove API；其他同名/相邻方法是具名依赖，不扩充为公共API保证。",
+    "file SHA为ZIP成员原字节；range SHA为UTF8解码splitlines后LF连接且无末尾换行。",
+    "服务环境759671与本候选来源身份分开；本窗口不运行游戏、不注册、不安装、不发布。"
+  ]
+}

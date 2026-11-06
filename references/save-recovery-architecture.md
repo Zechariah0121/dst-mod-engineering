@@ -1,12 +1,12 @@
 # 保存恢复接入：用配对涡流口贯穿状态、引用与任务
 
-结论：复杂 Mod 应先找清楚“谁保存权威值、谁创建实体、谁提供映射、谁在何阶段消费引用、谁重建并取消任务”。原版具名路径提供这些接线，但没有自动把所有状态变成磁盘事务。本专题是工程接入说明与静态推导，不是可直接宣称已运行的框架或实现。
+先明确谁保存权威值、谁创建实体与映射、何时接回引用、谁重建并取消任务。下面以原版配对涡流口说明接线，再给出工程建议。
 
-本批来源：762172 / build 26474873；冻结 ZIP SHA256 `733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980`。版本是任务给定来源身份，已核对 ZIP 字节；未启动游戏。事实（NSF）、推导（EI）、建议（REC）分别标识，所有条目保持 research/restricted/hold，runtime_verified=false。准确证据符号、范围及 raw/range SHA 全部位于 [登记研究](../knowledge/research/native-mechanisms/persistence_recovery-c9ceaf8c5538.json) 的 source_references；本文不含原版 Lua。
+来源为 762172/build26474873，ZIP SHA256 `733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980`。本篇为静态研究；符号、范围与摘要见[登记研究](../knowledge/research/native-mechanisms/persistence_recovery-c9ceaf8c5538.json)，准入按[检索策略](kb-retrieval.md)。
 
 ## 先界定已有知识与本次增量
 
-组件分发顺序、默认缺键、Timer 通用合同沿用 `AI-N001-07`、`NC-N004-FINAL-07`；世界加载阶段沿用 `N006-READY-F03`；保存表不等于落盘、独立回滚不保证恰好一次沿用生命周期/露露事务专题。它们各自历史 Scope 与 HOLD 不变。本批增量是 001 的旧 GUID 映射生产消费闭环、002 的 mermhouse 具体三态读档消费者，以及 003 的保存委托与 callback 续行合同，已有条目保留原身份与范围。
+组件分发顺序、默认缺键、Timer 通用合同沿用 `AI-N001-07`、`NC-N004-FINAL-07`；世界加载阶段沿用 `N006-READY-F03`；保存表不等于落盘、独立回滚不保证恰好一次沿用生命周期/露露事务专题。本篇侧重 001 的旧 GUID 映射生产消费闭环、002 的 mermhouse 具体三态读档消费者，以及 003 的保存委托与 callback 续行合同。
 
 ## 贯穿例：bootleg 创建的两个 oceanwhirlportal
 
@@ -64,7 +64,7 @@ burnt onload 会经构造绑定的 DefaultBurntStructureFn 移除 ChildSpawner�
 | 磁盘保存 | 表、原生接口、callback 后续层次可查 | 两次独立进程验证真实值/引用/任务，进程中断/断电写盘保证 |
 | 跨 shard 与独立回滚 | 本地表和 GUID 协议不提供共同提交证明 | 真实双 shard 乱序、断线、单侧回滚；不能照搬 lulu journal 名字即声称 exactly-once |
 
-以上是待验方案，未运行。对目标 Mod 的最小验收应先断言测试前提，再覆盖同 shard 保存→退出→独立进程恢复：两口互引、缺一口、不存在 prefab、任务到期/暂停/组件移除，以及旧缺字段/显式 false/burnt 数据。涉及账号和 shard 时另建隔离场景，报告每份保存与运行身份。纯表回调替身即使通过，也只能验证本地逻辑，不能替代这些引擎、磁盘或网络结果。
+本篇涡流口与鱼人示例未运行。目标 Mod 先断言前提，再验同 shard 独立进程恢复：互引、缺目标/prefab、任务到期/暂停/移除，以及缺字段/显式 false/burnt 数据。账号与跨 shard 另验；当前有界服务器恢复观察见[阶段 9](../docs/phase9-action-closure.md)。
 
 ## 证据导航
 
@@ -80,4 +80,4 @@ burnt onload 会经构造绑定的 DefaultBurntStructureFn 移除 ChildSpawner�
 | SAVE-S34～S40 | Merm 装备 postpass、烧毁组件移除、旧 timer 转换与装备消费者 |
 | SAVE-S41～S46 | 房屋最终工厂、孩子监听建立/移除、postpass 更新生命周期、组件移除分发与烧毁包装接线 |
 
-所有编号都可在 [登记研究](../knowledge/research/native-mechanisms/persistence_recovery-c9ceaf8c5538.json) 独立定位到精确 ZIP member、符号和范围摘要；引用链不是运行结果。
+所有编号都可在 [登记研究](../knowledge/research/native-mechanisms/persistence_recovery-c9ceaf8c5538.json) 独立定位到精确 ZIP member、符号和范围摘要。

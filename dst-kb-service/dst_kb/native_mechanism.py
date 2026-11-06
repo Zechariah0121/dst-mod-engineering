@@ -159,7 +159,12 @@ def score(record, query):
     if not terms:
         return 0
     identities = declared_identities(entry)
+    # Python \w includes Han characters. A mixed natural-language question
+    # beginning with an English noun is not one requested API identifier. Only
+    # the captured name must be ASCII; signature arguments may be Unicode.
     identity = IDENTITY.fullmatch(query)
+    if identity is not None and not identity[1].isascii():
+        identity = None
     requested = identity[1].lower() if identity else None
     qualified = requested is not None and ('.' in requested or ':' in requested)
     leaves = {re.split(r'[.:]', name)[-1] for name in identities}
@@ -201,7 +206,7 @@ def score(record, query):
     fields = [(6, entry.get('title', '')), (5, ' '.join(entry.get('aliases', []))),
               (8, ' '.join(sorted(declared_identities(entry, lowercase=False)))),
               (3, entry.get('engineering_question', '')),
-              (1, json.dumps(entry.get('api_contracts', []), ensure_ascii=False))]
+              (1, ' '.join(text for _, text in navigation_units(entry)))]
     relevance = 0
     whole_identifier_hit = bool(priority)
     for weight, text in fields:
@@ -216,6 +221,43 @@ def score(record, query):
     if requested is not None and not whole_identifier_hit:
         return 0
     return priority * 100 + min(relevance, 99)
+
+
+def navigation_units(entry):
+    """Original deliverable units, excluding evidence/identity wrapper prose."""
+    units = []
+    for field in ('claims', 'api_contracts', 'mechanism_steps'):
+        for index, value in enumerate(entry.get(field, [])):
+            if field == 'api_contracts':
+                content = {key: value[key] for key in
+                           ('symbol', 'parameters', 'returns', 'preconditions', 'side_effects', 'lifecycle')
+                           if key in value}
+            else:
+                content = value['statement' if field == 'claims' else 'description']
+            units.append(('/' + field + '/' + str(index),
+                          content if isinstance(content, str) else json.dumps(content, ensure_ascii=False)))
+    return units
+
+
+def navigation_terms(text):
+    """Bounded task vocabulary for navigation, never evidence or API admission."""
+    from .retrieval_v2 import words, extract_symbols
+    return words(text) | extract_symbols(text) | {'topic:' + topic for topic in navigation_topics(text)}
+
+
+def navigation_topics(text):
+    from .public_catalog import tokens
+    from .retrieval_v2 import topics
+    # Lifecycle nouns are intentionally ignored by the task evidence matcher.
+    # For research navigation they still distinguish resource owners from a
+    # component that merely happens to implement a common load callback.
+    vocabulary = {
+        'scheduling': ('task', 'tasks', 'pendingtasks', 'scheduler', '调度', '任务'),
+        'subscription': ('listener', 'listeners', 'listenforevent', 'removeeventcallback', '订阅', '监听', '解绑'),
+    }
+    terms = tokens(text)
+    return topics(text.lower()) | {name for name, variants in vocabulary.items()
+                           if any(term in terms if term.isascii() else term in text for term in variants)}
 
 
 # Navigation syntax only. It never establishes a physical/public declaration.

@@ -1,0 +1,1169 @@
+{
+  "baseline_head": "35781e07a41312a7ea02c06a7dcdbde694c86800",
+  "source_epoch": "762172",
+  "source_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "old_scope_and_hold_changed": false,
+  "api_policy": "Six structured player/preview API contracts; existing NC-N003-INT-02 branch semantics are reuse, not wholly new APIs or facts. Existing BufferedAction/EntityScript execution contracts are not re-registered.",
+  "old_entry_scope": {
+    "entry_id": "NC-N003-INT-02",
+    "file": "knowledge/data/nativecore/native-core.json",
+    "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+    "pointer": "/entries/9",
+    "knowledge_status": "canonical",
+    "retrieval_status": "task_conditional",
+    "coding_status": "hold",
+    "scope": {
+      "statement": "已引 LeftClick 与 DoAction 分支、locomotor 到达/清理、RemoteBufferedAction；不成为完整移动网络协议条目。",
+      "source_commit": "d6ab7e6332e10e67aef1e52349cb23287266e565",
+      "runtime_verified": false,
+      "scope_refs": [
+        {
+          "artifact_path": "research/native-core/sources/689635242bbaa6d0-n003-staging.json",
+          "sha256": "c35c57b0531771d675766ebbb140f51a67a38c0fb79d42faca5c7657738c09e7",
+          "pointer": "/entries/1/scope"
+        },
+        {
+          "artifact_path": "research/native-core/sources/689635242bbaa6d0-n003-staging.json",
+          "sha256": "c35c57b0531771d675766ebbb140f51a67a38c0fb79d42faca5c7657738c09e7",
+          "pointer": "/entries/1/reviewer_conditions"
+        }
+      ],
+      "reviewer_conditions": [
+        "无 locomotor 且 non_preview_cb 存在、pre_action_cb 为 nil 时，承认该回调可早于此函数的后续检查；该前置分支无显式 self.ismastersim 条件。",
+        "有 pre_action_cb 的无 locomotor 后置请求分支只在通过早退后调用；缺 non_preview_cb 时此分支不代为调用 pre_action_cb。",
+        "DoAction 的重复比较仅含 action/target/pos；lastheldaction 的 IsValid 失败不等于这里统一停止分发。",
+        "分开到达、atdestfn、交接、Stop/Clear；不承诺必定等下一帧。"
+      ],
+      "sample_support": [
+        {
+          "sample": "LeftClick",
+          "basis_atom_ids": [
+            "N003-C02-NSF01",
+            "N003-C02-NSF02",
+            "N003-C02-NSF03"
+          ],
+          "limit": "仅所引鼠标入口，code/mod_name 匹配不是所有输入协议。"
+        }
+      ],
+      "proves": "Only the preserved original Lua branch facts; CHOP/REPAIR/channel samples retain their named branches and frame values.",
+      "snapshot_equivalence": "Dot fixed commit game build is unspecified. Existing installed-file hash matches are not full snapshot/executable identity.",
+      "latest_short_projection_ref": {
+        "artifact_path": "research/native-core/sources/6b9114dc515eac4d-n003-product-projection.json",
+        "sha256": "de2a58e842a332defe9b0d75bdc8f941c3b616f99199916f20b86d2439d231a9",
+        "pointer": "/entries/1"
+      },
+      "does_not_prove_runtime": "No native rollback/latency/order guarantee, real-client behavior, Runtime, or AI causal benefit.",
+      "installed_snapshot_locator_refs": [
+        {
+          "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+          "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+          "pointer": "/snapshot_id"
+        },
+        {
+          "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+          "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+          "pointer": "/archive_sha256"
+        },
+        {
+          "artifact_path": "research/native-core/sources/b33cbc8cc3801b00-snapshot-manifest.json",
+          "sha256": "546d1149ab54006fe7c37079400590635fed62fc52a9a51f89a3f9161b8e37cd",
+          "pointer": "/freshness"
+        }
+      ],
+      "source_scopes": [
+        {
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+          "source_commit": null,
+          "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+          "game_version": "759671",
+          "steam_buildid": "26148036",
+          "scope_ref": {
+            "artifact_path": "research/native-core/sources/57386ba8df581720-w27-noncombat759671-source-evidence.json",
+            "sha256": "1b9cda619e402240b9bc433a5e2b809140f227e42708b8046333360c98bae123",
+            "pointer": "/source_scope"
+          },
+          "runtime_verified": false,
+          "applies_to": "Only new or replaced claim pointers referencing this source artifact; legacy scopes retain their original identities."
+        },
+        {
+          "snapshot_id": "KLEI-SAVED-20261023-759671-03d745ab",
+          "source_epoch_id": "STEAM-PUBLIC-759671-BUILD26148036-03d745ab",
+          "source_commit": null,
+          "game_version": "759671",
+          "steam_buildid": "26148036",
+          "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+          "scope_ref": {
+            "artifact_path": "research/native-core/sources/e5d1ce11f3fd2433-whole-claims-759671-declaration-enclosure.json",
+            "sha256": "b5b5217924d52d8f887da4ec2ad1b8b0f4ce9650a9e42ae0a250de91f772e659",
+            "pointer": "/source_scope"
+          },
+          "runtime_verified": false,
+          "applies_to": "Only exact current claims referencing the whole fact nodes in this artifact."
+        }
+      ]
+    }
+  },
+  "old_atom_mapping": [
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/0",
+      "claim_index": 0,
+      "original_kind": "NSF",
+      "original_statement": "OnLeftClick 在非 mastersim 且无 locomotor 时配置 non_preview_cb；有 locomotor 时，仅对非 WALKTO 且 CanLocomote() 的动作配置 preview_cb。这两个带动作请求的回调都传递 action.code 与 action.mod_name；函数中另有无参 RPC.LeftClick 调用，用于更新左键按下状态。",
+      "original_atom_sha256": "facd0090af4abb188eedd43e8c51b16c10351e651b0b40b1aff72dc177e6f415",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C03",
+        "EXP-ACT-001-C05",
+        "EXP-ACT-002-C04"
+      ],
+      "decision": "两闭包、动作code/mod_name及全nil按下消息为已有语义；新链按PICK具体实参串接。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/1",
+      "claim_index": 1,
+      "original_kind": "NSF",
+      "original_statement": "OnRemoteLeftClick 只在 self.ismastersim、控制器启用且 handler 为 nil 时处理；它用 SetClientRequestedAction 标记请求，调用服务器 playeractionpicker:DoGetMouseActions 重新生成 lmb/rmb，再清该标记。涉及 spellbook 时还检查背包归属、spellbook 组件和 SelectSpell 返回值。",
+      "original_atom_sha256": "7b14b221c52b2721f7e8a16786e5fe444ae268e93dfc03dd1442d364ced3b2e8",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-002-C03"
+      ],
+      "decision": "服务器入口门禁、临时请求标记、picker重建和spellbook分支已有。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/2",
+      "claim_index": 2,
+      "original_kind": "NSF",
+      "original_statement": "此函数除明确的原版 LOOKAT/WALKTO 回退外，只接受重新生成的 lmb/rmb/double-click action 中 code 与 mod_name 同时匹配的候选；有候选后才调用 DoAction。",
+      "original_atom_sha256": "5f20238bb52e9b3d6be89471696298bafd947738fd9eaee91d6dbbaa30196ba2",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-002-C03"
+      ],
+      "decision": "候选code/mod_name同时匹配及LOOKAT/WALKTO回退已有。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/3",
+      "claim_index": 3,
+      "original_kind": "NSF",
+      "original_statement": "EntityScript:PerformPreviewBufferedAction 通过 playercontroller:RemoteBufferedAction 发送预演请求并标记 ispreviewing；RemoteBufferedAction 在 classified 控制器启用时调用 buffered action 的 preview_cb。它与 PerformBufferedAction 调用 bufferedaction:Do 的路径不同。",
+      "original_atom_sha256": "f73ec3b0aac36f8b3d703303717333ea4fa054ab5a8800fbb85f751dbf3be837",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C07",
+        "EXP-ACT-001-C08"
+      ],
+      "decision": "preview发送与标记、与Do执行不同的基本语义已有；本轮细分后置写入的当前槽身份。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/4",
+      "claim_index": 4,
+      "original_kind": "NSF",
+      "original_statement": "DoAction 的 non_preview_cb 前置分支要求 buffaction 存在、有 non_preview_cb、action.pre_action_cb 为 nil、self.locomotor 为 nil；它在本函数的对象有效性、busy 与重复动作检查之前调用该回调。此分支本身没有显式 self.ismastersim 检查。",
+      "original_atom_sha256": "8ef1c91c6fa3b1b849faf3caa7de7cf6746741b659e12b018a42e9163983cf4b",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04",
+        "EXP-ACT-001-C05"
+      ],
+      "decision": "non_preview_cb前置条件及早于本地检查已有；本轮应用到普通PICK。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/5",
+      "claim_index": 5,
+      "original_kind": "NSF",
+      "original_statement": "DoAction 的初始 local valid 检查拒绝缺失 buffaction、失效 invobject/target/doer。busy 通常拒绝，但 CASTAOE 在所选 item 具有 aoetargeting、CanRepeatCast() 为真且玩家有 canrepeatcast 标签时可保留 valid；失败分支仅清 actionholdtime 后 return。",
+      "original_atom_sha256": "4fca4704f363c4b030e0621e79f75ecd7442172a7f9f6a75421b6f91304ddf89",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04"
+      ],
+      "decision": "DoAction初始对象/busy拒绝及清actionholdtime已有；本样例不扩CASTAOE例外。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/6",
+      "claim_index": 6,
+      "original_kind": "NSF",
+      "original_statement": "DoAction 对当前 buffered action 按 action、target、pos 比较并可直接 return；例外要求当前动作正在 ispreviewing，且实体 idle 标签与 SG idle 状态标签同时存在。该重复检查没有比较 invobject、recipe 或整个 BufferedAction 对象。",
+      "original_atom_sha256": "a010715a8a0fbe2792ebda45cdb5e45f2d849145751534d8aeee80930427fdb2",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04"
+      ],
+      "decision": "action/target/pos重复键和不比较invobject等字段已有。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/7",
+      "claim_index": 7,
+      "original_kind": "NSF",
+      "original_statement": "到达分发前，DoAction 清 attack_buffer、调用 DoActionAutoEquip，并仅在动作非 instant、非 invalid_hold_action 且 buffaction:IsValid() 时把它记为 lastheldaction；否则清 actionholdtime。这里的 IsValid 为假并不会在此处 return，随后仍进入 mastersim/locomotor 分支。",
+      "original_atom_sha256": "376a80988b3d80e57f47087db5f10ef5e1ce12f48585e21318c985e90f4ee290",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04"
+      ],
+      "decision": "自动装备调用、lastheldaction与IsValid不统一阻断分发已有。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/8",
+      "claim_index": 8,
+      "original_kind": "NSF",
+      "original_statement": "DoAction 的主分发先判断 self.ismastersim：真时调用 self.locomotor:PushAction(buffaction, true)。非 master 且 self.locomotor 为 nil 时，仅在 non_preview_cb 与 action.pre_action_cb 同时存在时先调用 pre_action_cb(buffaction)，再调用 non_preview_cb()。非 master 且具有 locomotor 时，仅 CanLocomote() 为真才调用 PreviewAction(buffaction, true)。该分支段不直接调用 action.fn 或 BufferedAction:Do。",
+      "original_atom_sha256": "8110f3ec951af0f7b3c49eed978b8d798f43d68d9901be1881c105d340a2ed2c",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04",
+        "EXP-ACT-002-C04"
+      ],
+      "decision": "mastersim/无预测/可预测分流已有；本轮连到PICK不同noforce。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/9",
+      "claim_index": 9,
+      "original_kind": "NSF",
+      "original_statement": "在 DoAction 的无 locomotor 后置分支中，缺少 non_preview_cb 时本函数不替它调用 pre_action_cb；源码注释说明这是兼容由别处手动触发 pre_action_cb 的旧行为。与前置路径相比，有 pre_action_cb 的 non_preview_cb 要等到本函数通过早退检查后才触发。",
+      "original_atom_sha256": "cc454330a9249964377cafc4c19e2c3c2426402fb834725f72c432064d34bf62",
+      "relation": "related_condition",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04"
+      ],
+      "decision": "旧原子明确无non_preview_cb时不代调pre_action_cb；本轮PICK输入已装闭包且无pre_action_cb，不将该兼容分支计新增。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/10",
+      "claim_index": 10,
+      "original_kind": "NSF",
+      "original_statement": "在759671/build26148036，对非 nil BufferedAction，LocoMotor:PushAction 先通知存在的 playercontroller:OnRemoteBufferedAction，再运行 pre_action_cb 与 TestForStart，失败发 actionfailed 后返回；通过后 Clear 并取得动作点。PreviewAction 也先运行 pre_action_cb，再 Clear/取得动作点。两者保留更前面的 WALKTO、LOOKAT、forced 分支；到达其后的 instant/do_not_locomote 分支时，action.instant、action.do_not_locomote、options.instant 或 options.do_not_locomote 任一真值，就分别直接交 inst:PushBufferedAction/PreviewBufferedAction，否则继续后面的 target/point 分流。此交接不是 action.fn 已执行的证明。",
+      "original_atom_sha256": "538e1d0637e01fcf9f8880998b26ab0b961710952e10685b9a8dfa86e7385235",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C06",
+        "EXP-ACT-002-C04",
+        "EXP-ACT-002-C05"
+      ],
+      "decision": "locomotor前置回调、TestForStart及移动/即时交接已有；本轮补PICK forced范围实参链。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/11",
+      "claim_index": 11,
+      "original_kind": "NSF",
+      "original_statement": "到达且非冷却时发 onreachdestination、调用 atdestfn；移交动作前先把 locomotor.bufferedaction 置 nil，再按 mastersim 调 PushBufferedAction 或 PreviewBufferedAction，最后 Stop/Clear。注释说明置 nil 用于避免已移交动作被 Clear 失败处理。",
+      "original_atom_sha256": "f72194b8c7b8a0ad68e8b9221b0ae94bbdab95ee51ec5f44b8021b59969a1b4a",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C06",
+        "EXP-ACT-002-C05"
+      ],
+      "decision": "到达回调、移交前脱离移动槽和Stop/Clear已有。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/12",
+      "claim_index": 12,
+      "original_kind": "NSF",
+      "original_statement": "GoToEntity/GoToPoint 在 SG 非 moving 时立即尝试 OnUpdate(0,true)，不保证等下一帧才发生到达检查。",
+      "original_atom_sha256": "16996c8df76aaae1ef186081d6faefee6661854be5b2d0773f04a7a158dac783",
+      "relation": "related_condition",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C06",
+        "EXP-ACT-002-C05"
+      ],
+      "decision": "可能即时到达检查已有，不把本链描述为必定延后一帧。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/13",
+      "claim_index": 13,
+      "original_kind": "NSF",
+      "original_statement": "LocoMotor:Clear 清目标、到达回调和移动意图，并 SetBufferedAction(nil)；SetBufferedAction 对旧动作调用 Fail。Stop 重置目标/路径、停止移动或交给 softstop SG、发 locomote 并停止更新，但清 bufferedaction 的语句被注释。",
+      "original_atom_sha256": "b94bd9af6c2f78d1989bd5a177d743492d0e76fa2ef57209a82c7883b2e1d484",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C06"
+      ],
+      "decision": "移动Clear/SetBufferedAction与Stop区别已有，保留为交接清理依赖。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/14",
+      "claim_index": 14,
+      "original_kind": "NSF",
+      "original_statement": "方向/拖拽输入松开分支仅在 CanLocomote() 且 controller_attack_override == nil 时 Stop locomotor 并捕获其 bufferedaction；清理移动标志后，只有确实捕获 buffaction 才按 mastersim 重新 PushAction 或 PreviewAction。注释说明此逻辑用于恢复与松移动键同时提交的动作。",
+      "original_atom_sha256": "6b94e8ac9e2e079d386cd484615e1f32ebe67d235ca9ebc3646fe968650861c8",
+      "relation": "related_boundary",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C09"
+      ],
+      "decision": "旧原子为方向/拖拽输入松开与动作恢复；本轮普通鼠标PRIMARY松键另核OnLeftUp/StopControl，不混同两入口。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/15",
+      "claim_index": 15,
+      "original_kind": "NSF",
+      "original_statement": "RemoteBufferedAction 只有在 classified 存在且 iscontrollerenabled 为真时，才会发送已有预测缓存对应的 GetWorldPosition（注释明确不是 GetPredictionPosition）并调用 preview_cb；缺少或禁用 classified 的分支只清缓存 tick。LocoMotor:PushAction 在存在 playercontroller 时调用其 OnRemoteBufferedAction。",
+      "original_atom_sha256": "324976b48e07d1a37c7ba608bc4924f71e72a89e20ded35ca6a88afad8a380bc",
+      "relation": "direct_overlap",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C07"
+      ],
+      "decision": "classified门禁、GetWorldPosition预测flush和拒绝时清tick已有；本轮不把这些标全新。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/16",
+      "claim_index": 16,
+      "original_kind": "NSF",
+      "original_statement": "服务器 OnRemoteBufferedAction 对残余预测点按条件对齐并把 remote_vector.y 设为 5；DoPredictWalking 遇到此模式且已持有/执行动作或非 idle/moving 状态时忽略预测移动，避免覆盖动作。",
+      "original_atom_sha256": "41362ad82081b4da2c865e774fd5f8dc51a4c46f8885ba7c556abe186f3dfb55",
+      "relation": "outside_new_scope",
+      "mapped_claim_ids": [],
+      "decision": "服务器残余预测点对齐/remote_vector模式已有；本轮仅保留原生移动校正边界，未扩写。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/17",
+      "claim_index": 17,
+      "original_kind": "EI",
+      "original_statement": "请求回调已运行、locomotor/SG 已接手和 action.fn 已运行是不同观察；局部检查不能提升成统一请求门禁。",
+      "original_atom_sha256": "fedca59e8c4821f87604c4db6e24497cc6d216842bd9d5bf5b8c3eb3fcce04b1",
+      "relation": "shared_inference",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C05",
+        "EXP-ACT-002-C10"
+      ],
+      "decision": "请求、分发与action.fn执行不同为已有推论；本轮净增量是PICK的具体时点/实参与业务链。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/18",
+      "claim_index": 18,
+      "original_kind": "REC",
+      "original_statement": "日志与排错按请求、分发、移动 owner、实体 owner 分层；改变取消/清理代码前检查哪个对象仍持有动作。",
+      "original_atom_sha256": "40a88454461ad574699885d3aa910c7bfedd450288db4ecadc80213114ea28ec",
+      "relation": "shared_recommendation",
+      "mapped_claim_ids": [
+        "EXP-ACT-003-C08"
+      ],
+      "decision": "按请求/移动槽/实体槽分层排错为已有建议；本轮补具体回调缓存/后置清槽条件。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/19",
+      "claim_index": 19,
+      "original_kind": "UNK",
+      "original_statement": "DoActionAutoEquip 内部未研究。",
+      "original_atom_sha256": "5584ca68e7108e167e97f96088923e88988d52d6eaf991d0f24f80861a941f4f",
+      "relation": "prior_unknown_retained",
+      "mapped_claim_ids": [
+        "EXP-ACT-001-C04"
+      ],
+      "decision": "旧DoActionAutoEquip内部未研究的UNK保持；本轮读取其实现作为无invobject样例依赖，不改旧知识状态。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/20",
+      "claim_index": 20,
+      "original_kind": "UNK",
+      "original_statement": "其它输入设备入口、复杂输入竞态、完整 RPC 安全契约未在本轮研究。",
+      "original_atom_sha256": "849411c9f7bc982dbf728593c1064e53a63f06b809139cb60910f10f4e73542f",
+      "relation": "outside_new_scope",
+      "mapped_claim_ids": [],
+      "decision": "其它设备输入、复杂竞态和完整RPC安全仍不在本轮样例内。"
+    },
+    {
+      "entry_id": "NC-N003-INT-02",
+      "file": "knowledge/data/nativecore/native-core.json",
+      "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "pointer": "/entries/9/claims/21",
+      "claim_index": 21,
+      "original_kind": "HISTORICAL_PRODUCT_EVIDENCE",
+      "original_statement": "历史产品评测及其 HOLD/冻结处置仅作为检索产品记录；本轮没有重评评分，不能用作 Runtime、通用 Native 规则或知识收益因果证据。",
+      "original_atom_sha256": "c989d99002028263e76f1ce737f89e3cb08baf62ed86eb5f966370c651977278",
+      "relation": "historical_not_source",
+      "mapped_claim_ids": [],
+      "decision": "历史产品评测保持原冻结边界，不作本轮源码或运行证据。"
+    }
+  ],
+  "existing_sources": [
+    "knowledge/data/nativecore/native-core.json",
+    "knowledge/research/native-mechanisms/brain-a22f70476174.json",
+    "knowledge/research/native-mechanisms/architecture_events-e9026d0a3b42.json",
+    "knowledge/research/native-mechanisms/component_task_lifecycle-5f01617bcbb0.json"
+  ],
+  "atoms": [
+    {
+      "claim_id": "EXP-ACT-001-C01",
+      "entry_id": "EXP-ACT-001",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "补本地输入登记、PRIMARY和鼠标候选缓存调用者。",
+      "evidence_refs": [
+        "ACT-INPUT",
+        "ACT-CONTROL",
+        "ACT-ENABLED",
+        "ACT-CACHE",
+        "ACT-GETTER"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C02",
+      "entry_id": "EXP-ACT-001",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "RC-C06"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "收集/构造为复用；新增carrot_planted生产者闭合，不将collector原则算新机制。",
+      "evidence_refs": [
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-MOUSE-PICKER",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C03",
+      "entry_id": "EXP-ACT-001",
+      "classification": "contract_extension",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/0",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "两发送闭包和全nil按下消息已有；本轮提供结构化合同并接普通PICK/noforce链，不把复用语义计净新增。",
+      "evidence_refs": [
+        "ACT-CLICK",
+        "ACT-MODE",
+        "ACT-GETTER",
+        "ACT-MODS",
+        "ACT-ACTION-CODE",
+        "ACT-RPC-SEND",
+        "ACT-RPC-CODE",
+        "ACT-RPC-HOLD"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C04",
+      "entry_id": "EXP-ACT-001",
+      "classification": "contract_extension",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/4",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/5",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/6",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/7",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/8",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/9",
+          "relation": "related_condition"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/19",
+          "relation": "prior_unknown_retained"
+        }
+      ],
+      "rationale": "早发、对象/busy/重复键、lastheldaction与端别分流已有；本轮扩充合同字段和普通PICK依赖，不把旧分支计全新。",
+      "evidence_refs": [
+        "ACT-DOACTION",
+        "ACT-AUTOEQUIP",
+        "ACT-MODS",
+        "ACT-BA",
+        "ACT-LOCO-PUSH",
+        "ACT-LOCO-PREVIEW"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C05",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/0",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/4",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/17",
+          "relation": "shared_inference"
+        }
+      ],
+      "rationale": "推导PICK非预测早发与预测延迟发送的差别。",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-DOACTION",
+        "ACT-LOCO-PREVIEW",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-RPC-LEFT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C06",
+      "entry_id": "EXP-ACT-001",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "NC-N003-INT-03",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/10",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/11",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/12",
+          "relation": "related_condition"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/13",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "移动到达/实体槽与doshortaction是旧依赖；新接普通PICK客户端完整路径。",
+      "evidence_refs": [
+        "ACT-LOCO-PREVIEW",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-LOCO-SET",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-SG-DISPATCH",
+        "ACT-CLIENT-HANDLER",
+        "ACT-CLIENT-STATE",
+        "ACT-LOCO-STOP",
+        "ACT-LOCO-CLEAR"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C07",
+      "entry_id": "EXP-ACT-001",
+      "classification": "contract_extension",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/3",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/15",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "RemoteBufferedAction门禁/flush与预演标记基本语义已有；本轮净增量是标记所写当前槽身份及回调重入的后置时点，详见C08。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-WALK-FLUSH"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C08",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/3",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "preview回调重入/门禁拒绝与标记的区别。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-CLICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C09",
+      "entry_id": "EXP-ACT-001",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "NC-N003-INT-03",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/14",
+          "relation": "related_boundary"
+        }
+      ],
+      "rationale": "预演状态更新为旧例同状态；新增松键控制释放与仍可发送的请求语义。",
+      "evidence_refs": [
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR",
+        "ACT-RELEASE",
+        "ACT-STOP-CONTROL",
+        "ACT-RPC-RELEASE",
+        "ACT-CLICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C01",
+      "entry_id": "EXP-ACT-002",
+      "classification": "context_only",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "NC-N002-FINAL-02"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "RPC/动作编号和队列仅作当前版本依赖，不计新增机制。",
+      "evidence_refs": [
+        "ACT-RPC-SEND",
+        "ACT-RPC-QUEUE",
+        "ACT-RPC-CALL",
+        "ACT-RPC-CODE",
+        "ACT-ACTION-CODE"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C02",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_branch",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-02"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "完整LeftClick形态、平台和点击点范围门禁，区别目标采集范围。",
+      "evidence_refs": [
+        "ACT-RPC-LEFT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C03",
+      "entry_id": "EXP-ACT-002",
+      "classification": "contract_extension",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/1",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/2",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "重建和匹配是旧事实；补完整入口的nil消息、临时标记和清理条件。",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-ENABLED",
+        "ACT-MODS",
+        "ACT-REQUEST",
+        "ACT-MOUSE-PICKER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C04",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_branch",
+      "existing_entry_ids": [
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/0",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/8",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/10",
+          "relation": "direct_overlap"
+        }
+      ],
+      "rationale": "同一普通PICK两种发送闭包的noforce实参导致不同服务器路径。",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-REMOTE-LEFT",
+        "ACT-DOACTION",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C05",
+      "entry_id": "EXP-ACT-002",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/10",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/11",
+          "relation": "direct_overlap"
+        },
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/12",
+          "relation": "related_condition"
+        }
+      ],
+      "rationale": "到达/移交复用；补PICK rangecheck与后续检查的顺序。",
+      "evidence_refs": [
+        "ACT-PICK-RANGE",
+        "ACT-LOCO-PUSH",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-BA",
+        "ACT-SERVER-HANDLER",
+        "ACT-SG-DISPATCH"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C06",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N003-INT-03",
+        "EXP-AI-007",
+        "RC-C06"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "复用执行状态/Do/PICK.validfn，闭合具名动作，非重复API。",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-TICK",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-CAN-PICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C07",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "RC-C06"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "PICK返回和guard复用；补具体植株的产物调用、字段/事件/移除顺序。",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-STUCK",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C08",
+      "entry_id": "EXP-ACT-002",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "RC-C06"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "不把PICK true解释为产物送达；新增picksomething早于canbepicked关闭的窗口。",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C09",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "EXP-LIFE-005",
+        "EXP-LIFE-006",
+        "EXP-AI-007"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "复用宿主任务/动作清理，落实到植株采后再生任务与Remove路径。",
+      "evidence_refs": [
+        "ACT-PICK",
+        "ACT-CARROT",
+        "ACT-DO-TASK",
+        "ACT-TASKS",
+        "ACT-REMOVE",
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C10",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "EXP-AI-007",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/17",
+          "relation": "shared_inference"
+        }
+      ],
+      "rationale": "综合本样例各校验时点；指出最终IsValid不自动重跑rangecheck。",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-RPC-LEFT",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-CLIENT-STATE",
+        "ACT-SERVER-STATE"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C01",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_detail",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "明确缓存发生在前置同步事件之后，补旧Perform描述的时点。",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C02",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "区分缓存前替换/清空与缓存后身份保护。",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C03",
+      "entry_id": "EXP-ACT-003",
+      "classification": "context_only",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "Fail/回调清列表及Clear/Push顺序已有；作后续重入推导依赖。",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C04",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "给出后置清槽覆盖新槽及递归Fail的明确条件。",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-CALLBACKS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C05",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "成功回调内Push不同动作会在旧槽上进入Fail的具名条件链。",
+      "evidence_refs": [
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C06",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "旧Do双Fail描述基础上补actionfailed中新注册回调被第二次Fail消费。",
+      "evidence_refs": [
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C07",
+      "entry_id": "EXP-ACT-003",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N003-INT-03",
+        "EXP-AI-007"
+      ],
+      "existing_atom_refs": [],
+      "rationale": "具体状态退出的action身份/lastheldaction例外与客户端timeout分开。",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-ENTER",
+        "ACT-POCKET",
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C08",
+      "entry_id": "EXP-ACT-003",
+      "classification": "recommendation",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "NC-N003-INT-02"
+      ],
+      "existing_atom_refs": [
+        {
+          "entry_id": "NC-N003-INT-02",
+          "file": "knowledge/data/nativecore/native-core.json",
+          "file_sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+          "pointer": "/entries/9/claims/18",
+          "relation": "shared_recommendation"
+        }
+      ],
+      "rationale": "只按真实回调点接动作，不引入通用事务或取消框架。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-ENTITY-PERFORM",
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS",
+        "ACT-CLICK"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "schema_version": "independent-action-contract-incremental-review/1",
+  "candidate_path": "coordinator/frozen/action_execution-b30719588342.json",
+  "candidate_sha256": "b30719588342b41172f91e8a1a49fad5263aba7bc479c3c3251476a34bf1c368",
+  "previous_candidate_path": "coordinator/frozen/action_execution-7d95e4c94918.json",
+  "previous_candidate_sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+  "previous_review_path": "agents/action_review/review.json",
+  "previous_review_sha256": "9777058f2ad2aa3f9422004cef07aeccc7bbe4e915e95a2bf50e814962f6e3c1",
+  "verdict": "pass_bounded_static",
+  "blockers": [],
+  "runtime_verified": false,
+  "review_scope": "Only exact five candidate string edits, revised dedup mappings/narrative and input preservation; unchanged 27-claim/6-API/10-step/66-ref coverage inherits original review, not a repeated full exploration.",
+  "resolved": [
+    {
+      "id": "AR-R1",
+      "status": "resolved",
+      "basis": "001-C03/C04/C07 reclassified contract_extension with NC-N003-INT-02 and exact old atom pointers; all22 old mappings preserve kind/statement/full-atom hashes and complete Scope/governance. Candidate increment now excludes reused branch semantics from net-new facts."
+    },
+    {
+      "id": "AR-R2",
+      "status": "resolved",
+      "basis": "003-C02 now states player short-circuit condition and the later nil Do access for nonplayer. Exact logic matches original reviewed EntityScript path."
+    },
+    {
+      "id": "AR-R3",
+      "status": "resolved",
+      "basis": "002-C09 and step4 now distinguish invalid Do early-return from valid fn callback consumption; identity comparison/slot clearing explicitly owned by EntityScript:PerformBufferedAction."
+    },
+    {
+      "id": "AR-C1",
+      "status": "resolved",
+      "basis": "002-C03 now states combat target clear and PRIMARY mark before nil-action early-return; no picker reconstruction in that path."
+    }
+  ],
+  "incremental_checks": {
+    "exact_candidate_change_count": 5,
+    "declared_delta_matches_independent_delta": true,
+    "no_other_candidate_values_changed": true,
+    "api_contracts_unchanged": true,
+    "source_references_unchanged": true,
+    "source_hash_audit_inherited": "agents/action_review/source-reference-audit.json",
+    "old_atom_mapping_count": 22,
+    "all_original_atom_hashes_match": true,
+    "old_scope_and_governance_exact": true,
+    "arch_notes_byte_identical": true,
+    "old_input_archive_hashes_match": true,
+    "new_handoff_and_revision_hashes_match": true
+  },
+  "candidate_changed_pointers": [
+    "/entries/0/scope/increment_over_existing",
+    "/entries/1/claims/2/statement",
+    "/entries/1/claims/8/statement",
+    "/entries/1/mechanism_steps/3/description",
+    "/entries/2/claims/1/statement"
+  ],
+  "review_dependencies": [
+    {
+      "path": "agents/action_review/review.json",
+      "path_base": "campaign",
+      "sha256": "9777058f2ad2aa3f9422004cef07aeccc7bbe4e915e95a2bf50e814962f6e3c1",
+      "role": "inherited complete original review and blockers"
+    },
+    {
+      "path": "coordinator/frozen/action_execution-7d95e4c94918.json",
+      "path_base": "campaign",
+      "sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+      "role": "original frozen candidate for exact delta"
+    },
+    {
+      "path": "coordinator/frozen/action_execution-b30719588342.json",
+      "path_base": "campaign",
+      "sha256": "b30719588342b41172f91e8a1a49fad5263aba7bc479c3c3251476a34bf1c368",
+      "role": "new frozen candidate; five JSON string changes"
+    },
+    {
+      "path": "windows/B/REVISION.json",
+      "path_base": "campaign",
+      "sha256": "5cd512f98b8679b211ad8eadf365d19bf7aa7db428c237101ff32f7fe2f1dce2",
+      "role": "declared delta and input hash manifest"
+    },
+    {
+      "path": "windows/B/REVISION.diff",
+      "path_base": "campaign",
+      "sha256": "860bcf281e278da68bcadced6a67a546aef73768ed6c50047a33c5c645bb42ef",
+      "role": "author unified diff; compared with independently computed candidate delta"
+    },
+    {
+      "path": "windows/B/DEDUP.md",
+      "path_base": "campaign",
+      "sha256": "3eebea1140983fcf7dec346f50b1216f73844354221bce96afc3c316a4885cbc",
+      "role": "revised complete dedup narrative"
+    },
+    {
+      "path": "windows/B/ATOM-DEDUP.json",
+      "path_base": "campaign",
+      "sha256": "afb53f25f3d5e18ecc582dc6f237ecc53f95e898807263425c07a15aff503d18",
+      "role": "revised classification and 22 old-atom mappings"
+    },
+    {
+      "path": "windows/B/handoff.json",
+      "path_base": "campaign",
+      "sha256": "3f512640bd7dca39e575622286462616ea385eef2ffb838785798db1a136546c",
+      "role": "new narrative dependency hashes"
+    },
+    {
+      "path": "windows/B/architecture-notes.md",
+      "path_base": "campaign",
+      "sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "role": "unchanged narrative, reread; byte-identical to original"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/manifest.json",
+      "path_base": "campaign",
+      "sha256": "ceace524e99d5b3d0ea6d88bdea8b2f3203031caf68b66a6f842abd4e06c8272",
+      "role": "original narrative audit mapping"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/candidate.json",
+      "path_base": "campaign",
+      "sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+      "role": "byte-exact preserved original formal review input; hashes independently matched"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/DEDUP.md",
+      "path_base": "campaign",
+      "sha256": "d97cae895ff9c130d30a71eddd41d7131ee300f630ec9daa71895a7a98fa58ce",
+      "role": "byte-exact preserved original formal review input; hashes independently matched"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/ATOM-DEDUP.json",
+      "path_base": "campaign",
+      "sha256": "e6630b678e1287874f38c89394190ad3b0b3330ca414b28bdf9065d6e3b654dc",
+      "role": "byte-exact preserved original formal review input; hashes independently matched"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/architecture-notes.md",
+      "path_base": "campaign",
+      "sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "role": "byte-exact preserved original formal review input; hashes independently matched"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/handoff.json",
+      "path_base": "campaign",
+      "sha256": "aebb8766bc54ff63b68e3557e043502792ebb36c296ad378057dc144eb113713",
+      "role": "byte-exact preserved original formal review input; hashes independently matched"
+    },
+    {
+      "path": "knowledge/data/nativecore/native-core.json",
+      "path_base": "baseline_repo",
+      "sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "role": "NC-N003-INT-02 original Scope/governance and mapping original-kind/statement/full-atom hashes verified; no old Scope edits"
+    }
+  ],
+  "inherited_review_dependencies": [
+    {
+      "path": "coordinator/frozen/action_execution-7d95e4c94918.json",
+      "path_base": "campaign",
+      "sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+      "role": "frozen candidate, full read"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/DEDUP.md",
+      "path_base": "campaign",
+      "sha256": "d97cae895ff9c130d30a71eddd41d7131ee300f630ec9daa71895a7a98fa58ce",
+      "role": "inherited original input now in byte-exact audit archive: dedup narrative, full read"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/ATOM-DEDUP.json",
+      "path_base": "campaign",
+      "sha256": "e6630b678e1287874f38c89394190ad3b0b3330ca414b28bdf9065d6e3b654dc",
+      "role": "inherited original input now in byte-exact audit archive: claim dedup, full read"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/architecture-notes.md",
+      "path_base": "campaign",
+      "sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "role": "inherited original input now in byte-exact audit archive: proposed narrative, full read"
+    },
+    {
+      "path": "windows/B/audit/pre-review-9777058f2ad2/handoff.json",
+      "path_base": "campaign",
+      "sha256": "aebb8766bc54ff63b68e3557e043502792ebb36c296ad378057dc144eb113713",
+      "role": "inherited original input now in byte-exact audit archive: author hashes and boundaries, full read"
+    },
+    {
+      "path": "agents/action_review/review-plan.json",
+      "path_base": "campaign",
+      "sha256": "e65c3cff54a2877b8c1324d86c2ad5a6ac2aca8dfc43e3012931b07b0eb2ae60",
+      "role": "frozen independent plan"
+    },
+    {
+      "path": "agents/action_review/independent-precheck.json",
+      "path_base": "campaign",
+      "sha256": "12875dd34f688c953a133d3a12eaf59c629ed08a0aefd3171248150749774478",
+      "role": "pre-candidate findings; PICKUP is preliminary only and not candidate proof"
+    },
+    {
+      "path": "agents/action_review/source-reference-audit.json",
+      "path_base": "campaign",
+      "sha256": "377a1dbe818799de4fb3c2d73fc076a20b6581f00b8ab02ee17e437bbaae6e74",
+      "role": "all 66 source identity checks"
+    },
+    {
+      "path": "agents/action_review/dependencies/applied-SKILL.md",
+      "path_base": "campaign",
+      "sha256": "77eddaa3add20275d49515ad603745c9fd459e2c3d6c9b2c55071ae638e4c320",
+      "role": "applied actual skill exact-byte copy; outside installation path omitted"
+    },
+    {
+      "path": "knowledge/research/native-mechanisms/brain-a22f70476174.json",
+      "path_base": "baseline_repo",
+      "sha256": "a22f7047617402d465d5b64b0fe2b660cd7ef570e3e3c5e41d9f1db000cc90c1",
+      "role": "full EXP-AI-007 atom including Scope/API/steps/compatibility/cited reference metadata"
+    },
+    {
+      "path": "knowledge/data/nativecore/native-core.json",
+      "path_base": "baseline_repo",
+      "sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "role": "dedup statements and selected full NC-N003-INT-02 atoms 0,1,2,3,4,5,6,10,15 plus full necessary Scope/refs; NC-N002-FINAL-03 claim1 and Scope; broad initial output truncated, not relied on as full record read"
+    },
+    {
+      "path": "references/kb-retrieval.md",
+      "path_base": "baseline_repo",
+      "sha256": "dddc8d4e1db38fcd2c8b2e087ddf141329ad8d5f5997f196d5e898df342144e8",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "references/ui-actions-controls.md",
+      "path_base": "baseline_repo",
+      "sha256": "71cd7fb711d0592f58e1f530248b33fdb8c66f8107421b3ac985eed4ad8431cd",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "references/networking-rpc.md",
+      "path_base": "baseline_repo",
+      "sha256": "5cbeebc31e4f5dd8c71f0438735e78cccb1212a80697aa06dcb98e92732f20c9",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "PRIVATE/scripts-762172.zip",
+      "path_base": "campaign",
+      "sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+      "role": "frozen authorized local source input; read cited ranges in-memory",
+      "package_policy": "do_not_ship_original_Lua"
+    },
+    {
+      "path": "external-skill-discovery-entry",
+      "path_base": "logical_external_label",
+      "sha256": "24cf5068870c9f265473084c74a634bfc5e028499a0d7fb55904af0493da5be3",
+      "role": "host discovery entry read only to find actual skill; contains private absolute locator and is not copied or used as source proof"
+    }
+  ],
+  "remaining_limits": [
+    "This is bounded static review, not game/runtime or network transport acceptance.",
+    "research/restricted/hold and historical source Scope remain unchanged.",
+    "No author, repository, config, installed/runtime or game changes performed by reviewer."
+  ]
+}

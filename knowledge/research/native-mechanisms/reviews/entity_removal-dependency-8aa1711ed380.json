@@ -1,0 +1,241 @@
+{
+  "schema_version": "independent-static-locators/1",
+  "source_epoch": "762172",
+  "runtime_verified": false,
+  "source_references": [
+    {
+      "id": "IR-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "role": "EntityScript:Remove; full ordered entry and Retire call boundary"
+    },
+    {
+      "id": "IR-S02",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 527,
+      "line_end": 558,
+      "range_sha256": "491f8979034df61bdf405826e10974fde3b85a664e00938da22f4e177820c56f",
+      "role": "global OnRemoveEntity; GUID registry, managers, coroutine tasks and current update indices"
+    },
+    {
+      "id": "IR-S03",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 560,
+      "line_end": 570,
+      "range_sha256": "793d98eb66a59913369df47b3aafe15f6b23e587149295d7e99b5af2302485a6",
+      "role": "RemoveEntity GUID caller; absent GUID and delayed client despawn branch"
+    },
+    {
+      "id": "IR-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 951,
+      "range_sha256": "56009cc854663597b00e8f0856e3b2032c3b296cf139bf1f65da69a1040a817c",
+      "role": "RemoveChild / RemovePlatformFollower; pre-entry ownership and platform callback"
+    },
+    {
+      "id": "IR-S05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1258,
+      "line_end": 1288,
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "role": "RemoveAllEventCallbacks; bilateral index cleanup"
+    },
+    {
+      "id": "IR-S06",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1300,
+      "line_end": 1349,
+      "range_sha256": "00e24e14548a6a549a0314dbc14d9ce50fda6353a99c99989d89c370b39717c3",
+      "role": "StopAllWatchingWorldStates and PushEvent; cleanup and callback snapshot/SG/Brain boundaries"
+    },
+    {
+      "id": "IR-S07",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 281,
+      "line_end": 325,
+      "range_sha256": "1da56332c3d479999eab54808551b86aad389b35efb18df6f7f71c836f9c96a3",
+      "role": "worldstate watcher owner and whole-inst removal branch"
+    },
+    {
+      "id": "IR-S08",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1091,
+      "line_end": 1097,
+      "range_sha256": "2122ae6655889f5882f58baf7966b7ffcfd1010794a5fb3b4b2e031eff3844b1",
+      "role": "KillTasks / StartThread; GUID coroutine identity"
+    },
+    {
+      "id": "IR-S09",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 268,
+      "line_end": 274,
+      "range_sha256": "95e180e856a611766510ea0071766c6a269679568dfbca787255b76fe1394bd7",
+      "role": "removeif; pure table deletion"
+    },
+    {
+      "id": "IR-S10",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 303,
+      "line_end": 314,
+      "range_sha256": "1541b4fdc5e5dd036f0bf67e255f252c1ce801b1efee2f891fb9b3295395b5f1",
+      "role": "KillTasksWithID; coroutine tables, excludes attime"
+    },
+    {
+      "id": "IR-S11",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 427,
+      "line_end": 430,
+      "range_sha256": "3d7ae4ff6af65702b1b225d7f412cc8037e2da48fec98e084cffdbc5ded1a57c",
+      "role": "KillThreadsWithID; ordinary and static scheduler"
+    },
+    {
+      "id": "IR-S12",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "role": "CancelAllPendingTasks, task_finish and task wrappers; ordinary/static shared host ownership"
+    },
+    {
+      "id": "IR-S13",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 56,
+      "line_end": 95,
+      "range_sha256": "7052ec2a86dd95c53f0457fc49f54ebe47e04279f6c238b72357931ce6c94fcc",
+      "role": "Periodic Cancel / Cleanup; onfinish and running callback boundary"
+    },
+    {
+      "id": "IR-S14",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 178,
+      "line_end": 216,
+      "range_sha256": "d74e9a6f4c4b9ee93724d87d4470791f21b382827ab935e40c2ab386711c9445",
+      "role": "OnTick; callback then limit/onfinish/Cleanup"
+    },
+    {
+      "id": "IR-S15",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 12,
+      "line_end": 17,
+      "range_sha256": "95c43f7b7143b0038880a198c553faa29b25fcab4bf2d8d57f9008da71872a12",
+      "role": "BrainManager OnRemoveEntity; registered brain only"
+    },
+    {
+      "id": "IR-S16",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 39,
+      "line_end": 54,
+      "range_sha256": "b9a68596a41c03eb41464e702f40cb3d131e0b4ea69a3b960ca406d04285d820",
+      "role": "BrainManager SendToList"
+    },
+    {
+      "id": "IR-S17",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 89,
+      "line_end": 98,
+      "range_sha256": "dc49dd075ec827fff26d025df1e875cf76b752487dbe7b253d5ed8328808e627",
+      "role": "BrainManager RemoveInstance; registry cleanup, no business stop hook"
+    },
+    {
+      "id": "IR-S18",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 76,
+      "line_end": 103,
+      "range_sha256": "eb8e9801391c87e79bd2788d4307bc7af91d185a8d725d4c0813eee8f5ebf78c",
+      "role": "SGManager OnRemoveEntity / RemoveInstance; buffer clear and registry cleanup"
+    },
+    {
+      "id": "IR-S19",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 490,
+      "line_end": 494,
+      "range_sha256": "9d634886662766ddf223f9c9f6d6515366764ab2cf5d6dee8fe841738e7c0fc9",
+      "role": "ClearBufferedEvents; nonempty buffer replacement"
+    },
+    {
+      "id": "IR-S20",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 208,
+      "line_end": 246,
+      "range_sha256": "a0da72ce87c8f4139cdf1cf1ad0504e5184a1207ab5c9696411a56deb28fe995",
+      "role": "replica public accessor and raw container initialization"
+    },
+    {
+      "id": "IR-S21",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 30,
+      "line_end": 32,
+      "range_sha256": "35b18cf2eb85edd7918074cd89f5b0dfa5de1cf0f129f08e6c108a4bb9ef6e5c",
+      "role": "ValidateReplicaComponent tag filtering"
+    },
+    {
+      "id": "IR-S22",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 62,
+      "line_end": 72,
+      "range_sha256": "7a554b79662a6acc4ed770c5c7089f881d1395610f5bda50de83056431568d6a",
+      "role": "UnreplicateComponent; retains raw object"
+    },
+    {
+      "id": "IR-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "role": "RemoveComponent distinction: OnRemoveFromEntity, not Remove's OnRemoveEntity"
+    },
+    {
+      "id": "IR-S24",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 111,
+      "line_end": 125,
+      "range_sha256": "0549a07f09bf0c52ba9e5c019a449da0c2678656d7ba121af742605ab8da99db",
+      "role": "bounded raw-replica cleanup example; branch-specific resource ownership"
+    },
+    {
+      "id": "IR-S25",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 439,
+      "line_end": 502,
+      "range_sha256": "58d20417ea105764d7a1995331008f2ed6c0ff879fe1c1dbbdfae27821ffbf0d",
+      "role": "update registration and deferred deletion; counter context"
+    },
+    {
+      "id": "IR-S26",
+      "source_file": "scripts/brain.lua",
+      "file_sha256": "c656c25bbb66c9a4cd9c6982fe6d866fd2f799687843be20a0857d4d5da97ede",
+      "line_start": 261,
+      "line_end": 267,
+      "range_sha256": "c5b4927e438517f3f7b400650597596171562b25d290c887d284fdd0be2e8011",
+      "role": "Brain PushEvent direct handler after manager removal"
+    }
+  ]
+}

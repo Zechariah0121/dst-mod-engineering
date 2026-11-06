@@ -1,6 +1,6 @@
 # 组件、任务与清理的设计参考
 
-这是冻结 game762172/build26474873 的静态研究参考，关联 EXP-LIFE-005..007。research/restricted/hold 保持不变；登记及独立审阅状态以 [FAMILY-REGISTRY](../knowledge/FAMILY-REGISTRY.json) 为准。不修改 canonical、历史 Scope 或 HOLD，runtime_verified=false。精确行号、文件及范围 SHA256 见 [登记研究](../knowledge/research/native-mechanisms/component_task_lifecycle-5f01617bcbb0.json)；本文不附 Lua 全文。
+基于 762172/build26474873 的静态研究 EXP-LIFE-005～007。符号、范围与 SHA256 见[登记研究](../knowledge/research/native-mechanisms/component_task_lifecycle-5f01617bcbb0.json)，准入按[检索策略](kb-retrieval.md)。
 
 ## 安装完成要按阶段理解
 
@@ -37,4 +37,4 @@ Timer 到期先 StopTimer，删除旧名字并取消旧句柄，再同步发 tim
 
 暂停停止计时与搜索；Stop 解除业务监听、停止名字、取消周期句柄并清配置；OnRemoveFromEntity 调 Stop 后再去 tag。LoadPostPass 仅消费已存在的 Timer 状态。SetSalted 会同步发 saltchange，所以 Stop 具有可观察副作用，也没有通用防重入锁。（CTL-S23..S29）
 
-项目实施时可以沿用现有组件和清理方法，只需列清这些资源及匹配退出动作。本研究不要求新增 Bus/Installer，也不设定玩法数值、死亡/换角/读档的产品政策。所有结论只到所列 Lua 静态路径；原生调度、异常恢复、实际舔盐行为与任意 mod 覆盖兼容尚未运行验证。
+实施时复用已有组件与清理方法，列清资源和匹配退出动作。SaltLicker 的实际舔盐、异常恢复和 Mod 覆盖兼容仍待验证；玩法与死亡/换角/读档政策由项目决定。可取消交互的整体接线见[动作指南](action-lifecycle-architecture.md)。

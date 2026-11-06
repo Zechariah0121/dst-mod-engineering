@@ -1,0 +1,2428 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "action_execution",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-ACT-001",
+      "title": "普通PICK的鼠标输入、预测发送与非预测早发分流",
+      "aliases": [
+        "PICK",
+        "carrot_planted",
+        "preview_cb",
+        "non_preview_cb",
+        "ispreviewing",
+        "RemoteBufferedAction",
+        "移动预测开关"
+      ],
+      "engineering_question": "同一次普通左键PICK何时发送完整动作RPC，preview标记与松键分别说明什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "runtime_verified": false,
+        "evidence": "frozen_local_lua_static",
+        "bounds": [
+          "普通鼠标左键、无活动/手持物覆盖，非AOE/放置/地图/双击；普通人形、不骑乘、不触发特殊采集技能，采可见可用carrot_planted。",
+          "主链为有locomotor的远端预测客户端，同时精确比较无locomotor的non-preview分支；pocket_rummage_item为空。",
+          "原生网络传输和移动校正只标明Lua边界。"
+        ],
+        "increment_over_existing": "NC-N002/NC-N003已有Action/RPC和SG原则；EXP-AI-007不研究玩家RPC闭环。本条补输入闭包、发送时点、preview门禁/标记和松键路径，不重复登记原有BufferedAction API。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ACT-001-C01",
+          "kind": "NSF",
+          "statement": "本地玩家Activate登记GeneralControlHandler到OnControl；未暂停且控制允许时PRIMARY交OnLeftClick。鼠标候选由controller更新中DoGetMouseActions写LMBaction，GetLeftMouseAction直接返回该缓存。",
+          "evidence_refs": [
+            "ACT-INPUT",
+            "ACT-CONTROL",
+            "ACT-ENABLED",
+            "ACT-CACHE",
+            "ACT-GETTER"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C02",
+          "kind": "NSF",
+          "statement": "普通场景PICK从pickable collector检查pickable且无fire/intense标签后收集，经SortActionList按priority排序、actionfilter过滤并构造BufferedAction。无活动物品/强制检查/攻击/特殊瞄准覆盖的场景分支走GetSceneActions，DoGetMouseActions取首个左键候选。carrot_planted仅mastersim配置pickable、carrot产物、remove_when_picked和quickpick；属性回调维护pickable/quickpick标签。",
+          "evidence_refs": [
+            "ACT-PICK-COLLECTOR",
+            "ACT-COLLECT",
+            "ACT-PICKER",
+            "ACT-LEFT-PICKER",
+            "ACT-MOUSE-PICKER",
+            "ACT-CARROT",
+            "ACT-PICK-PROPS",
+            "ACT-PICK-SETUP",
+            "ACT-BA"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C03",
+          "kind": "NSF",
+          "statement": "普通鼠标按下先ClearActionHold，再检查控制器/HUD等分支，最后取缓存左键动作。远端无locomotor时安装non_preview_cb；有locomotor时可先发全nil的LeftClick仅报告LMB按下，非WALKTO且CanLocomote才装preview_cb，随后DoAction。两闭包传原版动作code、点击坐标、mouseover、修饰键及平台等；preview_cb发送时再取isreleased。",
+          "evidence_refs": [
+            "ACT-CLICK",
+            "ACT-MODE",
+            "ACT-GETTER",
+            "ACT-MODS",
+            "ACT-ACTION-CODE",
+            "ACT-RPC-SEND",
+            "ACT-RPC-CODE",
+            "ACT-RPC-HOLD"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C04",
+          "kind": "NSF",
+          "statement": "DoAction在无locomotor且有non_preview_cb、action无pre_action_cb时，先执行该发送闭包，再做实体引用、busy和重复动作检查。其重复键是action/target/pos相等，不比较invobject；IsValid结果只决定是否记录lastheldaction，不是后续分流的统一受理gate。mastersim交PushAction；无预测且有pre_action_cb时在后段先pre_action_cb再non_preview_cb；可预测时交PreviewAction。",
+          "evidence_refs": [
+            "ACT-DOACTION",
+            "ACT-AUTOEQUIP",
+            "ACT-MODS",
+            "ACT-BA",
+            "ACT-LOCO-PUSH",
+            "ACT-LOCO-PREVIEW"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C05",
+          "kind": "EI",
+          "statement": "未改写的PICK无pre_action_cb，所以关闭移动预测的non_preview_cb可在本地拒绝或去重之前发送；本地DoAction返回nil不能判定RPC未发送。可预测路径的完整动作请求则在到达并进入preview时触发，不能把最早的全nil LeftClick视为PICK已经提交。",
+          "evidence_refs": [
+            "ACT-ACTION-DEF",
+            "ACT-CLICK",
+            "ACT-DOACTION",
+            "ACT-LOCO-PREVIEW",
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PREVIEW",
+            "ACT-REMOTE-PREVIEW",
+            "ACT-RPC-LEFT"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C06",
+          "kind": "NSF",
+          "statement": "本样例客户端PreviewAction到目标并在到达时先将locomotor.bufferedaction置nil，再交EntityScript:PreviewBufferedAction，随后Stop/Clear移动路径。实体preview按target/action/invobject重复比较，普通SG路径写实体槽并调PreviewAction；PICK quickpick handler选择doshortaction，其onenter停止移动、播放预测动画并调用PerformPreviewBufferedAction。该客户端状态没有权威PerformBufferedAction执行点。",
+          "evidence_refs": [
+            "ACT-LOCO-PREVIEW",
+            "ACT-GO-ENTITY",
+            "ACT-DEST",
+            "ACT-LOCO-SET",
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PREVIEW",
+            "ACT-SG-DISPATCH",
+            "ACT-CLIENT-HANDLER",
+            "ACT-CLIENT-STATE",
+            "ACT-LOCO-STOP",
+            "ACT-LOCO-CLEAR"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C07",
+          "kind": "NSF",
+          "statement": "PerformPreviewBufferedAction仅在实体槽非nil且ispreviewing不真时调用controller:RemoteBufferedAction，随后从当时self.bufferedaction写ispreviewing=true。RemoteBufferedAction要求classified且iscontrollerenabled真；有尚未发送的预测行走tick时先交RemotePredictWalking并清tick，然后直接调用buffaction.preview_cb。门禁不通过只清tick。",
+          "evidence_refs": [
+            "ACT-ENTITY-PREVIEW",
+            "ACT-REMOTE-PREVIEW",
+            "ACT-WALK-FLUSH"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C08",
+          "kind": "EI",
+          "statement": "ispreviewing在发送回调正常返回后才写，且写的是当时槽位：发送门禁拒绝仍可能被标记；preview_cb若换槽则标记新对象，若清空则后置写入会索引nil。回调中再次调用PerformPreviewBufferedAction也尚未被该标记挡住。因此ispreviewing不是服务器接收或权威成功回执。",
+          "evidence_refs": [
+            "ACT-ENTITY-PREVIEW",
+            "ACT-REMOTE-PREVIEW",
+            "ACT-CLICK"
+          ]
+        },
+        {
+          "id": "EXP-ACT-001-C09",
+          "kind": "NSF",
+          "statement": "客户端doshortaction的更新先判断ServerStateMatches并尝试FlattenMovementPrediction，只有不匹配的elseif才检查实体槽已空；timeout会ClearBufferedAction后回idle。普通松键OnLeftUp发送StopControl，远端OnRemoteStopControl只清控制位；preview闭包在松键后仍能带isreleased=true提交动作，松键本身不在这条路径清动作槽。",
+          "evidence_refs": [
+            "ACT-CLIENT-STATE",
+            "ACT-ENTITY-CLEAR",
+            "ACT-RELEASE",
+            "ACT-STOP-CONTROL",
+            "ACT-RPC-RELEASE",
+            "ACT-CLICK"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "PlayerController:OnLeftClick",
+          "source_file": "scripts/components/playercontroller.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [
+            "down：truthy为按下；false/nil交OnLeftUp。本卡主链为鼠标PRIMARY按下，非AOE、非放置/地图/双击/特殊动作。"
+          ],
+          "returns": "无显式返回；任何分支nil不表示未发送RPC。依赖对象/闭包错误会向外抛出，本入口没有统一异常恢复。",
+          "preconditions": [
+            "本地玩家controller已Activate，鼠标模式、classified控制允许、玩法HUD不阻挡；候选已由picker缓存。",
+            "普通PICK目标为未烧毁/未intense、可采的carrot_planted；不在坐骑/特殊角色技能或物品覆盖分支。"
+          ],
+          "side_effects": [
+            "ClearActionHold会清重复动作字段并在客户端发对应RPC；设置按下时间和preview/non_preview闭包，可能先发全nil LeftClick，再交DoAction。",
+            "关闭预测时闭包位置不同；开启预测时preview_cb在调用时读取按键释放状态。"
+          ],
+          "lifecycle": [
+            "非预测发送闭包可在DoAction本地检查之前执行；松键只交OnLeftUp的控制释放路径，不代表取消已提交动作。"
+          ],
+          "evidence_refs": [
+            "ACT-CLICK",
+            "ACT-MODE",
+            "ACT-ENABLED",
+            "ACT-GETTER",
+            "ACT-CACHE",
+            "ACT-MODS",
+            "ACT-DOACTION",
+            "ACT-RELEASE",
+            "ACT-STOP-CONTROL",
+            "ACT-RPC-HOLD",
+            "ACT-RPC-SEND"
+          ],
+          "unknowns": [
+            "AOE、建造、双击、地图等分支的业务效果未展开；网络实际传输由游戏验证负责。"
+          ]
+        },
+        {
+          "symbol": "PlayerController:DoAction",
+          "source_file": "scripts/components/playercontroller.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [
+            "buffaction：非nil动作对象，含action、target/doer/invobject、pos及options；nil在基本检查阶段拒绝。",
+            "spellbook：可选，仅相关动作使用；本样例nil。"
+          ],
+          "returns": "无显式返回；busy/无效/重复时均可能提前nil，早发non_preview_cb可能已执行。异常不被本方法捕获。",
+          "preconditions": [
+            "controller/宿主结构就绪；动作定义及组件方法符合当前端。",
+            "本卡覆盖PICK无invobject、无pre_action_cb及具备标准locomotor的服务器/预测客户端；特殊动作分支仅记录分流。"
+          ],
+          "side_effects": [
+            "在特定非预测分支先发闭包；检查对象与busy，按action/target/pos去重，自动装备，再按IsValid决定lastheldaction，最后分流。"
+          ],
+          "lifecycle": [
+            "分流后成功/失败由SG/BufferedAction/业务接口决定；方法不把IsValid=false统一当作退出，也不提供统一完成回执。"
+          ],
+          "evidence_refs": [
+            "ACT-DOACTION",
+            "ACT-AUTOEQUIP",
+            "ACT-MODS",
+            "ACT-BA",
+            "ACT-LOCO-PUSH",
+            "ACT-LOCO-PREVIEW"
+          ],
+          "unknowns": [
+            "高亮、CASTAOE重复施法和自动装备业务不在本样例执行范围。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:PreviewBufferedAction",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [
+            "bufferedaction：须非nil；起始重复比较中的非nil条件不是全方法nil保护。"
+          ],
+          "returns": "无显式返回。重复、WALKTO、无合适SG或handler拒绝均可不保留新槽；关联回调异常不捕获。",
+          "preconditions": [
+            "预测端动作结构/SG和controller已就绪；普通PICK有SGwilson_client的handler。"
+          ],
+          "side_effects": [
+            "按target/action/invobject和实体/SG双idle例外去重；options.instant直接preview；有SG写槽并PreviewAction，失败清槽；无SG仅action.instant可直接preview。",
+            "替换旧槽时本入口没有先Fail旧动作的分支，也不统一TestForStart。"
+          ],
+          "lifecycle": [
+            "locomotor到达交接前清自己的槽；实体预演只触发发送/动画，不调用action.fn。"
+          ],
+          "evidence_refs": [
+            "ACT-ENTITY-PREVIEW",
+            "ACT-ARRIVE",
+            "ACT-SG-DISPATCH",
+            "ACT-CLIENT-HANDLER",
+            "ACT-CLIENT-STATE"
+          ],
+          "unknowns": [
+            "不扩展为任意客户端业务执行许可；无SG和instant其他动作的运行表现未测。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:PerformPreviewBufferedAction",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [],
+          "returns": "无显式返回；无槽或已previewing时无操作。回调清槽/抛错可能使后置标记失败。",
+          "preconditions": [
+            "当前实体槽为动作对象；存在controller时其RemoteBufferedAction接口可用。",
+            "标准预测请求的preview_cb由玩家输入入口安装。"
+          ],
+          "side_effects": [
+            "先将当前动作交RemoteBufferedAction，正常返回后向当前槽写ispreviewing=true；无controller也会写标记。"
+          ],
+          "lifecycle": [
+            "标记后置且无捕获动作身份；不执行Do、Succeed/Fail，也不提供网络确认。"
+          ],
+          "evidence_refs": [
+            "ACT-ENTITY-PREVIEW",
+            "ACT-REMOTE-PREVIEW",
+            "ACT-CLICK",
+            "ACT-CLIENT-STATE"
+          ],
+          "unknowns": [
+            "回调重入的结论为Lua静态推导，未运行游戏。"
+          ]
+        },
+        {
+          "symbol": "PlayerController:RemoteBufferedAction",
+          "source_file": "scripts/components/playercontroller.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [
+            "buffaction：带可调用preview_cb的动作；本方法未检查该字段是否为函数。"
+          ],
+          "returns": "无显式返回；classified缺失/控制未允许时不执行preview_cb。回调或移动发送错误可向外抛出。",
+          "preconditions": [
+            "预测客户端controller；classified.iscontrollerenabled为真时，client_last_predict_walk和移动相关结构已初始化。",
+            "若有待发送行走tick，需要locomotor及RemotePredictWalking依赖；本卡不展开原生移动校正。"
+          ],
+          "side_effects": [
+            "可先提交当前模拟位置的预测移动并清tick，再执行preview_cb；拒绝门禁也清tick。"
+          ],
+          "lifecycle": [
+            "不设置ispreviewing、不执行action.fn、不清动作槽；标记由调用方在返回后处理。"
+          ],
+          "evidence_refs": [
+            "ACT-REMOTE-PREVIEW",
+            "ACT-WALK-FLUSH",
+            "ACT-ENTITY-PREVIEW",
+            "ACT-CLICK"
+          ],
+          "unknowns": [
+            "预测移动的网络到达、校正与实体映射仍由原生实现；实际游戏未测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "picker生成并缓存PICK；PRIMARY输入进入普通左键分支，创建发送闭包。",
+          "evidence_refs": [
+            "ACT-INPUT",
+            "ACT-CONTROL",
+            "ACT-CACHE",
+            "ACT-GETTER",
+            "ACT-PICKER",
+            "ACT-LEFT-PICKER",
+            "ACT-MOUSE-PICKER",
+            "ACT-COLLECT",
+            "ACT-PICK-COLLECTOR",
+            "ACT-CARROT",
+            "ACT-PICK-PROPS",
+            "ACT-PICK-SETUP",
+            "ACT-CLICK"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "DoAction按预测能力分流；客户端locomotor到达后移交实体槽，由PICK handler进入预测doshortaction。",
+          "evidence_refs": [
+            "ACT-DOACTION",
+            "ACT-LOCO-PREVIEW",
+            "ACT-GO-ENTITY",
+            "ACT-DEST",
+            "ACT-LOCO-SET",
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PREVIEW",
+            "ACT-SG-DISPATCH",
+            "ACT-CLIENT-HANDLER",
+            "ACT-CLIENT-STATE"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "preview消费者调用输入闭包发完整LeftClick；非预测分支在自己的早发点发送；松键消息仅释放控制位。",
+          "evidence_refs": [
+            "ACT-CLICK",
+            "ACT-DOACTION",
+            "ACT-ENTITY-PREVIEW",
+            "ACT-REMOTE-PREVIEW",
+            "ACT-WALK-FLUSH",
+            "ACT-RELEASE",
+            "ACT-STOP-CONTROL",
+            "ACT-RPC-RELEASE",
+            "ACT-RPC-SEND",
+            "ACT-RPC-CODE",
+            "ACT-RPC-HOLD",
+            "ACT-MODE"
+          ]
+        }
+      ],
+      "unknowns": [
+        "ServerStateMatches/FlattenMovementPrediction的原生结果不等同采集成功；实际预测与发送未验证。",
+        "本条不覆盖控制器按钮、repeat-held动作循环及全部角色技能。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ACT-INPUT",
+            "role": "本地输入控制处理器的登记调用者",
+            "claim_ids": [
+              "EXP-ACT-001-C01"
+            ]
+          },
+          {
+            "ref": "ACT-CONTROL",
+            "role": "暂停/启用筛选后PRIMARY交OnLeftClick",
+            "claim_ids": [
+              "EXP-ACT-001-C01"
+            ]
+          },
+          {
+            "ref": "ACT-ENABLED",
+            "role": "classified/HUD启用门禁和本地/远端按键读取",
+            "claim_ids": [
+              "EXP-ACT-001-C01"
+            ]
+          },
+          {
+            "ref": "ACT-MODE",
+            "role": "鼠标模式与点击前重复动作清理",
+            "claim_ids": [
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-CACHE",
+            "role": "鼠标候选缓存生产者",
+            "claim_ids": [
+              "EXP-ACT-001-C01"
+            ]
+          },
+          {
+            "ref": "ACT-GETTER",
+            "role": "点击读取候选缓存",
+            "claim_ids": [
+              "EXP-ACT-001-C01",
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-CLICK",
+            "role": "具名鼠标入口及preview/non-preview闭包创建",
+            "claim_ids": [
+              "EXP-ACT-001-C03",
+              "EXP-ACT-001-C05",
+              "EXP-ACT-001-C08",
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-MODS",
+            "role": "控制修饰、预测与busy门禁",
+            "claim_ids": [
+              "EXP-ACT-001-C03",
+              "EXP-ACT-001-C04"
+            ]
+          },
+          {
+            "ref": "ACT-DOACTION",
+            "role": "controller分流、早发RPC、对象检查与候选去重",
+            "claim_ids": [
+              "EXP-ACT-001-C04",
+              "EXP-ACT-001-C05"
+            ]
+          },
+          {
+            "ref": "ACT-AUTOEQUIP",
+            "role": "DoAction关联依赖；无invobject的本样例不自动装备",
+            "claim_ids": [
+              "EXP-ACT-001-C04"
+            ]
+          },
+          {
+            "ref": "ACT-REMOTE-PREVIEW",
+            "role": "preview_cb消费者与classified发送门禁",
+            "claim_ids": [
+              "EXP-ACT-001-C05",
+              "EXP-ACT-001-C07",
+              "EXP-ACT-001-C08"
+            ]
+          },
+          {
+            "ref": "ACT-WALK-FLUSH",
+            "role": "preview前可选预测移动RPC发送",
+            "claim_ids": [
+              "EXP-ACT-001-C07"
+            ]
+          },
+          {
+            "ref": "ACT-RELEASE",
+            "role": "松键处理、拖行分支与停止控制消息",
+            "claim_ids": [
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-STOP-CONTROL",
+            "role": "松键的远端控制位清理消费者",
+            "claim_ids": [
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PREVIEW",
+            "role": "实体preview槽、SG分流与ispreviewing标记",
+            "claim_ids": [
+              "EXP-ACT-001-C05",
+              "EXP-ACT-001-C06",
+              "EXP-ACT-001-C07",
+              "EXP-ACT-001-C08"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-CLEAR",
+            "role": "实体槽Fail与无条件后置清槽",
+            "claim_ids": [
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-BA",
+            "role": "动作对象生产、最终校验和业务分发",
+            "claim_ids": [
+              "EXP-ACT-001-C02",
+              "EXP-ACT-001-C04"
+            ]
+          },
+          {
+            "ref": "ACT-PICKER",
+            "role": "动作收集、过滤和BufferedAction构造",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-LEFT-PICKER",
+            "role": "无活动物品的场景动作选择分支",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-MOUSE-PICKER",
+            "role": "本地/远端重算鼠标候选的共同入口",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-COLLECT",
+            "role": "实体动作索引到collector的消费者",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-COLLECTOR",
+            "role": "pickable与fire/intense标签决定PICK候选",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-ACTION-DEF",
+            "role": "PICK的canforce/rangecheck/非instant和回调默认",
+            "claim_ids": [
+              "EXP-ACT-001-C05"
+            ]
+          },
+          {
+            "ref": "ACT-ACTION-CODE",
+            "role": "原版动作code生产与反向映射",
+            "claim_ids": [
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-PREVIEW",
+            "role": "客户端动作到目标/位置或实体preview的交接",
+            "claim_ids": [
+              "EXP-ACT-001-C04",
+              "EXP-ACT-001-C05",
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-PUSH",
+            "role": "服务器动作校验、forced范围检查及移动分流",
+            "claim_ids": [
+              "EXP-ACT-001-C04"
+            ]
+          },
+          {
+            "ref": "ACT-DEST",
+            "role": "实体或BufferedAction动态目的地",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-GO-ENTITY",
+            "role": "目标距离设置及移动/即时到达检查",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-SET",
+            "role": "移动槽替换及controller通知",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-CLEAR",
+            "role": "移动槽与移动意图清理",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-STOP",
+            "role": "动作状态停止移动，但不自动Fail移动槽",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-ARRIVE",
+            "role": "有效性/死亡退出、到达及动作槽移交消费者",
+            "claim_ids": [
+              "EXP-ACT-001-C05",
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-SG-DISPATCH",
+            "role": "两端handler到具体状态的分派",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-CLIENT-HANDLER",
+            "role": "普通quickpick的客户端选态",
+            "claim_ids": [
+              "EXP-ACT-001-C06"
+            ]
+          },
+          {
+            "ref": "ACT-CLIENT-STATE",
+            "role": "preview发送、状态匹配、超时清理",
+            "claim_ids": [
+              "EXP-ACT-001-C06",
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-LEFT",
+            "role": "LeftClick形态/平台/点击点范围门禁",
+            "claim_ids": [
+              "EXP-ACT-001-C05"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-CODE",
+            "role": "RPC编号生成及handler映射",
+            "claim_ids": [
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-SEND",
+            "role": "RPC发送Lua包装到TheNet边界",
+            "claim_ids": [
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-RELEASE",
+            "role": "松键消息到远端控制位消费者",
+            "claim_ids": [
+              "EXP-ACT-001-C09"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-HOLD",
+            "role": "点击前ClearActionHold的远端消费者",
+            "claim_ids": [
+              "EXP-ACT-001-C03"
+            ]
+          },
+          {
+            "ref": "ACT-CARROT",
+            "role": "具名普通原版目标及权威pickable配置",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-PROPS",
+            "role": "动作显示标签与quickpick标记生产",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-SETUP",
+            "role": "可采集状态与产物配置",
+            "claim_ids": [
+              "EXP-ACT-001-C02"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举本卡涉及的Lua输入/调用/消费者/清理；网络编码、实体映射、移动预测原生实现与mod覆盖另行核验。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ACT-002",
+      "title": "普通PICK的服务器候选重建、forced距离与最终业务执行",
+      "aliases": [
+        "RPC.LeftClick",
+        "OnRemoteLeftClick",
+        "PICK.rangecheckfn",
+        "forced",
+        "carrot_planted",
+        "doshortaction",
+        "actionfailed"
+      ],
+      "engineering_question": "远端PICK收到后服务器具体重检哪些条件，什么时候执行，失败和植株删除怎样收尾？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "runtime_verified": false,
+        "evidence": "frozen_local_lua_static",
+        "bounds": [
+          "沿EXP-ACT-001普通carrot_planted样例继续，区分预测forced与非预测非forced；目标不含jostle、pocket rummage或特殊技能。",
+          "读取网络Lua两端边界，不将TheNet.SendRPCToServer到HandleRPC/CallRPC的原生桥接当作已经实际验证。",
+          "产物分支核到SpawnProductLoot与inventory:GiveItem调用；不扩展库存转移/背包满时所有消费者合同。"
+        ],
+        "increment_over_existing": "NC-N002已有远端重新生成与code/mod_name匹配，RC-C06已有PICK返回不等于产物完成；这些作必要依赖。新增具名鼠标链的noforce差异、三个距离/校验时点、权威时间点、回调与植株任务删除闭环。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ACT-002-C01",
+          "kind": "NSF",
+          "statement": "SendRPCToServer只断言code有handler再转TheNet。Lua HandleRPC按code找handler，table sender或USERID例外经每发送者队列限额入队；HandleRPCQueue跳过失效table sender，按sender/tick门禁交TheNet:CallRPC。RPC编号由handler表排序映射，动作code另由ACTIONS表生成，不是同一个编号空间。",
+          "evidence_refs": [
+            "ACT-RPC-SEND",
+            "ACT-RPC-QUEUE",
+            "ACT-RPC-CALL",
+            "ACT-RPC-CODE",
+            "ACT-ACTION-CODE"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C02",
+          "kind": "NSF",
+          "statement": "LeftClick handler允许参数全nil，或逐项检查动作/坐标数值、可选实体/布尔/字符串等形态；平台相对坐标需平台存在并转换。非nil动作还要求点击点到玩家的距离平方<=4096，再交OnRemoteLeftClick；这检查点击点，不检查target是否在采集距离。",
+          "evidence_refs": [
+            "ACT-RPC-LEFT"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C03",
+          "kind": "NSF",
+          "statement": "OnRemoteLeftClick仅mastersim、IsEnabled且handler=nil处理；全nil动作只更新PRIMARY状态并返回。正常请求先DecodeControlMods并SetClientRequestedAction，以服务器playeractionpicker重新生成lmb/rmb和可选双击候选；之后ClearClientRequestedAction、处理isreleased并ClearControlMods。除LOOKAT/WALKTO回退外，按action.code与mod_name匹配才DoAction。",
+          "evidence_refs": [
+            "ACT-REMOTE-LEFT",
+            "ACT-ENABLED",
+            "ACT-MODS",
+            "ACT-REQUEST",
+            "ACT-MOUSE-PICKER",
+            "ACT-PICKER",
+            "ACT-LEFT-PICKER",
+            "ACT-PICK-COLLECTOR",
+            "ACT-COLLECT"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C04",
+          "kind": "NSF",
+          "statement": "标准PICK定义canforce=true。预测输入preview_cb发送noforce=nil；服务器匹配后将动作点设为远端预测位置或当前玩家位置并置forced=true。DoAction交locomotor；PushAction先TestForStart，随后forced分支调用PICK.rangecheckfn，失败则清target与initialtargetowner，有动作点才GoToPoint。非预测普通左键闭包发送act.action.canforce作noforce，因此此样例不置forced，改走目标移动。",
+          "evidence_refs": [
+            "ACT-ACTION-DEF",
+            "ACT-CLICK",
+            "ACT-REMOTE-LEFT",
+            "ACT-DOACTION",
+            "ACT-LOCO-PUSH",
+            "ACT-PICK-RANGE",
+            "ACT-GO-POINT",
+            "ACT-GO-ENTITY",
+            "ACT-BA"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C05",
+          "kind": "NSF",
+          "statement": "PickRangeCheck针对普通无jostle目标比较玩家到目标距离平方与(target:GetPhysicsRadius(0)+4)^2；这在forced分流处调用。到达分支还检查目的地/BufferedAction当前有效及死亡，移交前清locomotor槽；服务器随后PushBufferedAction再TestForStart，PICK quickpick handler进入doshortaction。",
+          "evidence_refs": [
+            "ACT-PICK-RANGE",
+            "ACT-LOCO-PUSH",
+            "ACT-GO-POINT",
+            "ACT-GO-ENTITY",
+            "ACT-DEST",
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PUSH",
+            "ACT-BA",
+            "ACT-SERVER-HANDLER",
+            "ACT-SG-DISPATCH"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C06",
+          "kind": "NSF",
+          "statement": "服务器doshortaction保存入态action，设置10FRAMES超时；6FRAMES时间点先移除busy再PerformBufferedAction。后者发performaction及可选主题事件，然后取当时槽的局部引用并Do。Do再IsValid，mastersim额外调用PICK.validfn；该validfn读取当前CanBePicked。IsValid本身没有通用距离检查。",
+          "evidence_refs": [
+            "ACT-SERVER-STATE",
+            "ACT-SG-TICK",
+            "ACT-ENTITY-PERFORM",
+            "ACT-EVENTS",
+            "ACT-BA",
+            "ACT-PICK-FN",
+            "ACT-CAN-PICK"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C07",
+          "kind": "NSF",
+          "statement": "PICK.fn在pickable分支先IsStuck，真则false,STUCK，否则调用Pick(doer)后直接true。Pick另以canbepicked/caninteractwith/not stuck作业务guard；普通carrot_planted通过时先SpawnProductLoot，正常普通产物分支SpawnPrefab后可向picker发布picksomething再尝试GiveItem或放置，随后Pick置canbepicked=false、可安排再生、发布picked，remove_when_picked则Remove植株。",
+          "evidence_refs": [
+            "ACT-PICK-FN",
+            "ACT-STUCK",
+            "ACT-PICK",
+            "ACT-PICK-LOOT",
+            "ACT-CARROT",
+            "ACT-PICK-PROPS",
+            "ACT-PICK-SETUP"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C08",
+          "kind": "EI",
+          "statement": "此样例的PICK成功值是动作分支的返回，不是产物已入背包的回执：PICK忽略Pick返回，产物创建与inventory:GiveItem的结果也未作为PICK返回值。SpawnProductLoot的picksomething普通监听位于Pick关闭canbepicked之前，可在该同步窗口观察仍可采的组件；回调重入的总产物数量需另验。",
+          "evidence_refs": [
+            "ACT-PICK-FN",
+            "ACT-PICK",
+            "ACT-PICK-LOOT",
+            "ACT-EVENTS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C09",
+          "kind": "NSF",
+          "statement": "植株Pick正常路径可先建立再生DoTaskInTime，随后Remove；宿主Remove清监听并CancelAllPendingTasks，清理该宿主已登记任务后调用组件OnRemoveEntity。动作Do正常完成/失败消费各回调列表；PerformBufferedAction成功返回true，失败发actionfailed再Fail，并只在实体槽仍等于执行局部动作时清槽。",
+          "evidence_refs": [
+            "ACT-PICK",
+            "ACT-CARROT",
+            "ACT-DO-TASK",
+            "ACT-TASKS",
+            "ACT-REMOVE",
+            "ACT-BA",
+            "ACT-CALLBACKS",
+            "ACT-ENTITY-PERFORM"
+          ]
+        },
+        {
+          "id": "EXP-ACT-002-C10",
+          "kind": "EI",
+          "statement": "服务器重建候选、forced范围检查、起步/到达/最终IsValid和Pick业务guard是不同检查点；最终IsValid不会自动重跑PickRangeCheck。对本链不能用客户端preview完成、服务器进入状态或performaction事件替代最终业务结果。",
+          "evidence_refs": [
+            "ACT-REMOTE-LEFT",
+            "ACT-RPC-LEFT",
+            "ACT-LOCO-PUSH",
+            "ACT-PICK-RANGE",
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PUSH",
+            "ACT-ENTITY-PERFORM",
+            "ACT-BA",
+            "ACT-PICK-FN",
+            "ACT-PICK",
+            "ACT-CLIENT-STATE",
+            "ACT-SERVER-STATE"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "PlayerController:OnRemoteLeftClick",
+          "source_file": "scripts/components/playercontroller.lua",
+          "visibility": "Lua实例方法；端别及本卡具名分支见前提与Scope",
+          "parameters": [
+            "actioncode：nil仅表示PRIMARY按下；否则为请求动作编号，与RPC编号不同。",
+            "position：Vector3绝对坐标；LeftClick handler负责形态、平台换算及点击点范围检查。",
+            "target：服务器映射的mouseover实体或nil；仍由服务器picker重新构建候选。",
+            "isreleased：真则重建后清PRIMARY控制位。",
+            "controlmodscode：修饰键位编码，临时解码后清理。",
+            "noforce：truthy阻止对canforce动作置forced；本预测PICK闭包传nil，非预测闭包传canforce。",
+            "mod_name：与候选动作同时匹配，原版PICK为nil。",
+            "spellbook/spell_id：可选；书需服务器验证GrandOwner/组件/选中技能，本PICK样例均nil。"
+          ],
+          "returns": "无显式返回；无匹配/门禁拒绝不发统一动作失败回执。直接调用绕过RPC handler的形态/平台/点范围检查；picker/回调异常无统一finally。",
+          "preconditions": [
+            "mastersim、控制允许、handler=nil的远端玩家controller；标准picker、combat、locomotor存在。",
+            "来自LeftClick handler的坐标和对象形态已经检查；具体目标资格仍由重建和后续业务决定。"
+          ],
+          "side_effects": [
+            "清combat目标、标PRIMARY、临时设置修饰和CLIENT_REQUESTED_ACTION，重建候选、清临时标记，再按code/mod_name匹配。",
+            "可为canforce候选覆盖动作点/forced并交DoAction；本方法不把客户端动作对象或成功结果直接送入业务。"
+          ],
+          "lifecycle": [
+            "正常重建后才清请求标记与修饰；异常可跳过这些后置清理。松键标记不撤回已发请求。",
+            "后续由locomotor到达、SG timeline、BufferedAction.Do及Pickable执行与清理。"
+          ],
+          "evidence_refs": [
+            "ACT-REMOTE-LEFT",
+            "ACT-RPC-LEFT",
+            "ACT-ENABLED",
+            "ACT-MODS",
+            "ACT-REQUEST",
+            "ACT-MOUSE-PICKER",
+            "ACT-PICKER",
+            "ACT-LEFT-PICKER",
+            "ACT-PICK-COLLECTOR",
+            "ACT-COLLECT",
+            "ACT-DOACTION",
+            "ACT-LOCO-PUSH",
+            "ACT-PICK-RANGE",
+            "ACT-ARRIVE",
+            "ACT-SERVER-STATE",
+            "ACT-BA",
+            "ACT-PICK-FN"
+          ],
+          "unknowns": [
+            "不验证原生RPC鉴权/编码/实体映射和端到端延迟；特殊spellbook与双击业务未展开。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "完整LeftClick经TheNet边界进入Lua队列，再由LeftClick handler换算平台/校验点击点，交服务器controller。",
+          "evidence_refs": [
+            "ACT-RPC-SEND",
+            "ACT-RPC-CODE",
+            "ACT-RPC-QUEUE",
+            "ACT-RPC-CALL",
+            "ACT-RPC-LEFT"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "服务器picker重建PICK，以code/mod_name匹配；预测路径置forced并在locomotor做rangecheck，非预测路径移动到目标。",
+          "evidence_refs": [
+            "ACT-REMOTE-LEFT",
+            "ACT-REQUEST",
+            "ACT-MODS",
+            "ACT-DOACTION",
+            "ACT-MOUSE-PICKER",
+            "ACT-PICKER",
+            "ACT-LEFT-PICKER",
+            "ACT-COLLECT",
+            "ACT-PICK-COLLECTOR",
+            "ACT-ACTION-DEF",
+            "ACT-CLICK",
+            "ACT-LOCO-PUSH",
+            "ACT-PICK-RANGE",
+            "ACT-GO-POINT",
+            "ACT-GO-ENTITY",
+            "ACT-DEST"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "到达后移交实体槽，PICK handler进入doshortaction；timeline调用Do并重验PICK可用性，转Pickable业务。",
+          "evidence_refs": [
+            "ACT-ARRIVE",
+            "ACT-ENTITY-PUSH",
+            "ACT-SG-DISPATCH",
+            "ACT-SG-ENTER",
+            "ACT-SERVER-HANDLER",
+            "ACT-SERVER-STATE",
+            "ACT-SG-TICK",
+            "ACT-ENTITY-PERFORM",
+            "ACT-BA",
+            "ACT-PICK-FN",
+            "ACT-CAN-PICK",
+            "ACT-STUCK"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "正常采集尝试创建/交付产物、置已采状态、发布picked并移除植株；清宿主任务；BufferedAction消费结果回调并按身份清执行槽。",
+          "evidence_refs": [
+            "ACT-CARROT",
+            "ACT-PICK-PROPS",
+            "ACT-PICK-SETUP",
+            "ACT-PICK",
+            "ACT-PICK-LOOT",
+            "ACT-DO-TASK",
+            "ACT-TASKS",
+            "ACT-REMOVE",
+            "ACT-CALLBACKS",
+            "ACT-BA",
+            "ACT-ENTITY-PERFORM"
+          ]
+        }
+      ],
+      "unknowns": [
+        "库存最终接纳、客户端显示、网络送达和实际采集未运行；本卡只陈述Lua调用及字段变化。",
+        "PICK最终validfn不包含通用距离重验；改造业务若需不同执行帧范围政策由项目决定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ACT-ENABLED",
+            "role": "classified/HUD启用门禁和本地/远端按键读取",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-CLICK",
+            "role": "具名鼠标入口及preview/non-preview闭包创建",
+            "claim_ids": [
+              "EXP-ACT-002-C04"
+            ]
+          },
+          {
+            "ref": "ACT-MODS",
+            "role": "控制修饰、预测与busy门禁",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-DOACTION",
+            "role": "controller分流、早发RPC、对象检查与候选去重",
+            "claim_ids": [
+              "EXP-ACT-002-C04"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PUSH",
+            "role": "权威实体槽安装、失败及StartAction交接",
+            "claim_ids": [
+              "EXP-ACT-002-C05",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PERFORM",
+            "role": "执行前事件、缓存点、Do及身份清理",
+            "claim_ids": [
+              "EXP-ACT-002-C06",
+              "EXP-ACT-002-C09",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-EVENTS",
+            "role": "普通事件监听同步调用；后接SG/Brain",
+            "claim_ids": [
+              "EXP-ACT-002-C06",
+              "EXP-ACT-002-C08"
+            ]
+          },
+          {
+            "ref": "ACT-BA",
+            "role": "动作对象生产、最终校验和业务分发",
+            "claim_ids": [
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C05",
+              "EXP-ACT-002-C06",
+              "EXP-ACT-002-C09",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-CALLBACKS",
+            "role": "无终态锁的回调消费与列表清理",
+            "claim_ids": [
+              "EXP-ACT-002-C09"
+            ]
+          },
+          {
+            "ref": "ACT-PICKER",
+            "role": "动作收集、过滤和BufferedAction构造",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-LEFT-PICKER",
+            "role": "无活动物品的场景动作选择分支",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-MOUSE-PICKER",
+            "role": "本地/远端重算鼠标候选的共同入口",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-COLLECT",
+            "role": "实体动作索引到collector的消费者",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-COLLECTOR",
+            "role": "pickable与fire/intense标签决定PICK候选",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-ACTION-DEF",
+            "role": "PICK的canforce/rangecheck/非instant和回调默认",
+            "claim_ids": [
+              "EXP-ACT-002-C04"
+            ]
+          },
+          {
+            "ref": "ACT-REQUEST",
+            "role": "远端重建期间请求动作的临时标记",
+            "claim_ids": [
+              "EXP-ACT-002-C03"
+            ]
+          },
+          {
+            "ref": "ACT-ACTION-CODE",
+            "role": "原版动作code生产与反向映射",
+            "claim_ids": [
+              "EXP-ACT-002-C01"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-RANGE",
+            "role": "PICK forced范围及到达距离扩展；局部函数仅作依赖",
+            "claim_ids": [
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C05",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-FN",
+            "role": "执行端PICK可用性和Pickable业务消费者",
+            "claim_ids": [
+              "EXP-ACT-002-C06",
+              "EXP-ACT-002-C07",
+              "EXP-ACT-002-C08",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-LOCO-PUSH",
+            "role": "服务器动作校验、forced范围检查及移动分流",
+            "claim_ids": [
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C05",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-DEST",
+            "role": "实体或BufferedAction动态目的地",
+            "claim_ids": [
+              "EXP-ACT-002-C05"
+            ]
+          },
+          {
+            "ref": "ACT-GO-ENTITY",
+            "role": "目标距离设置及移动/即时到达检查",
+            "claim_ids": [
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C05"
+            ]
+          },
+          {
+            "ref": "ACT-GO-POINT",
+            "role": "forced位置的到达距离设置与检查",
+            "claim_ids": [
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C05"
+            ]
+          },
+          {
+            "ref": "ACT-ARRIVE",
+            "role": "有效性/死亡退出、到达及动作槽移交消费者",
+            "claim_ids": [
+              "EXP-ACT-002-C05",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-SG-DISPATCH",
+            "role": "两端handler到具体状态的分派",
+            "claim_ids": [
+              "EXP-ACT-002-C05"
+            ]
+          },
+          {
+            "ref": "ACT-SG-ENTER",
+            "role": "旧onexit、新记忆与onenter的阶段",
+            "claim_ids": []
+          },
+          {
+            "ref": "ACT-SG-TICK",
+            "role": "timeout/timeline/onupdate的实际消费者",
+            "claim_ids": [
+              "EXP-ACT-002-C06"
+            ]
+          },
+          {
+            "ref": "ACT-CLIENT-STATE",
+            "role": "preview发送、状态匹配、超时清理",
+            "claim_ids": [
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-SERVER-HANDLER",
+            "role": "普通quickpick的服务器选态",
+            "claim_ids": [
+              "EXP-ACT-002-C05"
+            ]
+          },
+          {
+            "ref": "ACT-SERVER-STATE",
+            "role": "6FRAMES执行、10FRAMES退出与动作身份清理",
+            "claim_ids": [
+              "EXP-ACT-002-C06",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-LEFT",
+            "role": "LeftClick形态/平台/点击点范围门禁",
+            "claim_ids": [
+              "EXP-ACT-002-C02",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-CODE",
+            "role": "RPC编号生成及handler映射",
+            "claim_ids": [
+              "EXP-ACT-002-C01"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-SEND",
+            "role": "RPC发送Lua包装到TheNet边界",
+            "claim_ids": [
+              "EXP-ACT-002-C01"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-QUEUE",
+            "role": "接收后handler查找、发送者形态与限流队列",
+            "claim_ids": [
+              "EXP-ACT-002-C01"
+            ]
+          },
+          {
+            "ref": "ACT-RPC-CALL",
+            "role": "发送者有效性、tick门禁和原生CallRPC交付",
+            "claim_ids": [
+              "EXP-ACT-002-C01"
+            ]
+          },
+          {
+            "ref": "ACT-REMOTE-LEFT",
+            "role": "服务器候选重建、匹配、forced标记及DoAction",
+            "claim_ids": [
+              "EXP-ACT-002-C03",
+              "EXP-ACT-002-C04",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-CARROT",
+            "role": "具名普通原版目标及权威pickable配置",
+            "claim_ids": [
+              "EXP-ACT-002-C07",
+              "EXP-ACT-002-C09"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-PROPS",
+            "role": "动作显示标签与quickpick标记生产",
+            "claim_ids": [
+              "EXP-ACT-002-C07"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-SETUP",
+            "role": "可采集状态与产物配置",
+            "claim_ids": [
+              "EXP-ACT-002-C07"
+            ]
+          },
+          {
+            "ref": "ACT-CAN-PICK",
+            "role": "最终validfn读取的当前可采集状态",
+            "claim_ids": [
+              "EXP-ACT-002-C06"
+            ]
+          },
+          {
+            "ref": "ACT-PICK-LOOT",
+            "role": "业务产物创建、picksomething及交给inventory的调用边界",
+            "claim_ids": [
+              "EXP-ACT-002-C07",
+              "EXP-ACT-002-C08"
+            ]
+          },
+          {
+            "ref": "ACT-PICK",
+            "role": "业务guard、产物调用、置空状态、picked与删除植株",
+            "claim_ids": [
+              "EXP-ACT-002-C07",
+              "EXP-ACT-002-C08",
+              "EXP-ACT-002-C09",
+              "EXP-ACT-002-C10"
+            ]
+          },
+          {
+            "ref": "ACT-STUCK",
+            "role": "PICK的STUCK拒绝依赖",
+            "claim_ids": [
+              "EXP-ACT-002-C07"
+            ]
+          },
+          {
+            "ref": "ACT-REMOVE",
+            "role": "采后删除的任务/监听/组件退出清理",
+            "claim_ids": [
+              "EXP-ACT-002-C09"
+            ]
+          },
+          {
+            "ref": "ACT-TASKS",
+            "role": "宿主移除时再生任务清理",
+            "claim_ids": [
+              "EXP-ACT-002-C09"
+            ]
+          },
+          {
+            "ref": "ACT-DO-TASK",
+            "role": "Pick可能建立的再生任务归入宿主",
+            "claim_ids": [
+              "EXP-ACT-002-C09"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举本卡涉及的Lua输入/调用/消费者/清理；网络编码、实体映射、移动预测原生实现与mod覆盖另行核验。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ACT-003",
+      "title": "动作回调重入时的缓存点、旧槽失败与后置清槽",
+      "aliases": [
+        "PerformBufferedAction缓存点",
+        "ClearBufferedAction重入",
+        "PushBufferedAction重入",
+        "performaction",
+        "actionfailed",
+        "Succeed/Fail回调",
+        "动作槽身份"
+      ],
+      "engineering_question": "事件/成功/失败回调提交下一动作时，哪些入口保留新槽，哪些会清掉它或再入旧回调？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "runtime_verified": false,
+        "evidence": "frozen_local_lua_static",
+        "bounds": [
+          "仅所列Lua调用正常返回/显式条件成立时的静态推导；以实体动作槽A/B/C表示对象身份，不作实际游戏测试断言。",
+          "比较前置事件、Do内部、结果回调和SG退出的不同阶段；同一动作再次Do的基本事实沿用EXP-AI-007。"
+        ],
+        "increment_over_existing": "EXP-AI-007已完整登记Do/IsValid/Push/Perform/Clear等API，不在此重复登记。此条只补旧unknown里的具体重入分支及缓存点前后的差异；API数组有意为空，复用旧合同并以本轮源码闭合新增原子。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ACT-003-C01",
+          "kind": "NSF",
+          "statement": "PerformBufferedAction的局部动作缓存位于performaction事件、主题选择与play_theme_music事件之后。普通监听同步执行；这些事件后的槽可以已变。Do期间保持实体槽可供旧代码读取，Do返回后的成功/失败清槽才比较槽身份。",
+          "evidence_refs": [
+            "ACT-ENTITY-PERFORM",
+            "ACT-EVENTS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C02",
+          "kind": "EI",
+          "statement": "若performaction或play_theme_music监听正常返回且把槽从A换成B，后续缓存/Do可处理B；若performaction监听将槽清nil，紧接的主题选择会读取nil.action。所谓缓存保护只覆盖缓存点之后，不能推广到这些前置事件。",
+          "evidence_refs": [
+            "ACT-ENTITY-PERFORM",
+            "ACT-EVENTS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C03",
+          "kind": "NSF",
+          "statement": "ClearBufferedAction先在当前槽上Fail，再无条件写槽nil；PushBufferedAction替换旧槽时同样先Fail再无条件清槽，随后才验证/处理传入新动作。Succeed/Fail均先pairs调用当前对应回调列表，全部正常返回后才替换两张列表，没有先置终态或先脱离实体槽。",
+          "evidence_refs": [
+            "ACT-ENTITY-CLEAR",
+            "ACT-ENTITY-PUSH",
+            "ACT-CALLBACKS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C04",
+          "kind": "EI",
+          "statement": "如果A的失败回调正常返回前把实体槽换成C，外层Clear或Push替换段仍会清掉C；相反，Perform缓存A后在Do/结果回调中建立B，正常尾部身份比较会保留B。失败回调中再次对仍在槽的A调用Clear/替换Push可重入A.Fail，不能将清槽入口视为已经先解绑。",
+          "evidence_refs": [
+            "ACT-ENTITY-CLEAR",
+            "ACT-ENTITY-PUSH",
+            "ACT-ENTITY-PERFORM",
+            "ACT-CALLBACKS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C05",
+          "kind": "EI",
+          "statement": "当A成功回调在列表清空前用PushBufferedAction提交不同签名的B，且A仍在实体槽、两者不命中去重时，Push会调用A.Fail；于是同一次A可在成功回调栈中进入失败回调。外层Succeed随后清的是A的列表，Perform正常尾部按身份保留B。条件不成立或回调抛错时不承诺此完整路径。",
+          "evidence_refs": [
+            "ACT-CALLBACKS",
+            "ACT-ENTITY-PUSH",
+            "ACT-ENTITY-PERFORM",
+            "ACT-BA"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C06",
+          "kind": "EI",
+          "statement": "Do有效但action.fn返回假会先Fail，再由Perform发actionfailed并再次Fail；通常第一次已清列表，第二次为空。但actionfailed普通监听若给A新增失败回调，外层第二次Fail会消费新增列表。Do的IsValid早退则不先Fail，由外层失败路径通知；actionfailed、Fail列表和业务回滚不是同一个操作。",
+          "evidence_refs": [
+            "ACT-BA",
+            "ACT-CALLBACKS",
+            "ACT-ENTITY-PERFORM",
+            "ACT-EVENTS"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C07",
+          "kind": "NSF",
+          "statement": "服务器doshortaction退出时，只有当前槽仍等于入态保存action，且无controller或lastheldaction不等于该动作，才在此分支ClearBufferedAction；10FRAMES超时只请求idle，由GoToState调用旧onexit。本样例无pocket_rummage_item时两个pocket辅助分支不另起动作。客户端本状态则在timeout显式Clear，未声明onexit清动作。",
+          "evidence_refs": [
+            "ACT-SERVER-STATE",
+            "ACT-SG-ENTER",
+            "ACT-POCKET",
+            "ACT-CLIENT-STATE",
+            "ACT-ENTITY-CLEAR"
+          ]
+        },
+        {
+          "id": "EXP-ACT-003-C08",
+          "kind": "REC",
+          "statement": "动作接入保留输入发送、SG预演、服务器执行和业务提交的现有职责。需链式提交新动作时，按实际回调点核对槽身份：Do后清理带身份比较，Clear/旧槽替换没有；preview回调还处于后置标记之前。只在项目确实需要时限定该回调的替换/清槽行为。",
+          "evidence_refs": [
+            "ACT-ENTITY-PREVIEW",
+            "ACT-ENTITY-PERFORM",
+            "ACT-ENTITY-CLEAR",
+            "ACT-ENTITY-PUSH",
+            "ACT-CALLBACKS",
+            "ACT-CLICK"
+          ]
+        }
+      ],
+      "api_contracts": [],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "执行前先同步发布事件，随后才缓存当前槽；进入Do时实体仍持有该动作。",
+          "evidence_refs": [
+            "ACT-ENTITY-PERFORM",
+            "ACT-EVENTS",
+            "ACT-BA"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Succeed/Fail在回调正常返回后才清列表；回调若再提交或清动作，按具体外层入口的后置写入追踪。",
+          "evidence_refs": [
+            "ACT-CALLBACKS",
+            "ACT-ENTITY-PUSH",
+            "ACT-ENTITY-CLEAR",
+            "ACT-ENTITY-PERFORM"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "SG退出按入态action/lastheldaction选择清理；客户端超时清理和服务器执行结果分别观察。",
+          "evidence_refs": [
+            "ACT-SERVER-STATE",
+            "ACT-CLIENT-STATE",
+            "ACT-SG-ENTER",
+            "ACT-POCKET",
+            "ACT-ENTITY-CLEAR"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行回调抛错、递归提交/清理或实际SG中断；不提供跨任意回调的重入安全保证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ACT-CLICK",
+            "role": "具名鼠标入口及preview/non-preview闭包创建",
+            "claim_ids": [
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PREVIEW",
+            "role": "实体preview槽、SG分流与ispreviewing标记",
+            "claim_ids": [
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PUSH",
+            "role": "权威实体槽安装、失败及StartAction交接",
+            "claim_ids": [
+              "EXP-ACT-003-C03",
+              "EXP-ACT-003-C04",
+              "EXP-ACT-003-C05",
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-PERFORM",
+            "role": "执行前事件、缓存点、Do及身份清理",
+            "claim_ids": [
+              "EXP-ACT-003-C01",
+              "EXP-ACT-003-C02",
+              "EXP-ACT-003-C04",
+              "EXP-ACT-003-C05",
+              "EXP-ACT-003-C06",
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-ENTITY-CLEAR",
+            "role": "实体槽Fail与无条件后置清槽",
+            "claim_ids": [
+              "EXP-ACT-003-C03",
+              "EXP-ACT-003-C04",
+              "EXP-ACT-003-C07",
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-EVENTS",
+            "role": "普通事件监听同步调用；后接SG/Brain",
+            "claim_ids": [
+              "EXP-ACT-003-C01",
+              "EXP-ACT-003-C02",
+              "EXP-ACT-003-C06"
+            ]
+          },
+          {
+            "ref": "ACT-BA",
+            "role": "动作对象生产、最终校验和业务分发",
+            "claim_ids": [
+              "EXP-ACT-003-C05",
+              "EXP-ACT-003-C06"
+            ]
+          },
+          {
+            "ref": "ACT-CALLBACKS",
+            "role": "无终态锁的回调消费与列表清理",
+            "claim_ids": [
+              "EXP-ACT-003-C03",
+              "EXP-ACT-003-C04",
+              "EXP-ACT-003-C05",
+              "EXP-ACT-003-C06",
+              "EXP-ACT-003-C08"
+            ]
+          },
+          {
+            "ref": "ACT-SG-ENTER",
+            "role": "旧onexit、新记忆与onenter的阶段",
+            "claim_ids": [
+              "EXP-ACT-003-C07"
+            ]
+          },
+          {
+            "ref": "ACT-CLIENT-STATE",
+            "role": "preview发送、状态匹配、超时清理",
+            "claim_ids": [
+              "EXP-ACT-003-C07"
+            ]
+          },
+          {
+            "ref": "ACT-SERVER-STATE",
+            "role": "6FRAMES执行、10FRAMES退出与动作身份清理",
+            "claim_ids": [
+              "EXP-ACT-003-C07"
+            ]
+          },
+          {
+            "ref": "ACT-POCKET",
+            "role": "本样例无pocket_rummage_item时的收尾分支",
+            "claim_ids": [
+              "EXP-ACT-003-C07"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举本卡涉及的Lua输入/调用/消费者/清理；网络编码、实体映射、移动预测原生实现与mod覆盖另行核验。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "ACT-INPUT",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 313,
+      "line_end": 320,
+      "range_sha256": "37c468ae1c0c0dfd7ab57d454691485fd07b0b426291babedce43094868e4f13",
+      "symbols": [
+        "PlayerController:Activate"
+      ]
+    },
+    {
+      "id": "ACT-CONTROL",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 601,
+      "line_end": 655,
+      "range_sha256": "6c7099996bcb2b7e626c29ccc720c02c98e4b1d3683d536fe76c0b7da121fb0a",
+      "symbols": [
+        "PlayerController:OnControl"
+      ]
+    },
+    {
+      "id": "ACT-ENABLED",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 491,
+      "line_end": 516,
+      "range_sha256": "67ef11e2f3a5b077f1be4d880fb93f9aa5b2e331e3fb4cd06011321b7740453a",
+      "symbols": [
+        "PlayerController:IsEnabled",
+        "PlayerController:IsControlPressed"
+      ]
+    },
+    {
+      "id": "ACT-MODE",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 2566,
+      "line_end": 2579,
+      "range_sha256": "af3aff362d32be3e22623c57b94b4e9c46f31c702a159f7c4ac23c01f30afcd0",
+      "symbols": [
+        "PlayerController:UsingMouse",
+        "PlayerController:ClearActionHold"
+      ]
+    },
+    {
+      "id": "ACT-CACHE",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 2817,
+      "line_end": 2830,
+      "range_sha256": "24f1ff3917d7dbfa733ee95a41e85b1b3a0c4ee7e8cdf89cefba6641df19b4bc",
+      "symbols": [
+        "PlayerController:OnUpdate mouse action cache"
+      ]
+    },
+    {
+      "id": "ACT-GETTER",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5324,
+      "line_end": 5326,
+      "range_sha256": "8d09226c1b3f0df6065ad003531eb16a529f95eea77b8c2d07cb159d6dad0f83",
+      "symbols": [
+        "PlayerController:GetLeftMouseAction"
+      ]
+    },
+    {
+      "id": "ACT-CLICK",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4683,
+      "line_end": 4891,
+      "range_sha256": "671b0ae34ce989591d6f18fd8680926a834969de032f57784dcad55ef9421e0a",
+      "symbols": [
+        "PlayerController:OnLeftClick"
+      ]
+    },
+    {
+      "id": "ACT-MODS",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 730,
+      "line_end": 777,
+      "range_sha256": "223e7b8ce1dc7e34314789f5190aec6ad0d4e75c5ff710c1ecf8e7306d6b4000",
+      "symbols": [
+        "PlayerController:EncodeControlMods",
+        "PlayerController:DecodeControlMods",
+        "PlayerController:ClearControlMods",
+        "PlayerController:CanLocomote",
+        "PlayerController:IsBusy"
+      ]
+    },
+    {
+      "id": "ACT-DOACTION",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4545,
+      "line_end": 4653,
+      "range_sha256": "e5211ef49c69208c9670e9ae7a8bcb3636aceeb43c0f7dc7c0d670e4dd3e5ef6",
+      "symbols": [
+        "PlayerController:DoAction"
+      ]
+    },
+    {
+      "id": "ACT-AUTOEQUIP",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4655,
+      "line_end": 4681,
+      "range_sha256": "d08ec2a931c9a68b5eb9d729a07f96039dbe279ffeb9cb4196514157600b8cde",
+      "symbols": [
+        "PlayerController:DoActionAutoEquip"
+      ]
+    },
+    {
+      "id": "ACT-REMOTE-PREVIEW",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5753,
+      "line_end": 5766,
+      "range_sha256": "eb3f4c75de966b11be8c84820bfe1f123deeab7577fde1217fb1ef5352190449",
+      "symbols": [
+        "PlayerController:RemoteBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-WALK-FLUSH",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 3925,
+      "line_end": 3937,
+      "range_sha256": "73c4bf574adb4ac08bd5fb2fcb00ad114130bf522e1945fd1c21f3f565c30b5a",
+      "symbols": [
+        "PlayerController:RemotePredictWalking"
+      ]
+    },
+    {
+      "id": "ACT-RELEASE",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4512,
+      "line_end": 4543,
+      "range_sha256": "fcb5697530f4bbab70b5e6ed2f473bf6a287c34b2a7d32b7c2066216605d31d1",
+      "symbols": [
+        "PlayerController:OnLeftUp"
+      ]
+    },
+    {
+      "id": "ACT-STOP-CONTROL",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 546,
+      "line_end": 565,
+      "range_sha256": "9a95c65b3dff9e162fcec716e069ffdda26ce5e5e9e6165a194fa3e42569a777",
+      "symbols": [
+        "PlayerController:OnRemoteStopControl",
+        "PlayerController:RemoteStopControl"
+      ]
+    },
+    {
+      "id": "ACT-ENTITY-PREVIEW",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1597,
+      "line_end": 1632,
+      "range_sha256": "624873ad315c3dd4cf54e727f2ac852770fce6ac9389eafa75651ea9b46af7ad",
+      "symbols": [
+        "EntityScript:PreviewBufferedAction",
+        "EntityScript:PerformPreviewBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-ENTITY-PUSH",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1634,
+      "line_end": 1677,
+      "range_sha256": "b29f053b6aac5bc7499ecb24e889268b44fbc35d97df49efc8f4c085e5e41e31",
+      "symbols": [
+        "EntityScript:PushBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-ENTITY-PERFORM",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1679,
+      "line_end": 1712,
+      "range_sha256": "d8f1895d5a9b9b1b5ce48c2694c6163884aa9bc770ead6f205351066da1135a3",
+      "symbols": [
+        "EntityScript:PerformBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-ENTITY-CLEAR",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1588,
+      "line_end": 1595,
+      "range_sha256": "212903647ab07cc468a6a8f79ebba8a1e48fd07b7ea7fa3a8f916ac7fd80032f",
+      "symbols": [
+        "EntityScript:ClearBufferedAction",
+        "EntityScript.InterruptBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-EVENTS",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "ACT-BA",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 2,
+      "line_end": 50,
+      "range_sha256": "c4581aa69e8e14b1d8c70435d936f31571459dc4f81d27378bb82d9856d7261a",
+      "symbols": [
+        "BufferedAction constructor",
+        "BufferedAction:Do",
+        "BufferedAction:IsValid",
+        "BufferedAction.TestForStart"
+      ]
+    },
+    {
+      "id": "ACT-CALLBACKS",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 74,
+      "line_end": 110,
+      "range_sha256": "a204cf5d372d8a0781a4b95f512563d0bf8d28d2da92c0f52ae7347a3276dc65",
+      "symbols": [
+        "BufferedAction:AddFailAction",
+        "BufferedAction:AddSuccessAction",
+        "BufferedAction:Succeed",
+        "BufferedAction:Fail",
+        "BufferedAction:GetActionPoint"
+      ]
+    },
+    {
+      "id": "ACT-PICKER",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "line_start": 78,
+      "line_end": 139,
+      "range_sha256": "e030478ecb3c236f8966e031fed2536191478e8566428130df7e5b4ca75427ba",
+      "symbols": [
+        "PlayerActionPicker:SortActionList",
+        "PlayerActionPicker:GetSceneActions"
+      ]
+    },
+    {
+      "id": "ACT-LEFT-PICKER",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "line_start": 301,
+      "line_end": 386,
+      "range_sha256": "a3a42eeb80f34afe04d33279e2ac331ad43dc2e8c577a2872f393fc44f6713f1",
+      "symbols": [
+        "PlayerActionPicker:GetLeftClickActions"
+      ]
+    },
+    {
+      "id": "ACT-MOUSE-PICKER",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "line_start": 498,
+      "line_end": 580,
+      "range_sha256": "a1771b0818dabbd0bac3c7b787abe844aa81d891539c0ad2d117ee7f8ef428dc",
+      "symbols": [
+        "PlayerActionPicker:DoGetMouseActions"
+      ]
+    },
+    {
+      "id": "ACT-COLLECT",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 3236,
+      "line_end": 3263,
+      "range_sha256": "b4700479e1063b6a78a74f08d7356cbe7372b6a97f217088a8387e1c16b2a0c7",
+      "symbols": [
+        "EntityScript:CollectActions"
+      ]
+    },
+    {
+      "id": "ACT-PICK-COLLECTOR",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 656,
+      "line_end": 660,
+      "range_sha256": "01dff476eb27ed1a8dd1bccd30e022716fdd49ede7548036b4e358bddc6df80b",
+      "symbols": [
+        "COMPONENT_ACTIONS.SCENE.pickable"
+      ]
+    },
+    {
+      "id": "ACT-ACTION-DEF",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 294,
+      "line_end": 366,
+      "range_sha256": "bbd931a86396c0b5fe6b164d764ea4ceefc25fe46189218ef54afc0a289c2815",
+      "symbols": [
+        "Action constructor",
+        "ACTIONS.PICK"
+      ]
+    },
+    {
+      "id": "ACT-REQUEST",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 281,
+      "line_end": 291,
+      "range_sha256": "8913ba6a36a102fe0d0128940aa6312f71fa0ed08e7626ccdd1d67852736e3a0",
+      "symbols": [
+        "SetClientRequestedAction",
+        "ClearClientRequestedAction"
+      ]
+    },
+    {
+      "id": "ACT-ACTION-CODE",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 749,
+      "line_end": 757,
+      "range_sha256": "a66718d9a15f1b1bd11a603850666b01e37c017f6691bfef3a8a70ace40fd7e5",
+      "symbols": [
+        "ACTIONS_BY_ACTION_CODE",
+        "ACTION_IDS"
+      ]
+    },
+    {
+      "id": "ACT-PICK-RANGE",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 18,
+      "line_end": 55,
+      "range_sha256": "6adb878c372eed3ef4b2aeb08158d3ca653c478321b9ec809bc908badd5f0dc8",
+      "symbols": [
+        "PickRangeCheck",
+        "ExtraPickRange"
+      ]
+    },
+    {
+      "id": "ACT-PICK-FN",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1933,
+      "line_end": 1959,
+      "range_sha256": "1125ec1df9607eca8db764ef366c8a5477f85000c12632d9bef7f0664021af9b",
+      "symbols": [
+        "ACTIONS.PICK.fn",
+        "ACTIONS.PICK.validfn",
+        "ACTIONS.PICK.theme_music_fn"
+      ]
+    },
+    {
+      "id": "ACT-LOCO-PREVIEW",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 782,
+      "line_end": 880,
+      "range_sha256": "16115102836c355076e67861c6b784309456f22a7a39e76c8475cc8c81da155e",
+      "symbols": [
+        "LocoMotor:PreviewAction"
+      ]
+    },
+    {
+      "id": "ACT-LOCO-PUSH",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 882,
+      "line_end": 980,
+      "range_sha256": "256cb6b98bb3469d302d5fd67ee5ac025b16b971a02c18354665b29a140de583",
+      "symbols": [
+        "LocoMotor:PushAction"
+      ]
+    },
+    {
+      "id": "ACT-DEST",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 18,
+      "line_end": 49,
+      "range_sha256": "add74eceb5e29669dd6a7e236bf3d64925d119204e7c2553b9c8bd47c4c50c5c",
+      "symbols": [
+        "Dest constructor",
+        "Dest:IsValid",
+        "Dest:GetPoint"
+      ]
+    },
+    {
+      "id": "ACT-GO-ENTITY",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 982,
+      "line_end": 1037,
+      "range_sha256": "fd4957cd49126b69f2fa2bbc41eb164372b2f468b0d4fa3287f36107a763833e",
+      "symbols": [
+        "LocoMotor:GoToEntity"
+      ]
+    },
+    {
+      "id": "ACT-GO-POINT",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1040,
+      "line_end": 1076,
+      "range_sha256": "7f5967e8eedbf68b34601bec2cdccf5e62666a7aae010fd7cd5ae61379fec12e",
+      "symbols": [
+        "LocoMotor:GoToPoint"
+      ]
+    },
+    {
+      "id": "ACT-LOCO-SET",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1078,
+      "line_end": 1089,
+      "range_sha256": "5907e8ce593d985e42ca58864cb4d4eae95a97c30a73e3dacf4e5928d9850139",
+      "symbols": [
+        "LocoMotor:SetBufferedAction"
+      ]
+    },
+    {
+      "id": "ACT-LOCO-CLEAR",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 755,
+      "line_end": 763,
+      "range_sha256": "984ffd34eebb5887cc0a7219ae92998db2bcfde2d788f3d911ad1ce60efc6dc7",
+      "symbols": [
+        "LocoMotor:Clear"
+      ]
+    },
+    {
+      "id": "ACT-LOCO-STOP",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1091,
+      "line_end": 1114,
+      "range_sha256": "753aee5c214b1a27d1ade05f036eaee9b005e17a4e97b9cf09d2bbb00a26ca80",
+      "symbols": [
+        "LocoMotor:Stop"
+      ]
+    },
+    {
+      "id": "ACT-ARRIVE",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1424,
+      "line_end": 1522,
+      "range_sha256": "8fa4f50a41daa2ccfb5a7efa2a7f56cbc515303ff076083f1f81dfa65d38c46b",
+      "symbols": [
+        "LocoMotor:OnUpdate arrival branch"
+      ]
+    },
+    {
+      "id": "ACT-SG-DISPATCH",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 405,
+      "line_end": 461,
+      "range_sha256": "150e8c0758c6a2ee0edff2090538bde9aebe436529de869ac8601ad0d46ac80b",
+      "symbols": [
+        "StateGraphInstance:PreviewAction",
+        "StateGraphInstance:StartAction"
+      ]
+    },
+    {
+      "id": "ACT-SG-ENTER",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 529,
+      "line_end": 600,
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "symbols": [
+        "StateGraphInstance:GoToState"
+      ]
+    },
+    {
+      "id": "ACT-SG-TICK",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 661,
+      "line_end": 705,
+      "range_sha256": "6a98b764c37019b2a3da69699a1c8df08ab7f67320da687be4df80c0789b6a35",
+      "symbols": [
+        "StateGraphInstance:UpdateState"
+      ]
+    },
+    {
+      "id": "ACT-CLIENT-HANDLER",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 408,
+      "line_end": 444,
+      "range_sha256": "8b92e0dd0d844b2ed9cbd6fad5b3386d42f721fef92448f3bd29fd79e6036416",
+      "symbols": [
+        "ACTIONS.PICK client ActionHandler"
+      ]
+    },
+    {
+      "id": "ACT-CLIENT-STATE",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 3122,
+      "line_end": 3156,
+      "range_sha256": "56b8b46f2becbebfff71bd814f9bdf605e39e207a73397304204d10b59564db2",
+      "symbols": [
+        "doshortaction client state"
+      ]
+    },
+    {
+      "id": "ACT-SERVER-HANDLER",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 1108,
+      "line_end": 1145,
+      "range_sha256": "1bd3ef6ee70af087a4c767b2bcdc85ce2c729c17bf1ce423c80345831700d8e0",
+      "symbols": [
+        "ACTIONS.PICK server ActionHandler"
+      ]
+    },
+    {
+      "id": "ACT-SERVER-STATE",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 8026,
+      "line_end": 8072,
+      "range_sha256": "1978147a0bddf1973eebba8d1ce12156c5d99771d61b837cf5ed5132445a3450",
+      "symbols": [
+        "doshortaction server state"
+      ]
+    },
+    {
+      "id": "ACT-POCKET",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 635,
+      "line_end": 677,
+      "range_sha256": "dbf326ba3ea316b25afa0e29ddc765077f9d36630bd0262d4edbafda889500fc",
+      "symbols": [
+        "CheckPocketRummageMem",
+        "TryResumePocketRummage"
+      ]
+    },
+    {
+      "id": "ACT-RPC-LEFT",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 4,
+      "line_end": 111,
+      "range_sha256": "6c0302081f3d3975756bd339fd88eb44c3d1a2b4fda4cb1245eebb591c3a6f95",
+      "symbols": [
+        "checkbool",
+        "checknumber",
+        "optentity",
+        "IsPointInRange",
+        "ConvertPlatformRelativePositionToAbsolutePosition",
+        "RPC_HANDLERS.LeftClick"
+      ]
+    },
+    {
+      "id": "ACT-RPC-CODE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1388,
+      "line_end": 1404,
+      "range_sha256": "0f08496038048ba6c5d57afdf1b61c812a94ffcfaa0eae59a46a1b3ed29b35b0",
+      "symbols": [
+        "RPC",
+        "RPC_HANDLERS numeric remap"
+      ]
+    },
+    {
+      "id": "ACT-RPC-SEND",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1640,
+      "line_end": 1643,
+      "range_sha256": "a42275ab1fc6e693f4cf5bf15adb407b718d5f70637933cc5389d763516b467a",
+      "symbols": [
+        "SendRPCToServer"
+      ]
+    },
+    {
+      "id": "ACT-RPC-QUEUE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1679,
+      "line_end": 1707,
+      "range_sha256": "1247ad911c17db6ca739ac6637fc38f4f68418117fcc10b6241577b2e51afa99",
+      "symbols": [
+        "HandleRPC"
+      ]
+    },
+    {
+      "id": "ACT-RPC-CALL",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1728,
+      "line_end": 1756,
+      "range_sha256": "bc6af539c65baba671541bc3bb5b558d2a02343bc6467b8917a9a20a89fe1e95",
+      "symbols": [
+        "HandleRPCQueue"
+      ]
+    },
+    {
+      "id": "ACT-RPC-RELEASE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 369,
+      "line_end": 378,
+      "range_sha256": "7391ab17274327a0d97c7b9df91eb247ce1cccc49a675f1c2890199d6dbd7b50",
+      "symbols": [
+        "RPC_HANDLERS.StopControl"
+      ]
+    },
+    {
+      "id": "ACT-RPC-HOLD",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1107,
+      "line_end": 1112,
+      "range_sha256": "9828b145fbbcc07c63ea88927c2fd2b784da7552202b7f43aaadaa555861794f",
+      "symbols": [
+        "RPC_HANDLERS.ClearActionHold"
+      ]
+    },
+    {
+      "id": "ACT-REMOTE-LEFT",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4893,
+      "line_end": 4970,
+      "range_sha256": "dd753e8b0120fad04f0bcc1684c7159f524709ae4cd113c3556bcddf0076ea41",
+      "symbols": [
+        "PlayerController:OnRemoteLeftClick"
+      ]
+    },
+    {
+      "id": "ACT-CARROT",
+      "source_file": "scripts/prefabs/carrot.lua",
+      "file_sha256": "367af438dfc1e1810ac4c34e565531a5e28c7107a8ad87e09ccbf5196f2634b7",
+      "line_start": 11,
+      "line_end": 57,
+      "range_sha256": "c8f194ae378fbc284941e9697f06c7d4bb08c2cb210bc14557c62cfb01f19704",
+      "symbols": [
+        "carrot_planted prefab fn"
+      ]
+    },
+    {
+      "id": "ACT-PICK-PROPS",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 1,
+      "line_end": 81,
+      "range_sha256": "8686e3e151fce806f3ca088b55e4b2ffa97afda309857e62b050136606cf47fa",
+      "symbols": [
+        "onpickable",
+        "onquickpick",
+        "Pickable constructor"
+      ]
+    },
+    {
+      "id": "ACT-PICK-SETUP",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 222,
+      "line_end": 228,
+      "range_sha256": "cd60f43f5791d1065f49b94387d782c235b29088f9d00801acb9cfb8f79f1fb1",
+      "symbols": [
+        "Pickable:SetUp"
+      ]
+    },
+    {
+      "id": "ACT-CAN-PICK",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 382,
+      "line_end": 384,
+      "range_sha256": "cadb8ffdec3ae8a06ae83d4bf82b8364d619e83e39d36859086cccf3ea59bc6f",
+      "symbols": [
+        "Pickable:CanBePicked"
+      ]
+    },
+    {
+      "id": "ACT-PICK-LOOT",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 450,
+      "line_end": 518,
+      "range_sha256": "21a487003d9c12401104a6073806905a719bddb8727062da49c8b167e2e37bbd",
+      "symbols": [
+        "Pickable:SpawnProductLoot"
+      ]
+    },
+    {
+      "id": "ACT-PICK",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 535,
+      "line_end": 583,
+      "range_sha256": "c94793daf25c53f65d8f2e332b9719426848d4ea75d34388c21a1bf37fb43561",
+      "symbols": [
+        "Pickable:Pick"
+      ]
+    },
+    {
+      "id": "ACT-STUCK",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 595,
+      "line_end": 601,
+      "range_sha256": "cf872150dba3a32bef783acc762b1996adb4a3713350fdb318d843883cbb9ca3",
+      "symbols": [
+        "Pickable:SetStuck",
+        "Pickable:IsStuck"
+      ]
+    },
+    {
+      "id": "ACT-REMOVE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "ACT-TASKS",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1510,
+      "range_sha256": "2d04eb0a077057d94233c5a5a16d12a546ccbb8ed10677f7b027932804d88d97",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish"
+      ]
+    },
+    {
+      "id": "ACT-DO-TASK",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1547,
+      "line_end": 1555,
+      "range_sha256": "c409a574a3a3aea78daf6a3d5f8a1f03e53e4a2a6d5d22edfcf679bacf0a164e",
+      "symbols": [
+        "EntityScript:DoTaskInTime"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "普通左键PICK开启和关闭移动预测时什么时候发RPC？",
+      "expected_entry_ids": [
+        "EXP-ACT-001",
+        "EXP-ACT-002"
+      ],
+      "purpose": "发送闭包与noforce分流"
+    },
+    {
+      "query": "PerformPreviewBufferedAction的ispreviewing能证明请求成功吗？",
+      "expected_entry_ids": [
+        "EXP-ACT-001"
+      ],
+      "purpose": "发送门禁、后置标记与回调重入"
+    },
+    {
+      "query": "carrot_planted的PICK服务器怎样重建动作、重验距离并执行？",
+      "expected_entry_ids": [
+        "EXP-ACT-002"
+      ],
+      "purpose": "具名输入到业务链"
+    },
+    {
+      "query": "鼠标松键或者客户端PICK超时能取消服务器已执行动作吗？",
+      "expected_entry_ids": [
+        "EXP-ACT-001",
+        "EXP-ACT-002"
+      ],
+      "purpose": "控制释放/preview清理与业务时点"
+    },
+    {
+      "query": "PerformBufferedAction在performaction监听之前缓存动作吗？",
+      "expected_entry_ids": [
+        "EXP-ACT-003"
+      ],
+      "purpose": "缓存位置与槽替换"
+    },
+    {
+      "query": "成功回调Push下一动作为什么可能进入旧动作Fail，Clear为何清掉新槽？",
+      "expected_entry_ids": [
+        "EXP-ACT-003"
+      ],
+      "purpose": "回调列表后清理和槽身份差异"
+    }
+  ],
+  "limitations": [
+    "冻结game762172/build26474873 Lua静态研究；服务环境身份仍759671，不改旧知识正文、Scope或HOLD。",
+    "research/restricted/hold；runtime_verified=false。独立审阅与登记由汇总窗口处理，本窗口未运行游戏、安装或发布。",
+    "文件SHA为zip成员原始bytes；范围SHA为UTF-8 decode后splitlines的1-based闭区间，以LF连接且无尾换行。",
+    "普通PICK/carrot_planted为具名有界样例；网络原生桥接、移动校正、库存最终接纳、任意mod覆盖和特殊角色动作不在静态结论内。"
+  ]
+}

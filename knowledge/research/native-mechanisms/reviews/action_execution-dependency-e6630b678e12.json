@@ -1,0 +1,473 @@
+{
+  "baseline_head": "35781e07a41312a7ea02c06a7dcdbde694c86800",
+  "source_epoch": "762172",
+  "source_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "old_scope_and_hold_changed": false,
+  "api_policy": "Only six player/preview APIs added; existing BufferedAction/EntityScript execution APIs reused, not re-registered.",
+  "existing_sources": [
+    "knowledge/data/nativecore/native-core.json",
+    "knowledge/research/native-mechanisms/brain-a22f70476174.json",
+    "knowledge/research/native-mechanisms/architecture_events-e9026d0a3b42.json",
+    "knowledge/research/native-mechanisms/component_task_lifecycle-5f01617bcbb0.json"
+  ],
+  "atoms": [
+    {
+      "claim_id": "EXP-ACT-001-C01",
+      "entry_id": "EXP-ACT-001",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01"
+      ],
+      "rationale": "补本地输入登记、PRIMARY和鼠标候选缓存调用者。",
+      "evidence_refs": [
+        "ACT-INPUT",
+        "ACT-CONTROL",
+        "ACT-ENABLED",
+        "ACT-CACHE",
+        "ACT-GETTER"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C02",
+      "entry_id": "EXP-ACT-001",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "RC-C06"
+      ],
+      "rationale": "收集/构造为复用；新增carrot_planted生产者闭合，不将collector原则算新机制。",
+      "evidence_refs": [
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-MOUSE-PICKER",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C03",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_branch",
+      "existing_entry_ids": [],
+      "rationale": "鼠标入口建立两种发送闭包和全nil按下消息。",
+      "evidence_refs": [
+        "ACT-CLICK",
+        "ACT-MODE",
+        "ACT-GETTER",
+        "ACT-MODS",
+        "ACT-ACTION-CODE",
+        "ACT-RPC-SEND",
+        "ACT-RPC-CODE",
+        "ACT-RPC-HOLD"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C04",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_contract",
+      "existing_entry_ids": [],
+      "rationale": "DoAction早发点、重复键和IsValid仅用于lastheldaction的具体分流。",
+      "evidence_refs": [
+        "ACT-DOACTION",
+        "ACT-AUTOEQUIP",
+        "ACT-MODS",
+        "ACT-BA",
+        "ACT-LOCO-PUSH",
+        "ACT-LOCO-PREVIEW"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C05",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_inference",
+      "existing_entry_ids": [],
+      "rationale": "推导PICK非预测早发与预测延迟发送的差别。",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-DOACTION",
+        "ACT-LOCO-PREVIEW",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-RPC-LEFT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C06",
+      "entry_id": "EXP-ACT-001",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "NC-N003-INT-03"
+      ],
+      "rationale": "移动到达/实体槽与doshortaction是旧依赖；新接普通PICK客户端完整路径。",
+      "evidence_refs": [
+        "ACT-LOCO-PREVIEW",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-LOCO-SET",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-SG-DISPATCH",
+        "ACT-CLIENT-HANDLER",
+        "ACT-CLIENT-STATE",
+        "ACT-LOCO-STOP",
+        "ACT-LOCO-CLEAR"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C07",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_contract",
+      "existing_entry_ids": [],
+      "rationale": "preview消费者门禁、可选行走flush及后置标记。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-WALK-FLUSH"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C08",
+      "entry_id": "EXP-ACT-001",
+      "classification": "new_inference",
+      "existing_entry_ids": [],
+      "rationale": "preview回调重入/门禁拒绝与标记的区别。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-CLICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-001-C09",
+      "entry_id": "EXP-ACT-001",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "NC-N003-INT-03"
+      ],
+      "rationale": "预演状态更新为旧例同状态；新增松键控制释放与仍可发送的请求语义。",
+      "evidence_refs": [
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR",
+        "ACT-RELEASE",
+        "ACT-STOP-CONTROL",
+        "ACT-RPC-RELEASE",
+        "ACT-CLICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C01",
+      "entry_id": "EXP-ACT-002",
+      "classification": "context_only",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "NC-N002-FINAL-02"
+      ],
+      "rationale": "RPC/动作编号和队列仅作当前版本依赖，不计新增机制。",
+      "evidence_refs": [
+        "ACT-RPC-SEND",
+        "ACT-RPC-QUEUE",
+        "ACT-RPC-CALL",
+        "ACT-RPC-CODE",
+        "ACT-ACTION-CODE"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C02",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_branch",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-02"
+      ],
+      "rationale": "完整LeftClick形态、平台和点击点范围门禁，区别目标采集范围。",
+      "evidence_refs": [
+        "ACT-RPC-LEFT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C03",
+      "entry_id": "EXP-ACT-002",
+      "classification": "contract_extension",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01"
+      ],
+      "rationale": "重建和匹配是旧事实；补完整入口的nil消息、临时标记和清理条件。",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-ENABLED",
+        "ACT-MODS",
+        "ACT-REQUEST",
+        "ACT-MOUSE-PICKER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C04",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_branch",
+      "existing_entry_ids": [],
+      "rationale": "同一普通PICK两种发送闭包的noforce实参导致不同服务器路径。",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-REMOTE-LEFT",
+        "ACT-DOACTION",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C05",
+      "entry_id": "EXP-ACT-002",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "rationale": "到达/移交复用；补PICK rangecheck与后续检查的顺序。",
+      "evidence_refs": [
+        "ACT-PICK-RANGE",
+        "ACT-LOCO-PUSH",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-BA",
+        "ACT-SERVER-HANDLER",
+        "ACT-SG-DISPATCH"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C06",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N003-INT-03",
+        "EXP-AI-007",
+        "RC-C06"
+      ],
+      "rationale": "复用执行状态/Do/PICK.validfn，闭合具名动作，非重复API。",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-TICK",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-CAN-PICK"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C07",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "RC-C06"
+      ],
+      "rationale": "PICK返回和guard复用；补具体植株的产物调用、字段/事件/移除顺序。",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-STUCK",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C08",
+      "entry_id": "EXP-ACT-002",
+      "classification": "chain_extension",
+      "existing_entry_ids": [
+        "RC-C06"
+      ],
+      "rationale": "不把PICK true解释为产物送达；新增picksomething早于canbepicked关闭的窗口。",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C09",
+      "entry_id": "EXP-ACT-002",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "EXP-LIFE-005",
+        "EXP-LIFE-006",
+        "EXP-AI-007"
+      ],
+      "rationale": "复用宿主任务/动作清理，落实到植株采后再生任务与Remove路径。",
+      "evidence_refs": [
+        "ACT-PICK",
+        "ACT-CARROT",
+        "ACT-DO-TASK",
+        "ACT-TASKS",
+        "ACT-REMOVE",
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-002-C10",
+      "entry_id": "EXP-ACT-002",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "NC-N002-FINAL-01",
+        "EXP-AI-007"
+      ],
+      "rationale": "综合本样例各校验时点；指出最终IsValid不自动重跑rangecheck。",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-RPC-LEFT",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-CLIENT-STATE",
+        "ACT-SERVER-STATE"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C01",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_detail",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "rationale": "明确缓存发生在前置同步事件之后，补旧Perform描述的时点。",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C02",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "rationale": "区分缓存前替换/清空与缓存后身份保护。",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C03",
+      "entry_id": "EXP-ACT-003",
+      "classification": "context_only",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "rationale": "Fail/回调清列表及Clear/Push顺序已有；作后续重入推导依赖。",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C04",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "rationale": "给出后置清槽覆盖新槽及递归Fail的明确条件。",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-CALLBACKS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C05",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "rationale": "成功回调内Push不同动作会在旧槽上进入Fail的具名条件链。",
+      "evidence_refs": [
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C06",
+      "entry_id": "EXP-ACT-003",
+      "classification": "new_inference",
+      "existing_entry_ids": [
+        "EXP-AI-007",
+        "EXP-ARCH-001"
+      ],
+      "rationale": "旧Do双Fail描述基础上补actionfailed中新注册回调被第二次Fail消费。",
+      "evidence_refs": [
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C07",
+      "entry_id": "EXP-ACT-003",
+      "classification": "bounded_sample",
+      "existing_entry_ids": [
+        "NC-N003-INT-03",
+        "EXP-AI-007"
+      ],
+      "rationale": "具体状态退出的action身份/lastheldaction例外与客户端timeout分开。",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-ENTER",
+        "ACT-POCKET",
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR"
+      ]
+    },
+    {
+      "claim_id": "EXP-ACT-003-C08",
+      "entry_id": "EXP-ACT-003",
+      "classification": "recommendation",
+      "existing_entry_ids": [
+        "EXP-AI-007"
+      ],
+      "rationale": "只按真实回调点接动作，不引入通用事务或取消框架。",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-ENTITY-PERFORM",
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS",
+        "ACT-CLICK"
+      ]
+    }
+  ]
+}

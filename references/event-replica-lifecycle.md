@@ -1,6 +1,6 @@
 # 事件订阅与 Replica 生命周期应用参考
 
-本篇补充已有[复杂 Mod 模块边界与协作](complex-mod-architecture.md)，重点是订阅身份和对象清理责任。冻结依据为 762172 / build26474873 的静态 Lua，逐引用及 SHA 见 [登记研究](../knowledge/research/native-mechanisms/event_replica_lifecycle-d095aaa0a869.json)。它是有独立审阅的静态研究参考，research / restricted / hold，runtime_verified:false；不是公共 API 稳定性或已运行保证。
+本篇补充[模块架构](complex-mod-architecture.md)中的订阅身份和清理责任，依据 762172/build26474873 静态 Lua。精确引用及 SHA 见[登记研究](../knowledge/research/native-mechanisms/event_replica_lifecycle-d095aaa0a869.json)，准入按[检索策略](kb-retrieval.md)。
 
 ## 订阅归谁，解绑就由谁持有身份
 
@@ -32,4 +32,4 @@ EntityScript:Remove 的 Lua 顺序是全局 Lua OnRemoveEntity → onremove → 
 
 上述事实见 EL-S09–18。container 的 pending 保存/消费和槽初始化异常边界继续复用 EXP-ARCH-004；本批只绑定它们作为 helper 的 caller/callee/cleanup。raw 容器是机制证据，不是推荐的常规 Mod 读写入口。NC-N002-FINAL-04 与 AI-N001-10 的分层视图结论及原 Scope 保持原样。
 
-待运行验证包括重复绑定后单次解绑、回调中解绑/移除、复制重放、构造/Attach 抛错和 seamless swap。原生到达顺序、所有 replica 与 Mod 覆盖未被这份静态研究证明，不据此添加统一 ready 事件或固定一帧恢复协议。
+复制重放、构造/Attach 异常、seamless swap 与原生到达顺序仍需运行验证；当前具名服务器事件覆盖见[阶段 9](../docs/phase9-action-closure.md)。按具体消费者判断就绪与重试条件。

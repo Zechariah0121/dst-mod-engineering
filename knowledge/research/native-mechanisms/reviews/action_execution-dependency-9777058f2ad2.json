@@ -1,0 +1,866 @@
+{
+  "schema_version": "independent-action-contract-review/1",
+  "candidate_path": "coordinator/frozen/action_execution-7d95e4c94918.json",
+  "candidate_sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+  "verdict": "request_changes",
+  "blockers": [
+    {
+      "id": "AR-R1",
+      "priority": 2,
+      "category": "dedup_classification",
+      "locations": [
+        "windows/B/DEDUP.md",
+        "windows/B/ATOM-DEDUP.json:EXP-ACT-001-C03",
+        "windows/B/ATOM-DEDUP.json:EXP-ACT-001-C04",
+        "windows/B/ATOM-DEDUP.json:EXP-ACT-001-C07",
+        "EXP-ACT-001/scope/increment_over_existing"
+      ],
+      "finding": "旧NC-N003-INT-02已有OnLeftClick两闭包及全nil按下消息、DoAction早发/重复键/lastheldaction分流、RemoteBufferedAction门禁及预测移动flush。当前分类new_branch/new_contract且existing_entry_ids为空，遗漏现有直接重合原子，不能把这些事实作为本轮净新增。",
+      "old_atom_pointers": [
+        "NC-N003-INT-02/claims/0",
+        "NC-N003-INT-02/claims/4",
+        "NC-N003-INT-02/claims/6",
+        "NC-N003-INT-02/claims/15"
+      ],
+      "required_change": "补旧ID及原子映射，区分复用语义与合同扩充；保留真正新增的PICK/noforce串接、后置ispreviewing身份/重入细节。无需删除完整具名链或已有Scope。"
+    },
+    {
+      "id": "AR-R2",
+      "priority": 2,
+      "category": "missing_condition",
+      "locations": [
+        "EXP-ACT-003-C02"
+      ],
+      "finding": "performaction监听清空槽后“紧接主题选择会读取nil.action”遗漏self:HasTag(\"player\")条件。非player会在and表达式短路，之后才在缓存nil后的Do调用失败；003 Scope当前未限定player。",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ],
+      "required_change": "明确player分支才在主题表达式读取nil.action；可另陈述非player后续nil:Do边界，或将此条前提限定为player实体。"
+    },
+    {
+      "id": "AR-R3",
+      "priority": 2,
+      "category": "result_and_cleanup_ownership",
+      "locations": [
+        "EXP-ACT-002-C09",
+        "EXP-ACT-002/mechanism_steps/4"
+      ],
+      "finding": "C09把Do失败概括为消费回调列表，但IsValid假时Do直接false且不Fail；此外步骤4的并列主语会把按身份清槽归给BufferedAction，实际该清理属于EntityScript:PerformBufferedAction。",
+      "evidence_refs": [
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM"
+      ],
+      "required_change": "把Do回调消费限定为通过IsValid、action.fn及回调正常返回的路径，明确无效早退由外层失败路径通知；步骤4明确BufferedAction消费回调而EntityScript按身份清槽。"
+    }
+  ],
+  "comments": [
+    {
+      "id": "AR-C1",
+      "priority": 3,
+      "locations": [
+        "EXP-ACT-002-C03"
+      ],
+      "finding": "“全nil动作只更新PRIMARY状态并返回”略去入口先combat:SetTarget(nil)的可见副作用。",
+      "suggestion": "写成先清combat目标并标记PRIMARY，nil动作随后早退，不进行picker重建。",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT"
+      ]
+    }
+  ],
+  "runtime_verified": false,
+  "review_scope": {
+    "entries": 3,
+    "claims": 27,
+    "apis": 6,
+    "mechanism_steps": 10,
+    "source_references": 66,
+    "source_hash_matches": 66,
+    "source_epoch": "762172",
+    "build": "26474873",
+    "service_environment_unchanged": "759671",
+    "named_sample": "ordinary PICK on carrot_planted; preliminary PICKUP notes not substituted",
+    "source_reference_method": "file=original member bytes; range=UTF8 decode/splitlines/LF join/no trailing LF"
+  },
+  "claim_reviews": [
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C01",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-INPUT",
+        "ACT-CONTROL",
+        "ACT-ENABLED",
+        "ACT-CACHE",
+        "ACT-GETTER"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C02",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-MOUSE-PICKER",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP",
+        "ACT-BA"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C03",
+      "kind": "NSF",
+      "status": "source_supported_with_dedup_revision",
+      "evidence_refs": [
+        "ACT-CLICK",
+        "ACT-MODE",
+        "ACT-GETTER",
+        "ACT-MODS",
+        "ACT-ACTION-CODE",
+        "ACT-RPC-SEND",
+        "ACT-RPC-CODE",
+        "ACT-RPC-HOLD"
+      ],
+      "note": "源码事实支持；净增量分类须修AR-R1"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C04",
+      "kind": "NSF",
+      "status": "source_supported_with_dedup_revision",
+      "evidence_refs": [
+        "ACT-DOACTION",
+        "ACT-AUTOEQUIP",
+        "ACT-MODS",
+        "ACT-BA",
+        "ACT-LOCO-PUSH",
+        "ACT-LOCO-PREVIEW"
+      ],
+      "note": "源码事实支持；旧DoAction原子重合须修AR-R1"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C05",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-DOACTION",
+        "ACT-LOCO-PREVIEW",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-RPC-LEFT"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C06",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-LOCO-PREVIEW",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-LOCO-SET",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-SG-DISPATCH",
+        "ACT-CLIENT-HANDLER",
+        "ACT-CLIENT-STATE",
+        "ACT-LOCO-STOP",
+        "ACT-LOCO-CLEAR"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C07",
+      "kind": "NSF",
+      "status": "source_supported_with_dedup_revision",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-WALK-FLUSH"
+      ],
+      "note": "源码事实支持；门禁/flush旧语义与后置标记新增应拆分计量AR-R1"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C08",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-CLICK"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "claim_id": "EXP-ACT-001-C09",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR",
+        "ACT-RELEASE",
+        "ACT-STOP-CONTROL",
+        "ACT-RPC-RELEASE",
+        "ACT-CLICK"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C01",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-RPC-SEND",
+        "ACT-RPC-QUEUE",
+        "ACT-RPC-CALL",
+        "ACT-RPC-CODE",
+        "ACT-ACTION-CODE"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C02",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-RPC-LEFT"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C03",
+      "kind": "NSF",
+      "status": "supported_with_minor_clarification",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-ENABLED",
+        "ACT-MODS",
+        "ACT-REQUEST",
+        "ACT-MOUSE-PICKER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT"
+      ],
+      "note": "主链支持；完整副作用表述见AR-C1"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C04",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-REMOTE-LEFT",
+        "ACT-DOACTION",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-BA"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C05",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-PICK-RANGE",
+        "ACT-LOCO-PUSH",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-BA",
+        "ACT-SERVER-HANDLER",
+        "ACT-SG-DISPATCH"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C06",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-TICK",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-CAN-PICK"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C07",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-STUCK",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C08",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-EVENTS"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C09",
+      "kind": "NSF",
+      "status": "revise",
+      "evidence_refs": [
+        "ACT-PICK",
+        "ACT-CARROT",
+        "ACT-DO-TASK",
+        "ACT-TASKS",
+        "ACT-REMOVE",
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM"
+      ],
+      "note": "Do无效早退缺口，见AR-R3"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "claim_id": "EXP-ACT-002-C10",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-RPC-LEFT",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-PICK",
+        "ACT-CLIENT-STATE",
+        "ACT-SERVER-STATE"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C01",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C02",
+      "kind": "EI",
+      "status": "revise",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ],
+      "note": "缺player条件，见AR-R2"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C03",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C04",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-CALLBACKS"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C05",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C06",
+      "kind": "EI",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-BA",
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C07",
+      "kind": "NSF",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-SG-ENTER",
+        "ACT-POCKET",
+        "ACT-CLIENT-STATE",
+        "ACT-ENTITY-CLEAR"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "claim_id": "EXP-ACT-003-C08",
+      "kind": "REC",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-ENTITY-PERFORM",
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PUSH",
+        "ACT-CALLBACKS",
+        "ACT-CLICK"
+      ],
+      "note": "逐项对照自己的引用与Scope；NSF/EI/REC分类与限定链相符，未当作运行结果。"
+    }
+  ],
+  "api_reviews": [
+    {
+      "entry_id": "EXP-ACT-001",
+      "symbol": "PlayerController:OnLeftClick",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-CLICK",
+        "ACT-MODE",
+        "ACT-ENABLED",
+        "ACT-GETTER",
+        "ACT-CACHE",
+        "ACT-MODS",
+        "ACT-DOACTION",
+        "ACT-RELEASE",
+        "ACT-STOP-CONTROL",
+        "ACT-RPC-HOLD",
+        "ACT-RPC-SEND"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "symbol": "PlayerController:DoAction",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-DOACTION",
+        "ACT-AUTOEQUIP",
+        "ACT-MODS",
+        "ACT-BA",
+        "ACT-LOCO-PUSH",
+        "ACT-LOCO-PREVIEW"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "symbol": "EntityScript:PreviewBufferedAction",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-ARRIVE",
+        "ACT-SG-DISPATCH",
+        "ACT-CLIENT-HANDLER",
+        "ACT-CLIENT-STATE"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "symbol": "EntityScript:PerformPreviewBufferedAction",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-CLICK",
+        "ACT-CLIENT-STATE"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "symbol": "PlayerController:RemoteBufferedAction",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-REMOTE-PREVIEW",
+        "ACT-WALK-FLUSH",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-CLICK"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "symbol": "PlayerController:OnRemoteLeftClick",
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-RPC-LEFT",
+        "ACT-ENABLED",
+        "ACT-MODS",
+        "ACT-REQUEST",
+        "ACT-MOUSE-PICKER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-PICK-COLLECTOR",
+        "ACT-COLLECT",
+        "ACT-DOACTION",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-ARRIVE",
+        "ACT-SERVER-STATE",
+        "ACT-BA",
+        "ACT-PICK-FN"
+      ],
+      "note": "参数、返回、端别/前提、副作用、后置清理及unknown均对照声明与具名调用者；只支持所列普通PICK分支，不提升为稳定公共API。"
+    }
+  ],
+  "step_reviews": [
+    {
+      "entry_id": "EXP-ACT-001",
+      "step": 1,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-INPUT",
+        "ACT-CONTROL",
+        "ACT-CACHE",
+        "ACT-GETTER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-MOUSE-PICKER",
+        "ACT-COLLECT",
+        "ACT-PICK-COLLECTOR",
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP",
+        "ACT-CLICK"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "step": 2,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-DOACTION",
+        "ACT-LOCO-PREVIEW",
+        "ACT-GO-ENTITY",
+        "ACT-DEST",
+        "ACT-LOCO-SET",
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-SG-DISPATCH",
+        "ACT-CLIENT-HANDLER",
+        "ACT-CLIENT-STATE"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-001",
+      "step": 3,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-CLICK",
+        "ACT-DOACTION",
+        "ACT-ENTITY-PREVIEW",
+        "ACT-REMOTE-PREVIEW",
+        "ACT-WALK-FLUSH",
+        "ACT-RELEASE",
+        "ACT-STOP-CONTROL",
+        "ACT-RPC-RELEASE",
+        "ACT-RPC-SEND",
+        "ACT-RPC-CODE",
+        "ACT-RPC-HOLD",
+        "ACT-MODE"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "step": 1,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-RPC-SEND",
+        "ACT-RPC-CODE",
+        "ACT-RPC-QUEUE",
+        "ACT-RPC-CALL",
+        "ACT-RPC-LEFT"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "step": 2,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-REMOTE-LEFT",
+        "ACT-REQUEST",
+        "ACT-MODS",
+        "ACT-DOACTION",
+        "ACT-MOUSE-PICKER",
+        "ACT-PICKER",
+        "ACT-LEFT-PICKER",
+        "ACT-COLLECT",
+        "ACT-PICK-COLLECTOR",
+        "ACT-ACTION-DEF",
+        "ACT-CLICK",
+        "ACT-LOCO-PUSH",
+        "ACT-PICK-RANGE",
+        "ACT-GO-POINT",
+        "ACT-GO-ENTITY",
+        "ACT-DEST"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "step": 3,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ARRIVE",
+        "ACT-ENTITY-PUSH",
+        "ACT-SG-DISPATCH",
+        "ACT-SG-ENTER",
+        "ACT-SERVER-HANDLER",
+        "ACT-SERVER-STATE",
+        "ACT-SG-TICK",
+        "ACT-ENTITY-PERFORM",
+        "ACT-BA",
+        "ACT-PICK-FN",
+        "ACT-CAN-PICK",
+        "ACT-STUCK"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-002",
+      "step": 4,
+      "status": "revise_owner_subject_AR-R3",
+      "evidence_refs": [
+        "ACT-CARROT",
+        "ACT-PICK-PROPS",
+        "ACT-PICK-SETUP",
+        "ACT-PICK",
+        "ACT-PICK-LOOT",
+        "ACT-DO-TASK",
+        "ACT-TASKS",
+        "ACT-REMOVE",
+        "ACT-CALLBACKS",
+        "ACT-BA",
+        "ACT-ENTITY-PERFORM"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "step": 1,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-ENTITY-PERFORM",
+        "ACT-EVENTS",
+        "ACT-BA"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "step": 2,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-CALLBACKS",
+        "ACT-ENTITY-PUSH",
+        "ACT-ENTITY-CLEAR",
+        "ACT-ENTITY-PERFORM"
+      ]
+    },
+    {
+      "entry_id": "EXP-ACT-003",
+      "step": 3,
+      "status": "supported_bounded_static",
+      "evidence_refs": [
+        "ACT-SERVER-STATE",
+        "ACT-CLIENT-STATE",
+        "ACT-SG-ENTER",
+        "ACT-POCKET",
+        "ACT-ENTITY-CLEAR"
+      ]
+    }
+  ],
+  "source_review_artifact": "agents/action_review/source-reference-audit.json",
+  "scope_and_governance": {
+    "preserved": true,
+    "knowledge_status": "research",
+    "retrieval_status": "restricted",
+    "coding_status": "hold",
+    "old_knowledge_not_edited": true,
+    "local_functions_not_promoted": true
+  },
+  "compatibility_review": "All claim/API/step refs resolve and equal per-entry dependency unions; direct enumerated Lua coverage only, no transitive/native closure claim.",
+  "review_dependencies": [
+    {
+      "path": "coordinator/frozen/action_execution-7d95e4c94918.json",
+      "path_base": "campaign",
+      "sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+      "role": "frozen candidate, full read"
+    },
+    {
+      "path": "windows/B/DEDUP.md",
+      "path_base": "campaign",
+      "sha256": "d97cae895ff9c130d30a71eddd41d7131ee300f630ec9daa71895a7a98fa58ce",
+      "role": "dedup narrative, full read"
+    },
+    {
+      "path": "windows/B/ATOM-DEDUP.json",
+      "path_base": "campaign",
+      "sha256": "e6630b678e1287874f38c89394190ad3b0b3330ca414b28bdf9065d6e3b654dc",
+      "role": "claim dedup, full read"
+    },
+    {
+      "path": "windows/B/architecture-notes.md",
+      "path_base": "campaign",
+      "sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "role": "proposed narrative, full read"
+    },
+    {
+      "path": "windows/B/handoff.json",
+      "path_base": "campaign",
+      "sha256": "aebb8766bc54ff63b68e3557e043502792ebb36c296ad378057dc144eb113713",
+      "role": "author hashes and boundaries, full read"
+    },
+    {
+      "path": "agents/action_review/review-plan.json",
+      "path_base": "campaign",
+      "sha256": "e65c3cff54a2877b8c1324d86c2ad5a6ac2aca8dfc43e3012931b07b0eb2ae60",
+      "role": "frozen independent plan"
+    },
+    {
+      "path": "agents/action_review/independent-precheck.json",
+      "path_base": "campaign",
+      "sha256": "12875dd34f688c953a133d3a12eaf59c629ed08a0aefd3171248150749774478",
+      "role": "pre-candidate findings; PICKUP is preliminary only and not candidate proof"
+    },
+    {
+      "path": "agents/action_review/source-reference-audit.json",
+      "path_base": "campaign",
+      "sha256": "377a1dbe818799de4fb3c2d73fc076a20b6581f00b8ab02ee17e437bbaae6e74",
+      "role": "all 66 source identity checks"
+    },
+    {
+      "path": "agents/action_review/dependencies/applied-SKILL.md",
+      "path_base": "campaign",
+      "sha256": "77eddaa3add20275d49515ad603745c9fd459e2c3d6c9b2c55071ae638e4c320",
+      "role": "applied actual skill exact-byte copy; outside installation path omitted"
+    },
+    {
+      "path": "knowledge/research/native-mechanisms/brain-a22f70476174.json",
+      "path_base": "baseline_repo",
+      "sha256": "a22f7047617402d465d5b64b0fe2b660cd7ef570e3e3c5e41d9f1db000cc90c1",
+      "role": "full EXP-AI-007 atom including Scope/API/steps/compatibility/cited reference metadata"
+    },
+    {
+      "path": "knowledge/data/nativecore/native-core.json",
+      "path_base": "baseline_repo",
+      "sha256": "5687b5f528566b0197bc9f627ad360ed258c4a5c66e939be48940e63002ffb90",
+      "role": "dedup statements and selected full NC-N003-INT-02 atoms 0,1,2,3,4,5,6,10,15 plus full necessary Scope/refs; NC-N002-FINAL-03 claim1 and Scope; broad initial output truncated, not relied on as full record read"
+    },
+    {
+      "path": "references/kb-retrieval.md",
+      "path_base": "baseline_repo",
+      "sha256": "dddc8d4e1db38fcd2c8b2e087ddf141329ad8d5f5997f196d5e898df342144e8",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "references/ui-actions-controls.md",
+      "path_base": "baseline_repo",
+      "sha256": "71cd7fb711d0592f58e1f530248b33fdb8c66f8107421b3ac985eed4ad8431cd",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "references/networking-rpc.md",
+      "path_base": "baseline_repo",
+      "sha256": "5cbeebc31e4f5dd8c71f0438735e78cccb1212a80697aa06dcb98e92732f20c9",
+      "role": "applied reference; repo bytes equal actual skill runtime copy read"
+    },
+    {
+      "path": "PRIVATE/scripts-762172.zip",
+      "path_base": "campaign",
+      "sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+      "role": "frozen authorized local source input; read cited ranges in-memory",
+      "package_policy": "do_not_ship_original_Lua"
+    },
+    {
+      "path": "external-skill-discovery-entry",
+      "path_base": "logical_external_label",
+      "sha256": "24cf5068870c9f265473084c74a634bfc5e028499a0d7fb55904af0493da5be3",
+      "role": "host discovery entry read only to find actual skill; contains private absolute locator and is not copied or used as source proof"
+    }
+  ],
+  "limitations": [
+    "No game, RPC transport, remote prediction, native movement or inventory acceptance test run.",
+    "MCP search was navigation-only due displayed truncation; source conclusions use frozen ZIP and explicitly read file atoms.",
+    "No author edits, repo/config/runtime/installed modifications."
+  ]
+}

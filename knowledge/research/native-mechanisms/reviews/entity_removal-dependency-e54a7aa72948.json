@@ -1,0 +1,142 @@
+{
+  "schema_version": "independent-static-review-plan/1",
+  "reviewer": "remove_review",
+  "topic": "EntityScript:Remove full static closure",
+  "candidate_read": false,
+  "status": "independent_navigation_frozen_waiting_for_exact_candidate_path_and_sha",
+  "source_epoch": "762172",
+  "steam_buildid": "26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "repository_head": "35781e07a41312a7ea02c06a7dcdbde694c86800",
+  "runtime_verified": false,
+  "blockers": [],
+  "formal_candidate_verdict": "not_started",
+  "independent_findings": [
+    {
+      "id": "IR-F01",
+      "finding": "Remove unlinks parent/platform first; platform removal can invoke owner's callback before global cleanup. Global OnRemoveEntity precedes onremove, removes Ents only for a present GUID, and has no finally protection.",
+      "refs": [
+        "IR-S01",
+        "IR-S02",
+        "IR-S04"
+      ]
+    },
+    {
+      "id": "IR-F02",
+      "finding": "Global cleanup deregisters Brain/SG managers and GUID coroutine tasks; this is distinct from the later pendingtasks cancellation. SG removal clears buffered events, but neither manager removal universally calls business Stop or clears entity fields.",
+      "refs": [
+        "IR-S02",
+        "IR-S08",
+        "IR-S09",
+        "IR-S10",
+        "IR-S11",
+        "IR-S15",
+        "IR-S16",
+        "IR-S17",
+        "IR-S18",
+        "IR-S19"
+      ]
+    },
+    {
+      "id": "IR-F03",
+      "finding": "onremove snapshots listeners and may still call the current Brain directly even though managers were deregistered. Errors or nested Remove are not isolated; no local validity/idempotence/reentry guard exists in Remove.",
+      "refs": [
+        "IR-S01",
+        "IR-S02",
+        "IR-S06",
+        "IR-S26"
+      ]
+    },
+    {
+      "id": "IR-F04",
+      "finding": "Later cleanup order is worldstate, bilateral events, pendingtasks, component OnRemoveEntity, raw replica OnRemoveEntity, update tables, child Remove, platform follower Lua links, entity-specific hook, persists=false, Retire. pairs order within component/replica/child loops is unspecified; mutations are not protected by snapshots.",
+      "refs": [
+        "IR-S01",
+        "IR-S05",
+        "IR-S06",
+        "IR-S07",
+        "IR-S12",
+        "IR-S20"
+      ]
+    },
+    {
+      "id": "IR-F05",
+      "finding": "Remove does not call RemoveComponent for every component, does not clear component slots or use public replica tag access, and does not promise cleanup of arbitrary external-host tasks or resources. A later cleanup hook can create new registrations after the one-time clearing stage; native Retire effects remain unknown.",
+      "refs": [
+        "IR-S01",
+        "IR-S12",
+        "IR-S20",
+        "IR-S21",
+        "IR-S22",
+        "IR-S23",
+        "IR-S24"
+      ]
+    },
+    {
+      "id": "IR-F06",
+      "finding": "Conditional static counter observation: when Ents[GUID] and UpdatingEnts[GUID] exist and self.updatecomponents remains truthy, global cleanup decrements num_updating_ents and the later Remove update block decrements it again. This is not a runtime fault verdict or an instruction to patch game code.",
+      "refs": [
+        "IR-S01",
+        "IR-S02",
+        "IR-S25"
+      ]
+    },
+    {
+      "id": "IR-F07",
+      "finding": "RemoveEntity(guid) has a missing-GUID no-op and delayclientdespawn branch; direct EntityScript:Remove has neither guard. Do not transfer the global caller's guards into the instance method contract.",
+      "refs": [
+        "IR-S01",
+        "IR-S03"
+      ]
+    }
+  ],
+  "deduplication": {
+    "prior_full_entries": [
+      {
+        "file": "knowledge/research/native-mechanisms/event_replica_lifecycle-d095aaa0a869.json",
+        "file_sha256": "d095aaa0a869a52fe0fc51ebf72b0094d65ba685ba0c83114cdf916e7e678892",
+        "entry_ids": [
+          "EXP-LIFE-001",
+          "EXP-LIFE-002",
+          "EXP-LIFE-003"
+        ],
+        "source_epoch": "762172",
+        "access": "file_reading_explicit_reviewer"
+      },
+      {
+        "file": "knowledge/research/native-mechanisms/component_task_lifecycle-5f01617bcbb0.json",
+        "file_sha256": "5f01617bcbb06fdfcad64a632fda62d8ea63139bfcf697630af63c4d51de7dc9",
+        "entry_ids": [
+          "EXP-LIFE-005",
+          "EXP-LIFE-006"
+        ],
+        "source_epoch": "762172",
+        "access": "file_reading_explicit_reviewer"
+      },
+      {
+        "file": "knowledge/research/native-mechanisms/architecture_events-e9026d0a3b42.json",
+        "file_sha256": "e9026d0a3b425c46d9d515f5717a2681d076a2979484060a0933269e44ee99d1",
+        "entry_ids": [
+          "EXP-ARCH-001"
+        ],
+        "source_epoch": "761239",
+        "access": "file_reading_explicit_reviewer"
+      }
+    ],
+    "incremental_scope": "New card owns the whole Remove entry and global cleanup dependencies, prefix/suffix ownership, exception/reentry and native boundary. Existing subscription, event dispatch, replica visibility, RemoveComponent and Periodic contracts remain dependencies with their original Scope/HOLD; do not rebrand them as new findings."
+  },
+  "formal_review_checklist": [
+    "Verify candidate exact bytes against coordinator-frozen SHA before reading; never read mutable drafts.",
+    "Check every claim, API field, mechanism step and dependency link against actual source range, whole-file SHA and range SHA.",
+    "Check default/return/error/no-op distinction for Remove versus global RemoveEntity and OnRemoveEntity.",
+    "Check parent/platform prelude, Brain/SG/coroutine cleanup, registry timing, snapshot events, worldstate, Periodic pendingtasks, components/raw replicas, all update tables, recursive children, followers, final hook, persists and Retire boundary.",
+    "Block unconditional promises of idempotence, reentry safety, finally completion, business Stop, all-resource cleanup, no remaining tasks, network authority or native success; distinguish static derivation from runtime observation.",
+    "Require explicit research/restricted/hold, source identity, runtime_verified:false, local evidence closure, unknowns, and unchanged old card Scope/canonical/admission.",
+    "Confirm no original Lua payload, private absolute paths, undeclared source or runtime claims enter package-review artifacts."
+  ],
+  "limitations": [
+    "Static Lua inspection only; no game, fixture, server, client, installation or configuration actions.",
+    "Retire/SetParent/SetPlatform native behavior, actual recursive reentry outcomes and arbitrary mod overrides are not verified.",
+    "Archive member hashes use original bytes; range hashes use UTF-8 splitlines then LF join with no final newline."
+  ]
+}

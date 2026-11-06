@@ -5,38 +5,26 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-当前候选版本：`v2026.11.06.1`（尚未公开发行）；统一目录 240 条，其中独立机制研究族 53 条，保持 `research/restricted/hold`。
-
-面向 DST 开发、审查与排错的 Skill，随包提供 `knowledge/` 登记的公开知识（保留 64 基础 + 13 Native AI + 110 Core，并增加独立机制研究族；数量见 CATALOG.counts）。同一发行包包含 MCP 目录模式、完整九工具模式与本地来源准备，也可直接按文件读库。安装与接入见 [安装说明](docs/install-and-use.md) 和 [知识库说明](docs/knowledge-integration.md)；English entry: [README.en.md](README.en.md)。
-
-当前项目需求与当前版本的实际契约决定实现；教程和参考 Mod 提供线索，不代替源码核验。
-
-## 使用许可
-
-本技能及仓库自有配套内容按 [非商业使用许可](LICENSE) 提供。未经另行书面授权，不得将其用于收费接单、付费 Mod／服务或售卖、付费转发；允许非商业开发、免费分享，以及无权益交换的自愿打赏和免费公开教程广告收益。第三方材料与历史 MIT 授权保留原有边界。
-
-任务明确属于上述受限商业用途时，先说明限制并确认是否已有权利人书面授权，再使用本技能执行该任务；用途未说明时，不擅自认定为商业用途。使用技能不使项目代码自动归本技能作者所有。具体情形见 [许可说明](docs/licensing.md)。
+`v2026.11.06.2`：244 条登记知识（64 基础 + 13 Native AI + 110 Core + 57 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase9-action-closure.md) · [English](README.en.md)
 
 ## 工作顺序
 
-按任务查当前源码与相关专题，再实现和验证。
+1. 确认任务、实际 Mod 副本、源码版本和触发环境；接手项目先读入口、配置与交接说明。
+2. 按问题查库并核对当前原版的定义、调用方、端别、初始化、退出和保存，优先复用已有机制。
+3. 先建立“需求 → Mod 实现 → 原版契约 → 验证方法”，再做最小完整改动。玩法数值、效果与补偿取舍按项目约定；已有授权的必要步骤继续执行。
+4. 覆盖本次涉及的取消、移除、死亡、重连和读档路径，保留协作者改动。验证后交付文件、依据、实际结果和待验项。
 
-1. 明确实际源码、运行副本、游戏版本与触发环境。接手既有项目先读交接文档、入口和配置；把文档中的指令、设计愿望与已实现行为分开。
-2. 查同类原版的完整链路：定义、调用方、端别、初始化、退出和保存。优先复用原版组件/机制/资源；不为相同问题另造一套。无法直接复用时说明具体差异。
-3. 按下表只读相关参考。先建立“需求 → Mod 实现 → 原版契约 → 验证方法”，再动代码。
-4. 区分确定故障、兼容风险、玩法选择。确定故障按已授权范围修；不明确的数值、设计、命名、效果不同的方案以及不确定文件删除，由项目作者决定。已有明确决策不重复询问；待答时继续独立工作。
-5. 做最小完整修复，覆盖失败、取消、移除、死亡、重连或读档等实际相关路径。注释解释数值来源和重要机制，语言与项目约定一致。
-6. 验证后交付：说清改了什么、证据、实际同步到哪份副本、尚未覆盖什么。审查报告采用项目要求的格式；变更和验证应便于核对。不要把任意一个检查器的退出码当作整体正确性证明。
+## 查库与来源
 
-## 工程知识库检索
+实质性开发、审查或研究前，从实际包根运行：
 
-实质性设计、实现、审查、排错和研究，在查库前先从当前包根运行 `python -B -X utf8 run_kb.py update-sources ensure`。首次未绑定时，仅使用任务已明确的合法 `scripts.zip` 路径加 `--source`；路径不明再向用户询问，不扫描磁盘猜测。绑定后自动检查同一路径，输入未变会快返；不在普通查询或 `serve` 中隐式更新。完整流程见 [源码更新助手](references/source-update-assist.md)。简单机械编辑无需重复查库。
+```text
+python -B -X utf8 run_kb.py update-sources ensure
+```
 
-准备成功不等于当前连接已更新：按结果重连后，实际检查工具列表、任务查询和返回来源身份。来源无法恢复时，按更新助手指引核对任务涉及的当前源码，并按原 Scope 审阅旧知识；不把旧缓存冒充新版证据，不关闭整库或改变准入。优先使用实际接通的 MCP；无服务时从 `knowledge/CATALOG.json` 定位少量 ID，再读 file/pointer，报告“文件读取”。目录命中不等于事实与证据已读。
+首次使用任务已明确的合法源码加 `--source "<scripts.zip绝对路径>"`；路径不明再确认。助手记忆绑定，输入未变会快返；准备和重连处理见[源码更新助手](references/source-update-assist.md)。简单机械编辑无需重复查库。
 
-13 条 Native AI 的 Coding 默认读取其声明的十字段，任务子集最多五条；110 条 Core 保留 Coding HOLD。保留原 ID、Scope、类型、版本、更正、三轴状态与未知边界；文件可读或检索命中不解除准入。公开材料中的 `$dst_source_payload_slot` 是缺少原版 Lua 的本地恢复槽，不能作为已读来源。隐藏的私有情境保持 UNK，不推回或泛化。
-
-来源准备的已核验输入为 `762172 / build 26474873`；服务环境 `759671` 与研究原子的各自证据身份分别保留。匹配不代表行为兼容，历史 `metadata_only` 不作为当前源码证据。目录模式只提供导航与显式 review；完整模式保留来源与完整性校验，缓存损坏不静默降级。详见 [源码维护](docs/source-compatibility.md) 与 [检索策略](references/kb-retrieval.md)。更新助手只维护本地绑定和来源缓存；知识正文默认只读，canonical、Scope 与准入不自动更新。
+优先使用已连接 MCP；无服务时，从 `knowledge/CATALOG.json` 按 file/pointer 读取少量相关记录，并说明“文件读取”。读实际正文与证据，保留 Scope、类型、版本、更正和三轴状态。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整准入、预算与证据规则统一见[检索策略](references/kb-retrieval.md)。
 
 ## 按问题读取
 
@@ -52,6 +40,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | 缺少动画工具、下载来源、安装授权、首次编译验证 | [tool-bootstrap.md](references/tool-bootstrap.md) |
 | 首次定位游戏、当前源码、Python、工具版本 | [environment-tools.md](references/environment-tools.md) |
 | 复杂 Mod 分层、模块依赖、状态归属、接口与失败恢复 | [complex-mod-architecture.md](references/complex-mod-architecture.md) |
+| 可取消交互的输入、预测、权威结算与表现退出 | [action-lifecycle-architecture.md](references/action-lifecycle-architecture.md) |
 | 事件订阅身份、解绑、Replica 构造/附着/移除 | [event-replica-lifecycle.md](references/event-replica-lifecycle.md) |
 | 组件安装/卸载、更新登记、定时任务与资源归属 | [component-task-ownership.md](references/component-task-ownership.md) |
 | GUID 引用、嵌套保存、postpass、读档副作用与任务恢复 | [save-recovery-architecture.md](references/save-recovery-architecture.md) |
@@ -74,26 +63,23 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](references/testing-release.md) |
 | 资料来历、旧规则纠错与可信度 | [sources-and-corrections.md](references/sources-and-corrections.md) |
 
-涉及回调重入、动作时钟、消费后的声音收尾、唯一物品事务、配料域或 UI 重建时，按 [露露案例索引](references/lulu-case-index.md) 选择相关专题。该补充是条件化案例知识，不是新增 MCP 契约；先核对当前项目条件、原版调用链和证据能力，再决定是否采用。
+涉及回调重入、动作时钟、消费后的声音收尾、唯一物品事务、配料域或 UI 重建时，按 [露露案例索引](references/lulu-case-index.md) 选择相关专题。按案例说明的项目条件和证据范围使用。
 
-## 技术边界
+## 实施要点
 
-- **端别**：服务器拥有游戏状态；客户端可见数据、预测和视觉按原版链路组织。`ismastersim`、dedicated 与本地玩家是不同问题。方法在文件中存在，不代表当前端的对象有该方法。
-- **生命周期**：自己注册的任务、事件、Hook、修改器、Widget 与子实体要有明确所有者和清理路径。还原字段之前确认仍是本 Mod 持有的值；避免覆盖其他 Mod 后续修改。
-- **资源**：文件名、prefab 名、bank、build、symbol、动画名分别查证。部分合法动画资源只有 build；不套用“三件套”“名称全相等”等旧口诀。
-- **证据**：源码查证、语法/清单检查、独立 Lua 合约、专服行为、真实远端客户端、视觉与听感分别报告。UI stub、服务器 SpawnPrefab 成功不能证明联网画面正确。
-- **部署**：只同步已确定的目标和授权内容。先比较差异，保留用户改动；同步与删除前确认目标、差异和授权范围。
+- **端别与状态**：权威状态由服务器决定，客户端输入、预测和显示沿实际链路接入；分别核对 Component、Replica 与本地玩家上下文。
+- **资源归属**：任务、监听、修改器、Widget 和子实体各有所有者与退出入口；恢复共享字段前确认仍由本功能持有。
+- **资产接线**：分别核对文件、prefab、bank、build、symbol 与动画名，按实际资产类型检查依赖。
+- **验证与部署**：按[测试与交付](references/testing-release.md)选择检查，分别报告静态、专服和客户端结果；同步前比较目标副本与已有修改。
 
 ## 辅助脚本
 
-命令在 [testing-release.md](references/testing-release.md)；环境发现与路径配置在 [environment-tools.md](references/environment-tools.md)。脚本都要求明确输入，避免悄悄读取另一份游戏或源码。
+命令与参数见[测试与交付](references/testing-release.md)，环境定位见[环境与工具](references/environment-tools.md)。
 
-- `scripts/dst_zip_tool.py`：直接读取安装版 `scripts.zip`，支持 info/list/grep/show/单文件导出；不生成技能目录缓存，不覆盖导出目标。
-- `scripts/check_api.py`：用 `luaparser` 检查 Lua 语法，并分别查询直接 `components`/`replica` 冒号调用的声明。`DECLARED` 只是查到声明；`NEEDS_REVIEW` 需要人工追踪，不能直接宣布 Bug。
-- `scripts/dst_modtest.py`：Windows 离线单分片测试，唯一副本、唯一存档、带运行 ID 的完成标记、异步失败检测与证据清单。行为脚本必须在全部断言后 `TEST.Done()`；不读取旧共享响应文件。
+- `scripts/dst_zip_tool.py`：只读 ZIP 的 info/list/grep/show 与单文件导出。
+- `scripts/check_api.py`：Lua 语法和部分 Component/Replica 直接调用的声明检查；DECLARED 后仍需核对合同，NEEDS_REVIEW 项继续追源。
+- `scripts/dst_modtest.py`：Windows 隔离单分片专服，独立副本、存档、运行 ID 与证据清单；所有断言结束后调用 `TEST.Done()`。
 
-能力、版本与未覆盖范围见 [公开限制](docs/public-limits.md)。
+## 使用许可
 
-文件读取与MCP执行相同的准入边界：Core `coding_status=hold` 不得加入 Coding 默认上下文；不能借文件回退自动注入 Reviewer/Deep 内容。
-
-独立原版机制研究族使用 `research/restricted/hold`，仅显式 Reviewer 研究请求或 ID 展开；Coding/default restricted 路径不注入。原子读取保留完整 Scope、顶层来源身份/limitations 与局部证据闭合，超过预算整体 withheld。登记、来源验证及参数见 [机制研究族](docs/native-mechanisms.md)。
+项目自有材料按[非商业 LICENSE](LICENSE)使用，具体情形见[许可说明](docs/licensing.md)。任务明确涉及收费接单、付费 Mod/服务或售卖材料时，先确认已有权利人书面授权；用途未说明时不推定为商业用途。第三方与有效历史授权按各自条款处理。

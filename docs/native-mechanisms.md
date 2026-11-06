@@ -1,8 +1,8 @@
 # 独立原版机制研究族
 
-`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充、表现、事件/SG 与加载/Replica 机制，独立机制研究族共 53 条；与历史三族合计 240 条，实际登记数量读目录 counts。
+`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充、表现、事件/SG、加载/Replica、生命周期/恢复与动作执行机制，独立机制研究族共 57 条；与历史三族合计 244 条，实际登记数量读目录 counts。
 
-新族始终为 `research/restricted/hold`。独立审阅记录绑定精确候选 SHA，但不是旧 Native Core 的 Gate A，不授予 Coding 或游戏实测状态。source_references 是限定归档的原始文件/行范围 hash 和定位，不是已交付 Lua；当前归档 hash 一致也不证明所有 native/dynamic 行为。
+机制研究为 `research/restricted/hold`；审阅绑定精确候选 SHA。来源引用提供限定归档的文件/范围定位与 hash，原生与动态依赖按条目 unknowns 保留。通用准入见[检索策略](../references/kb-retrieval.md)。
 
 ## 查询和完整读取
 
@@ -57,3 +57,5 @@
 复杂架构与原版执行链新增范围见[阶段说明](phase7-architecture-native.md)。
 
 事件/Replica、组件任务与存档恢复新增范围见[本阶段说明](phase8-lifecycle-persistence.md)。
+
+实体 Remove、普通动作执行与本轮接入收口见[阶段 9](phase9-action-closure.md)。

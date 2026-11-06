@@ -516,7 +516,9 @@ class Service:
         envelopes are research material, not Legacy/Core projections. Their
         unrelated family scores must never be compared or concatenated top-k.
         """
-        from .retrieval_v2 import words, extract_symbols, intent
+        from .retrieval_v2 import extract_symbols, intent
+        terms_for=native_mechanism.navigation_terms
+        topics_for=native_mechanism.navigation_topics
         ranker=self._ranker_v2()
         documents={d['id']:d for d in ranker.documents}
         for record in self._mechanisms().values():
@@ -524,12 +526,11 @@ class Service:
             documents[entry['id']]={'id':entry['id'],'entry':entry,'family':'native_mechanism'}
         fields={}
         declared_by_id={}
+        subjects_by_id={}
         for identifier,d in documents.items():
             entry=d['entry']
             if d['family']=='native_mechanism':
-                units=[c['statement'] for c in entry['claims']]
-                units += [json.dumps({k:a[k] for k in ('symbol','parameters','returns','preconditions','side_effects','lifecycle')},ensure_ascii=False) for a in entry['api_contracts']]
-                units += [step['description'] for step in entry.get('mechanism_steps',[])]
+                units=[text for _,text in native_mechanism.navigation_units(entry)]
             else:
                 units=[json.dumps(a['statement'],ensure_ascii=False) for a in projection_v2._atoms(entry,d['family'])
                        if a.get('kind')!='PROJECT_POLICY']
@@ -537,17 +538,29 @@ class Service:
             focus=' '.join([entry['title'],entry.get('engineering_question','')]+entry.get('aliases',[]))
             declared_by_id[identifier]=({name.lower() for api in entry['api_contracts'] for name in declared_navigation_symbols(api)}
                 if d['family']=='native_mechanism' else set(d.get('contract_navigation',())))
-            fields[identifier]=(words(focus),words(body),extract_symbols(focus+' '+body),[words(u) for u in units])
+            # Legacy navigation can include a callee/dependency. Only an
+            # authored mechanism API owner contributes a primary subject here;
+            # other families retain their title's own subject, not borrowed API
+            # ownership from a physical/source navigation match.
+            owners=(' '.join(re.split(r'[.:][^.:]+$',name)[0] for name in declared_by_id[identifier]
+                             if ':' in name or '.' in name) if d['family']=='native_mechanism' else '')
+            subjects_by_id[identifier]=topics_for(entry['title']+' '+owners)
+            fields[identifier]=(terms_for(focus),terms_for(body),extract_symbols(focus+' '+body),[terms_for(u) for u in units])
         df=Counter(term for focus,body,_,_ in fields.values() for term in focus|body)
         idf={term:math.log(1+(len(fields)-n+.5)/(n+.5)) for term,n in df.items()}
-        positive=intent(query)['original_positive'];terms=words(positive);symbols=extract_symbols(positive)
+        symbol_df=Counter(name for _,_,names,_ in fields.values() for name in names)
+        symbol_idf={name:math.log(1+(len(fields)-n+.5)/(n+.5)) for name,n in symbol_df.items()}
+        positive=intent(query)['original_positive'];terms=terms_for(positive);symbols=extract_symbols(positive)
+        subjects=topics_for(positive)
         candidates=list(rows)+[{'document':documents[r['entry']['id']],'mechanism_record':r} for r in mechanisms]
         for row in candidates:
             identifier=row['document']['id'];focus,body,names,units=fields[identifier]
             score=(10000. if positive.strip().lower()==identifier.lower() else
-                   sum(sorted((idf[t]*4 for t in terms&focus),reverse=True)[:3])
-                   +max((sum(sorted((idf[t] for t in terms&unit),reverse=True)[:5]) for unit in units),default=0.)
-                   +20*len(symbols&names)
+                   sum(sorted((idf[t]*4 for t in terms&focus),reverse=True)[:4])
+                   +max((sum(sorted((idf[t] for t in terms&unit),reverse=True)[:6]) for unit in units),default=0.)
+                   +.6*sum(sorted((idf[t] for t in terms&body),reverse=True)[:8])
+                   +4*sum(sorted((symbol_idf[name] for name in symbols&names),reverse=True)[:3])
+                   +20*sum(idf['topic:'+topic] for topic in subjects&subjects_by_id[identifier])
                    +60*len({name for name in symbols&declared_by_id[identifier] if ':' in name or '.' in name}))
             row['score']=round(score,5)
             row['match_reason']={**row.get('match_reason',{}),
@@ -556,10 +569,10 @@ class Service:
         return sorted((row for row in candidates if not positive.strip() or row['score']>0),
                       key=lambda row:(-row['score'],row['document']['id']))
 
-    def _research_seed_view(self,card,query):
+    def _research_seed_view(self,card,query,grouped=True):
         """A whole admitted atom with its own required closure, never prose slices."""
         from .retrieval_v2 import words, intent
-        positive=intent(query)['original_positive'];terms=words(positive)
+        positive=intent(query)['original_positive'];terms=native_mechanism.navigation_terms(positive)
         # Parse complete names before matching declarations. A shorter method
         # is never an exact identity inside an extended name or another owner.
         requested_names={m.group().lower() for m in re.finditer(
@@ -570,24 +583,30 @@ class Service:
         if card.get('family')=='native_mechanism':
             record=self._mechanisms()[card['id']]
             choices=[]
-            for field in ('claims','api_contracts','mechanism_steps'):
-                for index,value in enumerate(record['entry'].get(field,[])):
-                    if field=='api_contracts':
-                        content={key:value[key] for key in
-                            ('symbol','parameters','returns','preconditions','side_effects','lifecycle')}
-                    else:content=value['statement' if field=='claims' else 'description']
-                    text=json.dumps(content,ensure_ascii=False)
-                    overlap=terms&words(text)
-                    if not overlap:continue
-                    # Exact declarations outrank incidental mentions; ranking
-                    # this original unit does not verify the task assertion.
-                    identity=native_mechanism.api_identity(value) if field=='api_contracts' else None
-                    declared=identity['symbol'].lower() if identity is not None else ''
-                    exact=declared in requested_names
-                    choices.append((not exact,-len(overlap),field,index))
+            claim_terms=set()
+            for pointer,text in native_mechanism.navigation_units(record['entry']):
+                field,index=pointer.strip('/').split('/');index=int(index)
+                overlap=terms&native_mechanism.navigation_terms(text)
+                if not overlap:continue
+                if field=='claims':claim_terms.update(overlap)
+                value=record['entry'][field][index]
+                # Exact declarations outrank incidental mentions; ranking
+                # this original unit does not verify the task assertion.
+                identity=native_mechanism.api_identity(value) if field=='api_contracts' else None
+                declared=identity['symbol'].lower() if identity is not None else ''
+                bare=positive.strip().lower()
+                exact=declared in requested_names or (identity is not None and bare==identity['leaf'].lower())
+                choices.append((not exact,-len(overlap),field,index))
             if not choices:return card
-            _,_,field,index=min(choices)
-            atom=native_mechanism.envelope(record,'/'+field+'/'+str(index),assessment_detail=False)
+            not_exact,negative_overlap,field,index=min(choices)
+            pointer='/'+field+'/'+str(index)
+            # A multi-step question can need several claims from one record.
+            # Deliver the exact authored claims array (each typed atom intact),
+            # never a synthetic summary or an incomplete API. The caller still
+            # charges this one record, every reference and its complete Scope.
+            if grouped and not_exact and len(claim_terms)>=max(4,-negative_overlap+2):
+                pointer='/claims'
+            atom=native_mechanism.envelope(record,pointer,assessment_detail=False)
             return atom|{key:card[key] for key in ('score','match_reason','expansion') if key in card}
         document=next((d for d in self._ranker_v2().documents if d['id']==card['id']),None)
         if document is None:return card
@@ -603,9 +622,17 @@ class Service:
             units=plan['units']
             if not units:return card
             atoms={a['record_pointer']:a for a in projection_v2._atoms(record,document['family'])}
-            best=max(units,key=lambda u:len(terms&words(json.dumps(
-                atoms.get(u['seed_record_pointer'],{}).get('statement',''),ensure_ascii=False))))
-            atom=projection_v2._atomic_subset_from_plan(card,record,[best['seed_record_pointer']],plan,**options)
+            overlaps={u['seed_record_pointer']:terms&words(json.dumps(
+                atoms.get(u['seed_record_pointer'],{}).get('statement',''),ensure_ascii=False)) for u in units}
+            best=max(units,key=lambda u:len(overlaps[u['seed_record_pointer']]))
+            selected=[best['seed_record_pointer']]
+            coverage=set().union(*overlaps.values())
+            if grouped and len(coverage)>=max(4,len(overlaps[selected[0]])+2):
+                # These are already admitted independent seeds, not new source
+                # selections. Reuse their verified dependency/Scope plan so a
+                # multi-step question need not lose every atom but one.
+                selected=[u['seed_record_pointer'] for u in units if overlaps[u['seed_record_pointer']]]
+            atom=projection_v2._atomic_subset_from_plan(card,record,selected,plan,**options)
             return project_l1_card(projection_v2.bundle_decision_card(atom),public_contract=True)
         except (ValueError,KeyError,TypeError,AttributeError):
             # An unavailable closure plan is not permission to strip Scope.
@@ -953,6 +980,9 @@ class Service:
                 if len(payload['results'])>=top_k:break
                 seed=seed_views.get(item['id'],item)
                 proposed=dict(payload,results=payload['results']+[seed])
+                if serialized_payload_cost(proposed)+200>64000 and view=='decision':
+                    seed=self._research_seed_view(rich_by_id[item['id']],query,grouped=False)
+                    proposed=dict(payload,results=payload['results']+[seed])
                 if serialized_payload_cost(proposed)+200<=64000:
                     payload['results'].append(seed)
                 else:

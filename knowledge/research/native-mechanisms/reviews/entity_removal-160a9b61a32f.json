@@ -1,0 +1,125 @@
+{
+  "schema_version": "independent-static-review/1",
+  "reviewer": "remove_review",
+  "candidate_file": "coordinator/frozen/entity_removal-f6c99c2f4ce8.json",
+  "candidate_sha256": "f6c99c2f4ce8cb2c89d901fe2bd9ddda599c51269ccb6f8c5608e1581094d51d",
+  "verdict": "approved_static",
+  "blockers": [],
+  "runtime_verified": false,
+  "entry_ids": [
+    "EXP-LIFE-008"
+  ],
+  "review_mode": "targeted_revision_diff_and_dependency_closure",
+  "conclusion": "B01已闭合：新增ER-S33证明Input.oncontrol的EventProcessor构造身份，并绑定C12、API、step3及compatibility。新候选与旧稿仅有五处所需引用增量；其余静态结论承接已完成的逐项初审。",
+  "closed_blockers": [
+    {
+      "id": "B01",
+      "status": "closed",
+      "pointer": "/entries/0/claims/11/evidence_refs",
+      "source_ref": "ER-S33",
+      "evidence": "input.lua:1–28含events加载及oncontrol=EventProcessor()；与原ER-S28转发和ER-S29句柄构造/Remove连成具名闭包。"
+    }
+  ],
+  "revision_diff": {
+    "exact_addition_count": 5,
+    "only_expected_changes": true,
+    "changes": [
+      {
+        "pointer": "/source_references/32",
+        "kind": "added",
+        "value": {
+          "id": "ER-S33",
+          "source_file": "scripts/input.lua",
+          "file_sha256": "b7b49c5711ab942019ef9d8805ead469884727f7df6a6280789bd9a0c41d72b0",
+          "line_start": 1,
+          "line_end": 28,
+          "range_sha256": "995a1aa60f6fb90f7e335e454d706e8addffb6e1685499035808c02105bddb7a",
+          "symbols": [
+            "Input",
+            "Input.oncontrol",
+            "EventProcessor"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/0/compatibility/dependency_refs/32",
+        "kind": "added",
+        "value": {
+          "ref": "ER-S33",
+          "role": "Input构造身份 / events加载与oncontrol绑定EventProcessor",
+          "claim_ids": [
+            "EXP-LIFE-008-C12"
+          ]
+        }
+      },
+      {
+        "pointer": "/entries/0/api_contracts/0/evidence_refs/32",
+        "kind": "added",
+        "value": "ER-S33"
+      },
+      {
+        "pointer": "/entries/0/claims/11/evidence_refs/6",
+        "kind": "added",
+        "value": "ER-S33"
+      },
+      {
+        "pointer": "/entries/0/mechanism_steps/2/evidence_refs/8",
+        "kind": "added",
+        "value": "ER-S33"
+      }
+    ]
+  },
+  "verification": {
+    "candidate_sha_match": true,
+    "initial_review_unchanged": true,
+    "source_references_verified": 33,
+    "all_file_and_range_hashes_match": true,
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "claim_prose_api_semantics_scope_unknowns_queries_unchanged": true,
+    "governance_unchanged": [
+      "research",
+      "restricted",
+      "hold"
+    ],
+    "dual_counter_observation": "仍仅记录两个Lua阶段，不推成游戏已证实故障。"
+  },
+  "review_dependencies": [
+    {
+      "file": "agents/remove_review/review.json",
+      "sha256": "77952570c1d1e92abc719fe43db7e9229a35e0c9536d2a6c0a76ba741bdaa754",
+      "role": "初稿14claims/1API/4steps/32refs完整独立静态审阅与唯一B01"
+    },
+    {
+      "file": "coordinator/frozen/entity_removal-b907175941c1.json",
+      "sha256": "b907175941c17e00e61b207e36273898c7c652a53c977d6938d144d41535ce67",
+      "role": "初稿精确输入"
+    },
+    {
+      "file": "coordinator/frozen/entity_removal-f6c99c2f4ce8.json",
+      "sha256": "f6c99c2f4ce8cb2c89d901fe2bd9ddda599c51269ccb6f8c5608e1581094d51d",
+      "role": "本次复核精确输入"
+    },
+    {
+      "file": "agents/remove_review/independent-locators.json",
+      "sha256": "8aa1711ed380bad86365dc8212cbbef4d14f3d60fec0b452a10f66623d59ce81",
+      "role": "candidate前独立定位"
+    },
+    {
+      "file": "windows/A/DEDUP.md",
+      "sha256": "964f9fd2a44f8c6130c11621091bbb56bd1832563631f705d21865ee9438dd7c",
+      "role": "已更新作者增量说明"
+    },
+    {
+      "file": "windows/A/handoff.json",
+      "sha256": "2669f7d0b54532898bcc9e6ecb68445a46ce60350b595fbda7743e91e64a4f02",
+      "role": "当前交接身份；非运行证据"
+    }
+  ],
+  "limitations": [
+    "仅冻结Lua静态审阅；未运行游戏/专服/客户端或行为夹具。",
+    "原生Retire/有效性/跨端表现、异常重入及协程yield结果等未知边界承接原候选；真实运行验证由E窗口负责。",
+    "旧review保持原始内容，新增本final记录关闭B01；未修改作者候选、repo、配置、canonical或HOLD。"
+  ]
+}

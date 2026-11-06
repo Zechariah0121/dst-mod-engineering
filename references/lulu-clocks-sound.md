@@ -1,10 +1,10 @@
 # 露露案例：动作时钟、同步重入与声音尾段
 
-适用于自定义角色主端 SG 的动态动作时长、消费回调和中断清理研究。作为条件化工程案例按需读取，不是原生 API 契约、新知识族或默认编码方案；既有 227 条登记及 Core HOLD 保持不变。相关基础见 [StateGraph](characters-brains-stategraphs.md)、[生命周期](lifecycle-save.md)、[音频](audio-particles.md)、[测试](testing-release.md)；案例导航见 [露露案例索引](lulu-case-index.md)。
+适用于角色主端 SG 的动作时长、消费回调和声音退出研究。案例范围见[露露索引](lulu-case-index.md)；基础机制见[StateGraph](characters-brains-stategraphs.md)、[生命周期](lifecycle-save.md)、[音频](audio-particles.md)与[测试](testing-release.md)。
 
 ## 来源与验证身份
 
-研究包 SHA256：`fc24353695f876b43f341497a698efc6f3dc24532817276e17f1432de218e3eb`。本轮研究于 2026-11-05 **自行读取当前 scripts.zip 并重算 SHA256**：`fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76`，所引原生文件及报告已有范围哈希均匹配。761239 / build 26335394 的版本身份由研究包及 MCP 来源准备信息支持，本轮研究未启动游戏。MCP 服务 source_epoch=759671 与各条历史 Scope 保留。
+研究包 SHA256：`fc24353695f876b43f341497a698efc6f3dc24532817276e17f1432de218e3eb`。本轮研究于 2026-11-05 **自行读取当前 scripts.zip 并重算 SHA256**：`fb94157f7c7728eff7c898816683ee323d9a7a6141d18c88ad95685ab5c93d76`，所引原生文件及报告已有范围哈希均匹配。761239 / build 26335394 的版本身份由研究包及 MCP 来源准备信息支持，本轮研究未启动游戏。
 
 本轮只做源码与身份静态核验、读取派生运行摘录；未执行附件脚本或重跑历史测试。下文“历史专服”表示研究包所报单分片、无真实客户端运行。原 manifest/log 只有哈希与选行摘录，完整原件未在本轮研究重新读取；发布 source/release 对应来自证据索引与研究报告，未重跑发布核验。代码与私人日志不随本参考稿分发；包内相对路径供持有研究包者定位，不能当成已附带依赖。
 

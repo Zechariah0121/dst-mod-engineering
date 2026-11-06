@@ -1,0 +1,122 @@
+{
+  "status": "pre_candidate_independent_source_precheck",
+  "candidate_read": false,
+  "runtime_verified": false,
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "plan": {
+    "path": "agents/action_review/review-plan.json",
+    "sha256": "e65c3cff54a2877b8c1324d86c2ad5a6ac2aca8dfc43e3012931b07b0eb2ae60"
+  },
+  "findings": [
+    {
+      "id": "AR-PRE-01",
+      "statement": "BufferedAction Do无效早退false时不Fail；IsValid不检查普通距离，没有统一端别业务拦截；构造owner/持有快照、实际动作validfn和调用者授权必须分别看。",
+      "evidence": [
+        "review-plan finite_initial_evidence 1-3"
+      ]
+    },
+    {
+      "id": "AR-PRE-02",
+      "statement": "PerformBufferedAction先发performaction及可能的主题事件，然后才缓存self.bufferedaction；缓存身份保护只对Do期间替换成立，不能推广为所有事件重入都安全。",
+      "evidence": [
+        "review-plan finite_initial_evidence 4"
+      ]
+    },
+    {
+      "id": "AR-PRE-03",
+      "statement": "Clear和Push替换旧动作均先调用Fail再无条件置nil；Fail回调可更换槽或重入同一Fail，回调表只在遍历后清空，不能声称通用幂等或重入安全。",
+      "evidence": [
+        "review-plan finite_initial_evidence 3-4"
+      ]
+    },
+    {
+      "id": "AR-PRE-04",
+      "statement": "普通非骑乘PICKUP映射doshortaction；客户端onenter发preview，超时Clear；服务端第6帧Perform，并在onexit按动作身份及lastheldaction条件清理。预测状态匹配或preview返回都不是业务完成信号。",
+      "evidence": [
+        "AR-P03",
+        "AR-P04",
+        "AR-P05",
+        "AR-P06"
+      ]
+    },
+    {
+      "id": "AR-PRE-05",
+      "statement": "LeftClick服务端有类型/位置范围初筛，OnRemoteLeftClick还要求mastersim、enabled、无本地handler，重算picker后按code/mod_name比对再DoAction。该链不等同任意RPC已完成通用权限验证。",
+      "evidence": [
+        "review-plan finite_initial_evidence 9",
+        "AR-P01",
+        "AR-P02"
+      ]
+    }
+  ],
+  "additional_finite_evidence": [
+    {
+      "id": "AR-P01",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 4836,
+      "line_end": 4891,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "8545bb451667c29951ccba8669fca74ab755707d336ecfd1cdce5d772df6fae4"
+    },
+    {
+      "id": "AR-P02",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 4893,
+      "line_end": 4970,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "dd753e8b0120fad04f0bcc1684c7159f524709ae4cd113c3556bcddf0076ea41"
+    },
+    {
+      "id": "AR-P03",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 1192,
+      "line_end": 1200,
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "range_sha256": "1daf152b3beede075a153ea8f5c24eb8dc685641c3a33c59ea76d53552222d02"
+    },
+    {
+      "id": "AR-P04",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "line_start": 485,
+      "line_end": 491,
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "range_sha256": "483d14977eda8be32051ed89ae330bfd259566ca93a72d49d520359c966721d1"
+    },
+    {
+      "id": "AR-P05",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 8027,
+      "line_end": 8072,
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "range_sha256": "d4708180514f6e95f7980281282a97c751f36b600cdb6261f9c289aee17a81cf"
+    },
+    {
+      "id": "AR-P06",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "line_start": 3123,
+      "line_end": 3156,
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "range_sha256": "bf4f80c51111d4e3e9c26e5e7463be24ade37a84e481ebe803299bad9c0dc057"
+    },
+    {
+      "id": "AR-P07",
+      "source_file": "scripts/actions.lua",
+      "line_start": 894,
+      "line_end": 980,
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "range_sha256": "4f06777f2c708e65bbf2d21f6bb0df446513868d1ac8d36bce6c9ccea05d42b8"
+    }
+  ],
+  "old_knowledge": "EXP-AI-007 full file-read Scope/claims/API/steps/compatibility, source epoch759671 preserved; no blanket compatibility claim.",
+  "kb_consultation": {
+    "search": "reviewer decision ordinary action request",
+    "first_attempt": "INVALID_ARGUMENT (unsupported limit)",
+    "second_attempt": "search succeeded but 176244-byte response display truncated; navigation only, not full atom-read assertion",
+    "reliance": "Direct 762172 ZIP and complete EXP-AI-007 file atom, not truncated MCP results"
+  },
+  "limitations": [
+    "No candidate verdict before exact candidate frozen hash.",
+    "No game/runtime tests.",
+    "No transitive/native/network execution closure claim."
+  ]
+}

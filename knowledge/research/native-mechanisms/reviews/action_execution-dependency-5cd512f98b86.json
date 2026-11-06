@@ -1,0 +1,114 @@
+{
+  "schema_version": "action-review-revision/1",
+  "review_path": "agents/action_review/review.json",
+  "review_sha256": "9777058f2ad2aa3f9422004cef07aeccc7bbe4e915e95a2bf50e814962f6e3c1",
+  "audit_manifest": "audit/pre-review-9777058f2ad2/manifest.json",
+  "audit_manifest_sha256": "ceace524e99d5b3d0ea6d88bdea8b2f3203031caf68b66a6f842abd4e06c8272",
+  "addressed": [
+    "AR-R1",
+    "AR-R2",
+    "AR-R3",
+    "AR-C1"
+  ],
+  "candidate_sha256": "b30719588342b41172f91e8a1a49fad5263aba7bc479c3c3251476a34bf1c368",
+  "source_archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "handoff_sha256": "3f512640bd7dca39e575622286462616ea385eef2ffb838785798db1a136546c",
+  "candidate_exact_changes": [
+    {
+      "pointer": "/entries/0/scope/increment_over_existing",
+      "before": "NC-N002/NC-N003已有Action/RPC和SG原则；EXP-AI-007不研究玩家RPC闭环。本条补输入闭包、发送时点、preview门禁/标记和松键路径，不重复登记原有BufferedAction API。",
+      "after": "NC-N003-INT-02已含OnLeftClick两发送闭包/全nil按下消息、DoAction早发/重复键/lastheldaction/端别分流，以及RemoteBufferedAction门禁与预测移动flush；这些作为复用原子，不计本轮净新增。新增为普通PICK/noforce串接、后置ispreviewing的槽身份/回调重入细节和结构化入口合同扩充；EXP-AI-007已有BufferedAction合同不重复登记。",
+      "review_item": "AR-R1"
+    },
+    {
+      "pointer": "/entries/1/claims/2/statement",
+      "before": "OnRemoteLeftClick仅mastersim、IsEnabled且handler=nil处理；全nil动作只更新PRIMARY状态并返回。正常请求先DecodeControlMods并SetClientRequestedAction，以服务器playeractionpicker重新生成lmb/rmb和可选双击候选；之后ClearClientRequestedAction、处理isreleased并ClearControlMods。除LOOKAT/WALKTO回退外，按action.code与mod_name匹配才DoAction。",
+      "after": "OnRemoteLeftClick仅mastersim、IsEnabled且handler=nil处理；通过门禁后先combat:SetTarget(nil)并标记PRIMARY，actioncode=nil时随后早退，不重建picker候选。正常请求先DecodeControlMods并SetClientRequestedAction，以服务器playeractionpicker重新生成lmb/rmb和可选双击候选；之后ClearClientRequestedAction、处理isreleased并ClearControlMods。除LOOKAT/WALKTO回退外，按action.code与mod_name匹配才DoAction。",
+      "review_item": "AR-C1"
+    },
+    {
+      "pointer": "/entries/1/claims/8/statement",
+      "before": "植株Pick正常路径可先建立再生DoTaskInTime，随后Remove；宿主Remove清监听并CancelAllPendingTasks，清理该宿主已登记任务后调用组件OnRemoveEntity。动作Do正常完成/失败消费各回调列表；PerformBufferedAction成功返回true，失败发actionfailed再Fail，并只在实体槽仍等于执行局部动作时清槽。",
+      "after": "植株Pick正常路径可先建立再生DoTaskInTime，随后Remove；宿主Remove清监听并CancelAllPendingTasks，清理该宿主已登记任务后调用组件OnRemoveEntity。BufferedAction:Do只有通过IsValid、action.fn及对应回调正常返回的路径才消费成功/失败回调列表；IsValid假时直接false，不调用Fail，由外层PerformBufferedAction失败路径通知。EntityScript:PerformBufferedAction成功返回true，失败发actionfailed再Fail，并只在实体槽仍等于执行局部动作时清槽。",
+      "review_item": "AR-R3"
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/3/description",
+      "before": "正常采集尝试创建/交付产物、置已采状态、发布picked并移除植株；清宿主任务；BufferedAction消费结果回调并按身份清执行槽。",
+      "after": "正常采集尝试创建/交付产物、置已采状态、发布picked并移除植株、清宿主任务。BufferedAction:Do通过IsValid且action.fn/回调正常返回时消费结果回调；IsValid早退由外层失败路径通知。执行槽的身份比较和清空由EntityScript:PerformBufferedAction负责。",
+      "review_item": "AR-R3"
+    },
+    {
+      "pointer": "/entries/2/claims/1/statement",
+      "before": "若performaction或play_theme_music监听正常返回且把槽从A换成B，后续缓存/Do可处理B；若performaction监听将槽清nil，紧接的主题选择会读取nil.action。所谓缓存保护只覆盖缓存点之后，不能推广到这些前置事件。",
+      "after": "若performaction或play_theme_music监听正常返回且把槽从A换成B，后续缓存/Do可处理B；若performaction监听将槽清nil，self:HasTag(\"player\")为真时紧接的主题表达式会读取nil.action。非player在该and表达式短路，之后缓存nil并在bufferedaction:Do()处失败。所谓缓存保护只覆盖缓存点之后，不能推广到这些前置事件。",
+      "review_item": "AR-R2"
+    }
+  ],
+  "file_changes": [
+    {
+      "file": "candidate.json",
+      "before_sha256": "7d95e4c9491892cf43cf4165fb9a3b5af1f3d9f399dd131a2d54d55c96c7ceb1",
+      "after_sha256": "b30719588342b41172f91e8a1a49fad5263aba7bc479c3c3251476a34bf1c368",
+      "changed": true
+    },
+    {
+      "file": "DEDUP.md",
+      "before_sha256": "d97cae895ff9c130d30a71eddd41d7131ee300f630ec9daa71895a7a98fa58ce",
+      "after_sha256": "3eebea1140983fcf7dec346f50b1216f73844354221bce96afc3c316a4885cbc",
+      "changed": true
+    },
+    {
+      "file": "ATOM-DEDUP.json",
+      "before_sha256": "e6630b678e1287874f38c89394190ad3b0b3330ca414b28bdf9065d6e3b654dc",
+      "after_sha256": "afb53f25f3d5e18ecc582dc6f237ecc53f95e898807263425c07a15aff503d18",
+      "changed": true
+    },
+    {
+      "file": "architecture-notes.md",
+      "before_sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "after_sha256": "f007ec9386db3312f8cd3bf7a679d546da48c39ec659b4d1bf972c7137ffc7d5",
+      "changed": false
+    },
+    {
+      "file": "handoff.json",
+      "before_sha256": "aebb8766bc54ff63b68e3557e043502792ebb36c296ad378057dc144eb113713",
+      "after_sha256": "3f512640bd7dca39e575622286462616ea385eef2ffb838785798db1a136546c",
+      "changed": true
+    },
+    {
+      "file": "generate_candidate.py",
+      "before_sha256": "bcf3bf97791196a3d13da799b435436bea467743ebbbcb9f73cb191ef0c582f5",
+      "after_sha256": "78be2d3db6527d774dcb475c2ca5c5f55126a69f533c7988a88ed731e3f490d0",
+      "changed": true
+    }
+  ],
+  "unified_diff": "REVISION.diff",
+  "unified_diff_sha256": "860bcf281e278da68bcadced6a67a546aef73768ed6c50047a33c5c645bb42ef",
+  "preserved": {
+    "entry_ids": [
+      "EXP-ACT-001",
+      "EXP-ACT-002",
+      "EXP-ACT-003"
+    ],
+    "api_count": 6,
+    "api_contracts_byte_equivalent_as_json_values": true,
+    "claim_ids_and_count": 27,
+    "source_references_and_hashes": 66,
+    "architecture_notes_byte_identical": true,
+    "old_core_scope_and_hold_unchanged": true,
+    "runtime_verified": false
+  },
+  "dedup_revision": {
+    "old_entry": "NC-N003-INT-02",
+    "old_atoms_mapped": 22,
+    "reclassified": [
+      "EXP-ACT-001-C03",
+      "EXP-ACT-001-C04",
+      "EXP-ACT-001-C07"
+    ],
+    "old_scope_preserved_as_context": true
+  },
+  "validation": "strict contract, exact 5 candidate JSON changes, 22 old atom mappings, archived original byte hashes, payload/narrative hashes passed",
+  "independent_rereview": "pending"
+}

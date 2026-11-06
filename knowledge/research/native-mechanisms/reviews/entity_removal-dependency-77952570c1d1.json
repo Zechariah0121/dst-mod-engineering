@@ -1,0 +1,335 @@
+{
+  "schema_version": "independent-static-review/1",
+  "reviewer": "remove_review",
+  "candidate_file": "coordinator/frozen/entity_removal-b907175941c1.json",
+  "candidate_sha256": "b907175941c17e00e61b207e36273898c7c652a53c977d6938d144d41535ce67",
+  "entry_ids": [
+    "EXP-LIFE-008"
+  ],
+  "verdict": "request_changes",
+  "runtime_verified": false,
+  "conclusion": "主体Lua合同与独立源码核验相符；需补一处具名外部处理器的构造身份依赖后重冻复核。",
+  "blockers": [
+    {
+      "id": "B01",
+      "severity": "P2",
+      "category": "incomplete_local_evidence_closure",
+      "pointer": "/entries/0/claims/11/evidence_refs",
+      "related_pointers": [
+        "/source_references/27",
+        "/entries/0/api_contracts/0/evidence_refs",
+        "/entries/0/mechanism_steps/2/evidence_refs",
+        "/entries/0/compatibility/dependency_refs"
+      ],
+      "issue": "C12称Input转发EventProcessor，并把NIS输入句柄闭合到EventHandler:Remove。ER-S28仅input.lua:139–141，证明转发到self.oncontrol:AddEventHandler；ER-S29证明EventProcessor/Handler实现，但二者之间self.oncontrol=EventProcessor()的身份绑定位于input.lua:8–28，当前32条选定范围均未覆盖。整文件SHA本身不能替代该局部依赖正文。",
+      "requested_change": "新增input.lua构造器范围引用（建议1–28，含events加载与oncontrol赋值），在C12、单API、mechanism step 3及compatibility绑定；或扩展现有ER-S28使其实际覆盖构造赋值并重算range SHA。随后重新冻结候选并提供精确SHA。",
+      "source_locator": {
+        "source_file": "scripts/input.lua",
+        "line_start": 1,
+        "line_end": 28,
+        "file_sha256": "b7b49c5711ab942019ef9d8805ead469884727f7df6a6280789bd9a0c41d72b0",
+        "range_sha256": "995a1aa60f6fb90f7e335e454d706e8addffb6e1685499035808c02105bddb7a",
+        "role": "Input constructor establishes oncontrol as EventProcessor; absent from candidate cited ranges"
+      },
+      "verification": "审阅者已独立读取该构造器，源码支持现有结论；此项要求补证据闭包，不要求更改正确的主体行为结论。"
+    }
+  ],
+  "claim_reviews": [
+    {
+      "pointer": "/entries/0/claims/0",
+      "id": "EXP-LIFE-008-C01",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02",
+        "ER-S04",
+        "ER-S14"
+      ],
+      "note": "无显式参数/返回；父/平台前段、全局Lua入口、onremove及入口无防护均吻合。"
+    },
+    {
+      "pointer": "/entries/0/claims/1",
+      "id": "EXP-LIFE-008-C02",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S02"
+      ],
+      "note": "碰撞回调无条件先清；其余依Ents命中执行，区别全局入口与末尾实例钩子正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/2",
+      "id": "EXP-LIFE-008-C03",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S05",
+        "ER-S06",
+        "ER-S07",
+        "ER-S08",
+        "ER-S09"
+      ],
+      "note": "Brain/SG管理列表及SG缓冲闭合；不调用Stop、不清实例字段的限定正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/3",
+      "id": "EXP-LIFE-008-C04",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S10",
+        "ER-S11",
+        "ER-S12",
+        "ER-S13",
+        "ER-S20",
+        "ER-S21"
+      ],
+      "note": "GUID协程清理覆盖两调度器且不扫attime；pendingtasks为后续独立阶段。"
+    },
+    {
+      "pointer": "/entries/0/claims/4",
+      "id": "EXP-LIFE-008-C05",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S15",
+        "ER-S16",
+        "ER-S17",
+        "ER-S19",
+        "ER-S20"
+      ],
+      "note": "onremove之后watcher、双向事件及pendingtasks顺序与owner整块移除正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/5",
+      "id": "EXP-LIFE-008-C06",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S24",
+        "ER-S25",
+        "ER-S26"
+      ],
+      "note": "组件与raw replica两遍pairs、table/truthy钩子条件、非RemoveComponent路径正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/6",
+      "id": "EXP-LIFE-008-C07",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02"
+      ],
+      "note": "更新新旧索引、children递归、followers只清Lua字段、实体钩子/persists/Retire顺序正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/7",
+      "id": "EXP-LIFE-008-C08",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02"
+      ],
+      "note": "组内pairs/无快照与计数/原生行为边界适当；没有把两处递减宣称为实测故障。"
+    },
+    {
+      "pointer": "/entries/0/claims/8",
+      "id": "EXP-LIFE-008-C09",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02",
+        "ER-S04",
+        "ER-S14",
+        "ER-S19",
+        "ER-S20",
+        "ER-S21"
+      ],
+      "note": "直接Lua调用异常可跳过后段；本地入口无Ents缺项早退或重入锁，EI限定成立。"
+    },
+    {
+      "pointer": "/entries/0/claims/9",
+      "id": "EXP-LIFE-008-C10",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S11",
+        "ER-S12",
+        "ER-S14",
+        "ER-S18",
+        "ER-S20",
+        "ER-S21",
+        "ER-S22",
+        "ER-S23"
+      ],
+      "note": "已进入Lua回调不因纯表移键/Cancel被主动中止；正常返回限定及协程yield未知保留正确。"
+    },
+    {
+      "pointer": "/entries/0/claims/10",
+      "id": "EXP-LIFE-008-C11",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02",
+        "ER-S16",
+        "ER-S19",
+        "ER-S20",
+        "ER-S27",
+        "ER-S28",
+        "ER-S29"
+      ],
+      "note": "一次清理不构成永久禁止登记，外部宿主及任意模块字段不在通用扫描范围；Retire后结果未断言。"
+    },
+    {
+      "pointer": "/entries/0/claims/11",
+      "id": "EXP-LIFE-008-C12",
+      "status": "request_changes_evidence_only",
+      "evidence_refs": [
+        "ER-S27",
+        "ER-S28",
+        "ER-S29",
+        "ER-S30",
+        "ER-S31",
+        "ER-S32"
+      ],
+      "note": "NIS句柄、Input转发、EventHandler释放与container/classified样本源码正确；Input.oncontrol具体类型的构造依赖未纳入引用，见B01。"
+    },
+    {
+      "pointer": "/entries/0/claims/12",
+      "id": "EXP-LIFE-008-C13",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S03"
+      ],
+      "note": "RemoveEntity包装缺项/延迟分支与直接Remove方法正确消歧。"
+    },
+    {
+      "pointer": "/entries/0/claims/13",
+      "id": "EXP-LIFE-008-C14",
+      "status": "pass_static",
+      "evidence_refs": [
+        "ER-S01",
+        "ER-S02",
+        "ER-S04",
+        "ER-S14",
+        "ER-S16",
+        "ER-S19",
+        "ER-S20",
+        "ER-S24",
+        "ER-S27",
+        "ER-S31",
+        "ER-S32"
+      ],
+      "note": "建议与实际责任阶段一致，未提出新玩法/数值或改变旧准入。"
+    }
+  ],
+  "api_review": {
+    "pointer": "/entries/0/api_contracts/0",
+    "symbol": "EntityScript:Remove",
+    "status": "request_changes_evidence_only",
+    "reviewed_fields": [
+      "symbol",
+      "source_file",
+      "visibility",
+      "parameters",
+      "returns",
+      "preconditions",
+      "side_effects",
+      "lifecycle",
+      "evidence_refs",
+      "unknowns"
+    ],
+    "result": "参数/返回/依赖前置、分阶段副作用、异常/重入与原生未知边界均通过静态审查；外部输入句柄身份引用按B01补齐。"
+  },
+  "mechanism_step_reviews": [
+    {
+      "pointer": "/entries/0/mechanism_steps/0",
+      "status": "pass_static",
+      "note": "父/平台及global/manager/协程前段顺序闭合。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/1",
+      "status": "pass_static",
+      "note": "onremove后watcher/事件/Periodic归属退出闭合。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/2",
+      "status": "request_changes_evidence_only",
+      "note": "组件/raw replica/更新/children/followers顺序正确；引用样本Input身份按B01补齐。"
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/3",
+      "status": "pass_static",
+      "note": "末尾钩子/persists/Retire以及原栈继续/未知边界闭合。"
+    }
+  ],
+  "source_reference_review": {
+    "status": "pass_integrity",
+    "count": 32,
+    "file_count": 12,
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "all_file_sha256_match": true,
+    "all_range_sha256_match": true,
+    "all_ranges_valid": true,
+    "dangling_evidence_refs": [],
+    "missing_reverse_claim_edges": [],
+    "note": "逐条从冻结ZIP原字节与UTF-8 splitlines/LF join重算；完整性通过不消除B01的缺少引用。"
+  },
+  "deduplication_review": {
+    "status": "pass_static",
+    "prior_complete_entry_ids": [
+      "EXP-LIFE-001",
+      "EXP-LIFE-002",
+      "EXP-LIFE-003",
+      "EXP-LIFE-005",
+      "EXP-LIFE-006",
+      "EXP-ARCH-001"
+    ],
+    "existing_authored_EntityScript_Remove_contracts": [],
+    "result": "既有局部API作依赖复用；新增独立Remove完整API及未展开global/managers/coroutine/ownership前后段。未改旧条目Scope、HOLD或canonical，同名file-local OnRemoveEntity不混合。"
+  },
+  "scope_unknown_review": {
+    "status": "pass_static",
+    "statuses": [
+      "research",
+      "restricted",
+      "hold"
+    ],
+    "result": "来源762172/build26474873与服务759671分开；runtime_verified:false明确。native Retire/有效性/父平台联动、任意Mod、遍历mutation、异常/重入/yield实机结果与跨端传播均保留未知。未把静态两处减计数推成游戏故障。"
+  },
+  "review_dependencies": [
+    {
+      "file": "agents/remove_review/review-plan.json",
+      "sha256": "e54a7aa729489ccf15134ee82b8ecbff8372b21fa1ca86b8750233b1e9091fdb",
+      "role": "candidate之前冻结的独立审阅计划"
+    },
+    {
+      "file": "agents/remove_review/independent-locators.json",
+      "sha256": "8aa1711ed380bad86365dc8212cbbef4d14f3d60fec0b452a10f66623d59ce81",
+      "role": "candidate之前独立核对的26个定位"
+    },
+    {
+      "file": "agents/remove_review/candidate-audit.json",
+      "sha256": "3a7c8eb711bd0e288ea8c7991b525f468550c501d0739515d14a5f4d0d9a9d88",
+      "role": "32引用完整性、reverse edges、API去重与补充定位"
+    },
+    {
+      "file": "windows/A/DEDUP.md",
+      "sha256": "c76da92f1b01c4ea8f33cc2ea04cca35080355cbf544ecb62e0259625d4832e1",
+      "role": "冻结后读取的作者增量说明；已独立核对核心去重"
+    },
+    {
+      "file": "windows/A/handoff.json",
+      "sha256": "a571fcd0bde94fbea8a1f7e997093db6f3e1e5fc7b9bc1cf092c5ea56a89e5ab",
+      "role": "作者交接身份与自检说明；不作为独立运行证据"
+    },
+    {
+      "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+      "role": "本campaign冻结合法来源ZIP；不输出私人绝对路径或Lua载荷"
+    }
+  ],
+  "limitations": [
+    "仅静态源码和JSON/hash核验；未启动游戏、专服、客户端或Lua行为夹具。",
+    "不修改候选、仓库、配置、canonical或HOLD；真实游戏验证属于独立E窗口。"
+  ]
+}

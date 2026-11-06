@@ -3,7 +3,7 @@
   "tools": [
     {
       "name": "search_kb",
-      "description": "Search a unified, ranked pool of Legacy, N001 and Native Core candidates for DST engineering. Deliver only whole original atoms admitted for this task and its positive/negative scope. Named samples require their own bounded original evidence and task relation under a fixed source version; relevance of the containing record alone is insufficient. Use projection=reviewer and view=decision for existing-code review or Native API research, then expand only useful IDs. Ranking explains relevance; it does not grant Coding admission or prove evidence. projection controls admission independently from view. Coding hold/prohibited remain excluded in every mode and view. scope_logic=and intersects filter dimensions; or unions them. Not for gameplay advice.",
+      "description": "Search ranked DST engineering knowledge across registered families. For code review or native API research use projection=reviewer, view=decision, then expand useful IDs. Results retain whole original atoms, Scope and evidence. scope_logic=and intersects filter dimensions; or unions them.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -143,7 +143,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [],
@@ -158,7 +158,7 @@
     },
     {
       "name": "lookup_api",
-      "description": "Default family=legacy preserves the historical physical declaration lookup. Explicit family=native_mechanism requires projection=reviewer and returns whole research API atoms, Scope, unknowns and version locators under max_bytes. Research identity is authored, never a public/physical API guarantee; ambiguous owners, sources, visibility or evidence versions require explicit disambiguation. Bare leaf or exact qualified identities including require(\"module\").field are supported; signatures and dynamic expressions are not. owner and identity_kind narrow only the research route. Navigate an exact declaration identity to mapped preserved typed claims; contract_delivery separates actual claim delivery, partial delivery and identity-only navigation. Use source_file to select the exact original scripts/...lua path when accepted physical declarations are ambiguous. Repeated records of one physical declaration do not create ambiguity. File-local declarations remain file-local. A catalog scope gap never establishes that the API is absent. Same-name methods of different owners do not substitute. Exact symbols alone are not method contracts. Defaults to projection=reviewer and compact view=decision; exact lookup is research navigation, not a Coding default or admission promotion. Inspect scope, corrections and current vanilla source; expand a selected ID only as needed.",
+      "description": "Look up an exact API identity. Default family=legacy finds preserved physical declarations and mapped claims; contract_delivery reports whether behavior claims were delivered. Explicit family=native_mechanism requires projection=reviewer and returns complete research API atoms under max_bytes. Use source_file to disambiguate sources; owner and identity_kind narrow native_mechanism only. Bare names and qualified identities such as require(\"module\").field are supported; signatures and dynamic expressions are not. File-local functions retain their visibility. A declaration or catalog gap alone does not establish a method contract, public API or absence. Defaults to reviewer projection and compact decision view.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -219,12 +219,12 @@
           "source_file": {
             "type": "string",
             "maxLength": 512,
-            "description": "Optional exact original scripts/...lua path. Required when accepted same-name declarations belong to different sources; does not promote file-local declarations to public APIs."
+            "description": "Exact original scripts/...lua path; use it to disambiguate same-name declarations in different files."
           },
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [
@@ -241,7 +241,7 @@
     },
     {
       "name": "get_entry",
-      "description": "Read one canonical knowledge ID. Omitting view preserves the legacy call shape; explicit view=decision is compact, reviewer adds research detail, evidence exposes evidence navigation. projection separately controls admission: selecting a view never bypasses Coding HOLD. For research use projection=reviewer, then resolve one exact evidence reference if necessary.",
+      "description": "Read a selected knowledge ID. view=decision is compact; reviewer adds detail; evidence adds source navigation. Omitting view preserves the legacy response. projection controls admission independently. For mechanism research, pointer selects a whole typed atom and max_bytes bounds delivery.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -276,7 +276,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [
@@ -293,7 +293,7 @@
     },
     {
       "name": "resolve_evidence",
-      "description": "Resolve one evidence reference for one knowledge ID, optionally narrowed by a relative JSON subpointer. Defaults to Reviewer research navigation. Returns bounded referenced evidence only, with locator/hash and truncation metadata; never fetches an entire evidence corpus or changes Coding admission.",
+      "description": "Read one evidence reference for a knowledge ID, optionally narrowed by a relative JSON subpointer. Defaults to Reviewer navigation. Returns the selected evidence with its locator, hash and delivery metadata under max_bytes.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -327,7 +327,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [
@@ -344,7 +344,7 @@
     },
     {
       "name": "get_related",
-      "description": "Traverse typed relations with explicit edge direction. Source/Claim nodes may be returned. No assertion that a related node proves another.",
+      "description": "Traverse typed relations in the chosen direction. Related Source or Claim nodes are navigation leads; inspect their evidence and Scope.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -388,7 +388,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [
@@ -405,7 +405,7 @@
     },
     {
       "name": "get_klei_facts",
-      "description": "Search only Klei source facts for DST engine/API behavior. Snapshot scoped; never substitute case observations for vanilla API evidence.",
+      "description": "Search Klei source facts for DST engine and API behavior within their recorded source version.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -418,7 +418,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [],
@@ -433,7 +433,7 @@
     },
     {
       "name": "get_tests",
-      "description": "Find applicable DST test candidates by query or related entry IDs. Returned tests may be unexecuted; inspect their status.",
+      "description": "Find relevant test candidates by query or knowledge IDs. Inspect execution status before treating a candidate as a result.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -452,7 +452,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [],
@@ -467,7 +467,7 @@
     },
     {
       "name": "get_context_bundle",
-      "description": "Start a substantial DST engineering task with a bounded selection from the unified ranked pool. For existing-code review or Native API research choose projection=reviewer, view=decision and normally budget=normal. Pack complete original atoms with their necessary original Scope and evidence metadata under the unchanged total payload budget. Never cut a branch or rewrite a fact to fit; withheld atoms and unresolved Scope or evidence remain explicit gaps. Named samples are bounded references only when their own original evidence and task relation qualify. Inspect gaps and progressively expand selected IDs. metadata_ref and metadata_template resolve within that card shared_metadata table. mode changes task priorities, never admission. Coding keeps its existing admitted defaults and hold/prohibited exclusions.",
+      "description": "Select knowledge for a substantial DST engineering task. For code review or native API research use projection=reviewer, view=decision and normally budget=normal. Packs whole original atoms with required Scope and evidence within the total budget; inspect gaps and expand selected IDs. metadata_ref and metadata_template resolve in the card shared_metadata table. mode changes task priorities; projection controls admission.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -514,7 +514,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [
@@ -531,14 +531,14 @@
     },
     {
       "name": "validate_kb",
-      "description": "Maintenance/curator only: verify current KB schema, index, sources, relations and manifest. Do not run on every ordinary coding request.",
+      "description": "Maintenance check for KB schema, index, source commitments, relations and manifest. Run when maintaining the package rather than before ordinary queries.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Frozen source environment from the configured catalog. Omit for its explicit default (release default: 759671). Use the same environment when expanding entries/evidence. Record source Scope remains authoritative; selecting an environment does not verify all records for that version."
+            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
           }
         },
         "required": [],
