@@ -147,7 +147,7 @@ end)
 - `main.lua:loadfn`、`mainfunctions.lua:LoadPrefabFile`，`strict.lua`：查 loader 和未声明全局错误；不要只按目录判环境。
 - `class.lua:Class`、`__index`、`__newindex`：查继承与属性代理。
 - API 检查至少核对对象类型、主组件/replica、定义及调用者。Lua 中搜不到定义可能是引擎绑定、方法别名或动态注入，不能直接判“不存在”。
-- 验收配置缺省、显式 false/0、只启用本模组、重复加载/初始化、原方法的返回值和其他分支。语法通过不能证明 Hook 被调用。
+- 按本次 Hook 与配置改动选择验收项，覆盖相关的配置缺省、显式 false/0、只启用本模组、原方法返回值和其他分支。有重复入口时再验重复加载/初始化。语法通过不能证明 Hook 被调用。
 
 相关工程案例：[前端入口拆分与模块消费者的具体反例](lulu-entry-ui-network.md)，按其中的项目条件与验证范围使用。
 

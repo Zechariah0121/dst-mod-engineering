@@ -1,0 +1,35 @@
+{
+  "schema": "dst-coordinator-review-resolution/1",
+  "date": "2026-10-26",
+  "candidate": "worldgen/mechanisms.json",
+  "candidate_sha256": "0c7772f40b77d9b3935d20ba0885bd0d173a675548bc36c6b2a17a2009729ecd",
+  "independent_review": "reviews/worldgen/review.json",
+  "reviewed_input_sha256": "de0efd497a547c4fbf47528f6717f6a5b2646c100bd80b85138669004fc43399",
+  "changed_pointers": [
+    "/entries/0/claims/1/statement",
+    "/entries/0/mechanism_steps/0/description",
+    "/entries/3/api_contracts/2/side_effects/0",
+    "/entries/3/api_contracts/3/side_effects/0",
+    "/entries/3/claims/5/statement",
+    "/entries/3/mechanism_steps/4/description"
+  ],
+  "findings": [
+    {
+      "id": "F001",
+      "status": "resolved",
+      "coordinator_source_check": "scripts/worldgen_main.lua:144-148",
+      "detail": "if moddata 的真值条件已在 claim 和 step 一致说明。"
+    },
+    {
+      "id": "F002",
+      "status": "resolved",
+      "coordinator_source_check": "scripts/map/object_layout.lua:370-431",
+      "detail": "有/无 position 两分支 MakeSafeFromDisconnect 条件调用、非零单元和 native 效果未知已写入 claim、两项 API 与 step。"
+    }
+  ],
+  "out_of_scope_optional_reference": "forest_map.lua:853-868 已由总控查看，存在提前 return nil 路径；最终候选未新增无条件清理的断言。",
+  "disposition": "bounded_static_research_candidate; retain research/restricted/hold",
+  "unresolved_semantic_findings_from_independent_review": 0,
+  "runtime_verified": false,
+  "coverage_limits": "继承独立报告对原冻结版本的明确范围，新增六处文本由总控按源码复核；不提升原研究/调用准入，不证明 native 或未来版本兼容。"
+}

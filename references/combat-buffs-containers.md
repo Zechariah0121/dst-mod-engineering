@@ -66,7 +66,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 
 使用游戏自带 `rechargeable`，不携带教程的同名旧组件覆盖原版。`Discharge(seconds)` 开始充能，`IsCharged()` 校验当前状态；需要时用 `SetOnChargedFn/SetOnDischargedFn` 配合 aoetargeting 显示。
 
-背包进度显示不是禁止使用。服务端行为执行前必须检查 charged，失败不能刷新/扣费；成功后再放电。包装 spellcaster/spellfn 保留全部参数与返回值，不能不管原法术失败就进入冷却。组件原有 OnSave/OnLoad 保存剩余进度；需测试旧档、读档重复初始化和特殊冷却政策。
+背包进度显示不是禁止使用。服务端行为执行前必须检查 charged。失败/中断是否消费、何时放电按项目政策和实际同步回调边界确定。包装 spellcaster/spellfn 保留全部参数与返回值，并按实际结果执行既定消费与冷却规则。组件原有 OnSave/OnLoad 保存剩余进度，旧档、读档重复初始化和特殊冷却检查按本次改动选择。
 
 ## 容器
 
@@ -92,7 +92,7 @@ target.components.combat.externaldamagemultipliers:RemoveModifier(source, "my_bu
 - `components/stackable_replica.lua:1-9,24-35,47-63,98-111`；`modindex.lua:GetModsToLoad/IsModEnabled`；`mods.lua:GetEnabledModNames`。
 - `prefabs/moonrockseed.lua`；`components/builder.lua:235-301`；`components/playerprox.lua:44-59,165-180`：科技选择与纯邻近触发。
 
-伤害测试需比较普通/位面/护甲/PvP、主目标不重复、范围边缘和叠加来源；Buff 测重复/到期/移除/死亡/读档；容器测多人打开、转移、召回与磁盘重启。网络展示、真实玩家输入和第三方 Mod 组合另做客户端验收。
+按本次机制改动选择场景。伤害检查普通/位面/护甲/PvP、主目标不重复、范围边缘和叠加来源，Buff 检查重复/到期/移除/死亡/读档，容器检查多人打开、转移、召回与磁盘重启中的相关路径。涉及网络展示、真实玩家输入和第三方 Mod 组合时另做客户端验收。
 
 ## 759671：受击入口、返回与 Hook 覆盖
 

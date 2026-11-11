@@ -1,0 +1,1970 @@
+{
+  "schema": "dst-growth-cross-review/1",
+  "date": "2026-10-26",
+  "reviewer_lane": "phase2/cooking",
+  "review_type": "independent_static_source_review",
+  "verdict": "minor_return_contract_revision_requested",
+  "inputs": {
+    "candidate_path": "local-private-artifact/mechanisms.json",
+    "candidate_sha256": "162632b4d75cc63219dd5da777b0a883e9ceb0300d47cb5663ea87e99772742c",
+    "expected_candidate_sha256": "162632b4d75cc63219dd5da777b0a883e9ceb0300d47cb5663ea87e99772742c",
+    "source_archive": "local-private-artifact/scripts.zip",
+    "archive_sha256": "03d745ab0aa78455b38240998c99d14f81e88e68b95320f31de79705f6ae5008",
+    "source_epoch": "759671",
+    "input_unchanged_after_review": true
+  },
+  "coverage": {
+    "entries": 4,
+    "claims": 41,
+    "api_contracts": 25,
+    "mechanism_steps": 16,
+    "reviewed_units": 82,
+    "source_references": 53,
+    "source_files": 18,
+    "all_cited_source_ranges_manually_read": true,
+    "core_files_read_in_full": [
+      "scripts/components/growable.lua",
+      "scripts/components/regrowthmanager.lua",
+      "scripts/components/plantregrowth.lua",
+      "scripts/regrowthutil.lua"
+    ],
+    "method": "逐条阅读候选原子/API/步骤；从原始ZIP读取完整核心方法和全部引用消费者/分发区间；逐单元附核验说明，哈希复算只作为身份检查"
+  },
+  "findings": [
+    {
+      "id": "GROW-XR-F1",
+      "priority": 2,
+      "category": "return_contract_precision",
+      "requires_revision": true,
+      "pointer": "/entries/1/api_contracts/1/returns/0",
+      "entry_id": "EXP-GROW-002",
+      "symbol": "Growable:Resume(reason)",
+      "current_wording": "原因清空且剩余时间存在、恢复任务时 true；其他路径 nil",
+      "issue": "此措辞容易把true等同于task已经恢复。Resume返回true只取决于原因集合为空且pausedremaining非nil；StartGrowingTask在实体睡眠且growoffscreen为假时只写targettime，不建立task handle。",
+      "impact": "调用者若以true断言self.task非nil或回调已被调度，会越过源码可保证的返回语义。",
+      "evidence": [
+        {
+          "ref": "GROW-S005",
+          "source_file": "scripts/components/growable.lua",
+          "line_start": 177,
+          "line_end": 189
+        },
+        {
+          "ref": "GROW-S002",
+          "source_file": "scripts/components/growable.lua",
+          "line_start": 28,
+          "line_end": 40
+        }
+      ],
+      "static_counterexample": {
+        "conditions": [
+          "pausedremaining=5",
+          "pausereasons为空",
+          "inst:IsAsleep()为true",
+          "growoffscreen为nil/false",
+          "task=nil"
+        ],
+        "result": "Resume调用StartGrowingTask设置targettime；不调用DoTaskInTime；清pausedremaining并返回true",
+        "execution": "not_run; derived from complete Lua branches"
+      },
+      "suggested_fix": "改为：原因表为空且pausedremaining非nil时，调用StartGrowingTask、清pausedremaining并返回true；true不保证task handle存在，睡眠且非growoffscreen时可能仅恢复targettime。其他路径nil。",
+      "scope": "不否定同卡C01/C03和StartGrowingTask契约；这些正文已经正确描述底层分支，需同步收紧独立API返回投影。"
+    }
+  ],
+  "nonblocking_observations": [
+    {
+      "id": "GROW-XR-O1",
+      "priority": 3,
+      "requires_revision": false,
+      "pointer": "/entries/3/claims/4/statement",
+      "issue": "“无区域/密度返回nil”宜限定为源码列出的nil guards，避免被误读为任意旧档缺字段均安全返回。GetFiveRadius检查generated整体nil、对应id和该id记录、prefab密度键；没有单独保护generated.densities容器表或topology结构缺失。",
+      "evidence": [
+        {
+          "ref": "GROW-S046",
+          "source_file": "scripts/regrowthutil.lua",
+          "line_start": 9,
+          "line_end": 35
+        }
+      ],
+      "suggested_fix": "可补一句：上述nil回退限源码显式guard；topology/generated.densities等外层结构仍须有效，不保证任意坏档安全。",
+      "assessment": "原句可按“缺prefab密度键”解释而与源码一致；作为非阻塞精确化观察，不将坏档假设当已发现运行故障。"
+    }
+  ],
+  "unit_reviews": [
+    {
+      "pointer": "/entries/0/claims/0",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C01",
+      "unit_type": "claims",
+      "unit_value_sha256": "974857306e25e8f15a2960cda77be11bfb90827c44670b72f2961b785ff5729d",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "构造和共享stages/表项引用与两个prefab赋值对应。",
+      "evidence_refs": [
+        "GROW-S001",
+        "GROW-S003",
+        "GROW-S019",
+        "GROW-S020",
+        "GROW-S023",
+        "GROW-S025"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/1",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C02",
+      "unit_type": "claims",
+      "unit_value_sha256": "1e6ad75af90ff244a644f249bfcf046f0538e389109c1a71a5cbd4c7a2d5d190",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "StartGrowing guards、nil时间回退/停止、multiplier及春季变换顺序逐行一致。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S003",
+        "GROW-S010"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/2",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C03",
+      "unit_type": "claims",
+      "unit_value_sha256": "b70649985510dd13365249f62dc6d3c1c04e0a78cb7ce0d2a807285ccd7a5859",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "StartGrowingTask睡眠分支、Stop字段及组件/实体清理路径一致。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S001",
+        "GROW-S003",
+        "GROW-S009",
+        "GROW-S011",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S012"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/3",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C04",
+      "unit_type": "claims",
+      "unit_value_sha256": "e90b79a5368ea88ad58b45a847dc3334e38ed76596f55767452ed9caaaf1c3b1",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "SetStage只上界钳制与GetNextStage循环分支一致。",
+      "evidence_refs": [
+        "GROW-S006",
+        "GROW-S003"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/4",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C05",
+      "unit_type": "claims",
+      "unit_value_sha256": "0cf77db4567a1255619d2fa6820180ab29b258d5dc0f17b24b034ba37d5dc0d2",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "DoGrowth目标回调顺序、growonly、单次有效性guard及true含义准确。",
+      "evidence_refs": [
+        "GROW-S004",
+        "GROW-S003",
+        "GROW-S006",
+        "GROW-S002"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/5",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C06",
+      "unit_type": "claims",
+      "unit_value_sha256": "52a8a615eb58f1bc147b8428e7ea0ee07bfc3f72d06a2f097d063e176ec270bb",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "常青树/石果灌木的阶段、采集和makeempty消费者调用已实查；未推广产物运行。",
+      "evidence_refs": [
+        "GROW-S020",
+        "GROW-S019",
+        "GROW-S021",
+        "GROW-S025",
+        "GROW-S023",
+        "GROW-S024",
+        "GROW-S052"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/6",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C07",
+      "unit_type": "claims",
+      "unit_value_sha256": "2904f486ad31a11156a3a3c551bd2a4b3668888732c6953107e9d9d27765af61",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "共享表风险与直接回调无事务保护属有边界推断。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S004",
+        "GROW-S006",
+        "GROW-S020",
+        "GROW-S025"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/7",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C08",
+      "unit_type": "claims",
+      "unit_value_sha256": "02ae3277172ff722661f4e29670bfbc9a39022838a3bc0612a88f273c3df3950",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "建议与有效阶段/时间及取消、重入边界一致，未升格事实。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S006",
+        "GROW-S004",
+        "GROW-S019"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/claims/8",
+      "entry_id": "EXP-GROW-001",
+      "unit": "EXP-GROW-001-C09",
+      "unit_type": "claims",
+      "unit_value_sha256": "de6afe41c6ca4143520a816be01ff00179c82e9fc40471d5a02d9006532706a8",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "魔法与运行未知保留，未把标记当完整魔法契约。",
+      "evidence_refs": [
+        "GROW-S004",
+        "GROW-S020",
+        "GROW-S025"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/api_contracts/0",
+      "entry_id": "EXP-GROW-001",
+      "unit": "Growable:StartGrowing(time)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "e93bf04cb72fb096e111e7b05d9f9190c4bad43ac2fa08a0d715c98c72bf9939",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "有效阶段前提、nil时间与副作用正确；空表/超界早退不是通用取消。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S003",
+        "GROW-S010"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/api_contracts/1",
+      "entry_id": "EXP-GROW-001",
+      "unit": "Growable:StartGrowingTask(time)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "3f06c4b30d78b9a0773cb258ca504844a75e9e6e46cf97246edf60ee0f2cfa54",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "仅实际调度分支替换task，睡眠仅写目标已说明。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S001",
+        "GROW-S011"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/api_contracts/2",
+      "entry_id": "EXP-GROW-001",
+      "unit": "Growable:StopGrowing()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "e07ce8631ac4aea8f164c70f6afca6e4aa30aa808c3bdc0c56b5c45bde8d8911",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "清两时间字段/取消自身handle、保留原因与sleeptime准确。",
+      "evidence_refs": [
+        "GROW-S003",
+        "GROW-S009",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S012"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/api_contracts/3",
+      "entry_id": "EXP-GROW-001",
+      "unit": "Growable:SetStage(stage)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "1c92946b5c7e8eff588980cad3ee3f5749f21dd07c0dbee996a98feb2fb2a746",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "无下界整型校验、不改计时、不转交fn返回准确。",
+      "evidence_refs": [
+        "GROW-S006",
+        "GROW-S002",
+        "GROW-S007"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/api_contracts/4",
+      "entry_id": "EXP-GROW-001",
+      "unit": "Growable:DoGrowth(skipgrownfn)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "26a4765211feaad2d1915e95b80600e0f1b6e384086cc43306a1dff2c6538251",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "停止时false、其他末尾true、paused路径与回调顺序准确。",
+      "evidence_refs": [
+        "GROW-S004",
+        "GROW-S006",
+        "GROW-S002",
+        "GROW-S003"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/0",
+      "entry_id": "EXP-GROW-001",
+      "unit": 1,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "f5c27b2d09369c7e97cb2b57e24ce75468d1e91e249143532b73564813f598f8",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "共享阶段表/静态阶段与master初始化调用对应。",
+      "evidence_refs": [
+        "GROW-S020",
+        "GROW-S019",
+        "GROW-S025",
+        "GROW-S023"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/1",
+      "entry_id": "EXP-GROW-001",
+      "unit": 2,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "2ed5e7aceb780665d60fe3d624fb6d0da5a27ef3024946ba082088f533b26b8a",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "正常StartGrowing路径计时/睡眠策略对应；早退边界已由同卡claims/API限定。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S003",
+        "GROW-S010",
+        "GROW-S011"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/2",
+      "entry_id": "EXP-GROW-001",
+      "unit": 3,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "07632a4223ba62c5a75183b7b753e9adadfcfb343962b05bf38daa0c72f0e8ed",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "OnGrow及目标回调/有效性顺序准确。",
+      "evidence_refs": [
+        "GROW-S001",
+        "GROW-S004",
+        "GROW-S006"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/0/mechanism_steps/3",
+      "entry_id": "EXP-GROW-001",
+      "unit": 4,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "2caecba80c841acf02c41ff0d532bd46b5552cb800f8c8f23d9bcbd816704493",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "stump/枯竭显式停与组件/实体两条清理路径一致。",
+      "evidence_refs": [
+        "GROW-S021",
+        "GROW-S024",
+        "GROW-S009",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S012"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/0",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C01",
+      "unit_type": "claims",
+      "unit_value_sha256": "9309b5aed1cbaef5e87e38e04ab4dbbddf4937251eb6635438dee67b2c4a6c46",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "Pause先补睡眠再floor剩余、truthy原因及Resume集合门槛与源码一致；API返回值另有精确化建议。",
+      "evidence_refs": [
+        "GROW-S005",
+        "GROW-S003",
+        "GROW-S008",
+        "GROW-S002"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/1",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C02",
+      "unit_type": "claims",
+      "unit_value_sha256": "5bfe072ac3f75dec510139abc0873c049c0a81b7d8a67c102d01fbf229fc7e07",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "暂停并非硬锁、StartGrowing绕原因、Resume不重算time/春季函数均对应。",
+      "evidence_refs": [
+        "GROW-S005",
+        "GROW-S004",
+        "GROW-S002",
+        "GROW-S003"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/2",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C03",
+      "unit_type": "claims",
+      "unit_value_sha256": "a05781d07217fa2d9ae326c7b7d75d45bcbf9a405358993b873831b532f8b0fd",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "睡眠task取消/目标保留/唤醒dt分支及全局prefab先行分发已实查。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S002",
+        "GROW-S018"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/3",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C04",
+      "unit_type": "claims",
+      "unit_value_sha256": "eef238e7f3c2860f77eb2031dec8c86b40607bebb8c67d0d286428c0cfe707d4",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "LongUpdate逐阶段与末尾单参growfn、growonly局部索引及完整循环不触发条件均准确。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S004",
+        "GROW-S002",
+        "GROW-S006",
+        "GROW-S003"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/4",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C05",
+      "unit_type": "claims",
+      "unit_value_sha256": "b38ac752ddc9e0f7b2fd97372960007d1a4b3fab931603f6ffa0f984c46742de",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "保存字段/归一化和未保存原因、无time不停止既有任务的语句对应。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S002",
+        "GROW-S006"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/5",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C06",
+      "unit_type": "claims",
+      "unit_value_sha256": "3f40d52a417d76d855d81b2b242309e9d0bbc1d2c37fce3ada1ff9c16bb92ed4",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "OnLoad原地改data.time后StartGrowing清usetimemultiplier的顺序属直接事实。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S002",
+        "GROW-S010"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/6",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C07",
+      "unit_type": "claims",
+      "unit_value_sha256": "334b1db0d7cfd737f1020a9f6155fccae07e437a5b4e9959bda879e8fc9f78b4",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "GetPersistData组件先、SetPersistData组件后prefab与常青树stump二次停止对应。",
+      "evidence_refs": [
+        "GROW-S015",
+        "GROW-S016",
+        "GROW-S022",
+        "GROW-S021",
+        "GROW-S007"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/7",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C08",
+      "unit_type": "claims",
+      "unit_value_sha256": "c06b79100e4f5bb9ed098243c57ba859a79f8250cdb710b30041cb4e90736e4b",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "远古树苗seed或条件、后续逐项Pause/Resume、终态生成失败仍移原实体对应。",
+      "evidence_refs": [
+        "GROW-S026",
+        "GROW-S027",
+        "GROW-S028",
+        "GROW-S029"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/8",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C09",
+      "unit_type": "claims",
+      "unit_value_sha256": "fa225913c36dc57b1e94c507f051c4f65ed23140e0f9900a2b63f1f50f033efe",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "时间不推进的循环可能不收敛为静态条件风险，未声称实测。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S005",
+        "GROW-S008",
+        "GROW-S002",
+        "GROW-S028"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/9",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C10",
+      "unit_type": "claims",
+      "unit_value_sha256": "18b81580b6046a7a05a7e2ab63b4e04ebd01bd773d2d0ddb8a9c4162413d1f13",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "正常与长更新growfn参数差异及环境恢复建议均有直接调用点。",
+      "evidence_refs": [
+        "GROW-S004",
+        "GROW-S008",
+        "GROW-S007",
+        "GROW-S016",
+        "GROW-S028"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/claims/10",
+      "entry_id": "EXP-GROW-002",
+      "unit": "EXP-GROW-002-C11",
+      "unit_type": "claims",
+      "unit_value_sha256": "efc5380a1ced2422f435f904e56d99ba24428a5498e1b8cc69d7aff28ea43c53",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "native/离线/回调重入未知保留。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S005",
+        "GROW-S007",
+        "GROW-S018",
+        "GROW-S017"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/0",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:Pause(reason)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "fb2988db36f5860ea62ac98ded258d322bcdfb7276c24fd680df06224461dc02",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "首次暂停可能补生长及负floor剩余、原因条件准确。",
+      "evidence_refs": [
+        "GROW-S005",
+        "GROW-S008",
+        "GROW-S003"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/1",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:Resume(reason)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "c486f0d40eb492fc70f42bbcc5d77607af8f1758b5943764f81d37fb6d1b2f1a",
+      "decision": "needs_return_wording_revision",
+      "review_note": "返回值需明确为满足恢复条件后true，不保证task handle已建立（F1）。",
+      "evidence_refs": [
+        "GROW-S005",
+        "GROW-S002"
+      ],
+      "finding_ids": [
+        "GROW-XR-F1"
+      ]
+    },
+    {
+      "pointer": "/entries/1/api_contracts/2",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:LongUpdate(dt)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "bd95e10a118aab568141d15f1b95c3b839a5ee9eb0f2ecbb5b8c5e5ae1c8383b",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "while和末尾growfn形状/收敛前提准确。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S004",
+        "GROW-S017",
+        "GROW-S005"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/3",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:OnEntitySleep()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "7ffef2b2b6be5df6ffec6a519e07f62015ffbbe184cd166ec56bb454f34cc49a",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "task及growoffscreen门槛、目标保留与分发位置准确。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S018"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/4",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:OnEntityWake()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "1fdeae5b662233d37c1d1d0788cc568e99dbf013d0b8a23c06a165eb000c7ea1",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "目标/离屏门槛和dt正/非正分支准确。",
+      "evidence_refs": [
+        "GROW-S008",
+        "GROW-S018",
+        "GROW-S002"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/5",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:OnSave()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "29cfaa8325db1e04fe6574bf3583089c592290377b1d01924d1909286a75e772",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "table返回、倍率除法前提及不保存原因符合代码。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S015"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/api_contracts/6",
+      "entry_id": "EXP-GROW-002",
+      "unit": "Growable:OnLoad(data)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "fc474fa5b34b271e14c0cebc980148cb9ef9a5abff296c5e900c2dc8b8f3cbac",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "nil返回、SetStage副作用、改data.time/清倍率标志与无time分支准确。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S006",
+        "GROW-S002",
+        "GROW-S016"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/0",
+      "entry_id": "EXP-GROW-002",
+      "unit": 1,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "0245ebb6c8e60915737606b1880f0280a63a9cf0ca2cb2f313f8e4ecd6bda05f",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "实际树苗约束调用Pause/Resume，两原因语义对应。",
+      "evidence_refs": [
+        "GROW-S005",
+        "GROW-S028"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/1",
+      "entry_id": "EXP-GROW-002",
+      "unit": 2,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "3e654c29a6f7b8330ae7edbd5866823c43e3ce88c303ca0c2abc92245c992ee5",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "prefab先、组件后，目标保留与追赶调用对应。",
+      "evidence_refs": [
+        "GROW-S018",
+        "GROW-S008",
+        "GROW-S017"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/2",
+      "entry_id": "EXP-GROW-002",
+      "unit": 3,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "495d1f1c64a0003a8ab757450c142ff401d144808195d8f056cb6eb1400791c6",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "存档只有数值/阶段及按有无time重建，不保存暂停原因，准确。",
+      "evidence_refs": [
+        "GROW-S007",
+        "GROW-S002"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/1/mechanism_steps/3",
+      "entry_id": "EXP-GROW-002",
+      "unit": 4,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "41df6e3960d9984ce5649ed5ee870eb008385e162f859ed7d5374756a73bbcc8",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "prefab stump恢复与树苗0延迟环境重判对应。",
+      "evidence_refs": [
+        "GROW-S016",
+        "GROW-S022",
+        "GROW-S021",
+        "GROW-S027",
+        "GROW-S028",
+        "GROW-S029"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/0",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C01",
+      "unit_type": "claims",
+      "unit_value_sha256": "a334e94bb993d9aa4970a90c7cdbc8909f8368af0a6a196eec654b73be488df6",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "mastersim断言、世界组件安装、29周期与未保存handle均有源码。",
+      "evidence_refs": [
+        "GROW-S030",
+        "GROW-S032",
+        "GROW-S039",
+        "GROW-S040",
+        "GROW-S011"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/1",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C02",
+      "unit_type": "claims",
+      "unit_value_sha256": "b266b5088ad416767a06b83c1806ab57d4f7def323037bd1f1968f7de8438e47",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "两个helper事件绑定/撤销、事件数据与入队快照、不撤已排队记录准确。",
+      "evidence_refs": [
+        "GROW-S035",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/2",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C03",
+      "unit_type": "claims",
+      "unit_value_sha256": "e826cb4d2d452ef0526e23d8c6afe0846be6ec4386f5bc62369a71f7e86187b2",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "覆盖配置重置内部时钟、timemult调用及carrot/flower即时状态因子对应。",
+      "evidence_refs": [
+        "GROW-S032",
+        "GROW-S033"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/3",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C04",
+      "unit_type": "claims",
+      "unit_value_sha256": "5b981a30032a1ae78a2dafabcf578b89fed21fdd92496697b8483ad7b5892cfe",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "尝试时中心地皮、偏移、玩家CACHE/空间FAILED与Spawn nil仍SUCCESS对应。",
+      "evidence_refs": [
+        "GROW-S030",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/4",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C05",
+      "unit_type": "claims",
+      "unit_value_sha256": "cdbee0378f24865d2a7bfcb3363c43c45e519fcbc51fd55a5df2753765d69d69",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "LinkedList迭代/删除追加、完整regrowtime重试与未使用RETRY_MULT对应。",
+      "evidence_refs": [
+        "GROW-S030",
+        "GROW-S033",
+        "GROW-S051"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/5",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C06",
+      "unit_type": "claims",
+      "unit_value_sha256": "b2ff58643eb004d2ad35bf46c9d07123d8e2b0cab7044241c284dd05baf926d5",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "相对剩余/零坐标保存、按已支持类型追加及不清队列对应。",
+      "evidence_refs": [
+        "GROW-S034",
+        "GROW-S032",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/6",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C07",
+      "unit_type": "claims",
+      "unit_value_sha256": "6e972903cb23e957aa0bbb77ebf349a815c893fc48ea8d004bc9f1cc7cb047c8",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "胡萝卜/花master消费者、延迟种植检查、Pick后Remove和onremove先行链已实查。",
+      "evidence_refs": [
+        "GROW-S036",
+        "GROW-S037",
+        "GROW-S038",
+        "GROW-S049",
+        "GROW-S014",
+        "GROW-S035"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/7",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C08",
+      "unit_type": "claims",
+      "unit_value_sha256": "a0090d380e22f589887de792c77fad267958fdb323ae66db36a260f41ba2e927",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "身份/状态未还原与宿主periodic/监听清理风险为有边界推断。",
+      "evidence_refs": [
+        "GROW-S031",
+        "GROW-S033",
+        "GROW-S034",
+        "GROW-S035",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S011",
+        "GROW-S032"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/8",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C09",
+      "unit_type": "claims",
+      "unit_value_sha256": "105b016831421c109f75253c4126fbab3b9178cbd2d5ec08cc69052d054aa8bd",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "注册、重配置、尝试/出生分层验收建议符合源码。",
+      "evidence_refs": [
+        "GROW-S032",
+        "GROW-S031",
+        "GROW-S033",
+        "GROW-S034",
+        "GROW-S035"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/claims/9",
+      "entry_id": "EXP-GROW-003",
+      "unit": "EXP-GROW-003-C10",
+      "unit_type": "claims",
+      "unit_value_sha256": "81c405c75f39850e921d09ceac67ebbbca66a9afdc996ceb4ac0a9075d6d485a",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "未运行及未穷举其他资源/haunt特例明确。",
+      "evidence_refs": [
+        "GROW-S031",
+        "GROW-S033",
+        "GROW-S034",
+        "GROW-S035"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/0",
+      "entry_id": "EXP-GROW-003",
+      "unit": "RegrowthManager:SetRegrowthForType(prefab, regrowtime, product, timemult)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "19615aa5e265f463ddbb3e3ebf0d165d3be53f1e6a45e78173d0f0cfb99d6c9d",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "覆盖配置/时钟置零且旧队列不rebase、timemult函数身份准确。",
+      "evidence_refs": [
+        "GROW-S032",
+        "GROW-S033",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/1",
+      "entry_id": "EXP-GROW-003",
+      "unit": "RegrowthManager:LongUpdate(dt)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "4cf0ccbeb225f4bb3edad6d5c5373fbdfbe4aaf307dc10b7edbaf0c7d1d17f30",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "每有队列类型需要配置、即期因子>0推进与三状态准确。",
+      "evidence_refs": [
+        "GROW-S033",
+        "GROW-S032",
+        "GROW-S031",
+        "GROW-S017"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/2",
+      "entry_id": "EXP-GROW-003",
+      "unit": "RegrowthManager:OnSave()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "28a5b2aa47e7ef7801024b4ef15f1221fb7381f42329c892c5218297588a7877",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "相对timer表、零坐标与不改队列准确。",
+      "evidence_refs": [
+        "GROW-S034",
+        "GROW-S032",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/3",
+      "entry_id": "EXP-GROW-003",
+      "unit": "RegrowthManager:OnLoad(data)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "4cad949038a944212f8ba88c5a3534c6ec54922996efa97fb3d04faeac58ff64",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "非nil data.timers及类型前置、追加不去重准确。",
+      "evidence_refs": [
+        "GROW-S034",
+        "GROW-S032",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/4",
+      "entry_id": "EXP-GROW-003",
+      "unit": "AddToRegrowthManager(inst)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "f18a427ffb365466c1883a089e291ef716d53ea73617bb04a4c206020a2f50cc",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "全局helper身份、监听而非立即生成、源实体前提准确。",
+      "evidence_refs": [
+        "GROW-S035",
+        "GROW-S031",
+        "GROW-S036",
+        "GROW-S038"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/api_contracts/5",
+      "entry_id": "EXP-GROW-003",
+      "unit": "RemoveFromRegrowthManager(inst)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "d08dcab847eb9b96bb48c911d7a5256f8c92f3f1c277784b29d726409d36eb54",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "仅撤helper监听/字段不删队列准确。",
+      "evidence_refs": [
+        "GROW-S035",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/0",
+      "entry_id": "EXP-GROW-003",
+      "unit": 1,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "9c37c0318bb18f9568abd173bbcaad2547ffc70076ff90ccc4ccbd0b86ebbcab",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "世界初始化和源helper两层登记对应。",
+      "evidence_refs": [
+        "GROW-S030",
+        "GROW-S032",
+        "GROW-S039",
+        "GROW-S040",
+        "GROW-S035"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/1",
+      "entry_id": "EXP-GROW-003",
+      "unit": 2,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "555f68aae9e93a60b8771fa471132507065ddca9666509e9874c1b721b74332d",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "Pick→Remove→onremove→beginregrowth→快照入队对应。",
+      "evidence_refs": [
+        "GROW-S036",
+        "GROW-S038",
+        "GROW-S049",
+        "GROW-S014",
+        "GROW-S035",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/2",
+      "entry_id": "EXP-GROW-003",
+      "unit": 3,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "cd4f62496bf44aeba49ffaa63392d1f62b8d7d400060be0657ab45baec76073e",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "即时倍率推进，三结果及Spawn对应。",
+      "evidence_refs": [
+        "GROW-S032",
+        "GROW-S033",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/2/mechanism_steps/3",
+      "entry_id": "EXP-GROW-003",
+      "unit": 4,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "96f30f1301780dcc5321ba2cf20452d31c1904154583f046cdb5caf049380750",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "相对保存与只对重配支持类型追加对应。",
+      "evidence_refs": [
+        "GROW-S034",
+        "GROW-S032"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/0",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C01",
+      "unit_type": "claims",
+      "unit_value_sha256": "0200817984e992466f0eeea5ee4a6747fbaf9e77b6ad0b95d0f39cf25e1e3f4e",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "共享世界任务/桶/类型时钟、TimeMultipliers公开引用及当次state更新对应。",
+      "evidence_refs": [
+        "GROW-S041",
+        "GROW-S042"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/1",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C02",
+      "unit_type": "claims",
+      "unit_value_sha256": "d527e6c6ffebbda271a1d8d4c2ddb5286048a0096ae8b0208a9fe7eae14e9dba",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "SetRegrowthRate重复追加、50项阈值、内部时刻及variance helper已查。",
+      "evidence_refs": [
+        "GROW-S042",
+        "GROW-S043",
+        "GROW-S050"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/2",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C03",
+      "unit_type": "claims",
+      "unit_value_sha256": "84b680f2f68bfe49083ff7135447177ca0060ba79ad32dc676bfe950faa043e2",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "先重置尝试时间、缺原点radius注销、候选密度/数量及Spawn无nil guard对应。",
+      "evidence_refs": [
+        "GROW-S044",
+        "GROW-S043",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/3",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C04",
+      "unit_type": "claims",
+      "unit_value_sha256": "509f61eb2a14a3fec66c3ba7087572c79bf8816981dd210de936e1d179be0560",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "skip仅绕CanPlantAtPoint，其他过滤/道路/半径3和8条件、10步对应。",
+      "evidence_refs": [
+        "GROW-S044",
+        "GROW-S031",
+        "GROW-S030"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/4",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C05",
+      "unit_type": "claims",
+      "unit_value_sha256": "a5420c43bd3e08c898fedf4db68e1aefdd6c5077d4353544c5c87a8300ca5ec5",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "公式、首个拓扑node和具体nil返回guards正确；缺densities容器表的边界建议另列观察。",
+      "evidence_refs": [
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/5",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C06",
+      "unit_type": "claims",
+      "unit_value_sha256": "60e65d23f7654978822ea45980cc04c39e35f11734754e4826aed79feb9ab725",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "只存相对剩余，配置/桶/radius不存；组件未实现LongUpdate，未推离线语义。",
+      "evidence_refs": [
+        "GROW-S045",
+        "GROW-S042",
+        "GROW-S041",
+        "GROW-S043"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/6",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C07",
+      "unit_type": "claims",
+      "unit_value_sha256": "1da6979ed4cee6f3163dc6ce30666ade7f2c4d123de9980c18b774abc69d840f",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "首个自身项注销、空桶/最后任务取消、InternalTimes保留及实体/世界所有权对应。",
+      "evidence_refs": [
+        "GROW-S043",
+        "GROW-S042",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S011"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/7",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C08",
+      "unit_type": "claims",
+      "unit_value_sha256": "38ea24c7ec4e6a0d67227faa0425154fab85ac1973ea414a6ac3fcd9165b44db",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "常青树build与月树master安装、产品/searchtag及父prefab时钟/密度键对应。",
+      "evidence_refs": [
+        "GROW-S020",
+        "GROW-S047",
+        "GROW-S048",
+        "GROW-S042",
+        "GROW-S044",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/8",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C09",
+      "unit_type": "claims",
+      "unit_value_sha256": "e86a6e94845a97edaa8aa65df93e714f62b44edf0018d57ac9164671ff89e8be",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "Growable暂停与PlantRegrowth调度互不代管，未虚构玩家缓存条件。",
+      "evidence_refs": [
+        "GROW-S003",
+        "GROW-S005",
+        "GROW-S042",
+        "GROW-S044",
+        "GROW-S031"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/9",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C10",
+      "unit_type": "claims",
+      "unit_value_sha256": "6a606bc5e8a091c8913e8eab23ad54b595f0bd5f556fb22f6e6eb5fbc2daafa3",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "新类型倍率/密度/产品前提与动态变更审慎建议合理。",
+      "evidence_refs": [
+        "GROW-S041",
+        "GROW-S042",
+        "GROW-S043",
+        "GROW-S044",
+        "GROW-S046",
+        "GROW-S045"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/claims/10",
+      "entry_id": "EXP-GROW-004",
+      "unit": "EXP-GROW-004-C11",
+      "unit_type": "claims",
+      "unit_value_sha256": "8a84ff037e6de92ab9c3f605a435dfd30dc4a9b378ad7f2ec7fe4e65a491f76a",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "native/Spawn失败仅静态边界、非已复现崩溃，未知保持。",
+      "evidence_refs": [
+        "GROW-S041",
+        "GROW-S042",
+        "GROW-S044",
+        "GROW-S046",
+        "GROW-S045"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/0",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:SetRegrowthRate(rate)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "e40032337763d15994ed86e4074489813824fb4e35c5510a605a04192ac1b02c",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "rate设定即登记且非幂等，TimeMultipliers前提与±20%一致。",
+      "evidence_refs": [
+        "GROW-S042",
+        "GROW-S043",
+        "GROW-S041",
+        "GROW-S050"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/1",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:SetProduct(product)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "73af7edc604dbafa4c836765bf9079c9a76effe6eff5e56117986c7e588b5f68",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "只写product且假值回退父prefab、不改时钟键准确。",
+      "evidence_refs": [
+        "GROW-S043",
+        "GROW-S044",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/2",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:SetSearchTag(tag)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "2ba919c1cd4c5428ed66806b597c1956430972e562560720d3b14023be2dee58",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "只写searchtag/假值回退、父密度键不变准确。",
+      "evidence_refs": [
+        "GROW-S043",
+        "GROW-S044",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/3",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:SetSkipCanPlantCheck(bool)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "d1d50d492436e466962598a86303db17298128a4b4d7db2ec1129766bd42fad0",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "truthy仅绕单项，不能跳过其余过滤，准确。",
+      "evidence_refs": [
+        "GROW-S043",
+        "GROW-S044",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/4",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:TrySpawnNearby()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "50ff103e895f83ce5f99ca43ac4c1b0cf2a09cab86f61b108ead141de3bdb333",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "nil返回、先耗尝试、radius缓存/注销和Spawn失败边界准确。",
+      "evidence_refs": [
+        "GROW-S044",
+        "GROW-S043",
+        "GROW-S042",
+        "GROW-S046"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/5",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:OnSave()",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "b4def2954e809117bcfb85ae39f9d228d9ff08478f60cdc27ca2d59c54c4dd69",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "相对时钟返回/登记前提、未存配置准确。",
+      "evidence_refs": [
+        "GROW-S045",
+        "GROW-S015"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/api_contracts/6",
+      "entry_id": "EXP-GROW-004",
+      "unit": "PlantRegrowth:OnLoad(data)",
+      "unit_type": "api_contracts",
+      "unit_value_sha256": "b0725b6ecd1faf11f3a032e7c6cfd84cb3538baf1eec4e05fc13d1b452b0dbbe",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "nil data无操作、已初始化时钟和有效regrowthtime前提准确。",
+      "evidence_refs": [
+        "GROW-S045",
+        "GROW-S042",
+        "GROW-S016"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/0",
+      "entry_id": "EXP-GROW-004",
+      "unit": 1,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "2a6c983a953ddc1803392bfa6febc739113a795c1b77e5889c41d9bb78f7b3d6",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "master消费者rate/product/searchtag、共享桶及父键对应。",
+      "evidence_refs": [
+        "GROW-S020",
+        "GROW-S047",
+        "GROW-S048",
+        "GROW-S041",
+        "GROW-S042",
+        "GROW-S043"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/1",
+      "entry_id": "EXP-GROW-004",
+      "unit": 2,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "7ae15320c420c0c8a0781caf1dd89bb7452aa9608509c07e467368a766867113",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "只轮一桶与先重置尝试间隔对应。",
+      "evidence_refs": [
+        "GROW-S041",
+        "GROW-S042",
+        "GROW-S044",
+        "GROW-S050"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/2",
+      "entry_id": "EXP-GROW-004",
+      "unit": 3,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "81aa7a0570b3fd7ff2895849d4d320bf8b1ed9d3f1e6e21002908c4fe99a3d23",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "生成密度、空间条件和数量门槛对应。",
+      "evidence_refs": [
+        "GROW-S046",
+        "GROW-S044",
+        "GROW-S043"
+      ],
+      "finding_ids": []
+    },
+    {
+      "pointer": "/entries/3/mechanism_steps/3",
+      "entry_id": "EXP-GROW-004",
+      "unit": 4,
+      "unit_type": "mechanism_steps",
+      "unit_value_sha256": "b0786fd51cd9ee4457ef2343052f2f5920f6db0b7ca5b81d83172f9c2b85a3b5",
+      "decision": "supported_within_stated_static_scope",
+      "review_note": "存相对剩余、桶注销/世界task取消，不由Growable Stop代管，准确。",
+      "evidence_refs": [
+        "GROW-S045",
+        "GROW-S043",
+        "GROW-S013",
+        "GROW-S014",
+        "GROW-S003",
+        "GROW-S005"
+      ],
+      "finding_ids": []
+    }
+  ],
+  "source_checks": [
+    {
+      "ref_id": "GROW-S001",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 1,
+      "line_end": 24,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "fda8534be15eb8854ac73d6e03b53ad7db99ae18088ef3e51183ff19727c1fee",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S002",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 28,
+      "line_end": 79,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "995c3c3caf743b36d60315ff88ae3fc3c37e154dabe0be2c48885159829e8ea0",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S003",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 81,
+      "line_end": 113,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "d55e874c3968723ac5404af934f130225a06174755105af4d7b1f9ad72fc21df",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S004",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 117,
+      "line_end": 151,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "fe384acef8f22c90816b54b577988ec01eb0357ecf1f7d9a74c87857eecd29f9",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S005",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 155,
+      "line_end": 205,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "13b842007abb1d997a1ceed26245db9dcf24a1727df63ea48fdf0f98f017e554",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S006",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 207,
+      "line_end": 219,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "0a28f25b80a4d81f52bfdebb19ba838cb8132ccdf8e3f4eaf75f2e00adcbce92",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S007",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 223,
+      "line_end": 269,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "4e25ea40b67f9a2f0dc8a9c1700664f18108c8d8a89a80c25b0fdbce70ef4fd2",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S008",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 273,
+      "line_end": 339,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "551e13256364c65f7e963366fbdf72007b34d3df95cb2c7e43eabed9ba9a5f83",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S009",
+      "source_file": "scripts/components/growable.lua",
+      "line_start": 365,
+      "line_end": 369,
+      "file_sha256": "5c2fa50dfd0d56ecefa21879034623ecc278e8df132a55c79de600f5cd223784",
+      "range_sha256": "52ddd583751d53d078392e64faff20642428ef8fd574a453c707c81efa61fe0e",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S010",
+      "source_file": "scripts/simutil.lua",
+      "line_start": 563,
+      "line_end": 565,
+      "file_sha256": "13815df52c2ba681b88eea0f84c83fecd15934af921c180e7c48a824e8497f7e",
+      "range_sha256": "1e02b7b13edbce3c6424a3433da573baa1e3c21606a4307c5da32a5c2a6fe7d7",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S011",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1515,
+      "line_end": 1533,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "74015930d04315d9f9b790f2bc61edd9756ce3df2fb7973577961875978f87f7",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S012",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1472,
+      "line_end": 1488,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "2d04eb0a077057d94233c5a5a16d12a546ccbb8ed10677f7b027932804d88d97",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S013",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 648,
+      "line_end": 663,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S014",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1708,
+      "line_end": 1775,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S015",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1906,
+      "line_end": 1940,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S016",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1957,
+      "line_end": 1992,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S017",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 2029,
+      "line_end": 2039,
+      "file_sha256": "752ad3376174a7671849bfd399852d20461874fdc6d0ff36c2dff794e0173774",
+      "range_sha256": "7010dd4d08f3636fa6330f00fe625e04e603569fa7adb2d076ab5a51bf79b7e2",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S018",
+      "source_file": "scripts/mainfunctions.lua",
+      "line_start": 696,
+      "line_end": 757,
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "range_sha256": "971749f9b02d10818adf98c3cd941bd59ff23dfa66e10db2eda92c114efd1005",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S019",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "line_start": 348,
+      "line_end": 384,
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "range_sha256": "68fbfbc926a52890073e3ada8483a75eb5eed80dc173de67d66ef0bc88fbba2b",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S020",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "line_start": 855,
+      "line_end": 910,
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "range_sha256": "98922de558cbf6cb4c38bd2be0e650430488652f6706253378c0c5c6cc43e0ce",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S021",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "line_start": 459,
+      "line_end": 487,
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "range_sha256": "00e643c0bfda7b37d285b17e5cb86d3b25d767e90e7000ae94f4a3af5aa4b660",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S022",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "line_start": 578,
+      "line_end": 624,
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "range_sha256": "74928a7f31b7c9b039ca270dd56d42f345440668165d9a09bba9de6078a21e58",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S023",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "line_start": 33,
+      "line_end": 115,
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "range_sha256": "b4d834aa5297996cfbd0be75b6d22ab824b181890883546e90ee08a3564c133f",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S024",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "line_start": 165,
+      "line_end": 213,
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "range_sha256": "93e26d95a3ded4d0ca2ea8e44b1271495faf8bf43f64f98e53f49deeb863c234",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S025",
+      "source_file": "scripts/prefabs/rock_avocado_bush.lua",
+      "line_start": 264,
+      "line_end": 320,
+      "file_sha256": "c832e0db83417d9d75e453190ce86f9ada056127c4ac375b4aee343fe945d5b7",
+      "range_sha256": "dcaa9c2112f76be7ab666e9adbacac1233e5cbbe4653981a1f8a92eac8e8fa84",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S026",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "line_start": 11,
+      "line_end": 15,
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "range_sha256": "bdccfe28b74278b796dc358426899231b5ed8a4fa00ce638980871f514a1fcf1",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S027",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "line_start": 37,
+      "line_end": 111,
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "range_sha256": "e2a41e4f39d29dc0f1263b7baadafa18e4e421c113dda559ad73c33b88783cb8",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S028",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "line_start": 160,
+      "line_end": 202,
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "range_sha256": "6c9954ded0e58caf111ebf98845fa3edfbb6ac8c0dd46515b71611d275c23185",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S029",
+      "source_file": "scripts/prefabs/ancienttrees.lua",
+      "line_start": 563,
+      "line_end": 607,
+      "file_sha256": "740aaa6b671ae25247a987e4cd877d067523cc6ec4ec25958afd568c81ca1353",
+      "range_sha256": "ccdbf670e57d049ce1dd5b6833b1686ad1b4a12e153dfaa49661a602928ce2fa",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S030",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "line_start": 5,
+      "line_end": 43,
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "range_sha256": "a61abc5aca55cb5085ddd621d735d02df0db81349fb09d9e65bc1244342b7ccd",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S031",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "line_start": 49,
+      "line_end": 129,
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "range_sha256": "b82371d68067a6e0aa24d26877f00fd151d019553a73debf856c45c8c60196ab",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S032",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "line_start": 135,
+      "line_end": 159,
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "range_sha256": "8397d84d1f5fa1fb4339bb67de8abd9889cfd183c2e1bc978ee8c00d94d14480",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S033",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "line_start": 225,
+      "line_end": 270,
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "range_sha256": "2a698b617e1a9f775ad1ce786e0cc9e017e941d206110cb19acdbb2600856963",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S034",
+      "source_file": "scripts/components/regrowthmanager.lua",
+      "line_start": 276,
+      "line_end": 312,
+      "file_sha256": "7540d4f2a77ffc461459a641a128e5912ca967ed16203e92b68ccd1820652571",
+      "range_sha256": "bc2435ffa6b97d8e6941db714c0ed14d58ebf255edcd688fe09d1e3e7c35d0c8",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S035",
+      "source_file": "scripts/standardcomponents.lua",
+      "line_start": 1834,
+      "line_end": 1847,
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "range_sha256": "6f6a80c2ba12bb4373b8a44ce7113ad0dab3646d6e320685a463fdc92677c290",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S036",
+      "source_file": "scripts/prefabs/carrot.lua",
+      "line_start": 25,
+      "line_end": 44,
+      "file_sha256": "367af438dfc1e1810ac4c34e565531a5e28c7107a8ad87e09ccbf5196f2634b7",
+      "range_sha256": "f541c36f424808ed76ac0014a463a435a6a8ea478e7ff724abba9a2c209d0037",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S037",
+      "source_file": "scripts/prefabs/flower.lua",
+      "line_start": 101,
+      "line_end": 105,
+      "file_sha256": "deb0fcce54ab84d5bca453b20f981bb00657bdad73c5dae0aa9d9b4346a5cf08",
+      "range_sha256": "0a1f32d7a3e0c90d48ffe3e962f915453a48049ea60b373231e29ea6a58364de",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S038",
+      "source_file": "scripts/prefabs/flower.lua",
+      "line_start": 159,
+      "line_end": 187,
+      "file_sha256": "deb0fcce54ab84d5bca453b20f981bb00657bdad73c5dae0aa9d9b4346a5cf08",
+      "range_sha256": "4b6c1a74d38cc33d2a344feed9cb7083886baa7875cfd3b1f8f6084fbbcd8782",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S039",
+      "source_file": "scripts/prefabs/forest.lua",
+      "line_start": 635,
+      "line_end": 663,
+      "file_sha256": "c6ca8746fa4aa4cc5e0a1d119ff3f877433f6de8897cb0f64add8229f5bcabbc",
+      "range_sha256": "cc67e9cd06933f9067ef224e570e688ca24193c75ea6645757810d7dfdae44ba",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S040",
+      "source_file": "scripts/prefabs/cave.lua",
+      "line_start": 518,
+      "line_end": 539,
+      "file_sha256": "3322c2df3bf584c3df81ccb55ed669c07bb6866b92b12bd1583693beea46fddb",
+      "range_sha256": "009902cb7428e37fe12b4e4a900efd69908562c7386b96611fd6565c3ff1242f",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S041",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "line_start": 1,
+      "line_end": 60,
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "range_sha256": "b19e1602f0e7b7aafc4e427526168fc2a419515e608f7a7b528f3e35aab56295",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S042",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "line_start": 62,
+      "line_end": 101,
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "range_sha256": "b304d1765a7aa6c4a0a64c7d4bd28aeee895524e034f1585030e85ddc9a4b14a",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S043",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "line_start": 103,
+      "line_end": 181,
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "range_sha256": "3b457e3ebfda0ae2c3bc394f57d2cfac288bc82e1a8e4b71cb93e0a418741be1",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S044",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "line_start": 183,
+      "line_end": 242,
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "range_sha256": "e2a005647ea5435f43e119a945c47fbb5d28003943a94c300da47ee2946b5b90",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S045",
+      "source_file": "scripts/components/plantregrowth.lua",
+      "line_start": 244,
+      "line_end": 256,
+      "file_sha256": "c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385",
+      "range_sha256": "bb8536b0816a4aa2433097392af283397d1129b96317ca052ecdc771f33b6ad2",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S046",
+      "source_file": "scripts/regrowthutil.lua",
+      "line_start": 2,
+      "line_end": 36,
+      "file_sha256": "846b8132bae98c0b02d82073342aaec2b97a23eb1ce92852663ffe91c23f1aec",
+      "range_sha256": "4939ed4bcb1e2fba1fd13cb177a01cab9429f8c64ffbf79caa9cef8992eae5b9",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S047",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "line_start": 57,
+      "line_end": 97,
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "range_sha256": "d38bf1dff7ae514d012fd49d63dede7e563ec65fbce378121a746723a3e0e442",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S048",
+      "source_file": "scripts/prefabs/moontree.lua",
+      "line_start": 578,
+      "line_end": 640,
+      "file_sha256": "78c0463672e1da8ba93af9a8acfcf96a8e89ee9afe6e7c7ea02afd5cfdd99719",
+      "range_sha256": "e98f75b735537ff81bc09e7b109501621919f8428a43f4ec9aae7f7310b98829",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S049",
+      "source_file": "scripts/components/pickable.lua",
+      "line_start": 535,
+      "line_end": 583,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "c94793daf25c53f65d8f2e332b9719426848d4ea75d34388c21a1bf37fb43561",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S050",
+      "source_file": "scripts/util.lua",
+      "line_start": 545,
+      "line_end": 547,
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "range_sha256": "8d00b7491c84b2e52c42439d3abe61f7c5a806ba736fa330500e0379880edeea",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S051",
+      "source_file": "scripts/util.lua",
+      "line_start": 1157,
+      "line_end": 1267,
+      "file_sha256": "5e2d9c75e1c2620c80f694b8c3bf6248ab3b3f2b949e01c5b12f94d68cf14838",
+      "range_sha256": "8ff299948c69fb8672350c13d464dd82bc5784a1ebdad3f7c842850be1c6d19e",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S052",
+      "source_file": "scripts/components/pickable.lua",
+      "line_start": 386,
+      "line_end": 396,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "24bd88693f06049df94696a3c0cff56e74e4a637aadfa108d317f37ef1142dec",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    },
+    {
+      "ref_id": "GROW-S053",
+      "source_file": "scripts/components/pickable.lua",
+      "line_start": 426,
+      "line_end": 448,
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "range_sha256": "73df2ab9e830e8cb78cb2e3b870dcb494fddef23333db5909d6d6e4f94809d66",
+      "hash_verified": true,
+      "source_text_manually_read": true
+    }
+  ],
+  "not_covered": [
+    "未运行Lua或游戏，不验证调度、物理、拓扑多边形、Spawn、存档或客户端实际行为。",
+    "未穷举其他植物/部署/采集/魔法/haunt或所有worldgen密度生产者。",
+    "未验证native RNG/空间查询或坏档/重复登记在游戏中的具体后果。",
+    "未做检索召回评分、安装版读取测试或Coding准入。",
+    "未将现有53条直接引用当成完整动态/native依赖闭包。"
+  ],
+  "kb_consultation": {
+    "mode": "research/reviewer/decision/compact",
+    "used_as_growth_fact_evidence": false,
+    "visible_background_ids": [
+      "PATTERN-NET-001",
+      "ANTI-LIFE-001"
+    ],
+    "partial_and_budget_gaps": true,
+    "note": "仅返回通用生命周期旧样例背景及预算缺口；未用于证明本候选原版机制，未加载缺口正文。"
+  },
+  "governance": {
+    "knowledge_status": "research",
+    "retrieval_status": "restricted",
+    "coding_status": "hold",
+    "runtime_verified": false,
+    "coding_admission_granted": false,
+    "growth_files_modified": false,
+    "game_or_install_modified": false
+  },
+  "conclusion": "41个claim与16个step在所声明静态scope内可由所引源码支持；25个API均完成主要参数/返回/副作用/生命周期核对，其中Resume返回措辞1处建议修订。无P0/P1源码矛盾发现；1条P2精确化、1条非阻塞P3观察。该审阅不提升准入或证明游戏运行。",
+  "publication_derivative": {
+    "schema": "dst-public-review-derivative/1",
+    "original_review_sha256": "9fa6dc6aa3f34cdbefceff5d9ab69d99e0e481276936bfd6b04142a2ee21bdc2",
+    "redacted_fields": [
+      {
+        "pointer": "/inputs/candidate_path",
+        "original_value_sha256": "cf30f68f75f228f4bcf0a713d5c1723c0c989deed66da3da1aeb88411e977b95"
+      },
+      {
+        "pointer": "/inputs/source_archive",
+        "original_value_sha256": "e56e6ca6dcf7c99ffb1b39bb4e952f4369b18d39dec646053ebaebd555daeb1e"
+      }
+    ],
+    "policy": "Workstation paths removed; prior-review references rebound to public derivatives. Candidate/source commitments and review findings retained."
+  }
+}

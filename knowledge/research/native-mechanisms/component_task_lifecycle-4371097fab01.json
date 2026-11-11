@@ -1,0 +1,1464 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "component_task_lifecycle",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-LIFE-005",
+      "title": "组件安装公布、卸载重入与更新停止的分阶段边界",
+      "engineering_question": "组件何时可从安装槽读取，清理钩子重装同名组件会影响什么，停止更新何时真正消费？",
+      "aliases": [
+        "AddComponent",
+        "RemoveComponent",
+        "StartUpdatingComponent",
+        "StopUpdatingComponent",
+        "lower_components_shadow",
+        "构造期更新",
+        "组件卸载重入"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "冻结762172的EntityScript安装/卸载、replica和动作关联及普通/static更新循环；FireFX仅作构造期登记证据。",
+        "excluded": "不重收NC-N002-FINAL-04的基本replica分层、EXP-ARCH-004的classified附着窗口、既有FireFX业务；不扩展到所有mod构造与引擎C++回滚。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-005-C01",
+          "kind": "NSF",
+          "statement": "AddComponent先按string.lower(name)检查lower_components_shadow；已存在时打印诊断并返回找到的旧实例，不再次构造、PostInit或登记动作。未重复时LoadComponent按原name缓存/require组件类，不将模块路径统一小写。",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S01"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C02",
+          "kind": "NSF",
+          "statement": "未重复安装按LoadComponent→ReplicateComponent→cmp(self)→components[name]及小写shadow公布→逐个ComponentPostInit→RegisterComponentActions→返回loadedcmp执行。组件构造期间本次实例尚未写入安装槽，shadow也未设置。",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S01",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S08"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C03",
+          "kind": "NSF",
+          "statement": "GetPostInitFns按enabledmods及各modfns的ipairs次序返回runmodfn包装；包装对原modfn用xpcall，失败则打印并调用RemoveBadMod/DisplayBadMods，成功返回其结果。AddComponent不使用PostInit返回值，也没有包围整个安装过程的回滚分支。",
+          "evidence_refs": [
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C04",
+          "kind": "EI",
+          "statement": "不能将PostInit回调错误等同于原样向AddComponent抛出；也不能把包装视为安装事务：构造/replica/动作注册与包装错误处理自身若向外抛出，没有本入口自动逆序恢复。PostInit正常返回后即使它卸载了本组件，外层仍会执行动作登记并返回原局部loadedcmp，没有槽位身份复核。",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S03",
+            "CTL-S04",
+            "CTL-S06",
+            "CTL-S08"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C05",
+          "kind": "NSF",
+          "statement": "RemoveComponent按传入name精确取components[name]；存在时先提交普通/static更新停止标记并立即停止wall更新，然后清安装槽和小写shadow，再直接调用OnRemoveFromEntity，最后UnreplicateComponent/UnregisterComponentActions。无匹配则不做事；不调用OnRemoveEntity，也不枚举任务或监听。",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C06",
+          "kind": "EI",
+          "statement": "卸载钩子中同名槽已经为空，可重入安装；外层卸载返回钩子后仍按旧name取消replica标签/动作索引，未核验新旧实例，所以不能把同名重装当原子替换。钩子向外抛错会跳过本次后续replica/动作注销。",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C07",
+          "kind": "NSF",
+          "statement": "StartUpdatingComponent仅先检查宿主IsValid；按cmp对象作更新表键，并扫描安装槽取诊断名，找不到也用component登记。它会撤掉同一宿主对同一cmp的待停止标记。FireFX构造中即调用此方法，说明构造期登记不依赖已公布安装槽。",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S14",
+            "CTL-S02"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C08",
+          "kind": "NSF",
+          "statement": "StopUpdatingComponent在宿主有普通或static更新表时只写StopUpdatingComponents[cmp]=self；正常Update调用OnUpdate前检查该标记，遍历后先合并NewUpdatingEnts，再调用Deferred删对象键及空表索引。StaticUpdate在server paused分支也消费同一停止表，且该分支遍历v.updatecomponents、向OnStaticUpdate传0。",
+          "evidence_refs": [
+            "CTL-S10",
+            "CTL-S12",
+            "CTL-S13"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C09",
+          "kind": "EI",
+          "statement": "停止会让尚未进入的相关更新调用被跳过，但不终止正在运行的OnUpdate；在停止被消费前对同一cmp再次Start会清标记。新宿主先入NewUpdatingEnts，合并点位于本轮组件循环之后；已在UpdatingEnts的宿主表则可直接变动，不能据本卡承诺所有Start都恰好下一帧首次执行。do_static_update为false也不删除既有static登记。",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S10",
+            "CTL-S12",
+            "CTL-S13"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-005-C10",
+          "kind": "REC",
+          "statement": "把安装槽、replica标签/底层对象、动作列表、更新对象身份和业务任务分别登记所有者与退出动作；清理钩子尽量不在原卸载栈里同名重装。确需重入或允许PostInit卸载时，由调用者验证槽位身份及清理完成情况。",
+          "evidence_refs": [
+            "CTL-S02",
+            "CTL-S03",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S09",
+            "CTL-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:AddComponent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "name：可供string.lower和模块路径拼接的组件名；重复判定忽略大小写，后续加载/存储/动作名保留原值。"
+          ],
+          "returns": "返回已存在的匹配实例或本次构造的loadedcmp；不是安装后仍存在的证明。加载require/assert、构造、关联调用及错误处理自身可报错；无统一回滚。",
+          "preconditions": [
+            "合法EntityScript及可加载的组件定义；组件/replica构造、mod回调和动作映射的专属前置条件由对应实现满足。"
+          ],
+          "side_effects": [
+            "可能加载并缓存组件类；构造replica/组件、公布槽及shadow、执行受包装PostInit、登记动作；重复分支只诊断并返回旧实例。"
+          ],
+          "lifecycle": [
+            "ctor早于安装槽公布，PostInit晚于公布但早于动作登记；失败时检查已发生阶段。"
+          ],
+          "evidence_refs": [
+            "CTL-S01",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S08"
+          ],
+          "unknowns": [
+            "未穷举各组件构造的副作用；未运行错误处理UI及原生复制。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:RemoveComponent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "name：components表精确键；与AddComponent的重复大小写判定不对称。"
+          ],
+          "returns": "无显式返回；无匹配时无操作。OnRemoveFromEntity等关联调用抛错会中断后续步骤，无自动恢复。",
+          "preconditions": [
+            "合法EntityScript；存在组件时其清理钩子及动作/replica依赖须能正常执行。"
+          ],
+          "side_effects": [
+            "停止更新、先清槽和shadow、再清理组件、再取消replica标签及动作登记；不等价删除宿主或全量取消宿主任务/监听。"
+          ],
+          "lifecycle": [
+            "普通/static停止延迟清表，wall立即清表；清理钩子中槽已空。"
+          ],
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07"
+          ],
+          "unknowns": [
+            "任意组件的清理完整性及同名重入结果需逐组件验证。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StartUpdatingComponent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "cmp：作为对象身份键；本方法不要求扫描时已在components中。",
+            "do_static_update：truthy时额外登记static；false/nil不撤销既有static登记。"
+          ],
+          "returns": "无显式返回；宿主无效时直接返回。cmp等非法表键或关联调用可报Lua错误，无类型保护。",
+          "preconditions": [
+            "有效宿主；实际执行还要求cmp提供相应OnUpdate/OnStaticUpdate，且对应更新循环运行。"
+          ],
+          "side_effects": [
+            "创建更新表与NewUpdatingEnts索引；可额外登记NewStaticUpdatingEnts；清除本宿主同cmp的停止标记。"
+          ],
+          "lifecycle": [
+            "没有承诺统一首次执行帧；登记与安装槽公布独立；不是任务调度API。"
+          ],
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S12",
+            "CTL-S13",
+            "CTL-S14"
+          ],
+          "unknowns": [
+            "原生驱动调用频率及pairs中增删键时实际顺序未运行验证。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopUpdatingComponent",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "cmp：要停止的对象身份键；方法仅根据宿主是否有更新表决定是否写停止标记。"
+          ],
+          "returns": "无显式返回；无更新表时无操作。非法键可报错；不等待回调结束。",
+          "preconditions": [
+            "合法宿主；延迟清表依赖正常Update或暂停分支StaticUpdate继续执行。"
+          ],
+          "side_effects": [
+            "覆盖StopUpdatingComponents[cmp]；消费者在调用前跳过带标记对象，Deferred最终移除普通/static键及空实体索引。"
+          ],
+          "lifecycle": [
+            "同宿主Start可在消费前撤销停止；不会取消DoTaskInTime/DoPeriodicTask，也不会停止wall更新。"
+          ],
+          "evidence_refs": [
+            "CTL-S10",
+            "CTL-S09",
+            "CTL-S12",
+            "CTL-S13",
+            "CTL-S03",
+            "CTL-S11"
+          ],
+          "unknowns": [
+            "未覆盖多宿主错误共享同一cmp键或停止消费者异常中断后的恢复。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "安装入口判重并加载类；先replica再ctor，随后公布槽、PostInit、动作登记。",
+          "evidence_refs": [
+            "CTL-S01",
+            "CTL-S02",
+            "CTL-S04",
+            "CTL-S05",
+            "CTL-S06",
+            "CTL-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "构造或业务调用Start登记cmp身份，Update/StaticUpdate消费相应更新表。",
+          "evidence_refs": [
+            "CTL-S09",
+            "CTL-S14",
+            "CTL-S12",
+            "CTL-S13"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "RemoveComponent提交停止、清槽、直接清理钩子，再处理replica及动作；更新循环后段消费停止。",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S10",
+            "CTL-S11",
+            "CTL-S04",
+            "CTL-S08",
+            "CTL-S07",
+            "CTL-S12",
+            "CTL-S13"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行同名重入、构造失败、mod错误显示或暂停/恢复场景；仅解释所列Lua分支。",
+        "未证明客户端与服务端在任意时刻拥有相同组件，也不改变原知识Scope。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CTL-S01",
+            "role": "组件类缓存、require与加载断言",
+            "claim_ids": [
+              "EXP-LIFE-005-C01",
+              "EXP-LIFE-005-C02"
+            ]
+          },
+          {
+            "ref": "CTL-S02",
+            "role": "安装生产者、名字去重与阶段顺序",
+            "claim_ids": [
+              "EXP-LIFE-005-C01",
+              "EXP-LIFE-005-C02",
+              "EXP-LIFE-005-C03",
+              "EXP-LIFE-005-C04",
+              "EXP-LIFE-005-C06",
+              "EXP-LIFE-005-C07",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S03",
+            "role": "卸载入口、槽位清除与清理钩子",
+            "claim_ids": [
+              "EXP-LIFE-005-C04",
+              "EXP-LIFE-005-C05",
+              "EXP-LIFE-005-C06",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S04",
+            "role": "安装/卸载关联的replica标签及底层对象",
+            "claim_ids": [
+              "EXP-LIFE-005-C02",
+              "EXP-LIFE-005-C04",
+              "EXP-LIFE-005-C06",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S05",
+            "role": "PostInit包装生产者及遍历次序",
+            "claim_ids": [
+              "EXP-LIFE-005-C02",
+              "EXP-LIFE-005-C03"
+            ]
+          },
+          {
+            "ref": "CTL-S06",
+            "role": "PostInit异常处理边界",
+            "claim_ids": [
+              "EXP-LIFE-005-C03",
+              "EXP-LIFE-005-C04"
+            ]
+          },
+          {
+            "ref": "CTL-S07",
+            "role": "动作注销的mod映射依赖",
+            "claim_ids": [
+              "EXP-LIFE-005-C06"
+            ]
+          },
+          {
+            "ref": "CTL-S08",
+            "role": "安装末尾与卸载末尾的动作索引消费者",
+            "claim_ids": [
+              "EXP-LIFE-005-C02",
+              "EXP-LIFE-005-C04",
+              "EXP-LIFE-005-C06",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S09",
+            "role": "对象身份更新登记与撤销停止标记",
+            "claim_ids": [
+              "EXP-LIFE-005-C07",
+              "EXP-LIFE-005-C09",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S10",
+            "role": "停止标记生产与延迟索引清理",
+            "claim_ids": [
+              "EXP-LIFE-005-C05",
+              "EXP-LIFE-005-C08",
+              "EXP-LIFE-005-C09",
+              "EXP-LIFE-005-C10"
+            ]
+          },
+          {
+            "ref": "CTL-S11",
+            "role": "RemoveComponent的wall更新清理依赖",
+            "claim_ids": [
+              "EXP-LIFE-005-C05"
+            ]
+          },
+          {
+            "ref": "CTL-S12",
+            "role": "正常更新消费者、合并新实体及应用停止标记",
+            "claim_ids": [
+              "EXP-LIFE-005-C08",
+              "EXP-LIFE-005-C09"
+            ]
+          },
+          {
+            "ref": "CTL-S13",
+            "role": "暂停状态下static更新消费者",
+            "claim_ids": [
+              "EXP-LIFE-005-C08",
+              "EXP-LIFE-005-C09"
+            ]
+          },
+          {
+            "ref": "CTL-S14",
+            "role": "构造中尚未公布安装槽即登记更新的具体调用者",
+            "claim_ids": [
+              "EXP-LIFE-005-C07"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本卡静态论证用到的Lua依赖；未覆盖引擎C++调度、原生net/标签实现、所有组件或mod替换的函数。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-LIFE-006",
+      "title": "宿主任务表、执行中取消与任务完成字段的不同寿命",
+      "engineering_question": "组件拆除、宿主删除、句柄Cancel各取消哪一层；执行中的一次性任务何时脱离pendingtasks？",
+      "aliases": [
+        "DoTaskInTime",
+        "DoPeriodicTask",
+        "CancelAllPendingTasks",
+        "pendingtasks",
+        "Periodic:Cancel",
+        "回调内自取消",
+        "任务归属"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "冻结762172的EntityScript普通任务生产、static共享归属、Periodic句柄和OnTick；删除路径只用于比较清理阶段。",
+        "excluded": "不重收Skill/lifecycle-save或firefreeze的基本实体删除会取消任务、组件卸载不等于删除实体；新增完成时点、执行中取消、字段残留和调度tick闭包。不覆盖协程StartThread。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-006-C01",
+          "kind": "NSF",
+          "statement": "DoTaskInTime与DoPeriodicTask均把self.GUID作为调度id、self作为回调首参，返回Periodic句柄并在self.pendingtasks[handle]=true登记；onfinish固定为task_finish。该完成函数只从宿主pendingtasks删除句柄，不清除组件自己的task字段。static两个变体使用同一个pendingtasks集合。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S17"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C02",
+          "kind": "NSF",
+          "statement": "ExecuteInTime经ExecutePeriodic使用limit=1；普通DoPeriodicTask传limit=nil。首个时间用initialdelay or period，Lua的0会被保留；到期tick由当前调度时间取ceil并在不大于nowtick时推到nowtick+1，不在创建调用栈直接调用fn。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C03",
+          "kind": "NSF",
+          "statement": "OnTick在调用fn后才扣limit；需继续的句柄重新排队，否则成功onfinish后Cleanup。Periodic:Cancel先置limit=0、从当前list去键，再以success=false调用onfinish，最后清fn/arg/nexttick；Cleanup清引用但不再发完成通知。",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C04",
+          "kind": "EI",
+          "statement": "因此未取消的一次性任务在自己的fn执行期间仍在宿主pendingtasks中；回调内Cancel或CancelAllPendingTasks可清此句柄，但不能撤回已执行语句或中止当前Lua栈。当前回调正常返回后，置0的limit再扣为负，走清理分支且不会重排。需自行清组件字段，不能据非nil旧句柄判断仍活动。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S19",
+            "CTL-S18"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C05",
+          "kind": "NSF",
+          "statement": "CancelAllPendingTasks遍历当前宿主集合调用各Cancel再把表置nil，不限普通/static、不按组件筛选。RemoveComponent没有这一步；EntityScript:Remove在onremove事件、watch/listener清理之后取消pendingtasks，然后才遍历组件OnRemoveEntity，且该函数后段没有第二次全量任务取消。",
+          "evidence_refs": [
+            "CTL-S15",
+            "CTL-S17",
+            "CTL-S16",
+            "CTL-S03",
+            "CTL-S21"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C06",
+          "kind": "EI",
+          "statement": "把组件任务安排在另一个仍存活宿主上时，本组件卸载或本实体删除均不自动扫描那个宿主的pendingtasks。任务包装无IsValid/组件槽检查；CancelAll也不是终身关闭调度入口，清理阶段之后新建任务需单独追踪。此结论仅按所列Lua路径推导，不证明实体Retire后的原生行为。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S03",
+            "CTL-S21",
+            "CTL-S20"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C07",
+          "kind": "NSF",
+          "statement": "OnTick中的fn及onfinish为直接调用，此局部路径没有pcall/finally。若fn向外抛错，该次调用之后的扣limit、onfinish和Cleanup不会沿此路径执行；本卡不据此推断引擎如何恢复或处理整个调度器。",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-006-C08",
+          "kind": "REC",
+          "statement": "按业务所有者保存并清空自己的句柄字段，在组件卸载取消自己的资源；仅当确要取消宿主所有普通/static任务时才用CancelAllPendingTasks。回调需要可中断语义时，自行在副作用前检查当前业务身份及安装槽。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S15",
+            "CTL-S18",
+            "CTL-S03",
+            "CTL-S21"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:DoTaskInTime",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "time：传至调度时间算术的延迟，要求与数值算术兼容；0仍排到后续调度tick。",
+            "fn：调度时调用fn(self, ...)，无自动有效性或组件身份复核。",
+            "...：由调度句柄保存并用unpack转给回调；本卡不承诺带空洞/尾nil参数的保持。"
+          ],
+          "returns": "返回Periodic句柄，提供Cancel等方法；不返回fn结果。参数/回调错误可抛出，局部无错误后自动清理保证。",
+          "preconditions": [
+            "有效的Lua宿主对象和已初始化scheduler；正常调度需要引擎继续驱动RunScheduler。"
+          ],
+          "side_effects": [
+            "创建一次任务、归入宿主pendingtasks并设置onfinish；持有self及附加参数直到完成/取消清引用。"
+          ],
+          "lifecycle": [
+            "单次fn正常返回后才成功完成；回调中可取消自己，但不会打断当前栈。组件字段另行清空。"
+          ],
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ],
+          "unknowns": [
+            "未验证原生时间精度、错误恢复以及参数空洞语义。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:DoPeriodicTask",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "time：重复周期，交给调度算术；本入口不校验正值。",
+            "fn：回调fn(self, ...)。",
+            "initialdelay：nil/false用time；数值0受支持；没有包装层随机初相位。",
+            "...：由句柄保存的附加参数，空洞语义不在本卡保证内。"
+          ],
+          "returns": "返回无限重复的Periodic句柄；fn返回值不停止重排。错误可抛出；用句柄Cancel退出。",
+          "preconditions": [
+            "scheduler已初始化并正常驱动；fn和其依赖可用。"
+          ],
+          "side_effects": [
+            "加入宿主pendingtasks；每次fn正常返回后按period从当时调度时间重新取下个tick。"
+          ],
+          "lifecycle": [
+            "循环期间留在pendingtasks；Cancel清除归属并释放保存引用；不随任意组件卸载自动取消。"
+          ],
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S20",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S03"
+          ],
+          "unknowns": [
+            "不提供固定墙钟频率或无漂移保证；未运行0/负周期边界。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:CancelAllPendingTasks",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [],
+          "returns": "无显式返回；未建pendingtasks时无操作。Cancel/onfinish若被外部替换且抛错，可中断遍历及最终置nil。",
+          "preconditions": [
+            "pendingtasks键应为可Cancel的任务句柄；常规包装设置task_finish。"
+          ],
+          "side_effects": [
+            "对当前表所有任务Cancel并清空宿主字段，覆盖共享表中的普通与static任务；不区分业务组件。"
+          ],
+          "lifecycle": [
+            "不是暂停、业务回滚或阻止以后创建任务的锁；正在执行的回调仍继续。"
+          ],
+          "evidence_refs": [
+            "CTL-S15",
+            "CTL-S16",
+            "CTL-S17",
+            "CTL-S18",
+            "CTL-S19",
+            "CTL-S21"
+          ],
+          "unknowns": [
+            "外部修改onfinish/pendingtasks及取消时重入创建任务的行为未保证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "EntityScript包装创建调度句柄并登记宿主pendingtasks和task_finish。",
+          "evidence_refs": [
+            "CTL-S16",
+            "CTL-S17",
+            "CTL-S15",
+            "CTL-S20"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "OnTick调用fn，之后才决定重排或完成；Cancel可以在fn内部改变该决定。",
+          "evidence_refs": [
+            "CTL-S19",
+            "CTL-S18"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "业务组件自行取消句柄；宿主CancelAll清共享集合；宿主Remove在组件退出钩子之前取消一次。",
+          "evidence_refs": [
+            "CTL-S03",
+            "CTL-S15",
+            "CTL-S21"
+          ]
+        }
+      ],
+      "unknowns": [
+        "没有运行游戏调度、回调抛错或原生Retire；不推断任务在原生实体死亡后的最终执行结果。",
+        "未覆盖修改Periodic.onfinish的mod、协程任务及静态/普通调度相对顺序。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CTL-S03",
+            "role": "卸载入口、槽位清除与清理钩子",
+            "claim_ids": [
+              "EXP-LIFE-006-C05",
+              "EXP-LIFE-006-C06",
+              "EXP-LIFE-006-C08"
+            ]
+          },
+          {
+            "ref": "CTL-S15",
+            "role": "宿主任务表及完成清理",
+            "claim_ids": [
+              "EXP-LIFE-006-C01",
+              "EXP-LIFE-006-C04",
+              "EXP-LIFE-006-C05",
+              "EXP-LIFE-006-C06",
+              "EXP-LIFE-006-C08"
+            ]
+          },
+          {
+            "ref": "CTL-S16",
+            "role": "普通调度生产者与宿主归属",
+            "claim_ids": [
+              "EXP-LIFE-006-C01",
+              "EXP-LIFE-006-C02",
+              "EXP-LIFE-006-C04",
+              "EXP-LIFE-006-C05",
+              "EXP-LIFE-006-C06",
+              "EXP-LIFE-006-C08"
+            ]
+          },
+          {
+            "ref": "CTL-S17",
+            "role": "共享pendingtasks的static调度生产者",
+            "claim_ids": [
+              "EXP-LIFE-006-C01",
+              "EXP-LIFE-006-C05"
+            ]
+          },
+          {
+            "ref": "CTL-S18",
+            "role": "任务句柄取消及引用释放",
+            "claim_ids": [
+              "EXP-LIFE-006-C03",
+              "EXP-LIFE-006-C04",
+              "EXP-LIFE-006-C07",
+              "EXP-LIFE-006-C08"
+            ]
+          },
+          {
+            "ref": "CTL-S19",
+            "role": "回调、重排、完成通知与清理消费者",
+            "claim_ids": [
+              "EXP-LIFE-006-C03",
+              "EXP-LIFE-006-C04",
+              "EXP-LIFE-006-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S20",
+            "role": "单次限制、初次延迟与最早tick计算",
+            "claim_ids": [
+              "EXP-LIFE-006-C02",
+              "EXP-LIFE-006-C06"
+            ]
+          },
+          {
+            "ref": "CTL-S21",
+            "role": "宿主退出清理阶段；不是组件卸载钩子",
+            "claim_ids": [
+              "EXP-LIFE-006-C05",
+              "EXP-LIFE-006-C06",
+              "EXP-LIFE-006-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本卡静态论证用到的Lua依赖；未覆盖引擎C++调度、原生net/标签实现、所有组件或mod替换的函数。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-LIFE-007",
+      "title": "SaltLicker跨周期句柄、具名Timer与事件监听的资源闭环",
+      "engineering_question": "具体原生组件如何在任务内部停止自己，并在计时完成事件中重新建立下一轮资源？",
+      "aliases": [
+        "SaltLicker:SetUp",
+        "SaltLicker:Stop",
+        "_StartSeeking",
+        "_StopSeeking",
+        "timerdone",
+        "salt",
+        "业务资源所有者"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "evidence": "local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "冻结762172的SaltLicker配置/搜索/暂停/卸载，配合普通Timer、事件普通监听和Periodic调度；搜索结果与finiteuses数值仅作外部依赖。",
+        "excluded": "不重收NC-N004-FINAL-07具名Timer重复/暂停/存读档/Transfer合同，不强制Bus或Installer；不扩展为玩法数值与通用状态机方案。"
+      },
+      "claims": [
+        {
+          "id": "EXP-LIFE-007-C01",
+          "kind": "NSF",
+          "statement": "SaltLicker构造assert宿主已经有timer；SetUp先Stop旧配置，再保存uses_per_lick，非nil时登记timerdone/limbo/sleep/freeze/death八种事件并TryUnpause。Stop只在uses_per_lick非nil分支解除这些监听、停止salt计时、_StopSeeking、取消salted状态并清配置字段。",
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C02",
+          "kind": "NSF",
+          "statement": "_StartSeeking先取消并清旧_task，登记saltlick_placed监听，再按saltedduration/8建随机初相位周期任务。_checkforsaltlick找到对象时写saltlick、启动salt具名计时、_StopSeeking取消并清本周期句柄及监听，然后SetSalted(true)并返回true。",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S27",
+            "CTL-S16"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C03",
+          "kind": "EI",
+          "statement": "上述找到目标的路径在周期fn内部取消自身但继续设置salted；OnTick随后读取被Cancel置零的limit，不再重排。周期回调返回true本身不控制调度，实际退出来自显式Cancel。这把业务_task字段清空、宿主pendingtasks删除及调度停止三层闭合。",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C04",
+          "kind": "NSF",
+          "statement": "Timer的OnTimerDone先StopTimer(name)，其中会Cancel句柄并删除计时名字，然后才PushEvent(timerdone,{name})。SaltLicker的salt事件消费者先按配置消耗现有有效saltlick的finiteuses，清saltlick；若不在limbo/睡眠/冰冻则立即再查目标，找到时可启动同名salt计时，找不到时恢复周期搜索。",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C05",
+          "kind": "EI",
+          "statement": "完成事件的普通监听同步执行时，旧timer名字与旧句柄归属已经清理，新建同名计时有自己的句柄；旧OnTick尾部仅清理旧句柄，不按名字再删新计时。此为完成前释放业务名字后同步重启的具体链路，不是所有timerdone监听都安全重入的保证。",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C06",
+          "kind": "NSF",
+          "statement": "OnPause停止salt计时和搜索；TryUnpause只在非limbo/睡眠/冰冻且无salt计时才尝试恢复。OnRemoveFromEntity调用Stop再去掉两个tag；SetSalted在变化时PushEvent(saltchange)。LoadPostPass若已有salt计时则停止搜索并设salted，未在本模块保存任务句柄或重建自己的计时。",
+          "evidence_refs": [
+            "CTL-S24",
+            "CTL-S25",
+            "CTL-S26"
+          ]
+        },
+        {
+          "id": "EXP-LIFE-007-C07",
+          "kind": "REC",
+          "statement": "借鉴此例时按实际消费者选择所需的任务、Timer和监听，由相应所有者负责退出。本例在timerdone中同步重启同名salt计时，复用这条交互依赖Timer先释放旧名字再发布事件。SaltLicker:Stop会同步发布saltchange，只处理本功能资源，不等价取消宿主其他组件的任务。",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S25",
+            "CTL-S26",
+            "CTL-S27",
+            "CTL-S28",
+            "CTL-S29"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SaltLicker:SetUp",
+          "source_file": "scripts/components/saltlicker.lua",
+          "visibility": "Lua实例方法；本卡不授予网络权威或跨端调用保证",
+          "parameters": [
+            "uses_per_lick：nil表示Stop后不启动；非nil保存作每次finiteuses:Use的参数，false也会进入非nil分支，数值合法性由业务调用者保证。"
+          ],
+          "returns": "无显式返回；Stop、事件回调、FindEntity及Timer依赖若抛错则可中断，未做事务回滚。",
+          "preconditions": [
+            "宿主已安装timer（构造assert）；配置期间saltlicker仍在components槽，事件消费者经该槽取组件。",
+            "搜索/状态查询及finiteuses消费的具体前置条件由宿主和目标满足；本卡未证明任意数值有效。"
+          ],
+          "side_effects": [
+            "先解除上次配置，再保存新参数、登记八种业务监听，立即TryUnpause；可能立即启动具名Timer或周期任务并改变salted。"
+          ],
+          "lifecycle": [
+            "Stop与OnRemoveFromEntity成对清业务句柄/名字/监听；宿主删除使用EntityScript删除链。同步saltchange可重入，未设防重入锁。"
+          ],
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24",
+            "CTL-S23",
+            "CTL-S26",
+            "CTL-S27",
+            "CTL-S16",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S28",
+            "CTL-S29",
+            "CTL-S03",
+            "CTL-S21"
+          ],
+          "unknowns": [
+            "未运行舔盐玩法、有限次数阈值和角色AI；未穷举FindEntity/finiteuses/状态组件的业务实现。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "SetUp/恢复入口根据环境立即搜索，未找到时建立周期任务与saltlick_placed监听。",
+          "evidence_refs": [
+            "CTL-S22",
+            "CTL-S25",
+            "CTL-S24",
+            "CTL-S23",
+            "CTL-S16"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "周期回调找到目标后启动salt计时、取消自身并清字段，继续设置状态。",
+          "evidence_refs": [
+            "CTL-S23",
+            "CTL-S27",
+            "CTL-S19",
+            "CTL-S18",
+            "CTL-S15",
+            "CTL-S26"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "Timer先释放旧名字/句柄，再同步发timerdone；消费者消耗本轮并决定重建计时或周期搜索。",
+          "evidence_refs": [
+            "CTL-S27",
+            "CTL-S23",
+            "CTL-S29",
+            "CTL-S19",
+            "CTL-S18"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "暂停/Stop/卸载成对释放业务任务、Timer名字与监听；载入后只消费既有Timer状态。",
+          "evidence_refs": [
+            "CTL-S24",
+            "CTL-S25",
+            "CTL-S26",
+            "CTL-S28",
+            "CTL-S03"
+          ]
+        }
+      ],
+      "unknowns": [
+        "业务SetSalted发布的同步事件可重入；此实现没有通用锁，不能据此承诺重复Stop或回调中卸载均原子安全。",
+        "未运行游戏；外部FindEntity、finiteuses及状态查询未作完整业务研究。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CTL-S03",
+            "role": "卸载入口、槽位清除与清理钩子",
+            "claim_ids": []
+          },
+          {
+            "ref": "CTL-S15",
+            "role": "宿主任务表及完成清理",
+            "claim_ids": [
+              "EXP-LIFE-007-C03",
+              "EXP-LIFE-007-C05"
+            ]
+          },
+          {
+            "ref": "CTL-S16",
+            "role": "普通调度生产者与宿主归属",
+            "claim_ids": [
+              "EXP-LIFE-007-C02"
+            ]
+          },
+          {
+            "ref": "CTL-S18",
+            "role": "任务句柄取消及引用释放",
+            "claim_ids": [
+              "EXP-LIFE-007-C03",
+              "EXP-LIFE-007-C05"
+            ]
+          },
+          {
+            "ref": "CTL-S19",
+            "role": "回调、重排、完成通知与清理消费者",
+            "claim_ids": [
+              "EXP-LIFE-007-C03",
+              "EXP-LIFE-007-C05"
+            ]
+          },
+          {
+            "ref": "CTL-S21",
+            "role": "宿主退出清理阶段；不是组件卸载钩子",
+            "claim_ids": []
+          },
+          {
+            "ref": "CTL-S22",
+            "role": "Timer前置依赖及任务字段初始化",
+            "claim_ids": [
+              "EXP-LIFE-007-C01"
+            ]
+          },
+          {
+            "ref": "CTL-S23",
+            "role": "周期生产、回调内自取消、Timer事件消费者",
+            "claim_ids": [
+              "EXP-LIFE-007-C02",
+              "EXP-LIFE-007-C03",
+              "EXP-LIFE-007-C04",
+              "EXP-LIFE-007-C05",
+              "EXP-LIFE-007-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S24",
+            "role": "暂停/恢复/死亡的资源切换入口",
+            "claim_ids": [
+              "EXP-LIFE-007-C01",
+              "EXP-LIFE-007-C06"
+            ]
+          },
+          {
+            "ref": "CTL-S25",
+            "role": "业务启动与组件卸载清理",
+            "claim_ids": [
+              "EXP-LIFE-007-C01",
+              "EXP-LIFE-007-C06",
+              "EXP-LIFE-007-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S26",
+            "role": "状态事件重入及载入后消费已有Timer",
+            "claim_ids": [
+              "EXP-LIFE-007-C06",
+              "EXP-LIFE-007-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S27",
+            "role": "具名计时生产、完成先删名与事件发布",
+            "claim_ids": [
+              "EXP-LIFE-007-C02",
+              "EXP-LIFE-007-C04",
+              "EXP-LIFE-007-C05",
+              "EXP-LIFE-007-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S28",
+            "role": "SaltLicker保留函数身份的事件登记与解除",
+            "claim_ids": [
+              "EXP-LIFE-007-C07"
+            ]
+          },
+          {
+            "ref": "CTL-S29",
+            "role": "Timer事件同步调用普通监听的消费者",
+            "claim_ids": [
+              "EXP-LIFE-007-C04",
+              "EXP-LIFE-007-C05",
+              "EXP-LIFE-007-C07"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本卡静态论证用到的Lua依赖；未覆盖引擎C++调度、原生net/标签实现、所有组件或mod替换的函数。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "CTL-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 52,
+      "line_end": 60,
+      "range_sha256": "a4dcd8e6a054e5f89f39bd306621ad4698b0c9aceda007c1ec761d4f462ed048",
+      "symbols": [
+        "LoadComponent"
+      ]
+    },
+    {
+      "id": "CTL-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 632,
+      "line_end": 668,
+      "range_sha256": "f1923cbc36685515f5746fea72085f8e95792112c741bdb9aa213254757a2881",
+      "symbols": [
+        "EntityScript:AddComponent"
+      ]
+    },
+    {
+      "id": "CTL-S03",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "CTL-S04",
+      "source_file": "scripts/entityreplica.lua",
+      "file_sha256": "c53ab2da6e1d10d4e8dae834337418aacea5e6656975141ab8278167d4e6ae5c",
+      "line_start": 30,
+      "line_end": 67,
+      "range_sha256": "e867870ca23384d4ad78f69c1c9dc0e37125ff4ae747ece864b1bd3be90bf3e3",
+      "symbols": [
+        "EntityScript:ValidateReplicaComponent",
+        "EntityScript:ReplicateComponent",
+        "EntityScript:UnreplicateComponent"
+      ]
+    },
+    {
+      "id": "CTL-S05",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 818,
+      "line_end": 838,
+      "range_sha256": "18037c2d13b1b8dc7ca4c87e0ec5bd1e434f73b2c3543e67584d33c585098ddb",
+      "symbols": [
+        "ModWrangler:GetPostInitFns"
+      ]
+    },
+    {
+      "id": "CTL-S06",
+      "source_file": "scripts/mods.lua",
+      "file_sha256": "4fc1f9760c6aa44bb113e07bbf8931326dbd496f12d8e28276627bbdf3291f17",
+      "line_start": 153,
+      "line_end": 166,
+      "range_sha256": "050ed4ba4999b1b97d678483f5015234e84964ea1aa7b15a2043d25ac85e7619",
+      "symbols": [
+        "runmodfn"
+      ]
+    },
+    {
+      "id": "CTL-S07",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 3152,
+      "line_end": 3168,
+      "range_sha256": "e74d33e53d1c9e67ef8323fa4e24476defb0946c18b3bb31231ce11c52f29d0e",
+      "symbols": [
+        "ModComponentWarning",
+        "CheckModComponentIds"
+      ]
+    },
+    {
+      "id": "CTL-S08",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 3183,
+      "line_end": 3234,
+      "range_sha256": "9f5f7500a4408483912bf4d4c8c69f324165ea93c337d263a46663b3d7917458",
+      "symbols": [
+        "EntityScript:RegisterComponentActions",
+        "EntityScript:UnregisterComponentActions"
+      ]
+    },
+    {
+      "id": "CTL-S09",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 439,
+      "line_end": 473,
+      "range_sha256": "43819b4a55a8951755b73c76c00cb9ed9a0f053f292c958eeb475ab5f6dbf911",
+      "symbols": [
+        "EntityScript:StartUpdatingComponent"
+      ]
+    },
+    {
+      "id": "CTL-S10",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 475,
+      "line_end": 502,
+      "range_sha256": "c6c225173d8064010a98f1897934343e4ca35da6bea42fad72c3f6ec4930d4ab",
+      "symbols": [
+        "EntityScript:StopUpdatingComponent",
+        "EntityScript:StopUpdatingComponent_Deferred"
+      ]
+    },
+    {
+      "id": "CTL-S11",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 527,
+      "line_end": 544,
+      "range_sha256": "f2f94a72c3e9c5c23b2cfffeb9401f479388fe10bb3493890008e3fae9ae01e3",
+      "symbols": [
+        "EntityScript:StopWallUpdatingComponent"
+      ]
+    },
+    {
+      "id": "CTL-S12",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 224,
+      "line_end": 298,
+      "range_sha256": "2b69986879999b3f39411f78f2edac1bd1e81c84f374edbe825b2323c0517ddb",
+      "symbols": [
+        "Update"
+      ]
+    },
+    {
+      "id": "CTL-S13",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 169,
+      "line_end": 220,
+      "range_sha256": "78b11ab375fddc37f4713be6fc04871dd57610da80f2325e08b447b9125b7de1",
+      "symbols": [
+        "StaticUpdate"
+      ]
+    },
+    {
+      "id": "CTL-S14",
+      "source_file": "scripts/components/firefx.lua",
+      "file_sha256": "05a29690766bd16346ea796e6daafe7d3db100f40952eaa8dee71cf4991b6205",
+      "line_start": 1,
+      "line_end": 25,
+      "range_sha256": "887953457490ada77f5a76cf198d2461e7e03e95819b6bffa914745f899ff74a",
+      "symbols": [
+        "FireFX constructor"
+      ]
+    },
+    {
+      "id": "CTL-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1510,
+      "range_sha256": "2d04eb0a077057d94233c5a5a16d12a546ccbb8ed10677f7b027932804d88d97",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish"
+      ]
+    },
+    {
+      "id": "CTL-S16",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1537,
+      "line_end": 1555,
+      "range_sha256": "74015930d04315d9f9b790f2bc61edd9756ce3df2fb7973577961875978f87f7",
+      "symbols": [
+        "EntityScript:DoPeriodicTask",
+        "EntityScript:DoTaskInTime"
+      ]
+    },
+    {
+      "id": "CTL-S17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1512,
+      "line_end": 1535,
+      "range_sha256": "f324a19f35c1f8487adee83c2013e386553f8ad2a11dc569a65175eb2eb2e09c",
+      "symbols": [
+        "EntityScript:DoStaticPeriodicTask",
+        "EntityScript:DoStaticTaskInTime"
+      ]
+    },
+    {
+      "id": "CTL-S18",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 45,
+      "line_end": 95,
+      "range_sha256": "c42df9745caa288c40ad937be16360bf31f654179cb5ea432f96b0741849fed2",
+      "symbols": [
+        "Periodic constructor",
+        "Periodic:Cancel",
+        "Periodic:Cleanup"
+      ]
+    },
+    {
+      "id": "CTL-S19",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 164,
+      "line_end": 216,
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "symbols": [
+        "Scheduler:OnTick"
+      ]
+    },
+    {
+      "id": "CTL-S20",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 276,
+      "line_end": 301,
+      "range_sha256": "668d7ce5cd699d740a0022774d27c7e2d984826a4f266a5e489f0788b23207be",
+      "symbols": [
+        "Scheduler:ExecuteInTime",
+        "Scheduler:GetListForTimeFromNow",
+        "Scheduler:ExecutePeriodic"
+      ]
+    },
+    {
+      "id": "CTL-S21",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "CTL-S22",
+      "source_file": "scripts/components/saltlicker.lua",
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "line_start": 71,
+      "line_end": 87,
+      "range_sha256": "e962349e50005f7bb2d6858c9259adc38a71c17e7705c07f3fbfc3f162252dbb",
+      "symbols": [
+        "SaltLicker constructor"
+      ]
+    },
+    {
+      "id": "CTL-S23",
+      "source_file": "scripts/components/saltlicker.lua",
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "line_start": 1,
+      "line_end": 69,
+      "range_sha256": "7ac2bf07eca88a2007a46a4a3c54716bfac98b6ff14da7a078b17797e6421bea",
+      "symbols": [
+        "_checkforsaltlick",
+        "_onsaltlickplaced",
+        "_StartSeeking",
+        "_StopSeeking",
+        "_ontimerdone"
+      ]
+    },
+    {
+      "id": "CTL-S24",
+      "source_file": "scripts/components/saltlicker.lua",
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "line_start": 89,
+      "line_end": 108,
+      "range_sha256": "061cd8175771f92f28ff61da56d188491a83064154fe6a3e00d42616ab31b5a7",
+      "symbols": [
+        "OnPause",
+        "TryUnpause",
+        "OnDeath"
+      ]
+    },
+    {
+      "id": "CTL-S25",
+      "source_file": "scripts/components/saltlicker.lua",
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "line_start": 110,
+      "line_end": 147,
+      "range_sha256": "686069fe6be7a266729d3facf71a12fb4d475c6bce96065a26e34322700964d5",
+      "symbols": [
+        "SaltLicker:SetUp",
+        "SaltLicker:Stop",
+        "SaltLicker:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "CTL-S26",
+      "source_file": "scripts/components/saltlicker.lua",
+      "file_sha256": "a6b5a67b50a5a56e855b355727d4c6fa81c41f394a150100ccf8555472435239",
+      "line_start": 149,
+      "line_end": 167,
+      "range_sha256": "7c549549086a1a6005c25ebc69a094d88f58ff3b68aaa03053fab26c5343050c",
+      "symbols": [
+        "SaltLicker:SetSalted",
+        "SaltLicker:OnSave",
+        "SaltLicker:LoadPostPass"
+      ]
+    },
+    {
+      "id": "CTL-S27",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 66,
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "symbols": [
+        "Timer:TimerExists",
+        "OnTimerDone",
+        "Timer:StartTimer",
+        "Timer:StopTimer"
+      ]
+    },
+    {
+      "id": "CTL-S28",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1214,
+      "line_end": 1256,
+      "range_sha256": "de73c910b3a85eba96d71364761402a5c89b5d8d245939bdeea9fa921e71ef72",
+      "symbols": [
+        "EntityScript:ListenForEvent",
+        "RemoveListener",
+        "EntityScript:RemoveEventCallback"
+      ]
+    },
+    {
+      "id": "CTL-S29",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "组件构造和ComponentPostInit时是否已写入components，重复AddComponent会重跑吗？",
+      "expected_entry_ids": [
+        "EXP-LIFE-005"
+      ],
+      "purpose": "安装公布/重复名字/包装异常"
+    },
+    {
+      "query": "RemoveComponent清理钩子里同名AddComponent为什么不能当原子替换？",
+      "expected_entry_ids": [
+        "EXP-LIFE-005"
+      ],
+      "purpose": "卸载重入与后置清理"
+    },
+    {
+      "query": "StopUpdatingComponent后立即Start会发生什么，static停止何时消费？",
+      "expected_entry_ids": [
+        "EXP-LIFE-005"
+      ],
+      "purpose": "更新停止标记与消费者"
+    },
+    {
+      "query": "DoTaskInTime回调内Cancel自己会终止当前代码吗，task字段何时清空？",
+      "expected_entry_ids": [
+        "EXP-LIFE-006",
+        "EXP-LIFE-007"
+      ],
+      "purpose": "执行中取消与实际消费者"
+    },
+    {
+      "query": "CancelAllPendingTasks是否只取消某个组件，和RemoveComponent有什么区别？",
+      "expected_entry_ids": [
+        "EXP-LIFE-006"
+      ],
+      "purpose": "宿主归属与清理边界"
+    },
+    {
+      "query": "SaltLicker怎样清周期任务/Timer/监听，timerdone为何能重开同名计时？",
+      "expected_entry_ids": [
+        "EXP-LIFE-007"
+      ],
+      "purpose": "具体生产消费退出闭环"
+    }
+  ],
+  "limitations": [
+    "仅冻结game762172/build26474873 Lua静态研究；未运行游戏、客户端、服务器、安装或注册。",
+    "research/restricted/hold保持不变；登记及独立审阅状态以FAMILY-REGISTRY为准；不修改canonical、历史Scope及HOLD。",
+    "所有引用从本地冻结zip重新计算；文件SHA为原始bytes，范围SHA为UTF-8 decode后splitlines选取闭区间，以LF连接且末尾无换行。",
+    "不分发Lua全文，不以脚本静态路径证明引擎C++行为；未验证API数值合法域、原生错误恢复及任意mod覆盖兼容。",
+    "本轮为基线231条/44个native mechanisms之上的候选研究；旧条目与Skill通用生命周期建议仅作去重上下文。"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "dst-engineering-recommendation-revisions/1",
+  "date": "2026-11-12",
+  "scope": "Revisions to engineering recommendations, not changes to historical source facts or coding admission.",
+  "runtime_verified": false,
+  "historical_projection_policy": "original_projection retains the exact historical input, including superseded recommendations. Current claims and these corrections contain the maintained recommendations.",
+  "revisions": [
+    {
+      "entry_id": "N005-UI-C01",
+      "claim_pointer": "/claims/14",
+      "finding_id": "B-JUDGMENT-01",
+      "before": "最终扣资源/世界 mutation 置于经授权的 server 路径；UI、preview、动画 onexit 不承担权威效果。",
+      "after": "最终扣资源和世界状态修改置于经授权的服务端路径；客户端 UI 和 preview 不承担这些效果。服务端 SG 的 onexit 可以恢复本状态拥有的权威状态；只在成功时触发的结算应绑定明确完成条件，不能把任意退出当作成功。",
+      "reason": "权威性取决于执行端与业务阶段。不能因回调名为 onexit 就排除服务端状态的正常收尾。",
+      "previous_record_sha256": "ab9beb3f599708d7c19e54acf0ff8915d1fbfff1e3056309a55a61d6b0b17db6",
+      "supersedes": [
+        {
+          "artifact_path": "research/native-core/sources/362faeec1a42ac8c-ui-complete-research.json",
+          "sha256": "d5e67b93daeca0ab643af02bea3812b915e8b858e01c89e6e16cfc13576f8800",
+          "pointer": "/compact_candidates/0/coding_recommendations/1"
+        }
+      ],
+      "runtime_verified": false,
+      "historical_projection_pointer": "/scope/original_projection/coding_recommendations/1",
+      "original_projection_sha256": "808e5171bad052df225b0c78c85e0f66f9239acedfe4fc25d34c1e2a4e365049"
+    },
+    {
+      "entry_id": "N005-UI-C03",
+      "claim_pointer": "/claims/15",
+      "finding_id": "B-JUDGMENT-02",
+      "before": "延迟工作除了 IsValid 再核对当前 owner/业务身份；player 替换后按已授权生命周期重建，不能把旧 callback 或 RPC 自动搬到新玩家。",
+      "after": "延迟工作按实际任务所有者安排清理；归属固定且随所有者结束的任务沿用既有生命周期。只有回调可能跨过玩家、owner 或业务对象的替换而继续执行时，再取消旧工作或核对当前身份。player 替换后按对应生命周期重建，不能把旧 callback 或 RPC 自动搬到新玩家。",
+      "reason": "身份检查用于可达的换源或跨请求路径，不应给已有任务所有权足以覆盖的工作增加冗余标记。",
+      "previous_record_sha256": "8f370220094ca2a39034da8e7654570f1fc506ad9fcf40dbe6ccd2cc7afe525e",
+      "supersedes": [
+        {
+          "artifact_path": "research/native-core/sources/362faeec1a42ac8c-ui-complete-research.json",
+          "sha256": "d5e67b93daeca0ab643af02bea3812b915e8b858e01c89e6e16cfc13576f8800",
+          "pointer": "/compact_candidates/2/coding_recommendations/1"
+        }
+      ],
+      "runtime_verified": false,
+      "historical_projection_pointer": "/scope/original_projection/coding_recommendations/1",
+      "original_projection_sha256": "7c1a92b2dfc02b79dc46ab5c513c3569d2653fb274bbf0a2f59d3458906d863c"
+    },
+    {
+      "entry_id": "N005-UI-C06",
+      "claim_pointer": "/claims/5",
+      "finding_id": "B-JUDGMENT-03",
+      "before": "工程实现先排除 UI/HUD 作为 server 前提；具体 Mod 用 host、remote prediction on/off、dedicated 分别验收。这里只提供静态分支知识，不宣称 ModQA 已通过。",
+      "after": "服务端逻辑不以 UI/HUD 存在为前提。按本次改动和承诺支持的运行端选择检查；涉及远端预测分支时检查对应预测设置，host 结果不能替代远端结果。这里只提供静态分支知识，不宣称目标 Mod 已通过运行验收。",
+      "reason": "验证范围由受影响分支决定，不能要求每次改动重复完整 host、remote prediction on/off、dedicated 矩阵。",
+      "previous_record_sha256": "ac5ba8fc769fd792079d06647246fe7df8d2e0e7b4a692273be0c9b0442b328b",
+      "supersedes": [
+        {
+          "artifact_path": "research/native-core/sources/362faeec1a42ac8c-ui-complete-research.json",
+          "sha256": "d5e67b93daeca0ab643af02bea3812b915e8b858e01c89e6e16cfc13576f8800",
+          "pointer": "/compact_candidates/5/coding_recommendations/0"
+        }
+      ],
+      "runtime_verified": false,
+      "historical_projection_pointer": "/scope/original_projection/coding_recommendations/0",
+      "original_projection_sha256": "ea098058216314c464ef792689b4e0d8da73815b550ce7db9dc10f9f2d6dceed"
+    },
+    {
+      "entry_id": "RC-C03",
+      "claim_pointer": "/claims/4",
+      "finding_id": "C-JUDGMENT-001",
+      "before": "不要在onpickedfn再发同一基础产物；预置有效lootdropper与可生成prefab。若需证明物品已入包，复用GiveItem完整接收/销毁/掉落合同，别根据Pick第二返回值或picksomething判断。",
+      "after": "不要在onpickedfn再发同一基础产物；按所用产物分支配置可生成prefab，仅依赖lootdropper的分支预置该组件。若需证明物品已入包，复用GiveItem完整接收/销毁/掉落合同，别根据Pick第二返回值或picksomething判断。",
+      "reason": "普通 product 分支可以直接 SpawnPrefab；lootdropper 只属于使用它的产物分支依赖。",
+      "previous_record_sha256": "131e457e85b39c4447a67cae576dac84b293db404be5e665e3cb39011989987e",
+      "supersedes": [
+        {
+          "artifact_path": "research/native-core/sources/ffdc125f842906f0-resource-completion-research.json",
+          "sha256": "8352beaea0b8752507bcf420a84c9cb2f1eab2bfa852ea694e7532e5d744505c",
+          "pointer": "/coding_projection/2/local_advice"
+        }
+      ],
+      "runtime_verified": false
+    }
+  ],
+  "legacy_applicability": {
+    "entry_id": "ARP-DST-001",
+    "pointer": "/details/applicability",
+    "value": "按本次改动选择相关步骤，已有代码足以说明的内容可简短合并。网络、保存、重试、迁移和补偿只在对应机制参与或需求存在时展开。",
+    "reason": "Select the parts of the existing workflow that apply to the actual change.",
+    "runtime_verified": false
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "dst-engineering-judgment-delta-review/1",
+  "date": "2026-11-12",
+  "reviewer": "E",
+  "candidate_sha256": "00a415ea508e6e6b6b20669c51076b91e614043164bbafbb35e953a507af497f",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "runtime_verified": false,
+  "review_scope": "仅复核EXP-WG-004-C08的最小工程建议修订，并核对其余文档内容与前次审阅身份链。",
+  "previous_document": {
+    "file": "research/native-mechanisms/worldgen-0c7772f40b77.json",
+    "sha256": "0c7772f40b77d9b3935d20ba0885bd0d173a675548bc36c6b2a17a2009729ecd"
+  },
+  "previous_review": {
+    "file": "research/native-mechanisms/reviews/worldgen-0e248e0ea180.json",
+    "sha256": "0e248e0ea180b336581f0b192ccbcb4167ae0e97dd781598edeb7a0818666959",
+    "status": "explicit_reviewer_research_only",
+    "runtime_verified": false,
+    "dependencies": [
+      {
+        "file": "research/native-mechanisms/reviews/worldgen-dependency-776d03f05b5e.json",
+        "sha256": "2fb657a5635dd6fd7fec58e07c96bce748ec2a88bf29ecc16c975f86233d9537",
+        "role": "independent_review"
+      }
+    ]
+  },
+  "changed_pointers": [
+    "/entries/3/claims/7/statement"
+  ],
+  "finding_resolutions": [
+    {
+      "id": "E-JUDGMENT-001",
+      "status": "resolved",
+      "detail": "检查项按本次改动及受影响功能选择，多seed限于涉及随机数量、落位或连通性的情形。保留隔离新世界中定向检查实际生成结果的建议，符合原有研究范围。"
+    }
+  ],
+  "static_checks": {
+    "candidate_sha256_matches_change": true,
+    "previous_document_sha256_matches_change": true,
+    "exactly_one_declared_statement_changed": true,
+    "before_after_match_change": true,
+    "all_original_nsf_unchanged": true,
+    "all_api_contracts_unchanged": true,
+    "all_scopes_unchanged": true,
+    "source_references_and_archive_identity_unchanged": true,
+    "other_document_content_unchanged": true,
+    "previous_review_sha256_matches_change": true,
+    "previous_review_dependency_hashes_match": true
+  },
+  "coverage_limits": "沿用759671历史来源身份、原审阅依赖链及research/restricted/hold状态。本次结论限于单条REC文字修订及结构差异检查，游戏、native和远端表现仍未验证。",
+  "blockers": []
+}

@@ -41,19 +41,40 @@ class ResearchReadTests(unittest.TestCase):
 
     def test_historical_facts_scope_governance_and_ids_are_preserved(self):
         expected={
-            'data/entries.json':'d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6',
+            'data/entries.json':'a22a2f274823cc7bc50c28a5ee10805cdfbbde70279627fba496d7dc1e08a1c6',
             'data/native001/canonical-native001-ai-knowledge.json':'bcf097f94cc98aeb27a0c00a8d455cb4c70a5beafa40729047480eff839c846a',
         }
         for name,digest in expected.items():self.assertEqual(sha((ROOT/'knowledge'/name).read_bytes()),digest,name)
         registry=families.load(ROOT/'knowledge')
         core=json.loads((ROOT/'knowledge/data/nativecore/native-core.json').read_bytes())
+        # Reverse only the four reviewed recommendation edits before comparing
+        # the historical semantic baseline. Source facts and original Scope
+        # remain covered by the original digest.
+        revision_path='research/native-core/recommendation-revisions-20261112.json'
+        revision_raw=(ROOT/'knowledge'/revision_path).read_bytes()
+        self.assertEqual(sha(revision_raw),'d50ff62d19154f19bf53119b29b71afa72d6ff2905776d550b5ecb26e2d680f3')
+        revisions=json.loads(revision_raw)['revisions']
+        self.assertEqual({r['entry_id'] for r in revisions},{'N005-UI-C01','N005-UI-C03','N005-UI-C06','RC-C03'})
+        for index,revision in enumerate(revisions):
+            entry=next(e for e in core['entries'] if e['id']==revision['entry_id'])
+            claim=entry['claims'][int(revision['claim_pointer'].split('/')[-1])]
+            self.assertEqual((claim['kind'],claim['statement']),('REC',revision['after']))
+            ref={'artifact_path':revision_path,'sha256':sha(revision_raw),'pointer':'/revisions/'+str(index)}
+            self.assertEqual(claim['evidence_refs'],[ref])
+            self.assertEqual(entry['correction_refs'][-1],ref)
+            entry['correction_refs'].pop()
+            claim['statement']=revision['before']
+            if 'original_projection' in entry['scope']:
+                self.assertEqual(entry['scope'].pop('recommendation_correction_ref'),ref)
+                self.assertEqual(entry['scope'].pop('recommendation_correction_note'),
+                    'original_projection 保留修订前研究原值；当前工程建议以 claims 和本更正为准。')
+                self.assertTrue(entry['scope']['projection_preserved_exact_as_json_value'])
         def semantic(value):
             if isinstance(value,dict):
                 return {k:semantic(v) for k,v in value.items() if k not in {'evidence_refs','sha256','bytes','source_artifacts'}}
             if isinstance(value,list):return [semantic(v) for v in value]
             return value
-        # Evidence commitments change during reviewed source maintenance; the
-        # preserved statements, Scope and governance must not change with them.
+        # Typed evidence commitments can change during source maintenance.
         preserved=json.dumps(semantic(core),ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
         self.assertEqual(sha(preserved),'511815910bbefb6b29ae334c25f1456bea715c087236d6c4a58f5ce12fb6f89a')
         governance={row['id']:row for row in core['state_registry']}

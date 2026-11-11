@@ -4,6 +4,8 @@
 
 The knowledge base has **279 registered records: 64 foundation, 13 Native AI, 110 Native Core and 92 mechanism research records**. This round adds 12 research records and 34 API contracts for UI and input, creature AI, farming and boats, with practical guides for choosing native mechanisms or simpler custom implementations. See [changes](docs/phase12-practical-native.md). Detailed technical guides are mainly in Chinese.
 
+Revised engineering guidance reduces unnecessary component dependencies, identity checks, persistence and migration logic, helping agents match implementation and verification to the actual feature.
+
 ## Download and setup
 
 Download [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.zip) from the [latest release](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest) and compare it with that release's `SHA256SUMS.txt`. Repository changes are published in batches. Extract the complete directory containing `SKILL.md`; install it in your agent's supported skill location. See [installation](docs/install-and-use.md).

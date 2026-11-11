@@ -1,0 +1,71 @@
+{
+  "schema": "dst-growth-engineering-judgment-review/1",
+  "date": "2026-11-12",
+  "review_type": "independent_minimal_diff_followup",
+  "candidate_sha256": "8dd5d704ebd99e2b8d6d28d4707603d844a477495199f8f8bc2f7aed03caf5b2",
+  "baseline_sha256": "06fcb280862dc556bd35f7d7317111c7b633a2c72c290ef1e0725a80299ec1b6",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "runtime_verified": false,
+  "blockers": [],
+  "previous_review": {
+    "file": "research/native-mechanisms/reviews/growth-46921287e64d.json",
+    "sha256": "13d392048e6265032f3710901e1cc27435f0691f4d24f2a83bb0dbef37bec6f9",
+    "runtime_verified": false,
+    "dependencies": [
+      {
+        "file": "research/native-mechanisms/reviews/growth-dependency-9fa6dc6aa3f3.json",
+        "sha256": "97e9e491e784bf91387919ef45261016d8e48c05fb1c294467794c67d452713a",
+        "role": "previous_review"
+      }
+    ]
+  },
+  "scope": "复核EXP-GROW-004-C10的工程建议最小修订及其他JSON语义值保持情况。",
+  "resolved": [
+    {
+      "id": "G-001",
+      "claim_id": "EXP-GROW-004-C10",
+      "pointer": "/entries/3/claims/9/statement",
+      "status": "resolved",
+      "assessment": "新文把桶处理限定于动态注销或重新登记，单独修改产品或搜索标签使用现有setter。跨存档状态保留对应恢复需求，保存数据含义变化才考虑迁移，消除了对临时策略变化一概要求迁移的过度要求。",
+      "evidence_refs": [
+        "GROW-S043",
+        "GROW-S045"
+      ],
+      "source_basis": "已读PlantRegrowth中SetRegrowthRate重新RegisterUpdate，SetProduct/SetSearchTag仅赋字段，OnSave/OnLoad仅记录相对regrowthtime。"
+    }
+  ],
+  "additional_wording_review": {
+    "pointer": "/entries/3/claims/9/statement",
+    "assessment": "末句改为核对繁殖效果时区分尝试、出生实体和动态密度，保留原有结果判据，并允许按本次改动选择所需检查。没有引入额外运行状态或统计框架。"
+  },
+  "diff_count": 1,
+  "differences": [
+    {
+      "pointer": "/entries/3/claims/9/statement",
+      "before": "把 rate 当初始化登记入口审慎调用一次；新父类型需配有效 TimeMultipliers 函数、生成密度依据和产品 prefab。需要动态启停/改变繁殖策略时先设计桶清理及存档迁移，检查停止阶段与停止繁殖两层，不用强行填 density 或假造拓扑来绕过无密度退出。验收分别统计尝试、出生实体和动态密度。",
+      "after": "把 rate 当初始化登记入口审慎调用一次；新父类型需配有效 TimeMultipliers 函数、生成密度依据和产品 prefab。动态注销或重新登记时处理原桶归属；只改产品或搜索标签可使用对应 setter。需要跨存档保留启停或策略状态时再设计恢复，改变已保存数据的含义时再考虑迁移。区分停止阶段与停止繁殖，不用强行填 density 或假造拓扑来绕过无密度退出。核对繁殖效果时区分尝试、出生实体和动态密度。"
+    }
+  ],
+  "unchanged_scope": {
+    "all_other_json_values": true,
+    "entry_ids_and_counts": true,
+    "all_NSF_and_EI_claims": true,
+    "all_API_contracts": true,
+    "all_mechanism_steps": true,
+    "all_entry_scopes": true,
+    "source_epoch_and_archive_hash": true,
+    "source_references": true,
+    "knowledge_retrieval_coding_states": true,
+    "previous_corrections_and_compatibility_metadata": true
+  },
+  "checks": [
+    "候选、基线及previous_review原始字节SHA256与变更清单一致。",
+    "完整JSON递归比较仅发现一处statement叶字段变化。将该字段恢复为before后，候选与基线全部JSON语义值相等。",
+    "本轮复用先前已读的指定762172归档源码判断。PlantRegrowth文件SHA256为c53751ebb93d483703245fa6c5a008768fa0595d3e668ce9e07f8c76de0d3385，与759671历史引用一致。"
+  ],
+  "limitations": [
+    "仅为最小建议修订的静态研究复核，历史source_epoch、Scope和未知项继续保留。",
+    "未运行Lua、游戏、模型试做或题库测试。research/restricted/hold准入状态保持。",
+    "JSON语义值比较不表示不同候选的序列化空白和键顺序相同。"
+  ]
+}

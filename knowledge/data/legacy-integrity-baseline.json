@@ -1,7 +1,7 @@
 {
   "schema": "dst-legacy-integrity-baseline/1",
   "source_revision": "eeb773cb",
-  "description": "Hashes of the unchanged 64 legacy records and their supporting registries/schema; complete prior snapshots remain in Git history. This file contains no duplicate knowledge bodies.",
+  "description": "Current integrity commitments for the 64 legacy records and supporting artifacts. The source_revision retains the historical baseline origin; reviewed_revisions records the explicitly reviewed maintenance changes.",
   "legacy_v0_1_migration_comparison": "PASS: semantic_migration_diff returned [] against the archived public v0.1 before snapshot removal.",
   "files": [
     {
@@ -11,8 +11,8 @@
     },
     {
       "path": "data/entries.json",
-      "bytes": 224218,
-      "sha256": "d626b4460c5c0bf05190aabc0ac8f51d1e1732762a80b80da97223091d247ce6"
+      "bytes": 224427,
+      "sha256": "a22a2f274823cc7bc50c28a5ee10805cdfbbde70279627fba496d7dc1e08a1c6"
     },
     {
       "path": "data/index.json",
@@ -46,8 +46,8 @@
     },
     {
       "path": "schemas/entries.schema.json",
-      "bytes": 42996,
-      "sha256": "98b1fcd17108773150d95d69768a891eaf442d228149f6b92f42fbc94e3d1fc2"
+      "bytes": 43091,
+      "sha256": "6500993b3aac8e3dbbfd16c59598cad0ae99c31398d407612a3464c4a64e950b"
     },
     {
       "path": "schemas/relations.schema.json",
@@ -311,11 +311,27 @@
     },
     {
       "id": "ARP-DST-001",
-      "sha256": "a42724da82a7f3e110d06491adaf6e905d7357a73eff2aae07cc8fa8dcca604b"
+      "sha256": "763ffae9418f6b9a59a7b38bd7af24d633d6f5d150ad5fedb62476dd5212422d"
     },
     {
       "id": "CASE-001",
       "sha256": "32bfbf22d6ec44c8f48578030bcf8dd119deac644d2ba0ee3e6c243772bc339b"
+    }
+  ],
+  "reviewed_revisions": [
+    {
+      "date": "2026-11-12",
+      "entry_id": "ARP-DST-001",
+      "pointer": "/details/applicability",
+      "previous_baseline_sha256": "5d4dcf383ed8da9e15667ce3d7660b93c2c09aefd9d758d841ce3ed2595f528b",
+      "previous_record_sha256": "a42724da82a7f3e110d06491adaf6e905d7357a73eff2aae07cc8fa8dcca604b",
+      "record_sha256": "763ffae9418f6b9a59a7b38bd7af24d633d6f5d150ad5fedb62476dd5212422d",
+      "supporting_schema_change": "Declare the optional playbook details.applicability string while retaining additionalProperties=false.",
+      "revision_ref": {
+        "artifact_path": "research/native-core/recommendation-revisions-20261112.json",
+        "sha256": "d50ff62d19154f19bf53119b29b71afa72d6ff2905776d550b5ecb26e2d680f3",
+        "pointer": "/legacy_applicability"
+      }
     }
   ]
 }

@@ -1,0 +1,88 @@
+{
+  "schema": "dst-growth-revision-review/1",
+  "date": "2026-10-26",
+  "review_type": "diff_only_followup",
+  "passed": true,
+  "candidate_path": "local-private-artifact/growth-reviewed.json",
+  "candidate_sha256": "06fcb280862dc556bd35f7d7317111c7b633a2c72c290ef1e0725a80299ec1b6",
+  "runtime_verified": false,
+  "previous_review": {
+    "path": "local-private-artifact/growth-review.json",
+    "sha256": "97e9e491e784bf91387919ef45261016d8e48c05fb1c294467794c67d452713a"
+  },
+  "original_candidate": {
+    "path": "local-private-artifact/mechanisms.json",
+    "sha256": "162632b4d75cc63219dd5da777b0a883e9ceb0300d47cb5663ea87e99772742c",
+    "author_file_preserved": true
+  },
+  "verdict": "F1_and_O1_resolved; no other JSON values changed",
+  "resolved": [
+    {
+      "id": "GROW-XR-F1",
+      "status": "resolved",
+      "pointer": "/entries/1/api_contracts/1/returns/0",
+      "assessment": "新版明确true仅表示调用StartGrowingTask并清pausedremaining；睡眠且非growoffscreen可能仅恢复targettime，不保证task handle存在。与先前独立源码核对的growable.lua:28-40、177-189一致。",
+      "evidence_refs": [
+        "GROW-S002",
+        "GROW-S005"
+      ]
+    },
+    {
+      "id": "GROW-XR-O1",
+      "status": "resolved",
+      "pointer": "/entries/3/claims/4/statement",
+      "assessment": "新版将nil回退限定到显式guards，并明确topology结构及generated.densities容器缺失没有单独保护；不再将任意坏档缺字段概括成安全返回。与先前regrowthutil.lua:9-35核对一致。",
+      "evidence_refs": [
+        "GROW-S046"
+      ]
+    }
+  ],
+  "diff_count": 2,
+  "differences": [
+    {
+      "pointer": "/entries/1/api_contracts/1/returns/0",
+      "before": "原因清空且剩余时间存在、恢复任务时 true；其他路径 nil",
+      "after": "原因表为空且pausedremaining非nil时，调用StartGrowingTask、清pausedremaining并返回true；true不保证task handle存在，睡眠且非growoffscreen时可能仅恢复targettime。其他路径nil。"
+    },
+    {
+      "pointer": "/entries/3/claims/4/statement",
+      "before": "GetFiveRadius 按 TheSim:WorldPointInPoly 找首个 topology node，要求 TheWorld.generated、对应 topology id 和 densities 记录；取父 prefab 密度后 CalculateFiveRadius=math.sqrt((2*16*5/density)/math.pi)。无区域/密度返回 nil；它依赖生成时数据，不是动态扫描计算全世界树总量，且不对密度正值做此处统一校验。",
+      "after": "GetFiveRadius 按 TheSim:WorldPointInPoly 找首个 topology node，要求 TheWorld.generated、对应 topology id 和 densities 记录；取父 prefab 密度后 CalculateFiveRadius=math.sqrt((2*16*5/density)/math.pi)。显式guard覆盖的无区域、无generated、无对应topology id/区域密度记录或父prefab密度时返回nil；topology结构和generated.densities容器表本身缺失未被单独保护，不保证任意坏档安全返回nil；它依赖生成时数据，不是动态扫描计算全世界树总量，且不对密度正值做此处统一校验。"
+    }
+  ],
+  "unchanged_scope": {
+    "all_other_json_values": true,
+    "source_references": true,
+    "source_epoch_and_archive_hash": true,
+    "entry_ids_and_counts": true,
+    "other_claim_api_step_values": true,
+    "knowledge_retrieval_coding_states": true,
+    "original_author_candidate_hash": true,
+    "previous_review_hash": true
+  },
+  "limitations": [
+    "本次只做两个叶字段差异复核，未重做未修改82个单元的全量语义审核，沿用previous_review冻结记录。",
+    "未执行revise_next_batch.py；已直接比较原/修订JSON值和核对给定哈希。",
+    "未运行Lua或游戏、未授予Coding，状态仍research/restricted/hold。",
+    "JSON语义值比较不声称序列化空白/键顺序字节相同；两个候选各自原字节哈希已冻结。"
+  ],
+  "publication_derivative": {
+    "schema": "dst-public-review-derivative/1",
+    "original_review_sha256": "46921287e64d2c6bb7940cd6ab0831f5168867cf6b81f74928a42bab2890bdd3",
+    "redacted_fields": [
+      {
+        "pointer": "/candidate_path",
+        "original_value_sha256": "dc50bd8e759d71807f3a80726b395919cfe3f24d0182efc5a6b1e061e3d25567"
+      },
+      {
+        "pointer": "/previous_review/path",
+        "original_value_sha256": "355e2a2758716dedcaa876ebab92206bc0e19ff77c40b22ca71b50d6d8cf2f3d"
+      },
+      {
+        "pointer": "/original_candidate/path",
+        "original_value_sha256": "cf30f68f75f228f4bcf0a713d5c1723c0c989deed66da3da1aeb88411e977b95"
+      }
+    ],
+    "policy": "Workstation paths removed; prior-review references rebound to public derivatives. Candidate/source commitments and review findings retained."
+  }
+}

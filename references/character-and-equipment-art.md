@@ -52,6 +52,6 @@
 
 灯光是引擎 `Light` 接口，原版使用 `inst.entity:AddLight()` 及 `inst.Light`；不能从“找不到 RemoveLight”推导应新增一个名为 `light` 的 Lua 组件。需要关闭/回收时沿同类原版的 `Light:Enable` 或独立灯光实体生命周期；发光贴图、Bloom 与照亮环境是不同效果。
 
-交付至少核对：源工程可追踪、内部名称和图集引用、目标动作与朝向预览、装备/卸下/换装、皮肤与形态变化、幽灵/复活、主机和远端观察者。静态检查、软件预览、专服加载和真实客户端视觉分别报告；不以字符数、文件大小或软件截图替代实际客户端结果。
+交付时核对源工程可追踪、内部名称和图集引用，并按资源实际消费者选择目标动作与朝向、装备/卸下/换装、皮肤与形态变化、幽灵/复活及主机和远端观察检查。静态检查、软件预览、专服加载和真实客户端视觉分别报告，不以字符数、文件大小或软件截图替代实际客户端结果。
 
 核验基线：2026-09-27 安装源码的 `prefabs/player_common.lua:MakePlayerCharacter`、`prefabs/wes.lua`、`prefabs/wickerbottom.lua`、`prefabs/spear.lua`、`prefabs/sword_lunarplant.lua`、`stategraphs/SGwilson.lua:book2`，实际 `data/anim/swap_spear.zip`，以及安装版 `mod_tools/tools/scripts/buildanimation.py:strhash/ExportBuild`。源码指纹见 [环境与来源](environment-tools.md)。

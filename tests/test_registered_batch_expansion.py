@@ -12,7 +12,7 @@ from dst_kb.public_catalog import PublicCatalog
 EXPECTED={
     'cooking':('39f19e255b6daa103177ef8d3bea5cf4d556beee4efe1509ee95dfdd408c323b',
                {'EXP-COOK-'+str(i).zfill(3) for i in range(1,8)}),
-    'growth':('06fcb280862dc556bd35f7d7317111c7b633a2c72c290ef1e0725a80299ec1b6',
+    'growth':('8dd5d704ebd99e2b8d6d28d4707603d844a477495199f8f8bc2f7aed03caf5b2',
               {'EXP-GROW-'+str(i).zfill(3) for i in range(1,5)}),
 }
 

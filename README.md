@@ -4,6 +4,8 @@
 
 当前共 **279 条登记知识：64 基础 + 13 Native AI + 110 Native Core + 92 机制研究**。本轮新增 12 条研究与 34 项 API 合同，补充 UI 输入、生物 AI、农作和船体的开发入口，让 AI 更容易选用原版机制、写出简洁的自有实现。见[本轮内容](docs/phase12-practical-native.md)。
 
+同时修订已有工程建议，减少多余的组件依赖、身份检查、保存与迁移设计，让 AI 按实际需求组织代码和选择检查范围。
+
 ## 下载与开始使用
 
 公开包从 [最新发行版](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest) 下载 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.zip)，对照同版 `SHA256SUMS.txt` 后完整解压；仓库中的新内容会分批发布。一个包包含 Skill、唯一 `knowledge/`、脚本、来源准备与 MCP；游戏 Lua、第三方可执行工具和私人项目不随包分发。
