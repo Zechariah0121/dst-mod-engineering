@@ -1,0 +1,1438 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "recovery_replay",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-SAVE-004",
+      "title": "Timer加载重放的相对截止时间与逐名替换边界",
+      "aliases": [
+        "Timer:OnLoad",
+        "构造默认计时替换",
+        "重复读档延长剩余时间",
+        "加载部分提交"
+      ],
+      "engineering_question": "Timer OnLoad覆盖哪些构造期任务，重复应用保存值及中途失败会留下什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-11",
+        "runtime_verified": false,
+        "source_identity": "本机version.txt和Steam appmanifest已核对，源码归档及本条逐引用SHA由本次读取重算。",
+        "environment": "当前762172的普通Timer、EntityScript组件加载分发、宿主调度与oceanwhirlportal master构造及timerdone消费者。",
+        "exclusions": [
+          "NC-N004-FINAL-07和EXP-SAVE-001已有保存字段/同名替换结论作为前置。新增完整OnLoad合同、重复应用重算截止时间及失败部分替换边界。",
+          "其他Timer变体、离线补偿策略和全部prefab恢复路径。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-SAVE-004-C01",
+          "kind": "NSF",
+          "statement": "Timer构造建立空timers表，OnLoad对保存名字执行StopTimer后StartTimer。StartTimer将end_time置为当前GetTime加timeleft，paused记录随后PauseTimer取消新句柄。未列入保存表的当前名字在该循环中保留。",
+          "evidence_refs": [
+            "REC-S01",
+            "REC-S02",
+            "REC-S03"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-004-C02",
+          "kind": "EI",
+          "statement": "在时间已推进后重放同一份运行中记录，新的截止时间随本次GetTime重算，剩余时间从保存值重新开始。它可替换同名句柄，但重复应用的时间结果并不保持上一次截止时间。",
+          "evidence_refs": [
+            "REC-S02",
+            "REC-S03"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-004-C03",
+          "kind": "EI",
+          "statement": "StopTimer在新记录字段求值和StartTimer完成之前已释放旧名字。后续字段或调度调用抛错时，旧名字可能已清，前面处理的名字已重建。pairs遍历没有固定名字先后，当前路径也没有整批回滚。",
+          "evidence_refs": [
+            "REC-S02",
+            "REC-S03",
+            "REC-S04",
+            "REC-S07",
+            "REC-S09"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-004-C04",
+          "kind": "NSF",
+          "statement": "oceanwhirlportal master构造建立closewhirlportal和独立_check_for_boats_task。完成消费者取消巡检并清字段、设persists=false、播放关闭动画并登记移除监听。同名Timer恢复只替换该名字拥有的句柄。",
+          "evidence_refs": [
+            "REC-S02",
+            "REC-S03",
+            "REC-S05",
+            "REC-S06"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-004-C05",
+          "kind": "REC",
+          "statement": "恢复调度前确认本次应用的保存状态和业务所有者。排查重复恢复时比较任务句柄、当前截止时间、未保存的构造名字及独立业务任务，按真实来源修正重复应用入口。",
+          "evidence_refs": [
+            "REC-S01",
+            "REC-S02",
+            "REC-S03",
+            "REC-S04",
+            "REC-S05",
+            "REC-S07"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Timer:OnLoad",
+          "source_file": "scripts/components/timer.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "data为保存的组件table，data.timers可缺省，其非nil值应为按名字索引的table。",
+            "每条记录包含数值timeleft以及可选paused、initial_time，输入直接传给StartTimer。"
+          ],
+          "returns": "正常返回nil。data=nil或记录结构/调度算术错误可抛出，已完成的停止/重建阶段保留。",
+          "preconditions": [
+            "宿主已安装timer且调度器可用，构造默认名字和其他任务可能已经存在。",
+            "EntityScript只对有保存数据键的匹配组件调用OnLoad。直接调用本方法须提供合适data。"
+          ],
+          "side_effects": [
+            "pairs遍历保存名字，先StopTimer再StartTimer。保存表未列出的现有名字保留。",
+            "运行中名字以当前GetTime加timeleft建立新的截止时间和句柄。paused记录先创建句柄，再由PauseTimer取消并保留暂停记录。",
+            "停止/重建本身沿所查Timer路径不发送timerdone，完成事件由后续调度的OnTimerDone发送。"
+          ],
+          "lifecycle": [
+            "重复应用相同剩余时间会再次取消旧句柄并从本次调用时刻重算截止时间。",
+            "每个名字独立变更，遍历和整条加载没有回滚分支。StopTimer先于读取本记录后续字段和创建新任务。",
+            "oceanwhirlportal的构造默认closewhirlportal被同名保存记录覆盖，独立周期巡检任务由构造持有。",
+            "Timer:OnRemoveFromEntity释放当前Timer句柄，宿主Remove释放其pendingtasks。"
+          ],
+          "evidence_refs": [
+            "REC-S01",
+            "REC-S02",
+            "REC-S03",
+            "REC-S04",
+            "REC-S05",
+            "REC-S06",
+            "REC-S07",
+            "REC-S08",
+            "REC-S09",
+            "REC-S10",
+            "REC-S18",
+            "REC-S31"
+          ],
+          "unknowns": [
+            "原生时间/调度推进、暂停恢复的实际帧以及载入期间引擎是否驱动任务尚待运行验证。",
+            "业务是否扣离线时间由其调用路径决定，本方法读取的是已提供的timeleft。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造建立默认Timer和独立任务，组件加载仅对存在的数据键分发。",
+          "evidence_refs": [
+            "REC-S01",
+            "REC-S04",
+            "REC-S05"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "逐名取消旧句柄并用保存的相对剩余时间重建，暂停分支立即取消新调度。",
+          "evidence_refs": [
+            "REC-S02",
+            "REC-S03",
+            "REC-S07",
+            "REC-S08",
+            "REC-S09"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "到期由调度器调用OnTimerDone，再同步进入具名业务消费者，卸载/删除有各自清理入口。",
+          "evidence_refs": [
+            "REC-S01",
+            "REC-S02",
+            "REC-S06",
+            "REC-S10",
+            "REC-S18",
+            "REC-S31"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "REC-S01",
+            "role": "Timer构造与组件卸载清理",
+            "claim_ids": [
+              "EXP-SAVE-004-C01",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S02",
+            "role": "Timer名字、启动、停止、暂停、恢复与时间读取",
+            "claim_ids": [
+              "EXP-SAVE-004-C01",
+              "EXP-SAVE-004-C02",
+              "EXP-SAVE-004-C03",
+              "EXP-SAVE-004-C04",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S03",
+            "role": "Timer保存生产者及恢复API",
+            "claim_ids": [
+              "EXP-SAVE-004-C01",
+              "EXP-SAVE-004-C02",
+              "EXP-SAVE-004-C03",
+              "EXP-SAVE-004-C04",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S04",
+            "role": "OnLoad调用者及缺组件数据键分发",
+            "claim_ids": [
+              "EXP-SAVE-004-C03",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S05",
+            "role": "master构造默认Timer和周期任务及事件接线",
+            "claim_ids": [
+              "EXP-SAVE-004-C04",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S06",
+            "role": "Timer完成消费者及表现清理",
+            "claim_ids": [
+              "EXP-SAVE-004-C04"
+            ]
+          },
+          {
+            "ref": "REC-S07",
+            "role": "宿主任务归属、完成字段及普通/static生产者",
+            "claim_ids": [
+              "EXP-SAVE-004-C03",
+              "EXP-SAVE-004-C05"
+            ]
+          },
+          {
+            "ref": "REC-S08",
+            "role": "旧句柄取消与引用清理callee",
+            "claim_ids": []
+          },
+          {
+            "ref": "REC-S09",
+            "role": "相对延迟到后续tick的调度生产者",
+            "claim_ids": [
+              "EXP-SAVE-004-C03"
+            ]
+          },
+          {
+            "ref": "REC-S10",
+            "role": "任务实际执行、完成与重排consumer",
+            "claim_ids": []
+          },
+          {
+            "ref": "REC-S18",
+            "role": "目标onremove和宿主事件/任务退出caller",
+            "claim_ids": []
+          },
+          {
+            "ref": "REC-S31",
+            "role": "组件卸载调用者",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "具名Lua定义、调用者、消费者与清理依赖已枚举。动态Hook、其他业务回调及原生内部行为仍按本条unknowns处理。",
+          "当前与上轮同SHA的文件身份已逐项比较。历史知识继续使用各自原Scope。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行重复OnLoad、异常记录、暂停、零剩余时间或跨独立进程恢复。",
+        "完整Timer既有合同及历史Core保持原Scope，本条只使用当前逐引用证据。"
+      ]
+    },
+    {
+      "id": "EXP-SAVE-005",
+      "title": "EntityTracker重复postpass与同名引用的监听所有权",
+      "aliases": [
+        "EntityTracker:LoadPostPass",
+        "EntityTracker:TrackEntity",
+        "EntityTracker:ForgetEntity",
+        "旧目标清除新引用",
+        "重复引用恢复"
+      ],
+      "engineering_question": "旧GUID接回同名槽后，重复恢复和换目标是否会正确转交onremove监听？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-11",
+        "runtime_verified": false,
+        "source_identity": "本机version.txt和Steam appmanifest已核对，源码归档及本条逐引用SHA由本次读取重算。",
+        "environment": "当前762172 EntityTracker与世界映射/postpass分发、事件登记及具名涡流口引用消费者。",
+        "exclusions": [
+          "EXP-SAVE-001的旧GUID映射/id与缺目标规则作为前置。新增Tracker完整合同和覆盖槽位后旧监听的身份边界。",
+          "其他组件所有权迁移、任意实体集合的恢复总序和跨分片引用。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-SAVE-005-C01",
+          "kind": "NSF",
+          "statement": "EntityTracker保存name/GUID并返回refs。LoadPostPass按映射存在性TrackEntity，缺项跳过。TrackEntity每次新建闭包，先覆盖当前名字记录，再登记目标onremove。闭包执行仅将该名字槽置nil。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S12",
+            "REC-S13",
+            "REC-S14",
+            "REC-S15"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-005-C02",
+          "kind": "EI",
+          "statement": "同名槽由目标A覆盖为B时，A的旧闭包仍可留在监听表。若该旧闭包随后被A的onremove派发，它会清掉当前名字槽，即使当前记录已指向B。此推导限所查顺序及该闭包实现。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S18",
+            "REC-S19"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-005-C03",
+          "kind": "EI",
+          "statement": "重放相同postpass会创建不同闭包并覆盖保存的函数身份。ForgetEntity或组件OnRemoveFromEntity只能解除当前记录保存的闭包，被覆盖闭包无法由该当前记录逐一找回。宿主RemoveAllEventCallbacks仍按实体归属清理两向索引。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S18",
+            "REC-S31"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-005-C04",
+          "kind": "NSF",
+          "statement": "涡流口以SetExit写exit，巡检通过GetEntity读取exit和blocker，并在本侧blocker离开距离时ForgetEntity。缺exit时该次巡检返回，引用变化会影响这条实际消费者路径。",
+          "evidence_refs": [
+            "REC-S05",
+            "REC-S20"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-005-C05",
+          "kind": "REC",
+          "statement": "需要更换已追踪目标时先按当前槽释放旧关系，再接入新对象。需要支持重复恢复的业务在自己的恢复入口核对实际槽位和订阅身份，并验证目标缺失、重复记录及组件退出。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S14",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S31"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityTracker:TrackEntity",
+          "source_file": "scripts/components/entitytracker.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "name为追踪槽键，inst为目标EntityScript。监听归属为self.inst，事件源为inst。"
+          ],
+          "returns": "正常返回nil，登记过程中发生Lua错误会外抛。",
+          "preconditions": [
+            "目标应支持事件源所需字段，name可作表键，宿主可登记监听。函数本身没有目标有效性或同名槽检查。"
+          ],
+          "side_effects": [
+            "每次创建新的onremove闭包，覆盖entities[name]，再向目标登记该闭包。",
+            "闭包只按name清槽位，执行时没有核对槽位仍指向原目标。"
+          ],
+          "lifecycle": [
+            "覆盖已有名字前没有移除旧闭包，同一目标重复调用也产生不同函数身份。",
+            "ForgetEntity和组件卸载按当前槽保存的闭包解绑。旧的被覆盖闭包由宿主整实体事件清理等其他路径释放。"
+          ],
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S18",
+            "REC-S19"
+          ],
+          "unknowns": [
+            "任意Mod对监听表和tracker表的覆写尚未覆盖，异常后的索引一致性需按具体阶段审查。"
+          ]
+        },
+        {
+          "symbol": "EntityTracker:ForgetEntity",
+          "source_file": "scripts/components/entitytracker.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "name为当前entities槽键。"
+          ],
+          "returns": "正常返回nil，缺当前槽时无动作。",
+          "preconditions": [
+            "当前槽为由TrackEntity创建的inst/onremove记录，宿主RemoveEventCallback可用。"
+          ],
+          "side_effects": [
+            "用当前槽的函数和目标解绑onremove，随后将当前槽置nil。"
+          ],
+          "lifecycle": [
+            "只查当前记录，既有被覆盖闭包不保存在该记录中。组件OnRemoveFromEntity同样只遍历当前entities记录。",
+            "解绑与目标事件快照的相对关系沿既有事件合同处理。"
+          ],
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S19",
+            "REC-S31"
+          ],
+          "unknowns": [
+            "具体已形成快照的重入结果仍取决于当次回调顺序。"
+          ]
+        },
+        {
+          "symbol": "EntityTracker:LoadPostPass",
+          "source_file": "scripts/components/entitytracker.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "ents为本次旧GUID映射，值预期含entity。data为组件保存table，data.entities可缺省。",
+            "entities为ipairs遍历的name/GUID记录数组。"
+          ],
+          "returns": "正常返回nil。缺GUID映射的记录跳过，存在映射便调用TrackEntity。结构错误和callee异常可外抛。",
+          "preconditions": [
+            "实际调用方负责建立映射和安排postpass。本方法不验证目标IsValid或补建缺目标。"
+          ],
+          "side_effects": [
+            "对每条已映射记录重新TrackEntity，登记新的目标onremove监听。未处理的现有槽保留。"
+          ],
+          "lifecycle": [
+            "PopulateWorld完成SpawnSaveRecord循环后经EntityScript分发。仅本次被重建对象进入该映射。",
+            "重复调用和同名重复记录均再次写槽与登记闭包，函数未先整体清除旧追踪关系。",
+            "后续目标onremove或Forget/组件卸载/宿主删除分别消费不同的闭包和归属。"
+          ],
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S12",
+            "REC-S13",
+            "REC-S14",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S18",
+            "REC-S19",
+            "REC-S20",
+            "REC-S31"
+          ],
+          "unknowns": [
+            "其他嵌套恢复调用方的映射与postpass安排需分别核对，跨分片身份恢复仍待独立协议。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "SpawnSaveRecord登记旧GUID映射，世界路径创建循环后分发组件postpass。",
+          "evidence_refs": [
+            "REC-S12",
+            "REC-S13",
+            "REC-S14"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Tracker按保存数组对已映射目标写槽和新增监听，业务消费者读取该槽。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S20"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "目标onremove按闭包清槽，Forget/组件卸载按当前函数身份解绑，宿主删除清整实体归属。",
+          "evidence_refs": [
+            "REC-S11",
+            "REC-S15",
+            "REC-S16",
+            "REC-S17",
+            "REC-S18",
+            "REC-S19",
+            "REC-S31"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "REC-S05",
+            "role": "master构造默认Timer和周期任务及事件接线",
+            "claim_ids": [
+              "EXP-SAVE-005-C04"
+            ]
+          },
+          {
+            "ref": "REC-S11",
+            "role": "Tracker构造、保存、postpass、替换、忘记及卸载闭包",
+            "claim_ids": [
+              "EXP-SAVE-005-C01",
+              "EXP-SAVE-005-C02",
+              "EXP-SAVE-005-C03",
+              "EXP-SAVE-005-C05"
+            ]
+          },
+          {
+            "ref": "REC-S12",
+            "role": "旧GUID映射生产者",
+            "claim_ids": [
+              "EXP-SAVE-005-C01"
+            ]
+          },
+          {
+            "ref": "REC-S13",
+            "role": "共享映射完成后postpass的具名世界调用者",
+            "claim_ids": [
+              "EXP-SAVE-005-C01"
+            ]
+          },
+          {
+            "ref": "REC-S14",
+            "role": "组件postpass与prefab postpass分发caller",
+            "claim_ids": [
+              "EXP-SAVE-005-C01",
+              "EXP-SAVE-005-C05"
+            ]
+          },
+          {
+            "ref": "REC-S15",
+            "role": "Tracker订阅新增与按函数身份释放callee",
+            "claim_ids": [
+              "EXP-SAVE-005-C01",
+              "EXP-SAVE-005-C02",
+              "EXP-SAVE-005-C03",
+              "EXP-SAVE-005-C05"
+            ]
+          },
+          {
+            "ref": "REC-S16",
+            "role": "同一函数身份移除callee",
+            "claim_ids": [
+              "EXP-SAVE-005-C03",
+              "EXP-SAVE-005-C05"
+            ]
+          },
+          {
+            "ref": "REC-S17",
+            "role": "宿主整实体双向事件清理",
+            "claim_ids": [
+              "EXP-SAVE-005-C03",
+              "EXP-SAVE-005-C05"
+            ]
+          },
+          {
+            "ref": "REC-S18",
+            "role": "目标onremove和宿主事件/任务退出caller",
+            "claim_ids": [
+              "EXP-SAVE-005-C02",
+              "EXP-SAVE-005-C03"
+            ]
+          },
+          {
+            "ref": "REC-S19",
+            "role": "同步事件消费者与回调快照",
+            "claim_ids": [
+              "EXP-SAVE-005-C02"
+            ]
+          },
+          {
+            "ref": "REC-S20",
+            "role": "Tracker出口/阻挡引用的具名写入与读取consumer",
+            "claim_ids": [
+              "EXP-SAVE-005-C04"
+            ]
+          },
+          {
+            "ref": "REC-S31",
+            "role": "组件卸载调用者",
+            "claim_ids": [
+              "EXP-SAVE-005-C03",
+              "EXP-SAVE-005-C05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "具名Lua定义、调用者、消费者与清理依赖已枚举。动态Hook、其他业务回调及原生内部行为仍按本条unknowns处理。",
+          "当前与上轮同SHA的文件身份已逐项比较。历史知识继续使用各自原Scope。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行同名换目标、重复postpass、旧目标移除、组件卸载或缺GUID映射场景。",
+        "本文未判定当前所有原版调用者都能到达同名覆盖。所列覆盖序列是API支持对象上的静态行为推导。"
+      ]
+    },
+    {
+      "id": "EXP-SAVE-006",
+      "title": "奖励队列恢复、重新调度与业务提交的先后",
+      "aliases": [
+        "Friendlevels:OnLoad",
+        "Friendlevels:LoadPostPass",
+        "Friendlevels:DoRewards",
+        "queuedrewards",
+        "hermitcrab rewardcheck",
+        "重复恢复奖励"
+      ],
+      "engineering_question": "恢复待奖励队列后何时创建任务、何时产生奖励和清队列，失败与重放怎样影响业务状态？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-11",
+        "runtime_verified": false,
+        "source_identity": "本机version.txt和Steam appmanifest已核对，源码归档及本条逐引用SHA由本次读取重算。",
+        "environment": "当前762172 Friendlevels及hermitcrab master构造、onTaskComplete/rewardcheck和具名默认奖励样本。",
+        "exclusions": [
+          "EXP-SAVE-001的加载分发、NC-N004-FINAL-07的加载回调可触发业务、EXP-LIFE-006的任务归属作为前置。新增真实奖励队列的恢复到提交消费者闭包。",
+          "全部等级奖励函数、其他事件监听、账号奖励、网络交付及独立回滚的共同提交。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-SAVE-006-C01",
+          "kind": "NSF",
+          "statement": "Friendlevels:OnSave保存enabled、level、任务complete数组和queuedrewards。OnLoad直接赋回保存队列，队列非空发布friend_task_complete，正level随后发布friend_level_changed。complete标志在LoadPostPass按数组索引恢复。",
+          "evidence_refs": [
+            "REC-S04",
+            "REC-S14",
+            "REC-S19",
+            "REC-S21"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C02",
+          "kind": "NSF",
+          "statement": "hermitcrab仅在master分支配置Friendlevels奖励回调、任务表和friend_task_complete监听。onTaskComplete按giverewardstask字段建立周期任务，回调在ishome或附近无玩家时返回并保留任务，条件满足才调用rewardcheck。",
+          "evidence_refs": [
+            "REC-S07",
+            "REC-S10",
+            "REC-S22",
+            "REC-S23",
+            "REC-S24",
+            "REC-S30"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C03",
+          "kind": "NSF",
+          "statement": "DoRewards逐条执行已配置奖励函数并拼接对象，再处理specifictaskreward，最后换空queuedrewards。rewardcheck收到返回数组后才逐个调用inventory:GiveItem并维护itemstotoss。奖励消费者结束后取消giverewardstask并清字段。",
+          "evidence_refs": [
+            "REC-S21",
+            "REC-S23",
+            "REC-S28"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C04",
+          "kind": "EI",
+          "statement": "如果后面的奖励函数或拼接步骤抛错，前面奖励函数已产生的副作用不会由本函数逆序撤销，尾部队列清空也未执行。成功换空组件队列并不修改旧payload保存的队列引用，重新OnLoad旧payload仍可接回该待处理队列。",
+          "evidence_refs": [
+            "REC-S19",
+            "REC-S21",
+            "REC-S28"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C05",
+          "kind": "NSF",
+          "statement": "具名默认奖励调用createbundle，后者可创建bundle和礼物，并包装后移除临时礼物实体。该函数还按独立pearlgiven/等级/任务条件处理珍珠，prefab另保存和恢复pearlgiven等业务字段。奖励函数和队列因此具有多处不同状态写入点。",
+          "evidence_refs": [
+            "REC-S25",
+            "REC-S26",
+            "REC-S27",
+            "REC-S29"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C06",
+          "kind": "EI",
+          "statement": "giverewardstask字段只限制当前消费者任务是否再次建立，队列恢复、奖励函数运行、清队列、库存GiveItem调用和以后磁盘保存分别位于不同阶段。各奖励的重复条件须结合独立字段审查，当前Lua路径未提供共同提交令牌。",
+          "evidence_refs": [
+            "REC-S07",
+            "REC-S18",
+            "REC-S21",
+            "REC-S22",
+            "REC-S23",
+            "REC-S26",
+            "REC-S29"
+          ]
+        },
+        {
+          "id": "EXP-SAVE-006-C07",
+          "kind": "REC",
+          "statement": "设计自己的恢复业务时记录权威任务状态、待交付记录、实际交付和保存边界。按业务决定旧payload重放与部分失败的恢复动作，并为允许重试的入口核对实际提交身份。",
+          "evidence_refs": [
+            "REC-S04",
+            "REC-S14",
+            "REC-S21",
+            "REC-S23",
+            "REC-S26",
+            "REC-S29"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Friendlevels:OnLoad",
+          "source_file": "scripts/components/friendlevels.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "data应包含enabled、可选level及queuedrewards，直接接收组件保存table。"
+          ],
+          "returns": "正常返回nil，事件回调与输入结构错误可外抛。",
+          "preconditions": [
+            "回调表和任务定义由宿主构造配置，queuedrewards应为可取长度并可按数组消费的table。"
+          ],
+          "side_effects": [
+            "赋enabled，level缺省为0，queuedrewards缺省为空table。保存队列直接赋引用。",
+            "队列非空时同步发布friend_task_complete，level大于0时随后发布friend_level_changed。"
+          ],
+          "lifecycle": [
+            "任务complete标志由稍后的组件LoadPostPass恢复，OnLoad事件发布发生在该步骤之前。",
+            "hermitcrab master构造配置回调并监听事件，onTaskComplete在giverewardstask为空时创建周期任务。",
+            "重放旧payload会重新赋回旧队列并再次发布事件，任务字段门仅限制当前消费者任务的建立。"
+          ],
+          "evidence_refs": [
+            "REC-S04",
+            "REC-S14",
+            "REC-S19",
+            "REC-S21",
+            "REC-S22",
+            "REC-S23"
+          ],
+          "unknowns": [
+            "所有friend_level_changed消费者和其他Mod监听尚未枚举，具体调度时点需运行核对。"
+          ]
+        },
+        {
+          "symbol": "Friendlevels:LoadPostPass",
+          "source_file": "scripts/components/friendlevels.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "newents由通用分发传入，本方法未使用。data可nil，data.taskscomplete按当前friendlytasks的数组索引对应。"
+          ],
+          "returns": "正常返回nil。没有taskscomplete则保持当前任务标志。",
+          "preconditions": [
+            "friendlytasks在构造中已配置，保存索引对应当前任务定义。"
+          ],
+          "side_effects": [
+            "遍历当前任务数组，只在保存的同索引记录存在时赋task.complete。"
+          ],
+          "lifecycle": [
+            "发生在组件OnLoad之后。本方法自身没有消费或清空queuedrewards。",
+            "未包含保存项的任务保留当前状态，跨版本任务索引变化需按项目schema审查。"
+          ],
+          "evidence_refs": [
+            "REC-S13",
+            "REC-S14",
+            "REC-S21",
+            "REC-S22"
+          ],
+          "unknowns": [
+            "任务顺序变更的迁移策略由实际业务决定，当前源码未提供稳定任务ID转换。"
+          ]
+        },
+        {
+          "symbol": "Friendlevels:DoRewards",
+          "source_file": "scripts/components/friendlevels.lua",
+          "visibility": "原版组件Lua方法，合同限本条具名调用环境与来源版本。",
+          "parameters": [
+            "target原样传给奖励回调，hermitcrab的rewardcheck调用时省略该参数。",
+            "queuedrewards按数组保存level/task，level为truthy时索引levelrewards，否则调用defaultrewards。"
+          ],
+          "returns": "正常返回拼接后的gifts数组。奖励回调返回值由ConcatArrays消费，nil贡献空数组。错误沿当前Lua调用栈外抛。",
+          "preconditions": [
+            "对应奖励函数已由构造配置，返回应为可数组遍历的对象，specifictaskreward若存在应为prefab名字数组。"
+          ],
+          "side_effects": [
+            "逐条同步调用配置奖励函数，聚合返回对象，再逐个SpawnPrefab处理specifictaskreward。",
+            "specifictaskreward循环正常完成后清该字段，所有上述步骤完成后才将queuedrewards换为空table。"
+          ],
+          "lifecycle": [
+            "奖励函数可已经创建物品或修改业务字段。中途异常会跳过尾部队列清空，前面副作用沿此路径保留。",
+            "成功清队列后，hermitcrab rewardcheck才把gifts加入itemstotoss并逐个调用inventory:GiveItem。",
+            "重放仍含旧队列的保存table会再次恢复待奖励记录。具体奖励的独立字段守卫需逐回调审查。",
+            "giverewardstask在消费者正常走完后Cancel并清字段，宿主移除由pendingtasks退出链释放。"
+          ],
+          "evidence_refs": [
+            "REC-S07",
+            "REC-S08",
+            "REC-S10",
+            "REC-S18",
+            "REC-S19",
+            "REC-S21",
+            "REC-S22",
+            "REC-S23",
+            "REC-S24",
+            "REC-S25",
+            "REC-S26",
+            "REC-S27",
+            "REC-S28",
+            "REC-S29",
+            "REC-S30"
+          ],
+          "unknowns": [
+            "奖励目标选择、随机选择、库存接受结果、对话/AI完整运行和磁盘提交时点尚待验证。",
+            "createbundle有pearlgiven等独立字段。此样本不推出每一种奖励都能重复或都具恰好一次语义。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造配置奖励函数和事件消费者，组件OnLoad恢复队列并发布事件。",
+          "evidence_refs": [
+            "REC-S04",
+            "REC-S19",
+            "REC-S21",
+            "REC-S22",
+            "REC-S24"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "postpass恢复任务complete，消费者周期任务按其运行条件继续检查待奖励队列。",
+          "evidence_refs": [
+            "REC-S07",
+            "REC-S10",
+            "REC-S13",
+            "REC-S14",
+            "REC-S21",
+            "REC-S23"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "调用奖励函数并聚合对象，完成后清队列，调用者再执行库存交付并释放消费者任务。",
+          "evidence_refs": [
+            "REC-S08",
+            "REC-S18",
+            "REC-S21",
+            "REC-S23",
+            "REC-S25",
+            "REC-S26",
+            "REC-S27",
+            "REC-S28",
+            "REC-S29"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "REC-S04",
+            "role": "OnLoad调用者及缺组件数据键分发",
+            "claim_ids": [
+              "EXP-SAVE-006-C01",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S07",
+            "role": "宿主任务归属、完成字段及普通/static生产者",
+            "claim_ids": [
+              "EXP-SAVE-006-C02",
+              "EXP-SAVE-006-C06"
+            ]
+          },
+          {
+            "ref": "REC-S08",
+            "role": "旧句柄取消与引用清理callee",
+            "claim_ids": []
+          },
+          {
+            "ref": "REC-S10",
+            "role": "任务实际执行、完成与重排consumer",
+            "claim_ids": [
+              "EXP-SAVE-006-C02"
+            ]
+          },
+          {
+            "ref": "REC-S13",
+            "role": "共享映射完成后postpass的具名世界调用者",
+            "claim_ids": []
+          },
+          {
+            "ref": "REC-S14",
+            "role": "组件postpass与prefab postpass分发caller",
+            "claim_ids": [
+              "EXP-SAVE-006-C01",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S18",
+            "role": "目标onremove和宿主事件/任务退出caller",
+            "claim_ids": [
+              "EXP-SAVE-006-C06"
+            ]
+          },
+          {
+            "ref": "REC-S19",
+            "role": "同步事件消费者与回调快照",
+            "claim_ids": [
+              "EXP-SAVE-006-C01",
+              "EXP-SAVE-006-C04"
+            ]
+          },
+          {
+            "ref": "REC-S21",
+            "role": "奖励队列生产、保存、加载、postpass与提交API闭包",
+            "claim_ids": [
+              "EXP-SAVE-006-C01",
+              "EXP-SAVE-006-C03",
+              "EXP-SAVE-006-C04",
+              "EXP-SAVE-006-C06",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S22",
+            "role": "master端Friendlevels回调/任务表配置与事件接线",
+            "claim_ids": [
+              "EXP-SAVE-006-C02",
+              "EXP-SAVE-006-C06"
+            ]
+          },
+          {
+            "ref": "REC-S23",
+            "role": "奖励队列消费者、周期任务与库存交付调用点",
+            "claim_ids": [
+              "EXP-SAVE-006-C02",
+              "EXP-SAVE-006-C03",
+              "EXP-SAVE-006-C06",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S24",
+            "role": "等级回调表身份",
+            "claim_ids": [
+              "EXP-SAVE-006-C02"
+            ]
+          },
+          {
+            "ref": "REC-S25",
+            "role": "具名默认奖励函数样本",
+            "claim_ids": [
+              "EXP-SAVE-006-C05"
+            ]
+          },
+          {
+            "ref": "REC-S26",
+            "role": "具名奖励创建样本与独立pearlgiven字段",
+            "claim_ids": [
+              "EXP-SAVE-006-C05",
+              "EXP-SAVE-006-C06",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S27",
+            "role": "奖励样本包装保存和事件callee",
+            "claim_ids": [
+              "EXP-SAVE-006-C05"
+            ]
+          },
+          {
+            "ref": "REC-S28",
+            "role": "奖励返回数组拼接callee",
+            "claim_ids": [
+              "EXP-SAVE-006-C03",
+              "EXP-SAVE-006-C04"
+            ]
+          },
+          {
+            "ref": "REC-S29",
+            "role": "prefab额外业务字段保存和加载caller",
+            "claim_ids": [
+              "EXP-SAVE-006-C05",
+              "EXP-SAVE-006-C06",
+              "EXP-SAVE-006-C07"
+            ]
+          },
+          {
+            "ref": "REC-S30",
+            "role": "友好度分类consumer",
+            "claim_ids": [
+              "EXP-SAVE-006-C02"
+            ]
+          }
+        ],
+        "unknowns": [
+          "具名Lua定义、调用者、消费者与清理依赖已枚举。动态Hook、其他业务回调及原生内部行为仍按本条unknowns处理。",
+          "当前与上轮同SHA的文件身份已逐项比较。历史知识继续使用各自原Scope。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行真实奖励、读取旧payload重放、奖励回调中途异常、库存拒收或两进程恢复。",
+        "具体任务complete、prefab业务字段及奖励函数之间的运行先后和结果按具名消费者验证。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "REC-S01",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 1,
+      "line_end": 12,
+      "range_sha256": "67d95384337cde2d375ad7e6107ccb02a4bd82242b5c51973e31d55c7e78d697",
+      "symbols": [
+        "Timer",
+        "Timer:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "REC-S02",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 114,
+      "range_sha256": "ab99392e2e0c4ca7e07135636a63d60871e14afd5db8fa83e5932de0b5abff00",
+      "symbols": [
+        "Timer:StartTimer",
+        "Timer:StopTimer",
+        "OnTimerDone",
+        "Timer:PauseTimer",
+        "Timer:ResumeTimer"
+      ]
+    },
+    {
+      "id": "REC-S03",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 122,
+      "line_end": 142,
+      "range_sha256": "9e86e55826707b694a9074e7254f0cfc62b6bb7d68dabe18d17b53fb44d41f6d",
+      "symbols": [
+        "Timer:OnSave",
+        "Timer:OnLoad"
+      ]
+    },
+    {
+      "id": "REC-S04",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "REC-S05",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 224,
+      "line_end": 260,
+      "range_sha256": "dea6bafdca6e019caf22c47404f0beb4497f6af03ecd2aa56ecbc5372e6fa82e",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "REC-S06",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 177,
+      "line_end": 195,
+      "range_sha256": "fcd712945847e1b23c85f61293340b23a2eac02056e355330e2529fdb034798c",
+      "symbols": [
+        "ontimerdone",
+        "OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "REC-S07",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "task_finish",
+        "EntityScript:DoTaskInTime",
+        "EntityScript:DoPeriodicTask"
+      ]
+    },
+    {
+      "id": "REC-S08",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 56,
+      "line_end": 95,
+      "range_sha256": "7052ec2a86dd95c53f0457fc49f54ebe47e04279f6c238b72357931ce6c94fcc",
+      "symbols": [
+        "Periodic:Cancel",
+        "Periodic:Cleanup"
+      ]
+    },
+    {
+      "id": "REC-S09",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 276,
+      "line_end": 301,
+      "range_sha256": "668d7ce5cd699d740a0022774d27c7e2d984826a4f266a5e489f0788b23207be",
+      "symbols": [
+        "Scheduler:ExecuteInTime",
+        "Scheduler:GetListForTimeFromNow",
+        "Scheduler:ExecutePeriodic"
+      ]
+    },
+    {
+      "id": "REC-S10",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 164,
+      "line_end": 216,
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "symbols": [
+        "Scheduler:OnTick"
+      ]
+    },
+    {
+      "id": "REC-S11",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 1,
+      "line_end": 66,
+      "range_sha256": "79e5e9e14c819fb3e71ddb2018ce6aab95ab82a46d15ec3d62b6225428ad0fe4",
+      "symbols": [
+        "EntityTracker:TrackEntity",
+        "EntityTracker:ForgetEntity",
+        "EntityTracker:LoadPostPass",
+        "EntityTracker:OnSave",
+        "EntityTracker:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "REC-S12",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "symbols": [
+        "SpawnSaveRecord"
+      ]
+    },
+    {
+      "id": "REC-S13",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 629,
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "symbols": [
+        "PopulateWorld"
+      ]
+    },
+    {
+      "id": "REC-S14",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1964,
+      "line_end": 1977,
+      "range_sha256": "d5d3d49922fdd678ef58ec530bee7bfaaaf7ba7b11538f99230541bc0073b210",
+      "symbols": [
+        "EntityScript:LoadPostPass"
+      ]
+    },
+    {
+      "id": "REC-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1256,
+      "range_sha256": "af29a12426ef44bb903ac81d7729ac714c8b2370e847a361f8a3a030239b5748",
+      "symbols": [
+        "AddListener",
+        "EntityScript:ListenForEvent",
+        "RemoveListener",
+        "EntityScript:RemoveEventCallback"
+      ]
+    },
+    {
+      "id": "REC-S16",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 238,
+      "line_end": 246,
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "symbols": [
+        "RemoveByValue"
+      ]
+    },
+    {
+      "id": "REC-S17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1258,
+      "line_end": 1288,
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "symbols": [
+        "EntityScript:RemoveAllEventCallbacks"
+      ]
+    },
+    {
+      "id": "REC-S18",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1758,
+      "range_sha256": "b11cf40d855c88bf4c923e47527b2281650d2b38893d01bc40f3a7ab20a58476",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "REC-S19",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "REC-S20",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "line_start": 54,
+      "line_end": 175,
+      "range_sha256": "bce3a74ca3f0d86becaeb0fe399cf1e7799afc30b5f19d3c2dd5d2e6bb9ccc63",
+      "symbols": [
+        "SetExit",
+        "CheckForBoatsTick"
+      ]
+    },
+    {
+      "id": "REC-S21",
+      "source_file": "scripts/components/friendlevels.lua",
+      "file_sha256": "6e5b2fa23325af9192cf7cdcb0a73f0615e923fd9eb010fa140d8357f67da859",
+      "line_start": 1,
+      "line_end": 119,
+      "range_sha256": "9f89ebbef744f3e9fde6ec9a622105374fa8cb12dd7a568d10ceba307bfc3d13",
+      "symbols": [
+        "Friendlevels",
+        "Friendlevels:CompleteTask",
+        "Friendlevels:OnSave",
+        "Friendlevels:OnLoad",
+        "Friendlevels:LoadPostPass",
+        "Friendlevels:DoRewards"
+      ]
+    },
+    {
+      "id": "REC-S22",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 1936,
+      "line_end": 1994,
+      "range_sha256": "8ca6fb1826b7c69ebbada2bfd8922ffed61de849e447c665ac357431477c2ce0",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "REC-S23",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 673,
+      "line_end": 776,
+      "range_sha256": "474bfe3d57c361a8b4bf50d86a6ba8d9e5beaed376f5234bc0f516ca021a4310",
+      "symbols": [
+        "rewardcheck",
+        "onTaskComplete"
+      ]
+    },
+    {
+      "id": "REC-S24",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 987,
+      "line_end": 998,
+      "range_sha256": "014adff6bd5e869cc6b3b8b8034da313ab4ca2cf26fbc86b21e4f5445ce720a0",
+      "symbols": [
+        "friendlevelrewards"
+      ]
+    },
+    {
+      "id": "REC-S25",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 878,
+      "line_end": 885,
+      "range_sha256": "e3ecc793dda558e94c8d3c9cb1b8bea816de934124a78fd42f8fb07af115e63b",
+      "symbols": [
+        "defaultfriendrewards"
+      ]
+    },
+    {
+      "id": "REC-S26",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 805,
+      "line_end": 847,
+      "range_sha256": "fb3b6775e757bfb863c27c346b47fb9119a9d93c557c81100a76bc8cf819f022",
+      "symbols": [
+        "extrarewardcheck",
+        "createbundle"
+      ]
+    },
+    {
+      "id": "REC-S27",
+      "source_file": "scripts/components/unwrappable.lua",
+      "file_sha256": "8498c4482a22bbb61c96110a0a93b7677302fd088c7713bab0db7c27b182d8ed",
+      "line_start": 47,
+      "line_end": 70,
+      "range_sha256": "940f776ca65e849420e3626b89e521b62c554cf6fa11a0928e79ec3c9061949d",
+      "symbols": [
+        "Unwrappable:WrapItems"
+      ]
+    },
+    {
+      "id": "REC-S28",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 323,
+      "line_end": 333,
+      "range_sha256": "6c4f481baceb069ab8d5cb1fc2e058349d9936353f559522e6c64639a7553c84",
+      "symbols": [
+        "ConcatArrays"
+      ]
+    },
+    {
+      "id": "REC-S29",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 398,
+      "line_end": 456,
+      "range_sha256": "69d80b7f3a143744ecb8a8e715fb1871aeb96a6a7f3f6aa364986213c1d0a723",
+      "symbols": [
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "REC-S30",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "line_start": 531,
+      "line_end": 536,
+      "range_sha256": "4fa87ec6ac5753c7aacedda15dc0019c38efce7bdfdc58f93c94d7bc8322d6ce",
+      "symbols": [
+        "getgeneralfriendlevel"
+      ]
+    },
+    {
+      "id": "REC-S31",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "Timer OnLoad 构造默认任务 保存缺名字 重复加载",
+      "expected_entry_ids": [
+        "EXP-SAVE-004"
+      ],
+      "purpose": "完整OnLoad合同"
+    },
+    {
+      "query": "Timer 重放 timeleft 截止时间 部分恢复失败",
+      "expected_entry_ids": [
+        "EXP-SAVE-004"
+      ],
+      "purpose": "相对时间与逐名替换边界"
+    },
+    {
+      "query": "EntityTracker LoadPostPass 重复恢复 同名目标 旧监听",
+      "expected_entry_ids": [
+        "EXP-SAVE-005"
+      ],
+      "purpose": "完整postpass与订阅合同"
+    },
+    {
+      "query": "TrackEntity ForgetEntity 旧目标移除 清除新引用",
+      "expected_entry_ids": [
+        "EXP-SAVE-005"
+      ],
+      "purpose": "目标替换后的闭包身份"
+    },
+    {
+      "query": "Friendlevels OnLoad queuedrewards 恢复奖励 周期任务",
+      "expected_entry_ids": [
+        "EXP-SAVE-006"
+      ],
+      "purpose": "恢复到消费者链"
+    },
+    {
+      "query": "DoRewards 重复读档 部分失败 队列清空 交付",
+      "expected_entry_ids": [
+        "EXP-SAVE-006"
+      ],
+      "purpose": "奖励业务提交边界"
+    }
+  ],
+  "limitations": [
+    "本次静态读取本机762172/build26474873，来源身份与范围SHA均重算，runtime_verified:false。",
+    "保留research/restricted/hold，候选等待独立审阅后登记。历史知识使用各自原始Scope。",
+    "file SHA使用ZIP成员原字节，range SHA使用UTF8 splitlines后LF连接且无末尾换行。",
+    "原生调度、序列化、交付与磁盘共同提交的内部行为按各条unknowns处理。"
+  ]
+}

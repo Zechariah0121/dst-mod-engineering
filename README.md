@@ -1,12 +1,12 @@
 # DST Mod Engineering
 
-`v2026.11.06.2` 面向《饥荒联机版》Mod 开发，提供按任务检索的知识、原版核查路径、开发辅助脚本与 MCP。[English](README.en.md)
+`v2026.11.11` 面向《饥荒联机版》Mod 开发，提供按任务检索的知识、原版核查路径、开发辅助脚本与 MCP。[English](README.en.md)
 
-本版共 **244 条登记知识：64 基础 + 13 Native AI + 110 Native Core + 57 机制研究**。自上一公开版起，补齐事件、任务、保存恢复与动作执行链，加入复杂 Mod 架构和露露案例，改善检索与源码更新流程。见[本轮内容](docs/phase9-action-closure.md)。
+本版共 **247 条登记知识：64 基础 + 13 Native AI + 110 Native Core + 60 机制研究**。本轮补充计时器、实体引用和奖励队列恢复，改进完整 API 与多步骤检索，并让测试器自动清理临时 Mod。见[本轮内容](docs/phase10-recovery-delivery.md)。
 
 ## 下载与开始使用
 
-下载 [v2026.11.06.2](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.11.06.2) 的 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.06.2/dst-mod-engineering.zip)，对照同版 `SHA256SUMS.txt` 后完整解压。一个包包含 Skill、唯一 `knowledge/`、脚本、来源准备与 MCP；游戏 Lua、第三方可执行工具和私人项目不随包分发。
+下载 [v2026.11.11](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.11.11) 的 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.11/dst-mod-engineering.zip)，对照同版 `SHA256SUMS.txt` 后完整解压。一个包包含 Skill、唯一 `knowledge/`、脚本、来源准备与 MCP；游戏 Lua、第三方可执行工具和私人项目不随包分发。
 
 1. 将直接包含 `SKILL.md` 的完整目录放入 Agent 支持的技能位置，见[安装说明](docs/install-and-use.md)。
 2. 调用 `dst-mod-engineering`，提供任务、Mod 目录和实际游戏源码；从 [Skill 专题表](SKILL.md) 选择入口。
@@ -31,6 +31,6 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 | 静态检查、隔离专服与交付 | [测试与交付](references/testing-release.md) |
 | 网页附件与云端交接 | [网页指南](references/web-chat.md) |
 
-研究记录保留各自 Scope 和 Coding HOLD，按[准入规则](references/kb-retrieval.md)使用。当前有界游戏验证与客户端未测范围见[本轮说明](docs/phase9-action-closure.md)。
+研究记录保留各自 Scope 和 Coding HOLD，按[准入规则](references/kb-retrieval.md)使用。本轮主要变化见[本轮说明](docs/phase10-recovery-delivery.md)。
 
 项目自有材料使用[非商业 LICENSE](LICENSE)，商业用途需另获书面授权；第三方与有效历史 MIT 授权按各自条款处理。具体情形见[许可说明](docs/licensing.md)。

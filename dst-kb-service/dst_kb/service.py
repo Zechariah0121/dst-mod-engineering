@@ -569,7 +569,7 @@ class Service:
         return sorted((row for row in candidates if not positive.strip() or row['score']>0),
                       key=lambda row:(-row['score'],row['document']['id']))
 
-    def _research_seed_view(self,card,query,grouped=True):
+    def _research_seed_view(self,card,query,grouped=True,fits=None):
         """A whole admitted atom with its own required closure, never prose slices."""
         from .retrieval_v2 import words, intent
         positive=intent(query)['original_positive'];terms=native_mechanism.navigation_terms(positive)
@@ -599,15 +599,19 @@ class Service:
                 choices.append((not exact,-len(overlap),field,index))
             if not choices:return card
             not_exact,negative_overlap,field,index=min(choices)
-            pointer='/'+field+'/'+str(index)
+            single_pointer='/'+field+'/'+str(index)
+            pointer=single_pointer
             # A multi-step question can need several claims from one record.
             # Deliver the exact authored claims array (each typed atom intact),
             # never a synthetic summary or an incomplete API. The caller still
             # charges this one record, every reference and its complete Scope.
             if grouped and not_exact and len(claim_terms)>=max(4,-negative_overlap+2):
                 pointer='/claims'
-            atom=native_mechanism.envelope(record,pointer,assessment_detail=False)
-            return atom|{key:card[key] for key in ('score','match_reason','expansion') if key in card}
+            metadata={key:card[key] for key in ('score','match_reason','expansion') if key in card}
+            atom=native_mechanism.envelope(record,pointer,assessment_detail=False)|metadata
+            if fits is not None and pointer!=single_pointer and not fits(atom):
+                atom=native_mechanism.envelope(record,single_pointer,assessment_detail=False)|metadata
+            return atom
         document=next((d for d in self._ranker_v2().documents if d['id']==card['id']),None)
         if document is None:return card
         record=document['entry']
@@ -625,15 +629,49 @@ class Service:
             overlaps={u['seed_record_pointer']:terms&words(json.dumps(
                 atoms.get(u['seed_record_pointer'],{}).get('statement',''),ensure_ascii=False)) for u in units}
             best=max(units,key=lambda u:len(overlaps[u['seed_record_pointer']]))
-            selected=[best['seed_record_pointer']]
+            best_pointer=best['seed_record_pointer']
+            selected=[best_pointer]
             coverage=set().union(*overlaps.values())
-            if grouped and len(coverage)>=max(4,len(overlaps[selected[0]])+2):
+            from .retrieval_v2 import extract_symbols
+            requested_symbols=extract_symbols(positive)
+            symbol_overlaps={pointer:requested_symbols&extract_symbols(json.dumps(
+                atoms.get(pointer,{}).get('statement',''),ensure_ascii=False)) for pointer in overlaps}
+            symbol_coverage=set().union(*symbol_overlaps.values())
+            complementary=(len(coverage)>=max(4,len(overlaps[best_pointer])+2) or
+                           bool(symbol_coverage-symbol_overlaps[best_pointer]))
+            if grouped and complementary:
                 # These are already admitted independent seeds, not new source
                 # selections. Reuse their verified dependency/Scope plan so a
                 # multi-step question need not lose every atom but one.
                 selected=[u['seed_record_pointer'] for u in units if overlaps[u['seed_record_pointer']]]
-            atom=projection_v2._atomic_subset_from_plan(card,record,selected,plan,**options)
-            return project_l1_card(projection_v2.bundle_decision_card(atom),public_contract=True)
+
+            def render(pointers):
+                atom=projection_v2._atomic_subset_from_plan(card,record,pointers,plan,**options)
+                return project_l1_card(projection_v2.bundle_decision_card(atom),public_contract=True)
+
+            result=render(selected)
+            if fits is None or len(selected)==1 or fits(result):
+                return result
+            # Try each admitted seed at most once. Prefer another requested
+            # operation before incidental word overlap, retaining the original
+            # plan's conditions and unknown dependencies for every proposal.
+            selected=[best_pointer]
+            result=render(selected)
+            covered_terms=set(overlaps[best_pointer])
+            covered_symbols=set(symbol_overlaps[best_pointer])
+            remaining=sorted((pointer for pointer in overlaps if pointer!=best_pointer),
+                key=lambda pointer:(-len(symbol_overlaps[pointer]-covered_symbols),
+                                    -len(overlaps[pointer]-covered_terms),-len(overlaps[pointer]),pointer))
+            for pointer in remaining:
+                if not (overlaps[pointer]-covered_terms or symbol_overlaps[pointer]-covered_symbols):
+                    continue
+                proposed=render(selected+[pointer])
+                if fits(proposed):
+                    selected.append(pointer)
+                    covered_terms.update(overlaps[pointer])
+                    covered_symbols.update(symbol_overlaps[pointer])
+                    result=proposed
+            return result
         except (ValueError,KeyError,TypeError,AttributeError):
             # An unavailable closure plan is not permission to strip Scope.
             return project_l1_card(projection_v2.bundle_decision_card(card),public_contract=True)
@@ -968,22 +1006,21 @@ class Service:
             # after a fit decision and push already accepted facts over budget.
             candidates=payload['results'];payload['results']=[]
             rich_by_id={item['id']:item for item in results}
-            seed_views={item['id']:self._research_seed_view(rich_by_id[item['id']],query)
-                        for item in candidates} if view=='decision' else {}
             payload.update(maximum_payload_bytes=64000,withheld_atoms=[],
                 withheld_atoms_total_count=0,withheld_atoms_omitted_count=0,
                 withheld_navigation_followup='Use a narrower query or get_entry with an explicitly selected ID.',
                 restricted_research_explicitly_requested=True,notice=native_mechanism.NOTICE,
                 payload_bytes=0,estimated_tokens_bytes_div_4=0)
             deferred=[]
+            def fits_seed(seed):
+                proposed=dict(payload,results=payload['results']+[seed])
+                return serialized_payload_cost(proposed)+200<=64000
+
             for item in candidates:
                 if len(payload['results'])>=top_k:break
-                seed=seed_views.get(item['id'],item)
-                proposed=dict(payload,results=payload['results']+[seed])
-                if serialized_payload_cost(proposed)+200>64000 and view=='decision':
-                    seed=self._research_seed_view(rich_by_id[item['id']],query,grouped=False)
-                    proposed=dict(payload,results=payload['results']+[seed])
-                if serialized_payload_cost(proposed)+200<=64000:
+                seed=(self._research_seed_view(rich_by_id[item['id']],query,fits=fits_seed)
+                      if view=='decision' else item)
+                if fits_seed(seed):
                     payload['results'].append(seed)
                 else:
                     deferred.append({'id':item['id'],
@@ -1093,7 +1130,9 @@ class Service:
         for key,record,pointer,identity in matches:
             # All views return the same original whole API atom with its complete
             # required envelope; decision never summarizes away conditions.
-            atom=native_mechanism.envelope(record,pointer)
+            outer_sources=payload.get('source_environment',{}).get('source_input_assessment',{}).get('sources')
+            detailed_assessment=view!='decision' or not outer_sources
+            atom=native_mechanism.envelope(record,pointer,assessment_detail=detailed_assessment)
             atom.update(api_identity=identity,whole_value_delivered=True)
             proposed=dict(payload,results=payload['results']+[atom],knowledge_gap=False,
                           contract_status='RESEARCH_CONTRACT_DELIVERED')

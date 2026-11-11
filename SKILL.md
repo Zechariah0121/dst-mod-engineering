@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.06.2`：244 条登记知识（64 基础 + 13 Native AI + 110 Core + 57 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase9-action-closure.md) · [English](README.en.md)
+`v2026.11.11`：247 条登记知识（64 基础 + 13 Native AI + 110 Core + 60 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase10-recovery-delivery.md) · [English](README.en.md)
 
 ## 工作顺序
 
@@ -63,7 +63,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](references/testing-release.md) |
 | 资料来历、旧规则纠错与可信度 | [sources-and-corrections.md](references/sources-and-corrections.md) |
 
-涉及回调重入、动作时钟、消费后的声音收尾、唯一物品事务、配料域或 UI 重建时，按 [露露案例索引](references/lulu-case-index.md) 选择相关专题。按案例说明的项目条件和证据范围使用。
+涉及回调重入、动作时钟、消费后的声音收尾、唯一物品事务、配料域或 UI 重建时，按 [工程案例索引](references/lulu-case-index.md) 选择相关专题。按案例说明的项目条件和证据范围使用。
 
 ## 实施要点
 

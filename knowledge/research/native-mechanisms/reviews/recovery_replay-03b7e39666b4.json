@@ -1,0 +1,436 @@
+{
+  "schema": "dst-independent-mechanism-research-review/1",
+  "date": "2026-11-11",
+  "reviewer": "F",
+  "candidate_sha256": "ec70042afbffd256fdf2961c3c25485a5db6289cccfc94e9dc67244090cb1f24",
+  "candidate_topic": "recovery_replay",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "accepted_scope": {
+    "entry_ids": [
+      "EXP-SAVE-004",
+      "EXP-SAVE-005",
+      "EXP-SAVE-006"
+    ],
+    "entries": 3,
+    "claims": 17,
+    "api_contracts": 7,
+    "mechanism_steps": 9,
+    "source_references": 31,
+    "governance": {
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold"
+    },
+    "source_epoch": "762172",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980"
+  },
+  "checks": [
+    {
+      "check": "schema_and_reference_graph",
+      "status": "PASS",
+      "result": "通过既有机制合同校验。31个引用ID唯一，所有claim/API/step引用均可解析，依赖枚举及claim反向边逐项一致，UTF8无BOM且LF。"
+    },
+    {
+      "check": "archive_file_and_range_identity",
+      "status": "PASS",
+      "result": "独立读取同SHA源码归档，11个ZIP成员原字节SHA及31个引用行范围SHA全部匹配。范围算法为UTF8 splitlines后LF连接、无末尾换行。"
+    },
+    {
+      "check": "declaration_and_baseline_deduplication",
+      "status": "PASS",
+      "result": "3个ID及7个机制族API声明相对244条基线新增。Timer保存字段/同名替换、旧GUID映射、原有任务归属与历史Core仍按候选列明的前置身份使用。增量为重放截止时间、Tracker闭包覆盖及具名奖励队列到交付的静态边界。"
+    },
+    {
+      "check": "typed_claims_scope_and_uncertainty",
+      "status": "PASS",
+      "result": "逐读17个claim、7个API及9个步骤。NSF、EI、REC有标注，重放/失败结论限定实际Lua顺序及具名消费者，动态Hook、调度实际时点、库存接受和磁盘/跨分片边界保留unknowns。"
+    }
+  ],
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-SAVE-004",
+      "status": "PASS",
+      "reviewed_pointers": [
+        "/claims",
+        "/api_contracts/0",
+        "/mechanism_steps",
+        "/compatibility",
+        "/unknowns"
+      ],
+      "source_refs": [
+        "REC-S01",
+        "REC-S02",
+        "REC-S03",
+        "REC-S04",
+        "REC-S05",
+        "REC-S06",
+        "REC-S07",
+        "REC-S08",
+        "REC-S09",
+        "REC-S10",
+        "REC-S18",
+        "REC-S31"
+      ],
+      "semantic_findings": [
+        "OnLoad逐保存名字先Stop再Start，未列名字保留，运行中截止时间按本次GetTime加保存剩余值建立。",
+        "暂停记录先创建再取消句柄。旧名字释放早于读取后续记录字段，失败可留下已完成的逐名变更。",
+        "涡流口默认具名Timer和独立巡检具有不同资源所有者，完成消费者取消巡检及安排退出。"
+      ]
+    },
+    {
+      "entry_id": "EXP-SAVE-005",
+      "status": "PASS",
+      "reviewed_pointers": [
+        "/claims",
+        "/api_contracts",
+        "/mechanism_steps",
+        "/compatibility",
+        "/unknowns"
+      ],
+      "source_refs": [
+        "REC-S05",
+        "REC-S11",
+        "REC-S12",
+        "REC-S13",
+        "REC-S14",
+        "REC-S15",
+        "REC-S16",
+        "REC-S17",
+        "REC-S18",
+        "REC-S19",
+        "REC-S20",
+        "REC-S31"
+      ],
+      "semantic_findings": [
+        "TrackEntity每次新建闭包，覆盖同名槽后再登记目标onremove，闭包仅按名字清槽。",
+        "同名覆盖后旧目标回调可清当前新槽。Forget和组件卸载使用当前记录身份，宿主整体删除另按双向事件归属清理。",
+        "世界调用方先完成构造循环再postpass，缺映射跳过；候选保留实际所有原版调用者是否到达覆盖序列的未知。"
+      ]
+    },
+    {
+      "entry_id": "EXP-SAVE-006",
+      "status": "PASS",
+      "reviewed_pointers": [
+        "/claims",
+        "/api_contracts",
+        "/mechanism_steps",
+        "/compatibility",
+        "/unknowns"
+      ],
+      "source_refs": [
+        "REC-S04",
+        "REC-S07",
+        "REC-S08",
+        "REC-S10",
+        "REC-S13",
+        "REC-S14",
+        "REC-S18",
+        "REC-S19",
+        "REC-S21",
+        "REC-S22",
+        "REC-S23",
+        "REC-S24",
+        "REC-S25",
+        "REC-S26",
+        "REC-S27",
+        "REC-S28",
+        "REC-S29",
+        "REC-S30"
+      ],
+      "semantic_findings": [
+        "OnLoad直接接回保存队列并同步发布事件，任务complete由稍后LoadPostPass恢复。hermitcrab的主端事件消费者按现有任务字段组织周期检查。",
+        "DoRewards调用奖励函数并拼接对象，正常尾部换空队列，调用者随后维护itemstotoss并调用GiveItem。异常可保留此前副作用及旧队列引用。",
+        "具名默认奖励样本创建包装物品并有独立pearlgiven状态。候选保留逐奖励回调条件及库存接受结果的范围。"
+      ]
+    }
+  ],
+  "evidence_verification": [
+    {
+      "reference_id": "REC-S01",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 1,
+      "line_end": 12,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "67d95384337cde2d375ad7e6107ccb02a4bd82242b5c51973e31d55c7e78d697",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S02",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 27,
+      "line_end": 114,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "ab99392e2e0c4ca7e07135636a63d60871e14afd5db8fa83e5932de0b5abff00",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S03",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 122,
+      "line_end": 142,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "9e86e55826707b694a9074e7254f0cfc62b6bb7d68dabe18d17b53fb44d41f6d",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S04",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1979,
+      "line_end": 2014,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S05",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "line_start": 224,
+      "line_end": 260,
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "range_sha256": "dea6bafdca6e019caf22c47404f0beb4497f6af03ecd2aa56ecbc5372e6fa82e",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S06",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "line_start": 177,
+      "line_end": 195,
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "range_sha256": "fcd712945847e1b23c85f61293340b23a2eac02056e355330e2529fdb034798c",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S07",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1494,
+      "line_end": 1555,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S08",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 56,
+      "line_end": 95,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "7052ec2a86dd95c53f0457fc49f54ebe47e04279f6c238b72357931ce6c94fcc",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S09",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 276,
+      "line_end": 301,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "668d7ce5cd699d740a0022774d27c7e2d984826a4f266a5e489f0788b23207be",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S10",
+      "source_file": "scripts/scheduler.lua",
+      "line_start": 164,
+      "line_end": 216,
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S11",
+      "source_file": "scripts/components/entitytracker.lua",
+      "line_start": 1,
+      "line_end": 66,
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "range_sha256": "79e5e9e14c819fb3e71ddb2018ce6aab95ab82a46d15ec3d62b6225428ad0fe4",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S12",
+      "source_file": "scripts/mainfunctions.lua",
+      "line_start": 464,
+      "line_end": 510,
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S13",
+      "source_file": "scripts/gamelogic.lua",
+      "line_start": 613,
+      "line_end": 629,
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S14",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1964,
+      "line_end": 1977,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "d5d3d49922fdd678ef58ec530bee7bfaaaf7ba7b11538f99230541bc0073b210",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S15",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1198,
+      "line_end": 1256,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "af29a12426ef44bb903ac81d7729ac714c8b2370e847a361f8a3a030239b5748",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S16",
+      "source_file": "scripts/util.lua",
+      "line_start": 238,
+      "line_end": 246,
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S17",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1258,
+      "line_end": 1288,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "5d420cfdcce82dee78790a633ef488f831819af32596701e7e56b065312af9fb",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S18",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1730,
+      "line_end": 1758,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "b11cf40d855c88bf4c923e47527b2281650d2b38893d01bc40f3a7ab20a58476",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S19",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1312,
+      "line_end": 1345,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S20",
+      "source_file": "scripts/prefabs/oceanwhirlportal.lua",
+      "line_start": 54,
+      "line_end": 175,
+      "file_sha256": "b7938f1769078c5e106b5ae7e40599950a0ec24a1b0e505bfe0935095d138493",
+      "range_sha256": "bce3a74ca3f0d86becaeb0fe399cf1e7799afc30b5f19d3c2dd5d2e6bb9ccc63",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S21",
+      "source_file": "scripts/components/friendlevels.lua",
+      "line_start": 1,
+      "line_end": 119,
+      "file_sha256": "6e5b2fa23325af9192cf7cdcb0a73f0615e923fd9eb010fa140d8357f67da859",
+      "range_sha256": "9f89ebbef744f3e9fde6ec9a622105374fa8cb12dd7a568d10ceba307bfc3d13",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S22",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 1936,
+      "line_end": 1994,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "8ca6fb1826b7c69ebbada2bfd8922ffed61de849e447c665ac357431477c2ce0",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S23",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 673,
+      "line_end": 776,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "474bfe3d57c361a8b4bf50d86a6ba8d9e5beaed376f5234bc0f516ca021a4310",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S24",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 987,
+      "line_end": 998,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "014adff6bd5e869cc6b3b8b8034da313ab4ca2cf26fbc86b21e4f5445ce720a0",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S25",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 878,
+      "line_end": 885,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "e3ecc793dda558e94c8d3c9cb1b8bea816de934124a78fd42f8fb07af115e63b",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S26",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 805,
+      "line_end": 847,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "fb3b6775e757bfb863c27c346b47fb9119a9d93c557c81100a76bc8cf819f022",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S27",
+      "source_file": "scripts/components/unwrappable.lua",
+      "line_start": 47,
+      "line_end": 70,
+      "file_sha256": "8498c4482a22bbb61c96110a0a93b7677302fd088c7713bab0db7c27b182d8ed",
+      "range_sha256": "940f776ca65e849420e3626b89e521b62c554cf6fa11a0928e79ec3c9061949d",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S28",
+      "source_file": "scripts/util.lua",
+      "line_start": 323,
+      "line_end": 333,
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "range_sha256": "6c4f481baceb069ab8d5cb1fc2e058349d9936353f559522e6c64639a7553c84",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S29",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 398,
+      "line_end": 456,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "69d80b7f3a143744ecb8a8e715fb1871aeb96a6a7f3f6aa364986213c1d0a723",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S30",
+      "source_file": "scripts/prefabs/hermitcrab.lua",
+      "line_start": 531,
+      "line_end": 536,
+      "file_sha256": "af9f72c3c67cfc13ea8339fd52d10222dd027ccfe99921e66d1a352382fa6e22",
+      "range_sha256": "4fa87ec6ac5753c7aacedda15dc0019c38efce7bdfdc58f93c94d7bc8322d6ce",
+      "status": "MATCHED_AND_READ"
+    },
+    {
+      "reference_id": "REC-S31",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 670,
+      "line_end": 685,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "status": "MATCHED_AND_READ"
+    }
+  ],
+  "remaining_unknowns": [
+    "候选列明的重复加载、异常中断、暂停/零时间及真实独立进程恢复行为仍待对应运行证据。",
+    "Tracker同名覆盖序列已按API静态推导，所有原版调用方的可达性仍按候选unknowns保留。",
+    "具体奖励、库存接受、第三方回调、磁盘提交及跨分片共同提交的运行性质需具名验证。"
+  ],
+  "review_evidence_scope": "独立源码与文稿静态审阅。源码版本身份按候选来源评估及已匹配归档记录，历史知识沿各自Scope。"
+}

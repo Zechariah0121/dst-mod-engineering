@@ -1,6 +1,6 @@
-# 露露案例：动作时钟、同步重入与声音尾段
+# 动作时钟、同步重入与声音收尾
 
-适用于角色主端 SG 的动作时长、消费回调和声音退出研究。案例范围见[露露索引](lulu-case-index.md)；基础机制见[StateGraph](characters-brains-stategraphs.md)、[生命周期](lifecycle-save.md)、[音频](audio-particles.md)与[测试](testing-release.md)。
+适用于角色主端 SG 的动作时长、消费回调和声音退出研究。案例来源与范围见[工程案例索引](lulu-case-index.md)；基础机制见[StateGraph](characters-brains-stategraphs.md)、[生命周期](lifecycle-save.md)、[音频](audio-particles.md)与[测试](testing-release.md)。
 
 ## 来源与验证身份
 

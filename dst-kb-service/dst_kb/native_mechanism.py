@@ -123,6 +123,11 @@ def envelope(record, pointer='', assessment_detail=True):
                 'per_source_reference_states': per_source,
                 'source_identities': 'source_environment.source_input_assessment.sources',
                 'detail_tools': ['get_entry', 'resolve_evidence'], 'runtime_game_verified': False}
+            from .source_epoch_runtime import epoch_arguments
+            result['source_input_assessment']['detail_followup'] = {
+                'tool': 'get_entry',
+                'arguments': epoch_arguments({'id': entry['id'], 'projection': 'reviewer',
+                                              'pointer': pointer, 'max_bytes': 64000})}
     return result
 
 
