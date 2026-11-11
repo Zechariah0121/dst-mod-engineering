@@ -1,6 +1,6 @@
 # 维护与构建
 
-当前版本 `v2026.11.12` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，267 条知识与 MCP 共用 knowledge/。用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
+当前工作版本 `v2026.11.12.1` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，279 条知识与 MCP 共用 knowledge/。用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
 
 ```text
 python -B -m unittest discover -s tests -v
@@ -10,7 +10,7 @@ python -B scripts/build_release.py
 python -B scripts/build_release.py --check
 ```
 
-生成器核对 `knowledge/PACKAGE-MANIFEST.json` 的每个文件、FAMILY-REGISTRY 生成的目录计数（当前 64 + 13 + 110 + 80 = 267 个唯一记录），以及单一证据环境，再从明确允许的文件构建 `dist/release/`。ZIP 内 `RELEASE-MANIFEST.json` 提供版本、记录计数和逐文件哈希；清单不对自身形成循环哈希。固定路径顺序、时间和 ZIP 元数据，使用 DEFLATE 压缩；相同 Python/压缩库下，同一源文件得到相同字节。跨压缩库比较时应以包内逐文件哈希核对内容。`build_web_bundle.py` 是同一命令的兼容入口，不再生成网页或独立 Skill 分包。
+生成器核对 `knowledge/PACKAGE-MANIFEST.json` 的每个文件、FAMILY-REGISTRY 生成的目录计数（当前 64 + 13 + 110 + 92 = 279 个唯一记录），以及单一证据环境，再从明确允许的文件构建 `dist/release/`。ZIP 内 `RELEASE-MANIFEST.json` 提供版本、记录计数和逐文件哈希；清单不对自身形成循环哈希。固定路径顺序、时间和 ZIP 元数据，使用 DEFLATE 压缩；相同 Python/压缩库下，同一源文件得到相同字节。跨压缩库比较时应以包内逐文件哈希核对内容。`build_web_bundle.py` 是同一命令的兼容入口，不再生成网页或独立 Skill 分包。
 
 构建排除缓存、游戏源码、本地客户端配置、测试夹具、旧知识副本和构建产物。`dist/` 只放发行 ZIP 与校验文件，不复制源码树。不要把含本地恢复 Lua 的 `cache/` 提交或上传。已有生成物被修改或目录中有未知文件时，构建器拒绝覆盖；应先检查差异，或选择新的输出目录。
 

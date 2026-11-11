@@ -1,10 +1,10 @@
 # 安装与使用 / Installation and use
 
-当前版本 `v2026.11.12` 包含 267 条登记记录，版本与数量分别见 RELEASE-MANIFEST、FAMILY-REGISTRY 和 CATALOG。
+当前版本 `v2026.11.12.1` 包含 279 条登记记录，版本与数量分别见 RELEASE-MANIFEST、FAMILY-REGISTRY 和 CATALOG。
 
 ## 下载与解压
 
-下载 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.12/dst-mod-engineering.zip)：一个完整包包含 Skill、267 条知识、开发脚本、来源准备与 MCP。网页和离线阅读使用同一包。
+从[最新发行版](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest)下载 [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/latest/download/dst-mod-engineering.zip)：一个完整包包含 Skill、知识、开发脚本、来源准备与 MCP。网页和离线阅读使用同一包，具体版本与数量以下载包内的清单为准。
 
 对照同版 `SHA256SUMS.txt` 后完整解压。ZIP 顶层只有 `dst-mod-engineering/`，直接包含 `SKILL.md`。安装时保留整个目录，包括知识、MCP 服务、来源准备文件和许可证；不要只复制入口文件。包内 `RELEASE-MANIFEST.json` 记录逐文件 SHA-256 与相应登记目录计数；历史 [v2026.10.25.4](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.10.25.4) 仍为 187 条，不与本版混用。
 

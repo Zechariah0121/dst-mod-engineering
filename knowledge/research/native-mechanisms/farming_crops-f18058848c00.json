@@ -1,0 +1,1610 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "farming_crops",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-FARM-001",
+      "title": "农田格水分营养与每株作物的用水接线",
+      "aliases": [
+        "farming_manager",
+        "农田灌溉",
+        "肥料部署",
+        "CycleNutrientsAtPoint",
+        "farmsoildrinker"
+      ],
+      "engineering_question": "怎样给农田加水或肥料，并正确区分共享格资源、每株用水历史和阶段营养消费？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "世界master的farming_manager、原版固定位置作物、WateryProtection与可部署肥料消费者。",
+        "exclusions": [
+          "N006-READY-R06的owner/derived-index结论为前置，本条增加具体农作API和消费者。",
+          "玩家moisture、Growable通用计时、跨分片农田同步和移动作物重索引协议。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FARM-001-C01",
+          "kind": "NSF",
+          "statement": "world在master返回分界后添加undertile、worldsettingstimer再安装farming_manager。管理器在worldmapsetsize后建立营养、水分、drinker和overlay四种DataGrid并安排周期更新。onterraform进入农田时初始化缺省营养并建立overlay，离开农田清水分及overlay，所查分支保留营养grid记录。",
+          "evidence_refs": [
+            "FARM-S01",
+            "FARM-S02",
+            "FARM-S03",
+            "FARM-S04",
+            "FARM-S11"
+          ]
+        },
+        {
+          "id": "EXP-FARM-001-C02",
+          "kind": "NSF",
+          "statement": "周期更新按格累加降雨或温度干燥率与同格drinker速率，再按dt应用。水分下限采用世界wetness，上限采用SOIL_MAX_MOISTURE_VALUE。作物master装配getdrinkratefn和onsoilmoisturestatechangefn，前者在growable仍生长时返回定义中的负用水率，后者把湿润过零通知转给每株的UpdateMoistureTime。",
+          "evidence_refs": [
+            "FARM-S03",
+            "FARM-S05",
+            "FARM-S12",
+            "FARM-S13",
+            "FARM-S22",
+            "FARM-S39"
+          ]
+        },
+        {
+          "id": "EXP-FARM-001-C03",
+          "kind": "NSF",
+          "statement": "AddSoilMoistureAtPoint接收世界x/y/z，只有中心格存在overlay且增量非零才写入。WateryProtection先对范围内实体施加保护，再对中心点调用此接口。AddTileNutrients接收格坐标并逐项钳到0..100，标准肥料部署先把世界点转格再加营养，随后OnApplied处理耐久或物品消费。",
+          "evidence_refs": [
+            "FARM-S06",
+            "FARM-S08",
+            "FARM-S24",
+            "FARM-S25",
+            "FARM-S26",
+            "FARM-S27"
+          ]
+        },
+        {
+          "id": "EXP-FARM-001-C04",
+          "kind": "NSF",
+          "statement": "CycleNutrientsAtPoint将世界点转格，无overlay返回true。存在consume时按可用量消费，返回depleted表示有任一所需营养未足额满足。test_only为真在写入前返回。实际路径按已消费总量向restore列出的类型回补，再AddTileNutrients。作物压力查询用not apply传test_only，阶段结算才进行消费。",
+          "evidence_refs": [
+            "FARM-S07",
+            "FARM-S14",
+            "FARM-S32",
+            "FARM-S40"
+          ]
+        },
+        {
+          "id": "EXP-FARM-001-C05",
+          "kind": "NSF",
+          "statement": "FarmSoilDrinker按实体累计湿/干经过时长，CalcPercentTimeHydrated先把当前状态这段时间计入再返回湿润比例。组件构造延后登记，组件移除发注销事件，管理器按登记/注销时的当前位置定位格。管理器保存营养/水分grid，加载当前格式后重建农田overlay，drinker实体列表由构造登记重建。",
+          "evidence_refs": [
+            "FARM-S04",
+            "FARM-S09",
+            "FARM-S10",
+            "FARM-S11",
+            "FARM-S12"
+          ]
+        },
+        {
+          "id": "EXP-FARM-001-C06",
+          "kind": "REC",
+          "statement": "灌溉或施肥效果可直接在既有权威业务入口调用格资源接口。面向多格的效果按受影响格组织一次增量，固定作物复用drinker和实际通知绑定。只有需要每株阶段干旱历史时再增加该组件，普通植物的单次浇水效果可继续留在其本地生长入口。",
+          "evidence_refs": [
+            "FARM-S05",
+            "FARM-S08",
+            "FARM-S12",
+            "FARM-S13",
+            "FARM-S24",
+            "FARM-S25"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FarmingManager:AddSoilMoistureAtPoint",
+          "source_file": "scripts/components/farming_manager.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "x,y,z为世界坐标。moisture_delta为可参与加法的数值，0直接跳过。"
+          ],
+          "returns": "正常返回nil，返回值不区分无overlay与实际写入。",
+          "preconditions": [
+            "world master已完成DataGrid初始化。调用方按业务确认目标农田格。"
+          ],
+          "side_effects": [
+            "取中心格overlay，有则以当前土壤水分或world.wetness为基值加增量。",
+            "SetSoilMoisture写钳制值，更新overlay，过零时调用当前格drinker通知并变更wildfireprotected标签。"
+          ],
+          "lifecycle": [
+            "水分归世界格保存。调用自身不遍历半径内其他土壤格，不消费施水工具。WateryProtection另行处理实体范围与onspreadprotectionfn。"
+          ],
+          "evidence_refs": [
+            "FARM-S03",
+            "FARM-S08",
+            "FARM-S24"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmingManager:AddTileNutrients",
+          "source_file": "scripts/components/farming_manager.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "x,y为格坐标。nutrient1/2/3为三种营养的数值增量。"
+          ],
+          "returns": "正常返回true，所查方法自身没有农田地皮准入分支。",
+          "preconditions": [
+            "管理器DataGrid已初始化，格坐标可被DataGrid读取。肥料部署调用方先用IsFarmableSoilAtPoint进行准入。"
+          ],
+          "side_effects": [
+            "GetTileNutrients优先解码已存值，再读地皮定义nutrients，最后0/0/0。",
+            "将旧值加各增量钳到0..100，经SetTileNutrients编码到grid，有overlay时更新显示。"
+          ],
+          "lifecycle": [
+            "方法自身不消耗肥料。标准部署之后调用Fertilizer:OnApplied，世界保存/载入持久化grid。"
+          ],
+          "evidence_refs": [
+            "FARM-S06",
+            "FARM-S09",
+            "FARM-S10",
+            "FARM-S25",
+            "FARM-S26"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmingManager:CycleNutrientsAtPoint",
+          "source_file": "scripts/components/farming_manager.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "_x,_y,_z为世界坐标。consume为nil或1..3顺序非负需求数组。",
+            "restore为nil或按营养类型索引的非空true稀疏表，类型限定1..3。test_only真值表示只测试需求。"
+          ],
+          "returns": "布尔depleted，true表示无overlay或至少一种消费不足，false表示需求均满足。consume为nil且有overlay时返回false。",
+          "preconditions": [
+            "管理器格数据与overlay已初始化。消费值与当前营养可比较。非nil restore需有有效恢复类型，原版定义以零消费类型产生该表。"
+          ],
+          "side_effects": [
+            "先求每种min(现存值,需求)。test_only真值且consume非nil时直接返回depleted。",
+            "实际调用即使depleted仍扣除可用部分，按已消费总量平均恢复到指定类型，余数随机分配，再写格营养。consume为nil时跳过消费/恢复，restore单独给出也不执行。"
+          ],
+          "lifecycle": [
+            "查询通过不预约营养。普通作物在阶段MakeStressCheckpoint应用，研究描述调用测试分支。该方法仅负责本次格营养计算。"
+          ],
+          "evidence_refs": [
+            "FARM-S07",
+            "FARM-S14",
+            "FARM-S32",
+            "FARM-S40"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmSoilDrinker:CalcPercentTimeHydrated",
+          "source_file": "scripts/components/farmsoildrinker.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [],
+          "returns": "湿润时长占比。累计wet_time为0时返回0。",
+          "preconditions": [
+            "实例固定在原版登记格，world farming_manager可用。time和timer_start_time由Reset/OnLoad建立。",
+            "作物已将onsoilmoisturestatechangefn接到UpdateMoistureTime以记录途中状态变化。"
+          ],
+          "side_effects": [
+            "查询当前格湿润状态，按该状态把距离timer_start_time的经过量计入wet或dry，并更新timer_start_time。",
+            "读取自身历史得到比例，查询本身推进这段历史采样。"
+          ],
+          "lifecycle": [
+            "原版阶段结算用比例评估moisture压力后Reset。组件保存累计时间及起点的经过量，OnLoad重建起点。",
+            "构造0延迟发登记事件，OnRemoveFromEntity发注销事件。移动实体索引由调用方另行设计。"
+          ],
+          "evidence_refs": [
+            "FARM-S04",
+            "FARM-S08",
+            "FARM-S12",
+            "FARM-S13",
+            "FARM-S14"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "world master建立管理器与地图格，农田地皮事件建立持久资源和overlay。",
+          "evidence_refs": [
+            "FARM-S01",
+            "FARM-S02",
+            "FARM-S03",
+            "FARM-S04",
+            "FARM-S11"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "施水与肥料实际消费者写格，固定位置作物登记速率并收集每株湿润历史。",
+          "evidence_refs": [
+            "FARM-S05",
+            "FARM-S06",
+            "FARM-S08",
+            "FARM-S12",
+            "FARM-S13",
+            "FARM-S24",
+            "FARM-S25",
+            "FARM-S27"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "作物阶段结算消费营养、读取本株湿润比例并重置本阶段历史，世界与实体分别保存其数据。",
+          "evidence_refs": [
+            "FARM-S07",
+            "FARM-S09",
+            "FARM-S10",
+            "FARM-S12",
+            "FARM-S14"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行灌溉、营养耗尽/回补、同格多株和两进程恢复。",
+        "移动植株、地图重建或组件安装后同tick即移除的调度结果未验证，本条固定位置范围不提供重索引方案。",
+        "原生Map地皮转换、DataGrid边界、气候本地温度及overlay客户端呈现的完整合同未在本条扩展。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FARM-S01",
+            "role": "世界master装配与管理器依赖顺序",
+            "claim_ids": [
+              "EXP-FARM-001-C01"
+            ]
+          },
+          {
+            "ref": "FARM-S02",
+            "role": "管理器端别与四种格子数据所有者",
+            "claim_ids": [
+              "EXP-FARM-001-C01"
+            ]
+          },
+          {
+            "ref": "FARM-S03",
+            "role": "水分钳制、过零通知与地图尺寸后初始化",
+            "claim_ids": [
+              "EXP-FARM-001-C01",
+              "EXP-FARM-001-C02"
+            ]
+          },
+          {
+            "ref": "FARM-S04",
+            "role": "地皮进入/退出、overlay及固定位置drinker索引",
+            "claim_ids": [
+              "EXP-FARM-001-C01",
+              "EXP-FARM-001-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S05",
+            "role": "天气与同格实体用水的实际更新",
+            "claim_ids": [
+              "EXP-FARM-001-C02",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S06",
+            "role": "格坐标营养读取、编码与钳制增量",
+            "claim_ids": [
+              "EXP-FARM-001-C03"
+            ]
+          },
+          {
+            "ref": "FARM-S07",
+            "role": "世界点到格的营养测试与实际消费恢复",
+            "claim_ids": [
+              "EXP-FARM-001-C04"
+            ]
+          },
+          {
+            "ref": "FARM-S08",
+            "role": "世界点水分写入与湿润判定",
+            "claim_ids": [
+              "EXP-FARM-001-C03",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S09",
+            "role": "持久格数据保存生产者",
+            "claim_ids": [
+              "EXP-FARM-001-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S10",
+            "role": "当前格式格数据恢复与overlay重建",
+            "claim_ids": [
+              "EXP-FARM-001-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S11",
+            "role": "地皮和drinker注册/注销事件接线",
+            "claim_ids": [
+              "EXP-FARM-001-C01",
+              "EXP-FARM-001-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S12",
+            "role": "每实体湿润时长、延迟登记、移除及保存",
+            "claim_ids": [
+              "EXP-FARM-001-C02",
+              "EXP-FARM-001-C05",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S13",
+            "role": "作物照料、用水与湿润通知消费者",
+            "claim_ids": [
+              "EXP-FARM-001-C02",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S14",
+            "role": "各压力条件与阶段结算协调者",
+            "claim_ids": [
+              "EXP-FARM-001-C04"
+            ]
+          },
+          {
+            "ref": "FARM-S22",
+            "role": "公共定义引用、网络阶段字段、master组件装配及初始暂停",
+            "claim_ids": [
+              "EXP-FARM-001-C02"
+            ]
+          },
+          {
+            "ref": "FARM-S24",
+            "role": "实体范围施水与中心格加水的实际消费者",
+            "claim_ids": [
+              "EXP-FARM-001-C03",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S25",
+            "role": "可部署肥料的地面查询、加营养和物品应用接线",
+            "claim_ids": [
+              "EXP-FARM-001-C03",
+              "EXP-FARM-001-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S26",
+            "role": "施肥后的耐久/堆叠物品消费",
+            "claim_ids": [
+              "EXP-FARM-001-C03"
+            ]
+          },
+          {
+            "ref": "FARM-S27",
+            "role": "原版肥料pristine与master实际装配",
+            "claim_ids": [
+              "EXP-FARM-001-C03"
+            ]
+          },
+          {
+            "ref": "FARM-S32",
+            "role": "营养消费与稀疏恢复类型的定义生产者",
+            "claim_ids": [
+              "EXP-FARM-001-C04"
+            ]
+          },
+          {
+            "ref": "FARM-S39",
+            "role": "原版用水率符号定义",
+            "claim_ids": [
+              "EXP-FARM-001-C02"
+            ]
+          },
+          {
+            "ref": "FARM-S40",
+            "role": "压力描述以apply=false调用测试函数的直接消费者",
+            "claim_ids": [
+              "EXP-FARM-001-C04"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举的定义、具名调用者及生命周期只覆盖本条路径。原生Map、网络传输和其他Mod调用另按本条范围判断。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FARM-002",
+      "title": "作物阶段压力、照料与成熟收获的决策时点",
+      "aliases": [
+        "farmplantstress",
+        "farmplanttendable",
+        "作物巨型判定",
+        "作物产量",
+        "MakeStressCheckpoint"
+      ],
+      "engineering_question": "自动照料、改生长条件或调整产量应落在哪个真实节点，成熟后改变环境还会影响哪些结果？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "farm_plants的具名master装配、普通GROWTH_STAGES、压力与照料组件及pickable/lootdropper收获链。",
+        "exclusions": [
+          "EXP-GROW-001/002通用阶段、Pause/Resume与保存语义作为前置。",
+          "随机种子替换、魔法催长及全部作物变种的完整路径，具体数值和平衡取舍。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FARM-002-C01",
+          "kind": "NSF",
+          "statement": "farm_plants在公共阶段声明网络研究阶段与标签，在master分界后安装七种压力、drinker、tendable、lootdropper和growable。普通sprout/small/med/full目标阶段pregrowfn执行MakeStressCheckpoint，full还调用CalcFinalStressState并写is_oversized，随后full.fn开启采集。",
+          "evidence_refs": [
+            "FARM-S19",
+            "FARM-S22"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C02",
+          "kind": "NSF",
+          "statement": "MakeStressCheckpoint依次重算邻居/拥挤/季节、按本阶段湿润比例设置moisture并Reset drinker，再应用营养消费。happiness保留动作回调给出的状态。MakeCheckpoint累计当前真值压力项，并把此前false项重置为true供下一阶段使用。GetGrowTime读取上一检查点压力数量与当时季节决定后续阶段时长。",
+          "evidence_refs": [
+            "FARM-S12",
+            "FARM-S14",
+            "FARM-S15",
+            "FARM-S18"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C03",
+          "kind": "NSF",
+          "statement": "照料动作INTERACT_WITH调用TendTo。仅tendable真且ontendtofn返回真时TendTo将资格设false并返回true，其他路径返回nil。原版ontendto把happiness设false，各生长阶段fn再设置该阶段tendable资格，成熟与腐烂阶段禁止照料。",
+          "evidence_refs": [
+            "FARM-S13",
+            "FARM-S17",
+            "FARM-S19",
+            "FARM-S28"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C04",
+          "kind": "NSF",
+          "statement": "CalcFinalStressState按累计stress_points的固定分段写NONE/LOW/MODERATE/HIGH并返回该状态。成熟前转换用此结果与force_oversized/no_oversized决定is_oversized。收获时SetupLoot再次读取当前is_oversized、腐烂标签和final_stress_state组织普通产品、种子或巨型产品。pickable通过GenerateLoot触发此设置，产物生成先于onpickedfn。",
+          "evidence_refs": [
+            "FARM-S15",
+            "FARM-S19",
+            "FARM-S20",
+            "FARM-S34",
+            "FARM-S35",
+            "FARM-S36"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C05",
+          "kind": "NSF",
+          "statement": "腐烂转换会再结算并Reset压力，巨型腐烂后StopGrowing，普通腐烂设置no_oversized并允许循环回生。压力组件保存累计值、各项标记与final，prefab保存巨型等字段并在OnPreLoad先应用。构造先StartGrowing后Pause，夜晚/光照/燃烧和加载postpass有自己的暂停恢复策略。",
+          "evidence_refs": [
+            "FARM-S16",
+            "FARM-S19",
+            "FARM-S21",
+            "FARM-S22",
+            "FARM-S23",
+            "FARM-S37"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C06",
+          "kind": "EI",
+          "statement": "只在成熟之后补水、补肥或设置当前happiness，不会沿上述普通阶段链重算此前累计压力或成熟时已写的is_oversized。onpickedfn发生时当前这次产物已生成，因此改变产物决策应接在生成读取的规则处。",
+          "evidence_refs": [
+            "FARM-S14",
+            "FARM-S15",
+            "FARM-S19",
+            "FARM-S20",
+            "FARM-S34",
+            "FARM-S35",
+            "FARM-S36"
+          ]
+        },
+        {
+          "id": "EXP-FARM-002-C07",
+          "kind": "REC",
+          "statement": "自动照料现有作物可复用TendTo并沿原阶段重新开放资格，水肥改动用现有格入口。只需要固定成长和固定收获的自定义植物，可用Growable与Pickable的本地阶段配置，把农作压力/研究/巨型配套保留给真正需要这些玩法的功能。",
+          "evidence_refs": [
+            "FARM-S13",
+            "FARM-S17",
+            "FARM-S19",
+            "FARM-S20",
+            "FARM-S22",
+            "FARM-S28"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FarmPlantStress:SetStressed",
+          "source_file": "scripts/components/farmplantstress.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "name为已注册且当前值非nil的压力项。stressed按布尔传入。doer透传可选变化回调。"
+          ],
+          "returns": "正常返回nil，未知或当前nil项跳过。",
+          "preconditions": [
+            "类别已由AddStressCategory建立。所传布尔表示当前是否受该项压力。"
+          ],
+          "side_effects": [
+            "将self.stressors[name]写为stressed==true。输入与旧值不等且有onchange时，直接调用onchange(inst,stressed,doer)。"
+          ],
+          "lifecycle": [
+            "只改本阶段标记，累计由MakeCheckpoint完成。原版照料清happiness，检查点重新评估其他条件。"
+          ],
+          "evidence_refs": [
+            "FARM-S13",
+            "FARM-S14",
+            "FARM-S15"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmPlantStress:MakeCheckpoint",
+          "source_file": "scripts/components/farmplantstress.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "分类与当前stressors已由调用方设置。该方法自身不执行注册的压力测试函数。"
+          ],
+          "side_effects": [
+            "统计真值项加入stress_points，把非真值项设回true。",
+            "写checkpoint_stress_points及max_stress_points调试量，选中实体时可打印调试信息。"
+          ],
+          "lifecycle": [
+            "调用次数由阶段pregrowfn决定。最终状态需另调用CalcFinalStressState。Reset清累计/最终状态，OnSave保存业务累计和项状态。"
+          ],
+          "evidence_refs": [
+            "FARM-S14",
+            "FARM-S15",
+            "FARM-S16",
+            "FARM-S19"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmPlantStress:CalcFinalStressState",
+          "source_file": "scripts/components/farmplantstress.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [],
+          "returns": "返回写入的FARM_PLANT_STRESS枚举。",
+          "preconditions": [
+            "stress_points为累计数值。原版在full阶段pregrowfn完成最后检查点后调用。"
+          ],
+          "side_effects": [
+            "累计<=1为NONE，<=6为LOW，<=11为MODERATE，其余HIGH。写final_stress_state，不额外采样条件或改变is_oversized。"
+          ],
+          "lifecycle": [
+            "full阶段随后用返回字段作巨型判定。GetFinalStressState供SetupLoot读取。各阈值是原版配置算法事实，目标Mod取舍另定。"
+          ],
+          "evidence_refs": [
+            "FARM-S15",
+            "FARM-S19",
+            "FARM-S20"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "FarmPlantTendable:TendTo",
+          "source_file": "scripts/components/farmplanttendable.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "doer原样传给ontendtofn，可为nil。"
+          ],
+          "returns": "仅当前tendable为真且回调返回真时返回true，其他路径返回nil。",
+          "preconditions": [
+            "组件已安装，需有对应业务ontendtofn才能完成照料。原版作物在master侧绑定ontendto。"
+          ],
+          "side_effects": [
+            "调用ontendtofn(inst,doer)后，成功分支将tendable=false，属性setter同步移除tendable_farmplant标签。",
+            "原版作物回调把happiness压力清除，阶段fn以后按stage_data.tendable重新开放。"
+          ],
+          "lifecycle": [
+            "资格随组件OnSave/OnLoad保存恢复。方法自身不累计压力、不重置阶段时钟、不生成奖励。"
+          ],
+          "evidence_refs": [
+            "FARM-S13",
+            "FARM-S17",
+            "FARM-S19",
+            "FARM-S22",
+            "FARM-S28"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master装配压力/照料/生长组件，合法照料改变当前阶段happiness。",
+          "evidence_refs": [
+            "FARM-S13",
+            "FARM-S17",
+            "FARM-S22",
+            "FARM-S28"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "目标阶段pregrowfn采样环境、结算水肥与累计压力，full转换确定最终压力及巨型标记。",
+          "evidence_refs": [
+            "FARM-S14",
+            "FARM-S15",
+            "FARM-S18",
+            "FARM-S19"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "成熟开启pickable，实际采集通过lootsetupfn选择产物，随后采后回调与实体退出。",
+          "evidence_refs": [
+            "FARM-S20",
+            "FARM-S34",
+            "FARM-S35",
+            "FARM-S36"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行实际照料、阶段转换、巨型成熟、采收、腐烂循环或保存恢复。",
+        "本条没有把普通阶段结论推广到全部魔法催长、随机种子、weed或Mod覆写路径。",
+        "客户端动作候选、预测、研究册和产物动画/重量的完整显示链另需对应任务验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FARM-S12",
+            "role": "每实体湿润时长、延迟登记、移除及保存",
+            "claim_ids": [
+              "EXP-FARM-002-C02"
+            ]
+          },
+          {
+            "ref": "FARM-S13",
+            "role": "作物照料、用水与湿润通知消费者",
+            "claim_ids": [
+              "EXP-FARM-002-C03",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S14",
+            "role": "各压力条件与阶段结算协调者",
+            "claim_ids": [
+              "EXP-FARM-002-C02",
+              "EXP-FARM-002-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S15",
+            "role": "压力分类、标记、累计与最终状态API",
+            "claim_ids": [
+              "EXP-FARM-002-C02",
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S16",
+            "role": "压力累计状态保存恢复",
+            "claim_ids": [
+              "EXP-FARM-002-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S17",
+            "role": "照料资格标签、调用结果与存档",
+            "claim_ids": [
+              "EXP-FARM-002-C03",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S18",
+            "role": "阶段压力被后续生长计时读取",
+            "claim_ids": [
+              "EXP-FARM-002-C02"
+            ]
+          },
+          {
+            "ref": "FARM-S19",
+            "role": "阶段转换结算、巨型决策、成熟及腐烂退出",
+            "claim_ids": [
+              "EXP-FARM-002-C01",
+              "EXP-FARM-002-C03",
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C05",
+              "EXP-FARM-002-C06",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S20",
+            "role": "采集组件接线与动态掉落表",
+            "claim_ids": [
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C06",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S21",
+            "role": "prefab巨型等字段预加载与加载后暂停",
+            "claim_ids": [
+              "EXP-FARM-002-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S22",
+            "role": "公共定义引用、网络阶段字段、master组件装配及初始暂停",
+            "claim_ids": [
+              "EXP-FARM-002-C01",
+              "EXP-FARM-002-C05",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S23",
+            "role": "夜晚监听、保存回调安装及局部工厂遍历入口",
+            "claim_ids": [
+              "EXP-FARM-002-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S28",
+            "role": "INTERACT_WITH对照料API的实际调用",
+            "claim_ids": [
+              "EXP-FARM-002-C03",
+              "EXP-FARM-002-C07"
+            ]
+          },
+          {
+            "ref": "FARM-S34",
+            "role": "采集产物读取lootdropper并交付的消费者",
+            "claim_ids": [
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S35",
+            "role": "先产物后onpicked与移除宿主的顺序",
+            "claim_ids": [
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S36",
+            "role": "实际生成掉落列表前调用作物设置函数",
+            "claim_ids": [
+              "EXP-FARM-002-C04",
+              "EXP-FARM-002-C06"
+            ]
+          },
+          {
+            "ref": "FARM-S37",
+            "role": "夜晚/光照/燃烧造成生长暂停与恢复的具名策略",
+            "claim_ids": [
+              "EXP-FARM-002-C05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举的定义、具名调用者及生命周期只覆盖本条路径。原生Map、网络传输和其他Mod调用另按本条范围判断。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FARM-003",
+      "title": "农作种子入土与自定义植物的接入选择",
+      "aliases": [
+        "farmplantable",
+        "PLANTSOIL",
+        "自定义作物种子",
+        "普通植物与农作系统",
+        "PLANT_DEFS"
+      ],
+      "engineering_question": "怎样让自定义种子通过原版入土动作创建作物，何时应选择自己的简单植物prefab？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "ACTIONS.PLANTSOIL到FarmPlantable:Plant、命名种子装配、farm_plants局部工厂及定义共享。",
+        "exclusions": [
+          "EXP-ITEM-001背包RemoveItem/GiveItem与EXP-GROW-001/002阶段实现为前置。",
+          "新的农作物资产制作、全部种子部署者、研究册收集和跨端放置预览。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FARM-003-C01",
+          "kind": "NSF",
+          "statement": "命名蔬菜种子在master侧添加farmplantable并配置plant='farm_plant_'..name。PLANTSOIL检查背包与soil目标后用Inventory:RemoveItem取出种子，先尝试相应plantable组件，正常返回true则结束，正常失败路径把取出对象GiveItem返还。单件拆堆遵循RemoveItem默认wholestack缺省分支。",
+          "evidence_refs": [
+            "FARM-S30",
+            "FARM-S31",
+            "FARM-S38"
+          ]
+        },
+        {
+          "id": "EXP-FARM-003-C02",
+          "kind": "NSF",
+          "statement": "FarmPlantable:Plant要求plant非nil且target有soil标签，用FunctionOrValue(self.plant,self.inst)选择prefab。选择非nil后先移除土堆，再SpawnPrefab并放到原位置，发on_planted含doer/seed/in_soil=true，可播放声音，再发世界itemplanted，最后移除传入的种子实体并返回true。",
+          "evidence_refs": [
+            "FARM-S29"
+          ]
+        },
+        {
+          "id": "EXP-FARM-003-C03",
+          "kind": "NSF",
+          "statement": "farm_plants的MakePlant是文件局部工厂，模块遍历当时PLANT_DEFS，为非data_only定义构造并返回Prefab。实例的plant_def直接引用该定义。定义预处理补产品、巨型产品、种子和身份标签，实例在公共分支设置网络研究阶段，在master后才装配权威农作组件。",
+          "evidence_refs": [
+            "FARM-S22",
+            "FARM-S23",
+            "FARM-S33",
+            "FARM-S41"
+          ]
+        },
+        {
+          "id": "EXP-FARM-003-C04",
+          "kind": "EI",
+          "statement": "直接调用FarmPlantable:Plant的材料数量由传入实体决定，它的末尾Remove处理整个self.inst。标准动作先取单件的行为不能由组件替调用方补齐。更改共享plant_def表会影响使用该表的其他实例，给单株定制值时应明确所改数据的共享范围。",
+          "evidence_refs": [
+            "FARM-S22",
+            "FARM-S29",
+            "FARM-S30",
+            "FARM-S31",
+            "FARM-S38"
+          ]
+        },
+        {
+          "id": "EXP-FARM-003-C05",
+          "kind": "REC",
+          "statement": "自定义种子若只需复用soil目标与标准动作，可在其master初始化中配置farmplantable.plant，确保目标prefab已注册并实现自己需要的生长/收获。需要原版水肥压力、巨型和研究体系时再接这些依赖。只需固定时间长成并采摘的植物，可选择自己的小prefab配Growable/Pickable，沿既有种植入口接入。",
+          "evidence_refs": [
+            "FARM-S20",
+            "FARM-S22",
+            "FARM-S23",
+            "FARM-S29",
+            "FARM-S30",
+            "FARM-S31"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FarmPlantable:Plant",
+          "source_file": "scripts/components/farmplantable.lua",
+          "visibility": "原版Lua组件方法，端别和输入合同限下述具名消费者。",
+          "parameters": [
+            "target为soil标签的土堆实体，具备GetPosition。planter透传事件，不在本方法做身份或距离检查。",
+            "self.plant为prefab名或以self.inst为唯一参数的选择函数。"
+          ],
+          "returns": "未配置plant、非soil目标或选择函数返回nil时返回false。正常完成返回true。后续直接调用的错误外抛。",
+          "preconditions": [
+            "调用方在master侧已确认土堆/种子合法。self.inst为本次要消费的种子实体，数量由上层准备。",
+            "选择出的prefab必须已注册且SpawnPrefab成功对象具备Transform/PushEvent，方法自身直接使用结果。"
+          ],
+          "side_effects": [
+            "缓存土堆位置，选择非nil后移除目标土堆，然后创建并定位植物。",
+            "on_planted携带doer、原种子和in_soil=true，随后可播放声音并发世界itemplanted，最后移除种子。"
+          ],
+          "lifecycle": [
+            "原版PLANTSOIL先从背包取出单件，正常false时返还该对象。",
+            "土堆移除先于植物创建，过程中直接调用可能产生已完成的业务副作用。需要不同失败保留策略的自定义入口按自身约定安排创建与材料交接。"
+          ],
+          "evidence_refs": [
+            "FARM-S29",
+            "FARM-S30",
+            "FARM-S31",
+            "FARM-S38"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生调度与实际游戏结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "种子master初始化声明farmplantable.plant，标准动作从背包取得本次对象。",
+          "evidence_refs": [
+            "FARM-S30",
+            "FARM-S31",
+            "FARM-S38"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Plant按soil目标替换实体，on_planted事件携带doer=planter、seed=self.inst、in_soil=true，正常完成消费该对象。",
+          "evidence_refs": [
+            "FARM-S29",
+            "FARM-S30"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "目标prefab选择自己的组件集合。原版完整农作在局部工厂装配，简单植物可复用已有Growable/Pickable入口。",
+          "evidence_refs": [
+            "FARM-S20",
+            "FARM-S22",
+            "FARM-S23",
+            "FARM-S33",
+            "FARM-S41"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行自定义种子、不同堆叠数量、生成失败、事件监听副作用或真人动作。",
+        "PLANT_DEFS加载/PrefabFiles收集的Mod间时序未扩展成通用注册协议，文件局部MakePlant并非导出的Mod工厂。",
+        "FunctionOrValue沿普通函数/值合同使用，输入合法性及库存交接沿本条前置和所列调用方。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FARM-S20",
+            "role": "采集组件接线与动态掉落表",
+            "claim_ids": [
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S22",
+            "role": "公共定义引用、网络阶段字段、master组件装配及初始暂停",
+            "claim_ids": [
+              "EXP-FARM-003-C03",
+              "EXP-FARM-003-C04",
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S23",
+            "role": "夜晚监听、保存回调安装及局部工厂遍历入口",
+            "claim_ids": [
+              "EXP-FARM-003-C03",
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S29",
+            "role": "种子选prefab、替换土堆与消耗当前实体完整方法",
+            "claim_ids": [
+              "EXP-FARM-003-C02",
+              "EXP-FARM-003-C04",
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S30",
+            "role": "背包取出种子后调用入土与false路径返还",
+            "claim_ids": [
+              "EXP-FARM-003-C01",
+              "EXP-FARM-003-C04",
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S31",
+            "role": "命名种子master侧farmplantable与独立部署入口",
+            "claim_ids": [
+              "EXP-FARM-003-C01",
+              "EXP-FARM-003-C04",
+              "EXP-FARM-003-C05"
+            ]
+          },
+          {
+            "ref": "FARM-S33",
+            "role": "作物产品、种子、身份标签与网络阶段默认数据",
+            "claim_ids": [
+              "EXP-FARM-003-C03"
+            ]
+          },
+          {
+            "ref": "FARM-S38",
+            "role": "标准入土调用者的单件拆堆必要callee",
+            "claim_ids": [
+              "EXP-FARM-003-C01",
+              "EXP-FARM-003-C04"
+            ]
+          },
+          {
+            "ref": "FARM-S41",
+            "role": "MakePlant文件局部函数声明",
+            "claim_ids": [
+              "EXP-FARM-003-C03"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举的定义、具名调用者及生命周期只覆盖本条路径。原生Map、网络传输和其他Mod调用另按本条范围判断。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "FARM-S01",
+      "source_file": "scripts/prefabs/world.lua",
+      "file_sha256": "c5f39346078b6d40b4dde59f6b919dfc0857c85ec639557bb27484cc40bb90d8",
+      "line_start": 568,
+      "line_end": 584,
+      "range_sha256": "79b622860d1eb6bdbbb966c3e31fa4fc643e9f70319e34d690cd8286f8c92ccb",
+      "symbols": [
+        "world",
+        "farming_manager"
+      ]
+    },
+    {
+      "id": "FARM-S02",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 25,
+      "line_end": 57,
+      "range_sha256": "b7afefd27df8538f9b11911217006931cc8036757a04235cfda706c005465e65",
+      "symbols": [
+        "FarmingManager"
+      ]
+    },
+    {
+      "id": "FARM-S03",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 88,
+      "line_end": 138,
+      "range_sha256": "3d1248485483bc9aa537421b0b8e44234b4f6e4a7b92bb7e0c92b990e0ecce1e",
+      "symbols": [
+        "SetSoilMoisture",
+        "InitializeDataGrids"
+      ]
+    },
+    {
+      "id": "FARM-S04",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 144,
+      "line_end": 215,
+      "range_sha256": "a479ea14de391e41133d049c3c7d30fab88822eb588ac492565690a203ea4592",
+      "symbols": [
+        "OnTerraform",
+        "OnRegisterSoilDrinker",
+        "OnRemoveSoilDrinker"
+      ]
+    },
+    {
+      "id": "FARM-S05",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 299,
+      "line_end": 330,
+      "range_sha256": "78b4e26d791b063afbf250ef6e0a63c5614eff890ac7ade75517ebb87358f227",
+      "symbols": [
+        "FarmingManager:_RefreshSoilMoisture"
+      ]
+    },
+    {
+      "id": "FARM-S06",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 368,
+      "line_end": 398,
+      "range_sha256": "82e20ca59dfb545874ccdea580b20a8281c2fad08a50a821d21abf4e709f1a59",
+      "symbols": [
+        "FarmingManager:GetTileNutrients",
+        "FarmingManager:SetTileNutrients",
+        "FarmingManager:AddTileNutrients"
+      ]
+    },
+    {
+      "id": "FARM-S07",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 400,
+      "line_end": 455,
+      "range_sha256": "ff92dc8a1f3b930d55351b1cb33d2ab68417231846a91edb3e6da13b01d81bee",
+      "symbols": [
+        "FarmingManager:CycleNutrientsAtPoint"
+      ]
+    },
+    {
+      "id": "FARM-S08",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 461,
+      "line_end": 475,
+      "range_sha256": "840f38941ae44c5c6905f9e6524fcd82fd41f6bda5b8947667c09bb14e457e84",
+      "symbols": [
+        "FarmingManager:AddSoilMoistureAtPoint",
+        "FarmingManager:IsSoilMoistAtPoint"
+      ]
+    },
+    {
+      "id": "FARM-S09",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 482,
+      "line_end": 496,
+      "range_sha256": "7e4f7c530cf70756c9a6dc3e42fa24e3cbd82470d63af64de68dbf9391bf80b4",
+      "symbols": [
+        "FarmingManager:OnSave"
+      ]
+    },
+    {
+      "id": "FARM-S10",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 530,
+      "line_end": 568,
+      "range_sha256": "0be8680f118c743485bca0ecf4250b81fa0d86ee7388e66dd939fbd9bca44e8d",
+      "symbols": [
+        "LoadVersion2Tiledata",
+        "FarmingManager:OnLoad"
+      ]
+    },
+    {
+      "id": "FARM-S11",
+      "source_file": "scripts/components/farming_manager.lua",
+      "file_sha256": "d3789f4f72ca886e09f74e302b3850d7f16cd8a8da791aedd79a19a5591e8832",
+      "line_start": 612,
+      "line_end": 619,
+      "range_sha256": "7fe2aa665b12b77ee029960b3cc378bd67f06011031701be483b5d4afeef1f88",
+      "symbols": [
+        "onterraform",
+        "ms_registersoildrinker",
+        "ms_unregistersoildrinker"
+      ]
+    },
+    {
+      "id": "FARM-S12",
+      "source_file": "scripts/components/farmsoildrinker.lua",
+      "file_sha256": "98de84f08b2b28fb86320875d2110aea90ac25ca5307ce434bb4fefa6f8e4189",
+      "line_start": 1,
+      "line_end": 64,
+      "range_sha256": "ff67de6b3e83b2a796ecb42276fe7049d354463fa3efa855fe838a3c5c23f5ce",
+      "symbols": [
+        "FarmSoilDrinker",
+        "FarmSoilDrinker:CalcPercentTimeHydrated",
+        "FarmSoilDrinker:UpdateMoistureTime",
+        "FarmSoilDrinker:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "FARM-S13",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 115,
+      "line_end": 127,
+      "range_sha256": "6586507203e2774f75c4543cd756fc480a93afb363155542e40cb61aabf19743",
+      "symbols": [
+        "ontendto",
+        "GetDrinkRate",
+        "OnSoilMoistureStateChange"
+      ]
+    },
+    {
+      "id": "FARM-S14",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 173,
+      "line_end": 258,
+      "range_sha256": "217e8104e56679757caf46b813e2bcb796d9de194b5445bb51804b0050a99112",
+      "symbols": [
+        "MoistureStressTest",
+        "NutrientsStressTest",
+        "MakeStressCheckpoint"
+      ]
+    },
+    {
+      "id": "FARM-S15",
+      "source_file": "scripts/components/farmplantstress.lua",
+      "file_sha256": "506db90d846dfa4d8e3d50be90297fdb9d11a2bef5847ee61d5bb4a5431045e5",
+      "line_start": 1,
+      "line_end": 84,
+      "range_sha256": "2b9577d45e29c4eef6883badbcdd6a78d9f6931078d2bc81c91540afecf08f59",
+      "symbols": [
+        "FarmPlantStress:AddStressCategory",
+        "FarmPlantStress:SetStressed",
+        "FarmPlantStress:MakeCheckpoint",
+        "FarmPlantStress:CalcFinalStressState"
+      ]
+    },
+    {
+      "id": "FARM-S16",
+      "source_file": "scripts/components/farmplantstress.lua",
+      "file_sha256": "506db90d846dfa4d8e3d50be90297fdb9d11a2bef5847ee61d5bb4a5431045e5",
+      "line_start": 120,
+      "line_end": 136,
+      "range_sha256": "9908bd3083ebd293c594cab79237800db0697db2e379986e4e22f5c7c8a1d73b",
+      "symbols": [
+        "FarmPlantStress:OnSave",
+        "FarmPlantStress:OnLoad"
+      ]
+    },
+    {
+      "id": "FARM-S17",
+      "source_file": "scripts/components/farmplanttendable.lua",
+      "file_sha256": "0f233fd47219bf25525f93f898490d46c77d2fbad6eb39f6018eb0b882a0feab",
+      "line_start": 1,
+      "line_end": 43,
+      "range_sha256": "dacba4f676c81c5f5b731efeb917fa271120ad419bec6aeeabe92d3cd53cc3d0",
+      "symbols": [
+        "FarmPlantTendable:SetTendable",
+        "FarmPlantTendable:TendTo",
+        "FarmPlantTendable:OnLoad"
+      ]
+    },
+    {
+      "id": "FARM-S18",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 377,
+      "line_end": 384,
+      "range_sha256": "cafdc2577fe36a4ac8d52d0beb7885471b3b5c684cb3da0ffae3832bc7a33c17",
+      "symbols": [
+        "GetGrowTime"
+      ]
+    },
+    {
+      "id": "FARM-S19",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 438,
+      "line_end": 567,
+      "range_sha256": "36849b045c2f2b5ee51ddc087f15eb566b2605434cd83a83a21220eee402ce47",
+      "symbols": [
+        "GROWTH_STAGES",
+        "MakeStressCheckpoint"
+      ]
+    },
+    {
+      "id": "FARM-S20",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 303,
+      "line_end": 362,
+      "range_sha256": "5a56e9f6eda2a280799671b17fcd18ce9495c79764ac84d48b022e16abc1d9e1",
+      "symbols": [
+        "MakePickable",
+        "SetupLoot"
+      ]
+    },
+    {
+      "id": "FARM-S21",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 721,
+      "line_end": 765,
+      "range_sha256": "138693d594bf335dba0611b7db8dc7f9f52dd24672d051d76e28ecc034ca3957",
+      "symbols": [
+        "OnSave",
+        "OnPreLoad",
+        "OnLoad",
+        "OnLoadPostPass"
+      ]
+    },
+    {
+      "id": "FARM-S22",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 792,
+      "line_end": 885,
+      "range_sha256": "8a7fb8191ed1cd5ceef1e5732e1c6603f9d0c9d9fc29092b6ed33f3edcff431f",
+      "symbols": [
+        "MakePlant",
+        "farmsoildrinker",
+        "farmplantstress",
+        "growable"
+      ]
+    },
+    {
+      "id": "FARM-S23",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 910,
+      "line_end": 937,
+      "range_sha256": "f663f048cb351b9046b9eb2da8031dc3002d4f783572da77aa4da99e3fc16da3",
+      "symbols": [
+        "MakePlant",
+        "plant_prefabs"
+      ]
+    },
+    {
+      "id": "FARM-S24",
+      "source_file": "scripts/components/wateryprotection.lua",
+      "file_sha256": "9f09221e5ef081253e0e4d659bbd49ac61faf3512b849c80929ab8aec74d091d",
+      "line_start": 43,
+      "line_end": 61,
+      "range_sha256": "d77c9910e4a7f765e12747deb86d09e39aeeaaf3eb37a0370ad4a139163628c1",
+      "symbols": [
+        "WateryProtection:SpreadProtectionAtPoint"
+      ]
+    },
+    {
+      "id": "FARM-S25",
+      "source_file": "scripts/standardcomponents.lua",
+      "file_sha256": "f60c567b7edfcd7bf51efb0e4057581f643529eff67a973bd948a797201f9b84",
+      "line_start": 1795,
+      "line_end": 1831,
+      "range_sha256": "c0bcb3bd2739edaa4d10ac23e985af58ff1947f6987e677175b9a72cbfbbe67f",
+      "symbols": [
+        "fertilizer_ondeploy",
+        "MakeDeployableFertilizerPristine",
+        "MakeDeployableFertilizer"
+      ]
+    },
+    {
+      "id": "FARM-S26",
+      "source_file": "scripts/components/fertilizer.lua",
+      "file_sha256": "0fbb8c30a25201a06be76e1e6a814fc2428c1fab002db51607a6570e08a957a7",
+      "line_start": 30,
+      "line_end": 48,
+      "range_sha256": "3685eacf785e20154fefcbf7cfad7a83a8be3e727d762215a0f55a231a93354e",
+      "symbols": [
+        "Fertilizer:OnApplied"
+      ]
+    },
+    {
+      "id": "FARM-S27",
+      "source_file": "scripts/prefabs/fertilizer.lua",
+      "file_sha256": "cc0900119356325c3ee09f40a066bf86abdf42ab25ad268e3a45c8f69f7aad8c",
+      "line_start": 28,
+      "line_end": 68,
+      "range_sha256": "e92264605143d3598f4174836f4429f360c8964522359672c50eaccf4fc47a44",
+      "symbols": [
+        "makefertilizer"
+      ]
+    },
+    {
+      "id": "FARM-S28",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1553,
+      "line_end": 1563,
+      "range_sha256": "850d2b2887058223c093833bd4fb2d32dec3dc7312ba715ddc06941368f8ada9",
+      "symbols": [
+        "ACTIONS.INTERACT_WITH.fn"
+      ]
+    },
+    {
+      "id": "FARM-S29",
+      "source_file": "scripts/components/farmplantable.lua",
+      "file_sha256": "98de02178b907eef0845703b4aab57183ab302fdd4ca57e00cec190d5d49d178",
+      "line_start": 1,
+      "line_end": 32,
+      "range_sha256": "7ec063d1a30b7f0cf1cf178998ea42b980deb6ab96c0dcf637deb7e11397cac8",
+      "symbols": [
+        "FarmPlantable:Plant"
+      ]
+    },
+    {
+      "id": "FARM-S30",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 4727,
+      "line_end": 4745,
+      "range_sha256": "fbfe4339d4a2682c1e920614080959da506f7e93882825fbb26a75870d3971f5",
+      "symbols": [
+        "ACTIONS.PLANTSOIL.fn"
+      ]
+    },
+    {
+      "id": "FARM-S31",
+      "source_file": "scripts/prefabs/veggies.lua",
+      "file_sha256": "3428e37d90c343de026f4e6f1f47d87302b29eb9237291dddc0943427d8ab26a",
+      "line_start": 481,
+      "line_end": 526,
+      "range_sha256": "51b095654324b68987092090c7bccaded99e053b2c12749854068567a5c60348",
+      "symbols": [
+        "farmplantable.plant",
+        "OnDeploy"
+      ]
+    },
+    {
+      "id": "FARM-S32",
+      "source_file": "scripts/prefabs/farm_plant_defs.lua",
+      "file_sha256": "212756cc14e5e4b23afc15404000aa3740e4ee174ede04aaa82fa26eacb66363",
+      "line_start": 101,
+      "line_end": 131,
+      "range_sha256": "c8725b48451eee7c59f585894f39591701e7b8ec18b95e077f00dbeb5a46e763",
+      "symbols": [
+        "PLANT_DEFS",
+        "nutrient_consumption",
+        "nutrient_restoration"
+      ]
+    },
+    {
+      "id": "FARM-S33",
+      "source_file": "scripts/prefabs/farm_plant_defs.lua",
+      "file_sha256": "212756cc14e5e4b23afc15404000aa3740e4ee174ede04aaa82fa26eacb66363",
+      "line_start": 254,
+      "line_end": 278,
+      "range_sha256": "5722b70eb31c5df11b191dcbeba893775ba8fdc4b01fa87e218d00fbff0faae6",
+      "symbols": [
+        "PLANT_DEFS"
+      ]
+    },
+    {
+      "id": "FARM-S34",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 450,
+      "line_end": 491,
+      "range_sha256": "fc32377848b0bf1183f27ff62f5280ec965df8846d49f4182148535194e83da5",
+      "symbols": [
+        "Pickable:SpawnProductLoot"
+      ]
+    },
+    {
+      "id": "FARM-S35",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 535,
+      "line_end": 582,
+      "range_sha256": "cb7e66b44acc9e7ab1f671023c10d370bb4fd527dbe24ca9153f1109f01c5834",
+      "symbols": [
+        "Pickable:Pick"
+      ]
+    },
+    {
+      "id": "FARM-S36",
+      "source_file": "scripts/components/lootdropper.lua",
+      "file_sha256": "96fc79e21ac17401cf54bdd1db2dc92a8b603b8eb1cfecf8a4ce9a9a2194883c",
+      "line_start": 186,
+      "line_end": 200,
+      "range_sha256": "31f72e273cdf1c5fce0bb921d6520377c5c2db37e4d01e6c3591176c65e1dcfc",
+      "symbols": [
+        "LootDropper:GenerateLoot"
+      ]
+    },
+    {
+      "id": "FARM-S37",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 31,
+      "line_end": 65,
+      "range_sha256": "9f181e13eaa37a504cdf54451faa7b299ae775747dec54e283afb7c122ee4687",
+      "symbols": [
+        "IsTooDarkToGrow",
+        "UpdateGrowing",
+        "OnIsDark"
+      ]
+    },
+    {
+      "id": "FARM-S38",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1403,
+      "range_sha256": "c1c1621067e2692f712e55b428205cc0ef488a851600486f10eff2c431de5a0b",
+      "symbols": [
+        "Inventory:RemoveItem"
+      ]
+    },
+    {
+      "id": "FARM-S39",
+      "source_file": "scripts/tuning.lua",
+      "file_sha256": "a5172ab9bc3b29a9fc59a6a399fd47a182ea0d25fedccb1292fe18e855b3b92c",
+      "line_start": 5802,
+      "line_end": 5804,
+      "range_sha256": "84cc852c33f09994cf0c2019dc1422db1abc78544c225c8924777c1a5195b3f3",
+      "symbols": [
+        "FARM_PLANT_DRINK_LOW",
+        "FARM_PLANT_DRINK_MED",
+        "FARM_PLANT_DRINK_HIGH"
+      ]
+    },
+    {
+      "id": "FARM-S40",
+      "source_file": "scripts/components/farmplantstress.lua",
+      "file_sha256": "506db90d846dfa4d8e3d50be90297fdb9d11a2bef5847ee61d5bb4a5431045e5",
+      "line_start": 90,
+      "line_end": 104,
+      "range_sha256": "6806104b15a100163776ca9dfb956da2d57930ed1504827a9ae789529c2a8cc7",
+      "symbols": [
+        "FarmPlantStress:GetStressDescription"
+      ]
+    },
+    {
+      "id": "FARM-S41",
+      "source_file": "scripts/prefabs/farm_plants.lua",
+      "file_sha256": "3db81a0b3bbe95a784c29b061f8d37520ac415852192eee195ce86e0062c0abe",
+      "line_start": 767,
+      "line_end": 767,
+      "range_sha256": "d5d1adf09330867d6fdf1c53fa73dd5f739cae5f9ea79b66daf7495032720c47",
+      "symbols": [
+        "MakePlant"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "做农田灌溉和肥料，水分营养按格还是按株保存",
+      "expected_entry_ids": [
+        "EXP-FARM-001"
+      ],
+      "purpose": "选择世界格资源入口与drinker历史归属。"
+    },
+    {
+      "query": "CycleNutrientsAtPoint返回true是否表示施肥成功",
+      "expected_entry_ids": [
+        "EXP-FARM-001"
+      ],
+      "purpose": "区分depleted、测试与真实消费恢复。"
+    },
+    {
+      "query": "自动照料作物以及什么时候决定巨型和收获种子",
+      "expected_entry_ids": [
+        "EXP-FARM-002"
+      ],
+      "purpose": "选择TendTo、阶段检查点和实际产物读取节点。"
+    },
+    {
+      "query": "新种子入土生成植物，普通Growable还是完整农作系统",
+      "expected_entry_ids": [
+        "EXP-FARM-003",
+        "EXP-FARM-002"
+      ],
+      "purpose": "接标准PLANTSOIL并按实际需求选择组件集合。"
+    }
+  ],
+  "limitations": [
+    "全部内容为762172/build26474873指定ZIP的静态Lua读取，runtime_verified=false。",
+    "研究状态research/restricted/hold，尚待独立审核与登记。",
+    "引用file SHA绑定ZIP成员原字节，range SHA绑定UTF8 splitlines后LF连接且无末尾换行。",
+    "原版行为用于确认兼容边界，REC/EI为按具体需求选择较小实现的建议与推导。"
+  ]
+}

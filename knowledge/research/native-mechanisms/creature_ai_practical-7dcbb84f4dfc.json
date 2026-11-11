@@ -1,0 +1,1347 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "creature_ai_practical",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-AI-008",
+      "title": "实用战斗AI的目标获取、保持与追击到SG交接",
+      "aliases": [
+        "ChaseAndAttack",
+        "Combat:SetRetargetFunction",
+        "Combat:SetKeepTargetFunction",
+        "追击放弃距离",
+        "目标获取和保持",
+        "doattack"
+      ],
+      "engineering_question": "做一只受领地约束的近战生物，何时只改combat回调，何时需要自有追击行为与SG接线？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "current_archive_static_lua",
+        "side": "具名原版生物的 mastersim Brain、combat、locomotor 与 SG 链。",
+        "increment_over_existing": "新增原版可复用的追击参数、目标生命周期和猎犬实际攻击事件消费者。既有007保留通用BufferedAction管线。",
+        "bounds": [
+          "结论限定所列 Lua 成员和实际消费者。版本号用于定位证据，其他版本按改动复核。",
+          "通用 Brain 调度、树重建与 BufferedAction 分发使用既有 EXP-AI-001 至 007 的各自范围。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-008-C01",
+          "kind": "NSF",
+          "statement": "SetRetargetFunction保存period/fn并取消旧任务，醒着且两者truthy时创建随机首延迟的周期任务。sleep取消任务，wake按retargetperiod非nil重建；TryRetarget在有targetfn且自身未死、未深睡时调用targetfn(inst)，读取newtarget,forcechange。",
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C06",
+            "AI2-HSET"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C02",
+          "kind": "NSF",
+          "statement": "TryRetarget对不同的非nil且无notarget标签候选，按forcechange、旧目标为structure而新目标非structure、SuggestTarget三条分支处理。SuggestTarget仅在当前无目标且cansuggesttargetfn通过时调用SetTarget并返回true，SetTarget另受IsValidTarget/ShouldAggro/玩家hiding条件约束。",
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C03",
+            "AI2-C07"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C03",
+          "kind": "NSF",
+          "statement": "SetKeepTargetFunction只替换keeptargetfn。EngageTarget在有该函数时登记组件更新；OnUpdate累计到keeptargettimeout<0才将计时置1并检查目标，要求有效、非limbo、有combat、keeptargetfn(inst,target)及CanBeAttacked通过。失败先losttarget再DropTarget。已有目标时事后设置函数的setter本身只赋值，更新登记另由EngageTarget或wake等入口承担。",
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C02"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C04",
+          "kind": "NSF",
+          "statement": "SetTarget换源经DropTarget/EngageTarget维护目标字段、replica写入、newcombattarget事件以及enterlimbo/onremove/transfercombattarget/leaderchanged监听。原版hound的retargetfn与KeepTarget各自检查领袖及距离，再调用CanTarget。其master初始化安装这两个函数。",
+          "evidence_refs": [
+            "AI2-C02",
+            "AI2-C03",
+            "AI2-C07",
+            "AI2-HPRED",
+            "AI2-HSET",
+            "AI2-CFIELD"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C05",
+          "kind": "NSF",
+          "statement": "ChaseAndAttack在READY调用ValidateTarget，仅在此后无目标时调用findnewtargetfn(inst)并交SetTarget。取得目标后BattleCry、记录startruntime、清numattacks并进入RUNNING。运行中按当前combat.target移动与TryAttack；longattack标签跳过该块。目标缺失/无效为FAILED，目标死亡为SUCCESS，两类均清目标并Stop。",
+          "evidence_refs": [
+            "AI2-CHASE",
+            "AI2-C03",
+            "AI2-C04",
+            "AI2-C05"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C06",
+          "kind": "NSF",
+          "statement": "ChaseAndAttack构造即监听onattackother和onmissother，二者均使numattacks加一并将startruntime设nil。max_attacks达标为SUCCESS且清目标；give_up_dist使用当前计算dsq>=距离平方，max_chase_time使用startruntime非nil且时间差严格大于阈值，二者为FAILED、GiveUp并Stop。OnStop解绑两个监听，继承的Reset只改树状态。",
+          "evidence_refs": [
+            "AI2-CHASE",
+            "AI2-C04",
+            "AI2-BASE"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C07",
+          "kind": "NSF",
+          "statement": "houndbrain有巢普通分支使用ChaseAndAttack(inst,10,20)，随后才到Leash。该节点通过TryAttack发doattack；TryAttack在attack标签已存在时也返回true。SGhound按自身死亡及状态门槛接doattack进入attack，onenter缓存target并StartAttack，16*FRAMES时DoAttack缓存目标。该交接由事件与SG时间线完成。",
+          "evidence_refs": [
+            "AI2-HBRAIN",
+            "AI2-C05",
+            "AI2-HSGEVENT",
+            "AI2-HSGATTACK"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C08",
+          "kind": "EI",
+          "statement": "give_up_dist使用当前计算的dsq比较阈值平方。普通分支取追击者到目标的距离；distance_from_ocean_target非nil、原始距离超出攻击范围且目标不在有效地面时，先偏移接近点，再把dsq重算为追击者到该接近点的距离。巢穴边界由目标获取/保持条件或返航行为表达。max_chase_time由攻击/落空事件重置，用它表达整个战斗的固定总时长会产生不同结果。",
+          "evidence_refs": [
+            "AI2-CHASE",
+            "AI2-HPRED",
+            "AI2-HBRAIN"
+          ]
+        },
+        {
+          "id": "EXP-AI-008-C09",
+          "kind": "REC",
+          "statement": "只改变敌人类型、获取/保持范围时，优先调整combat回调并保留现有追击和SG。固定总交战时限可先由本功能持有截止时间，用持续条件组合现有追击节点，开始和重置时机按玩法确定。需要独立状态或取消生命周期且现有组合难以表达时，再使用自有行为节点。即时截断已进入的攻击时间线需接对应SG退出。",
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-CHASE",
+            "AI2-HSGEVENT",
+            "AI2-HSGATTACK"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:SetTarget",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "target为候选实体或nil。相同目标直接保留当前状态。"
+          ],
+          "returns": "正常无显式返回，受理结果应读取combat.target。",
+          "preconditions": [
+            "combat、replica与实体事件接口已就绪，非nil候选支持IsValidTarget、ShouldAggro及hiding条件读取。"
+          ],
+          "side_effects": [
+            "不同目标通过条件后先DropTarget(target~=nil)，再EngageTarget(target,oldtarget)，维护旧新监听、字段和目标事件。",
+            "设置非nil新目标时抑制旧目标的droppedtarget事件，随后发布newcombattarget。设置nil时可发布droppedtarget。"
+          ],
+          "lifecycle": [
+            "StartTrackingTarget登记enterlimbo/onremove等监听，退出由StopTrackingTarget与组件卸载解除。",
+            "目标事件可执行外部回调，异常会中断后续步骤。SuggestTarget的true只反映其调用分支，最终目标仍取本字段。"
+          ],
+          "evidence_refs": [
+            "AI2-CFIELD",
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-C03",
+            "AI2-C06",
+            "AI2-C07",
+            "AI2-HPRED",
+            "AI2-HSET"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Combat:SetRetargetFunction",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "period为周期秒数或nil，fn为fn(inst)返回候选实体或nil及可选forcechange。正常周期须为可调度数值。"
+          ],
+          "returns": "正常无显式返回，结果写入targetfn、retargetperiod及retargettask。",
+          "preconditions": [
+            "权威combat已安装，实体提供任务和睡眠接口，回调返回的非nil候选支持实体接口。"
+          ],
+          "side_effects": [
+            "取消旧任务，保存新配置，醒着且period与fn为truthy时创建周期任务，首延迟为period*math.random()。"
+          ],
+          "lifecycle": [
+            "sleep取消，wake按period非nil恢复，卸载取消任务。停用周期配置可同时清period和fn。",
+            "回调返回nil保留当前目标。forcechange路径仍调用SetTarget自身的验证。TryRetarget没有显式返回。"
+          ],
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-C03",
+            "AI2-C06",
+            "AI2-HSET"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Combat:SetKeepTargetFunction",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "fn为fn(inst,target)返回保留目标的truthy值或nil以清除该回调。"
+          ],
+          "returns": "正常无显式返回，仅赋值keeptargetfn。",
+          "preconditions": [
+            "目标已被combat跟踪时须确认组件更新已登记。原版hound在初始配置阶段安装。"
+          ],
+          "side_effects": [
+            "替换单个函数槽。EngageTarget有回调才StartUpdatingComponent，wake有目标和回调时也启动更新。"
+          ],
+          "lifecycle": [
+            "OnUpdate每次阈值到达还检查目标combat和CanBeAttacked，回调只承担其中一项。失败发送losttarget并DropTarget。",
+            "setter在已存在目标时只赋值，登记/注销更新由后继组件控制流负责。回调异常沿调用栈传播。"
+          ],
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-HSET"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "ChaseAndAttack",
+          "source_file": "scripts/behaviours/chaseandattack.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "按位置传入inst,max_chase_time,give_up_dist,max_attacks,findnewtargetfn,walk,distance_from_ocean_target。",
+            "三个max/距离限制可nil。findnewtargetfn(inst)仅在READY验证后无目标时调用。walk为真时GoToPoint用走路意图。",
+            "distance_from_ocean_target可数值或fn(inst,target)，配置非nil、原始距离超出攻击范围且目标不在有效地面时调整接近点，并重算dsq。give_up_dist以当前dsq比较阈值平方，普通分支对应目标距离，偏移分支对应接近点距离。max_chase_time/give_up_dist/max_attacks直接参与算术或比较。"
+          ],
+          "returns": "返回BehaviourNode实例，结果写status；READY无目标FAILED，死亡目标或达到max_attacks为SUCCESS，失效/放弃为FAILED。",
+          "preconditions": [
+            "inst具备combat、locomotor、SG及实体/位置接口，目标具备实体与位置接口。构造时立即注册事件监听。"
+          ],
+          "side_effects": [
+            "READY发BattleCry，运行中GoToPoint/Stop/TryAttack，按分支清目标或GiveUp，常规运行Sleep(.125)。",
+            "两个攻击结果事件均计数并清追击计时，监听期间事件与当前节点运行状态之间没有过滤条件。"
+          ],
+          "lifecycle": [
+            "OnStop解除监听，Reset继承基础实现。复用已Stop旧节点的监听恢复需由调用方处理，原版树重建会构造新节点。",
+            "移动判定读取WantsToRun，已跑时接近阈值采用物理半径和，未跑时采用攻击范围。随后尝试攻击，再检查数量和放弃条件。",
+            "运行中目标更换继续读取combat.target，startruntime/numattacks沿当前节点状态保留至相应重置入口。"
+          ],
+          "evidence_refs": [
+            "AI2-CHASE",
+            "AI2-C03",
+            "AI2-C04",
+            "AI2-C05",
+            "AI2-HBRAIN",
+            "AI2-HSGEVENT",
+            "AI2-HSGATTACK",
+            "AI2-BASE",
+            "AI2-LOCOPOINT"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master阶段安装目标获取与保持回调，combat维护目标与相关监听。",
+          "evidence_refs": [
+            "AI2-HSET",
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-C03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "ChaseAndAttack读取共享combat目标，决定移动、尝试攻击或放弃。",
+          "evidence_refs": [
+            "AI2-CHASE",
+            "AI2-HBRAIN"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "TryAttack产生doattack，SGhound选择攻击状态并在时间线执行DoAttack。",
+          "evidence_refs": [
+            "AI2-C05",
+            "AI2-HSGEVENT",
+            "AI2-HSGATTACK"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "掉目标、sleep和卸载分别清跟踪/任务，树Stop解除追击监听。",
+          "evidence_refs": [
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-C06",
+            "AI2-CHASE",
+            "AI2-BASE"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AI2-BASE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C01",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C02",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C03",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C04",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C05",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C06",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C07",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-CFIELD",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-CHASE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HBRAIN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HPRED",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HSET",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HSGATTACK",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HSGEVENT",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-LOCOPOINT",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          }
+        ],
+        "unknowns": [
+          "原生寻路、实际攻击帧与多人可见结果未运行验证。",
+          "所列hound分支的其他事件与其他Mod更换目标可能改变运行中行为。"
+        ]
+      },
+      "unknowns": [
+        "原生寻路、实际攻击帧与多人可见结果未运行验证。",
+        "所列hound分支的其他事件与其他Mod更换目标可能改变运行中行为。"
+      ]
+    },
+    {
+      "id": "EXP-AI-009",
+      "title": "领地回位与入巢收纳的入口选择",
+      "aliases": [
+        "Leash",
+        "HomeSeeker:SetHome",
+        "HomeSeeker:GoHome",
+        "ACTIONS.GOHOME",
+        "生物回家",
+        "领地范围",
+        "兔子回洞"
+      ],
+      "engineering_question": "生物要回出生点附近还是进入巢穴，如何连接Leash、HomeSeeker和GOHOME且保留预期实体生命周期？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "current_archive_static_lua",
+        "side": "具名原版生物的 mastersim Brain、combat、locomotor 与 SG 链。",
+        "increment_over_existing": "新增Leash阈值与动态getter合同、回位和真实收纳两种开发路径及兔洞所有权消费者。原有REL的follower leashing保持原范围。",
+        "bounds": [
+          "结论限定所列 Lua 成员和实际消费者。版本号用于定位证据，其他版本按改动复核。",
+          "通用 Brain 调度、树重建与 BufferedAction 分发使用既有 EXP-AI-001 至 007 的各自范围。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-009-C01",
+          "kind": "NSF",
+          "statement": "Leash每次Visit先求homepos，缺失则FAILED。READY在到家距离平方严格小于max_dist平方时FAILED，否则先Stop并转RUNNING；同次Visit停在该分支。后续RUNNING距离严格大于inner_return_dist平方才GoToPoint(home,nil,run)，否则SUCCESS。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-LOCOPOINT"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C02",
+          "kind": "NSF",
+          "statement": "Leash的homepos/max_dist/inner_return_dist/running均经FunctionOrValue求值并传inst。homepos在一次Visit可被重复求值。完成或homepos缺失分支仅写status，显式Stop位于READY出界入口。原版hound在追击之后使用GetNoLeaderLeashPos作为home getter。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-HHOME",
+            "AI2-HBRAIN"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C03",
+          "kind": "NSF",
+          "statement": "HomeSeeker:SetHome先解绑旧home的onremove，写home，调用inst.homeseeker_onsethome(inst,home,oldhome)，再监听新home移除。该移除回调将home清空，并在默认removecomponent=true时移除homeseeker组件。HomeSeeker:GoHome有home才创建GOHOME BufferedAction，交locomotor或实体入口。",
+          "evidence_refs": [
+            "AI2-HOME"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C04",
+          "kind": "NSF",
+          "statement": "兔脑GoHomeAction要求home有效且自身SG无trapped标签，构造GOHOME动作，由gohome事件或夜晚/春季分支DoAction发起。SGrabbit的GOHOME handler选择action状态，onenter立即PerformBufferedAction。rabbit的Brain和SG安装位于master早退之后。",
+          "evidence_refs": [
+            "AI2-RBRAIN",
+            "AI2-RSGACTION",
+            "AI2-RSGDO",
+            "AI2-RSET"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C05",
+          "kind": "NSF",
+          "statement": "GOHOME.fn在有target时按spawner、childspawner、hideout顺序交其GoHome；target具备这些组件的分支返回该组件结果。若target三个组件均缺失则给target发送onwenthome并Remove执行者、返回true；仅pos存在的分支也Remove执行者。force_onwenthome_message会在上述处理前先给执行者发送onwenthome。",
+          "evidence_refs": [
+            "AI2-GOHOME"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C06",
+          "kind": "NSF",
+          "statement": "兔洞master配置spawner生成rabbit。Spawner:TakeOwnership记录child、记忆home坐标并安装/设置homeseeker。其GoHome只在self.child==child且未Occupied时AddChild、归零局部坐标、RemoveFromScene、Stop移动、可选灭火、卸下homeseeker并调用onoccupied，成功返回true；拒绝时发gohomefailed。",
+          "evidence_refs": [
+            "AI2-RHOLE",
+            "AI2-SPAWNOWN",
+            "AI2-SPAWNHOME"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C07",
+          "kind": "EI",
+          "statement": "仅到领地坐标附近的需求可直接复用Leash，家位置可以来自现有位置getter。使用GOHOME需要同时选择目标实体的收纳语义与所有权入口，单独SetHome只建立归属引用。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-HOME",
+            "AI2-GOHOME",
+            "AI2-SPAWNOWN",
+            "AI2-SPAWNHOME"
+          ]
+        },
+        {
+          "id": "EXP-AI-009-C08",
+          "kind": "REC",
+          "statement": "新领地生物先确定max_dist与inner_return_dist的玩法值及优先级。希望形成出界后回到更内侧的滞回区时选inner_return_dist<max_dist。普通领地限制可把相同条件接到目标获取和保持；保持检查按累计约一秒的节奏进行，猎犬已进入的攻击SG还可沿缓存目标继续执行。严格或即时停止需求按实际要求主动接手返航运动，并处理当前攻击SG退出。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-C01",
+            "AI2-C02",
+            "AI2-HBRAIN",
+            "AI2-HSGATTACK"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Leash",
+          "source_file": "scripts/behaviours/leash.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "按位置传inst,homelocation,max_dist,inner_return_dist,running。",
+            "homelocation为位置或fn(inst)返回位置/nil/false。max_dist与inner_return_dist为数值或fn(inst)返回数值。running为值或fn(inst)，nil/false初始化为false。距离计算为distsq。"
+          ],
+          "returns": "返回节点，结果写status。READY在max_dist内FAILED，出界转RUNNING；RUNNING进入return距离内或边界时SUCCESS。",
+          "preconditions": [
+            "inst具备locomotor和GetPosition，位置及半径getter在同次Visit的重复调用中提供一致、可计算的值。"
+          ],
+          "side_effects": [
+            "出界启动时Stop，后续超出return阈值时调用GoToPoint(home,nil,run)。GoToPoint写入移动目的地和移动意图。"
+          ],
+          "lifecycle": [
+            "相等max_dist也启动，相等inner_return_dist就成功。启动和移动位于不同Visit分支。",
+            "本类继承基础Reset/Stop，home缺失和完成分支的显式处理为写status。终点精确停止若属于产品要求，由当前运动/状态的所有者处理。"
+          ],
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-BASE",
+            "AI2-LOCOPOINT",
+            "AI2-HHOME",
+            "AI2-HBRAIN"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "HomeSeeker:SetHome",
+          "source_file": "scripts/components/homeseeker.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "home为目标家实体或nil，home可支持onremove事件。"
+          ],
+          "returns": "正常无显式返回。",
+          "preconditions": [
+            "homeseeker已安装，inst提供事件API，可选homeseeker_onsethome可调用。"
+          ],
+          "side_effects": [
+            "解除旧home移除监听，写新字段，调用hook，再登记新home移除监听。相同home也执行这些步骤。"
+          ],
+          "lifecycle": [
+            "home移除时默认清home并卸载组件，removecomponent字段可改变卸载分支。hook异常会打断后续监听登记。",
+            "Spawner:TakeOwnership通过本入口关联家，另行记录自己持有的child。收纳时Spawner会卸载child的homeseeker。"
+          ],
+          "evidence_refs": [
+            "AI2-HOME",
+            "AI2-SPAWNOWN",
+            "AI2-SPAWNHOME"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "HomeSeeker:GoHome",
+          "source_file": "scripts/components/homeseeker.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "shouldrun直接交locomotor:PushAction的奔跑参数，无locomotor时交inst:PushBufferedAction。"
+          ],
+          "returns": "无home早退，其他路径也无显式返回。受理与完成由动作、SG和目标组件后续控制流决定。",
+          "preconditions": [
+            "self.home存在，执行实体支持BufferedAction分发，目标收纳组件及实际SG handler已接线。"
+          ],
+          "side_effects": [
+            "每次调用新建BufferedAction(inst,home,ACTIONS.GOHOME)并提交，方法本身只检查home是否truthy。"
+          ],
+          "lifecycle": [
+            "原版RunAway的runhome分支会反复调用本入口，兔脑则由DoAction观察自己构造的动作。",
+            "目标具有spawner时该组件检查child所有权，home实体缺少三类收纳组件时GOHOME走Remove执行者分支。"
+          ],
+          "evidence_refs": [
+            "AI2-HOME",
+            "AI2-RUN",
+            "AI2-GOHOME",
+            "AI2-SPAWNHOME",
+            "AI2-RBRAIN",
+            "AI2-RSGACTION",
+            "AI2-RSGDO"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "根据需求选择坐标getter，或让原版Spawner取得child所有权并设置homeseeker。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-SPAWNOWN",
+            "AI2-HOME"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "坐标路径由Leash修改移动意图。入巢路径构造GOHOME并经兔SG的action入口执行。",
+          "evidence_refs": [
+            "AI2-LEASH",
+            "AI2-RBRAIN",
+            "AI2-RSGACTION",
+            "AI2-RSGDO"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "GOHOME委托家组件，Spawner按child身份收纳并移出场景，后继离巢由Spawner业务管理。",
+          "evidence_refs": [
+            "AI2-GOHOME",
+            "AI2-SPAWNOWN",
+            "AI2-SPAWNHOME"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AI2-BASE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C01",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-C02",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-GOHOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HBRAIN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HHOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HSGATTACK",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-LEASH",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-LOCOPOINT",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RBRAIN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RHOLE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RSET",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RSGACTION",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RSGDO",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RUN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-SPAWNHOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-SPAWNOWN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          }
+        ],
+        "unknowns": [
+          "Spawner的其他生成、放出、保存恢复合同保持其独立业务范围。此处只核收纳所需的所有权与入口。",
+          "原生地形寻路、动作到达时刻及收纳/出巢的实际可见效果未运行验证。"
+        ]
+      },
+      "unknowns": [
+        "Spawner的其他生成、放出、保存恢复合同保持其独立业务范围。此处只核收纳所需的所有权与入口。",
+        "原生地形寻路、动作到达时刻及收纳/出巢的实际可见效果未运行验证。"
+      ]
+    },
+    {
+      "id": "EXP-AI-010",
+      "title": "按威胁逃跑、冷却躲避与回巢模式的参数选择",
+      "aliases": [
+        "RunAway",
+        "hunterparams",
+        "safe_point_fn",
+        "runhome",
+        "冷却躲避",
+        "生物逃跑",
+        "持续威胁条件"
+      ],
+      "engineering_question": "如何复用RunAway完成可靠逃跑，处理威胁选择、持续条件和SG移动交接？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "current_archive_static_lua",
+        "side": "具名原版生物的 mastersim Brain、combat、locomotor 与 SG 链。",
+        "increment_over_existing": "新增RunAway完整构造参数、阶段性回调与兔/猪实际消费者，继承While基础语义沿用004。",
+        "bounds": [
+          "结论限定所列 Lua 成员和实际消费者。版本号用于定位证据，其他版本按改动复核。",
+          "通用 Brain 调度、树重建与 BufferedAction 分发使用既有 EXP-AI-001 至 007 的各自范围。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-AI-010-C01",
+          "kind": "NSF",
+          "statement": "RunAway在READY获取威胁。hunterparams为字符串时转必需标签并默认排除NOCLICK；为table时读取getfn/fn/tags/notags/oneoftags/seeequipped；其他类型作为FindEntity谓词。getfn(inst)路径只再检查返回者有效且在see_dist内，查找谓词不参与这一路径。",
+          "evidence_refs": [
+            "AI2-RUN"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C02",
+          "kind": "NSF",
+          "statement": "普通查找使用FindEntity(inst,see_dist,hunterfn,tags,notags,oneoftags)。seeequipped路径自行FindEntities，按结果顺序找非自身、谓词通过、可见或已装备者，并排除由自身领袖持有的候选。选出hunter后shouldrunfn(hunter,inst)只在READY作为入场条件调用。",
+          "evidence_refs": [
+            "AI2-RUN"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C03",
+          "kind": "NSF",
+          "statement": "RUNNING沿保留的hunter继续，失效则FAILED并Stop。常规逃跑求当前位置、hunter位置、可选safe_point_fn(inst)，GetRunAngle后WalkInDirection或RunInDirection；距离平方严格大于safe_dist平方才SUCCESS并Stop。运行中搜索/入场谓词没有在本类Visit重跑。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-LOCODIR"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C04",
+          "kind": "NSF",
+          "statement": "GetRunAngle以背离威胁方向或逃离向量与safe_point方向混合求角度，再根据locomotor是否aquatic选可游/可走偏移搜索。首次搜索失败后放宽墙阻挡，fix_overhang分支可尝试附近海/陆，最终仍找不到角度时返回最初角度。偏折角度缓存不足1秒时直接复用。",
+          "evidence_refs": [
+            "AI2-RUN"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C05",
+          "kind": "NSF",
+          "statement": "runhome为真且有homeseeker.home、home无燃烧及burnt标签时，RunAway调用homeseeker:GoHome(true)，该分支每次RUNNING Visit均可执行并Sleep(.25)。距离完成判断位于另一条方向逃跑分支。兔脑先放短距离方向逃跑，再放较远距离runhome逃跑。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-HOME",
+            "AI2-RBRAIN"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C06",
+          "kind": "NSF",
+          "statement": "猪脑的Dodge用外层While检查仍有combat目标且冷却中，内部RunAway以getfn返回当前combat.target。locomotor的方向移动会SetBufferedAction(nil)、清dest和路径，设置移动/奔跑意图并发locomote。兔SG按idle/moving门槛、WantsToMoveForward与WantsToRun选择idle/run/hop。",
+          "evidence_refs": [
+            "AI2-PIGGET",
+            "AI2-PIGDODGE",
+            "AI2-LOCODIR",
+            "AI2-LOCOPOINT",
+            "AI2-RSGMOVE"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C07",
+          "kind": "EI",
+          "statement": "safe_dist用于成功退出，see_dist用于READY获取，两个半径承担不同阶段。safe_point_fn提供角度偏向；实际终态仍取与hunter的距离。对运行中目标换人、变阵营或条件撤销的需求，需要持续守卫或专门行为。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-PIGGET",
+            "AI2-PIGDODGE"
+          ]
+        },
+        {
+          "id": "EXP-AI-010-C08",
+          "kind": "REC",
+          "statement": "只要现有威胁标签、半径和入场条件能表达需求，就局部替换RunAway参数或在正确优先级插入节点。需要持续条件时参照猪人把业务条件放在While外层，并按运动及SG所有者实现产品要求的即时停步。确定性目的地或多威胁路线规划宜使用自有行为。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-PIGDODGE",
+            "AI2-BASE",
+            "AI2-LOCODIR",
+            "AI2-RSGMOVE"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "RunAway",
+          "source_file": "scripts/behaviours/runaway.lua",
+          "visibility": "原版 Lua 构造器或组件方法。具名消费者在 mastersim 接线，本类本身的端别约束以所列定义为准。",
+          "parameters": [
+            "按位置传inst,hunterparams,see_dist,safe_dist,fn,runhome,fix_overhang,walk_instead,safe_point_fn。see_dist/safe_dist是数值。",
+            "hunterparams可以是标签字符串、hunterfn(hunter,inst)、或table{getfn,fn,tags,notags,oneoftags,seeequipped}。getfn(inst)直接返回威胁实体或nil，并优先于其他搜索路径。",
+            "第五参数fn为shouldrunfn(hunter,inst)，在选出威胁后做READY入场过滤。runhome/fix_overhang/walk_instead按truthy处理。safe_point_fn(inst)返回可选位置，影响逃离角度。"
+          ],
+          "returns": "返回行为节点，READY无威胁FAILED，有威胁RUNNING；RUNNING威胁失效FAILED，方向逃跑超safe_dist为SUCCESS。",
+          "preconditions": [
+            "inst具备locomotor、位置与地形接口，hunter具备实体与位置接口。getfn返回者必须有效且在see_dist内。",
+            "runhome使用的home须能提供对应实体接口与预期的GOHOME收纳合同。"
+          ],
+          "side_effects": [
+            "READY选择并保存hunter；RUNNING方向移动或重复提交GoHome，运行周期Sleep(.25)。",
+            "方向移动取消locomotor持有的动作、清目的地和路径，SG实际移动由locomote消费者执行。"
+          ],
+          "lifecycle": [
+            "shouldrunfn与获取谓词在READY调用，RUNNING继续观察保留hunter和逃离距离。",
+            "本类沿基础Reset/Stop，节点被改选时的即时运动/已交SG动作处理应由具体所有者定义。",
+            "runhome分支的持续运行交给home/SG/收纳生命周期，see/safe距离完成检查只在方向逃跑分支。safe_point和偏移搜索影响角度选择，最终搜索失败返回原始方向。"
+          ],
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-RBRAIN",
+            "AI2-PIGGET",
+            "AI2-PIGDODGE",
+            "AI2-LOCODIR",
+            "AI2-LOCOPOINT",
+            "AI2-RSGMOVE",
+            "AI2-HOME",
+            "AI2-GOHOME",
+            "AI2-BASE"
+          ],
+          "unknowns": [
+            "自定义回调、其他 Mod 覆盖及原生寻路/物理时序需要在目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "按getfn或查询参数获取威胁，再运行入场过滤。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-PIGGET",
+            "AI2-RBRAIN"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "方向逃跑更新locomotor意图并由locomote事件交给SG移动状态，或提交回巢动作。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-LOCODIR",
+            "AI2-RSGMOVE",
+            "AI2-HOME"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "越过safe_dist、威胁失效或外部持续条件改变时，分别沿当前节点和父分支退出。",
+          "evidence_refs": [
+            "AI2-RUN",
+            "AI2-PIGDODGE",
+            "AI2-BASE"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "AI2-BASE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-GOHOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-HOME",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-LOCODIR",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-LOCOPOINT",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-PIGDODGE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-PIGGET",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RBRAIN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RSGMOVE",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          },
+          {
+            "ref": "AI2-RUN",
+            "role": "所列定义、直接依赖或具名实际消费者"
+          }
+        ],
+        "unknowns": [
+          "FindWalkableOffset/FindSwimmableOffset的原生可达性及拥堵、多威胁实际逃离效果待目标地图验证。",
+          "方向偏好与返回SUCCESS来自静态表达式，真实客户端动画/位移和墙边停步未运行验证。"
+        ]
+      },
+      "unknowns": [
+        "FindWalkableOffset/FindSwimmableOffset的原生可达性及拥堵、多威胁实际逃离效果待目标地图验证。",
+        "方向偏好与返回SUCCESS来自静态表达式，真实客户端动画/位移和墙边停步未运行验证。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "AI2-CFIELD",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 4,
+      "line_end": 18,
+      "range_sha256": "ae277ac6a8523a0d07026c9d27158e261eeab0290a38446b0f1555d22c347ea7",
+      "symbols": [
+        "ontarget"
+      ]
+    },
+    {
+      "id": "AI2-C01",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 230,
+      "line_end": 309,
+      "range_sha256": "6e58c764bcf0ee65fa06ada1e25c4403a548232e8540b42f6dc492c1522820be",
+      "symbols": [
+        "Combat:SuggestTarget",
+        "Combat:SetKeepTargetFunction",
+        "Combat:TryRetarget",
+        "Combat:SetRetargetFunction",
+        "Combat:OnEntitySleep",
+        "Combat:OnEntityWake"
+      ]
+    },
+    {
+      "id": "AI2-C02",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 311,
+      "line_end": 400,
+      "range_sha256": "54cb12edf305102deb2891a605af01b56df416ff96483677e1d52809c078977d",
+      "symbols": [
+        "Combat:OnUpdate",
+        "Combat:StartTrackingTarget",
+        "Combat:StopTrackingTarget",
+        "Combat:DropTarget",
+        "Combat:EngageTarget"
+      ]
+    },
+    {
+      "id": "AI2-C03",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 424,
+      "line_end": 496,
+      "range_sha256": "db3cde9aba59f459b46807f72542eb6d32e02ace2852cffbd71efa5b67c09795",
+      "symbols": [
+        "Combat:ShouldAggro",
+        "Combat:SetTarget",
+        "Combat:ValidateTarget"
+      ]
+    },
+    {
+      "id": "AI2-C04",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 517,
+      "line_end": 564,
+      "range_sha256": "148de9f868d0b9939f35c277487443dc2f01cb428f5f62051093f37b3784dec9",
+      "symbols": [
+        "Combat:GiveUp",
+        "Combat:BattleCry"
+      ]
+    },
+    {
+      "id": "AI2-C05",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 780,
+      "line_end": 843,
+      "range_sha256": "dc9b0a8b6122f7f82e06f081877acc1001ff0aa16c8fab5a353b5143fe3fefdc",
+      "symbols": [
+        "Combat:CanAttack",
+        "Combat:TryAttack"
+      ]
+    },
+    {
+      "id": "AI2-C06",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1359,
+      "line_end": 1372,
+      "range_sha256": "6291f871f986a6a16353a0aa44b9a688fde2f45e9a51b88fea59f9647b393861",
+      "symbols": [
+        "Combat:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "AI2-C07",
+      "source_file": "scripts/components/combat_replica.lua",
+      "file_sha256": "c73a867402892cf085e73e1b30534f5741e2992537fef7ea42f01f8086b63dc6",
+      "line_start": 292,
+      "line_end": 324,
+      "range_sha256": "2866fd215572ce05849beaab8a5bb76053d79a5338bb0316fff596cb26aa1438",
+      "symbols": [
+        "Combat:IsValidTarget",
+        "Combat:CanTarget"
+      ]
+    },
+    {
+      "id": "AI2-CHASE",
+      "source_file": "scripts/behaviours/chaseandattack.lua",
+      "file_sha256": "e897d2c821c639641028f64dac45a4800261dc7875aa0ee044e0143ae4420b50",
+      "line_start": 1,
+      "line_end": 120,
+      "range_sha256": "56430b5d38c1b6b3b2146806ca1bd949f53667cca134fd314c4a314622daeafc",
+      "symbols": [
+        "ChaseAndAttack",
+        "ChaseAndAttack:Visit",
+        "ChaseAndAttack:OnStop",
+        "ChaseAndAttack:OnAttackOther"
+      ]
+    },
+    {
+      "id": "AI2-HPRED",
+      "source_file": "scripts/prefabs/hound.lua",
+      "file_sha256": "dd5659092970361b9f09c8cdd72cce4e69aaa0239dd05cb550670f6f439d7c70",
+      "line_start": 174,
+      "line_end": 215,
+      "range_sha256": "f2c5b7d3f9bf6df7dc121b24d9a0ba05b360574a47cba41d17a4b93bc8ddd2ee",
+      "symbols": [
+        "retargetfn",
+        "KeepTarget"
+      ]
+    },
+    {
+      "id": "AI2-HSET",
+      "source_file": "scripts/prefabs/hound.lua",
+      "file_sha256": "dd5659092970361b9f09c8cdd72cce4e69aaa0239dd05cb550670f6f439d7c70",
+      "line_start": 512,
+      "line_end": 559,
+      "range_sha256": "f97075e9242ff726558057680e6ad5634d8a85c577f5ee8deac67b62d46ac3d6",
+      "symbols": [
+        "fncommon"
+      ]
+    },
+    {
+      "id": "AI2-HBRAIN",
+      "source_file": "scripts/brains/houndbrain.lua",
+      "file_sha256": "41ec8bc4dbd8cbe35fdf0250767dcb634ea49ed686c70bbd634483bb22deda44",
+      "line_start": 188,
+      "line_end": 242,
+      "range_sha256": "a4e6ebcf89ba46ad00d60249098450af07f1241e8996e8791956cb5a6da1c949",
+      "symbols": [
+        "HoundBrain:OnStart"
+      ]
+    },
+    {
+      "id": "AI2-HHOME",
+      "source_file": "scripts/brains/houndbrain.lua",
+      "file_sha256": "41ec8bc4dbd8cbe35fdf0250767dcb634ea49ed686c70bbd634483bb22deda44",
+      "line_start": 45,
+      "line_end": 56,
+      "range_sha256": "a70d6058c78f1c8476bac2a0f033be3e8a216d4b3c07fb3b01cd07a579e818da",
+      "symbols": [
+        "GetHome",
+        "GetHomePos",
+        "GetNoLeaderLeashPos"
+      ]
+    },
+    {
+      "id": "AI2-HSGEVENT",
+      "source_file": "scripts/stategraphs/SGhound.lua",
+      "file_sha256": "794d23c25687990b182f9dd6f9eb5ffb32f1267132e73b7419b0124dec76c083",
+      "line_start": 21,
+      "line_end": 47,
+      "range_sha256": "20e14b794b188c45c150aa4a6b7910802b25a704acdad29d12a32d7f785f6646",
+      "symbols": [
+        "events.doattack"
+      ]
+    },
+    {
+      "id": "AI2-HSGATTACK",
+      "source_file": "scripts/stategraphs/SGhound.lua",
+      "file_sha256": "794d23c25687990b182f9dd6f9eb5ffb32f1267132e73b7419b0124dec76c083",
+      "line_start": 221,
+      "line_end": 251,
+      "range_sha256": "d80004e3afe17e248cc361371695780572a970aa4ded938a0e1a20a1f6eb857f",
+      "symbols": [
+        "states.attack"
+      ]
+    },
+    {
+      "id": "AI2-BASE",
+      "source_file": "scripts/behaviourtree.lua",
+      "file_sha256": "897c12764d6ff976c27018b0ae5f1e6a28c7bea48fb4ed0f2740f3e04a332903",
+      "line_start": 171,
+      "line_end": 191,
+      "range_sha256": "26e14b7683431c540b93b58765f042a274c06ffc7c2792c2245dd00dffc59af6",
+      "symbols": [
+        "BehaviourNode:Reset",
+        "BehaviourNode:Stop"
+      ]
+    },
+    {
+      "id": "AI2-LEASH",
+      "source_file": "scripts/behaviours/leash.lua",
+      "file_sha256": "b3cb724835954e30ca8df4fca011bd267481a7bfaffe8afbd3ce1627848cc614",
+      "line_start": 1,
+      "line_end": 61,
+      "range_sha256": "f310e110f19ed75ffe78d797b094faaf81b0621ee2f3968345e5490053c1e946",
+      "symbols": [
+        "Leash",
+        "Leash:Visit",
+        "Leash:GetHomePos"
+      ]
+    },
+    {
+      "id": "AI2-HOME",
+      "source_file": "scripts/components/homeseeker.lua",
+      "file_sha256": "eb832c53c649fadc8d58a062a482516b5c61f3e3b328fc0534270c39f9c38397",
+      "line_start": 1,
+      "line_end": 55,
+      "range_sha256": "b493e7f14660dc83c80c3f2410943450d635721c6c7c248d41f5a0bb8e8ae37e",
+      "symbols": [
+        "HomeSeeker:SetHome",
+        "HomeSeeker:GoHome",
+        "HomeSeeker:GetHomePos"
+      ]
+    },
+    {
+      "id": "AI2-RBRAIN",
+      "source_file": "scripts/brains/rabbitbrain.lua",
+      "file_sha256": "279194ebca126064a59a14d15886f05a551c23692d82fcaa28d81090c2607546",
+      "line_start": 20,
+      "line_end": 68,
+      "range_sha256": "6351decc3beda8226b78407d393e5bf168a440c41c119b796f0e7eb94954160c",
+      "symbols": [
+        "GoHomeAction",
+        "RabbitBrain:OnStart",
+        "HunterParams"
+      ]
+    },
+    {
+      "id": "AI2-RSET",
+      "source_file": "scripts/prefabs/rabbit.lua",
+      "file_sha256": "49a236b875c3171c7020c19c5119aa7fe2553ab7c1b9b74441eab644aefc88db",
+      "line_start": 370,
+      "line_end": 381,
+      "range_sha256": "cd472656c78a2de92efd6670f08cb4a5de346f4ef7c5f3d04c20d7c9d45c4b4f",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "AI2-RSGACTION",
+      "source_file": "scripts/stategraphs/SGrabbit.lua",
+      "file_sha256": "6bcd266c33588ae0a4889082db451ce694ca2a010f0ce5c18c8541960ecee6e0",
+      "line_start": 3,
+      "line_end": 7,
+      "range_sha256": "040aa34fb83ff3d5c9bf84a8eaa1f02a65e2379d0672f2b20f2b5a32a1aab6cb",
+      "symbols": [
+        "actionhandlers.GOHOME"
+      ]
+    },
+    {
+      "id": "AI2-RSGDO",
+      "source_file": "scripts/stategraphs/SGrabbit.lua",
+      "file_sha256": "6bcd266c33588ae0a4889082db451ce694ca2a010f0ce5c18c8541960ecee6e0",
+      "line_start": 108,
+      "line_end": 120,
+      "range_sha256": "9996f6e45d690524eb7f7166e9f2ad62d1ed619411f7746763298fb79a1a174c",
+      "symbols": [
+        "states.action"
+      ]
+    },
+    {
+      "id": "AI2-RSGMOVE",
+      "source_file": "scripts/stategraphs/SGrabbit.lua",
+      "file_sha256": "6bcd266c33588ae0a4889082db451ce694ca2a010f0ce5c18c8541960ecee6e0",
+      "line_start": 24,
+      "line_end": 42,
+      "range_sha256": "90a57d61427afac6c614479e244961fa5c94a8928520f5dc4c6debbc012f3e5c",
+      "symbols": [
+        "events.locomote"
+      ]
+    },
+    {
+      "id": "AI2-GOHOME",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 2956,
+      "line_end": 2976,
+      "range_sha256": "059004d1653dd4ebe46bd4765566442838d6fe3ea67b8b148c0d1bd77051888a",
+      "symbols": [
+        "ACTIONS.GOHOME.fn"
+      ]
+    },
+    {
+      "id": "AI2-RHOLE",
+      "source_file": "scripts/prefabs/rabbithole.lua",
+      "file_sha256": "9e78f3cac3597b6d47d1631438b7a9a08ed654dbb82794fbdc213915c43c26c9",
+      "line_start": 251,
+      "line_end": 268,
+      "range_sha256": "fbfe1e323410df9a443d7bdc41cfd2acaac50f19b62c670b4f300c264971c770",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "AI2-SPAWNOWN",
+      "source_file": "scripts/components/spawner.lua",
+      "file_sha256": "3bd56cdc82534bcdd6e044a66fc32daddcb947fd96cd6a72c0f49e0274c60ad5",
+      "line_start": 186,
+      "line_end": 224,
+      "range_sha256": "7c1b0c0460d74e9165531f48349b5f93cf63a9116316cdbbf65a30f60431addf",
+      "symbols": [
+        "Spawner:TakeOwnership",
+        "Spawner:LoadPostPass",
+        "Spawner:IsOccupied"
+      ]
+    },
+    {
+      "id": "AI2-SPAWNHOME",
+      "source_file": "scripts/components/spawner.lua",
+      "file_sha256": "3bd56cdc82534bcdd6e044a66fc32daddcb947fd96cd6a72c0f49e0274c60ad5",
+      "line_start": 295,
+      "line_end": 322,
+      "range_sha256": "b455bbb579e98d75f1aeedc5395ab5261c389f00718dd738d6d0a0f4c5d88213",
+      "symbols": [
+        "Spawner:GoHome"
+      ]
+    },
+    {
+      "id": "AI2-RUN",
+      "source_file": "scripts/behaviours/runaway.lua",
+      "file_sha256": "15ab82fdcac164c56f6bddd9bf09def68c4759b05e4ad0f38828019be164f551",
+      "line_start": 1,
+      "line_end": 185,
+      "range_sha256": "295df133b7f282da98bc4c0cb6e4dc0d1780695efa75611010901ca90e77ec55",
+      "symbols": [
+        "RunAway",
+        "RunAway:GetRunAngle",
+        "RunAway:Visit",
+        "ShouldGoHome"
+      ]
+    },
+    {
+      "id": "AI2-PIGGET",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 267,
+      "line_end": 277,
+      "range_sha256": "97f48c2bf8a52fe3c7b63ea846ed0b7f9d125f726b554d594d57380303e01853",
+      "symbols": [
+        "GetRunAwayTarget",
+        "RUN_AWAY_FROM_PIG_PARAMS"
+      ]
+    },
+    {
+      "id": "AI2-PIGDODGE",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 395,
+      "line_end": 408,
+      "range_sha256": "cd5d903970cc79c63241e4c6f184d273e2986d1687a8a2a2f83c72da0cdef993",
+      "symbols": [
+        "PigBrain:OnStart"
+      ]
+    },
+    {
+      "id": "AI2-LOCOPOINT",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1040,
+      "line_end": 1114,
+      "range_sha256": "1fa57409b51bdf6db275c8ac7e953df8654f4a2462dff6bfe6a6de5b073396d5",
+      "symbols": [
+        "LocoMotor:GoToPoint",
+        "LocoMotor:SetBufferedAction",
+        "LocoMotor:Stop"
+      ]
+    },
+    {
+      "id": "AI2-LOCODIR",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1116,
+      "line_end": 1146,
+      "range_sha256": "8b61364effb428e37bfcc1ddd70746db31fc582300ec500c50475263e4d83b57",
+      "symbols": [
+        "LocoMotor:WalkInDirection",
+        "LocoMotor:RunInDirection"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "做一只可靠追击并受领地约束的生物",
+      "expected_entry_ids": [
+        "EXP-AI-008",
+        "EXP-AI-009"
+      ],
+      "purpose": "选择combat回调、追击节点及返航优先级"
+    },
+    {
+      "query": "生物回出生点和进入巢穴怎么选",
+      "expected_entry_ids": [
+        "EXP-AI-009"
+      ],
+      "purpose": "核对坐标回位与目标收纳生命周期"
+    },
+    {
+      "query": "生物逃跑条件变化和冷却躲避",
+      "expected_entry_ids": [
+        "EXP-AI-010"
+      ],
+      "purpose": "选择RunAway参数、持续守卫及移动SG"
+    }
+  ],
+  "limitations": [
+    "纯静态源码研究，runtime_verified=false，游戏和客户端验证均未运行。",
+    "NSF限定具名源码分支，EI为工程推断，REC为按具体需求选用的建议。",
+    "source_file原始字节计算file_sha256，范围按UTF-8 splitlines后LF连接且无尾换行计算range_sha256。",
+    "既有记录的Scope、证据身份和三轴状态各自保留。本候选的research/restricted/hold状态供独立复审。"
+  ]
+}

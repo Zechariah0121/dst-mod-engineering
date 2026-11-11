@@ -1,0 +1,1215 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "ocean_devices_and_boat_motion",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-OCEAN-001",
+      "title": "船上实体的平台归属、跟随与附属物接入",
+      "aliases": [
+        "EntityScript:GetCurrentPlatform",
+        "WalkablePlatform:SetEntitiesOnPlatform",
+        "Hull:AttachEntityToBoat",
+        "船上装置",
+        "platform follower"
+      ],
+      "engineering_question": "给船上装置取得真实船体、跟随船移动及管理船属装饰时，哪些入口已有消费者和退出路径？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "authorized_frozen_zip_static_lua",
+        "runtime_verified": false,
+        "environment": "原版boat、mast、anchor及具名服务器消费者；客端只核对本文明确列出的平台查询/本地表现分支。",
+        "focus": "新增boat平台成员刷新、平台查询与Hull附属物三种实际接线。修船、通用Entity Remove和旧GUID保存沿既有条目。",
+        "exclusions": [
+          "原生SetPlatform、碰撞与网络复制内部实现和运行结果",
+          "其他自定义船型、人物移动控制与跨分片协议"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-OCEAN-001-C01",
+          "kind": "NSF",
+          "statement": "木船common构造在客端返回前安装walkableplatform并设置半径，master后续安装hull、boatphysics等。平台manager的server PostUpdate先刷新所有有效平台注册实体，再检查玩家平台，最后提交各平台玩家集合；客端分支只检查本地玩家。",
+          "evidence_refs": [
+            "OC-S03",
+            "OC-S06",
+            "OC-S09",
+            "OC-S10",
+            "OC-S11"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-001-C02",
+          "kind": "NSF",
+          "statement": "SetEntitiesOnPlatform按平台圆域和排除标签查实体，只处理无原生父实体的对象。新增成员经AddPlatformFollower写Lua platform/集合并调用原生SetPlatform；离开集合的旧对象经RemovePlatformFollower清关系。无限质量障碍边缘相交还会触发平台halting，中心落在visual ground时可Kill船体Health。",
+          "evidence_refs": [
+            "OC-S01",
+            "OC-S05"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-001-C03",
+          "kind": "NSF",
+          "statement": "GetCurrentPlatform在master先递归Lua parent的当前平台，再读self.platform；客端先递归原生parent，再读原生GetPlatform。Oar:Row直接用doer当前平台取得boatphysics。玩家got_on_platform/got_off_platform事件位于非专服且本地ThePlayer的表现分支。",
+          "evidence_refs": [
+            "OC-S02",
+            "OC-S07",
+            "OC-S13"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-001-C04",
+          "kind": "NSF",
+          "statement": "Hull:AttachEntityToBoat登记船onremove时移除obj；parent_to_boat真则原生SetParent并写局部offset，假则零延时把obj定位到船当前位置加offset。该方法本身没有AddPlatformFollower；SetBoatLip另显式AddPlatformFollower，木船plank则以parent_to_boat=true调用。",
+          "evidence_refs": [
+            "OC-S12",
+            "OC-S10"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-001-C05",
+          "kind": "NSF",
+          "statement": "船的OnPhysicsSleep停止boatphysics更新并延后一秒停止平台成员刷新；OnPhysicsWake取消等待或重新登记平台，并启动boatphysics。WalkablePlatform:OnRemoveEntity从manager退出、移除玩家碰撞、派发onsink、处理圆域物品/结构、解除已缓存followers并注销已有UID。",
+          "evidence_refs": [
+            "OC-S08",
+            "OC-S03",
+            "OC-S04"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-001-C06",
+          "kind": "REC",
+          "statement": "普通可部署船上装置沿已有平台成员机制获得跟随，在服务器业务入口查询GetCurrentPlatform。只为船创建且随船销毁的附属物选择Hull接线。短促操作现场取船即可；持续工作装置在自己的已有更新中使用当前平台，减少额外扫描和位置同步状态。",
+          "evidence_refs": [
+            "OC-S02",
+            "OC-S05",
+            "OC-S06",
+            "OC-S12",
+            "OC-S13"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:GetCurrentPlatform",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [],
+          "returns": "返回沿所列parent/platform分支得到的平台EntityScript或nil。",
+          "preconditions": [
+            "TheWorld和实体关系载体已就绪；master的Lua parent/platform与客端的原生关系分别由所属机制维护。"
+          ],
+          "side_effects": [
+            "读取并可递归parent，不创建成员关系、改坐标或保证对象具备boatphysics。"
+          ],
+          "lifecycle": [
+            "Oar:Row在执行时查询并检查平台有效性及boatphysics。平台成员刷新由manager的后更新安排；新生成实体需沿实际关联完成时机调用。"
+          ],
+          "evidence_refs": [
+            "OC-S02",
+            "OC-S13",
+            "OC-S06"
+          ],
+          "unknowns": [
+            "原生GetParent/GetPlatform的复制时点及自定义关系覆盖保持未知。"
+          ]
+        },
+        {
+          "symbol": "Hull:AttachEntityToBoat",
+          "source_file": "scripts/components/hull.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "obj为船拥有的实体；offset_x/offset_z为数值；parent_to_boat为真时使用局部坐标，否则在零延时任务执行时读取船世界位置并加偏移。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "宿主船和obj支持事件与Transform；该所有权允许船移除时直接移除obj。"
+          ],
+          "side_effects": [
+            "由obj监听船的onremove，回调对仍有效obj调用Remove。",
+            "真分支调用原生SetParent/SetPosition；假分支由船持有零延时定位任务。"
+          ],
+          "lifecycle": [
+            "方法本身只安排上述关系和定位。SetBoatLip另调用AddPlatformFollower；master木船构造用真分支安装walkingplank。对象的独立保存路径仍沿其parent/persists与已有保存合同判断。"
+          ],
+          "evidence_refs": [
+            "OC-S12",
+            "OC-S10"
+          ],
+          "unknowns": [
+            "原生父子物理/复制语义及零延时执行前删除对象的结果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "木船分别建立可见平台和master船体功能。",
+          "evidence_refs": [
+            "OC-S09",
+            "OC-S10",
+            "OC-S11"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "manager刷新实体/玩家成员并委托原生平台跟随；业务消费者读取当前平台。",
+          "evidence_refs": [
+            "OC-S01",
+            "OC-S02",
+            "OC-S05",
+            "OC-S06",
+            "OC-S13"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "船属装饰选择Hull所有权；睡眠和移除沿船/平台生命周期退出。",
+          "evidence_refs": [
+            "OC-S12",
+            "OC-S08",
+            "OC-S03",
+            "OC-S04"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "OC-S01",
+            "role": "Lua follower/parent操作到原生SetPlatform/SetParent边界"
+          },
+          {
+            "ref": "OC-S02",
+            "role": "平台查询定义"
+          },
+          {
+            "ref": "OC-S03",
+            "role": "平台构造、manager登记及移除"
+          },
+          {
+            "ref": "OC-S04",
+            "role": "沉没消费及成员缓存"
+          },
+          {
+            "ref": "OC-S05",
+            "role": "成员刷新及几何状态消费"
+          },
+          {
+            "ref": "OC-S06",
+            "role": "实际后更新调用者"
+          },
+          {
+            "ref": "OC-S07",
+            "role": "服务器玩家集合和本地表现条件"
+          },
+          {
+            "ref": "OC-S08",
+            "role": "原版船睡眠/唤醒调用者"
+          },
+          {
+            "ref": "OC-S09",
+            "role": "平台common装配"
+          },
+          {
+            "ref": "OC-S10",
+            "role": "master组件及plank消费者"
+          },
+          {
+            "ref": "OC-S11",
+            "role": "木船端别入口"
+          },
+          {
+            "ref": "OC-S12",
+            "role": "附属物定义和boatlip消费者"
+          },
+          {
+            "ref": "OC-S13",
+            "role": "现场平台查询的实际业务消费者"
+          }
+        ],
+        "unknowns": [
+          "只枚举影响本条开发选择的Lua依赖。原生接口内部保持调用边界。"
+        ]
+      },
+      "unknowns": [
+        "静态Lua可确定登记和调用顺序；实际原生跟随、碰撞、船上物品复制与客户端表现待目标功能定向验证。"
+      ]
+    },
+    {
+      "id": "EXP-OCEAN-002",
+      "title": "船体推力入口、帆力配置与最终速度消费",
+      "aliases": [
+        "BoatPhysics:ApplyRowForce",
+        "Mast:SetSailForce",
+        "Mast:CalcSailForce",
+        "船用推进装置",
+        "修改帆速"
+      ],
+      "engineering_question": "实现短促推进、持续动力或修改已有帆力时，怎样接入boatphysics并保留船体的阻力和上限结算？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "authorized_frozen_zip_static_lua",
+        "runtime_verified": false,
+        "environment": "原版boat、mast、anchor及具名服务器消费者；客端只核对本文明确列出的平台查询/本地表现分支。",
+        "focus": "新增Oar到船速度累加、帆力/容量聚合和motor提交。人物locomotor速度表和SourceModifierList通用合同沿既有研究。",
+        "exclusions": [
+          "原生SetPlatform、碰撞与网络复制内部实现和运行结果",
+          "其他自定义船型、人物移动控制与跨分片协议"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-OCEAN-002-C01",
+          "kind": "NSF",
+          "statement": "Oar:Row先以doer:GetCurrentPlatform取得有效船及boatphysics，计算方向并读取expertsailor的力/速度修正，再调用ApplyRowForce，随后向doer发rowing、向船发rowed。它驱动船体速度字段。",
+          "evidence_refs": [
+            "OC-S13"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-002-C02",
+          "kind": "NSF",
+          "statement": "ApplyRowForce按当前速度与归一输入方向的点积分流。正向分量使用随当前速度/max_velocity变化的easing阻尼，侧向使用基础force dampening；非正向支路直接使用传入dir_x/z乘力。DoApplyForce累加velocity_x/z并裁到MAX_ALLOWED_VELOCITY。max_velocity参与正向阻尼计算。",
+          "evidence_refs": [
+            "OC-S14"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-002-C03",
+          "kind": "NSF",
+          "statement": "Mast:SetSailForce仅写sail_force。CalcSailForce按inverted、is_sail_raised和furlunits比例输出该值或0；CalcMaxVelocity独立按相同帆状态比例读取max_velocity。mast构造零延时按当前平台SetBoat并登记到船masts；malbatross prefab的master设置自己的sail_force/max_velocity及反向部署模式。",
+          "evidence_refs": [
+            "OC-S18",
+            "OC-S20"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-002-C04",
+          "kind": "NSF",
+          "statement": "BoatPhysics逐帧汇总各mast的CalcSailForce并乘阻力源的sailforcemodifier。GetMaxVelocity把非零mast容量升序排序后以1、0.7逐项折减，磁吸容量另组同类聚合；再乘船max_velocity和各boatdrag.max_velocity_mod，最后裁全局允许上限。OnUpdate安排磁吸、帆力与阻力，按船旋转转向量后调用Physics:SetMotorVel。",
+          "evidence_refs": [
+            "OC-S15",
+            "OC-S16"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-002-C05",
+          "kind": "NSF",
+          "statement": "boatphysics的实体睡眠入口CloseAllSails逐个调用mast:CloseSail；船PhysicsSleep停止其更新、Wake重新启动。原版mast烧毁回调先从船RemoveMast并移除rudder，再RemoveComponent(mast)。BoatPhysics保存的是目标方向、旋转偏移与速度分量。",
+          "evidence_refs": [
+            "OC-S17",
+            "OC-S08",
+            "OC-S19",
+            "OC-S21"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-002-C06",
+          "kind": "REC",
+          "statement": "动作式推进可在权威动作中向当前boatphysics提交一次ApplyRowForce；方向由调用者归一并提供正的max_velocity。持续推进在装置自己的工作更新中按dt换算每次输入，停工时结束这份更新。修改现成帆优先调整mast帆力和独立容量配置，沿已有帆状态与船体结算消费。",
+          "evidence_refs": [
+            "OC-S13",
+            "OC-S14",
+            "OC-S18",
+            "OC-S20",
+            "OC-S16"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "BoatPhysics:ApplyRowForce",
+          "source_file": "scripts/components/boatphysics.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "dir_x/dir_z为方向分量；force为本次速度增量输入；max_velocity传给前向easing计算。",
+            "函数没有输入数值校验；所列Oar消费者提供归一方向和配置速度，调用者需给有限方向/力及正max_velocity。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master船体已有boatphysics/Physics；boatdraginstances中各项满足其组件字段合同。"
+          ],
+          "side_effects": [
+            "读当前速度及阻力贡献，分前向/侧向或非前向两路调用DoApplyForce。",
+            "修改velocity_x/z，受DoApplyForce的MAX_ALLOWED_VELOCITY裁剪；不在该入口直接写人物坐标。"
+          ],
+          "lifecycle": [
+            "Oar:Row按一次划桨调用；该函数没有dt参数，连续设备自行按已有工作更新选择每次输入。",
+            "后继boatphysics OnUpdate还施加阻力、帆/磁吸并提交原生motor；max_velocity的这一入参属于前向阻尼尺度。"
+          ],
+          "evidence_refs": [
+            "OC-S13",
+            "OC-S14",
+            "OC-S16"
+          ],
+          "unknowns": [
+            "真实碰撞、速度离散误差及复制效果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Mast:SetSailForce",
+          "source_file": "scripts/components/mast.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "set原样写为sail_force，所列消费者按数值参与计算。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master mast组件存在；后续CalcSailForce需要可参与数值乘法的配置。"
+          ],
+          "side_effects": [
+            "只写self.sail_force，不切换帆状态、部署模式、max_velocity或船体motor。"
+          ],
+          "lifecycle": [
+            "CalcSailForce在对应帆状态下按furlunits比例消费；BoatPhysics OnUpdate汇总。",
+            "max_velocity由CalcMaxVelocity单独读，malbatross master构造为两者分别赋值。该setter无保存字段实现，持久配置在自己的重建入口应用。"
+          ],
+          "evidence_refs": [
+            "OC-S18",
+            "OC-S20",
+            "OC-S15",
+            "OC-S16"
+          ],
+          "unknowns": [
+            "动态多Mod同时修改同一mast字段的数值合并政策由目标项目确定。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "服务器划桨消费者取当前船，按人物修正提交一次船体推力。",
+          "evidence_refs": [
+            "OC-S13",
+            "OC-S14"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "现成帆组件保留自己的帆状态，并向船体提供力和容量。",
+          "evidence_refs": [
+            "OC-S18",
+            "OC-S20",
+            "OC-S15"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "船体统一施加阻力和其他动力，最后委托motor；睡眠/烧毁停止各自贡献。",
+          "evidence_refs": [
+            "OC-S16",
+            "OC-S17",
+            "OC-S08",
+            "OC-S19"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "OC-S13",
+            "role": "ApplyRowForce实际调用者和平台/方向前提"
+          },
+          {
+            "ref": "OC-S14",
+            "role": "推力定义和最终速度裁剪callee"
+          },
+          {
+            "ref": "OC-S15",
+            "role": "容量与阻力源聚合"
+          },
+          {
+            "ref": "OC-S16",
+            "role": "实际每帧消费与原生motor边界"
+          },
+          {
+            "ref": "OC-S17",
+            "role": "更新登记及睡眠关闭帆"
+          },
+          {
+            "ref": "OC-S18",
+            "role": "mast力/容量定义和船体登记"
+          },
+          {
+            "ref": "OC-S19",
+            "role": "原版烧毁移除贡献"
+          },
+          {
+            "ref": "OC-S20",
+            "role": "master装配及具名变体配置"
+          },
+          {
+            "ref": "OC-S08",
+            "role": "Physics唤醒/睡眠实际更新入口"
+          },
+          {
+            "ref": "OC-S21",
+            "role": "boatphysics构造和保存字段"
+          }
+        ],
+        "unknowns": [
+          "只枚举影响本条开发选择的Lua依赖。原生接口内部保持调用边界。"
+        ]
+      },
+      "unknowns": [
+        "连续自定义动力的目标速率、消耗和组合政策由项目需求确定。这里只提供真实消费入口。",
+        "原生SetMotorVel和碰撞细节、实际航速与客户端同步未运行验证。"
+      ]
+    },
+    {
+      "id": "EXP-OCEAN-003",
+      "title": "船上装置的阻力贡献、急停来源与恢复接线",
+      "aliases": [
+        "BoatPhysics:AddBoatDrag",
+        "BoatPhysics:RemoveBoatDrag",
+        "BoatPhysics:AddEmergencyBrakeSource",
+        "BoatPhysics:RemoveEmergencyBrakeSource",
+        "Anchor:SetIsAnchorLowered",
+        "停车装置"
+      ],
+      "engineering_question": "做拖曳/制动装置或暂时锁船时，怎样通过自己的来源加入与退出，而保留锚、帆和其他装置的结算？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "authorized_frozen_zip_static_lua",
+        "runtime_verified": false,
+        "environment": "原版boat、mast、anchor及具名服务器消费者；客端只核对本文明确列出的平台查询/本地表现分支。",
+        "focus": "新增船体boatdrag四通道与硬制动来源的具体消费者、生命周期和恢复。SourceModifierList通用身份/折叠沿EXP-MOVE-001。",
+        "exclusions": [
+          "原生SetPlatform、碰撞与网络复制内部实现和运行结果",
+          "其他自定义船型、人物移动控制与跨分片协议"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-OCEAN-003-C01",
+          "kind": "NSF",
+          "statement": "BoatDrag默认drag=0、max_velocity_mod=1、forcedampening=0、sailforcemodifier=1。船体把drag相加、max_velocity_mod相乘、从1减各forcedampening后钳至少0、sailforcemodifier相乘；相应值分别进入阻力、容量、外部推力和帆力路径。",
+          "evidence_refs": [
+            "OC-S22",
+            "OC-S14",
+            "OC-S15",
+            "OC-S16"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-003-C02",
+          "kind": "NSF",
+          "statement": "AddBoatDrag以装置实体为键存其boatdrag组件，并监听该实体onremove/death/onburnt；RemoveBoatDrag删该键并按同一函数/源解除三种监听。两者在船有physicsmodifiedexternally时重算外部速度，该callee还按总anchor drag调节外部向量。事件回调接收事件源实体，查询它届时的GetCurrentPlatform；取得带boatphysics的平台时才请求RemoveBoatDrag。",
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S30",
+            "OC-S31"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-003-C03",
+          "kind": "NSF",
+          "statement": "原版anchor prefab的master安装anchor和boatdrag并配置drag、容量倍率、帆力倍率。SGanchor进入lowered调用SetIsAnchorLowered(true)，进入raised/raising路径调用false；组件只在lowered布尔变化时对其已绑boat AddBoatDrag或RemoveBoatDrag。",
+          "evidence_refs": [
+            "OC-S23",
+            "OC-S24",
+            "OC-S25"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-003-C04",
+          "kind": "NSF",
+          "statement": "AddEmergencyBrakeSource把source以固定stoprightthere键写入布尔SourceModifierList，随后设halting=true并把船Physics质量置0。Remove以同一身份移除并按剩余列表重算halting，全部来源消失才把质量设回TUNING.BOAT.MASS。OnUpdate在halting时把本次提交motor的局部向量/局部速度清0，所存velocity_x/z仍按前面步骤计算。",
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S26",
+            "OC-S29",
+            "OC-S16"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-003-C05",
+          "kind": "NSF",
+          "statement": "crabking炮塔消费者用带tower.GUID的字符串加急停来源，在炮塔onremove时向捕获的原船调用Remove；其LoadPostPass按恢复炮塔的当前平台重新安装同类来源及移除监听。BoatPhysics:OnSave仅写方向/旋转/速度分量；SetHalting另保留给walkableplatform几何状态并会关闭所有帆。",
+          "evidence_refs": [
+            "OC-S27",
+            "OC-S28",
+            "OC-S21",
+            "OC-S26"
+          ]
+        },
+        {
+          "id": "EXP-OCEAN-003-C06",
+          "kind": "REC",
+          "statement": "需要渐进减速或降低推力的装置配置自己的boatdrag并成对注册；需要固定停船的功能持有自己的非nil来源身份并成对调用急停API。移船、停止、组件卸载或装置退出时，对最初登记的船释放贡献，再接新船。玩法要求跨读档保留时，再保存所需业务开关，并在平台关联完成后重新登记；原船引用和来源注册作为运行期状态，按当前实例重建。",
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S23",
+            "OC-S26",
+            "OC-S27",
+            "OC-S28"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "BoatPhysics:AddBoatDrag",
+          "source_file": "scripts/components/boatphysics.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "boatdraginst为带boatdrag组件的装置实体。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master船体和装置已构造；组件具有drag/max_velocity_mod/forcedampening/sailforcemodifier数值。"
+          ],
+          "side_effects": [
+            "保存装置→组件引用；可触发外部速度重算；登记三种退出事件。"
+          ],
+          "lifecycle": [
+            "Anchor:SetIsAnchorLowered(true)为实际消费者。登记回调依事件源届时的平台作条件性移除；业务停止/换船保存原登记接收者并主动移除。",
+            "相同实体键再次赋值只覆盖集合槽，ListenForEvent仍按本方法执行。组件本身单独卸载的退出由使用者安排；普通实体Remove在onremove前已经释放其platform关系。"
+          ],
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S22",
+            "OC-S23",
+            "OC-S30",
+            "OC-S31",
+            "OC-S32"
+          ],
+          "unknowns": [
+            "物理外部速度与boatphysics motor的原生组合和实际制动曲线未运行验证。"
+          ]
+        },
+        {
+          "symbol": "BoatPhysics:RemoveBoatDrag",
+          "source_file": "scripts/components/boatphysics.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "boatdraginst为原登记的同一装置实体。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "接收船仍有boatphysics；传入源支持事件索引。"
+          ],
+          "side_effects": [
+            "删除该源槽、按需重算外部速度、解除该函数在该源上的onremove/death/onburnt监听。"
+          ],
+          "lifecycle": [
+            "原版anchor在lowered状态变为false时调用。方法处理这艘接收船的集合，不搜索其他船，也不删除源装置。"
+          ],
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S23",
+            "OC-S30"
+          ],
+          "unknowns": [
+            "原生位移/碰撞结果待目标场景验证。"
+          ]
+        },
+        {
+          "symbol": "BoatPhysics:AddEmergencyBrakeSource",
+          "source_file": "scripts/components/boatphysics.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "source为来源身份。具名消费者使用稳定字符串；底层列表也识别EntityScript来源。方法没有对nil单独早退。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master boatphysics、Physics和其布尔来源表已初始化。正常成对使用需持有非nil来源身份。"
+          ],
+          "side_effects": [
+            "向列表写true，随后无条件设置halting并SetMass(0)。"
+          ],
+          "lifecycle": [
+            "炮塔安装时加入来源，移除回调对捕获的原船用同一字符串释放。",
+            "按字段定义急停影响OnUpdate末端motor提交；方向/速度保存路径与来源重建由各所有者分别负责。"
+          ],
+          "evidence_refs": [
+            "OC-S26",
+            "OC-S21",
+            "OC-S29",
+            "OC-S27",
+            "OC-S16"
+          ],
+          "unknowns": [
+            "质量0及motor0与其他原生外力/碰撞的关系未运行验证。"
+          ]
+        },
+        {
+          "symbol": "BoatPhysics:RemoveEmergencyBrakeSource",
+          "source_file": "scripts/components/boatphysics.lua",
+          "visibility": "所列原版Lua实例方法。端别、接收者和条件限本条来源及实际消费者。",
+          "parameters": [
+            "source为对应的原来源身份。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "原接收船与boatphysics/Physics仍可用。"
+          ],
+          "side_effects": [
+            "移除固定键并从剩余列表重算halting；剩余列表假时SetMass(TUNING.BOAT.MASS)。"
+          ],
+          "lifecycle": [
+            "存在其他true来源时保留halting；最后来源释放后恢复该原版质量值。",
+            "底层来源表的自动onremove重算与此方法的halting/质量更新是不同入口，装置退出沿成对方法执行。"
+          ],
+          "evidence_refs": [
+            "OC-S26",
+            "OC-S29",
+            "OC-S27",
+            "OC-S28"
+          ],
+          "unknowns": [
+            "自定义船质量策略及其他Mod直接写mass/halting的冲突由目标项目处理。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "装置配置自己的boatdrag或建立自己的急停身份。",
+          "evidence_refs": [
+            "OC-S22",
+            "OC-S24",
+            "OC-S27"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "原版锚状态或炮塔安装调用船体入口，船体在统一更新中消费各通道。",
+          "evidence_refs": [
+            "OC-S23",
+            "OC-S25",
+            "OC-S21",
+            "OC-S15",
+            "OC-S16",
+            "OC-S26"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "停止/移除成对释放原接收船；保存恢复由具名业务重建来源。",
+          "evidence_refs": [
+            "OC-S21",
+            "OC-S27",
+            "OC-S28"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "OC-S21",
+            "role": "集合、退出监听、构造来源表及保存字段"
+          },
+          {
+            "ref": "OC-S22",
+            "role": "阻力源全部默认字段"
+          },
+          {
+            "ref": "OC-S14",
+            "role": "推力阻尼消费"
+          },
+          {
+            "ref": "OC-S15",
+            "role": "容量/阻力/帆倍率消费"
+          },
+          {
+            "ref": "OC-S16",
+            "role": "最终更新和halting motor分支"
+          },
+          {
+            "ref": "OC-S23",
+            "role": "锚lowered状态调用者"
+          },
+          {
+            "ref": "OC-S24",
+            "role": "原版锚boatdrag配置"
+          },
+          {
+            "ref": "OC-S25",
+            "role": "SG实际锚状态消费者"
+          },
+          {
+            "ref": "OC-S26",
+            "role": "来源化急停和几何halting区别"
+          },
+          {
+            "ref": "OC-S27",
+            "role": "炮塔加入及捕获原船的移除回调"
+          },
+          {
+            "ref": "OC-S28",
+            "role": "保存恢复后重新接线消费者"
+          },
+          {
+            "ref": "OC-S29",
+            "role": "列表布尔身份与成对移除callee"
+          },
+          {
+            "ref": "OC-S30",
+            "role": "可达外部物理重算callee"
+          },
+          {
+            "ref": "OC-S31",
+            "role": "退出回调实参来自事件源"
+          },
+          {
+            "ref": "OC-S32",
+            "role": "普通实体退出时platform关系释放的时点"
+          }
+        ],
+        "unknowns": [
+          "只枚举影响本条开发选择的Lua依赖。原生接口内部保持调用边界。"
+        ]
+      },
+      "unknowns": [
+        "船体物理native行为未运行。急停范围限所列Lua motor/质量设置。",
+        "该指南不选择目标功能的减速值、耗能、恢复速度或自定义船质量平衡。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "OC-S01",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 975,
+      "range_sha256": "d6bf047d9ca9827fcf35d5bd1719d492f8899893fcc08b5325b76f47c77ee20d",
+      "symbols": [
+        "EntityScript:AddChild",
+        "EntityScript:AddPlatformFollower",
+        "EntityScript:RemovePlatformFollower"
+      ]
+    },
+    {
+      "id": "OC-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1856,
+      "line_end": 1865,
+      "range_sha256": "c5cf736ec71452e23a4e15d5c218e9023903704a3c2d6cf25ea937e13d053346",
+      "symbols": [
+        "EntityScript:GetCurrentPlatform"
+      ]
+    },
+    {
+      "id": "OC-S03",
+      "source_file": "scripts/components/walkableplatform.lua",
+      "file_sha256": "d988195a4d9b8dc018b0a8ecdb84c1b6ccd42452624ebfd1ab4a4b1fbd32dce5",
+      "line_start": 1,
+      "line_end": 75,
+      "range_sha256": "093b40868814e374998b6b89a8820d3118cb6fa92b36f313fe0f2f1c6e88bd0a",
+      "symbols": [
+        "WalkablePlatform constructor",
+        "WalkablePlatform:OnRemoveEntity",
+        "WalkablePlatform:StartUpdating",
+        "WalkablePlatform:StopUpdating"
+      ]
+    },
+    {
+      "id": "OC-S04",
+      "source_file": "scripts/components/walkableplatform.lua",
+      "file_sha256": "d988195a4d9b8dc018b0a8ecdb84c1b6ccd42452624ebfd1ab4a4b1fbd32dce5",
+      "line_start": 77,
+      "line_end": 114,
+      "range_sha256": "516799a85dae3859cbf1a53688a35abc35d52f4fe3f899981e1098321080a92b",
+      "symbols": [
+        "WalkablePlatform:DestroyObjectsOnPlatform",
+        "WalkablePlatform:GetEntitiesOnPlatform",
+        "WalkablePlatform:GetPlayersOnPlatform"
+      ]
+    },
+    {
+      "id": "OC-S05",
+      "source_file": "scripts/components/walkableplatform.lua",
+      "file_sha256": "d988195a4d9b8dc018b0a8ecdb84c1b6ccd42452624ebfd1ab4a4b1fbd32dce5",
+      "line_start": 143,
+      "line_end": 206,
+      "range_sha256": "c2e6703bb6aaa274ed4880a347535a64b1b60ca8bdf9432d0242ffb81bb41e51",
+      "symbols": [
+        "WalkablePlatform:AddEntityToPlatform",
+        "WalkablePlatform:SetEntitiesOnPlatform",
+        "WalkablePlatform:RemoveObject"
+      ]
+    },
+    {
+      "id": "OC-S06",
+      "source_file": "scripts/components/walkableplatformmanager.lua",
+      "file_sha256": "24b17b6ad3a55b13faa7aff93e0e70071861ff94d92ad4cc8607835a48a36400",
+      "line_start": 48,
+      "line_end": 79,
+      "range_sha256": "d4b9c2a2517015c84d9dce9481c5cbd1260e40620c2f3c21ab2c59fae3bdcdab",
+      "symbols": [
+        "WalkablePlatformManager:PostUpdate"
+      ]
+    },
+    {
+      "id": "OC-S07",
+      "source_file": "scripts/components/walkableplatformplayer.lua",
+      "file_sha256": "897a763bdc0c37c7c39933d92c3bac86072a0ec175c344fce7824070a042dd93",
+      "line_start": 198,
+      "line_end": 284,
+      "range_sha256": "cfc0b9069ae4a5e1c7ba7062d51379683aa1e2ad51ebf70bdb0c9b683e2a1958",
+      "symbols": [
+        "WalkablePlatformPlayer:GetOnPlatform",
+        "WalkablePlatformPlayer:GetOffPlatform",
+        "WalkablePlatformPlayer:TestForPlatform"
+      ]
+    },
+    {
+      "id": "OC-S08",
+      "source_file": "scripts/prefabs/boat.lua",
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "line_start": 314,
+      "line_end": 343,
+      "range_sha256": "301b9390288e8b94aa02d98d8c47b912446cb033ef0421281f2cc9b6cfc6fc59",
+      "symbols": [
+        "OnPhysicsWake",
+        "OnPhysicsSleep"
+      ]
+    },
+    {
+      "id": "OC-S09",
+      "source_file": "scripts/prefabs/boat.lua",
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "line_start": 366,
+      "line_end": 421,
+      "range_sha256": "fc38a06d47442a2d3ac3a2bc9e982df4e8d50c85f73ff5b517781445818f8e5d",
+      "symbols": [
+        "create_common_pre"
+      ]
+    },
+    {
+      "id": "OC-S10",
+      "source_file": "scripts/prefabs/boat.lua",
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "line_start": 519,
+      "line_end": 601,
+      "range_sha256": "fe79512d11dc09505a3bdb34a338d489677dce31421dcdefdd4833d490514b67",
+      "symbols": [
+        "create_master_pst"
+      ]
+    },
+    {
+      "id": "OC-S11",
+      "source_file": "scripts/prefabs/boat.lua",
+      "file_sha256": "4019e03dd2576267ff887ab9469783bd7c6da9c8d00670ea5e8e9077e4e52ff1",
+      "line_start": 751,
+      "line_end": 777,
+      "range_sha256": "29f896144eae5794d4f6bd4a8ce56a7ea45d670dd408c17a2c85b9593c6ebdce",
+      "symbols": [
+        "wood_fn"
+      ]
+    },
+    {
+      "id": "OC-S12",
+      "source_file": "scripts/components/hull.lua",
+      "file_sha256": "60efbabca64250ec317a3277bbc7b10e88ef1cbe6ea54debce9034f345a2a6f1",
+      "line_start": 5,
+      "line_end": 41,
+      "range_sha256": "a7935cb1fa94232222d9bed641441b1076de85163c6d1bdae45514a01fbe4576",
+      "symbols": [
+        "Hull:AttachEntityToBoat",
+        "Hull:SetBoatLip",
+        "Hull:FinishRemovingEntity"
+      ]
+    },
+    {
+      "id": "OC-S13",
+      "source_file": "scripts/components/oar.lua",
+      "file_sha256": "5ed14794c4f70b432e0f53209f807e3828ed5f11aaa3f9caf8a002cbb38ebb41",
+      "line_start": 1,
+      "line_end": 33,
+      "range_sha256": "4f8adf2b348cad1de6379efd22768a3ac6ffc201f12203dafbab310c16c712c6",
+      "symbols": [
+        "Oar:Row"
+      ]
+    },
+    {
+      "id": "OC-S14",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 277,
+      "line_end": 342,
+      "range_sha256": "22bbf6c16691bb3bb19431b716bf46c78eec0253b74c251f395bbf5b057d3393",
+      "symbols": [
+        "BoatPhysics:GetForceDampening",
+        "BoatPhysics:DoApplyForce",
+        "BoatPhysics:ApplyRowForce",
+        "BoatPhysics:ApplyForce"
+      ]
+    },
+    {
+      "id": "OC-S15",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 344,
+      "line_end": 414,
+      "range_sha256": "7548f633edc85ee4093400542c93d9ad1dbfbd3c6981a74d5653d10c4fdf97de",
+      "symbols": [
+        "BoatPhysics:GetMaxVelocity",
+        "BoatPhysics:GetTotalAnchorDrag",
+        "BoatPhysics:GetBoatDrag",
+        "BoatPhysics:GetAnchorSailForceModifier"
+      ]
+    },
+    {
+      "id": "OC-S16",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 453,
+      "line_end": 638,
+      "range_sha256": "19e829ae6735b444c949dd19b06d2d885bf7daf0c9e21c4fbf0c6421648d77df",
+      "symbols": [
+        "BoatPhysics:ApplyDrag",
+        "BoatPhysics:ApplySailForce",
+        "BoatPhysics:ApplyMagnetForce",
+        "BoatPhysics:OnUpdate"
+      ]
+    },
+    {
+      "id": "OC-S17",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 670,
+      "line_end": 687,
+      "range_sha256": "7b798a3cfe613d1d5b7d66de9c10df7c545c460720dc1977601bab46f6f45d63",
+      "symbols": [
+        "BoatPhysics:StartUpdating",
+        "BoatPhysics:StopUpdating",
+        "BoatPhysics:CloseAllSails",
+        "BoatPhysics:OnEntitySleep"
+      ]
+    },
+    {
+      "id": "OC-S18",
+      "source_file": "scripts/components/mast.lua",
+      "file_sha256": "b79aa769a7baa42a94f7980e8a943b633161534718ad72e4849129c2ee8eab7d",
+      "line_start": 19,
+      "line_end": 128,
+      "range_sha256": "12c3c17e59b7e8056419ef84de900a50eae23904e338f08530ed57faa9f4ca68",
+      "symbols": [
+        "Mast constructor",
+        "Mast:SetSailForce",
+        "Mast:CalcSailForce",
+        "Mast:CalcMaxVelocity",
+        "Mast:SetBoat"
+      ]
+    },
+    {
+      "id": "OC-S19",
+      "source_file": "scripts/prefabs/mast.lua",
+      "file_sha256": "e15ed9ada0c55eeb443c000a809578b5d82dd1d037d3eb84582f7551a0141cff",
+      "line_start": 234,
+      "line_end": 245,
+      "range_sha256": "719531e6d7425117054e0e8c1dcd257fb76172b7cd49e1c7d1b7130e9de0c086",
+      "symbols": [
+        "onburnt"
+      ]
+    },
+    {
+      "id": "OC-S20",
+      "source_file": "scripts/prefabs/mast.lua",
+      "file_sha256": "e15ed9ada0c55eeb443c000a809578b5d82dd1d037d3eb84582f7551a0141cff",
+      "line_start": 371,
+      "line_end": 469,
+      "range_sha256": "039da18035bab840e7b80dbca5ea1a6e13a13b208ce2d9c0314a1650037acca0",
+      "symbols": [
+        "fn_pst",
+        "fn",
+        "malbatrossfn"
+      ]
+    },
+    {
+      "id": "OC-S21",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 137,
+      "line_end": 242,
+      "range_sha256": "449e029272f65bc1d32669b45b42122eee56c9161438bdb1d098f943717ff60d",
+      "symbols": [
+        "on_boatdrag_removed",
+        "BoatPhysics constructor",
+        "BoatPhysics:OnSave",
+        "BoatPhysics:OnLoad",
+        "BoatPhysics:AddBoatDrag",
+        "BoatPhysics:RemoveBoatDrag"
+      ]
+    },
+    {
+      "id": "OC-S22",
+      "source_file": "scripts/components/boatdrag.lua",
+      "file_sha256": "38ab0b1e9035030b40d76df63447b321e9830b2ea514e41fe5b1c2bcc50e2b4e",
+      "line_start": 1,
+      "line_end": 18,
+      "range_sha256": "fde631093e8271b262511a78808f2ba3d9ea331acf5f65690aa3bfe34a087227",
+      "symbols": [
+        "BoatDrag constructor"
+      ]
+    },
+    {
+      "id": "OC-S23",
+      "source_file": "scripts/components/anchor.lua",
+      "file_sha256": "db9e3d3178bbf9a83182b4242b1773d83b2c0dbacacfd0eb980e3b7583cf72cb",
+      "line_start": 145,
+      "line_end": 157,
+      "range_sha256": "ebe447ebb22ad3f9d4cfcfe24cb5d38fb2425bdf994aecc0513dee104226f61e",
+      "symbols": [
+        "Anchor:SetIsAnchorLowered"
+      ]
+    },
+    {
+      "id": "OC-S24",
+      "source_file": "scripts/prefabs/anchor.lua",
+      "file_sha256": "7e66e068c23e68f388fd6970643c75a6e29c9775ca1964da9f6f60f345d1d6b8",
+      "line_start": 95,
+      "line_end": 139,
+      "range_sha256": "e21f66d37dd9c83dcf52731fc2e3bcef3c5a27bffaff7d00ce22760091e23625",
+      "symbols": [
+        "common_fn master branch"
+      ]
+    },
+    {
+      "id": "OC-S25",
+      "source_file": "scripts/stategraphs/SGanchor.lua",
+      "file_sha256": "6d406336841dcd443def5c59699a8ce3c13d997f07b220ada6d712c21d50cc3b",
+      "line_start": 1,
+      "line_end": 115,
+      "range_sha256": "5212d996b97882770f6a7379e962c9bbec414222dbda24d5d067252749098c02",
+      "symbols": [
+        "anchor_lowered",
+        "anchor_raised",
+        "raised",
+        "lowered"
+      ]
+    },
+    {
+      "id": "OC-S26",
+      "source_file": "scripts/components/boatphysics.lua",
+      "file_sha256": "6d4434ebf21b533bed3b526ddcd75f15a3e170a3199e262369d87b8f98e277c4",
+      "line_start": 640,
+      "line_end": 664,
+      "range_sha256": "9af642e2017c828a75ae367630bd7f1d445f5595085bb7335d966fe9bf4a435e",
+      "symbols": [
+        "BoatPhysics:AddEmergencyBrakeSource",
+        "BoatPhysics:RemoveEmergencyBrakeSource",
+        "BoatPhysics:SetHalting"
+      ]
+    },
+    {
+      "id": "OC-S27",
+      "source_file": "scripts/prefabs/crabking.lua",
+      "file_sha256": "344e4e871ea7312b0be21984f5ccc19576fea52701a6d263b854dace550cee74",
+      "line_start": 1046,
+      "line_end": 1068,
+      "range_sha256": "88837d4f8c5f9e84898b34dab46f1bc68b27c3124af032f87d184cf482fb0e9f",
+      "symbols": [
+        "cannon tower boat brake installation and removal"
+      ]
+    },
+    {
+      "id": "OC-S28",
+      "source_file": "scripts/prefabs/crabking.lua",
+      "file_sha256": "344e4e871ea7312b0be21984f5ccc19576fea52701a6d263b854dace550cee74",
+      "line_start": 630,
+      "line_end": 655,
+      "range_sha256": "d932ff95cfa73ad5d03ba2f45f61356c6bc33e52fd8897a6fb14a4f9d511d49e",
+      "symbols": [
+        "OnLoadPostPass cannon tower brake reconstruction"
+      ]
+    },
+    {
+      "id": "OC-S29",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 8,
+      "line_end": 122,
+      "range_sha256": "51dedd7e3e7e5e42918af480f68b5e0e9d2538e8b1ab52b978301d6aaa577422",
+      "symbols": [
+        "SourceModifierList constructor",
+        "SourceModifierList.boolean",
+        "SourceModifierList:SetModifier",
+        "SourceModifierList:RemoveModifier"
+      ]
+    },
+    {
+      "id": "OC-S30",
+      "source_file": "scripts/components/physicsmodifiedexternally.lua",
+      "file_sha256": "d68cd96f1edf6ab92e146d163fe45540b129f71ebfb5e542c38d6d77d438315c",
+      "line_start": 38,
+      "line_end": 58,
+      "range_sha256": "9d0d5d048548e6c6ac9d9969c9c1559b61f09fe55087e89f0e8b546c9c7ac60e",
+      "symbols": [
+        "PhysicsModifiedExternally:RecalculateExternalVelocity"
+      ]
+    },
+    {
+      "id": "OC-S31",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1326,
+      "range_sha256": "57c2a8c2e2799190b6735a63766daf7d83cd68c2a04d32a644730a41557d9912",
+      "symbols": [
+        "EntityScript:PushEvent_Internal callback source argument"
+      ]
+    },
+    {
+      "id": "OC-S32",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1745,
+      "range_sha256": "a4d63832717f9382a923d1e3f618d32dadd06d9a6d85adf41e30c43a814bf848",
+      "symbols": [
+        "EntityScript:Remove platform release before onremove"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "船上装置 GetCurrentPlatform 跟船移动 Hull AttachEntityToBoat",
+      "expected_entry_ids": [
+        "EXP-OCEAN-001"
+      ],
+      "purpose": "选择平台归属和船属装饰入口"
+    },
+    {
+      "query": "船用推进 ApplyRowForce 修改帆力 sail_force max_velocity",
+      "expected_entry_ids": [
+        "EXP-OCEAN-002"
+      ],
+      "purpose": "选择动作推力或已有帆配置"
+    },
+    {
+      "query": "船上制动 Anchor AddBoatDrag 急停 AddEmergencyBrakeSource 移除恢复",
+      "expected_entry_ids": [
+        "EXP-OCEAN-003"
+      ],
+      "purpose": "选择阻力贡献或来源化急停并配对退出"
+    }
+  ],
+  "limitations": [
+    "来源为授权冻结ZIP的762172/build26474873静态Lua，当前归档/file/range SHA均重算；版本用于证据身份。",
+    "全部条目research/restricted/hold，runtime_verified=false；本轮未启动游戏。",
+    "file SHA绑定ZIP成员原字节；range SHA绑定UTF-8 splitlines后LF连接、无末尾换行。",
+    "只收与船上装置实现选择相关的定义、消费者及生命周期；原生接口内部保持边界。",
+    "新增入口建议按具体功能采用，用户配置的数值、玩法与多个Mod的平衡取舍另由目标项目决定。"
+  ]
+}

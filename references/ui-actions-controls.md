@@ -1,5 +1,7 @@
 # HUD、输入、动作与状态图
 
+自定义弹窗、按键消费和本地 HUD 挂载见[界面接入](ui-screen-input.md)。
+
 适用：徽章、面板、快捷键、拖拽、法术轮盘、角色动作和预测。专服无客户端 UI；组件的权威执行与客户端展示分别核验。保存/清理见 [lifecycle-save.md](lifecycle-save.md)，RPC 见 [networking-rpc.md](networking-rpc.md)。
 
 ## 复用 Widget 与 Screen

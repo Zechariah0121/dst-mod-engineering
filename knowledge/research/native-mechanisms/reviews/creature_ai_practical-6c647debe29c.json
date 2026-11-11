@@ -1,0 +1,48 @@
+{
+  "schema": "dst-independent-practical-static-review/1",
+  "date": "2026-11-12",
+  "candidate": "windows/B/candidate.json",
+  "candidate_sha256": "7dcbb84f4dfc657a218a97c643a766ae98cd92f92545a2a4fde451182e81a424",
+  "source_epoch": "762172",
+  "steam_buildid": "26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "runtime_verified": false,
+  "scope": "初审独立读取全部25条claim、8个API合同、机制步骤、32处引用及具名消费者。修订复核仅核定向语义、API/guide一致性与其余原子保持情况。",
+  "checks": {
+    "candidate_identity": "PASS",
+    "mechanism_contract_validate": "PASS",
+    "all_other_candidate_atoms_unchanged": "PASS",
+    "source_references_unchanged": "PASS",
+    "archive_and_32_file_range_hashes": "PASS_INITIAL_REVIEW_REUSED"
+  },
+  "blockers": [],
+  "resolved_findings": [
+    {
+      "id": "AI-REVIEW-01",
+      "location": "candidate.json /entries/1/claims/7 (EXP-AI-009-C08)；guide.md 领地条件说明",
+      "resolution": "已把combat回调限定为普通领地限制，明确保持检查约一秒节奏，以及猎犬已缓存目标的攻击SG可继续。严格或即时要求由主动接手返航运动与当前SG退出承担。新增AI2-HSGATTACK引用及依赖对应已有源码，具备支持。"
+    },
+    {
+      "id": "AI-REVIEW-02",
+      "location": "candidate.json /entries/0/claims/7 (EXP-AI-008-C08)、/entries/0/api_contracts/3/parameters/2；guide.md give_up_dist说明",
+      "resolution": "已明确配置非nil、原始距离超攻击范围且目标不在有效地面时偏移接近点并重算dsq。give_up_dist使用当前dsq，普通目标距离与偏移接近点距离的说明一致。"
+    }
+  ],
+  "semantic_basis": [
+    "combat获取、SetTarget验证与跟踪、保持回调登记、sleep/wake及卸载的主要合同与定义一致。SuggestTarget返回true与SetTarget最终受理结果的区别已经明确。",
+    "ChaseAndAttack的READY索敌、运行中读取共享目标、攻击/落空计数与计时、OnStop监听清理，以及TryAttack到猎犬SG时间线的链路成立。",
+    "Leash的外圈/内圈比较、分两次Visit启动移动、完成时仅改status的事实准确。HomeSeeker家引用与Spawner子实体所有权及GOHOME收纳分支的区分正确。",
+    "RunAway的getfn优先级、READY过滤与RUNNING保留hunter、runhome分支、方向移动对locomotor动作的影响，以及兔SG门槛均有直接源码支持。",
+    "通过CATALOG定向读取EXP-AI-001至004、006/007、EXP-REL-001及NC-N004-FINAL-03。新增配置参数、目标生命周期和物种消费者具有实际增量，既有调度/通用动作链范围可继续复用。",
+    "本次修订还将固定总交战时限优先表述为本功能截止时间加持续条件组合现有节点，并明确即时截断攻击需SG退出。该REC与已有While/Reset及SG所有权边界一致。",
+    "除三处statement、ChaseAndAttack一项参数说明，以及EXP-AI-009-C08增加的SG引用和对应依赖外，candidate其余原子完全一致。来源引用本体及全部8个API身份保持不变。",
+    "guide与候选中的距离、普通领地限制和严格退出说明一致。连接示意补出local inst，末段按实际改动选择验证范围，均延续既定接入方案。",
+    "NSF、EI与REC分开，具名官方消费者用于解释合同。指南根据实际需求选择combat回调、现有节点组合或自有行为。"
+  ],
+  "unverified_boundaries": [
+    "未运行游戏、专服或真实客户端。寻路、物理、网络可见效果和原生调度时机尚未验证。",
+    "未实测领地边界跨越与SG攻击时间线同帧的表现、节点改选后的实际停步、收纳与再次出巢。",
+    "Spawner其他生成、存档和恢复流程，以及其他Mod覆写保持其各自范围。"
+  ]
+}

@@ -284,6 +284,12 @@ def navigation_topics(text):
     vocabulary = {
         'scheduling': ('task', 'tasks', 'pendingtasks', 'scheduler', '调度', '任务'),
         'subscription': ('listener', 'listeners', 'listenforevent', 'removeeventcallback', '订阅', '监听', '解绑'),
+        'inventory': ('inventory', 'inventoryitem', '背包', '库存'),
+        'stack': ('stackable', 'stacksize', '堆叠', '拆堆'),
+        'follower': ('follower', '跟随者', '跟随关系', '随从', '忠诚'),
+        'rider': ('rider', 'rideable', '骑乘', '坐骑'),
+        'armor': ('armor', 'armour', '护甲', '防具'),
+        'health': ('health', '生命值', '血量'),
     }
     terms = tokens(text)
     return topics(text.lower()) | {name for name, variants in vocabulary.items()

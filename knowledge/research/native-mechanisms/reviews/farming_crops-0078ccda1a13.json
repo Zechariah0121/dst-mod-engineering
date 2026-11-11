@@ -1,0 +1,45 @@
+{
+  "schema": "dst-independent-practical-static-review/1",
+  "date": "2026-11-12",
+  "candidate": "windows/C/candidate.json",
+  "candidate_sha256": "f18058848c000c6474350d75d7470d6f4a9fad1cc89811ef5667d5fa873fa006",
+  "guide_sha256": "e39a2bc16ae26dafb5530505bea52576270047e4392bbd82ab39dfa705ce9094",
+  "source_epoch": "762172",
+  "steam_buildid": "26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "runtime_verified": false,
+  "scope": "在v1独立读取3条候选的18条claim、9个API合同、9个机制步骤及具名消费者基础上，定向复核v2事件载荷字段修正、两处新增精确引用和完整修订差异。v2共41处来源引用，其余事实与原审阅保持一致。",
+  "checks": {
+    "candidate_identity": "PASS",
+    "guide_identity": "PASS",
+    "archive_identity": "PASS",
+    "mechanism_contract_validate": "PASS",
+    "all_41_file_and_range_hashes": "PASS",
+    "candidate_semantic_review": "PASS",
+    "guide_event_payload_wording": "PASS",
+    "supplemental_query_consumer_reference": "PASS",
+    "supplemental_local_factory_declaration": "PASS",
+    "revision_diff_scope": "PASS"
+  },
+  "blockers": [],
+  "nonblocking_findings": [],
+  "semantic_basis": [
+    "world master在undertile、worldsettingstimer之后安装farming_manager。营养和水分grid由世界保存，overlay与drinker索引在初始化、地皮事件和实体登记路径建立。离开农田所查分支清水分及overlay，保留营养记录。",
+    "AddSoilMoistureAtPoint接世界坐标并只处理中心overlay格，AddTileNutrients接格坐标并钳制三类营养。WateryProtection的实体范围保护与中心格加水、标准肥料的世界点转格及OnApplied消费均与候选一致。",
+    "CycleNutrientsAtPoint的true表示无overlay或需求不足，实际执行仍扣可用部分并按实际消费总量恢复指定类型。测试通过不预留营养，test_only分支没有写格。",
+    "FarmSoilDrinker记录每株wet/dry经过时长，湿润状态通知把刚结束的时间计入旧状态，比例查询补计当前片段。原版GetDrinkRate和OnSoilMoistureStateChange在master侧实际绑定，阶段MakeStressCheckpoint评估比例后Reset。",
+    "普通sprout、small、med、full的pregrowfn先结算压力，full计算final并写is_oversized。TendTo成功清happiness且关闭本阶段资格，阶段fn重新设置资格。腐烂分支再次结算并Reset，巨型停止而普通作物设置no_oversized后回生。",
+    "SetupLoot在GenerateLoot阶段读取当前巨型、腐烂标签和最终压力。Pickable先生成产物再调用onpickedfn，之后按remove_when_picked移除。成熟后只补水肥或改当前happiness，不会沿普通阶段链重算前面累计压力及已作出的巨型判定。",
+    "PLANTSOIL以Inventory:RemoveItem默认单件分支准备种子对象，组件正常失败时返还该对象。FarmPlantable:Plant先移除soil目标，再生成定位并发on_planted，最后移除传入的整个种子实体。候选已正确说明直接调用者负责材料数量与不同失败策略。",
+    "MakePlant文件局部工厂按当时PLANT_DEFS构造非data_only prefab，实例plant_def直接引用定义。候选没有把增加定义表等同于完成全部prefab和资产接线。",
+    "REC/EI明确属于工程选择。普通Growable/Pickable的小型方案可满足固定成长与采摘，反复收获仍需在采后入口安排阶段和计时。完整农作组件集合用于实际需要的水肥、压力、巨型和研究功能，未被提升为所有植物的强制架构。",
+    "通过CATALOG逐项解析267条登记位置并定向检查命中正文。N006-READY-R06覆盖管理器归属，EXP-GROW-001/002覆盖通用阶段与暂停保存，EXP-ITEM-001覆盖库存交接。新候选增加农作坐标、营养周转、逐株用水历史、压力到产物时点和PLANTSOIL链路，具有独立实用增量，三个ID无冲突。",
+    "v2指南及EXP-FARM-003机制步骤明确on_planted载荷为doer=planter、seed=self.inst、in_soil=true，与FarmPlantable:Plant一致。新增FARM-S40直接覆盖GetStressDescription以apply=false调用测试函数，FARM-S41直接覆盖MakePlant的local声明，并已挂接相应claim/API/机制步骤及依赖元数据。"
+  ],
+  "unverified_boundaries": [
+    "未运行游戏、专服或真实客户端。灌溉与营养变化、阶段转换、巨型收获、腐烂循环和保存恢复的实际结果尚未验证。",
+    "客户端动作显示、放置预测、研究册呈现、资产和原生调度保持候选所述边界。",
+    "移动作物重索引、其他Mod覆写、全部随机种子和魔法催长路径未扩展成本轮合同。"
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "candidate_sha256": "57f6e507338a0a9e3fe8040dbb37534c2586435acddee5fe489fa581c535d98d",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "通过",
+  "runtime_verified": false,
+  "source_epoch": "DST scripts 762172 / Steam build 26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "只读源码语义审阅、既有内容定向去重及原创指南接线复核。",
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": "通过",
+    "frozen_candidate_identity": "匹配",
+    "archive_identity": "匹配",
+    "source_file_and_range_hashes": "全部匹配",
+    "governance": "各条保留 research / restricted / hold，运行验证保持 false。"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-UI-001",
+      "claim_ids": [
+        "EXP-UI-001-C01",
+        "EXP-UI-001-C02",
+        "EXP-UI-001-C03",
+        "EXP-UI-001-C04",
+        "EXP-UI-001-C05",
+        "EXP-UI-001-C06"
+      ],
+      "api_symbols": [
+        "FrontEnd:PushScreen",
+        "FrontEnd:PopScreen",
+        "Screen:OnBecomeActive"
+      ],
+      "mechanism_steps": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "result": "通过",
+      "semantic_basis": "Push/Pop 的文字输入与 FlushInput 副作用、按对象匹配、下层移除、销毁及栈顶变化后激活条件均与实现相符。Screen 保存焦点并按实体有效性恢复，default_focus 分支没有相同检查。Widget Kill 与 FrontEnd 栈登记是两个实际责任边界。",
+      "evidence_refs": [
+        "UI-S01",
+        "UI-S02",
+        "UI-S03",
+        "UI-S04",
+        "UI-S05",
+        "UI-S06",
+        "UI-S07",
+        "UI-S14",
+        "UI-S34"
+      ],
+      "fact_inference_recommendation": "来源实现标为 NSF。Controls 子树与独立 Screen 的所有权推断标为 EI，实例关闭及引用管理选择标为 REC，分类相符。"
+    },
+    {
+      "entry_id": "EXP-UI-002",
+      "claim_ids": [
+        "EXP-UI-002-C01",
+        "EXP-UI-002-C02",
+        "EXP-UI-002-C03",
+        "EXP-UI-002-C04",
+        "EXP-UI-002-C05",
+        "EXP-UI-002-C06",
+        "EXP-UI-002-C07"
+      ],
+      "api_symbols": [
+        "Widget:OnControl",
+        "Button:OnControl",
+        "TEMPLATES.ControllerFunctionsFromButtons"
+      ],
+      "mechanism_steps": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "result": "通过",
+      "semantic_basis": "Button 基类优先分发、enabled/focus/selected/mouseonly 门禁、首次 down 与已按下 up 的配对、失焦/禁用取消及匹配释放仍消费均准确。模板仅在全部未配置映射且多按钮时补末按钮 CANCEL，取消闭包在释放时执行。FrontEnd control 消费阻止后续 control 广播，raw-key 事件处理器忽略回调返回，二者区别明确。",
+      "evidence_refs": [
+        "UI-S08",
+        "UI-S09",
+        "UI-S10",
+        "UI-S11",
+        "UI-S12",
+        "UI-S13",
+        "UI-S14",
+        "UI-S15",
+        "UI-S16",
+        "UI-S17",
+        "UI-S32",
+        "UI-S33",
+        "UI-S35"
+      ],
+      "fact_inference_recommendation": "Hide、focus 与 enabled 的实现事实已分开，隐藏存活面板的焦点交接和自定义 control 接线保留为 REC。"
+    },
+    {
+      "entry_id": "EXP-UI-003",
+      "claim_ids": [
+        "EXP-UI-003-C01",
+        "EXP-UI-003-C02",
+        "EXP-UI-003-C03",
+        "EXP-UI-003-C04",
+        "EXP-UI-003-C05",
+        "EXP-UI-003-C06",
+        "EXP-UI-003-C07"
+      ],
+      "api_symbols": [
+        "PlayerHud:SetMainCharacter",
+        "Controls:MakeScalingNodes",
+        "Controls:SetHUDSize"
+      ],
+      "mechanism_steps": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "result": "通过",
+      "semantic_basis": "本地正常路径与 seamless swap 均创建新 HUD。SetMainCharacter 的新 Controls、匿名监听与 overflow Close/Open 副作用均有直接来源，CreateOverlays 的清理节点也未被扩大。postconstruct 在整个构造返回前运行，因此直接使用传入 controls 的时序推断成立。现成缩放根字段、SetHUDSize 分支与构造/屏幕尺寸变化消费者均匹配。",
+      "evidence_refs": [
+        "UI-S19",
+        "UI-S20",
+        "UI-S21",
+        "UI-S22",
+        "UI-S23",
+        "UI-S24",
+        "UI-S25",
+        "UI-S26",
+        "UI-S27",
+        "UI-S28",
+        "UI-S29",
+        "UI-S35",
+        "UI-S36"
+      ],
+      "fact_inference_recommendation": "构造内 owner.HUD.controls 尚未完成赋值标为 EI，逐实例挂接、刷新和自定义重绑定设计标为 REC。指南仅使用一个弹窗实例字段及局部关闭函数，复杂度与示例责任相称。"
+    }
+  ],
+  "guide_review": {
+    "result": "PASS_STATIC_WIRING",
+    "runtime_verified": false,
+    "semantic_basis": "非 dedicated 门禁、本地 owner 筛选、原构造后的 top_root 挂接、TextButton 的文字命中尺寸与 PRIMARY 映射、PopupDialog 单按钮显式 CANCEL、按实例 PopScreen、OnDestroy 清字段及 Controls Kill 保留旧链均能按已读来源接线。Controls 沿 Widget 继承 control 分发，PlayerHud 先分发基类，鼠标入口具备静态调用路径。",
+    "design_choices_disclosed": [
+      "示例采用鼠标文字入口。",
+      "入口坐标与内容为占位，手柄打开入口的导航由目标 HUD 另行接线。"
+    ],
+    "evidence_refs": [
+      "UI-S01",
+      "UI-S02",
+      "UI-S03",
+      "UI-S04",
+      "UI-S05",
+      "UI-S10",
+      "UI-S11",
+      "UI-S13",
+      "UI-S14",
+      "UI-S20",
+      "UI-S23",
+      "UI-S28",
+      "UI-S29",
+      "UI-S30",
+      "UI-S31"
+    ],
+    "remaining_validation": "目标 Mod 的实际布局、鼠标命中、控制器导航、反复开关、HUD 替换及第三方覆写仍按指南验收。"
+  },
+  "dedup_review": {
+    "method": "通过 knowledge/CATALOG.json 的 file/pointer 定向文件读取既有正文，并读取相关 UI 与输入重建参考专题。",
+    "checked_existing_entry_ids": [
+      "AI-N001-10",
+      "N005-UI-C02",
+      "N005-UI-C03",
+      "N005-UI-C04",
+      "N005-UI-C05",
+      "N005-UI-C06",
+      "EXP-LIFE-002",
+      "EXP-LIFE-008"
+    ],
+    "result": "通过",
+    "semantic_basis": "既有内容已覆盖 getter/订阅、Widget Kill、模式与 owner 替换、raw-key 广播及输入权限。当前三条新增的中心分别是精确栈操作与焦点恢复、完整 Button 配对及模板取消条件、Controls 构造时序与现成缩放消费者。重复事实作为接线依赖保留，未重新生成行重建案例或扩大旧运行证据。"
+  },
+  "unresolved_items": [],
+  "limitations": [
+    "本轮完成静态来源与接线审阅。游戏行为、原生输入刷新、真实鼠标命中及视觉布局尚无本轮运行验证。"
+  ]
+}

@@ -1,5 +1,7 @@
 # 角色、Brain 与 StateGraph
 
+生物索敌、追击、逃跑与入巢的实现选择见[生物 AI 开发](creature-ai-practical.md)。
+
 适用于角色创建、动物亲和、定制生物、形态变化与动作状态排错。以 2026-09-27 核验环境的原版脚本为基线，详见 [environment-tools.md](environment-tools.md)。美术、网络变量与客户端界面细节按技能入口中的对应专题展开。
 
 角色外观和选人资源接入见 [角色与装备美术](character-and-equipment-art.md)；魔力/能量条与恢复流程见 [法术与自定义数值](spells-and-custom-stats.md)。

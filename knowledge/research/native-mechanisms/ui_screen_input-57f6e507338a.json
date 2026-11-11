@@ -1,0 +1,1228 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "practical-ui-screen-control-hud",
+  "source_epoch": "DST scripts 762172 / Steam build 26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-UI-001",
+      "title": "可关闭弹窗的 Screen 栈、销毁与焦点恢复",
+      "aliases": [
+        "PushScreen",
+        "PopScreen",
+        "弹窗关闭",
+        "default_focus",
+        "last_focus"
+      ],
+      "engineering_question": "为本地 HUD 打开一个可关闭弹窗时，怎样归属窗口、恢复焦点并避免旧 Screen 留在栈里？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "DST scripts 762172 / Steam build 26474873",
+        "audience": "本地客户端 UI，包括有本地玩家 HUD 的主机",
+        "boundary": "具名 Lua 调用链的静态契约；实例上第三方覆写需重新核对",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-UI-001-C01",
+          "kind": "NSF",
+          "statement": "PushScreen 先清 focus_locked、停止强制文字输入并 FlushInput，再让原栈顶 OnBecomeInactive；把新 Screen 加到 screenroot 和 screenstack，处理覆盖层后按 tracking_mouse 决定是否 SetDefaultFocus，随后 OnBecomeActive 和 Update(0)。该方法没有重复实例检查，也没有显式返回值。",
+          "evidence_refs": [
+            "UI-S01",
+            "UI-S34"
+          ]
+        },
+        {
+          "id": "EXP-UI-001-C02",
+          "kind": "NSF",
+          "statement": "PopScreen(screen) 按对象身份查找并移除首个匹配项，只有移除旧栈顶时才先调用其 OnBecomeInactive；随后 OnDestroy 和 screenroot:RemoveChild。不传参数则移除当前栈顶。新栈顶相对 old_head 改变时才 SetFocus、OnBecomeActive、刷新鼠标命中并 Update(0)。传入未登记对象时不销毁它，但入口的文字输入停止与 FlushInput 仍执行。",
+          "evidence_refs": [
+            "UI-S02",
+            "UI-S34"
+          ]
+        },
+        {
+          "id": "EXP-UI-001-C03",
+          "kind": "NSF",
+          "statement": "Screen:OnDestroy 默认调用 Kill；OnBecomeInactive 保存 GetDeepestFocus。OnBecomeActive 设置 UI root，保存目标的实体仍有效就 SetFocus，否则清 last_focus 并尝试 default_focus。default_focus 分支没有同样的有效性检查。Widget:SetFocus 会按 focus_forward 转发或聚焦自己并清子焦点，子控件取得焦点会向父级传播并清兄弟焦点。",
+          "evidence_refs": [
+            "UI-S03",
+            "UI-S06"
+          ]
+        },
+        {
+          "id": "EXP-UI-001-C04",
+          "kind": "NSF",
+          "statement": "AddChild 改写 Widget 父子表和实体父级并返回 child；RemoveChild 只脱离这些父子关系。Widget:Kill 清更新、子树、父表、inst.widget、跟鼠标监听并 Remove 实体，这个方法本身没有移除 FrontEnd.screenstack 的操作。ClearScreens 逐个调用 OnDestroy 后移除栈项。",
+          "evidence_refs": [
+            "UI-S04",
+            "UI-S05",
+            "UI-S07"
+          ]
+        },
+        {
+          "id": "EXP-UI-001-C05",
+          "kind": "REC",
+          "statement": "普通临时弹窗可直接复用 PopupDialogScreen 与 PushScreen/PopScreen(instance)，把该 Screen 实例保存到当前功能所有者，OnDestroy 时清引用。关闭已入栈窗口交给 FrontEnd，默认焦点指向当前实例中的活控件。只有确实要保留状态的内嵌面板才另选 Show/Hide 生命周期。",
+          "evidence_refs": [
+            "UI-S01",
+            "UI-S02",
+            "UI-S03",
+            "UI-S14"
+          ]
+        },
+        {
+          "id": "EXP-UI-001-C06",
+          "kind": "EI",
+          "statement": "由 Controls 打开的独立 Screen 挂在 FrontEnd.screenroot，它的父级归属与 Controls 子控件树不同。因此 Controls 被 Kill 时，其普通子树清理不足以表达这个弹窗的关闭责任；功能自身可在 Controls 退出时按保存的实例 PopScreen。",
+          "evidence_refs": [
+            "UI-S01",
+            "UI-S04",
+            "UI-S05"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "FrontEnd:PushScreen",
+          "source_file": "scripts/frontend.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "screen，已构造且具备 Screen 生命周期方法的对象"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "FrontEnd 的 screenroot、覆盖层和输入服务已初始化。",
+            "调用方保证同一 Screen 实例仅登记一次。"
+          ],
+          "side_effects": [
+            "停用旧栈顶，挂接新 Screen，登记栈项。",
+            "停止强制文字输入并刷新输入，激活新 Screen 后 Update(0)。"
+          ],
+          "lifecycle": "成对关闭使用 PopScreen(screen)；Push 不负责调用方的字段引用清理。",
+          "evidence_refs": [
+            "UI-S01",
+            "UI-S03",
+            "UI-S04",
+            "UI-S34"
+          ],
+          "unknowns": [
+            "FlushInput 的原生时序及第三方 Screen 回调重入需要具体项目验证。"
+          ]
+        },
+        {
+          "symbol": "FrontEnd:PopScreen",
+          "source_file": "scripts/frontend.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "screen，可省略；提供时以对象身份匹配首个栈项"
+          ],
+          "returns": "无显式返回值，不能据此判断是否找到对象。",
+          "preconditions": [
+            "目标通过同一 FrontEnd 入栈。",
+            "OnDestroy 保留目标约定的销毁链。"
+          ],
+          "side_effects": [
+            "入口重置焦点锁、强制文字输入并刷新输入。",
+            "找到目标才移除、销毁、脱离父级；栈顶改变才激活新栈顶。"
+          ],
+          "lifecycle": "用于已入栈 Screen 的关闭；显式实例支持关闭处于下层的自有窗口。",
+          "evidence_refs": [
+            "UI-S02",
+            "UI-S03",
+            "UI-S04",
+            "UI-S34"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Screen:OnBecomeActive",
+          "source_file": "scripts/widgets/screen.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "Screen 自身实体有效。",
+            "自定义 default_focus 若存在，应指向当前可聚焦对象。"
+          ],
+          "side_effects": [
+            "写 LastUIRoot 并 SetUIRoot。",
+            "优先恢复仍有效的 last_focus，回退到 default_focus。"
+          ],
+          "lifecycle": "被 PushScreen 以及栈顶改变的 PopScreen 调用，与 OnBecomeInactive 保存焦点相配。",
+          "evidence_refs": [
+            "UI-S03",
+            "UI-S06",
+            "UI-S01",
+            "UI-S02"
+          ],
+          "unknowns": [
+            "实体有效性判断不能单独证明目标适合本次页面内容或导航。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "构造当前弹窗并设定其默认焦点，把实例引用存入本次 Controls/功能所有者。",
+          "evidence_refs": [
+            "UI-S14",
+            "UI-S03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "PushScreen 把它交给 FrontEnd 层级与栈，旧页面保存焦点。",
+          "evidence_refs": [
+            "UI-S01",
+            "UI-S03"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "关闭按钮或取消操作以实例 PopScreen，OnDestroy 清自有引用并保留基类销毁。",
+          "evidence_refs": [
+            "UI-S02",
+            "UI-S03",
+            "UI-S14"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "新栈顶激活时恢复保存焦点；功能所有者提前退出时同样关闭它拥有的独立 Screen。",
+          "evidence_refs": [
+            "UI-S02",
+            "UI-S03",
+            "UI-S05"
+          ]
+        }
+      ],
+      "unknowns": [
+        "尚未实测连续开关、文字编辑后关闭、控制器焦点回落及其他 Mod 覆写。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "UI-S04",
+            "role": "Widget 父子关系与脱离合同"
+          },
+          {
+            "ref": "UI-S05",
+            "role": "普通子树的最终销毁边界"
+          },
+          {
+            "ref": "UI-S06",
+            "role": "焦点保存、传播与转发"
+          },
+          {
+            "ref": "UI-S07",
+            "role": "批量退出销毁消费者"
+          },
+          {
+            "ref": "UI-S14",
+            "role": "原版弹窗的具体关闭消费者"
+          },
+          {
+            "ref": "UI-S34",
+            "role": "Push/Pop 入口停止文字处理的副作用"
+          }
+        ],
+        "unknowns": [
+          "换源后重查方法与依赖分支；来源身份用于证据追溯。",
+          "原生输入刷新、鼠标命中与图形行为尚无本轮游戏运行证据。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-UI-002",
+      "title": "控件 control 传播、Button 按放配对与取消键接入",
+      "aliases": [
+        "Button OnControl",
+        "控制消费",
+        "controller_control",
+        "鼠标点击",
+        "隐藏焦点"
+      ],
+      "engineering_question": "怎样让面板按钮与取消操作正确消费 control，同时保留子控件、文字输入和玩法输入各自的路径？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "DST scripts 762172 / Steam build 26474873",
+        "audience": "本地客户端 UI，包括有本地玩家 HUD 的主机",
+        "boundary": "具名 Lua 调用链的静态契约；实例上第三方覆写需重新核对",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-UI-002-C01",
+          "kind": "NSF",
+          "statement": "Input:OnControl 在鼠标条件允许且 FrontEnd 返回非真值时才分发特定 control 与 general oncontrol。FrontEnd 的普通栈路径先对 PRIMARY 映射 ACCEPT，并在特定文字处理条件之后调用栈顶 OnControl；栈顶消费时返回 true。PlayerController:Activate 为本地 ThePlayer 注册 general-control 消费者。",
+          "evidence_refs": [
+            "UI-S08",
+            "UI-S09",
+            "UI-S17"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C02",
+          "kind": "NSF",
+          "statement": "Widget:OnControl 要求自身 focus，仅遍历 focus 为真的子控件并在子控件返回真值时消费；未消费的滚轮 control 可转给 parent_scroll_list，最后返回 false。该方法本身没有 shown 或 enabled 门禁。",
+          "evidence_refs": [
+            "UI-S10"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C03",
+          "kind": "NSF",
+          "statement": "Button:OnControl 先执行基类分发，再要求 IsEnabled、focus 以及 selected 许可；匹配 control 和 mouseonly 条件后，首次 down 保存位置、置 down、触发 ondown，up 仅在先前 down 时复位并调用 onclick。匹配分支即使 up 没有对应 down 也返回 true。SetControl(PRIMARY) 存 ACCEPT 并设 mouseonly。",
+          "evidence_refs": [
+            "UI-S11",
+            "UI-S32"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C04",
+          "kind": "NSF",
+          "statement": "Button:OnLoseFocus 与 OnDisable 会撤销尚未释放的 down、还原点击位置并停止更新。Widget:Hide 仅改变显示状态并调用 OnHide；Widget:IsEnabled 只检查 enabled 及父链。故自定义隐藏路径需要结合自己的焦点和输入策略。",
+          "evidence_refs": [
+            "UI-S12",
+            "UI-S33",
+            "UI-S32"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C05",
+          "kind": "NSF",
+          "statement": "ControllerFunctionsFromButtons 返回 OnControl 和 GetHelpText 两个闭包。它会检查所有按钮是否已配置 controller_control，全部未配置且按钮多于一个时才把最后按钮设为 CANCEL；按下返回 false，释放匹配时执行 cb 并返回 true。MENU_START 仅允许在控制器已连接时走这条按钮匹配。PopupDialogScreen 先调用基类，再调用此闭包。",
+          "evidence_refs": [
+            "UI-S13",
+            "UI-S14"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C06",
+          "kind": "REC",
+          "statement": "简单 PopupDialogScreen 明确给关闭按钮设置 controller_control=CANCEL，尤其只有一个按钮时；扩展已有 OnControl 先保留旧返回，处理自有 control 后返回 true，其余保留原行为。需要按放交互时优先让 Button 处理配对，业务回调放 onclick。",
+          "evidence_refs": [
+            "UI-S11",
+            "UI-S12",
+            "UI-S13",
+            "UI-S14"
+          ]
+        },
+        {
+          "id": "EXP-UI-002-C07",
+          "kind": "REC",
+          "statement": "常驻内嵌面板被隐藏而仍存活时，关闭入口可显式 ClearFocus，并按功能把焦点交回当前入口控件；原版 Controls:OnUpdate 隐藏 mapcontrols 时也对其已有 focus 显式 ClearFocus。全局 raw-key 回调适合观察快捷键；如果功能需要上游消费，接入当前 Screen/control 路径，并遵守已有文字处理与焦点规则。",
+          "evidence_refs": [
+            "UI-S06",
+            "UI-S10",
+            "UI-S15",
+            "UI-S16",
+            "UI-S33",
+            "UI-S35"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Widget:OnControl",
+          "source_file": "scripts/widgets/widget.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "control，控制常量",
+            "down，按下/释放状态"
+          ],
+          "returns": "自身无焦点或最终未消费返回 false；子控件消费返回 true；滚轮转发沿用 parent_scroll_list 返回值。",
+          "preconditions": [
+            "焦点路径由当前 Screen/Widget 树建立。"
+          ],
+          "side_effects": [
+            "调用有焦点的子控件；滚轮可进一步转发给父滚动列表。"
+          ],
+          "lifecycle": "覆写时保留基类或已有实现的消费结果；调用顺序会影响后续按钮和玩法输入。",
+          "evidence_refs": [
+            "UI-S10",
+            "UI-S06"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Button:OnControl",
+          "source_file": "scripts/widgets/button.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "control，通常已由 FrontEnd 把 PRIMARY 映射到 ACCEPT",
+            "down，按放状态"
+          ],
+          "returns": "基类消费或匹配本按钮时返回 true；禁用/无焦点/不允许的 selected 返回 false；其余路径隐式 nil。",
+          "preconditions": [
+            "基础分发后需 IsEnabled 且 focus。",
+            "selected 与 mouseonly 条件允许当前 control。"
+          ],
+          "side_effects": [
+            "首次 down 设置点击状态、偏移，可登记更新并调用 ondown。",
+            "已 down 的 up 复位、调用 onclick 并停止更新。"
+          ],
+          "lifecycle": "失焦或禁用会取消未完成点击；需要成对按放才能从本按钮产生 onclick。",
+          "evidence_refs": [
+            "UI-S11",
+            "UI-S12",
+            "UI-S32",
+            "UI-S09"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "TEMPLATES.ControllerFunctionsFromButtons",
+          "source_file": "scripts/widgets/redux/templates.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "buttons，带 text、cb 及可选 controller_control 的按钮描述数组，允许 nil/空表"
+          ],
+          "returns": "两个函数，分别为 OnControl(control, down) 与 GetHelpText()。空按钮得到返回 false 与空字符串的闭包。",
+          "preconditions": [
+            "匹配的按钮 cb 可调用；帮助文字所需输入服务可用。"
+          ],
+          "side_effects": [
+            "全部未配置控制且按钮多于一个时，原地给末按钮写 CANCEL。",
+            "返回的控制闭包只在匹配释放时播放声音、调用 cb 并消费。"
+          ],
+          "lifecycle": "PopupDialogScreen 构造时创建并保存闭包；描述表中的控制映射由闭包读取。",
+          "evidence_refs": [
+            "UI-S13",
+            "UI-S14"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "输入先经过 FrontEnd 的文字/栈顶路径，普通 PRIMARY 在此映射为 ACCEPT。",
+          "evidence_refs": [
+            "UI-S08",
+            "UI-S09"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Widget 沿焦点子树分发，Button 管理 down/up 状态并报告消费。",
+          "evidence_refs": [
+            "UI-S10",
+            "UI-S11",
+            "UI-S12"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "弹窗的按钮控制闭包补充明确的取消释放行为；单按钮主动配置 CANCEL。",
+          "evidence_refs": [
+            "UI-S13",
+            "UI-S14"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "FrontEnd 未消费才进入 general-control 消费者；raw key 另走事件广播。",
+          "evidence_refs": [
+            "UI-S08",
+            "UI-S15",
+            "UI-S16",
+            "UI-S17"
+          ]
+        }
+      ],
+      "unknowns": [
+        "当前引擎的设备到 control 映射、视觉命中和多 Mod 共同覆写需目标环境验证。",
+        "FrontEnd 文本处理、调试键、淡入淡出分支各有条件；本条未将栈顶普通路径泛化为所有输入都被屏蔽。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "UI-S08",
+            "role": "已存在的输入总线分发边界，供新控件契约接线"
+          },
+          {
+            "ref": "UI-S09",
+            "role": "control 映射及文字输入前置条件"
+          },
+          {
+            "ref": "UI-S12",
+            "role": "按放被失焦/禁用中断的清理消费者"
+          },
+          {
+            "ref": "UI-S14",
+            "role": "两个模板闭包的实际保存及调用方"
+          },
+          {
+            "ref": "UI-S15",
+            "role": "raw-key 广播的返回值语义"
+          },
+          {
+            "ref": "UI-S16",
+            "role": "raw-key 广播入口"
+          },
+          {
+            "ref": "UI-S17",
+            "role": "玩法 general-control 的具名消费者"
+          },
+          {
+            "ref": "UI-S32",
+            "role": "enabled 父链门禁"
+          },
+          {
+            "ref": "UI-S33",
+            "role": "保持存活的隐藏动作"
+          },
+          {
+            "ref": "UI-S06",
+            "role": "自定义关闭入口使用的焦点清理"
+          },
+          {
+            "ref": "UI-S35",
+            "role": "原版隐藏后显式清焦点的具体消费者"
+          }
+        ],
+        "unknowns": [
+          "换源后重查方法与依赖分支；来源身份用于证据追溯。",
+          "原生输入刷新、鼠标命中与图形行为尚无本轮游戏运行证据。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-UI-003",
+      "title": "本地 HUD 重建时逐个 Controls 挂接与缩放节点复用",
+      "aliases": [
+        "SetMainCharacter",
+        "Controls postconstruct",
+        "HUD 重建",
+        "MakeScalingNodes",
+        "HUD scale"
+      ],
+      "engineering_question": "本地玩家 HUD 创建或替换后，怎样把小控件接到新实例并复用现成布局缩放，避免用完整 HUD 初始化充当刷新？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "DST scripts 762172 / Steam build 26474873",
+        "audience": "本地客户端 UI，包括有本地玩家 HUD 的主机",
+        "boundary": "具名 Lua 调用链的静态契约；实例上第三方覆写需重新核对",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-UI-003-C01",
+          "kind": "NSF",
+          "statement": "ActivateHUD 每次新建 PlayerHud，先 PushScreen，必要时聚焦，设置相机更新回调，再 SetMainCharacter(inst)。OnSetOwner 只在本地玩家且 HUD 为空时进入本地 HUD 安装分支，seamless-swap 目标延后到 ActivatePlayer 的交换分支创建新 HUD。DeactivateHUD PopScreen(inst.HUD) 后清玩家 HUD 字段。",
+          "evidence_refs": [
+            "UI-S19",
+            "UI-S25",
+            "UI-S26"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C02",
+          "kind": "NSF",
+          "statement": "SetMainCharacter(maincharacter) 仅在参数为真时执行，先写 maincharacter.HUD 和 self.owner，再 CreateOverlays，向 self.root AddChild 新的 Controls(owner)，然后为 owner 登记多个匿名监听、初始化 sanity 显示并对存在的 overflow Close/Open。该方法没有先 Kill 旧 controls 或解绑上一次 owner 的这些监听。",
+          "evidence_refs": [
+            "UI-S20"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C03",
+          "kind": "NSF",
+          "statement": "CreateOverlays 的入口只 KillAllChildren 于 overlayroot、under_root、over_root，SetMainCharacter 中的 Controls 挂在 root。Controls 构造保存传入 owner，构造过程中调用 MakeScalingNodes。AddClassPostConstruct 保存并先调用原构造，再把相同 self 和其余参数传给 postfn。",
+          "evidence_refs": [
+            "UI-S27",
+            "UI-S20",
+            "UI-S21",
+            "UI-S22",
+            "UI-S28"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C04",
+          "kind": "EI",
+          "statement": "SetMainCharacter 的 self.controls 赋值要在 Controls(self.owner) 求值完成后才执行，postconstruct 也发生在该构造调用返回之前。因此构造 hook 内应使用传入的 Controls 实例；此时 owner.HUD.controls 可能仍为空或仍指向旧对象。",
+          "evidence_refs": [
+            "UI-S20",
+            "UI-S28"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C05",
+          "kind": "NSF",
+          "statement": "MakeScalingNodes 建立带屏幕锚点、比例缩放和最大放大的节点，再建立用户 HUD 缩放子节点并改写 top_root 等字段。SetHUDSize 对这些具名节点应用 HUD scale，对左右节点依 Player1 分配 crafting scale，按平台/分屏条件调整 commandwheel，对存在的 desync 设缩放，最后向 owner.HUD.inst 发 refreshhudsize。Controls 构造会调用它，OnUpdate 在屏幕尺寸变化时再次调用。",
+          "evidence_refs": [
+            "UI-S23",
+            "UI-S24",
+            "UI-S35",
+            "UI-S36"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C06",
+          "kind": "REC",
+          "statement": "本地 HUD 小控件优先在 widgets/controls 的 postconstruct 内按传入 owner 挂到本次 Controls 的合适缩放节点。每个新实例创建自己的控件及回调，实例字段保存本次对象；全局只登记构造 hook。静态内容无需再建立轮询器或全局控件管理器。",
+          "evidence_refs": [
+            "UI-S20",
+            "UI-S21",
+            "UI-S22",
+            "UI-S23",
+            "UI-S24",
+            "UI-S28"
+          ]
+        },
+        {
+          "id": "EXP-UI-003-C07",
+          "kind": "REC",
+          "statement": "已有控件的数据刷新用自己的 setter/getter 与必要订阅完成。完整 SetMainCharacter 适合作为本来源中的新 HUD 初始化调用；需要同一 HUD 换 owner 的项目应专门设计旧绑定退出与新绑定进入。独立弹窗按保存实例随 Controls 退出关闭，HUD 普通子控件继续沿基类 Kill 链清理。",
+          "evidence_refs": [
+            "UI-S20",
+            "UI-S19",
+            "UI-S05",
+            "UI-S29",
+            "UI-S01",
+            "UI-S02"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "PlayerHud:SetMainCharacter",
+          "source_file": "scripts/screens/playerhud.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [
+            "maincharacter，可为假值；真值需要本地玩家形状的 replica 与事件接口"
+          ],
+          "returns": "无显式返回值，假值直接不执行初始化体。",
+          "preconditions": [
+            "PlayerHud 根节点和本地 UI 服务已构造。",
+            "该源码正常调用方为刚创建的 HUD 初始化。"
+          ],
+          "side_effects": [
+            "互写玩家 HUD 与 HUD owner，创建覆盖层及新的 Controls。",
+            "添加 owner 事件监听，读取 sanity，可能 Close/Open overflow。"
+          ],
+          "lifecycle": "方法为增量初始化体；重复调用会再次创建 Controls 和匿名监听，调用方需要自定义完整重绑定时不能仅依赖本方法。",
+          "evidence_refs": [
+            "UI-S20",
+            "UI-S19",
+            "UI-S27"
+          ],
+          "unknowns": [
+            "其他 Mod 若覆写为可重入绑定器，需按它的实际合同核对。"
+          ]
+        },
+        {
+          "symbol": "Controls:MakeScalingNodes",
+          "source_file": "scripts/widgets/controls.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "Controls Widget 已构造，处于其构造初始化过程。"
+          ],
+          "side_effects": [
+            "创建锚点/比例缩放父节点。",
+            "创建用户 HUD 缩放子节点并改写多个根字段。"
+          ],
+          "lifecycle": "原构造已调用；挂接控件复用现成字段即可，再调用会增加节点和替换字段。",
+          "evidence_refs": [
+            "UI-S23",
+            "UI-S21",
+            "UI-S22"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Controls:SetHUDSize",
+          "source_file": "scripts/widgets/controls.lua",
+          "visibility": "原版 Lua 实例方法或模板导出函数，非稳定性承诺",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "MakeScalingNodes 及该方法使用的其余控件已经初始化，owner.HUD.inst 可用。"
+          ],
+          "side_effects": [
+            "读取 FrontEnd HUD/crafting 缩放设置，对具名根节点、容器、hover、mousefollow 等设置缩放。",
+            "commandwheel 受平台/分屏条件影响，PS5 乘 .65；desync 存在时设缩放。",
+            "Player1 左节点用 crafting scale、右节点用 HUD scale，其他实例相反。",
+            "向 owner.HUD.inst 发 refreshhudsize，参数为 HUD scale。"
+          ],
+          "lifecycle": "原构造及屏幕尺寸改变的 OnUpdate 调用；挂到 top_root 等现成节点的自有 Widget 继承这条缩放链。",
+          "evidence_refs": [
+            "UI-S24",
+            "UI-S23",
+            "UI-S35",
+            "UI-S36"
+          ],
+          "unknowns": [
+            "不同分辨率、HUD 缩放、分屏与其他布局 Mod 下的最终位置需实际 UI 验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "本地 owner 路径创建新 PlayerHud，调用 SetMainCharacter 构造本次 Controls。",
+          "evidence_refs": [
+            "UI-S19",
+            "UI-S20",
+            "UI-S25",
+            "UI-S26"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "postconstruct 在原构造后取得 Controls 和 owner，使用现成缩放节点 AddChild 自有控件。",
+          "evidence_refs": [
+            "UI-S21",
+            "UI-S22",
+            "UI-S23",
+            "UI-S28",
+            "UI-S04"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "控件引用、弹窗引用和必要订阅属于本次实例；数据刷新只更新该控件。",
+          "evidence_refs": [
+            "UI-S20",
+            "UI-S04",
+            "UI-S01"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "本次 Controls/HUD 退出时沿 Kill 清普通子树，功能显式 Pop 自己另挂在 FrontEnd 的 Screen。新 HUD 构造自然重新接入。",
+          "evidence_refs": [
+            "UI-S05",
+            "UI-S29",
+            "UI-S19",
+            "UI-S01",
+            "UI-S02"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本轮没有运行游戏验证重连、角色交换及多 Mod 布局；建议接入需在目标 Mod 实际入口验证。",
+        "控件的业务数据就绪、订阅事件和服务器权限取决于目标功能，本条未定义玩法或数值。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "UI-S19",
+            "role": "新 HUD 的具名创建和退出调用方"
+          },
+          {
+            "ref": "UI-S25",
+            "role": "普通本地 owner 安装门禁"
+          },
+          {
+            "ref": "UI-S26",
+            "role": "玩家交换后新建 HUD 的实际消费者"
+          },
+          {
+            "ref": "UI-S27",
+            "role": "overlay 清理的实际根节点范围"
+          },
+          {
+            "ref": "UI-S28",
+            "role": "postconstruct 传参和先后顺序"
+          },
+          {
+            "ref": "UI-S04",
+            "role": "本次实例的子树挂接"
+          },
+          {
+            "ref": "UI-S05",
+            "role": "控件子树退出"
+          },
+          {
+            "ref": "UI-S29",
+            "role": "HUD 的基类销毁消费者"
+          },
+          {
+            "ref": "UI-S01",
+            "role": "独立弹窗挂在 FrontEnd 的事实"
+          },
+          {
+            "ref": "UI-S02",
+            "role": "独立弹窗的退出入口"
+          },
+          {
+            "ref": "UI-S35",
+            "role": "屏幕尺寸改变时的缩放刷新消费者"
+          },
+          {
+            "ref": "UI-S36",
+            "role": "首次构造的缩放刷新消费者"
+          }
+        ],
+        "unknowns": [
+          "换源后重查方法与依赖分支；来源身份用于证据追溯。",
+          "原生输入刷新、鼠标命中与图形行为尚无本轮游戏运行证据。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "UI-S01",
+      "source_file": "scripts/frontend.lua",
+      "file_sha256": "9c08dad47b951b977f8c806bcbc2dbe34d180e1c526a1e035d2cfc19a29e2f72",
+      "line_start": 972,
+      "line_end": 1005,
+      "range_sha256": "07b324d05150a774dc47856ec24ff38ccf2f59861dd9579fb3b2b5b04b4648f3",
+      "symbols": [
+        "FrontEnd:PushScreen"
+      ]
+    },
+    {
+      "id": "UI-S02",
+      "source_file": "scripts/frontend.lua",
+      "file_sha256": "9c08dad47b951b977f8c806bcbc2dbe34d180e1c526a1e035d2cfc19a29e2f72",
+      "line_start": 1098,
+      "line_end": 1148,
+      "range_sha256": "480c853cbe350d1c2d08621683f66e3a3764a0f1ee652aba7ac71889daba2064",
+      "symbols": [
+        "FrontEnd:PopScreen"
+      ]
+    },
+    {
+      "id": "UI-S03",
+      "source_file": "scripts/widgets/screen.lua",
+      "file_sha256": "c191cad8353981246f01000b3da424ceff61dcc2292952a85ff1a2dcb42055fc",
+      "line_start": 20,
+      "line_end": 43,
+      "range_sha256": "08b27e4fbc43384354130e62bed4f74f0255552ae89dfa48d4f852440b0c8960",
+      "symbols": [
+        "Screen:OnDestroy",
+        "Screen:OnBecomeInactive",
+        "Screen:OnBecomeActive"
+      ]
+    },
+    {
+      "id": "UI-S04",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 282,
+      "line_end": 309,
+      "range_sha256": "1e7760d8331b7a8a0598f37526136c997952fc7d0f94d33b05c0b105d0b1ab1d",
+      "symbols": [
+        "Widget:RemoveChild",
+        "Widget:KillAllChildren",
+        "Widget:AddChild"
+      ]
+    },
+    {
+      "id": "UI-S05",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 325,
+      "line_end": 334,
+      "range_sha256": "fb43c12ca997c66e043c52e9f758621f85993a54e90833666a4a6bc2057eeaf7",
+      "symbols": [
+        "Widget:Kill"
+      ]
+    },
+    {
+      "id": "UI-S06",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 592,
+      "line_end": 688,
+      "range_sha256": "fa12cb8f0deb138b9d02d28cabf7d989935044624cdbefd31026a03f6889ecbf",
+      "symbols": [
+        "Widget:GetDeepestFocus",
+        "Widget:ClearFocus",
+        "Widget:SetFocusFromChild",
+        "Widget:SetFocus"
+      ]
+    },
+    {
+      "id": "UI-S07",
+      "source_file": "scripts/frontend.lua",
+      "file_sha256": "9c08dad47b951b977f8c806bcbc2dbe34d180e1c526a1e035d2cfc19a29e2f72",
+      "line_start": 1007,
+      "line_end": 1016,
+      "range_sha256": "e97c4b396b7a2ed1902f31a0a0c4c7122ea0345fc6a597155a8bdfb7d40a1040",
+      "symbols": [
+        "FrontEnd:ClearScreens"
+      ]
+    },
+    {
+      "id": "UI-S08",
+      "source_file": "scripts/input.lua",
+      "file_sha256": "b7b49c5711ab942019ef9d8805ead469884727f7df6a6280789bd9a0c41d72b0",
+      "line_start": 163,
+      "line_end": 170,
+      "range_sha256": "c7b1e147d3bd80eb8bbeb58aa199c8803b195855e550243d4bc7b6dc795c64e5",
+      "symbols": [
+        "Input:OnControl"
+      ]
+    },
+    {
+      "id": "UI-S09",
+      "source_file": "scripts/frontend.lua",
+      "file_sha256": "9c08dad47b951b977f8c806bcbc2dbe34d180e1c526a1e035d2cfc19a29e2f72",
+      "line_start": 419,
+      "line_end": 455,
+      "range_sha256": "b98bb8f0315c162095269bfd5095ba40ac71b7ee58f219b8241e37de21afd8bd",
+      "symbols": [
+        "FrontEnd:OnControl"
+      ]
+    },
+    {
+      "id": "UI-S10",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 124,
+      "line_end": 138,
+      "range_sha256": "add98877f556d74dc18df73673c1c366b2c8ada5c48bdd22dc6d1fd6979c268d",
+      "symbols": [
+        "Widget:OnControl"
+      ]
+    },
+    {
+      "id": "UI-S11",
+      "source_file": "scripts/widgets/button.lua",
+      "file_sha256": "723b1ab3b21edef123d09decb266c378d0c23af40cc46de6039d99f7f5a028be",
+      "line_start": 47,
+      "line_end": 94,
+      "range_sha256": "f205d7491ce52e831bb3014e161354a43837c7d1bad997e16a44cd4620d873d7",
+      "symbols": [
+        "Button:SetControl",
+        "Button:OnControl"
+      ]
+    },
+    {
+      "id": "UI-S12",
+      "source_file": "scripts/widgets/button.lua",
+      "file_sha256": "723b1ab3b21edef123d09decb266c378d0c23af40cc46de6039d99f7f5a028be",
+      "line_start": 118,
+      "line_end": 164,
+      "range_sha256": "7dc4caf429be01e1fbd12fc2507ad65f3f93aa9c23740b415860b0baee4a1f0d",
+      "symbols": [
+        "Button:ResetPreClickPosition",
+        "Button:OnLoseFocus",
+        "Button:OnDisable"
+      ]
+    },
+    {
+      "id": "UI-S13",
+      "source_file": "scripts/widgets/redux/templates.lua",
+      "file_sha256": "3ddf61d80d60c7c5eb20e83835ac7d2b1c97b5ea1ceb2b3ac8b8fd8c5036a7a2",
+      "line_start": 1914,
+      "line_end": 1966,
+      "range_sha256": "bb4c3773be87d3628a9568c92b1fde808d5045013ec564124c5a08902d03a800",
+      "symbols": [
+        "TEMPLATES.ControllerFunctionsFromButtons"
+      ]
+    },
+    {
+      "id": "UI-S14",
+      "source_file": "scripts/screens/redux/popupdialog.lua",
+      "file_sha256": "71773ea3b2f496076053b0d26908d2619ac226fff9e0f46e3f4c0c09c8a6f294",
+      "line_start": 52,
+      "line_end": 90,
+      "range_sha256": "7617b36f021284b6ac3226fdf1088fd43a09fe492c731a8616ffc59eb7f5dca0",
+      "symbols": [
+        "PopupDialogScreen constructor",
+        "PopupDialogScreen:OnControl",
+        "PopupDialogScreen:Close"
+      ]
+    },
+    {
+      "id": "UI-S15",
+      "source_file": "scripts/events.lua",
+      "file_sha256": "6bff572b49698466311e5db92de287720fb0df515c1a325496d4046bbe1fc61c",
+      "line_start": 42,
+      "line_end": 49,
+      "range_sha256": "68b921f244729472a867471960a1f4179d979192bc8e500e672a88c77988310f",
+      "symbols": [
+        "EventProcessor:HandleEvent"
+      ]
+    },
+    {
+      "id": "UI-S16",
+      "source_file": "scripts/input.lua",
+      "file_sha256": "b7b49c5711ab942019ef9d8805ead469884727f7df6a6280789bd9a0c41d72b0",
+      "line_start": 186,
+      "line_end": 193,
+      "range_sha256": "e136a8901054b13a3e816faeed4b985574ca2376c454dd0885c4547cda1e9cee",
+      "symbols": [
+        "Input:OnRawKey"
+      ]
+    },
+    {
+      "id": "UI-S17",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 313,
+      "line_end": 345,
+      "range_sha256": "a1ffdc7f0d5d24d00e4d924201c4a27222ffd6c55945488163705415d244854e",
+      "symbols": [
+        "PlayerController:Activate"
+      ]
+    },
+    {
+      "id": "UI-S18",
+      "source_file": "scripts/screens/playerhud.lua",
+      "file_sha256": "89efec8385b91e49f7b86048d3d349a51ceae9044acab3e3995ec7825a2128ff",
+      "line_start": 1094,
+      "line_end": 1132,
+      "range_sha256": "d40349278f7caf88c496b83a833000e02c7774a07bea76de5c527a6a69d69209",
+      "symbols": [
+        "PlayerHud:HasInputFocus",
+        "PlayerHud:SetModFocus"
+      ]
+    },
+    {
+      "id": "UI-S19",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 740,
+      "line_end": 760,
+      "range_sha256": "cf5f1329b07d4a0b4c71f8067630b9b90385859f7c90f8cdb0710a8b21942285",
+      "symbols": [
+        "ActivateHUD",
+        "DeactivateHUD"
+      ]
+    },
+    {
+      "id": "UI-S20",
+      "source_file": "scripts/screens/playerhud.lua",
+      "file_sha256": "89efec8385b91e49f7b86048d3d349a51ceae9044acab3e3995ec7825a2128ff",
+      "line_start": 928,
+      "line_end": 962,
+      "range_sha256": "9217bc026f7546ed49120a6b57f60ba01b6a668bf58958fc5963e740ed1b7e4e",
+      "symbols": [
+        "PlayerHud:SetMainCharacter"
+      ]
+    },
+    {
+      "id": "UI-S21",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 55,
+      "line_end": 58,
+      "range_sha256": "2ac54f98346ff4a3e833a69dabadadc66003c5fb015594fa98439e6a1188f526",
+      "symbols": [
+        "Controls constructor"
+      ]
+    },
+    {
+      "id": "UI-S22",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 94,
+      "line_end": 100,
+      "range_sha256": "ec24acad8734e3a9caa7cd81b9806ca82897152c8abf6a420f400c80a4e521a7",
+      "symbols": [
+        "Controls constructor scaling initialization"
+      ]
+    },
+    {
+      "id": "UI-S23",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 493,
+      "line_end": 553,
+      "range_sha256": "55ca05913119c69cf36a332e0199c0f1936003ee83e761a5437aa345cc2b908f",
+      "symbols": [
+        "Controls:MakeScalingNodes"
+      ]
+    },
+    {
+      "id": "UI-S24",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 555,
+      "line_end": 595,
+      "range_sha256": "b4abd6c9b0dae6588f7b5906b394c59400df81d4da0637b66aff2400a26b6f38",
+      "symbols": [
+        "Controls:SetHUDSize"
+      ]
+    },
+    {
+      "id": "UI-S25",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1036,
+      "line_end": 1057,
+      "range_sha256": "83a183514cbfac788e89d8a24d6cb5c471ac6bde1321620f7dd4567a7653998f",
+      "symbols": [
+        "OnSetOwner local HUD branch"
+      ]
+    },
+    {
+      "id": "UI-S26",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 788,
+      "line_end": 815,
+      "range_sha256": "170507e01180325161f9b71b3f5d22809d88800b9ee78ba3ae66472a042c9d4d",
+      "symbols": [
+        "ActivatePlayer seamless-swap branch"
+      ]
+    },
+    {
+      "id": "UI-S27",
+      "source_file": "scripts/screens/playerhud.lua",
+      "file_sha256": "89efec8385b91e49f7b86048d3d349a51ceae9044acab3e3995ec7825a2128ff",
+      "line_start": 112,
+      "line_end": 115,
+      "range_sha256": "48fe3ac6131f88e38e25b969212b235417c2fba8fe299bf67248c536985c5303",
+      "symbols": [
+        "PlayerHud:CreateOverlays entry"
+      ]
+    },
+    {
+      "id": "UI-S28",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 153,
+      "line_end": 165,
+      "range_sha256": "1def6c5d8163b5389b6d49e8f1b7f84e00fb5db6389f014904508bbe9e950466",
+      "symbols": [
+        "DoAddClassPostConstruct",
+        "AddClassPostConstruct"
+      ]
+    },
+    {
+      "id": "UI-S29",
+      "source_file": "scripts/screens/playerhud.lua",
+      "file_sha256": "89efec8385b91e49f7b86048d3d349a51ceae9044acab3e3995ec7825a2128ff",
+      "line_start": 248,
+      "line_end": 258,
+      "range_sha256": "46b33740bf5630ccf7d23a3f7e5b6f5887a5ff03a58bebaa4bfa1ec933b3be81",
+      "symbols": [
+        "PlayerHud:OnDestroy"
+      ]
+    },
+    {
+      "id": "UI-S30",
+      "source_file": "scripts/widgets/textbutton.lua",
+      "file_sha256": "a2c28ce52b3d2f8d23264e64a22963e4e3ad4dd13238ef943fcde1993892bbe3",
+      "line_start": 1,
+      "line_end": 27,
+      "range_sha256": "2f35ae8a47156ca9fc58f68bbe309a937dfc10c2e88ddc9d1e5e12c237032cc6",
+      "symbols": [
+        "TextButton constructor",
+        "TextButton:SetText"
+      ]
+    },
+    {
+      "id": "UI-S31",
+      "source_file": "scripts/widgets/button.lua",
+      "file_sha256": "723b1ab3b21edef123d09decb266c378d0c23af40cc46de6039d99f7f5a028be",
+      "line_start": 235,
+      "line_end": 237,
+      "range_sha256": "dc650ce46b120f0de7a57756840277c7166867280298c6149e896080d56e4866",
+      "symbols": [
+        "Button:SetOnClick"
+      ]
+    },
+    {
+      "id": "UI-S32",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 233,
+      "line_end": 242,
+      "range_sha256": "259c936c6738f38f29c8cc9ae534d107e958c0b21642ac6e44d3f969c437711d",
+      "symbols": [
+        "Widget:IsEnabled"
+      ]
+    },
+    {
+      "id": "UI-S33",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 311,
+      "line_end": 323,
+      "range_sha256": "cd74d559b70ea8e92a506f732f8dcac31092498001b0e9f81a400328fd328027",
+      "symbols": [
+        "Widget:Hide",
+        "Widget:Show"
+      ]
+    },
+    {
+      "id": "UI-S34",
+      "source_file": "scripts/frontend.lua",
+      "file_sha256": "9c08dad47b951b977f8c806bcbc2dbe34d180e1c526a1e035d2cfc19a29e2f72",
+      "line_start": 1181,
+      "line_end": 1196,
+      "range_sha256": "fc70be67375d877c4fd4cf00eaffeebc50d7531af32569fc139b96f5a30a3b05",
+      "symbols": [
+        "FrontEnd:SetForceProcessTextInput"
+      ]
+    },
+    {
+      "id": "UI-S35",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 597,
+      "line_end": 622,
+      "range_sha256": "43026d5f3c0509912651cd14f822ca450018ade2b0d9da3cdb4760aeb4a5a1fe",
+      "symbols": [
+        "Controls:OnUpdate screen-size and mapcontrols branches"
+      ]
+    },
+    {
+      "id": "UI-S36",
+      "source_file": "scripts/widgets/controls.lua",
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "line_start": 412,
+      "line_end": 415,
+      "range_sha256": "579588d40a62a4371e309528b3a5f4e0730a28b65b0b1a6c0c34eead0d4df0d9",
+      "symbols": [
+        "Controls constructor SetHUDSize consumer"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "HUD 弹窗关闭 PopScreen 实例与焦点恢复",
+      "expected_entry_ids": [
+        "EXP-UI-001"
+      ],
+      "purpose": "按实例关闭并保留 Screen 生命周期"
+    },
+    {
+      "query": "Button 按下释放 onclick 取消键 controller_control 单按钮",
+      "expected_entry_ids": [
+        "EXP-UI-002"
+      ],
+      "purpose": "定位按放配对、模板按钮取消映射"
+    },
+    {
+      "query": "隐藏面板仍有 focus 输入消费",
+      "expected_entry_ids": [
+        "EXP-UI-002"
+      ],
+      "purpose": "核对 Hide、focus、enabled 的具体门禁"
+    },
+    {
+      "query": "HUD 重建 Controls postconstruct top_root 缩放 SetMainCharacter",
+      "expected_entry_ids": [
+        "EXP-UI-003"
+      ],
+      "purpose": "逐实例挂接并复用布局缩放"
+    }
+  ],
+  "limitations": [
+    "全部结论来自明确源码范围的文件读取与静态分析，未运行游戏。",
+    "NSF 为来源事实，EI 为有边界的推断，REC 为适用条件明确的工程选择。",
+    "候选仅含自写说明、符号和哈希位置；不附原版 Lua 正文。",
+    "已有 raw-key 广播、Widget Kill 清理与 HUD 焦点知识作为依赖复用；新增范围见 DEDUP.md。"
+  ]
+}
