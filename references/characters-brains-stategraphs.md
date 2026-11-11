@@ -91,6 +91,19 @@ Brain 的行为节点选择目标
 - 暂停/恢复自己的 AI 干预可使用成对的 `StopBrain(reason)` / `RestartBrain(reason)`，保留同一个有命名空间的 reason，避免与其他停止原因相互解除。
 - 测试要保证实体醒着且在可活动地形；休眠实体没动不能证明 AI 补丁失败。至少验证正常启动、停止重启、休眠唤醒和目标移除。
 
+## 移动速度、跟随与骑乘
+
+按 762172 的[移动与关系研究](../knowledge/research/native-mechanisms/movement_relationships-e27b088ade4f.json)核对参数、状态写入和原版消费者。
+
+| 问题 | 接入与排错要点 | 研究 ID |
+|---|---|---|
+| 多来源速度效果 | `SourceModifierList:SetModifier(source, m, key)` 与 `LocoMotor:SetExternalSpeedMultiplier(source, key, m)` 参数顺序不同；普通与预测速度贡献使用不同存储和读取路径 | EXP-MOVE-001 |
+| 奔跑与骑乘速度 | master 骑乘的基础跑速来自坐骑，外部速度贡献仍读骑手；继续追装备、鞍、地面、预测及最终 motor 调用 | EXP-MOVE-002 |
+| 跟随者换主人 | Leader 索引、Follower 指针、忠诚任务与事件分阶段变化；Follower 卸载钩子不主动清旧 Leader 索引，主动卸载前沿已有关系入口解除 | EXP-REL-001 |
+| 上下坐骑 | `Dismount`/`Buck` 先发事件，具名 SG 的退出再调用 `ActualDismount`；请求返回、riding、mount 与坐骑占用各有写入时点 | EXP-REL-002 |
+
+需要撤销效果时保留原 source/key；关系重接和下马则跟踪双方字段及实际完成入口。完整的客户端预测与跨分片行为按任务验证。
+
 ## 原版检索入口与验收
 
 - `prefabs/player_common.lua:MakePlayerCharacter`、`prefabs/player_common_extensions.lua`、`components/skinner.lua`：角色初始化、存档包装、幽灵与造型。

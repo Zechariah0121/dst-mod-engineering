@@ -1,0 +1,2312 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "world_shard",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-WORLD-001",
+      "title": "WorldState逐字段派发的观察时点与回调中解绑边界",
+      "aliases": [
+        "phasechanged",
+        "多字段中间状态",
+        "派发中StopWatchingWorldState",
+        "worldstate原数组遍历"
+      ],
+      "engineering_question": "世界昼夜事件到来时，观察者看到的是哪一步状态，当前派发中的解绑能影响哪些后续回调？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮按已核对762172/build26474873的归档重算整体、成员和范围SHA。该身份仅限定本轮证据。",
+        "environment": "普通WorldState、Clock phasechanged生产者、EntityScript及组件watch包装、玩家lunacy具名观察者。",
+        "exclusions": [
+          "N006-READY-F02已有注册接收者、初始应用和保存键规则作为前置。新增逐字段可见时点、原数组修改结果及完整API合同。",
+          "所有天气/季节生产者、任意重入形成的全局总序和跨分片状态传输。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WORLD-001-C01",
+          "kind": "NSF",
+          "statement": "Clock的具名OnUpdate分支在_phasedirty时向世界PushEvent(phasechanged, phase)。WorldState按cave标签选择OnCavePhaseChanged或OnPhaseChanged。后者依次设置phase、isday、isdusk、isnight、isfullmoon、isnewmoon，最后进入cave字段更新。每个SetVariable先写该键再同步派发其普通watcher，之后才派发该键的start/stop组。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS03",
+            "WS08",
+            "WS13"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-001-C02",
+          "kind": "EI",
+          "statement": "在没有回调额外改状态且旧值实际不同的普通地表phasechanged路径中，phase观察者进入时phase已是新值，isday/isdusk/isnight仍可为上一阶段的值。生产者尚未执行后续SetVariable。该路径没有把多个世界键作为一个整体发布。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS13"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-001-C03",
+          "kind": "NSF",
+          "statement": "SetVariable对_watchers[var]的实体分组使用pairs，对每组保存的数组使用ipairs，直接调用其中函数。AddWatcher直接append，没有查重或快照。RemoveWatcher在原数组table.remove匹配项，fn=nil则删整个实体分组。",
+          "evidence_refs": [
+            "WS01",
+            "WS04"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-001-C04",
+          "kind": "EI",
+          "statement": "限定同一实体组原数组仅有A、B且A回调以匹配fn/target解除A时，table.remove把B移到索引1，外层ipairs下次读索引2，B可在该次派发被跳过。若A调用StopAllWatchingWorldStates，只删除分组映射，已被外层局部变量持有的原数组仍可继续派发。两种退出路径不提供相同的当前轮取消语义。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS07"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-001-C05",
+          "kind": "NSF",
+          "statement": "玩家监听isnight和isalterawake到同一OnAlterNight，函数重新读取这两个当前键后调用sanity:EnableLunacy。isfullmoon监听则使用回调的布尔参数。构造末段还显式调用两者初始化。完整实体Remove在onremove之后停止全部worldstate观察。",
+          "evidence_refs": [
+            "WS09",
+            "WS10",
+            "WS11",
+            "WS12"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-001-C06",
+          "kind": "REC",
+          "statement": "需要若干世界键共同决定业务时，核对具名生产者逐项顺序和所监听键的时点。保存原函数/receiver用于解绑，业务退出后仍可能有当前轮调用时在实际消费者核对自身业务状态。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS04",
+            "WS06",
+            "WS09"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:WatchWorldState",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "原版EntityScript Lua方法，实体接收者入口。",
+          "parameters": [
+            "var为观察键，fn为回调函数对象。普通变化接收fn(self,val)，toggle组接收fn(self)。"
+          ],
+          "returns": "正常返回nil，登记异常直接外抛。",
+          "preconditions": [
+            "TheWorld及worldstate组件已建立，var可作表键且fn可调用。"
+          ],
+          "side_effects": [
+            "宿主worldstatewatching记录fn，世界组件在var/self分组追加{fn,self}。重复调用重复登记，注册期间不应用当前值。"
+          ],
+          "lifecycle": [
+            "与StopWatchingWorldState以同一var/fn配对。整实体Remove通过StopAllWatchingWorldStates清当前宿主所有分组。"
+          ],
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS10",
+            "WS11",
+            "WS12"
+          ],
+          "unknowns": [
+            "任意回调的业务副作用及错误处理由其调用者决定。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopWatchingWorldState",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "原版EntityScript Lua方法，实体接收者入口。",
+          "parameters": [
+            "var和fn匹配原登记身份。fn应提供原函数对象。"
+          ],
+          "returns": "正常返回nil，未登记时无匹配动作。",
+          "preconditions": [
+            "TheWorld.components.worldstate可用。fn=nil在世界组件层会删除整个实体组，不能当作单函数释放。"
+          ],
+          "side_effects": [
+            "宿主记录按RemoveByValue移除全部相等函数，世界组件以fn/self删除匹配项。"
+          ],
+          "lifecycle": [
+            "在正在派发的原数组上删除可改变本轮后续ipairs结果。已进入回调正常返回后继续原调用栈。组件包装另以组件对象作为target。"
+          ],
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS07",
+            "WS14"
+          ],
+          "unknowns": [
+            "派发中任意增删组合、跨实体pairs次序没有稳定合同。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopAllWatchingWorldStates",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "原版EntityScript Lua方法，整宿主观察分组释放入口。",
+          "parameters": [],
+          "returns": "正常返回nil，无worldstatewatching时立即返回。",
+          "preconditions": [
+            "需要释放的观察变量已登记在宿主worldstatewatching中。"
+          ],
+          "side_effects": [
+            "逐变量调用RemoveWatcher(var,self)，将整个宿主分组移除，最后清宿主登记表。"
+          ],
+          "lifecycle": [
+            "涵盖该宿主登记的组件target。已被SetVariable局部变量持有的数组没有在此被清空。"
+          ],
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS12"
+          ],
+          "unknowns": [
+            "直接绕过宿主包装添加且未进入登记表的变量不由本方法自动发现。"
+          ]
+        },
+        {
+          "symbol": "WorldState:AddWatcher",
+          "source_file": "scripts/components/worldstate.lua",
+          "visibility": "原版worldstate组件Lua方法，闭包内self方法。",
+          "parameters": [
+            "var为变量名，inst为分组宿主，fn为函数，target为回调第一个参数。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "宿主和var均可作表键。消费者fn/target参数形状与该变量生产者匹配。"
+          ],
+          "side_effects": [
+            "创建缺失分组并追加{fn,target}，不去重，不调用fn。"
+          ],
+          "lifecycle": [
+            "组件包装使用宿主inst分组及组件target。解绑函数/target和整宿主释放沿RemoveWatcher。"
+          ],
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06"
+          ],
+          "unknowns": [
+            "直接调用本组件方法不会建立宿主worldstatewatching登记。"
+          ]
+        },
+        {
+          "symbol": "WorldState:RemoveWatcher",
+          "source_file": "scripts/components/worldstate.lua",
+          "visibility": "原版worldstate组件Lua方法，闭包内self方法。",
+          "parameters": [
+            "var/inst确定分组。fn非nil时按相等函数匹配，target非nil时还要求相等target。fn=nil删除该inst整组。"
+          ],
+          "returns": "正常返回nil。缺变量或宿主组时无动作。",
+          "preconditions": [
+            "现有观察表保有AddWatcher创建的结构。"
+          ],
+          "side_effects": [
+            "在原数组上删除匹配项，空分组与空变量表被释放。"
+          ],
+          "lifecycle": [
+            "没有派发快照或延迟删除。当前轮遍历受原数组移动和局部数组引用影响。"
+          ],
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06"
+          ],
+          "unknowns": [
+            "不同实体组间pairs次序与任意回调重入组合仍需逐例验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Clock发phasechanged，WorldState进入明确地表/洞穴handler。",
+          "evidence_refs": [
+            "WS08",
+            "WS13",
+            "WS02",
+            "WS03"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "handler逐键写值并立即派发各自观察者，回调执行期间后续键尚待更新。",
+          "evidence_refs": [
+            "WS01",
+            "WS02"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "实际玩家观察者按自身合同读键或用参数，退出按fn/target或宿主组释放。",
+          "evidence_refs": [
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS09",
+            "WS10",
+            "WS11",
+            "WS12"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "WS01",
+            "role": "具名Lua定义或直接生产/消费/退出边界 SetVariable",
+            "claim_ids": [
+              "EXP-WORLD-001-C01",
+              "EXP-WORLD-001-C02",
+              "EXP-WORLD-001-C03",
+              "EXP-WORLD-001-C04",
+              "EXP-WORLD-001-C06"
+            ]
+          },
+          {
+            "ref": "WS02",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnPhaseChanged, OnCavePhaseChanged, OnMoonPhaseChanged2",
+            "claim_ids": [
+              "EXP-WORLD-001-C01",
+              "EXP-WORLD-001-C02",
+              "EXP-WORLD-001-C06"
+            ]
+          },
+          {
+            "ref": "WS03",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WorldState, phasechanged",
+            "claim_ids": [
+              "EXP-WORLD-001-C01"
+            ]
+          },
+          {
+            "ref": "WS08",
+            "role": "具名Lua定义或直接生产/消费/退出边界 Clock:OnUpdate, phasechanged",
+            "claim_ids": [
+              "EXP-WORLD-001-C01"
+            ]
+          },
+          {
+            "ref": "WS13",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:PushEvent_Internal, EntityScript:PushEvent",
+            "claim_ids": [
+              "EXP-WORLD-001-C01",
+              "EXP-WORLD-001-C02"
+            ]
+          },
+          {
+            "ref": "WS04",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WorldState:AddWatcher, WorldState:RemoveWatcher",
+            "claim_ids": [
+              "EXP-WORLD-001-C03",
+              "EXP-WORLD-001-C04",
+              "EXP-WORLD-001-C06"
+            ]
+          },
+          {
+            "ref": "WS05",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityWatchWorldState, EntityStopWatchingWorldState, ComponentWatchWorldState, ComponentStopWatchingWorldState",
+            "claim_ids": [
+              "EXP-WORLD-001-C04"
+            ]
+          },
+          {
+            "ref": "WS06",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:WatchWorldState, EntityScript:StopWatchingWorldState, EntityScript:StopAllWatchingWorldStates",
+            "claim_ids": [
+              "EXP-WORLD-001-C04",
+              "EXP-WORLD-001-C06"
+            ]
+          },
+          {
+            "ref": "WS07",
+            "role": "具名Lua定义或直接生产/消费/退出边界 RemoveByValue",
+            "claim_ids": [
+              "EXP-WORLD-001-C04"
+            ]
+          },
+          {
+            "ref": "WS09",
+            "role": "具名Lua定义或直接生产/消费/退出边界 fns.OnAlterNight, fns.OnFullMoonEnlightenment",
+            "claim_ids": [
+              "EXP-WORLD-001-C05",
+              "EXP-WORLD-001-C06"
+            ]
+          },
+          {
+            "ref": "WS10",
+            "role": "具名Lua定义或直接生产/消费/退出边界 RegisterMasterEventListeners, EntityScript:WatchWorldState",
+            "claim_ids": [
+              "EXP-WORLD-001-C05"
+            ]
+          },
+          {
+            "ref": "WS11",
+            "role": "具名Lua定义或直接生产/消费/退出边界 fns.OnAlterNight, fns.OnFullMoonEnlightenment",
+            "claim_ids": [
+              "EXP-WORLD-001-C05"
+            ]
+          },
+          {
+            "ref": "WS12",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:Remove",
+            "claim_ids": [
+              "EXP-WORLD-001-C05"
+            ]
+          },
+          {
+            "ref": "WS14",
+            "role": "具名Lua定义或直接生产/消费/退出边界 LoadComponent, ComponentWatchWorldState, ComponentStopWatchingWorldState",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举限本条具名Lua链，回调指向的其他组件业务、动态Hook和原生内部行为按unknowns保留。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行自解绑、整组释放、回调异常、递归phasechanged或真实昼夜切换用例。",
+        "该静态局部推导依赖给定的数组和调用顺序，不能覆盖任意Hook同时增删观察者的结果。"
+      ]
+    },
+    {
+      "id": "EXP-WORLD-002",
+      "title": "Shard Mod RPC重复登记与入队处理器身份",
+      "aliases": [
+        "AddShardModRPCHandler",
+        "GetShardModRPC",
+        "GetShardModRPCHandler",
+        "SendModRPCToShard",
+        "重复RPC注册",
+        "旧RPC编号"
+      ],
+      "engineering_question": "同一namespace/name再次登记后，名字查找、旧id和已入队消息各自使用哪个处理器？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮按已核对762172/build26474873的归档重算整体、成员和范围SHA。该身份仅限定本轮证据。",
+        "environment": "networkclientrpc全局Shard Mod RPC定义、modutil的env包装、WallUpdate消费及静态tick时间线重置。",
+        "exclusions": [
+          "FACT-DST-006、NC-N002-FINAL-07/08和N006-READY-F04的基础注册/队列事实作为前置，新增重复身份、大小写元表、查询缺项、禁发替换及完整API。",
+          "TheNet目标分片参数解析、编码/解码格式、身份认证、重传、可靠性、消息持久化和业务事务。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WORLD-002-C01",
+          "kind": "NSF",
+          "statement": "SHARD_MOD_RPC和handler表及创建的namespace子表安装小写索引/新键写入元表。AddShardModRPCHandler无同名保护，每次向该namespace处理器数组追加fn，然后把name映射改写成新的{namespace,id}。id记录所传namespace及追加后的数组长度。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C02",
+          "kind": "EI",
+          "statement": "正常函数输入下同名重复登记保留旧数组项并把名字映射指向新id。旧id_table仍可指向旧处理器，GetShardModRPC/Handler名字查找则得到当前映射。两个分片若注册顺序不同，Lua编号生成本身不能让同一id自动代表同一函数。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC03",
+            "RPC05"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C03",
+          "kind": "NSF",
+          "statement": "HandleShardModRPC在接收时查得fn并将该函数值连同sender/data/tick存入队列。后续HandleRPCQueue读取的是队列内fn，经可用来源和tick分支交给TheNet:CallShardRPC。WallUpdate调用HandleRPCQueue，StaticUpdate调用TickRPCQueue重置时间线。",
+          "evidence_refs": [
+            "RPC04",
+            "RPC06",
+            "RPC10",
+            "RPC11",
+            "RPC12"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C04",
+          "kind": "EI",
+          "statement": "消息一旦由HandleShardModRPC入队，随后同名再登记不重写已存入的fn。这个绑定点由Lua队列记录确定，原生何时送入该入口仍是外部边界。",
+          "evidence_refs": [
+            "RPC02",
+            "RPC04",
+            "RPC06"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C05",
+          "kind": "NSF",
+          "statement": "SendModRPCToShard只断言本地namespace/id存在后把二者和全部变参交给TheNet。DisableRPCSending会把全局发送函数替换为空函数，DeactivateWorld是具名调用者。modutil提供登记、查询和发送包装，发送包装在调用全局函数前读取id_table字段作initprint。",
+          "evidence_refs": [
+            "RPC03",
+            "RPC07",
+            "RPC08",
+            "RPC09",
+            "RPC15"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C06",
+          "kind": "NSF",
+          "statement": "原版SendRPCToShard(code,...)旁的注释约定首个变参shards可为nil表示全部已连接分片、单个shardid或分片列表。Shard_SyncWorldSettings实际把world_id放在该位置，次分片连接时把SHARDID.MASTER用于ResyncWorldSettings请求。此目标参数证据限原版SendRPCToShard，Mod包装的变参继续保留原生边界。",
+          "evidence_refs": [
+            "RPC13",
+            "RPC14"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-002-C07",
+          "kind": "REC",
+          "statement": "在各参与分片一致的初始化路径中登记RPC并保存当前查询结果。需要热替换或可重放协议时明确版本和旧编号处理，再检查已入队fn身份。根据实际原生调用证据补全目标参数和业务校验，避免从Lua变参推导传输保证。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC03",
+            "RPC04",
+            "RPC05",
+            "RPC06"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "AddShardModRPCHandler",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua函数，modutil通过env.AddShardModRPCHandler转发。",
+          "parameters": [
+            "namespace/name为应使用的字符串键，fn为可由原生CallShardRPC调用的处理器。"
+          ],
+          "returns": "正常返回nil。输入结构或元表字符串处理错误可外抛。",
+          "preconditions": [
+            "在参与通信的分片建立一致namespace与注册顺序，handler数组保持原结构。"
+          ],
+          "side_effects": [
+            "必要时创建namespace映射和handler数组，追加fn并覆盖名字映射。没有重复登记拒绝或旧handler移除。"
+          ],
+          "lifecycle": [
+            "新登记只影响后续名字查找和后续按新编号接收。已入队记录持有原fn。"
+          ],
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC04",
+            "RPC05",
+            "RPC08"
+          ],
+          "unknowns": [
+            "原生注册环境和处理器可接收的编码类型未由该函数证明。"
+          ]
+        },
+        {
+          "symbol": "GetShardModRPC",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua函数，modutil通过env.GetShardModRPC返回其结果。",
+          "parameters": [
+            "namespace/name为已登记的字符串键。"
+          ],
+          "returns": "返回当前{namespace,id}表本身。namespace存在而name缺失时返回nil，namespace缺失时对子表索引会抛错。",
+          "preconditions": [
+            "namespace映射已创建。使用者保持返回表的namespace/id有效。"
+          ],
+          "side_effects": [
+            "仅索引映射，不复制或重新登记。小写元表用于缺键查询。"
+          ],
+          "lifecycle": [
+            "同名再登记替换名字处表，已持有旧表的调用方仍持有旧id。"
+          ],
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC05",
+            "RPC09"
+          ],
+          "unknowns": [
+            "直接修改返回表可改变发送输入，其跨调用方后果未覆盖。"
+          ]
+        },
+        {
+          "symbol": "GetShardModRPCHandler",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua函数，modutil通过env.GetShardModRPCHandler返回其结果。",
+          "parameters": [
+            "namespace/name为现存登记键。"
+          ],
+          "returns": "返回当前名字映射id对应的handler函数值。缺namespace或name可在索引链抛错。",
+          "preconditions": [
+            "namespace、名字和对应handler数组项结构有效。"
+          ],
+          "side_effects": [
+            "只读取名字映射和数组。"
+          ],
+          "lifecycle": [
+            "重复登记后查询返回新fn，旧id与旧队列记录各自保留原引用。"
+          ],
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC04",
+            "RPC05",
+            "RPC08"
+          ],
+          "unknowns": [
+            "得到函数值不证明直接调用时具备原生RPC解包和来源语义。"
+          ]
+        },
+        {
+          "symbol": "SendModRPCToShard",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua函数，modutil通过env.SendModRPCToShard转发。",
+          "parameters": [
+            "id_table至少有namespace/id且本地handler对应项存在。其余变参完整转给TheNet:SendModRPCToShard。",
+            "变参中的目标选择和payload类型由原生接口决定，本合同仅记录Lua转发。"
+          ],
+          "returns": "正常返回nil，未return原生结果。正常定义下登记断言失败可抛错，禁发替换后为空函数。",
+          "preconditions": [
+            "合法id_table和本地匹配登记，发送功能未被DisableRPCSending替换。"
+          ],
+          "side_effects": [
+            "调用TheNet原生发送边界，Lua包装自身未建立确认、重试、持久化或业务结果状态。"
+          ],
+          "lifecycle": [
+            "DisableRPCSending重绑定全局符号。modutil包装后续调用该全局符号，但仍先读取id_table.namespace/id。"
+          ],
+          "evidence_refs": [
+            "RPC02",
+            "RPC03",
+            "RPC07",
+            "RPC09",
+            "RPC15"
+          ],
+          "unknowns": [
+            "目标分片选择参数、序列化、先后、送达、断线恢复与exactly-once未验证。"
+          ]
+        },
+        {
+          "symbol": "SendRPCToShard",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua函数，原生Shard RPC发送包装。",
+          "parameters": [
+            "code为SHARD_RPC_HANDLERS已有编号。首个变参shards按原版注释为nil、shardid或shardid列表，余下变参为消息参数。",
+            "nil的注释范围为全部已连接分片，具名调用者以world_id或SHARDID.MASTER选择目的地。"
+          ],
+          "returns": "正常返回nil，未return原生结果。非法本地code触发assert，禁发替换后为空函数。",
+          "preconditions": [
+            "本地code已登记，目标参数符合原生接口约定，发送功能处于正常定义。"
+          ],
+          "side_effects": [
+            "向TheNet:SendRPCToShard转交code和全部变参。Lua层没有实现广播循环或目标列表校验。"
+          ],
+          "lifecycle": [
+            "DeactivateWorld调用DisableRPCSending替换此全局发送函数。"
+          ],
+          "evidence_refs": [
+            "RPC13",
+            "RPC14",
+            "RPC07",
+            "RPC15"
+          ],
+          "unknowns": [
+            "注释和具名调用不证明离线目标处理、广播自身、列表去重、顺序或可靠交付。"
+          ]
+        },
+        {
+          "symbol": "HandleShardModRPC",
+          "source_file": "scripts/networkclientrpc.lua",
+          "visibility": "原版全局Lua接收分发入口，外部调用者处于原生边界。",
+          "parameters": [
+            "sender/tick由上游接收入口提供，namespace/code用于索引本地表，data为原生解包阶段消费的数据。"
+          ],
+          "returns": "正常返回nil。未知namespace/code只打印并跳过登记。结构错误仍可能外抛。",
+          "preconditions": [
+            "本地登记表与队列有效，上游提供可用于索引的namespace/code。"
+          ],
+          "side_effects": [
+            "保存当时查得的fn及sender/data/tick进入RPC_Shard_Queue。没有在此直接调用fn。"
+          ],
+          "lifecycle": [
+            "消费时可用来源和tick分支再决定调用、保留或跳过。fn身份在入队时绑定。"
+          ],
+          "evidence_refs": [
+            "RPC04",
+            "RPC06",
+            "RPC10",
+            "RPC11",
+            "RPC12"
+          ],
+          "unknowns": [
+            "TheNet:CallShardRPC如何解包data和传给fn的精确参数类型由原生实现决定。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "一致初始化路径通过modutil进入全局登记，名字映射和追加数组分离。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "查询取得当前名字映射，发送包装校验后进入TheNet。",
+          "evidence_refs": [
+            "RPC03",
+            "RPC05",
+            "RPC09"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "接收时绑定fn入队，wall消费与静态tick重置分别执行，禁发会替换全局发送符号。",
+          "evidence_refs": [
+            "RPC04",
+            "RPC06",
+            "RPC07",
+            "RPC10",
+            "RPC11",
+            "RPC12"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "RPC01",
+            "role": "具名Lua定义或直接生产/消费/退出边界 setmetadata, __index_lower, __newindex_lower, SHARD_MOD_RPC",
+            "claim_ids": [
+              "EXP-WORLD-002-C01",
+              "EXP-WORLD-002-C02",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC02",
+            "role": "具名Lua定义或直接生产/消费/退出边界 AddShardModRPCHandler",
+            "claim_ids": [
+              "EXP-WORLD-002-C01",
+              "EXP-WORLD-002-C02",
+              "EXP-WORLD-002-C04",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC03",
+            "role": "具名Lua定义或直接生产/消费/退出边界 SendModRPCToShard",
+            "claim_ids": [
+              "EXP-WORLD-002-C02",
+              "EXP-WORLD-002-C05",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC05",
+            "role": "具名Lua定义或直接生产/消费/退出边界 GetShardModRPCHandler, GetShardModRPC",
+            "claim_ids": [
+              "EXP-WORLD-002-C02",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC04",
+            "role": "具名Lua定义或直接生产/消费/退出边界 HandleShardModRPC",
+            "claim_ids": [
+              "EXP-WORLD-002-C03",
+              "EXP-WORLD-002-C04",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC06",
+            "role": "具名Lua定义或直接生产/消费/退出边界 HandleRPCQueue, TickRPCQueue",
+            "claim_ids": [
+              "EXP-WORLD-002-C03",
+              "EXP-WORLD-002-C04",
+              "EXP-WORLD-002-C07"
+            ]
+          },
+          {
+            "ref": "RPC10",
+            "role": "具名Lua定义或直接生产/消费/退出边界 ShardPortals, Shard_IsWorldAvailable",
+            "claim_ids": [
+              "EXP-WORLD-002-C03"
+            ]
+          },
+          {
+            "ref": "RPC11",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WallUpdate, HandleRPCQueue",
+            "claim_ids": [
+              "EXP-WORLD-002-C03"
+            ]
+          },
+          {
+            "ref": "RPC12",
+            "role": "具名Lua定义或直接生产/消费/退出边界 StaticUpdate, TickRPCQueue",
+            "claim_ids": [
+              "EXP-WORLD-002-C03"
+            ]
+          },
+          {
+            "ref": "RPC07",
+            "role": "具名Lua定义或直接生产/消费/退出边界 DisableRPCSending",
+            "claim_ids": [
+              "EXP-WORLD-002-C05"
+            ]
+          },
+          {
+            "ref": "RPC08",
+            "role": "具名Lua定义或直接生产/消费/退出边界 env.AddShardModRPCHandler, env.GetShardModRPCHandler",
+            "claim_ids": [
+              "EXP-WORLD-002-C05"
+            ]
+          },
+          {
+            "ref": "RPC09",
+            "role": "具名Lua定义或直接生产/消费/退出边界 env.SendModRPCToShard, env.GetShardModRPC",
+            "claim_ids": [
+              "EXP-WORLD-002-C05"
+            ]
+          },
+          {
+            "ref": "RPC15",
+            "role": "具名Lua定义或直接生产/消费/退出边界 DeactivateWorld, DisableRPCSending",
+            "claim_ids": [
+              "EXP-WORLD-002-C05"
+            ]
+          },
+          {
+            "ref": "RPC13",
+            "role": "具名Lua定义或直接生产/消费/退出边界 SendRPCToShard",
+            "claim_ids": [
+              "EXP-WORLD-002-C06"
+            ]
+          },
+          {
+            "ref": "RPC14",
+            "role": "具名Lua定义或直接生产/消费/退出边界 Shard_SyncWorldSettings, Shard_OnShardConnected",
+            "claim_ids": [
+              "EXP-WORLD-002-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "依赖枚举限本条具名Lua链，回调指向的其他组件业务、动态Hook和原生内部行为按unknowns保留。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行双分片注册次序不一致、同名覆盖、旧id发送、入队后再登记或禁发用例。",
+        "大小写元表对新键写入和缺键查询执行string.lower，不覆盖Lua rawset/已有原始键直写等任意篡改。",
+        "分片可用性检查及sender来源不能替代业务字段与写入权威的具体合同。"
+      ]
+    },
+    {
+      "id": "EXP-WORLD-003",
+      "title": "玩家迁移离场的延迟保存请求与原生交接",
+      "aliases": [
+        "WorldMigrator:Activate",
+        "ms_playerdespawnandmigrate",
+        "PlayerRemove",
+        "SerializeUserSession",
+        "migration.worldid来源"
+      ],
+      "engineering_question": "玩家进洞或回地表的激活成功值覆盖到哪一步，迁移记录在哪个阶段写入并请求保存？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮按已核对762172/build26474873的归档重算整体、成员和范围SHA。该身份仅限定本轮证据。",
+        "environment": "WorldMigrator的player分支、PlayerSpawner离场事件、ColourTweener完成回调、player_common保存/离场包装和SerializeUserSession。",
+        "exclusions": [
+          "AI-N001-12/13、N006-WC-06和EXP-SAVE-003已有迁移分类、源字段与序列化委托作为前置。新增激活返回、tween/静态任务、角色_OnDespawn先序与完整API合同。",
+          "WorldMigrator非玩家物品事务分支、所有角色自定义_OnDespawn内部业务、原生磁盘和跨分片会话传送内部。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WORLD-003-C01",
+          "kind": "NSF",
+          "statement": "ACTIONS.MIGRATE.fn在doer、target及目标worldmigrator存在时调用Activate。WorldMigrator:Activate在linkedWorld=nil时返回false/NODESTINATION。player分支仅在_despawning为假时发migration_activate及ms_playerdespawnandmigrate，事件带player、源portalid、目标worldid与fxoverride。该分支随后返回true，包括_despawning已真而跳过派发的情况。此player分支没有额外检查IsActive或目标可用性。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG14"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C02",
+          "kind": "NSF",
+          "statement": "PlayerSpawner监听迁移事件，先标记_despawning、禁控制、停止/清locomotor，再启动wall update的13*FRAMES颜色tween。tween完成回调清_despawning后调用PlayerRemove(player,false,data)。PlayerRemove未ready时只登记零延迟静态任务，ready时才执行后续离场。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG04",
+            "MIG05",
+            "MIG06",
+            "MIG13"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C03",
+          "kind": "NSF",
+          "statement": "ready分支依次调用player:OnDespawn(migrationdata)，将player.migration设为源TheShard ID、源portalid、源sessionid及可选目标坐标，调用SerializeUserSession，调用player:Remove，最后调用TheShard:StartMigration(userid,目标worldid)。传给StartMigration的worldid与保存migration.worldid的来源不同。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG09",
+            "MIG12"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C04",
+          "kind": "NSF",
+          "statement": "MakePlayerCharacter保留角色_OnDespawn并将OnDespawn指向公共包装。包装先调用角色钩子，再处理睡眠和已列组件收尾。携migrationdata时走DropEverythingWithTag(irreplaceable)分支，随后发player_despawn、清跟随者关系和移动控制。公共OnSave把inst.migration写入保存data。",
+          "evidence_refs": [
+            "MIG07",
+            "MIG08",
+            "MIG12"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C05",
+          "kind": "NSF",
+          "statement": "SerializeUserSession在玩家、非空userid及本地玩家或server条件满足时取GetSaveRecord，DataDumper后调用TheNet:SerializeUserSession，isnewspawn只有严格true才传true。GetSaveRecord调用GetPersistData，后者先组件OnSave再实体OnSave。Lua包装没有等待完成回调或返回原生保存结果。",
+          "evidence_refs": [
+            "MIG09",
+            "MIG10",
+            "MIG11",
+            "MIG12"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C06",
+          "kind": "EI",
+          "statement": "Activate的true表示该player分支执行至返回，迁移链仍含tween、静态任务、业务钩子、保存原生调用、Remove与StartMigration阶段。上述Lua直接调用缺少整链回滚或共同提交，任一前段抛错会阻止其后调用，故不能由true推导已保存、已抵达或原子迁移。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG02",
+            "MIG03",
+            "MIG05",
+            "MIG07",
+            "MIG09"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-003-C07",
+          "kind": "REC",
+          "statement": "排查迁移时分别记录源/目标shardid、portalid、tween/静态任务和保存请求/StartMigration阶段。角色_OnDespawn若调整状态，核对其早于公共清理及迁移字段生成的时点。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG07",
+            "MIG08",
+            "MIG09"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "WorldMigrator:Activate",
+          "source_file": "scripts/components/worldmigrator.lua",
+          "visibility": "原版组件Lua方法，本合同只覆盖HasTag(player)分支及缺目的地分支。",
+          "parameters": [
+            "doer为有效玩家EntityScript，具备player标签。"
+          ],
+          "returns": "linkedWorld=nil返回false,\"NODESTINATION\"。player分支正常返回true，即使_despawning已真而未发事件。",
+          "preconditions": [
+            "linkedWorld已配置，id可用于打印拼接和迁移元数据，TheWorld安装playerspawner消费者。",
+            "可用性、动作许可由实际上游调用者决定，本player分支自身未复查IsActive。"
+          ],
+          "side_effects": [
+            "未处于_despawning时发本portal的migration_activate和世界ms_playerdespawnandmigrate事件。"
+          ],
+          "lifecycle": [
+            "事件同步进入PlayerSpawner，真正Remove由颜色tween之后的静态任务推进。"
+          ],
+          "evidence_refs": [
+            "MIG01",
+            "MIG02",
+            "MIG03",
+            "MIG04",
+            "MIG14",
+            "WS13"
+          ],
+          "unknowns": [
+            "非玩家物品分支另走ShardTransaction，不在此API合同。"
+          ]
+        },
+        {
+          "symbol": "PlayerRemove",
+          "source_file": "scripts/components/playerspawner.lua",
+          "visibility": "文件局部Lua函数，未导出，实际入口来自PlayerSpawner离场回调和自身静态任务。",
+          "parameters": [
+            "player为玩家实例，deletesession为删除会话选择，migrationdata为迁移事件table或nil，readytoremove控制是否执行离场。"
+          ],
+          "returns": "正常返回nil。readytoremove假值时安排任务后结束。内部错误直接外抛。",
+          "preconditions": [
+            "玩家仍拥有所需组件和调度环境。迁移table含player、worldid、portalid和可选x/y/z。"
+          ],
+          "side_effects": [
+            "ready分支按OnDespawn→迁移字段/保存或删除会话→Remove→可选StartMigration顺序执行。"
+          ],
+          "lifecycle": [
+            "静态任务归player所有，执行ready分支前玩家若被其他路径移除，任务生命周期另受宿主清理影响。函数未实现重入或重复调用去重。"
+          ],
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG07",
+            "MIG09",
+            "MIG13",
+            "WS12"
+          ],
+          "unknowns": [
+            "调度实际帧、保存完成、原生迁移成功和中断恢复未实测。"
+          ]
+        },
+        {
+          "symbol": "SerializeUserSession",
+          "source_file": "scripts/networking.lua",
+          "visibility": "原版全局Lua函数，玩家会话保存包装。",
+          "parameters": [
+            "player可为nil，合法玩家需非空字符串userid。isnewspawn仅严格等于true时传入新生标志。"
+          ],
+          "returns": "正常返回nil，guard不满足时不调用保存。GetSaveRecord、DataDumper或原生调用错误可外抛。",
+          "preconditions": [
+            "player==ThePlayer或TheNet:GetIsServer()，player具有保存所需Transform/Network/组件。"
+          ],
+          "side_effects": [
+            "生成保存record并序列化为字符串，server生成character metadata，调用TheNet:SerializeUserSession。忽略GetSaveRecord的refs返回值。"
+          ],
+          "lifecycle": [
+            "PlayerRemove在调用之后继续Remove及StartMigration，未在Lua等待保存确认。"
+          ],
+          "evidence_refs": [
+            "MIG02",
+            "MIG09",
+            "MIG10",
+            "MIG11",
+            "MIG12"
+          ],
+          "unknowns": [
+            "原生写盘、完成时点、错误回调和与迁移共同提交的契约未知。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "portal player激活同步发迁移事件，PlayerSpawner禁控制并启动颜色tween。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG03",
+            "MIG04",
+            "MIG06"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "颜色完成后先登记player零延迟静态任务，ready任务执行角色与公共OnDespawn。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG05",
+            "MIG07",
+            "MIG08",
+            "MIG13"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "生成源迁移字段并请求会话序列化，再Remove和调用原生StartMigration。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG09",
+            "MIG10",
+            "MIG11",
+            "MIG12"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "MIG01",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WorldMigrator:Activate",
+            "claim_ids": [
+              "EXP-WORLD-003-C01",
+              "EXP-WORLD-003-C06"
+            ]
+          },
+          {
+            "ref": "MIG14",
+            "role": "具名Lua定义或直接生产/消费/退出边界 ACTIONS.MIGRATE.fn, WorldMigrator:Activate",
+            "claim_ids": [
+              "EXP-WORLD-003-C01"
+            ]
+          },
+          {
+            "ref": "MIG02",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerRemove",
+            "claim_ids": [
+              "EXP-WORLD-003-C02",
+              "EXP-WORLD-003-C03",
+              "EXP-WORLD-003-C06",
+              "EXP-WORLD-003-C07"
+            ]
+          },
+          {
+            "ref": "MIG03",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnPlayerDespawn, OnPlayerDespawnAndMigrate",
+            "claim_ids": [
+              "EXP-WORLD-003-C02",
+              "EXP-WORLD-003-C06",
+              "EXP-WORLD-003-C07"
+            ]
+          },
+          {
+            "ref": "MIG04",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerSpawner, ms_playerdespawnandmigrate",
+            "claim_ids": [
+              "EXP-WORLD-003-C02"
+            ]
+          },
+          {
+            "ref": "MIG05",
+            "role": "具名Lua定义或直接生产/消费/退出边界 ColourTweener:EndTween",
+            "claim_ids": [
+              "EXP-WORLD-003-C02",
+              "EXP-WORLD-003-C06"
+            ]
+          },
+          {
+            "ref": "MIG06",
+            "role": "具名Lua定义或直接生产/消费/退出边界 ColourTweener:StartTween, ColourTweener:DoUpdate",
+            "claim_ids": [
+              "EXP-WORLD-003-C02"
+            ]
+          },
+          {
+            "ref": "MIG13",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:DoStaticTaskInTime, EntityScript:DoTaskInTime",
+            "claim_ids": [
+              "EXP-WORLD-003-C02"
+            ]
+          },
+          {
+            "ref": "MIG09",
+            "role": "具名Lua定义或直接生产/消费/退出边界 SerializeUserSession",
+            "claim_ids": [
+              "EXP-WORLD-003-C03",
+              "EXP-WORLD-003-C05",
+              "EXP-WORLD-003-C06",
+              "EXP-WORLD-003-C07"
+            ]
+          },
+          {
+            "ref": "MIG12",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnSave",
+            "claim_ids": [
+              "EXP-WORLD-003-C03",
+              "EXP-WORLD-003-C04",
+              "EXP-WORLD-003-C05"
+            ]
+          },
+          {
+            "ref": "MIG07",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnDespawn",
+            "claim_ids": [
+              "EXP-WORLD-003-C04",
+              "EXP-WORLD-003-C06",
+              "EXP-WORLD-003-C07"
+            ]
+          },
+          {
+            "ref": "MIG08",
+            "role": "具名Lua定义或直接生产/消费/退出边界 MakePlayerCharacter, OnSave, OnPreLoad, OnDespawn",
+            "claim_ids": [
+              "EXP-WORLD-003-C04",
+              "EXP-WORLD-003-C07"
+            ]
+          },
+          {
+            "ref": "MIG10",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:GetSaveRecord",
+            "claim_ids": [
+              "EXP-WORLD-003-C05"
+            ]
+          },
+          {
+            "ref": "MIG11",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:GetPersistData",
+            "claim_ids": [
+              "EXP-WORLD-003-C05"
+            ]
+          },
+          {
+            "ref": "WS13",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:PushEvent_Internal, EntityScript:PushEvent",
+            "claim_ids": []
+          },
+          {
+            "ref": "WS12",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:Remove",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举限本条具名Lua链，回调指向的其他组件业务、动态Hook和原生内部行为按unknowns保留。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行真实地表/洞穴迁移、tween中断、角色钩子异常、重复事件、会话保存失败或目的分片断线用例。",
+        "所有OnDespawn下游组件内部和角色专属钩子未在本条逐项展开，已有调用只证明调用顺序。",
+        "TheShard:StartMigration及TheNet:SerializeUserSession属于原生接口边界，本轮没有可见内部原子性、可靠性或恢复保证。"
+      ]
+    },
+    {
+      "id": "EXP-WORLD-004",
+      "title": "迁移玩家会话加载与落点分支的临时状态消费",
+      "aliases": [
+        "ResumeExistingUserSession",
+        "PlayerSpawner:SpawnAtLocation",
+        "GetMigrationPortalLocation",
+        "原世界失败迁移",
+        "migrationpets"
+      ],
+      "engineering_question": "载入含migration的玩家记录后，Lua怎样选择落点，源世界重入和重复应用记录怎样影响临时状态？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮按已核对762172/build26474873的归档重算整体、成员和范围SHA。该身份仅限定本轮证据。",
+        "environment": "ResumeExistingUserSession的服务器现有实体分支、EntityScript preload/load分发、公共player preload、PlayerSpawner迁移分支与componentutil落点工具。",
+        "exclusions": [
+          "AI-N001-13、N006-WC-06及EXP-SAVE-003已有普通Resume现有实体加载入口，EXP-SAVE-001已有通用保存/postpass规则，SPATIAL-CODE-FAILURE-POLICY已有落点缓存、门替换及fallback链作为前置。新增迁移preload、同源分片分支、门登记分支及临时字段消费合同。",
+          "原生选择保存文件及创建/绑定guid的内部、snapshot/reroll/seamless换角、全部宠物生产者与完整空间寻路算法。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WORLD-004-C01",
+          "kind": "NSF",
+          "statement": "ResumeExistingUserSession要求server且Ents[guid]存在，在该已有实例上SetPersistData(data.data or {})、EnableLoadingProtection、ResolveSaveRecordPosition，经过可选virtualroom安全位置调整后调用playerspawner:SpawnAtLocation(...,true)。正常返回该玩家classified原生entity或nil。",
+          "evidence_refs": [
+            "ARR01"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C02",
+          "kind": "NSF",
+          "statement": "SetPersistData在组件OnLoad循环前调用实体OnPreLoad。公共player OnPreLoad将data.migration写入inst.migration，并在存在迁移值时新建migrationpets数组，再调用角色_OnPreLoad。Inventory:OnLoad是一个实际producer，其载入物品后CheckMigrationPets可把物品持有的pet加入该数组。",
+          "evidence_refs": [
+            "ARR02",
+            "ARR03",
+            "MIG08",
+            "ARR11"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C03",
+          "kind": "NSF",
+          "statement": "SpawnAtLocation看到migration非nil时，仅当保存的源worldid不同于当前TheShard ID才用GetMigrationPortalLocation替换传入位置并迁移仍有效的migrationpets。若源worldid等于当前shard，保留传入位置且跳过迁移宠物搬位。两支之后都清migration与migrationpets，再记录玩家已生成并Teleport玩家。",
+          "evidence_refs": [
+            "ARR04"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C04",
+          "kind": "NSF",
+          "statement": "GetMigrationPortalFromMigrationData按ShardPortals数组顺序找第一个worldmigrator:IsDestinationForPortal(源worldid,源portalid)匹配项。GetMigrationPortalLocation优先使用portaloverride或该匹配门，缓存位置/offset后调用门ActivatedByOther。无门且dest_x/y/z齐全时走坐标偏移，其他情况调用GetAnySpawnPoint。",
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR09",
+            "ARR10"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C05",
+          "kind": "NSF",
+          "statement": "WorldMigrator构造以DoTaskInTime安排普通零延迟init。id缺失时init分配ID；已有id时扫描ShardPortals，发现已登记门的worldmigrator.id相等便打印后提前return，跳过登记事件与Shard_UpdatePortalState。通过该ID处理后才发ms_registermigrationportal并更新门状态；PlayerSpawner登记去重并监听onremove删除。迁移门OnLoad保留receivedPortal的历史拼写recievedPortal兼容，且本方法不调用ValidateAndPushEvents。落点匹配依赖当时已登记的门及其当前字段。",
+          "evidence_refs": [
+            "ARR07",
+            "ARR08",
+            "ARR12",
+            "MIG04"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C06",
+          "kind": "EI",
+          "statement": "SpawnAtLocation清迁移字段先于玩家Teleport。后续传送或其他副作用错误时，当前实例可能已失去这次临时迁移字段。直接再次调用同一实例的SpawnAtLocation通常走无migration路径，而重新SetPersistData同一保存值会由preload重新建立迁移状态，两种重复方式具有不同入口和副作用。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR02",
+            "ARR03",
+            "ARR04"
+          ]
+        },
+        {
+          "id": "EXP-WORLD-004-C07",
+          "kind": "REC",
+          "statement": "诊断迁移到错误位置时保留源worldid/portalid、当前shard、已登记门和可选dest坐标，按门→坐标→默认位置链核对。审查重试时指明重放的是完整保存记录还是单个落点调用，并检查已执行的门动画、宠物搬位和临时字段清理。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR03",
+            "ARR04",
+            "ARR05",
+            "ARR07",
+            "ARR08"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ResumeExistingUserSession",
+          "source_file": "scripts/mainfunctions.lua",
+          "visibility": "原版全局Lua入口，按已存在的Ents[guid]消费服务器玩家会话。",
+          "parameters": [
+            "data为已解析的玩家save record，data.data为可选持久化table。guid标识已存在玩家。"
+          ],
+          "returns": "server且存在玩家时返回player.player_classified.entity或nil，其他分支返回nil。内部callee错误直接外抛。",
+          "preconditions": [
+            "本地server，guid已由外部创建并放入Ents，记录与玩家prefab/组件兼容。"
+          ],
+          "side_effects": [
+            "加载持久数据、开loading protection、解析位置、可选virtualroom安全调整并执行SpawnAtLocation(isloading=true)。"
+          ],
+          "lifecycle": [
+            "函数体不SpawnPrefab，不建立world newents映射或调用LoadPostPass。重复调用会再次加载组件及执行落点/表现副作用。"
+          ],
+          "evidence_refs": [
+            "ARR01",
+            "ARR02",
+            "ARR03",
+            "ARR04"
+          ],
+          "unknowns": [
+            "外部原生何时创建玩家、选择哪份会话、转交data/guid及客户端同步时序未知。"
+          ]
+        },
+        {
+          "symbol": "PlayerSpawner:SpawnAtLocation",
+          "source_file": "scripts/components/playerspawner.lua",
+          "visibility": "原版playerspawner组件Lua方法，闭包内self方法。",
+          "parameters": [
+            "inst为世界实体，player为已构造且持久化加载完成的玩家，x/y/z为初始或保存位置，isloading控制加载表现。"
+          ],
+          "returns": "正常返回nil。该方法未返回抵达或存档提交结果，内部调用异常可外抛。",
+          "preconditions": [
+            "playerspawner仅在mastersim构造。player具备Physics和所需组件。migration存在时migrationpets应为公共preload建立的数组。"
+          ],
+          "side_effects": [
+            "跨源shard时重算落点并搬迁有效宠物，同源shard保留传入位置。随后清临时字段、记录已生成、Teleport、更新areaaware，并执行实际照明/保护/加载表现分支。"
+          ],
+          "lifecycle": [
+            "清迁移字段早于玩家Teleport，具名门ActivatedByOther可能在字段清理前触发。加载表现另登记player静态任务恢复显示和控制。"
+          ],
+          "evidence_refs": [
+            "ARR04",
+            "ARR05",
+            "ARR03",
+            "ARR11",
+            "ARR13"
+          ],
+          "unknowns": [
+            "保护判定、宠物偏移器内部、Physics空间有效性和完整玩家表现恢复未在本条展开。"
+          ]
+        },
+        {
+          "symbol": "GetMigrationPortalFromMigrationData",
+          "source_file": "scripts/componentutil.lua",
+          "visibility": "原版全局Lua辅助函数，读取当前ShardPortals。",
+          "parameters": [
+            "migrationdata为非nil表，worldid和portalid为源标识。"
+          ],
+          "returns": "两个标识非nil且有匹配门时返回首个匹配实体，其他情况返回nil。",
+          "preconditions": [
+            "ShardPortals为当前登记数组，门的worldmigrator关系字段已恢复。"
+          ],
+          "side_effects": [
+            "只扫描匹配，不在此激活门或检查目标可用性。"
+          ],
+          "lifecycle": [
+            "门登记/移除会改变下一次扫描候选，IsDestinationForPortal比较linkedWorld及receivedPortal相等。"
+          ],
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR08",
+            "ARR12"
+          ],
+          "unknowns": [
+            "门init的DoTaskInTime普通零延迟任务与原生会话加载的总序尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "GetMigrationPortalLocation",
+          "source_file": "scripts/componentutil.lua",
+          "visibility": "原版全局Lua辅助函数，返回迁移落点并激活选中门表现。",
+          "parameters": [
+            "ent用于player标签和日志，migrationdata为源标识/可选dest_x/y/z记录，portaloverride可直接指定门。"
+          ],
+          "returns": "正常返回x,y,z三值。有门分支固定y=0，offset存在返回缓存x+offset.x,0,z+offset.z，offset缺失返回缓存x,0,z。坐标offset缺失回给定坐标，无候选则返回GetAnySpawnPoint结果。",
+          "preconditions": [
+            "门及worldmigrator可用，空间搜索依赖TheWorld.Map，默认位置依赖playerspawner。portaloverride优先且本方法不复查其匹配关系。"
+          ],
+          "side_effects": [
+            "有门时读取其物理位置并尝试FindWalkableOffset，在缓存位置和offset之后调用ActivatedByOther发送migration_activate_other。"
+          ],
+          "lifecycle": [
+            "ActivatedByOther可能使门自行替换或移除，函数使用此前缓存的位置返回。函数本身不Teleport ent。"
+          ],
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR09",
+            "ARR10"
+          ],
+          "unknowns": [
+            "FindWalkableOffset/Map实际路径可达性、寻点失败原因及门替换消费者内部未覆盖。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "服务器用已有guid实体加载记录，公共preload先建立migration/pets，组件load填入具体状态。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR02",
+            "ARR03",
+            "ARR11",
+            "MIG08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "SpawnAtLocation比较源worldid与当前shard，跨源时按门/坐标/默认位置解析，原世界重入保留输入位置。",
+          "evidence_refs": [
+            "ARR04",
+            "ARR05",
+            "ARR06",
+            "ARR09",
+            "ARR10"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "门激活与宠物搬位后消费临时字段，再执行玩家Teleport及加载表现。",
+          "evidence_refs": [
+            "ARR04",
+            "ARR05",
+            "ARR07"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ARR01",
+            "role": "具名Lua定义或直接生产/消费/退出边界 ResumeExistingUserSession",
+            "claim_ids": [
+              "EXP-WORLD-004-C01",
+              "EXP-WORLD-004-C06",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "ARR02",
+            "role": "具名Lua定义或直接生产/消费/退出边界 EntityScript:SetPersistData",
+            "claim_ids": [
+              "EXP-WORLD-004-C02",
+              "EXP-WORLD-004-C06"
+            ]
+          },
+          {
+            "ref": "ARR03",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnPreLoad, OnLoad",
+            "claim_ids": [
+              "EXP-WORLD-004-C02",
+              "EXP-WORLD-004-C06",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "MIG08",
+            "role": "具名Lua定义或直接生产/消费/退出边界 MakePlayerCharacter, OnSave, OnPreLoad, OnDespawn",
+            "claim_ids": [
+              "EXP-WORLD-004-C02"
+            ]
+          },
+          {
+            "ref": "ARR11",
+            "role": "具名Lua定义或直接生产/消费/退出边界 CheckMigrationPets, Inventory:OnLoad",
+            "claim_ids": [
+              "EXP-WORLD-004-C02"
+            ]
+          },
+          {
+            "ref": "ARR04",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerSpawner:SpawnAtLocation",
+            "claim_ids": [
+              "EXP-WORLD-004-C03",
+              "EXP-WORLD-004-C06",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "ARR05",
+            "role": "具名Lua定义或直接生产/消费/退出边界 NoHoles, GetMigrationPortalFromMigrationData, GetMigrationPortalLocation",
+            "claim_ids": [
+              "EXP-WORLD-004-C04",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "ARR06",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WorldMigrator:IsDestinationForPortal, WorldMigrator:SetID",
+            "claim_ids": [
+              "EXP-WORLD-004-C04"
+            ]
+          },
+          {
+            "ref": "ARR07",
+            "role": "具名Lua定义或直接生产/消费/退出边界 WorldMigrator:ActivatedByOther, WorldMigrator:OnSave, WorldMigrator:OnLoad",
+            "claim_ids": [
+              "EXP-WORLD-004-C04",
+              "EXP-WORLD-004-C05",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "ARR09",
+            "role": "具名Lua定义或直接生产/消费/退出边界 GetNextSpawnPosition",
+            "claim_ids": [
+              "EXP-WORLD-004-C04"
+            ]
+          },
+          {
+            "ref": "ARR10",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerSpawner.GetAnySpawnPoint",
+            "claim_ids": [
+              "EXP-WORLD-004-C04"
+            ]
+          },
+          {
+            "ref": "ARR08",
+            "role": "具名Lua定义或直接生产/消费/退出边界 OnRegisterMigrationPortal, UnregisterMigrationPortal",
+            "claim_ids": [
+              "EXP-WORLD-004-C05",
+              "EXP-WORLD-004-C07"
+            ]
+          },
+          {
+            "ref": "ARR12",
+            "role": "具名Lua定义或直接生产/消费/退出边界 init, WorldMigrator",
+            "claim_ids": [
+              "EXP-WORLD-004-C05"
+            ]
+          },
+          {
+            "ref": "MIG04",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerSpawner, ms_playerdespawnandmigrate",
+            "claim_ids": [
+              "EXP-WORLD-004-C05"
+            ]
+          },
+          {
+            "ref": "ARR13",
+            "role": "具名Lua定义或直接生产/消费/退出边界 PlayerSpawner",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举限本条具名Lua链，回调指向的其他组件业务、动态Hook和原生内部行为按unknowns保留。"
+        ]
+      },
+      "unknowns": [
+        "尚未运行迁移到达、原分片恢复、无门fallback、门自替换、宠物搬位、重复恢复或中段失败用例。",
+        "ResolveSaveRecordPosition及virtualroom安全调整本条只记录其位置和调用，未展开其全部空间语义。",
+        "Inventory只是迁移宠物数组的具名生产者样本，角色专属petleash/ghostlybond等完整保存链不在此条覆盖。",
+        "从现有guid开始的Lua链不能证明原生玩家重建、跨分片送达、落盘原子性或exactly-once。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "WS01",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 24,
+      "line_end": 48,
+      "range_sha256": "7043370e28f552c6e57a6ef92b69bc59d7bd2fc95919007d0c5464d6a9869427",
+      "symbols": [
+        "SetVariable"
+      ]
+    },
+    {
+      "id": "WS02",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 63,
+      "line_end": 95,
+      "range_sha256": "92e6e09a2a86537162f2463c8a58be1c91f65779582779f0f3df038342a11dc5",
+      "symbols": [
+        "OnPhaseChanged",
+        "OnCavePhaseChanged",
+        "OnMoonPhaseChanged2"
+      ]
+    },
+    {
+      "id": "WS03",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 188,
+      "line_end": 217,
+      "range_sha256": "3ed10028d2d9ccadd9f64845d24741eceea9c5e9187b5176310482193f7e96ec",
+      "symbols": [
+        "WorldState",
+        "phasechanged"
+      ]
+    },
+    {
+      "id": "WS04",
+      "source_file": "scripts/components/worldstate.lua",
+      "file_sha256": "67b6d485b404168a741c942b5390b5c6ca5c0c1a2cd84834357533ab1b7d5a84",
+      "line_start": 281,
+      "line_end": 325,
+      "range_sha256": "1da56332c3d479999eab54808551b86aad389b35efb18df6f7f71c836f9c96a3",
+      "symbols": [
+        "WorldState:AddWatcher",
+        "WorldState:RemoveWatcher"
+      ]
+    },
+    {
+      "id": "WS05",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 11,
+      "line_end": 50,
+      "range_sha256": "c0f0b22d50a6ca35fb86c58ea98bad9ebbf930c2f28d2edbf1fe974ac3aba7b8",
+      "symbols": [
+        "EntityWatchWorldState",
+        "EntityStopWatchingWorldState",
+        "ComponentWatchWorldState",
+        "ComponentStopWatchingWorldState"
+      ]
+    },
+    {
+      "id": "WS06",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1290,
+      "line_end": 1310,
+      "range_sha256": "325f8dd7533a652c7237f8d6e36445949b8db834f9368627c64720775f9ac469",
+      "symbols": [
+        "EntityScript:WatchWorldState",
+        "EntityScript:StopWatchingWorldState",
+        "EntityScript:StopAllWatchingWorldStates"
+      ]
+    },
+    {
+      "id": "WS07",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 238,
+      "line_end": 246,
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "symbols": [
+        "RemoveByValue"
+      ]
+    },
+    {
+      "id": "WS08",
+      "source_file": "scripts/components/clock.lua",
+      "file_sha256": "e15702779a31cd7d3ef23cd7e761079bf44032c2f5c04b349fdb457ed9343925",
+      "line_start": 390,
+      "line_end": 405,
+      "range_sha256": "cf60990e671114bc1ff23f14a6cb415da0a49f2ff66a63382cc6f75b439278a0",
+      "symbols": [
+        "Clock:OnUpdate",
+        "phasechanged"
+      ]
+    },
+    {
+      "id": "WS09",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 587,
+      "line_end": 606,
+      "range_sha256": "f87a251a0e62c2df76cf05d998e83ffea966361b91d8d3df63864405dfc8de52",
+      "symbols": [
+        "fns.OnAlterNight",
+        "fns.OnFullMoonEnlightenment"
+      ]
+    },
+    {
+      "id": "WS10",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 697,
+      "line_end": 704,
+      "range_sha256": "e4f246e293ea1c46b3f69b89a57724e8da7114ca1844bbe2f9949384267d055a",
+      "symbols": [
+        "RegisterMasterEventListeners",
+        "EntityScript:WatchWorldState"
+      ]
+    },
+    {
+      "id": "WS11",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2948,
+      "line_end": 2949,
+      "range_sha256": "0085484d1b1ef97f4dd1f457d63c38833b895707ce6f509329d9ae8327357a46",
+      "symbols": [
+        "fns.OnAlterNight",
+        "fns.OnFullMoonEnlightenment"
+      ]
+    },
+    {
+      "id": "WS12",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1758,
+      "range_sha256": "b11cf40d855c88bf4c923e47527b2281650d2b38893d01bc40f3a7ab20a58476",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "WS13",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "WS14",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 52,
+      "line_end": 60,
+      "range_sha256": "a4dcd8e6a054e5f89f39bd306621ad4698b0c9aceda007c1ec761d4f462ed048",
+      "symbols": [
+        "LoadComponent",
+        "ComponentWatchWorldState",
+        "ComponentStopWatchingWorldState"
+      ]
+    },
+    {
+      "id": "RPC01",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1808,
+      "line_end": 1836,
+      "range_sha256": "aa5a5ac6d5d3672024b3bbb938ea0615a11328be0fce51020abd125a3c299128",
+      "symbols": [
+        "setmetadata",
+        "__index_lower",
+        "__newindex_lower",
+        "SHARD_MOD_RPC"
+      ]
+    },
+    {
+      "id": "RPC02",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1870,
+      "line_end": 1883,
+      "range_sha256": "8721953cd2eae08811956555f3fda277b01d019ab253cdb291f630681135dfb4",
+      "symbols": [
+        "AddShardModRPCHandler"
+      ]
+    },
+    {
+      "id": "RPC03",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1895,
+      "line_end": 1898,
+      "range_sha256": "63bcb2c7ab3e9df18600410a53cf5caec69b54a7d80a6e1834797fd1bbf6ec47",
+      "symbols": [
+        "SendModRPCToShard"
+      ]
+    },
+    {
+      "id": "RPC04",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1947,
+      "line_end": 1958,
+      "range_sha256": "54194fa8a9aa4d7dc7d2dd2f77e3cf0df567c32d3a49674a61e45d9a47e0b638",
+      "symbols": [
+        "HandleShardModRPC"
+      ]
+    },
+    {
+      "id": "RPC05",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1968,
+      "line_end": 1982,
+      "range_sha256": "927e7e909aa6772404355c0167f3a4508030e700ae2338f6e4546fa4fb5d41cc",
+      "symbols": [
+        "GetShardModRPCHandler",
+        "GetShardModRPC"
+      ]
+    },
+    {
+      "id": "RPC06",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1777,
+      "line_end": 1806,
+      "range_sha256": "68c76e37b1da0420b73a43df6c674ab3e5857d05dda9f9bcf67e3fb384c927ff",
+      "symbols": [
+        "HandleRPCQueue",
+        "TickRPCQueue"
+      ]
+    },
+    {
+      "id": "RPC07",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1999,
+      "line_end": 2008,
+      "range_sha256": "1fb901611a9b5839c9b241c70c5f0ca21baf7c17d60e60bde8723e84d9f7dace",
+      "symbols": [
+        "DisableRPCSending"
+      ]
+    },
+    {
+      "id": "RPC08",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 867,
+      "line_end": 885,
+      "range_sha256": "fc3289ec4f7cf8431fed7b085581845af4396c04948951a1e78c0dbb295d44e5",
+      "symbols": [
+        "env.AddShardModRPCHandler",
+        "env.GetShardModRPCHandler"
+      ]
+    },
+    {
+      "id": "RPC09",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 897,
+      "line_end": 917,
+      "range_sha256": "27d6099616878bfcdc5db6f394146d66dc39821ad4c0a46f49eda1abc38716e2",
+      "symbols": [
+        "env.SendModRPCToShard",
+        "env.GetShardModRPC"
+      ]
+    },
+    {
+      "id": "RPC10",
+      "source_file": "scripts/shardnetworking.lua",
+      "file_sha256": "9940c6a8dcc1b6488fc6ad9d80b640ee34793f7ab9c73d0f3b5ea3101dc7bba3",
+      "line_start": 7,
+      "line_end": 22,
+      "range_sha256": "8f95a23ec7e756e0ae1f917df138561aa62b8eb1ed1bc1b4c1176114a71e50b9",
+      "symbols": [
+        "ShardPortals",
+        "Shard_IsWorldAvailable"
+      ]
+    },
+    {
+      "id": "RPC11",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 32,
+      "line_end": 43,
+      "range_sha256": "93afa309157b7425254baecac04028db16f4a606bfd0ea1156edb717c4be3d85",
+      "symbols": [
+        "WallUpdate",
+        "HandleRPCQueue"
+      ]
+    },
+    {
+      "id": "RPC12",
+      "source_file": "scripts/update.lua",
+      "file_sha256": "7b2d7d757a7967258680730849c869fb91e94bc4a7351db554ddda58ff7c74b4",
+      "line_start": 176,
+      "line_end": 184,
+      "range_sha256": "48aeb1b26821452286a6e59b67b85251340b4be12ae6f17f8b094dbcb558a665",
+      "symbols": [
+        "StaticUpdate",
+        "TickRPCQueue"
+      ]
+    },
+    {
+      "id": "RPC13",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1656,
+      "line_end": 1664,
+      "range_sha256": "c94b6a6818a495fe32eb00e46961bb1b6b72fe10e8651535a2f0a6ffe9133329",
+      "symbols": [
+        "SendRPCToShard"
+      ]
+    },
+    {
+      "id": "RPC14",
+      "source_file": "scripts/shardnetworking.lua",
+      "file_sha256": "9940c6a8dcc1b6488fc6ad9d80b640ee34793f7ab9c73d0f3b5ea3101dc7bba3",
+      "line_start": 24,
+      "line_end": 49,
+      "range_sha256": "12572beed7a37ad8822ba619e3fcf0e197b5cd274bd7bbeab76976d912f186bf",
+      "symbols": [
+        "Shard_SyncWorldSettings",
+        "Shard_OnShardConnected"
+      ]
+    },
+    {
+      "id": "RPC15",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 690,
+      "line_end": 701,
+      "range_sha256": "87139a6426fc271025f45266f614edfcb17f5c72fe9f4fd33c87fb54f5ec9b3c",
+      "symbols": [
+        "DeactivateWorld",
+        "DisableRPCSending"
+      ]
+    },
+    {
+      "id": "MIG01",
+      "source_file": "scripts/components/worldmigrator.lua",
+      "file_sha256": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951",
+      "line_start": 198,
+      "line_end": 211,
+      "range_sha256": "81ce9655c2628aba9f94bb13e1ab176678dd6412aba431b6400d81de34d1636d",
+      "symbols": [
+        "WorldMigrator:Activate"
+      ]
+    },
+    {
+      "id": "MIG02",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 81,
+      "line_end": 104,
+      "range_sha256": "2c665baf1b7daef5814fc3af226cc798745e3bfcb8a6c9d5df026a1f103c6667",
+      "symbols": [
+        "PlayerRemove"
+      ]
+    },
+    {
+      "id": "MIG03",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 134,
+      "line_end": 157,
+      "range_sha256": "827a97daa31bede5c8a32c4bb2268a41714fbbe5c09fd5983e5b0d3832484fcd",
+      "symbols": [
+        "OnPlayerDespawn",
+        "OnPlayerDespawnAndMigrate"
+      ]
+    },
+    {
+      "id": "MIG04",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 211,
+      "line_end": 216,
+      "range_sha256": "9dd87361614155f3982099daaf7b82aae67e1081f5e2d7ca2ad2cff2ffa6540f",
+      "symbols": [
+        "PlayerSpawner",
+        "ms_playerdespawnandmigrate"
+      ]
+    },
+    {
+      "id": "MIG05",
+      "source_file": "scripts/components/colourtweener.lua",
+      "file_sha256": "56fef1abd28e4ce224eeac01559e67bb15358117a6df452786da1057acdadb30",
+      "line_start": 27,
+      "line_end": 45,
+      "range_sha256": "2d56c050d91613363fad0d6785bbdaba7c3c9a0d64dd97b91c4e15c67c6fa93d",
+      "symbols": [
+        "ColourTweener:EndTween"
+      ]
+    },
+    {
+      "id": "MIG06",
+      "source_file": "scripts/components/colourtweener.lua",
+      "file_sha256": "56fef1abd28e4ce224eeac01559e67bb15358117a6df452786da1057acdadb30",
+      "line_start": 54,
+      "line_end": 106,
+      "range_sha256": "ceaa0fb668942090b897e8c96fd33c97af356fdd2bd1116172da2437577fb32b",
+      "symbols": [
+        "ColourTweener:StartTween",
+        "ColourTweener:DoUpdate"
+      ]
+    },
+    {
+      "id": "MIG07",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1417,
+      "line_end": 1476,
+      "range_sha256": "01fb26da845bbfb537c2ef546d936688da186b33fa0bf12d386a89982302db5d",
+      "symbols": [
+        "OnDespawn"
+      ]
+    },
+    {
+      "id": "MIG08",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2932,
+      "line_end": 2941,
+      "range_sha256": "6b008c586d0e54cfe026328ae5a0967c027877324ebce587c73d6a07e14456d5",
+      "symbols": [
+        "MakePlayerCharacter",
+        "OnSave",
+        "OnPreLoad",
+        "OnDespawn"
+      ]
+    },
+    {
+      "id": "MIG09",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 303,
+      "line_end": 320,
+      "range_sha256": "0a7152e7088c5d3c6d50a2397049ec3c4af96f8821228a8e2c1813ef805601fe",
+      "symbols": [
+        "SerializeUserSession"
+      ]
+    },
+    {
+      "id": "MIG10",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 248,
+      "line_end": 316,
+      "range_sha256": "9d481040bf0dbaead41c3af063852d8a1a469462d12207da61de1b5fdeea7715",
+      "symbols": [
+        "EntityScript:GetSaveRecord"
+      ]
+    },
+    {
+      "id": "MIG11",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData"
+      ]
+    },
+    {
+      "id": "MIG12",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1213,
+      "line_end": 1217,
+      "range_sha256": "b3200b3e8643bd58591282008c7b736376ad90cb1b3bb684e05b51180629b39e",
+      "symbols": [
+        "OnSave"
+      ]
+    },
+    {
+      "id": "MIG13",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "symbols": [
+        "EntityScript:DoStaticTaskInTime",
+        "EntityScript:DoTaskInTime"
+      ]
+    },
+    {
+      "id": "MIG14",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 4109,
+      "line_end": 4115,
+      "range_sha256": "06b82825d907e302aefb470c9407c4b119b007cea7f06dc2de0f0065f4dbb7ee",
+      "symbols": [
+        "ACTIONS.MIGRATE.fn",
+        "WorldMigrator:Activate"
+      ]
+    },
+    {
+      "id": "ARR01",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2101,
+      "line_end": 2128,
+      "range_sha256": "1975a7ac5bc80d1b96791d3b6618bc1157ae471428df6f0c2363550d84b8f4d7",
+      "symbols": [
+        "ResumeExistingUserSession"
+      ]
+    },
+    {
+      "id": "ARR02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "ARR03",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1255,
+      "line_end": 1269,
+      "range_sha256": "68ba5a8141db037a15fed9c38f0127d31199bcac5fdd7e2ee0a4e957bdd96d63",
+      "symbols": [
+        "OnPreLoad",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "ARR04",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 238,
+      "line_end": 300,
+      "range_sha256": "58566626679916c7923442dd47fe91ed02629b506a93e4edade17544d8c8651f",
+      "symbols": [
+        "PlayerSpawner:SpawnAtLocation"
+      ]
+    },
+    {
+      "id": "ARR05",
+      "source_file": "scripts/componentutil.lua",
+      "file_sha256": "c16f7ab5be64e5eb606a00cbf2a44ce440cd1f343dddc02b05a65cab81a84a90",
+      "line_start": 1094,
+      "line_end": 1141,
+      "range_sha256": "268beeccaa9cd022f959fab56970196810bf238c6d26329ee44be523f6a5bd5d",
+      "symbols": [
+        "NoHoles",
+        "GetMigrationPortalFromMigrationData",
+        "GetMigrationPortalLocation"
+      ]
+    },
+    {
+      "id": "ARR06",
+      "source_file": "scripts/components/worldmigrator.lua",
+      "file_sha256": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951",
+      "line_start": 130,
+      "line_end": 147,
+      "range_sha256": "aba4f1815a9cc554fd01e50c4c743a3fa6378421c3ffc97eed397178487ee0ba",
+      "symbols": [
+        "WorldMigrator:IsDestinationForPortal",
+        "WorldMigrator:SetID"
+      ]
+    },
+    {
+      "id": "ARR07",
+      "source_file": "scripts/components/worldmigrator.lua",
+      "file_sha256": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951",
+      "line_start": 235,
+      "line_end": 258,
+      "range_sha256": "87bc32d512d0de45d69763720bd0a822f4e4b818df3fd27e48b34bc0d017c428",
+      "symbols": [
+        "WorldMigrator:ActivatedByOther",
+        "WorldMigrator:OnSave",
+        "WorldMigrator:OnLoad"
+      ]
+    },
+    {
+      "id": "ARR08",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 191,
+      "line_end": 205,
+      "range_sha256": "96cfb138528031de83504272eb9f6e7da0c21dca6f7579ce941a6fae9abd1043",
+      "symbols": [
+        "OnRegisterMigrationPortal",
+        "UnregisterMigrationPortal"
+      ]
+    },
+    {
+      "id": "ARR09",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 44,
+      "line_end": 79,
+      "range_sha256": "a206a3c5033a8ffb7e6048c1b87e99546449aacb27461b378d422e1f570fb404",
+      "symbols": [
+        "GetNextSpawnPosition"
+      ]
+    },
+    {
+      "id": "ARR10",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 302,
+      "line_end": 305,
+      "range_sha256": "6a13ad7fe412be08160b896591942fae1f1615406ff1d438700904691950c106",
+      "symbols": [
+        "PlayerSpawner.GetAnySpawnPoint"
+      ]
+    },
+    {
+      "id": "ARR11",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 266,
+      "line_end": 325,
+      "range_sha256": "c2026626bb5d95cd72796496bba9669bb3fea8d88efaf0b9b93d878577cb7a4e",
+      "symbols": [
+        "CheckMigrationPets",
+        "Inventory:OnLoad"
+      ]
+    },
+    {
+      "id": "ARR12",
+      "source_file": "scripts/components/worldmigrator.lua",
+      "file_sha256": "8983f95da1a69114ebc3e498da03b572e3aa8c237ad0c12b08d2543898a21951",
+      "line_start": 21,
+      "line_end": 54,
+      "range_sha256": "76190d944159cb8e54c4bce2258c624d9dc5ee06784fcb90dc9dfe908270510b",
+      "symbols": [
+        "init",
+        "WorldMigrator"
+      ]
+    },
+    {
+      "id": "ARR13",
+      "source_file": "scripts/components/playerspawner.lua",
+      "file_sha256": "b6e1354fb7b69f134ed1dabe38c85e4494a30e667eb0ba1261cd6d29cd43745f",
+      "line_start": 5,
+      "line_end": 8,
+      "range_sha256": "9dc7f6288ee0b3d9b730e3c3c84f7728124706a326caa693c05a4030e1cbe385",
+      "symbols": [
+        "PlayerSpawner"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "WorldState phasechanged 多字段 中间状态 自解绑 跳过回调",
+      "expected_entry_ids": [
+        "EXP-WORLD-001"
+      ],
+      "purpose": "逐字段派发与当前轮解绑"
+    },
+    {
+      "query": "WatchWorldState StopWatchingWorldState StopAllWatchingWorldStates 完整合同",
+      "expected_entry_ids": [
+        "EXP-WORLD-001"
+      ],
+      "purpose": "观察入口生命周期"
+    },
+    {
+      "query": "AddShardModRPCHandler 同名重复登记 旧id GetShardModRPCHandler 入队函数",
+      "expected_entry_ids": [
+        "EXP-WORLD-002"
+      ],
+      "purpose": "注册和队列身份边界"
+    },
+    {
+      "query": "SendModRPCToShard DisableRPCSending 返回值 目标参数",
+      "expected_entry_ids": [
+        "EXP-WORLD-002"
+      ],
+      "purpose": "Lua发送包装与原生目标边界"
+    },
+    {
+      "query": "WorldMigrator Activate ms_playerdespawnandmigrate PlayerRemove SerializeUserSession",
+      "expected_entry_ids": [
+        "EXP-WORLD-003"
+      ],
+      "purpose": "玩家迁移离场交接"
+    },
+    {
+      "query": "迁移 migration.worldid 源分片 保存请求 StartMigration 顺序",
+      "expected_entry_ids": [
+        "EXP-WORLD-003"
+      ],
+      "purpose": "字段方向与阶段"
+    },
+    {
+      "query": "ResumeExistingUserSession SpawnAtLocation 原世界失败迁移 migrationpets",
+      "expected_entry_ids": [
+        "EXP-WORLD-004"
+      ],
+      "purpose": "已有实体加载和迁移消费"
+    },
+    {
+      "query": "GetMigrationPortalLocation GetMigrationPortalFromMigrationData 无门 坐标 默认位置",
+      "expected_entry_ids": [
+        "EXP-WORLD-004"
+      ],
+      "purpose": "迁移落点选择"
+    }
+  ],
+  "limitations": [
+    "静态证据来自本轮762172/build26474873合法本地归档，整体及成员/范围SHA重算，runtime_verified:false。",
+    "全部条目保持research/restricted/hold，候选需绑定精确SHA的独立审阅后登记。",
+    "成员SHA使用ZIP原字节，范围SHA使用UTF8 splitlines后LF连接且无末尾换行。候选仅保留定位与论述。",
+    "源码身份限定本轮证据，不形成新版准入白名单。原生发送目标、玩家创建、磁盘与分片交付内部仍未知。"
+  ]
+}

@@ -1,0 +1,3188 @@
+{
+  "schema": "dst-independent-mechanism-research-review/1",
+  "date": "2026-11-12",
+  "reviewer": "independent-movement-review",
+  "candidate_topic": "movement_relationships",
+  "candidate_sha256": "e27b088ade4fe0bd92d8ab20f6a65af5307e6242cebd1fe4bdd2cc551720c07f",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "accepted_scope": {
+    "entry_ids": [
+      "EXP-MOVE-001",
+      "EXP-MOVE-002",
+      "EXP-REL-001",
+      "EXP-REL-002"
+    ],
+    "entries": 4,
+    "claims": 30,
+    "api_contracts": 23,
+    "mechanism_steps": 12,
+    "source_references": 48,
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+    "governance": {
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold"
+    }
+  },
+  "checks": [
+    {
+      "check": "frozen_candidate_identity",
+      "status": "PASS",
+      "result": "独立复制并核对冻结候选SHA，READY与副本身份一致。"
+    },
+    {
+      "check": "archive_file_range_identity",
+      "status": "PASS",
+      "result": "归档SHA及48个引用的成员原字节SHA、UTF8 splitlines/LF无尾换行范围SHA全部匹配。"
+    },
+    {
+      "check": "schema_and_reference_graph",
+      "status": "PASS",
+      "result": "独立执行现有mechanism_contract.validate通过。4条、30 claims、23 API、12 steps及48 refs均逐项审核。"
+    },
+    {
+      "check": "baseline_increment",
+      "status": "PASS",
+      "result": "按CATALOG file/pointer独立读取全部247个实际条目并定向比较相关正文。旧NC-N004-FINAL-05/10已覆盖SML基础及PlayerSpeedMult缓存，本候选明确作为前置。新增为locomotor两套来源API/真实预演和速度消费、Leader/Follower与Rider/Rideable双侧接线及退出链。"
+    },
+    {
+      "check": "typed_claims_consumers_and_boundaries",
+      "status": "PASS",
+      "result": "逐NSF、EI、REC核对定义/调用者/具名消费者。事件普通监听同步与SG消费时点、多个字段提交阶段、普通/预测来源和服务器/客户端getter边界均保留。"
+    }
+  ],
+  "baseline_deduplication": {
+    "records_read": 247,
+    "related_records": [
+      "PATTERN-SHARD-001",
+      "NC-N004-FINAL-01",
+      "NC-N004-FINAL-03",
+      "NC-N004-FINAL-04",
+      "NC-N004-FINAL-05",
+      "NC-N004-FINAL-08",
+      "NC-N004-FINAL-10",
+      "NC-N004-FINAL-11",
+      "N005-UI-C03",
+      "N006-READY-F01",
+      "N007-MC-04",
+      "N007-MC-05",
+      "N007-MC-06",
+      "DC-C01",
+      "HC-P01",
+      "HC-P03",
+      "BTR-P01",
+      "EXP-WET-001",
+      "EXP-SURV-004",
+      "EXP-PRES-003",
+      "EXP-PRES-006",
+      "EXP-PRES-007",
+      "EXP-ARCH-002",
+      "EXP-LIFE-008",
+      "EXP-ACT-001"
+    ],
+    "overlap_preserved": [
+      "NC-N004-FINAL-05",
+      "NC-N004-FINAL-10",
+      "EXP-AI-007",
+      "EXP-ARCH-002",
+      "EXP-LIFE-008"
+    ],
+    "conclusion": "基础SML事实有明确复用。新增条目的接受依据为完整API及新增具名调用链，未将复用前置逐句计作新增机制。"
+  },
+  "entries": [
+    {
+      "id": "EXP-MOVE-001",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "id": "EXP-MOVE-001-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "构造缺省base/reducer与显式参数、默认key、nil source和base值转移除均与定义一致。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "缓存先提交后dirtycb，同值跳过、空Reset与缺key重算边界均成立。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C03",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "pairs顺序相关reducer及同步回调重入是所查Lua的有限推论，缓存Get定义支持结论。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "普通表与预测列表实际为两套结构，包装参数交换及Multipler全量读取准确。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "客户端classified/本地后备乘预测聚合，START/STOP预演正逆倍率和任务字段控制清理均成立。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S09",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 5773,
+              "line_end": 5852
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S46",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 1,
+              "line_end": 7
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C06",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC以支持来源身份的实际接口为条件，与具名预演和卸载释放点相符。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S09",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 5773,
+              "line_end": 5852
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SourceModifierList:SetModifier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "nil source和默认key、m=nil/base移除、同值跳过、首次实体监听、缓存后dirtycb和异常外抛成立。",
+          "definition": {
+            "source_file": "scripts/util/sourcemodifierlist.lua",
+            "line_start": 64,
+            "line_end": 99
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "SourceModifierList:RemoveModifier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "省略key去整source，缺source早退，缺key但有其他项仍重算，最后项解绑后删除成立。",
+          "definition": {
+            "source_file": "scripts/util/sourcemodifierlist.lua",
+            "line_start": 103,
+            "line_end": 122
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S45",
+              "source_file": "scripts/util.lua",
+              "line_start": 238,
+              "line_end": 246
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "SourceModifierList:Reset",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "整表释放监听并清缓存至base，空表仍dirtycb，locomotor卸载调用成立。",
+          "definition": {
+            "source_file": "scripts/util/sourcemodifierlist.lua",
+            "line_start": 124,
+            "line_end": 135
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:SetPredictExternalSpeedMultiplier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "包装参数source/key/m转source/m/key，按需列表且无本方法端别早退，客户端具名消费者成立。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 548,
+            "line_end": 553
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S09",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 5773,
+              "line_end": 5852
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S46",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 1,
+              "line_end": 7
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:RemovePredictExternalSpeedMultiplier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "未建列表无动作，沿SML移除单key/整source，保留列表，预演及卸载清理成立。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 556,
+            "line_end": 560
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S09",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 5773,
+              "line_end": 5852
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:GetPredictExternalSpeedMultipler",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "保留源码Multipler拼写，声明source/key未使用，读取整表缓存或1。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 563,
+            "line_end": 565
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S09",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 5773,
+              "line_end": 5852
+            },
+            {
+              "id": "MR-S46",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 1,
+              "line_end": 7
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S08",
+              "source_file": "scripts/stategraphs/SGwilson_client.lua",
+              "line_start": 90,
+              "line_end": 134
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S18",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            }
+          ]
+        }
+      ],
+      "scope_and_unknowns": "所查Lua的静态事实及有限EI/REC接受。各条所列未运行用例、动态hook、原生、网络和跨分片边界保留。"
+    },
+    {
+      "id": "EXP-MOVE-002",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "id": "EXP-MOVE-002-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "master/client构造绑定和客户端去setter已核对，classified载体存在条件保留。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "显式key、nil/1转移除以及无EntityScript类型分流均成立，普通API未假定支持字符串来源。",
+          "locations": [
+            {
+              "id": "MR-S01",
+              "source_file": "scripts/util/sourcemodifierlist.lua",
+              "line_start": 1,
+              "line_end": 185
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "装备/鞍互斥分支、mighty下限、临时地面/地面与throttle及客户端对应getter均成立。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S21",
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 126,
+              "line_end": 144
+            },
+            {
+              "id": "MR-S22",
+              "source_file": "scripts/components/saddler.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "id": "MR-S23",
+              "source_file": "scripts/components/inventoryitem_replica.lua",
+              "line_start": 391,
+              "line_end": 429
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "walk base与骑乘run base分离，速度getter到SetMotorSpeed和Physics委托已核对。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "非平台扫描else、正motor、CheckDrownable假值及近目标局部乘数替换条件准确。",
+          "locations": [
+            {
+              "id": "MR-S07",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1424,
+              "line_end": 1760
+            },
+            {
+              "id": "MR-S48",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1416,
+              "line_end": 1422
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "骑手外部聚合与坐骑runspeed组合支持有限EI，原生位移及其他分支仍在unknowns。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S07",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1424,
+              "line_end": 1760
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            }
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC沿实际取值链定位，并保留不同来源表及各自退出身份。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S07",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1424,
+              "line_end": 1760
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "LocoMotor:SetExternalSpeedMultiplier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "key=nil早退、nil/1转移除、无nil-source/type保护、监听与属性setter以及端别限制准确。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 490,
+            "line_end": 512
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:RemoveExternalSpeedMultiplier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "缺source早退，key可省略，保留其他key分支及最后项解绑/重算与channelcaster消费成立。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 515,
+            "line_end": 531
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:GetExternalSpeedMultiplier",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "查询单source/key并以1后备，省略key计算该来源乘积，本方法不返回全局聚合。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 534,
+            "line_end": 546
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:GetWalkSpeed",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "walkspeed乘绑定GetSpeedMultiplier，必要getter副作用和WalkForward消费成立。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 589,
+            "line_end": 591
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S21",
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 126,
+              "line_end": 144
+            },
+            {
+              "id": "MR-S22",
+              "source_file": "scripts/components/saddler.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "id": "MR-S23",
+              "source_file": "scripts/components/inventoryitem_replica.lua",
+              "line_start": 391,
+              "line_end": 429
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "LocoMotor:GetRunSpeed",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "绑定RunSpeed乘当前骑手GetSpeedMultiplier，坐骑base和客户端replica/classified条件准确。",
+          "definition": {
+            "source_file": "scripts/components/locomotor.lua",
+            "line_start": 593,
+            "line_end": 595
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S07",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1424,
+              "line_end": 1760
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S21",
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 126,
+              "line_end": 144
+            },
+            {
+              "id": "MR-S22",
+              "source_file": "scripts/components/saddler.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "id": "MR-S23",
+              "source_file": "scripts/components/inventoryitem_replica.lua",
+              "line_start": 391,
+              "line_end": 429
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S48",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1416,
+              "line_end": 1422
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S05",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 589,
+              "line_end": 680
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S21",
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 126,
+              "line_end": 144
+            },
+            {
+              "id": "MR-S22",
+              "source_file": "scripts/components/saddler.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "id": "MR-S23",
+              "source_file": "scripts/components/inventoryitem_replica.lua",
+              "line_start": 391,
+              "line_end": 429
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S03",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 387,
+              "line_end": 401
+            },
+            {
+              "id": "MR-S04",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 480,
+              "line_end": 565
+            },
+            {
+              "id": "MR-S06",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 721,
+              "line_end": 754
+            },
+            {
+              "id": "MR-S07",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1424,
+              "line_end": 1760
+            },
+            {
+              "id": "MR-S10",
+              "source_file": "scripts/components/channelcaster.lua",
+              "line_start": 1,
+              "line_end": 102
+            },
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S48",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1416,
+              "line_end": 1422
+            }
+          ]
+        }
+      ],
+      "scope_and_unknowns": "所查Lua的静态事实及有限EI/REC接受。各条所列未运行用例、动态hook、原生、网络和跨分片边界保留。"
+    },
+    {
+      "id": "EXP-REL-001",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "id": "EXP-REL-001-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "Add索引先写与事件/监听顺序、Remove删索引/回调/invalid假值后段准确。",
+          "locations": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "旧关系解除、新关系建立、helper和replica以及changed后段均已核对，互调以索引和指针收束。",
+          "locations": [
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            },
+            {
+              "id": "MR-S34",
+              "source_file": "scripts/components/followermemory.lua",
+              "line_start": 178,
+              "line_end": 192
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "component/replica getter优先itemowner，helper的来源/容器监听与itemfollowers调用点相符。",
+          "locations": [
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "忠诚上限、倍率、gainloyalty先于句柄替换、到期条件及leash独立资源成立。",
+          "locations": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "leader死亡keepdeadleader选择、OnRemoveEntity别名及Follower局部卸载残留均可由定义确认。",
+          "locations": [
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S18",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "局部卸载留下leader索引及后续普通Remove依赖follower组件的EI成立，重入/异常只推断已提交阶段。",
+          "locations": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C07",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "非玩家GUID列表、LoadPostPass映射和玩家缓存重接/清理条件相符，未扩大为跨分片协议。",
+          "locations": [
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C08",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "master猪人构造、trader回调、PigBrain目标函数、FunctionOrValue与Follow实际移动请求链成立。",
+          "locations": [
+            {
+              "id": "MR-S29",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 80,
+              "line_end": 135
+            },
+            {
+              "id": "MR-S30",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 804,
+              "line_end": 881
+            },
+            {
+              "id": "MR-S31",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 121,
+              "line_end": 123
+            },
+            {
+              "id": "MR-S32",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 334,
+              "line_end": 349
+            },
+            {
+              "id": "MR-S33",
+              "source_file": "scripts/behaviours/follow.lua",
+              "line_start": 1,
+              "line_end": 165
+            },
+            {
+              "id": "MR-S47",
+              "source_file": "scripts/util.lua",
+              "line_start": 1718,
+              "line_end": 1724
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C09",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC明确区分leader、owner与getter目标，并由关系字段、任务和实际Follow消费者支持。",
+          "locations": [
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            },
+            {
+              "id": "MR-S33",
+              "source_file": "scripts/behaviours/follow.lua",
+              "line_start": 1,
+              "line_end": 165
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Leader:AddFollower",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "正常nil，目标组件/已有索引门、先写索引再互调及事件和后段监听顺序准确。",
+          "definition": {
+            "source_file": "scripts/components/leader.lua",
+            "line_start": 189,
+            "line_end": 216
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S29",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 80,
+              "line_end": 135
+            },
+            {
+              "id": "MR-S30",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 804,
+              "line_end": 881
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Leader:RemoveFollower",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "正常nil与nil/缺索引早退，invalid真假分流、业务回调先于目标清理以及重入无复核准确。",
+          "definition": {
+            "source_file": "scripts/components/leader.lua",
+            "line_start": 170,
+            "line_end": 187
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Follower:SetLeader",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "changed与递归中间nil、旧资源释放、新source/helper/leader/监听和末段hook事件准确。",
+          "definition": {
+            "source_file": "scripts/components/follower.lua",
+            "line_start": 293,
+            "line_end": 351
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            },
+            {
+              "id": "MR-S34",
+              "source_file": "scripts/components/followermemory.lua",
+              "line_start": 178,
+              "line_end": 192
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Follower:GetLeader",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "返回itemowner or leader，getter自身不验IsValid，replica与PigBrain/Follow消费相符。",
+          "definition": {
+            "source_file": "scripts/components/follower.lua",
+            "line_start": 59,
+            "line_end": 61
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            },
+            {
+              "id": "MR-S31",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 121,
+              "line_end": 123
+            },
+            {
+              "id": "MR-S32",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 334,
+              "line_end": 349
+            },
+            {
+              "id": "MR-S33",
+              "source_file": "scripts/behaviours/follow.lua",
+              "line_start": 1,
+              "line_end": 165
+            },
+            {
+              "id": "MR-S47",
+              "source_file": "scripts/util.lua",
+              "line_start": 1718,
+              "line_end": 1724
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Follower:AddLoyaltyTime",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "neverexpire早退、倍率和maxfollowtime缺省0、截止夹取及事件先于句柄替换准确。",
+          "definition": {
+            "source_file": "scripts/components/follower.lua",
+            "line_start": 365,
+            "line_end": 389
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S29",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 80,
+              "line_end": 135
+            },
+            {
+              "id": "MR-S30",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 804,
+              "line_end": 881
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Follower:StopFollowing",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "neverexpire/IsValid门、先清targettime再loseloyalty后SetLeader(nil)，正常nil。",
+          "definition": {
+            "source_file": "scripts/components/follower.lua",
+            "line_start": 399,
+            "line_end": 410
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S27",
+              "source_file": "scripts/components/follower_replica.lua",
+              "line_start": 1,
+              "line_end": 20
+            },
+            {
+              "id": "MR-S29",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 80,
+              "line_end": 135
+            },
+            {
+              "id": "MR-S30",
+              "source_file": "scripts/prefabs/pigman.lua",
+              "line_start": 804,
+              "line_end": 881
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S28",
+              "source_file": "scripts/componentutil.lua",
+              "line_start": 1777,
+              "line_end": 1855
+            },
+            {
+              "id": "MR-S31",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 121,
+              "line_end": 123
+            },
+            {
+              "id": "MR-S32",
+              "source_file": "scripts/brains/pigbrain.lua",
+              "line_start": 334,
+              "line_end": 349
+            },
+            {
+              "id": "MR-S33",
+              "source_file": "scripts/behaviours/follow.lua",
+              "line_start": 1,
+              "line_end": 165
+            },
+            {
+              "id": "MR-S47",
+              "source_file": "scripts/util.lua",
+              "line_start": 1718,
+              "line_end": 1724
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S18",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            },
+            {
+              "id": "MR-S25",
+              "source_file": "scripts/components/leader.lua",
+              "line_start": 1,
+              "line_end": 312
+            },
+            {
+              "id": "MR-S26",
+              "source_file": "scripts/components/follower.lua",
+              "line_start": 1,
+              "line_end": 532
+            },
+            {
+              "id": "MR-S34",
+              "source_file": "scripts/components/followermemory.lua",
+              "line_start": 178,
+              "line_end": 192
+            }
+          ]
+        }
+      ],
+      "scope_and_unknowns": "所查Lua的静态事实及有限EI/REC接受。各条所列未运行用例、动态hook、原生、网络和跨分片边界保留。"
+    },
+    {
+      "id": "EXP-REL-002",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "id": "EXP-REL-002-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "动作资格门、调用后true与Mount拒绝/成功均nil的区别准确。",
+          "locations": [
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S37",
+              "source_file": "scripts/actions.lua",
+              "line_start": 4141,
+              "line_end": 4172
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "target_mount/riding/SG先于child/scene/tracking/mount/SetRider，属性和replica写入顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C03",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "riding早于mount及切态/事件后外层续行有直接Lua依据，异常恢复留在unknowns。",
+          "locations": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "SetRider先写字段，再解绑/重绑及按需周期任务，重复同对象仍发riderchanged成立。",
+          "locations": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "Dismount/Buck发布事件，SG门和三个状态onexit提交ActualDismount，实际解除顺序成立。",
+          "locations": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C06",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "OnDespawn调用与安装、两组件局部卸载、嵌套mount保存及SpawnSaveRecord后Mount调用点成立。",
+          "locations": [
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S43",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 1417,
+              "line_end": 1437
+            },
+            {
+              "id": "MR-S44",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 2936,
+              "line_end": 2944
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C07",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "单侧SetRider与局部卸载不完成双侧关系/场景的EI有明确字段写入边界支持。",
+          "locations": [
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C08",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC沿资格/建立/SG退出和阶段诊断，保留复制、原生与具体角色业务未知。",
+          "locations": [
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S37",
+              "source_file": "scripts/actions.lua",
+              "line_start": 4141,
+              "line_end": 4172
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            },
+            {
+              "id": "MR-S43",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 1417,
+              "line_end": 1437
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Rider:Mount",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "资格拒绝与成功均nil，双侧和scene接线分阶段、同步SG续行、任务和mounted发布点准确。",
+          "definition": {
+            "source_file": "scripts/components/rider.lua",
+            "line_start": 67,
+            "line_end": 171
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S37",
+              "source_file": "scripts/actions.lua",
+              "line_start": 4141,
+              "line_end": 4172
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            },
+            {
+              "id": "MR-S43",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 1417,
+              "line_end": 1437
+            },
+            {
+              "id": "MR-S44",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 2936,
+              "line_end": 2944
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Rider:Dismount",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "只PushEvent且正常nil，SG条件和onexit提交边界准确，未承诺同步完成下马。",
+          "definition": {
+            "source_file": "scripts/components/rider.lua",
+            "line_start": 173,
+            "line_end": 175
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Rider:ActualDismount",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "非riding返回nil，完整清理返回ex_mount，riding先false且mount最后nil，具名SG和Despawn调用成立。",
+          "definition": {
+            "source_file": "scripts/components/rider.lua",
+            "line_start": 179,
+            "line_end": 244
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            },
+            {
+              "id": "MR-S43",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 1417,
+              "line_end": 1437
+            },
+            {
+              "id": "MR-S44",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 2936,
+              "line_end": 2944
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Rideable:TestRider",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "无custom函数true，有函数直接消费其真假结果，输入原样传入，同步hook副作用限定。",
+          "definition": {
+            "source_file": "scripts/components/rideable.lua",
+            "line_start": 108,
+            "line_end": 111
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Rideable:SetRider",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "正常nil，同对象仍解绑/重绑/事件，StartRiddenTick限制重复任务，单侧维护边界准确。",
+          "definition": {
+            "source_file": "scripts/components/rideable.lua",
+            "line_start": 174,
+            "line_end": 191
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S15",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 276,
+              "line_end": 301
+            },
+            {
+              "id": "MR-S16",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 164,
+              "line_end": 216
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        },
+        {
+          "symbol": "Rideable:Buck",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "当前rider及其rider组件门、gentle数据、事件请求与SG falloff/bucked消费准确。",
+          "definition": {
+            "source_file": "scripts/components/rideable.lua",
+            "line_start": 201,
+            "line_end": 205
+          },
+          "caller_consumer_and_dependencies": [
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            }
+          ],
+          "visibility_assessment": "可定位的原版Lua方法，依本条Scope、接收者和具名端别/消费者审阅，保持research/restricted/hold。"
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S37",
+              "source_file": "scripts/actions.lua",
+              "line_start": 4141,
+              "line_end": 4172
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S02",
+              "source_file": "scripts/components/locomotor.lua",
+              "line_start": 1,
+              "line_end": 350
+            },
+            {
+              "id": "MR-S19",
+              "source_file": "scripts/class.lua",
+              "line_start": 1,
+              "line_end": 214
+            },
+            {
+              "id": "MR-S20",
+              "source_file": "scripts/prefabs/player_classified.lua",
+              "line_start": 1595,
+              "line_end": 1622
+            },
+            {
+              "id": "MR-S24",
+              "source_file": "scripts/components/rider_replica.lua",
+              "line_start": 1,
+              "line_end": 273
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            }
+          ]
+        },
+        {
+          "step": 3,
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "描述与具名定义、调用者、消费及退出顺序一致。",
+          "locations": [
+            {
+              "id": "MR-S11",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1198,
+              "line_end": 1288
+            },
+            {
+              "id": "MR-S12",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "MR-S13",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1494,
+              "line_end": 1555
+            },
+            {
+              "id": "MR-S14",
+              "source_file": "scripts/scheduler.lua",
+              "line_start": 45,
+              "line_end": 95
+            },
+            {
+              "id": "MR-S17",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 670,
+              "line_end": 685
+            },
+            {
+              "id": "MR-S35",
+              "source_file": "scripts/components/rider.lua",
+              "line_start": 1,
+              "line_end": 270
+            },
+            {
+              "id": "MR-S36",
+              "source_file": "scripts/components/rideable.lua",
+              "line_start": 1,
+              "line_end": 239
+            },
+            {
+              "id": "MR-S38",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 2388,
+              "line_end": 2399
+            },
+            {
+              "id": "MR-S39",
+              "source_file": "scripts/stategraphs/SGwilson.lua",
+              "line_start": 19611,
+              "line_end": 19777
+            },
+            {
+              "id": "MR-S40",
+              "source_file": "scripts/stategraph.lua",
+              "line_start": 529,
+              "line_end": 600
+            },
+            {
+              "id": "MR-S41",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "id": "MR-S42",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            },
+            {
+              "id": "MR-S43",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 1417,
+              "line_end": 1437
+            },
+            {
+              "id": "MR-S44",
+              "source_file": "scripts/prefabs/player_common.lua",
+              "line_start": 2936,
+              "line_end": 2944
+            }
+          ]
+        }
+      ],
+      "scope_and_unknowns": "所查Lua的静态事实及有限EI/REC接受。各条所列未运行用例、动态hook、原生、网络和跨分片边界保留。"
+    }
+  ],
+  "limitations": [
+    "静态审核，未启动游戏，未执行客户端、专服、重连、读档、骑乘或移动用例。",
+    "原生物理/动画/网络复制/调度实际结果及动态Mod重入恢复仍按候选unknowns保留。",
+    "本审阅接受限定研究范围，knowledge/retrieval/coding状态按候选保持research/restricted/hold。"
+  ]
+}

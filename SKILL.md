@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.11`：247 条登记知识（64 基础 + 13 Native AI + 110 Core + 60 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase10-recovery-delivery.md) · [English](README.en.md)
+`v2026.11.12`：267 条登记知识（64 基础 + 13 Native AI + 110 Core + 80 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase11-native-expansion.md) · [English](README.en.md)
 
 ## 工作顺序
 
@@ -46,13 +46,13 @@ python -B -X utf8 run_kb.py update-sources ensure
 | GUID 引用、嵌套保存、postpass、读档副作用与任务恢复 | [save-recovery-architecture.md](references/save-recovery-architecture.md) |
 | modmain/prefab 环境、Class、Hook、配置、加载错误 | [core-lua-hooks.md](references/core-lua-hooks.md) |
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](references/entities-components.md) |
-| 角色、Brain、Stategraph、自定义生物 | [characters-brains-stategraphs.md](references/characters-brains-stategraphs.md) |
+| 角色、自定义生物、Brain、Stategraph、移速、跟随与骑乘 | [characters-brains-stategraphs.md](references/characters-brains-stategraphs.md) |
 | 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](references/spells-and-custom-stats.md) |
-| netvar、Replica、RPC、客户端与服务端 | [networking-rpc.md](references/networking-rpc.md) |
+| netvar、Replica、RPC、Shard RPC、客户端与服务端 | [networking-rpc.md](references/networking-rpc.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](references/lifecycle-save.md) |
 | HUD、Widget、输入、Action、施法与预测 | [ui-actions-controls.md](references/ui-actions-controls.md) |
 | 伤害、Buff、容器、冷却、范围查询 | [combat-buffs-containers.md](references/combat-buffs-containers.md) |
-| 装备、投掷、维修、制作、锅料理、树木种植 | [items-food-plants.md](references/items-food-plants.md) |
+| 物品转移与堆叠、装备、投掷、维修、制作采集、锅料理、树木种植 | [items-food-plants.md](references/items-food-plants.md) |
 | 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](references/cooker-dishes.md) |
 | 地图生成、布局、地皮、空间判定 | [worldgen-spatial.md](references/worldgen-spatial.md) |
 | TEX/XML、SCML、bank/build/symbol、编译资源 | [assets-animation.md](references/assets-animation.md) |

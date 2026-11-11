@@ -1,0 +1,2897 @@
+{
+  "schema_version": "dst-independent-static-review/1",
+  "topic": "item_transfer_ownership",
+  "candidate_sha256": "af7a26f884a83624c984430c414b60a3e38a659f0ed71844847be8edbac23440",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "source_locator_review": {
+    "verdict": "EXACT_FILE_RANGE_ALL",
+    "references_checked": 60,
+    "method": "独立计算ZIP整体SHA、成员原始bytes文件SHA以及UTF8 splitlines闭区间LF无末尾换行范围SHA。哈希校验与以下语义判断分别完成。"
+  },
+  "catalog_review": {
+    "entries_scanned": 247,
+    "mapped_atoms_checked": 24,
+    "mapped_atom_hashes": "ALL_MATCH",
+    "related_entries_read": [
+      "NC-N004-FINAL-04",
+      "NC-N004-FINAL-05",
+      "NC-N004-FINAL-09",
+      "TR-C03",
+      "TR-C02",
+      "FACT-DST-005",
+      "FACT-DST-004",
+      "RC-C03",
+      "EXP-ACT-002",
+      "EXP-SURV-003",
+      "EXP-SAVE-006"
+    ],
+    "conclusion": "基础归属、拆分、部分交付及装备回调次序已有覆盖。四条均包含可区分的新选位/调用者/客户端请求或回调阶段边界，重复前置事实不单独计为新增机制。"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-ITEM-001",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "NC-N004-FINAL-04已有归属及多结果边界，FINAL-09已有拆堆先于成员查找。新增选位完整分流、被忽略的容器返回、具体事件写入窗口与Drop接收者/直接owner分工。",
+      "claims": [
+        {
+          "claim_id": "EXP-ITEM-001-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "入口字段读取、有效性、装备卸下、跨直接owner移除及OnPickup事件/自定义返回次序成立。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PICKUP",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-UNEQUIP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 436,
+              "line_end": 468
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "prevslot与prevcontainer的分流、返还尝试与提示清理符合源码，建议格仍经CanTakeItemInSlot。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ADMIT",
+            "ITEM-STACK",
+            "ITEM-CT-OPEN"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 231,
+              "line_end": 252
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 727,
+              "line_end": 729
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "equipstack优先、普通堆暂存与overflow/特殊容器优先关系、空格顺序和返回容器形态成立。",
+          "evidence_refs": [
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-ADMIT",
+            "ITEM-CT-PRIORITY",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 801,
+              "line_end": 909
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 231,
+              "line_end": 252
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 308,
+              "line_end": 324
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "普通格写入早于OnPut及itemget，ToPocket无owner实参，容器空格分支忽略GiveItem结果并true及剩余递归成立。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-OWNER",
+            "ITEM-EQUIPPABLE",
+            "ITEM-CT-GIVE",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 285,
+              "line_end": 291
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "overflow尝试、ignorefull、active/HandleLeftoversFn/活动堆/掉落与returnvalue分流成立。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-STACK",
+            "ITEM-INV-DROP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1012,
+              "line_end": 1027
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C06",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "单件拆分位于成员搜索前，普通/active清指针和事件早于OnRemoved，overflow原样返回可终止搜索成立。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-ON-PUT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-CT-REMOVE",
+            "ITEM-INV-SPECIAL",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C07",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Drop沿直接owner委托移除并回退源物，接收者默认落点、OnDropped、提示清理和dropitem次序成立。",
+          "evidence_refs": [
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ON-DROP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 378,
+              "line_end": 434
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C08",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "同步事件消费者可观察指定清槽与清owner中间阶段，Drop接收者及直接owner的职责区分有源码依据。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ENTITY-EVENT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-001-C09",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC依赖多返回、剩余实体及成员位置的已核分支，未把动作返回作为入包确认。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-PICK-DELIVERY",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/pickable.lua",
+              "line_start": 493,
+              "line_end": 518
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/0/api_contracts/0",
+          "symbol": "Inventory:GiveItem",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "定义、三实参和slot/true/false/nil分支成立，容器分支忽略子调用返回的限制见同entry C04，完整结果须沿成员和剩余物读取。 新增直接读取active/equipslots/itemslots的查询及AddChild/RemoveFromScene引用符合该方法实际消费者链。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ADMIT",
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-ON-PICKUP",
+            "ITEM-ON-PUT",
+            "ITEM-FROM-OWNER",
+            "ITEM-CT-GIVE",
+            "ITEM-STACK",
+            "ITEM-EQUIPPABLE",
+            "ITEM-INV-DROP",
+            "ITEM-INV-QUERY",
+            "ITEM-INV-SLOT-QUERY",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 231,
+              "line_end": 252
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 801,
+              "line_end": 909
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 436,
+              "line_end": 468
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 502,
+              "line_end": 512
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 773,
+              "line_end": 779
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/0/api_contracts/1",
+          "symbol": "Inventory:GetNextAvailableSlot",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "定义与slot/container多形态返回成立，选择阶段含自定义谓词，交付由GiveItem后续执行。",
+          "evidence_refs": [
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-CT-PRIORITY",
+            "ITEM-INV-ADMIT",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 801,
+              "line_end": 909
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 308,
+              "line_end": 324
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 231,
+              "line_end": 252
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/0/api_contracts/2",
+          "symbol": "Inventory:RemoveItem",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、nil/拆件/匹配物/未命中原item返回成立，未宣称返回即成功移除。 新增GetItemSlot查询与RemoveChild/ReturnToScene消费者引用补齐成员位置及退出阶段。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-STACK",
+            "ITEM-CT-REMOVE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-POCKET-QUERY",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1459,
+              "line_end": 1494
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 592,
+              "line_end": 598
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/0/api_contracts/3",
+          "symbol": "Inventory:DropItem",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、拒绝nil与实际dropped实体返回成立，沿直接owner移除，接收者负责默认位置及dropitem。",
+          "evidence_refs": [
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ON-DROP",
+            "ITEM-ACTION-DROP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 378,
+              "line_end": 434
+            },
+            {
+              "source_file": "scripts/actions.lua",
+              "line_start": 1168,
+              "line_end": 1189
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": "所列生产者、组件入口与消费者已按定义和真实调用核对，步骤有界成立。",
+      "scope_unknowns": "保留research/restricted/hold与runtime_verified=false，原生复制/物理/生成、UI送达及具体mod回调仍在unknowns。"
+    },
+    {
+      "entry_id": "EXP-ITEM-002",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "复用NC-N004-FINAL-04部分交付/未找到原样返回，补准入与占位关系、fallback格选择、readonly/无限堆取出、源/目标开放检查和返还剩余链。EXP-ARCH-004的classified附着仅作去重。",
+      "claims": [
+        {
+          "claim_id": "EXP-ITEM-002-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "容器准入仅对锁定占用格作兼容堆例外，普通占用格可通过，readonly/slot范围/itemtestfn次序成立。",
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 569,
+              "line_end": 604
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "入口准入、特定格、嵌套优先容器、并堆与fallback空格分支成立，fallback循环不重新逐格测试itemtestfn。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SPECIAL",
+            "ITEM-CT-PRIORITY",
+            "ITEM-CT-OVERFLOW"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 789,
+              "line_end": 814
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 308,
+              "line_end": 324
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 367,
+              "line_end": 374
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "常规写槽/无限上限/OnPut/itemget及直接owner通知成立，方法体未做Inventory入口的旧owner移除与OnPickup。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-MOVE",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1332,
+              "line_end": 1410
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "单件部分接收false早退、尾部条件掉落及Put的nil控制流判定成立，未把false视为零交付。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-DROP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 378,
+              "line_end": 434
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "按格/对象移除、readonly、单件或originalmaxsize分拆、整件清槽与无限上限复原次序成立。",
+          "evidence_refs": [
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 569,
+              "line_end": 604
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C06",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "replica准入与classified预测、busy/实体门禁、remainder非nil后更新源预览及发送RPC成立。",
+          "evidence_refs": [
+            "ITEM-CT-REPLICA",
+            "ITEM-CT-REPLICA-MOVE",
+            "ITEM-CT-CLIENT",
+            "ITEM-CT-BUSY",
+            "ITEM-RPC-SEND"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container_replica.lua",
+              "line_start": 340,
+              "line_end": 384
+            },
+            {
+              "source_file": "scripts/components/container_replica.lua",
+              "line_start": 621,
+              "line_end": 627
+            },
+            {
+              "source_file": "scripts/prefabs/container_classified.lua",
+              "line_start": 732,
+              "line_end": 789
+            },
+            {
+              "source_file": "scripts/prefabs/container_classified.lua",
+              "line_start": 78,
+              "line_end": 80
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 1640,
+              "line_end": 1643
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C07",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "RPC形态检查和源开放、组件目标开放/准入、过堆处理、暂存标志、失败返还当前剩余及正常尾部清理成立。",
+          "evidence_refs": [
+            "ITEM-RPC-MOVE",
+            "ITEM-RPC-SHAPE",
+            "ITEM-CT-MOVE",
+            "ITEM-CT-OPEN",
+            "ITEM-INV-OPEN",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 897,
+              "line_end": 908
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 4,
+              "line_end": 13
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1332,
+              "line_end": 1410
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 727,
+              "line_end": 729
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2015,
+              "line_end": 2017
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-002-C08",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "准入与最终成员接收分支、直接GiveItem调用者旧槽责任、标志清false而非任意旧值恢复的推导成立。",
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-MOVE",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1332,
+              "line_end": 1410
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/1/api_contracts/0",
+          "symbol": "Container:CanTakeItemInSlot",
+          "source_file": "scripts/components/container.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "参数、准入结果、itemtestfn、非整数未统一拒绝与错误传播边界成立。",
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 569,
+              "line_end": 604
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/1/api_contracts/1",
+          "symbol": "Container:GiveItem",
+          "source_file": "scripts/components/container.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名与副作用成立，returns已保留前向兼容筛选与反向Put检查可能非对称、Put不兼容nil触发true及部分交付false，独立原子保留接收结果限制。新增owner/父子/场景引用与OnPut消费者相符。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-PRIORITY",
+            "ITEM-CT-SPECIAL",
+            "ITEM-CT-OVERFLOW",
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-DROP",
+            "ITEM-OWNER",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 308,
+              "line_end": 324
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 789,
+              "line_end": 814
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 367,
+              "line_end": 374
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 378,
+              "line_end": 434
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 285,
+              "line_end": 291
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/1/api_contracts/2",
+          "symbol": "Container:RemoveItemBySlot",
+          "source_file": "scripts/components/container.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、按格取物委托内部、nil/拆件/原物与readonly边界成立。",
+          "evidence_refs": [
+            "ITEM-CT-SLOT",
+            "ITEM-CT-REMOVE",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 569,
+              "line_end": 604
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/1/api_contracts/3",
+          "symbol": "Container:RemoveItem",
+          "source_file": "scripts/components/container.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名保留未使用参数、未命中原物、内部拆堆/清槽副作用成立。",
+          "evidence_refs": [
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 569,
+              "line_end": 604
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/1/api_contracts/4",
+          "symbol": "Container:MoveItemFromAllOfSlot",
+          "source_file": "scripts/components/container.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、源/目标开放检查归属、剩余物返还、标记正常清理及无局部finally成立。",
+          "evidence_refs": [
+            "ITEM-CT-MOVE",
+            "ITEM-RPC-MOVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-CT-OPEN",
+            "ITEM-INV-OPEN",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1332,
+              "line_end": 1410
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 897,
+              "line_end": 908
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 269,
+              "line_end": 305
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 727,
+              "line_end": 729
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2015,
+              "line_end": 2017
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": "所列生产者、组件入口与消费者已按定义和真实调用核对，步骤有界成立。",
+      "scope_unknowns": "保留research/restricted/hold与runtime_verified=false，原生复制/物理/生成、UI送达及具体mod回调仍在unknowns。"
+    },
+    {
+      "entry_id": "EXP-ITEM-003",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "拆分与owner继承、稀释基础为旧事实，当前版本重算引用。新增兼容判断的双端差异、Put不兼容nil、源删除/数量事件早于目标赋值及消费者成员接线。",
+      "claims": [
+        {
+          "claim_id": "EXP-ITEM-003-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "服务端prefab/skinname/custom链及replica组件委托成立。客户端明确双方AnimState均存在才比较SkinBuild，缺任一时跳过该比较并继续后续自定义谓词。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-STACK-REPLICA"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/stackable_replica.lua",
+              "line_start": 130,
+              "line_end": 150
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-003-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "不兼容nil、容量及numberadded、稀释、全并删源/部分源改量、目标后置改量和事件次序成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-WRAP",
+            "ITEM-DILUTE-TEMP-WRAP",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL",
+            "ITEM-ENTITY-REMOVE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/perishable.lua",
+              "line_start": 168,
+              "line_end": 178
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 166,
+              "line_end": 170
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 254,
+              "line_end": 258
+            },
+            {
+              "source_file": "scripts/components/inventoryitemmoisture.lua",
+              "line_start": 126,
+              "line_end": 131
+            },
+            {
+              "source_file": "scripts/components/inventoryitemtemperature.lua",
+              "line_start": 113,
+              "line_end": 118
+            },
+            {
+              "source_file": "scripts/components/edible.lua",
+              "line_start": 244,
+              "line_end": 249
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-003-C03",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "nil覆盖不兼容与全并，源onremove或stacksizechange早于目标数量写入，稀释消费者使用旧目标量的推导成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ENTITY-REMOVE",
+            "ITEM-ENTITY-EVENT",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            },
+            {
+              "source_file": "scripts/components/perishable.lua",
+              "line_start": 168,
+              "line_end": 178
+            },
+            {
+              "source_file": "scripts/components/inventoryitemmoisture.lua",
+              "line_start": 126,
+              "line_end": 131
+            },
+            {
+              "source_file": "scripts/components/inventoryitemtemperature.lua",
+              "line_start": 113,
+              "line_end": 118
+            },
+            {
+              "source_file": "scripts/components/edible.lua",
+              "line_start": 244,
+              "line_end": 249
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-003-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Get的默认1、Spawn同prefab/skin、先数量后ondestack、选定组件复制、owner及湿温继承、返原物分支成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-003-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Get不登记槽位，Inventory/Container消费者另作OnRemoved或写槽/OnPut，无限堆取出分支成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 228,
+              "line_end": 244
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-003-C06",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC保留接收堆、源堆、Get返回物实际身份并沿已核消费者登记成员，依据充分。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 447,
+              "line_end": 567
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/2/api_contracts/0",
+          "symbol": "Stackable:CanStackWith",
+          "source_file": "scripts/components/stackable.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "服务端定义、prefab/skinname/custom兼容谓词与真假返回成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-STACK-REPLICA"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/stackable_replica.lua",
+              "line_start": 130,
+              "line_end": 150
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/2/api_contracts/1",
+          "symbol": "Stackable:Get",
+          "source_file": "scripts/components/stackable.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "默认数量、返新物或源物、未统一验证正整数/Spawn返回、owner继承与消费者成员接线边界成立。 新增SetOwner、AddChild/RemoveFromScene消费者引用精确说明继承owner与场景，仍由外层消费者登记槽位。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-OWNER",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/container.lua",
+              "line_start": 1009,
+              "line_end": 1053
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 285,
+              "line_end": 291
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/2/api_contracts/2",
+          "symbol": "Stackable:Put",
+          "source_file": "scripts/components/stackable.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "源实体与组件self的assert原样比较、nil歧义、剩余物返回、源先目标后事件及删除消费者边界成立。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ENTITY-REMOVE",
+            "ITEM-FROM-OWNER",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-WRAP",
+            "ITEM-DILUTE-TEMP-WRAP",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1730,
+              "line_end": 1797
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/perishable.lua",
+              "line_start": 168,
+              "line_end": 178
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 166,
+              "line_end": 170
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 254,
+              "line_end": 258
+            },
+            {
+              "source_file": "scripts/components/inventoryitemmoisture.lua",
+              "line_start": 126,
+              "line_end": 131
+            },
+            {
+              "source_file": "scripts/components/inventoryitemtemperature.lua",
+              "line_start": 113,
+              "line_end": 118
+            },
+            {
+              "source_file": "scripts/components/edible.lua",
+              "line_start": 244,
+              "line_end": 249
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": "所列生产者、组件入口与消费者已按定义和真实调用核对，步骤有界成立。",
+      "scope_unknowns": "保留research/restricted/hold与runtime_verified=false，原生复制/物理/生成、UI送达及具体mod回调仍在unknowns。"
+    },
+    {
+      "entry_id": "EXP-ITEM-004",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "旧NC-N004-FINAL-04/05已有基础装备回调和owner次序。本条补旧物/余堆去向、同物再次Equip、捕获旧对象与后置写槽、以及客户端预测到服务器当前active的请求链。",
+      "claims": [
+        {
+          "claim_id": "EXP-ITEM-004-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "入口限制、捕获旧槽、防卸、提示/控制器与重物互斥、持有移除/地面拆堆次序成立。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-INV-GIVE",
+            "ITEM-STACK"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 147,
+              "line_end": 194
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "leftovers与旧物去向、新物OnPut/Equip后写槽、overflow及重物/手持标志、equip/setbonus和from_ground分支成立。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-DROP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1012,
+              "line_end": 1027
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Unequip先物品回调后清槽/owner事件，空槽仍发布unequip，Equippable标志、事件与model回调次序成立。",
+          "evidence_refs": [
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C04",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "限定正常单件/可卸且未改引用后，同物再次Equip先强制Unequip/OnRemoved，再因局部olditem==item跳过安装并nil的推导成立。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-EQUIP-ENTRY"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2452,
+              "line_end": 2494
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C05",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "olditem捕获和新物回调早于最终槽写入，现明确回调正常返回后外层沿局部引用继续。最终槽写入没有独立身份比较的有界推导成立。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-ENTITY-EVENT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C06",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "replica/classified本地预览先于RPC，RPC无物品参数，服务端重新读取active与空槽后Equip的端别边界成立。",
+          "evidence_refs": [
+            "ITEM-INV-REPLICA-EQUIP",
+            "ITEM-INV-CLIENT-EQUIP",
+            "ITEM-INV-CLIENT-BUSY",
+            "ITEM-INV-CLIENT-PREVIEW",
+            "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+            "ITEM-RPC-EQUIP",
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-INV-EQUIP",
+            "ITEM-RPC-SEND"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory_replica.lua",
+              "line_start": 552,
+              "line_end": 574
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 1035,
+              "line_end": 1042
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 89,
+              "line_end": 91
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 606,
+              "line_end": 621
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 658,
+              "line_end": 669
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 824,
+              "line_end": 847
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2452,
+              "line_end": 2494
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 1640,
+              "line_end": 1643
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-ITEM-004-C07",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "EquipActionItem给定物的GrandOwner检查、HANDS/已装备门禁、Get余堆及active身份清理、普通动作返回路径成立。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-FROM-OWNER",
+            "ITEM-STACK",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-ACTION-EQUIP",
+            "ITEM-INV-DROP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2452,
+              "line_end": 2494
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/actions.lua",
+              "line_start": 858,
+              "line_end": 885
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "pointer": "/entries/3/api_contracts/0",
+          "symbol": "Inventory:Equip",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、true/nil分支和生命周期成立。errors已明确异常中断后续步骤，正常返回才继续缓存局部对象及后置写槽。新增查询、ReturnActiveItem与父子/场景引用与真实调用链一致。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-DROP",
+            "ITEM-STACK",
+            "ITEM-INV-POCKET-QUERY",
+            "ITEM-INV-QUERY",
+            "ITEM-INV-SLOT-QUERY",
+            "ITEM-INV-RETURN-ACTIVE",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 147,
+              "line_end": 194
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1012,
+              "line_end": 1027
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 713,
+              "line_end": 753
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 592,
+              "line_end": 598
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 502,
+              "line_end": 512
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 773,
+              "line_end": 779
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 570,
+              "line_end": 586
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 913,
+              "line_end": 935
+            },
+            {
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 348,
+              "line_end": 413
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/3/api_contracts/1",
+          "symbol": "Inventory:Unequip",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、防卸/force、物品回调先于清槽、owner清理由后续移交负责及原物/nil返回成立。",
+          "evidence_refs": [
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-ON-PUT"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 68,
+              "line_end": 123
+            },
+            {
+              "source_file": "scripts/components/equippable.lua",
+              "line_start": 147,
+              "line_end": 194
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 319,
+              "line_end": 376
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/3/api_contracts/2",
+          "symbol": "Inventory:EquipActionItem",
+          "source_file": "scripts/components/inventory.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "签名、GrandOwner/HANDS门禁、余堆拆出GiveItem、Equip与active身份清理成立，无显式返回。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-FROM-OWNER",
+            "ITEM-STACK",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2452,
+              "line_end": 2494
+            },
+            {
+              "source_file": "scripts/components/inventoryitem.lua",
+              "line_start": 475,
+              "line_end": 506
+            },
+            {
+              "source_file": "scripts/components/stackable.lua",
+              "line_start": 1,
+              "line_end": 204
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1029,
+              "line_end": 1217
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1219,
+              "line_end": 1264
+            }
+          ]
+        },
+        {
+          "pointer": "/entries/3/api_contracts/3",
+          "symbol": "Inventory:EquipActiveItem",
+          "source_file": "scripts/components/inventory_replica.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "精确source_file定位replica身份，组件/客户端classified分流、本地预览与无物品参数RPC边界成立，无显式返回。",
+          "evidence_refs": [
+            "ITEM-INV-REPLICA-EQUIP",
+            "ITEM-INV-CLIENT-EQUIP",
+            "ITEM-INV-CLIENT-BUSY",
+            "ITEM-INV-CLIENT-PREVIEW",
+            "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+            "ITEM-RPC-EQUIP",
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-INV-EQUIP",
+            "ITEM-RPC-SEND"
+          ],
+          "evidence": [
+            {
+              "source_file": "scripts/components/inventory_replica.lua",
+              "line_start": 552,
+              "line_end": 574
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 1035,
+              "line_end": 1042
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 89,
+              "line_end": 91
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 606,
+              "line_end": 621
+            },
+            {
+              "source_file": "scripts/prefabs/inventory_classified.lua",
+              "line_start": 658,
+              "line_end": 669
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 824,
+              "line_end": 847
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 2452,
+              "line_end": 2494
+            },
+            {
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1266,
+              "line_end": 1388
+            },
+            {
+              "source_file": "scripts/networkclientrpc.lua",
+              "line_start": 1640,
+              "line_end": 1643
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": "所列生产者、组件入口与消费者已按定义和真实调用核对，步骤有界成立。",
+      "scope_unknowns": "保留research/restricted/hold与runtime_verified=false，原生复制/物理/生成、UI送达及具体mod回调仍在unknowns。"
+    }
+  ],
+  "limitations": [
+    "仅静态Lua研究，未启动游戏或验证native/网络送达。",
+    "任意mod回调、重入、异常后的业务结果仍需结合具体项目验证。",
+    "本次审阅仅绑定精确候选SHA，修订候选需重绑并复核所改原子。"
+  ],
+  "source_references_checked": [
+    {
+      "id": "ITEM-INV-GIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1029,
+      "line_end": 1217,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-ADMIT",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 231,
+      "line_end": 252,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-SELECT",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 801,
+      "line_end": 909,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-SPECIAL",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1459,
+      "line_end": 1494,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-REMOVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1390,
+      "line_end": 1454,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-DROP",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 713,
+      "line_end": 753,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-ACTIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1012,
+      "line_end": 1027,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-EQUIP",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1266,
+      "line_end": 1388,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-UNEQUIP",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1219,
+      "line_end": 1264,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-EQUIP-ENTRY",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 2452,
+      "line_end": 2494,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-OPEN",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 2015,
+      "line_end": 2017,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 502,
+      "line_end": 512,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-POCKET-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 592,
+      "line_end": 598,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-SLOT-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 773,
+      "line_end": 779,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-RETURN-ACTIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 570,
+      "line_end": 586,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-OWNER",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 285,
+      "line_end": 291,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ON-PUT",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 319,
+      "line_end": 376,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ON-DROP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 378,
+      "line_end": 434,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ON-PICKUP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 436,
+      "line_end": 468,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-FROM-OWNER",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 475,
+      "line_end": 506,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-GIVE",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 447,
+      "line_end": 567,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-ADMIT",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 269,
+      "line_end": 305,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-PRIORITY",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 308,
+      "line_end": 324,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-SPECIAL",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 789,
+      "line_end": 814,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-OVERFLOW",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 367,
+      "line_end": 374,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-REMOVE",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 1009,
+      "line_end": 1053,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-SLOT",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 569,
+      "line_end": 604,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-EXCESS",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 228,
+      "line_end": 244,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-MOVE",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 1332,
+      "line_end": 1410,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-OPEN",
+      "source_file": "scripts/components/container.lua",
+      "line_start": 727,
+      "line_end": 729,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-STACK",
+      "source_file": "scripts/components/stackable.lua",
+      "line_start": 1,
+      "line_end": 204,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-STACK-REPLICA",
+      "source_file": "scripts/components/stackable_replica.lua",
+      "line_start": 130,
+      "line_end": 150,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-EQUIPPABLE",
+      "source_file": "scripts/components/equippable.lua",
+      "line_start": 68,
+      "line_end": 123,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-EQUIP-RESTRICT",
+      "source_file": "scripts/components/equippable.lua",
+      "line_start": 147,
+      "line_end": 194,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-REPLICA",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 340,
+      "line_end": 384,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-REPLICA-MOVE",
+      "source_file": "scripts/components/container_replica.lua",
+      "line_start": 621,
+      "line_end": 627,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-CLIENT",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 732,
+      "line_end": 789,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-CT-BUSY",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "line_start": 78,
+      "line_end": 80,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-RPC-MOVE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "line_start": 897,
+      "line_end": 908,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-RPC-SHAPE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "line_start": 4,
+      "line_end": 13,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-RPC-SEND",
+      "source_file": "scripts/networkclientrpc.lua",
+      "line_start": 1640,
+      "line_end": 1643,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-REPLICA-EQUIP",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "line_start": 552,
+      "line_end": 574,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-CLIENT-EQUIP",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 1035,
+      "line_end": 1042,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-CLIENT-BUSY",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 89,
+      "line_end": 91,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-CLIENT-PREVIEW",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 606,
+      "line_end": 621,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 658,
+      "line_end": 669,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-RPC-EQUIP",
+      "source_file": "scripts/networkclientrpc.lua",
+      "line_start": 824,
+      "line_end": 847,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ACTION-EQUIP",
+      "source_file": "scripts/actions.lua",
+      "line_start": 858,
+      "line_end": 885,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ACTION-DROP",
+      "source_file": "scripts/actions.lua",
+      "line_start": 1168,
+      "line_end": 1189,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-PICK-DELIVERY",
+      "source_file": "scripts/components/pickable.lua",
+      "line_start": 493,
+      "line_end": 518,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ENTITY-REMOVE",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1730,
+      "line_end": 1797,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ENTITY-EVENT",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1312,
+      "line_end": 1345,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ENTITY-CHILD",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 913,
+      "line_end": 935,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-ENTITY-SCENE",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 348,
+      "line_end": 413,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-WRAP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 166,
+      "line_end": 170,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-TEMP-WRAP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 254,
+      "line_end": 258,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-PERISH",
+      "source_file": "scripts/components/perishable.lua",
+      "line_start": 168,
+      "line_end": 178,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-MOIST",
+      "source_file": "scripts/components/inventoryitemmoisture.lua",
+      "line_start": 126,
+      "line_end": 131,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-TEMP",
+      "source_file": "scripts/components/inventoryitemtemperature.lua",
+      "line_start": 113,
+      "line_end": 118,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    },
+    {
+      "id": "ITEM-DILUTE-CHILL",
+      "source_file": "scripts/components/edible.lua",
+      "line_start": 244,
+      "line_end": 249,
+      "file_sha256_match": true,
+      "range_sha256_match": true
+    }
+  ],
+  "blockers": [],
+  "resolved_findings": [
+    {
+      "finding_id": "ITEM-REVIEW-01",
+      "verdict": "RESOLVED_STATIC",
+      "affected_pointers": [
+        "/entries/1/api_contracts/1/returns"
+      ],
+      "assessment": "已补充true仅代表控制流，以及前向CanStackWith筛选与接收堆Put反向检查的非对称nil边界。对照container.lua 487–514与stackable.lua 72–85、159–203，修订成立。",
+      "evidence": [
+        {
+          "source_file": "scripts/components/container.lua",
+          "line_start": 487,
+          "line_end": 514
+        },
+        {
+          "source_file": "scripts/components/stackable.lua",
+          "line_start": 72,
+          "line_end": 85
+        },
+        {
+          "source_file": "scripts/components/stackable.lua",
+          "line_start": 159,
+          "line_end": 203
+        }
+      ]
+    },
+    {
+      "finding_id": "ITEM-REVIEW-02",
+      "verdict": "RESOLVED_STATIC",
+      "affected_pointers": [
+        "/entries/2/claims/0/statement"
+      ],
+      "assessment": "已补双方AnimState均存在才比较GetSkinBuild，缺任一则跳过并继续后续谓词。对照stackable_replica.lua 130–148，修订成立。",
+      "evidence": [
+        {
+          "source_file": "scripts/components/stackable_replica.lua",
+          "line_start": 130,
+          "line_end": 148
+        }
+      ]
+    },
+    {
+      "finding_id": "ITEM-REVIEW-03",
+      "verdict": "RESOLVED_STATIC",
+      "affected_pointers": [
+        "/entries/3/api_contracts/0/lifecycle/errors",
+        "/entries/3/claims/4/statement"
+      ],
+      "assessment": "API errors已明确异常传播并中断后续步骤，C05同时限定回调正常返回才沿缓存局部引用继续。对照inventory.lua 1277–1278、1339–1366及equippable.lua 92–106，修订成立。",
+      "evidence": [
+        {
+          "source_file": "scripts/components/inventory.lua",
+          "line_start": 1364,
+          "line_end": 1366
+        },
+        {
+          "source_file": "scripts/components/equippable.lua",
+          "line_start": 92,
+          "line_end": 106
+        }
+      ]
+    }
+  ],
+  "revision_review": {
+    "base_candidate_sha256": "c1a0412f7005fbf4749a2807bd370ddb164ad287668bb401875d49dae1760c2f",
+    "expanded_candidate_sha256": "ecc73bb19dc12a5fe10b224ec4beae526f8ff8fc6f992894c948a86661092b2e",
+    "final_candidate_sha256": "af7a26f884a83624c984430c414b60a3e38a659f0ed71844847be8edbac23440",
+    "structural_diff_verified": true,
+    "first_delta_nodes": 10,
+    "second_delta_nodes": 4,
+    "unchanged_original_references": 54,
+    "api_evidence_lists_changed": 5,
+    "dependency_lists_changed": 4,
+    "contract_validation": "PASS",
+    "added_source_reviews": [
+      {
+        "reference_id": "ITEM-INV-QUERY",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "GetActiveItem直接读activeitem，IsItemEquipped遍历equipslots按对象身份返回键。GiveItem与Equip相关查询链成立。",
+        "evidence": [
+          {
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 502,
+            "line_end": 512
+          }
+        ]
+      },
+      {
+        "reference_id": "ITEM-INV-POCKET-QUERY",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "GetItemSlot只扫描普通itemslots按对象身份返键，与InventoryItem:GetSlotNum及Equip旧位提示的消费者相符。",
+        "evidence": [
+          {
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 592,
+            "line_end": 598
+          }
+        ]
+      },
+      {
+        "reference_id": "ITEM-INV-SLOT-QUERY",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "GetEquippedItem与GetItemInSlot直接按键读各自表，支持GiveItem建议格与Equip重物/槽读取。",
+        "evidence": [
+          {
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 773,
+            "line_end": 779
+          }
+        ]
+      },
+      {
+        "reference_id": "ITEM-INV-RETURN-ACTIVE",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "GiveActiveItem先ReturnActiveItem。后者可Get拆件后Give/Drop，普通路径Give/Drop当前active再SetActiveItem(nil)，相关调用正常返回才继续。",
+        "evidence": [
+          {
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 570,
+            "line_end": 586
+          }
+        ]
+      },
+      {
+        "reference_id": "ITEM-ENTITY-CHILD",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "AddChild移除旧Lua parent后建立新parent/children及原生SetParent，RemoveChild清Lua关系后SetParent(nil)。这些操作与inventoryitem.owner字段写入属于可辨阶段。",
+        "evidence": [
+          {
+            "source_file": "scripts/entityscript.lua",
+            "line_start": 913,
+            "line_end": 935
+          }
+        ]
+      },
+      {
+        "reference_id": "ITEM-ENTITY-SCENE",
+        "verdict": "PASS_STATIC_RESEARCH",
+        "assessment": "RemoveFromScene先改limbo/原生可见与物理/动画等状态，尾部enterlimbo；ReturnToScene反向处理并尾部exitlimbo。当前正文仅限定这些Lua调用边界，保留原生及具体回调unknown。",
+        "evidence": [
+          {
+            "source_file": "scripts/entityscript.lua",
+            "line_start": 348,
+            "line_end": 413
+          }
+        ]
+      }
+    ],
+    "dependency_assessment": "四条的新增compatibility依赖角色均符合真实查询、OnPut/OnRemoved父子场景调用或GiveActiveItem前置ReturnActiveItem。附加到五个API的证据未改变其身份、Scope或端别。"
+  }
+}

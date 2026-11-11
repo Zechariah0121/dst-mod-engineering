@@ -1,0 +1,2043 @@
+{
+  "schema_version": "dst-independent-static-review/1",
+  "topic": "combat_damage",
+  "candidate_sha256": "f97f4c349c5f3432b8ae20457a13943020209a70a59e6970281b2d729ac5b740",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "summary": "独立核对全部四条、30个claim及19个API合同，所列Lua分支事实、推导及建议与定义/调用方/具名消费者相符。维持research/restricted/hold。",
+  "verification": {
+    "candidate_sha256_matches_frozen_input": true,
+    "archive_sha256_matches": true,
+    "source_reference_count": 30,
+    "source_files_and_ranges_hashes_match": true,
+    "candidate_schema_validation": "PASS",
+    "independent_semantic_read": "definitions_callers_and_named_consumers",
+    "baseline_entries_read": 247,
+    "related_baseline_entries_deep_read": [
+      "AI-N001-11",
+      "NC-N004-FINAL-01",
+      "NC-N004-FINAL-03",
+      "NC-N004-FINAL-05",
+      "NC-N004-FINAL-07"
+    ],
+    "real_game_run": "not_run",
+    "runtime_verified": false
+  },
+  "entries": [
+    {
+      "entry_id": "EXP-COMBAT-001",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "increment_over_baseline": "基线N004的Combat/Health主链作为上下文保留。新增Inventory内部普通最高吸收与比例耐久、特殊容量多轮分摊以及Armor破损完整阶段。",
+      "claims": [
+        {
+          "claim_id": "EXP-COMBAT-001-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "inventory 430-453在装备扫描后统一乘类型倍率。435-438分别取最大吸收和吸收率总和，451按比例及weakness建立耐久账，441-442固定本次普通剩余量。未依剩余condition限制本次吸收。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S24",
+              "source_file": "scripts/components/damagetyperesist.lua",
+              "line_start": 1,
+              "line_end": 42
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "inventory 457-491逐类型改原表，469在每轮开始取dmg/count，472-479保留或移除容量，480-484记录抵挡及带armor时的耐久。无armor仍经过480扣除伤害。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "inventory 494-497在全部账目建立后扣耐久。armor 157-163与93-113支持单件内部顺序，percentusedchange同步监听由entityscript 1312-1326支持。不同护甲间pairs顺序保留未知。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S03",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 1,
+              "line_end": 43
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S10",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "armor 94-95只早退SetCondition，TakeDamage 160-163仍有后继语句。101按当前condition<=0分支，无正转零检查。120-123证明有condition的加载直接进入该setter。",
+          "evidence": [
+            {
+              "reference_id": "CD-S04",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 45,
+              "line_end": 64
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 615-631给出本体、isequipped及ignorecombat门禁，644-678才计算本体倍率并检查Health无敌及DoDelta。health 623-640另处理redirect/吸收和SetVal。该项作为既有主链上下文接受。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S07",
+              "source_file": "scripts/components/health.lua",
+              "line_start": 565,
+              "line_end": 649
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "EI成立于所列顺序。护甲扣减先于combat 652的无敌检查及health 623的redirect，故后段拒绝生命变化并不回滚耐久。ordinary leftover已在inventory 442求值，后续破甲不重新计算。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S07",
+              "source_file": "scripts/components/health.lua",
+              "line_start": 565,
+              "line_end": 649
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-001-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC针对不同阶段记录量和核对回调生命期，与两个返回量、账目及SetCondition/TakeDamage顺序一致。没有增加玩法取舍或运行保证。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S07",
+              "source_file": "scripts/components/health.lua",
+              "line_start": 565,
+              "line_end": 649
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Inventory:ApplyDamage",
+          "source_file": "scripts/components/inventory.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法定义408-500。输入damage数值及可变spdamage、二返回、Resistance短路、最高吸收和特殊容量分摊、原地表修改、最终pairs扣耐久均吻合。Combat门禁和后续Health阶段已独立交叉核对。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S03",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 1,
+              "line_end": 43
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S08",
+              "source_file": "scripts/equipslotutil.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        },
+        {
+          "symbol": "Armor:InitCondition",
+          "source_file": "scripts/components/armor.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法39-43直接设置三个字段并隐式nil返回，无percentusedchange及indestructible清除。hats 402-415为master消费者。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S03",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 1,
+              "line_end": 43
+            },
+            {
+              "reference_id": "CD-S04",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 45,
+              "line_end": 64
+            },
+            {
+              "reference_id": "CD-S17",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 395,
+              "line_end": 416
+            }
+          ]
+        },
+        {
+          "symbol": "Armor:GetAbsorption",
+          "source_file": "scripts/components/armor.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法139-141经126-137的CanResist返回配置数值或nil。attacker=nil时有tags不单独查weapon，nil写absorbers会移除键，不按condition裁剪。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S04",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 45,
+              "line_end": 64
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            }
+          ]
+        },
+        {
+          "symbol": "Armor:GetBonusDamage",
+          "source_file": "scripts/components/armor.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法143-154在weakness不存在或attacker=nil时0，按匹配标签取最大值。inventory仅total_absorption>0时将其加入对应耐久账。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            }
+          ]
+        },
+        {
+          "symbol": "Armor:TakeDamage",
+          "source_file": "scripts/components/armor.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法156-164先倍率、setter、回调、事件，隐式nil。输入负值及indestructible后继路径描述与代码相符。SetCondition删除后的native安全被正确留作unknown。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S03",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 1,
+              "line_end": 43
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S10",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "symbol": "Armor:SetCondition",
+          "source_file": "scripts/components/armor.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法93-114早退、钳值、事件、零值统计/回调/Remove次序吻合。事件和回调同步可改状态或抛错，无事务回滚。OnLoad及Repair两个调用方已核对。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S03",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 1,
+              "line_end": 43
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S10",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": {
+        "verdict": "PASS_STATIC_RESEARCH",
+        "steps_reviewed": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "conclusion": "逐步描述与上述定义/调用方/消费者顺序一致，分支条件随完整条目Scope和claims保留。",
+        "evidence": [
+          {
+            "reference_id": "CD-S01",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 570,
+            "line_end": 737
+          },
+          {
+            "reference_id": "CD-S02",
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 408,
+            "line_end": 500
+          },
+          {
+            "reference_id": "CD-S08",
+            "source_file": "scripts/equipslotutil.lua",
+            "line_start": 1,
+            "line_end": 50
+          },
+          {
+            "reference_id": "CD-S06",
+            "source_file": "scripts/components/armor.lua",
+            "line_start": 126,
+            "line_end": 171
+          },
+          {
+            "reference_id": "CD-S09",
+            "source_file": "scripts/components/spdamageutil.lua",
+            "line_start": 22,
+            "line_end": 114
+          },
+          {
+            "reference_id": "CD-S03",
+            "source_file": "scripts/components/armor.lua",
+            "line_start": 1,
+            "line_end": 43
+          },
+          {
+            "reference_id": "CD-S05",
+            "source_file": "scripts/components/armor.lua",
+            "line_start": 66,
+            "line_end": 124
+          },
+          {
+            "reference_id": "CD-S10",
+            "source_file": "scripts/entityscript.lua",
+            "line_start": 1312,
+            "line_end": 1345
+          },
+          {
+            "reference_id": "CD-S07",
+            "source_file": "scripts/components/health.lua",
+            "line_start": 565,
+            "line_end": 649
+          }
+        ]
+      },
+      "unknowns_review": {
+        "verdict": "ACCEPT_BOUNDED_STATIC_SCOPE",
+        "conclusion": "候选明确保留运行调度、native实体生命期、远端可见性及Mod重入/异常组合缺口。选定Lua分支的静态结论可接受，运行未知继续保留。",
+        "retained_unknowns": [
+          "原生Remove后句柄可调用安全性、各Mod回调异常与多人可见时序尚待实际环境验证。",
+          "pairs遍历护甲耐久账的先后没有固定物品顺序，本文保留单件内部顺序。"
+        ]
+      }
+    },
+    {
+      "entry_id": "EXP-COMBAT-002",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "increment_over_baseline": "基线Cooldown通用合同作为依赖保留。新增Resistance标签/谓词/通知及骨甲短任务、燃料、充能和退出分支的业务连接，辅以木雕帽耐久消费者。",
+      "claims": [
+        {
+          "claim_id": "EXP-COMBAT-002-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "resistance 3、8-24完整支持tags表、删除及attacker非nil门槛。38-40的or表达式在有谓词时返回该谓词值，无谓词时true。weapon单独存在不触发匹配。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "inventory 411-420按初始化槽ID检查，标签及谓词均真才调用并立即返回0,nil。430以后倍率应用与446以后耐久账均未执行。较早槽位可能已求值GetResist或GetAbsorption，候选未声称扫描本身完全无副作用。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S08",
+              "source_file": "scripts/equipslotutil.lua",
+              "line_start": 1,
+              "line_end": 50
+            },
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "resistance 42-47无重复门禁，回调在事件前。hats 395-415将该回调接至armor:TakeDamage，证明短路与消费者自主耐久损耗可同时成立。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S17",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 395,
+              "line_end": 416
+            },
+            {
+              "reference_id": "CD-S06",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 126,
+              "line_end": 171
+            },
+            {
+              "reference_id": "CD-S10",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "armor_skeleton 229-247仅master安装组件，74-82为装备/owner/forcefield条件，84-92加标签。57-71按任务、清回调、扣燃料、检查当前onchargedfn再StartCharging执行。",
+          "evidence": [
+            {
+              "reference_id": "CD-S12",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 8,
+              "line_end": 21
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S15",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 213,
+              "line_end": 258
+            },
+            {
+              "reference_id": "CD-S16",
+              "source_file": "scripts/components/cooldown.lua",
+              "line_start": 1,
+              "line_end": 95
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "armor_skeleton 49-55、84-98、133-179逐一支持短任务恢复、充能提前取消任务、卸装/模型退出和nofuel顺序。cooldown 46-49证明FinishCharging还要求deadline存在，候选仅声称nofuel调用它。",
+          "evidence": [
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S14",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 123,
+              "line_end": 179
+            },
+            {
+              "reference_id": "CD-S16",
+              "source_file": "scripts/components/cooldown.lua",
+              "line_start": 1,
+              "line_end": 95
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "EI由resistance 42-47及骨甲清onresistdamage而保留tags推得。窗口内只跳过该回调，事件仍在后续语句。其成立条件是装备谓词、匹配标签及源生命期仍满足。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-002-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC分别安排匹配、谓词、业务回调、任务及充能责任，与具名消费者分工一致。真实tick和恢复调度仍留unknowns。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S14",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 123,
+              "line_end": 179
+            },
+            {
+              "reference_id": "CD-S16",
+              "source_file": "scripts/components/cooldown.lua",
+              "line_start": 1,
+              "line_end": 95
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Resistance:AddResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法8-10以tag键和值登记，返回nil。骨甲charge/exit调用与无保存函数的组件全文一致。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S14",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 123,
+              "line_end": 179
+            },
+            {
+              "reference_id": "CD-S15",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 213,
+              "line_end": 258
+            }
+          ]
+        },
+        {
+          "symbol": "Resistance:RemoveResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法12-14只清tags[tag]，不清谓词或业务回调。骨甲短任务及装备退出调用成立。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S14",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 123,
+              "line_end": 179
+            }
+          ]
+        },
+        {
+          "symbol": "Resistance:HasResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法16-24仅attacker非nil时扫描，attacker或weapon标签命中返回true，未命中nil。Inventory下一步谓词受其真值短路。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            }
+          ]
+        },
+        {
+          "symbol": "Resistance:ShouldResistDamage",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法38-40无回调true，否则返回单参item谓词结果。骨甲谓词完整核对了装备、owner及可选owner.inventory的forcefield检查。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            }
+          ]
+        },
+        {
+          "symbol": "Resistance:ResistDamage",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法42-47未重复检查匹配/条件，先业务回调再事件，输入普通damage未含weapon/spdamage。木雕帽和骨甲分别证明耐久及短窗口消费者。回调抛错时后继事件不会正常到达，合同的正常路径描述成立。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S16",
+              "source_file": "scripts/components/cooldown.lua",
+              "line_start": 1,
+              "line_end": 95
+            },
+            {
+              "reference_id": "CD-S17",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 395,
+              "line_end": 416
+            },
+            {
+              "reference_id": "CD-S10",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1345
+            }
+          ]
+        },
+        {
+          "symbol": "Resistance:SetOnResistDamageFn",
+          "source_file": "scripts/components/resistance.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法30-32仅替换函数引用、隐式nil。骨甲触发、短任务、充能完成、卸装和模型路径的安装/清除已逐一核对。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S11",
+              "source_file": "scripts/components/resistance.lua",
+              "line_start": 1,
+              "line_end": 47
+            },
+            {
+              "reference_id": "CD-S13",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 49,
+              "line_end": 98
+            },
+            {
+              "reference_id": "CD-S14",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 123,
+              "line_end": 179
+            },
+            {
+              "reference_id": "CD-S15",
+              "source_file": "scripts/prefabs/armor_skeleton.lua",
+              "line_start": 213,
+              "line_end": 258
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": {
+        "verdict": "PASS_STATIC_RESEARCH",
+        "steps_reviewed": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "conclusion": "逐步描述与上述定义/调用方/消费者顺序一致，分支条件随完整条目Scope和claims保留。",
+        "evidence": [
+          {
+            "reference_id": "CD-S15",
+            "source_file": "scripts/prefabs/armor_skeleton.lua",
+            "line_start": 213,
+            "line_end": 258
+          },
+          {
+            "reference_id": "CD-S13",
+            "source_file": "scripts/prefabs/armor_skeleton.lua",
+            "line_start": 49,
+            "line_end": 98
+          },
+          {
+            "reference_id": "CD-S14",
+            "source_file": "scripts/prefabs/armor_skeleton.lua",
+            "line_start": 123,
+            "line_end": 179
+          },
+          {
+            "reference_id": "CD-S16",
+            "source_file": "scripts/components/cooldown.lua",
+            "line_start": 1,
+            "line_end": 95
+          },
+          {
+            "reference_id": "CD-S02",
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 408,
+            "line_end": 500
+          },
+          {
+            "reference_id": "CD-S08",
+            "source_file": "scripts/equipslotutil.lua",
+            "line_start": 1,
+            "line_end": 50
+          },
+          {
+            "reference_id": "CD-S11",
+            "source_file": "scripts/components/resistance.lua",
+            "line_start": 1,
+            "line_end": 47
+          }
+        ]
+      },
+      "unknowns_review": {
+        "verdict": "ACCEPT_BOUNDED_STATIC_SCOPE",
+        "conclusion": "候选明确保留运行调度、native实体生命期、远端可见性及Mod重入/异常组合缺口。选定Lua分支的静态结论可接受，运行未知继续保留。",
+        "retained_unknowns": [
+          "实际帧边界、FX/燃料原生交互以及充能与短任务同帧竞争尚未运行验证。",
+          "本条未穷举骨甲存档载入时所有装备恢复分发顺序，沿已登记Cooldown合同保留其加载回调边界。"
+        ]
+      }
+    },
+    {
+      "entry_id": "EXP-COMBAT-003",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "increment_over_baseline": "基线已记DoAttack反伤框架。新增具体来源枚举、骑乘来源替换、组件回调默认值、逐源记录与聚合表别名、通知有效性和lunarplant消费者。",
+      "claims": [
+        {
+          "claim_id": "EXP-COMBAT-003-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "damagereflect 3-23支持初值10、完整回调参数、第一返回or默认及第二返回透传。Lua中0为真值，nil/false回退。无回调只返回defaultdamage。",
+          "evidence": [
+            {
+              "reference_id": "CD-S20",
+              "source_file": "scripts/components/damagereflect.lua",
+              "line_start": 1,
+              "line_end": 26
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 966-1012证明helper nil返回0、本体先于装备、装备按pairs(EQUIPSLOTS)，骑乘分支仅对mount和saddle各调用helper，ignoredamagereflect早退。没有把骑手本体额外合入。",
+          "evidence": [
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 976-991在普通量>0或特殊表非nil时累加并存源记录。spdamageutil 63-71证明双表时改第一表，单表时复用其引用。记录中的attacker是攻击方self.inst。",
+          "evidence": [
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 1212-1241支持预收集、目标受击、武器、范围、临时状态与时间、反伤门槛、自身受击、有效源通知的次序。未消费Internal布尔结果作为通知门禁。适用范围为到达该直接结算尾部的分支。",
+          "evidence": [
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S29",
+              "source_file": "scripts/components/weapon.lua",
+              "line_start": 105,
+              "line_end": 121
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "armor_lunarplant 154-168返回新planar表且普通0，按攻击方标签选值，通知先检查data及attacker有效再生成FX。197-216证明master安装和监听。",
+          "evidence": [
+            {
+              "reference_id": "CD-S21",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 134,
+              "line_end": 168
+            },
+            {
+              "reference_id": "CD-S22",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 197,
+              "line_end": 228
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "EI的别名链成立。首个特殊表经Merge直接成为聚合表，后续合并可改同一记录引用，反伤自身受击又将聚合表交Inventory及ApplySpDefense原地改。source普通数值以独立字段缓存。骑乘分支有分组聚合，候选的可共享表述保持保守。",
+          "evidence": [
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            },
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C07",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 1234-1240只以反伤输入/自身health状态及来源有效性决定尾部，未检查实际HP差或Internal返回。Armor默认破损可Remove，源失效则跳过对应通知。源记录普通量可保留初始贡献，特殊表可能已被改写，需与C06一起读。",
+          "evidence": [
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S05",
+              "source_file": "scripts/components/armor.lua",
+              "line_start": 66,
+              "line_end": 124
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-003-C08",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC针对收集、默认值、来源身份和事后通知分阶段验证，符合可变表别名及生命周期。没有把通知数据升级为最终生命损失。",
+          "evidence": [
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S20",
+              "source_file": "scripts/components/damagereflect.lua",
+              "line_start": 1,
+              "line_end": 26
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:CalcReflectedDamage",
+          "source_file": "scripts/components/combat.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法1000-1012及局部helper966-998身份分开核对。接受可写reflect_list，返回普通总量和可变特殊表，骑乘替换来源、回调聚合及记录顺序均相符。自身不提交反伤或通知。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S20",
+              "source_file": "scripts/components/damagereflect.lua",
+              "line_start": 1,
+              "line_end": 26
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        },
+        {
+          "symbol": "DamageReflect:GetReflectedDamage",
+          "source_file": "scripts/components/damagereflect.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法18-24参数顺序、0与nil/false默认规则及第二返回直接透传相符。无比例自动推导，调用可重复。DoAttack具名调用处在目标受击前。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S20",
+              "source_file": "scripts/components/damagereflect.lua",
+              "line_start": 1,
+              "line_end": 26
+            },
+            {
+              "reference_id": "CD-S18",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 966,
+              "line_end": 1012
+            },
+            {
+              "reference_id": "CD-S19",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1192,
+              "line_end": 1242
+            },
+            {
+              "reference_id": "CD-S21",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 134,
+              "line_end": 168
+            },
+            {
+              "reference_id": "CD-S22",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 197,
+              "line_end": 228
+            }
+          ]
+        },
+        {
+          "symbol": "DamageReflect:SetReflectDamageFn",
+          "source_file": "scripts/components/damagereflect.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法10-12直接替换函数且隐式nil，不创建监听/任务。armor_lunarplant分别接线setter和onreflectdamage监听。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S20",
+              "source_file": "scripts/components/damagereflect.lua",
+              "line_start": 1,
+              "line_end": 26
+            },
+            {
+              "reference_id": "CD-S21",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 134,
+              "line_end": 168
+            },
+            {
+              "reference_id": "CD-S22",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 197,
+              "line_end": 228
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": {
+        "verdict": "PASS_STATIC_RESEARCH",
+        "steps_reviewed": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "conclusion": "逐步描述与上述定义/调用方/消费者顺序一致，分支条件随完整条目Scope和claims保留。",
+        "evidence": [
+          {
+            "reference_id": "CD-S18",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 966,
+            "line_end": 1012
+          },
+          {
+            "reference_id": "CD-S19",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 1192,
+            "line_end": 1242
+          },
+          {
+            "reference_id": "CD-S20",
+            "source_file": "scripts/components/damagereflect.lua",
+            "line_start": 1,
+            "line_end": 26
+          },
+          {
+            "reference_id": "CD-S01",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 570,
+            "line_end": 737
+          },
+          {
+            "reference_id": "CD-S02",
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 408,
+            "line_end": 500
+          },
+          {
+            "reference_id": "CD-S05",
+            "source_file": "scripts/components/armor.lua",
+            "line_start": 66,
+            "line_end": 124
+          },
+          {
+            "reference_id": "CD-S29",
+            "source_file": "scripts/components/weapon.lua",
+            "line_start": 105,
+            "line_end": 121
+          },
+          {
+            "reference_id": "CD-S07",
+            "source_file": "scripts/components/health.lua",
+            "line_start": 565,
+            "line_end": 649
+          },
+          {
+            "reference_id": "CD-S21",
+            "source_file": "scripts/prefabs/armor_lunarplant.lua",
+            "line_start": 134,
+            "line_end": 168
+          },
+          {
+            "reference_id": "CD-S22",
+            "source_file": "scripts/prefabs/armor_lunarplant.lua",
+            "line_start": 197,
+            "line_end": 228
+          }
+        ]
+      },
+      "unknowns_review": {
+        "verdict": "ACCEPT_BOUNDED_STATIC_SCOPE",
+        "conclusion": "候选明确保留运行调度、native实体生命期、远端可见性及Mod重入/异常组合缺口。选定Lua分支的静态结论可接受，运行未知继续保留。",
+        "retained_unknowns": [
+          "反伤回调、装备删除与其他Mod重入修改的完整组合未实测。",
+          "骑乘来源采用该分支静态枚举，实际有效mount/saddle身份与原生实体生命期待运行核查。",
+          "特殊table别名后续可变值需在目标场景采样，本文未把通知字段作为实际HP损失证明。"
+        ]
+      }
+    },
+    {
+      "entry_id": "EXP-COMBAT-004",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "increment_over_baseline": "基线概述condition/external及类型倍率。新增函数对象身份、重新登记尾移、撤销空表、普通类型倍率实际两处乘算、特殊通道及knight消费者。",
+      "claims": [
+        {
+          "claim_id": "EXP-COMBAT-004-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 1273-1283与util 185-191支持先移除相同函数再尾插、首个相等项删除及末项删除后空表残留。没有额外source/key身份。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S25",
+              "source_file": "scripts/util.lua",
+              "line_start": 185,
+              "line_end": 191
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 1285-1293逐项fn(victim,attacker,weapon) or 1相乘再乘damage，0保留且nil/false回退。没有本地nil数组或异常捕获、返回类型校验。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "combat 644-651确有条件表非nil时一次damagetypemult，以及后继无条件再一次。665-666在特殊防御后只加一次本体damagetypemult*特殊总量。Health后继吸收是另一阶段。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S09",
+              "source_file": "scripts/components/spdamageutil.lua",
+              "line_start": 22,
+              "line_end": 114
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "damagetyperesist 32-42按匹配标签列表各乘一次，attacker=nil直接保持1。同标签attacker/weapon匹配用or，未重复乘。inventory 424-430与458及combat 644-651支持装备和本体阶段分离。",
+          "evidence": [
+            {
+              "reference_id": "CD-S24",
+              "source_file": "scripts/components/damagetyperesist.lua",
+              "line_start": 1,
+              "line_end": 42
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "knight 449-452直接读attacker.isplayer，560-585在YOTH master接线登记。armor_lunarplant 49-55和220-226以相同inst及setbonus键增删独立类型贡献。",
+          "evidence": [
+            {
+              "reference_id": "CD-S26",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 449,
+              "line_end": 452
+            },
+            {
+              "reference_id": "CD-S27",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 560,
+              "line_end": 585
+            },
+            {
+              "reference_id": "CD-S30",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 49,
+              "line_end": 55
+            },
+            {
+              "reference_id": "CD-S22",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 197,
+              "line_end": 228
+            },
+            {
+              "reference_id": "CD-S24",
+              "source_file": "scripts/components/damagetyperesist.lua",
+              "line_start": 1,
+              "line_end": 42
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "EI算式逐步成立。nil表时100*0.5*1=50，空表时Apply返回100，再经两次0.5得到25。Remove末项保持表，故该差异可由注册/撤销引入。仅为静态表达式用例。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S25",
+              "source_file": "scripts/util.lua",
+              "line_start": 185,
+              "line_end": 191
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C07",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "EI由inventory 494-497先提交、combat 648-651后调用回调且无保护性调用推得。回调错误打断本次剩余Lua路径，不撤销已发生账目。knight的缺省attacker风险明确保留为待核对输入。",
+          "evidence": [
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S26",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 449,
+              "line_end": 452
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-COMBAT-004-C08",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "conclusion": "REC保存同一函数对象并核对空表、类型及特殊通道符合真实身份和结算表达式，未擅改原版行为或数值。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S25",
+              "source_file": "scripts/util.lua",
+              "line_start": 185,
+              "line_end": 191
+            },
+            {
+              "reference_id": "CD-S24",
+              "source_file": "scripts/components/damagetyperesist.lua",
+              "line_start": 1,
+              "line_end": 42
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:AddConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法1273-1277同函数对象去重后尾插且建立持久非nil表。knight YOTH分支的具名函数登记与attacker假定已核对。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S25",
+              "source_file": "scripts/util.lua",
+              "line_start": 185,
+              "line_end": 191
+            },
+            {
+              "reference_id": "CD-S26",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 449,
+              "line_end": 452
+            },
+            {
+              "reference_id": "CD-S27",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 560,
+              "line_end": 585
+            }
+          ]
+        },
+        {
+          "symbol": "Combat:RemoveConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法1279-1283支持nil表、首个相等项移除及未命中不变，隐式nil。空表影响Internal条件分支，OnRemoveFromEntity没有逐项撤销。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S25",
+              "source_file": "scripts/util.lua",
+              "line_start": 185,
+              "line_end": 191
+            },
+            {
+              "reference_id": "CD-S28",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1359,
+              "line_end": 1374
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            }
+          ]
+        },
+        {
+          "symbol": "Combat:ApplyConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法1285-1293直接ipairs，回调参数、or1、数值0及最终返回一致。Internal在非nil表、装备/鞍具之后调用，遍历无快照及错误保留先前副作用边界成立。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S23",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 1273,
+              "line_end": 1293
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S26",
+              "source_file": "scripts/prefabs/knight.lua",
+              "line_start": 449,
+              "line_end": 452
+            }
+          ]
+        },
+        {
+          "symbol": "DamageTypeResist:GetResist",
+          "source_file": "scripts/components/damagetyperesist.lua",
+          "identity_kind": "component_method",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "checked_dimensions": [
+            "owner",
+            "parameters",
+            "branches",
+            "ordering",
+            "returns",
+            "visibility",
+            "mutation_and_aliasing",
+            "lifecycle",
+            "failure_side_effects",
+            "unknowns"
+          ],
+          "conclusion": "组件方法32-42只在attacker非nil时对匹配标签列表连乘，返回初值1。Add/Remove委托SourceModifierList，装备与本体两阶段消费者及lunarplant套装key已核对。",
+          "visibility_conclusion": "所列原版Lua组件方法身份成立，范围为候选所列权威组件链，维持原visibility限制与research/restricted/hold。",
+          "evidence": [
+            {
+              "reference_id": "CD-S24",
+              "source_file": "scripts/components/damagetyperesist.lua",
+              "line_start": 1,
+              "line_end": 42
+            },
+            {
+              "reference_id": "CD-S02",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 408,
+              "line_end": 500
+            },
+            {
+              "reference_id": "CD-S01",
+              "source_file": "scripts/components/combat.lua",
+              "line_start": 570,
+              "line_end": 737
+            },
+            {
+              "reference_id": "CD-S30",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 49,
+              "line_end": 55
+            },
+            {
+              "reference_id": "CD-S22",
+              "source_file": "scripts/prefabs/armor_lunarplant.lua",
+              "line_start": 197,
+              "line_end": 228
+            }
+          ]
+        }
+      ],
+      "mechanism_steps": {
+        "verdict": "PASS_STATIC_RESEARCH",
+        "steps_reviewed": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "conclusion": "逐步描述与上述定义/调用方/消费者顺序一致，分支条件随完整条目Scope和claims保留。",
+        "evidence": [
+          {
+            "reference_id": "CD-S27",
+            "source_file": "scripts/prefabs/knight.lua",
+            "line_start": 560,
+            "line_end": 585
+          },
+          {
+            "reference_id": "CD-S26",
+            "source_file": "scripts/prefabs/knight.lua",
+            "line_start": 449,
+            "line_end": 452
+          },
+          {
+            "reference_id": "CD-S30",
+            "source_file": "scripts/prefabs/armor_lunarplant.lua",
+            "line_start": 49,
+            "line_end": 55
+          },
+          {
+            "reference_id": "CD-S24",
+            "source_file": "scripts/components/damagetyperesist.lua",
+            "line_start": 1,
+            "line_end": 42
+          },
+          {
+            "reference_id": "CD-S02",
+            "source_file": "scripts/components/inventory.lua",
+            "line_start": 408,
+            "line_end": 500
+          },
+          {
+            "reference_id": "CD-S01",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 570,
+            "line_end": 737
+          },
+          {
+            "reference_id": "CD-S23",
+            "source_file": "scripts/components/combat.lua",
+            "line_start": 1273,
+            "line_end": 1293
+          },
+          {
+            "reference_id": "CD-S09",
+            "source_file": "scripts/components/spdamageutil.lua",
+            "line_start": 22,
+            "line_end": 114
+          },
+          {
+            "reference_id": "CD-S07",
+            "source_file": "scripts/components/health.lua",
+            "line_start": 565,
+            "line_end": 649
+          },
+          {
+            "reference_id": "CD-S25",
+            "source_file": "scripts/util.lua",
+            "line_start": 185,
+            "line_end": 191
+          }
+        ]
+      },
+      "unknowns_review": {
+        "verdict": "ACCEPT_BOUNDED_STATIC_SCOPE",
+        "conclusion": "候选明确保留运行调度、native实体生命期、远端可见性及Mod重入/异常组合缺口。选定Lua分支的静态结论可接受，运行未知继续保留。",
+        "retained_unknowns": [
+          "回调中增删同一数组、并发Mod包装和真实攻击帧时序未运行验证。",
+          "这里的100/0.5/1为表达式推导用例，未作为游戏实测数值或玩法配置。",
+          "未证明所有普通原版调用都保证attacker非nil，knight缺省输入风险保留待测。"
+        ]
+      }
+    }
+  ],
+  "remaining_gaps": [
+    "真实游戏攻击帧、充能和短任务同tick的结果未运行验证。",
+    "删除后native句柄安全、动态Mod包装及网络远端可见时序仍按候选unknowns保留。",
+    "没有穷举所有装备、所有伤害入口或全部反伤/Resistance业务消费者，结论限定为所列源码分支和具名消费者。",
+    "服务登记、安装、发布及真实游戏验证由主控后续处理。"
+  ]
+}

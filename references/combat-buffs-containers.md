@@ -14,6 +14,19 @@
 
 冲刺优先查当前 `prefabs/spear_wathgrithr.lua`、`components/aoeweapon_lunge.lua` 及基类。reticule 的回调配置位置按原版 `aoetargeting.reticule` 核对；`aoespell` 回调顺序为 item、doer、pos。命中回调只补额外行为，不未经核对再次结算完整伤害。
 
+## 护甲、抵挡与反伤的结算阶段
+
+以下按 762172 的[战斗研究](../knowledge/research/native-mechanisms/combat_damage-f97f4c349c5f.json)定位完整合同与来源。
+
+| 问题 | 需要追踪的原版行为 | 研究 ID |
+|---|---|---|
+| 多件护甲如何分摊 | 普通吸收取最高率，耐久按各护甲吸收率权重分摊；特殊防御按剩余容量逐轮分配。耐久处理早于 Health 的无敌检查与生命提交 | EXP-COMBAT-001 |
+| 抵挡与短护盾窗口 | Resistance 的匹配、动态谓词和抵挡副作用分开；骨甲业务回调清除后，短护盾窗口仍可抵挡并发事件 | EXP-COMBAT-002 |
+| 反伤数值与通知 | `0` 可保留零普通反伤，`nil/false` 采用默认量；特殊伤害表可与来源记录共享，通知读取尾部阶段的状态 | EXP-COMBAT-003 |
+| 条件减伤登记与撤销 | 同一函数重登记移到末尾，撤销最后一项仍留下非 nil 空表；条件表非 nil 时，当前普通伤害在条件阶段和后继表达式各乘一次本体类型抗性，未创建表时只在后继乘一次 | EXP-COMBAT-004 |
+
+排错时分别记录输入伤害、护甲耐久、生命变化和回调阶段。条件伤害表的未创建、有条件、撤销后空表三个状态应分别核对。
+
 ## 击退、睡眠与飞行不是单行开关
 
 `target:PushEvent("knockback", {knocker=source, radius=..., strengthmult=...})` 需要目标状态机支持。radius 参与按距离计算推力，不是会搜索所有目标的 AOE 半径；不要照抄 200。保留攻击原回调，按服务端与目标类型添加，验重型、骑乘、平台、死亡和碰撞。

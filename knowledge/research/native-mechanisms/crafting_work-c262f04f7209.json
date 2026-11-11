@@ -1,0 +1,2652 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "crafting_work",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-CRAFT-001",
+      "title": "Builder材料合同与折扣护符消费事件的交接",
+      "aliases": [
+        "Builder:HasIngredients",
+        "Builder:GetIngredients",
+        "Builder:RemoveIngredients",
+        "consumeingredients",
+        "greenamulet",
+        "角色材料",
+        "科技材料",
+        "材料湿度"
+      ],
+      "engineering_question": "查询、实体材料计划和实际消费各接收/返回什么，折扣护符何时额外扣次数？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮协调者核对version.txt与Steam build，候选构建重算归档、ZIP成员原字节和逐范围SHA256。",
+        "environment": "普通Builder服务器组件、Inventory的材料接口与greenamulet装备监听；沿菜单/BUILD调用进入DoBuild。",
+        "exclusions": [
+          "FACT-DST-003/010、NC-N002-FINAL-02和NC-N004-FINAL-08/09已覆盖查询/消耗分段及Provider归属。本条新增完整API合同、角色/科技返回量、湿度聚合和护符事件消费者。",
+          "Inventory/Container/Stackable完整基础合同归其他研究；不扩展全部角色成本内部实现、料理或制造站。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CRAFT-001-C01",
+          "kind": "NSF",
+          "statement": "HasIngredients接受配方对象或名称，freebuild直接通过，其他分支检查限制次数、逐项普通材料和角色/科技条件。GetIngredients仅对普通正amount生成按type索引的实体→数量表并返回discounted，HasIngredients仍对其每项折算至少1调用Inventory:Has。两者对非正amount的处理位置不同。",
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S03",
+            "CW-S04",
+            "CW-S10",
+            "CW-S11"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-001-C02",
+          "kind": "NSF",
+          "statement": "HasCharacterIngredient的第二返回值是当前向上取整health/sanity或剩余未惩罚比例，health要求严格大于成本，sanity允许相等。HasTechIngredient从accessible_tech_trees读取技术等级，tech只在此查询，没有对应的RemoveIngredients科技扣减循环。",
+          "evidence_refs": [
+            "CW-S03",
+            "CW-S02",
+            "CW-S04"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-001-C03",
+          "kind": "NSF",
+          "statement": "GetIngredientWetness对材料内表每个实体按所取数量乘湿度相加，优先InventoryItem:GetMoisture，其次在没有rainimmunity时取世界wetness。返回总加权湿度值，源码没有除以总件数；DoBuild随后将正值传入产物InheritMoisture。",
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S07"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-001-C04",
+          "kind": "NSF",
+          "statement": "RemoveIngredients的非freebuild路径逐件RemoveItem后倾倒作为材料的container内容并Remove实体，再处理health/maxhealth/sanity，最后发consumeingredients并传discounted。MAX_SANITY分支留给生成实体负责。greenamulet装备时写ingredientmod并监听该事件，只有data.discounted显式false才跳过Use(1)，卸下和装备模型分支解绑并把ingredientmod恢复1。",
+          "evidence_refs": [
+            "CW-S02",
+            "CW-S12",
+            "CW-S13",
+            "CW-S25",
+            "REV-CW-A01",
+            "REV-CW-A02"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-001-C05",
+          "kind": "EI",
+          "statement": "护符次数消费位于consumeingredients普通监听内，故可发生在DoBuild的builditem和库存交付之前。后续产物回调或交付失败不会由这一条Lua链撤回已消费护符次数；RemoveIngredients的nil返回也不报告逐材料执行成功。",
+          "evidence_refs": [
+            "CW-S02",
+            "CW-S07",
+            "CW-S13",
+            "CW-S45",
+            "REV-CW-A01",
+            "REV-CW-A02"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-001-C06",
+          "kind": "REC",
+          "statement": "接入额外材料或折扣逻辑时保持当前实体计划、discounted数据和实际消费入口一致。验证材料变动、freebuild、护符耗尽及产物后续回调错误时分别记录原料与护符状态。",
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S02",
+            "CW-S04",
+            "CW-S07",
+            "CW-S13",
+            "REV-CW-A01",
+            "REV-CW-A02"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Builder:HasIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "recipe为配方对象或名称字符串；隐式self为服务器builder。"
+          ],
+          "returns": "布尔值。无有效配方、限制次数不足或任一材料条件失败返回false，全部满足返回true。",
+          "preconditions": [
+            "配方含ingredients/character_ingredients/tech_ingredients数组，普通库存及所需角色组件接口可用。",
+            "仅检查材料，不在此执行KnowsRecipe/CanLearn/放置合法性。"
+          ],
+          "side_effects": [
+            "普通路径以当前ingredientmod折算后分别查询Inventory:Has(...,true)，不预留或删除实体。",
+            "自定义getlimitedrecipecount(recipe,inst)被直接调用，其副作用由该回调决定。"
+          ],
+          "lifecycle": [
+            "菜单先查询，DoBuild执行时可再次查询。freebuild在有限次数和角色/科技检查前直接true。"
+          ],
+          "evidence_refs": [
+            "CW-S04",
+            "CW-S03",
+            "CW-S09",
+            "CW-S06",
+            "CW-S10"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Builder:GetIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "recname为AllRecipes键，按当前ingredientmod选择普通材料。"
+          ],
+          "returns": "有效配方返回ingredients,discounted；无该配方无显式返回。ingredients[type]是实体→数量表，discounted为至少一项折算量小于原量。",
+          "preconditions": [
+            "普通配方项含type/amount，inventory:GetCraftingIngredient可用。输入计划并非固定槽位或总数映射。"
+          ],
+          "side_effects": [
+            "只对amount>0的项计算max(1,RoundBiasedUp(amount*ingredientmod))并请求实体表，同type后项覆盖该type槽。",
+            "本方法不从所选实体取件、不执行角色/科技成本，也不保证材料表满足所需总量。"
+          ],
+          "lifecycle": [
+            "DoBuild在refreshcrafting事件后建立当前计划，之后mimic检查、onPreBuilt和RemoveIngredients使用该实体表。"
+          ],
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S06",
+            "CW-S07",
+            "CW-S11"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Builder:RemoveIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "ingredients为外层type→内层实体→数量表；recname查询角色成本；discounted原样放入consumeingredients数据。"
+          ],
+          "returns": "正常nil，freebuild入口也nil。结构、组件或回调异常外抛，返回不提供扣减清单或补偿信息。",
+          "preconditions": [
+            "计划中的实体及数量可供inventory:RemoveItem处理，返回对象应具备所需组件/Remove。",
+            "角色成本所需组件存在；调用方负责资格检查和计划一致性。"
+          ],
+          "side_effects": [
+            "逐件RemoveItem(entity,false,true)，有container则DropEverything到制作者位置，然后Remove。",
+            "之后扣health/maxhealth/sanity，MAX_SANITY留空；最后同步consumeingredients。不会在此扣tech_ingredients。",
+            "freebuild入口跳过全部这些消费和通知。"
+          ],
+          "lifecycle": [
+            "库存产物的onPreBuilt之后、builditem之前执行；manufactured另有调用路径。",
+            "没有全批回滚和事件重入锁；监听可额外耗尽greenamulet。"
+          ],
+          "evidence_refs": [
+            "CW-S02",
+            "CW-S07",
+            "CW-S06",
+            "CW-S12",
+            "CW-S13",
+            "CW-S45",
+            "REV-CW-A01",
+            "REV-CW-A02"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Builder:HasCharacterIngredient",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "ingredient含CHARACTER_INGREDIENT类型与amount。"
+          ],
+          "returns": "返回是否满足,当前值。HEALTH第二值ceil(currenthealth)，SANITY为ceil(current)，MAX分支为1-penalty；类型/组件不匹配返回false,0。",
+          "preconditions": [
+            "对应health/sanity组件可提供当前字段或GetPenaltyPercent，amount可比较。"
+          ],
+          "side_effects": [
+            "HEALTH严格current>amount_required，health_as_oldage标签按OLDAGE_HEALTH_SCALE换算要求。",
+            "SANITY允许相等，MAX分支比较penalty+amount与TUNING最大惩罚比例。函数本身只读。"
+          ],
+          "lifecycle": [
+            "HasIngredients逐角色项使用第一返回值；真正成本由RemoveIngredients及特定生成实体各自处理。"
+          ],
+          "evidence_refs": [
+            "CW-S03",
+            "CW-S04",
+            "CW-S02"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Builder:HasTechIngredient",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "ingredient含type/amount；有效tech type还须以_material结尾。"
+          ],
+          "returns": "合法科技材料返回level>=amount,level，其余false,0。",
+          "preconditions": [
+            "IsTechIngredient可用，accessible_tech_trees为技术键→等级表。"
+          ],
+          "side_effects": [
+            "剥去_material，将类型前缀大写后读取技术等级，缺等级按0。没有扣级语句。"
+          ],
+          "lifecycle": [
+            "作为HasIngredients科技门槛；RemoveIngredients消费域不包含科技材料。"
+          ],
+          "evidence_refs": [
+            "CW-S03",
+            "CW-S04",
+            "CW-S02"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Builder:GetIngredientWetness",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "ingredients与GetIngredients输出同形，内层数量用于加权。"
+          ],
+          "returns": "返回数值总湿度，totalItems>0时为sum(实体湿度*所取数量)，否则0。",
+          "preconditions": [
+            "实体提供components且数量可参与算术；TheWorld.state.wetness可读。"
+          ],
+          "side_effects": [
+            "读取inventoryitem:GetMoisture或无rainimmunity时的世界wetness。它不修改原料湿度。"
+          ],
+          "lifecycle": [
+            "DoBuild在onPreBuilt与RemoveIngredients之前取值，对主库存产物继承正值；额外非堆叠产物没有同段继承调用。"
+          ],
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S07"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "菜单与最终DoBuild分别执行材料门槛，最终执行前按当前实体和ingredientmod建计划。",
+          "evidence_refs": [
+            "CW-S04",
+            "CW-S09",
+            "CW-S06",
+            "CW-S01",
+            "CW-S11"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "主产物先读取湿度和onPreBuilt，再逐件消费实体与角色成本。",
+          "evidence_refs": [
+            "CW-S01",
+            "CW-S02",
+            "CW-S07",
+            "CW-S12"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "consumeingredients进入greenamulet具名监听并按discounted扣次数，随后外层DoBuild继续交付。",
+          "evidence_refs": [
+            "CW-S02",
+            "CW-S13",
+            "CW-S25",
+            "CW-S45",
+            "CW-S07",
+            "REV-CW-A01",
+            "REV-CW-A02"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CW-S01",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:GetIngredientWetness、Builder:GetIngredients",
+            "claim_ids": [
+              "EXP-CRAFT-001-C01",
+              "EXP-CRAFT-001-C03",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "CW-S03",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:HasCharacterIngredient、Builder:HasTechIngredient",
+            "claim_ids": [
+              "EXP-CRAFT-001-C01",
+              "EXP-CRAFT-001-C02"
+            ]
+          },
+          {
+            "ref": "CW-S04",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:HasIngredients、Builder:CanBuild",
+            "claim_ids": [
+              "EXP-CRAFT-001-C01",
+              "EXP-CRAFT-001-C02",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "CW-S10",
+            "role": "定义/调用或消费者依赖，定位符号为Inventory:Has",
+            "claim_ids": [
+              "EXP-CRAFT-001-C01"
+            ]
+          },
+          {
+            "ref": "CW-S11",
+            "role": "定义/调用或消费者依赖，定位符号为Inventory:GetCraftingIngredient",
+            "claim_ids": [
+              "EXP-CRAFT-001-C01"
+            ]
+          },
+          {
+            "ref": "CW-S02",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:CheckIngredientsForMimic、Builder:CheckDiscountEquipsForMimic、Builder:RemoveIngredients",
+            "claim_ids": [
+              "EXP-CRAFT-001-C02",
+              "EXP-CRAFT-001-C04",
+              "EXP-CRAFT-001-C05",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "CW-S07",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:DoBuild、GiveOrDropItem",
+            "claim_ids": [
+              "EXP-CRAFT-001-C03",
+              "EXP-CRAFT-001-C05",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "CW-S12",
+            "role": "定义/调用或消费者依赖，定位符号为Inventory:RemoveItem",
+            "claim_ids": [
+              "EXP-CRAFT-001-C04"
+            ]
+          },
+          {
+            "ref": "CW-S13",
+            "role": "定义/调用或消费者依赖，定位符号为onequip_green、onunequip_green、onequiptomodel_green",
+            "claim_ids": [
+              "EXP-CRAFT-001-C04",
+              "EXP-CRAFT-001-C05",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "CW-S25",
+            "role": "定义/调用或消费者依赖，定位符号为FiniteUses:SetUses、FiniteUses:Use",
+            "claim_ids": [
+              "EXP-CRAFT-001-C04"
+            ]
+          },
+          {
+            "ref": "CW-S45",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:PushEvent_Internal、EntityScript:PushEvent、EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-CRAFT-001-C05"
+            ]
+          },
+          {
+            "ref": "CW-S09",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:MakeRecipeFromMenu",
+            "claim_ids": []
+          },
+          {
+            "ref": "CW-S06",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:DoBuild",
+            "claim_ids": []
+          },
+          {
+            "ref": "REV-CW-A01",
+            "role": "greenamulet具名构造与装备/卸装回调接线",
+            "claim_ids": [
+              "EXP-CRAFT-001-C04",
+              "EXP-CRAFT-001-C05",
+              "EXP-CRAFT-001-C06"
+            ]
+          },
+          {
+            "ref": "REV-CW-A02",
+            "role": "greenamulet具名构造与装备/卸装回调接线",
+            "claim_ids": [
+              "EXP-CRAFT-001-C04",
+              "EXP-CRAFT-001-C05",
+              "EXP-CRAFT-001-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "列举本条实际使用的Lua定义、调用者与消费者，动态Hook、其他prefab与原生行为保留未知。"
+        ]
+      },
+      "unknowns": [
+        "尚未在游戏中运行护符耗尽、并发库存变化、异常计划、非正amount或角色死亡/惩罚边界。",
+        "health/sanity内部倍率、原生湿度复制和完整容器所有权归各自合同，不由本条材料调用证明。"
+      ]
+    },
+    {
+      "id": "EXP-CRAFT-002",
+      "title": "普通制作产物的回调交付顺序与实际初始化消费者",
+      "aliases": [
+        "Builder:DoBuild",
+        "EntityScript:OnBuilt",
+        "OnBuiltFn",
+        "onPreBuilt",
+        "多产物",
+        "top_onprebuilt",
+        "mapscroll",
+        "MapRecorder:RecordMap"
+      ],
+      "engineering_question": "普通库存/建筑产物何时消费、交付并执行初始化，回调失败和多产物有哪些分支？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮协调者核对version.txt与Steam build，候选构建重算归档、ZIP成员原字节和逐范围SHA256。",
+        "environment": "普通服务器BUILD→Builder:DoBuild→主/额外库存产物或非库存结构，具名tophat_magician与mapscroll消费者。",
+        "exclusions": [
+          "NC-N004-FINAL-08和FACT-DST-003既有早期门槛、buffer清理与onPreBuilt顺序保留。本条新增完整DoBuild/OnBuilt合同、多产物差异及帽子/地图初始化链。",
+          "制造站产物只作为显式分支边界；不重做料理、所有配方、Inventory:GiveItem基础或pocketwatch已有案例。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CRAFT-002-C01",
+          "kind": "NSF",
+          "statement": "ACTIONS.BUILD.fn直接转发DoBuild的返回。DoBuild普通库存分支先生成主prod，继承湿度并调用prod:onPreBuilt(builder,materials,recipe)，再RemoveIngredients，发builditem，然后按可装备/堆叠/dropitem分支交付。tophat在server构造接入top_onprebuilt，tophat_magician配方触发ConvertToMagician，增加标签/组件并更新装备回调。",
+          "evidence_refs": [
+            "CW-S46",
+            "CW-S06",
+            "CW-S07",
+            "CW-S16",
+            "CW-S17",
+            "REV-CW-A06",
+            "REV-CW-A07",
+            "REV-CW-A08",
+            "REV-CW-A09",
+            "REV-CW-A10"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C02",
+          "kind": "NSF",
+          "statement": "numtogive来自override_numtogive_fn(recipe,builder)结果或recipe.numtogive。可堆叠主产物直接SetStackSize；非堆叠额外产物逐次SpawnPrefab(recipe.product)，随后GiveItem或GiveOrDropItem。额外实体没有主生成调用的skin/userid参数，也没有该方法中对主prod执行的onPreBuilt、湿度继承、builditem和OnBuilt调用。",
+          "evidence_refs": [
+            "CW-S05",
+            "CW-S07"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C03",
+          "kind": "NSF",
+          "statement": "库存交付后调用self.onBuild(builder,prod)，再prod:OnBuilt(builder)才返回true。EntityScript:OnBuilt以pairs遍历components并调用truthy OnBuilt，再调用实体OnBuiltFn，忽略这些回调返回。mapscroll将OnBuiltFn接到maprecorder:RecordMap(builder)，RecordMap可返回false,NOEXPLORER或false,BLANK，mapscroll包装没有返回该结果。",
+          "evidence_refs": [
+            "CW-S07",
+            "CW-S15",
+            "CW-S18",
+            "CW-S19",
+            "CW-S20"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C04",
+          "kind": "NSF",
+          "statement": "非库存产物只在本次非buffered时RemoveIngredients，之后设置位置/旋转、buildstructure和产物onbuilt事件，再onBuild与OnBuilt后true。onbuilt事件与EntityScript:OnBuilt分开执行。初始SpawnPrefab失败可无显式返回；缺制作者inventory时库存产物被Remove且最终无显式返回。",
+          "evidence_refs": [
+            "CW-S06",
+            "CW-S07",
+            "CW-S08",
+            "CW-S15"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C05",
+          "kind": "EI",
+          "statement": "普通回调的false/nil不会主动撤销消费或交付。MapRecorder返回false可经mapscroll回调被忽略，外层DoBuild仍可true；抛错则中断当前Lua后续步骤，已生成/消费/交付部分取决于异常阶段。多产物循环已交付前面的实体后，后一次生成或交付异常没有本地全批恢复。",
+          "evidence_refs": [
+            "CW-S07",
+            "CW-S08",
+            "CW-S15",
+            "CW-S18",
+            "CW-S20"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C06",
+          "kind": "NSF",
+          "statement": "清buffer、hungrybuilder局部成本和refreshcrafting发生于mimic检查及初始产物生成之前。mimic检查会调用TurnEvil并返回ITEMMIMIC；其具名callee可先DropItem、ReplacePrefab、jump及惊吓/理智处理，属于失败返回前实际副作用。",
+          "evidence_refs": [
+            "CW-S06",
+            "CW-S02",
+            "CW-S14"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-002-C07",
+          "kind": "REC",
+          "statement": "为制作初始化选择真实阶段，材料数据读取放在onPreBuilt，完成后初始化沿OnBuiltFn并核对额外产物是否也需要它。验证按初始生成失败、材料事件、交付和初始化各阶段观察实体/材料实际状态。",
+          "evidence_refs": [
+            "CW-S07",
+            "CW-S08",
+            "CW-S15",
+            "CW-S17",
+            "CW-S18",
+            "REV-CW-A06",
+            "REV-CW-A07",
+            "REV-CW-A08",
+            "REV-CW-A09",
+            "REV-CW-A10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Builder:DoBuild",
+          "source_file": "scripts/components/builder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "recname为配方名；pt为位置或nil；rotation为旋转或nil；skin为皮肤请求。"
+          ],
+          "returns": "成功分支true。部分门槛返回false及可选原因MOUNTED/HASPET/ITEMMIMIC/自定义msg，其他门槛false，未进入或初始产物失败等路径可返回nil。返回不包含产物实体。",
+          "preconditions": [
+            "服务器builder及配方/状态依赖有效，普通材料表与库存接口可工作。",
+            "本方法普通分支不负责KnowsRecipe/CanLearn科技资格和地图放置门槛，正常调用方另行处理；recipe.canbuild被直接调用。"
+          ],
+          "side_effects": [
+            "通过早期门槛后清buffer、可能扣hungrybuilder饥饿并发事件，refreshcrafting后取材料和触发mimic。",
+            "manufactured消费后true并委派站点产出。普通库存分支生成主prod后prebuilt、消费、通知与装备/交付、多产物处理，末尾onBuild/OnBuilt。",
+            "非库存分支按buffer状态决定本次消费，设置位置旋转后发buildstructure/onbuilt，再末尾回调。"
+          ],
+          "lifecycle": [
+            "已有buffer可在后续ITEMMIMIC或生成失败前被清。库存分支没有非库存分支的is_buffered_build消费保护。",
+            "不读取GiveItem/Equip或完成初始化回调的成功返回来决定最后true，直接调用报错沿栈外抛。",
+            "没有统一回滚、失败退款或重入锁；自定义回调、事件和多产物循环的阶段保留各自副作用。"
+          ],
+          "evidence_refs": [
+            "CW-S06",
+            "CW-S07",
+            "CW-S08",
+            "CW-S05",
+            "CW-S46",
+            "CW-S15",
+            "CW-S14",
+            "CW-S18",
+            "CW-S20",
+            "REV-CW-A06",
+            "REV-CW-A07",
+            "REV-CW-A08",
+            "REV-CW-A09",
+            "REV-CW-A10"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "EntityScript:OnBuilt",
+          "source_file": "scripts/entityscript.lua",
+          "visibility": "EntityScript Lua实例方法，DoBuild中观察到服务器产物调用，端别权限由调用环境决定。",
+          "parameters": [
+            "builder为制作者EntityScript；self为主产物实体。"
+          ],
+          "returns": "正常nil；组件OnBuilt与实体OnBuiltFn返回值均被忽略，直接回调错误外抛。",
+          "preconditions": [
+            "self.components为组件表，truthy的OnBuilt/OnBuiltFn字段应可调用。方法本身没有端别或实体有效性守卫。"
+          ],
+          "side_effects": [
+            "以pairs遍历当前components，对有OnBuilt的值调用v:OnBuilt(builder)，最后调用self:OnBuiltFn(builder)。"
+          ],
+          "lifecycle": [
+            "DoBuild库存主产物在交付之后调用，结构主产物在onbuilt事件之后调用。额外非堆叠产物在该方法中未逐个进入此入口。",
+            "组内pairs顺序无约定，回调可重入或修改组件集合；没有快照、回滚和IsValid后检。"
+          ],
+          "evidence_refs": [
+            "CW-S15",
+            "CW-S07",
+            "CW-S08",
+            "CW-S18",
+            "CW-S19"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "MapRecorder:RecordMap",
+          "source_file": "scripts/components/maprecorder.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "target为具有player_classified.MapExplorer的玩家，具名调用者mapscroll.OnBuiltFn传builder。"
+          ],
+          "returns": "无Explorer返回false,NOEXPLORER；记录非空数据后回调并true；数据空则ClearMap再false,BLANK。",
+          "preconditions": [
+            "TheWorld.meta/session/state字段可用，MapExplorer:RecordMap原生接口可调用，结果在HasData中支持len。"
+          ],
+          "side_effects": [
+            "记录mapdata、mapsession、maplocation、mapauthor、mapday，成功时可调用ondatachangedfn。空数据分支ClearMap清data/session/author/day并调用变化回调。"
+          ],
+          "lifecycle": [
+            "mapscroll包装不return结果，EntityScript:OnBuilt也忽略回调结果，因此false不会沿此链变成DoBuild拒绝。",
+            "地图数据采集及网络复制的引擎细节尚未运行核验。"
+          ],
+          "evidence_refs": [
+            "CW-S20",
+            "CW-S18",
+            "CW-S19",
+            "CW-S15",
+            "CW-S07"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "BUILD转发DoBuild，执行早期门槛、buffer/饥饿/refreshcrafting和材料mimic阶段。",
+          "evidence_refs": [
+            "CW-S46",
+            "CW-S06",
+            "CW-S02",
+            "CW-S14"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "普通主prod执行prebuilt与消费，再分支交付主/额外产物或设置结构位置并通知。",
+          "evidence_refs": [
+            "CW-S07",
+            "CW-S08",
+            "CW-S05",
+            "CW-S16",
+            "CW-S17",
+            "REV-CW-A06",
+            "REV-CW-A07",
+            "REV-CW-A08",
+            "REV-CW-A09",
+            "REV-CW-A10"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "主产物进入组件OnBuilt及OnBuiltFn，mapscroll消费builder数据并触及MapExplorer原生边界。",
+          "evidence_refs": [
+            "CW-S15",
+            "CW-S18",
+            "CW-S19",
+            "CW-S20",
+            "CW-S07"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CW-S46",
+            "role": "定义/调用或消费者依赖，定位符号为ACTIONS.BUILD.fn",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01"
+            ]
+          },
+          {
+            "ref": "CW-S06",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:DoBuild",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C04",
+              "EXP-CRAFT-002-C06"
+            ]
+          },
+          {
+            "ref": "CW-S07",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:DoBuild、GiveOrDropItem",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C02",
+              "EXP-CRAFT-002-C03",
+              "EXP-CRAFT-002-C04",
+              "EXP-CRAFT-002-C05",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "CW-S16",
+            "role": "定义/调用或消费者依赖，定位符号为top_convert_to_magician",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01"
+            ]
+          },
+          {
+            "ref": "CW-S17",
+            "role": "定义/调用或消费者依赖，定位符号为top_onprebuilt、fns.top",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "CW-S05",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:MakeRecipe、GiveOrDropItem",
+            "claim_ids": [
+              "EXP-CRAFT-002-C02"
+            ]
+          },
+          {
+            "ref": "CW-S15",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:OnBuilt",
+            "claim_ids": [
+              "EXP-CRAFT-002-C03",
+              "EXP-CRAFT-002-C04",
+              "EXP-CRAFT-002-C05",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "CW-S18",
+            "role": "定义/调用或消费者依赖，定位符号为OnBuilt",
+            "claim_ids": [
+              "EXP-CRAFT-002-C03",
+              "EXP-CRAFT-002-C05",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "CW-S19",
+            "role": "定义/调用或消费者依赖，定位符号为common_serverfn、fn",
+            "claim_ids": [
+              "EXP-CRAFT-002-C03"
+            ]
+          },
+          {
+            "ref": "CW-S20",
+            "role": "定义/调用或消费者依赖，定位符号为GetMapExplorer、MapRecorder:HasData、MapRecorder:ClearMap、MapRecorder:RecordMap",
+            "claim_ids": [
+              "EXP-CRAFT-002-C03",
+              "EXP-CRAFT-002-C05"
+            ]
+          },
+          {
+            "ref": "CW-S08",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:DoBuild",
+            "claim_ids": [
+              "EXP-CRAFT-002-C04",
+              "EXP-CRAFT-002-C05",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "CW-S02",
+            "role": "定义/调用或消费者依赖，定位符号为Builder:CheckIngredientsForMimic、Builder:CheckDiscountEquipsForMimic、Builder:RemoveIngredients",
+            "claim_ids": [
+              "EXP-CRAFT-002-C06"
+            ]
+          },
+          {
+            "ref": "CW-S14",
+            "role": "定义/调用或消费者依赖，定位符号为ItemMimic:TurnEvil",
+            "claim_ids": [
+              "EXP-CRAFT-002-C06"
+            ]
+          },
+          {
+            "ref": "REV-CW-A06",
+            "role": "tophat_magician产品字段与tophat具名构造选择",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A07",
+            "role": "tophat_magician产品字段与tophat具名构造选择",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A08",
+            "role": "tophat_magician产品字段与tophat具名构造选择",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A09",
+            "role": "tophat_magician产品字段与tophat具名构造选择",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A10",
+            "role": "tophat_magician产品字段与tophat具名构造选择",
+            "claim_ids": [
+              "EXP-CRAFT-002-C01",
+              "EXP-CRAFT-002-C07"
+            ]
+          }
+        ],
+        "unknowns": [
+          "列举本条实际使用的Lua定义、调用者与消费者，动态Hook、其他prefab与原生行为保留未知。"
+        ]
+      },
+      "unknowns": [
+        "未运行皮肤/多产物/缺库存/错误注入、事件重入和实际自动装备/掉落，不能由静态true证明最终持有物品或初始化业务成功。",
+        "tophat转换内部FX、全部组件OnBuilt、原生MapExplorer:RecordMap与SpawnPrefab的内部结果及第三方Hook未枚举。"
+      ]
+    },
+    {
+      "id": "EXP-CRAFT-003",
+      "title": "普通工具采集的工作量与成功后磨损交接",
+      "aliases": [
+        "Tool:SetAction",
+        "Tool:GetEffectiveness",
+        "Tool:CanDoAction",
+        "Workable:ShouldRecoil",
+        "Workable:WorkedBy",
+        "WorkMultiplier:ResolveSpecialWorkAmount",
+        "DoToolWork",
+        "CHOP",
+        "MINE",
+        "DIG",
+        "工具磨损"
+      ],
+      "engineering_question": "一次普通工具动作的work量怎样形成，recoil、工作回调和工具次数消费按什么顺序执行？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮协调者核对version.txt与Steam build，候选构建重算归档、ZIP成员原字节和逐范围SHA256。",
+        "environment": "服务器BufferedAction对普通CHOP/MINE/DIG的业务调用，Tool/Worker/WorkMultiplier/Workable与EntityScript→FiniteUses磨损接口，axe/moonglassaxe原版接线。",
+        "exclusions": [
+          "RC-C01/02/06已有工作量与动作返回事实，ID-C01/02已有FiniteUses算术。本条新增完整工具/recoil API和动作→工作→成功后磨损→原版斧头的跨组件闭环。",
+          "不扩展完整输入/预测/RPC/SG链、SourceModifierList实现、攻击磨损和全部特种工具。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CRAFT-003-C01",
+          "kind": "NSF",
+          "statement": "DoToolWork通过目标action/CanBeWorked和装备限制后，优先使用act.invobject.tool的effectiveness，其次worker组件，缺省1；再乘workmultiplier:GetMultiplier，经过目标ShouldRecoil和可选ResolveSpecialWorkAmount，最后调用WorkedBy_Internal。Tool:GetEffectiveness未配置返回0，Lua的0保留在优先分支。",
+          "evidence_refs": [
+            "CW-S21",
+            "CW-S27",
+            "CW-S28",
+            "CW-S29",
+            "CW-S32",
+            "CW-S33"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C02",
+          "kind": "NSF",
+          "statement": "DoToolWork用act.invobject做recoil工具，直接WorkedBy则读取worker当时HANDS装备；WorkedBy不在自身重查CanBeWorked。零work仍进入Internal的lastwork字段、working/worked与onwork。自定义ShouldRecoil返回非nil第一值会选其分支，真recoil缺remainingworks按0，假recoil缺值按原numworks。",
+          "evidence_refs": [
+            "CW-S21",
+            "CW-S32",
+            "CW-S33"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C03",
+          "kind": "NSF",
+          "statement": "BufferedAction:Do先IsValid，再action.fn。成功后仅在invobject仍有效时调用EntityScript:OnUsedAsItem，后者以pairs分发到组件，FiniteUses按action映射、efficientuser和modifyuseconsumption计算Use。因而普通工作和其全部正常返回的业务回调先于该工具磨损入口。",
+          "evidence_refs": [
+            "CW-S22",
+            "CW-S23",
+            "CW-S26",
+            "CW-S32"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C04",
+          "kind": "NSF",
+          "statement": "普通模式且没有nofiniteuses选项的axe配置CHOP有效量1及每次CHOP消费1，moonglassaxe分别配置EFFECTIVENESS与CONSUMPTION。Tool只保存action→有效量，有限次数映射独立保存在FiniteUses；其percentusedchange监听可在物品仍有owner且无rechargeable时向owner发送toolbroke。",
+          "evidence_refs": [
+            "CW-S27",
+            "CW-S34",
+            "CW-S35",
+            "CW-S24",
+            "CW-S25",
+            "CW-S26",
+            "REV-CW-A03",
+            "REV-CW-A04",
+            "REV-CW-A05"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C05",
+          "kind": "NSF",
+          "statement": "具名消费者mermbrain的HasDigTool读取当前HANDS工具的Tool:CanDoAction(DIG)，供挖树桩行为条件使用。Wolfgang将SpecialWorkMultiplierFn接入WorkMultiplier，回调要求非recoil、非零numworks与Mighty，按技能/概率条件可返回99999，其余无显式返回，由ResolveSpecialWorkAmount回退原量。",
+          "evidence_refs": [
+            "CW-S48",
+            "CW-S49",
+            "CW-S50",
+            "CW-S51",
+            "CW-S29"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C06",
+          "kind": "EI",
+          "statement": "通过validfn后若业务回调以正常返回改变目标状态，动作返回true仍可沿成功路径磨损有效工具。workmultiplier/recoil使实际work为0并不自动把该动作置失败；若工作回调删除工具，成功后的IsValid检查可跳过OnUsedAsItem。若工作回调抛错，Do中后续磨损和Succeed没有沿该Lua栈执行。",
+          "evidence_refs": [
+            "CW-S21",
+            "CW-S22",
+            "CW-S23",
+            "CW-S32",
+            "CW-S45"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-003-C07",
+          "kind": "REC",
+          "statement": "工具有效量和每次动作成本分别配置并验证。统计采集收益时观察workleft/产物与FiniteUses两个阶段，覆盖recoil零work、工具在工作回调内移除以及onwork异常。",
+          "evidence_refs": [
+            "CW-S21",
+            "CW-S22",
+            "CW-S26",
+            "CW-S27",
+            "CW-S34",
+            "CW-S35",
+            "REV-CW-A03",
+            "REV-CW-A04",
+            "REV-CW-A05"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Tool:SetAction",
+          "source_file": "scripts/components/tool.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "action为具备id且在TOOLACTIONS登记的Action对象；effectiveness为可选有效量。"
+          ],
+          "returns": "正常nil；TOOLACTIONS[action.id]不为真时assert错误。",
+          "preconditions": [
+            "action为有效对象，effectiveness用于后续作用量算术。"
+          ],
+          "side_effects": [
+            "将actions[action]设为effectiveness或1，并添加action.id.._tool标签。Lua中0保留。"
+          ],
+          "lifecycle": [
+            "Tool:GetEffectiveness提供工作量，FiniteUses:SetConsumption另行配置每动作磨损。组件卸载遍历actions清对应工具标签。"
+          ],
+          "evidence_refs": [
+            "CW-S27",
+            "CW-S21",
+            "CW-S34",
+            "CW-S35",
+            "CW-S24",
+            "REV-CW-A03",
+            "REV-CW-A04",
+            "REV-CW-A05"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Tool:GetEffectiveness",
+          "source_file": "scripts/components/tool.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "action为Action对象键，与SetAction相同身份。"
+          ],
+          "returns": "返回actions[action]或0，缺映射为0。",
+          "preconditions": [
+            "self.actions为构造建立的表。"
+          ],
+          "side_effects": [
+            "只读映射。"
+          ],
+          "lifecycle": [
+            "DoToolWork只要存在tool组件即读取此值，0在Lua中为真，不回退worker或缺省1。"
+          ],
+          "evidence_refs": [
+            "CW-S27",
+            "CW-S21",
+            "CW-S34",
+            "CW-S35",
+            "REV-CW-A03",
+            "REV-CW-A04",
+            "REV-CW-A05"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Tool:CanDoAction",
+          "source_file": "scripts/components/tool.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "action为Action对象键。"
+          ],
+          "returns": "返回actions[action]~=nil布尔值，映射0仍为true。",
+          "preconditions": [
+            "self.actions可读。"
+          ],
+          "side_effects": [
+            "只测试映射存在，不计算剩余次数或检查目标workable。"
+          ],
+          "lifecycle": [
+            "mermbrain的HasDigTool读取当前HANDS能力并供DIG树桩行为条件使用。Tool卸载清能力标签，工作量和次数由各自映射提供。"
+          ],
+          "evidence_refs": [
+            "CW-S27",
+            "CW-S24",
+            "CW-S21",
+            "CW-S48",
+            "CW-S49"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:ShouldRecoil",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "worker、tool及预期numworks；DoToolWork传act.invobject，WorkedBy传当前HANDS。"
+          ],
+          "returns": "返回recoil,remainingworks。自定义recoil非nil时采用该值的truthiness并缺省remainingworks；否则tough条件不满足返回true,0，其余false,numworks。",
+          "preconditions": [
+            "自定义shouldrecoilfn可调用并遵守数值剩余作用量约定。worker/tool可缺省于默认tough检测，其他调用者有各自更强前提。"
+          ],
+          "side_effects": [
+            "直接调用shouldrecoilfn(inst,worker,tool,numworks)，其返回值影响后续作用量。默认分支只读worker标签及tool:CanDoToughWork。"
+          ],
+          "lifecycle": [
+            "DoToolWork之后可再经WorkMultiplier特殊回调修改量；WorkedBy仅使用返回的numworks并丢弃recoil。",
+            "该方法自己不扣work、不消费工具或发送recoil事件。"
+          ],
+          "evidence_refs": [
+            "CW-S33",
+            "CW-S32",
+            "CW-S21",
+            "CW-S27",
+            "CW-S29"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:WorkedBy",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "worker为提供components及PushEvent的实体；numworks为可选工作量。"
+          ],
+          "returns": "正常nil，不转发完成状态或recoil布尔值。",
+          "preconditions": [
+            "worker非nil且components可读，组件回调和Internal所需上下文有效。",
+            "本方法不自行检查CanBeWorked/action或有效性，直接调用方负责选择适合入口。"
+          ],
+          "side_effects": [
+            "读取worker inventory当前HANDS工具，ShouldRecoil后将第二返回值传WorkedBy_Internal。"
+          ],
+          "lifecycle": [
+            "与DoToolWork不同，本方法不读取工具有效量或worker的workmultiplier，不按BufferedAction自动消费工具。目标workmultiplierfn仍在Internal内生效。"
+          ],
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S33",
+            "CW-S21",
+            "CW-S22"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WorkMultiplier:ResolveSpecialWorkAmount",
+          "source_file": "scripts/components/workmultiplier.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "action,target,tool,numworks,recoil由DoToolWork传入；隐式self.inst为worker。"
+          ],
+          "returns": "有specialfn时返回其truthy结果，否则原numworks。0为truthy可保留，nil/false回退原量。",
+          "preconditions": [
+            "specialfn存在时可按(inst,action,target,tool,numworks,recoil)调用，最终结果可供Internal算术。"
+          ],
+          "side_effects": [
+            "调用业务specialfn，其副作用由回调决定；没有独立状态写入。"
+          ],
+          "lifecycle": [
+            "在ShouldRecoil之后、recoil通知与WorkedBy_Internal之前执行，允许对已反冲的量再作调整。",
+            "Wolfgang接线的具名回调在非recoil/非零work/Mighty及概率条件下返回99999，其余nil触发回退原量。"
+          ],
+          "evidence_refs": [
+            "CW-S29",
+            "CW-S21",
+            "CW-S32",
+            "CW-S50",
+            "CW-S51"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "BufferedAction先validfn，普通工具动作在DoToolWork读取有效量、角色倍率、recoil和特殊工作量。",
+          "evidence_refs": [
+            "CW-S22",
+            "CW-S21",
+            "CW-S27",
+            "CW-S28",
+            "CW-S29",
+            "CW-S33"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Internal同步处理工作量、事件和业务回调，CHOP等外层回传动作结果。",
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S21",
+            "CW-S45"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "动作成功且工具有效才分发OnUsedAsItem，FiniteUses读取独立action成本，axe与moonglassaxe提供实际配置消费者。",
+          "evidence_refs": [
+            "CW-S22",
+            "CW-S23",
+            "CW-S24",
+            "CW-S25",
+            "CW-S26",
+            "CW-S27",
+            "CW-S34",
+            "CW-S35",
+            "REV-CW-A03",
+            "REV-CW-A04",
+            "REV-CW-A05"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CW-S21",
+            "role": "定义/调用或消费者依赖，定位符号为DoToolWork、ValidToolWork、ACTIONS.CHOP.fn、ACTIONS.MINE.fn、ACTIONS.DIG.fn",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01",
+              "EXP-CRAFT-003-C02",
+              "EXP-CRAFT-003-C06",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S27",
+            "role": "定义/调用或消费者依赖，定位符号为Tool、PercentChanged、Tool:SetAction、Tool:GetEffectiveness、Tool:CanDoAction",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01",
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S28",
+            "role": "定义/调用或消费者依赖，定位符号为Worker:GetEffectiveness、Worker:SetAction",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01"
+            ]
+          },
+          {
+            "ref": "CW-S29",
+            "role": "定义/调用或消费者依赖，定位符号为WorkMultiplier:GetMultiplier、WorkMultiplier:ResolveSpecialWorkAmount",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01",
+              "EXP-CRAFT-003-C05"
+            ]
+          },
+          {
+            "ref": "CW-S32",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:WorkedBy、Workable:WorkedBy_Internal",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01",
+              "EXP-CRAFT-003-C02",
+              "EXP-CRAFT-003-C03",
+              "EXP-CRAFT-003-C06"
+            ]
+          },
+          {
+            "ref": "CW-S33",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:SetOnWorkCallback、Workable:SetOnFinishCallback、Workable:ShouldRecoil",
+            "claim_ids": [
+              "EXP-CRAFT-003-C01",
+              "EXP-CRAFT-003-C02"
+            ]
+          },
+          {
+            "ref": "CW-S22",
+            "role": "定义/调用或消费者依赖，定位符号为BufferedAction:Do、BufferedAction:IsValid",
+            "claim_ids": [
+              "EXP-CRAFT-003-C03",
+              "EXP-CRAFT-003-C06",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S23",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:OnUsedAsItem",
+            "claim_ids": [
+              "EXP-CRAFT-003-C03",
+              "EXP-CRAFT-003-C06"
+            ]
+          },
+          {
+            "ref": "CW-S26",
+            "role": "定义/调用或消费者依赖，定位符号为FiniteUses:SetModifyUseConsumption、FiniteUses:OnUsedAsItem、FiniteUses:GetPercent",
+            "claim_ids": [
+              "EXP-CRAFT-003-C03",
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S34",
+            "role": "定义/调用或消费者依赖，定位符号为Tool:SetAction、FiniteUses:SetConsumption",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S35",
+            "role": "定义/调用或消费者依赖，定位符号为glass_master_postinit、Tool:SetAction、FiniteUses:SetConsumption",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "CW-S24",
+            "role": "定义/调用或消费者依赖，定位符号为FiniteUses:SetConsumption、FiniteUses:ClearAllConsumptions",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04"
+            ]
+          },
+          {
+            "ref": "CW-S25",
+            "role": "定义/调用或消费者依赖，定位符号为FiniteUses:SetUses、FiniteUses:Use",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04"
+            ]
+          },
+          {
+            "ref": "CW-S48",
+            "role": "定义/调用或消费者依赖，定位符号为HasDigTool、Tool:CanDoAction",
+            "claim_ids": [
+              "EXP-CRAFT-003-C05"
+            ]
+          },
+          {
+            "ref": "CW-S49",
+            "role": "定义/调用或消费者依赖，定位符号为HasDigTool、BrainCommon.NodeAssistLeaderDoAction",
+            "claim_ids": [
+              "EXP-CRAFT-003-C05"
+            ]
+          },
+          {
+            "ref": "CW-S50",
+            "role": "定义/调用或消费者依赖，定位符号为SpecialWorkMultiplierFn",
+            "claim_ids": [
+              "EXP-CRAFT-003-C05"
+            ]
+          },
+          {
+            "ref": "CW-S51",
+            "role": "定义/调用或消费者依赖，定位符号为WorkMultiplier:SetSpecialMultiplierFn",
+            "claim_ids": [
+              "EXP-CRAFT-003-C05"
+            ]
+          },
+          {
+            "ref": "CW-S45",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:PushEvent_Internal、EntityScript:PushEvent、EntityScript:PushEventImmediate",
+            "claim_ids": [
+              "EXP-CRAFT-003-C06"
+            ]
+          },
+          {
+            "ref": "REV-CW-A03",
+            "role": "axe/moonglassaxe具名导出与master_postinit接线",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A04",
+            "role": "axe/moonglassaxe具名导出与master_postinit接线",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          },
+          {
+            "ref": "REV-CW-A05",
+            "role": "axe/moonglassaxe具名导出与master_postinit接线",
+            "claim_ids": [
+              "EXP-CRAFT-003-C04",
+              "EXP-CRAFT-003-C07"
+            ]
+          }
+        ],
+        "unknowns": [
+          "列举本条实际使用的Lua定义、调用者与消费者，动态Hook、其他prefab与原生行为保留未知。"
+        ]
+      },
+      "unknowns": [
+        "尚未在游戏中运行零work/recoil、磨损最后一次、工作回调删除工具或异常注入；原生IsValid、动画帧、网络预测结果仍未知。",
+        "DoToolWork为actions.lua文件局部函数，作为调用链证据使用，不授予外部可调用API。SourceModifierList、efficientuser及特种工作量业务未在本条展开。"
+      ]
+    },
+    {
+      "id": "EXP-CRAFT-004",
+      "title": "工作完成消费者的组件替换与原栈继续",
+      "aliases": [
+        "Workable:WorkedBy_Internal",
+        "Workable:SetWorkLeft",
+        "Workable:SetWorkAction",
+        "Workable:SetOnWorkCallback",
+        "Workable:SetOnFinishCallback",
+        "evergreen",
+        "make_stump",
+        "dig_up_stump",
+        "rock_moon_shell",
+        "workfinished"
+      ],
+      "engineering_question": "砍倒后重建DIG组件、挖根删除和矿壳workfinished消费者如何接续，哪个组件/动作被后续通知读取？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮协调者核对version.txt与Steam build，候选构建重算归档、ZIP成员原字节和逐范围SHA256。",
+        "environment": "当前普通evergreen砍倒→make_stump→DIG及普通rocks/Moon shell的服务器组件回调；局部Workable对象与inst.components.workable替换明确区分。",
+        "exclusions": [
+          "RC-C01/02已有通用扣work/事件顺序，RC-C05已有保存合同。本条新增完整设置/执行API及树/矿壳真实消费者的组件身份闭环。",
+          "不扩展成长再生、Treeguard生成完整算法、所有LootDropper概率/飞散/季节分支和实体Remove总合同。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CRAFT-004-C01",
+          "kind": "NSF",
+          "statement": "服务器evergreen把CHOP组件onwork接到chop_tree、onfinish接到chop_down_tree。完成回调先DropLoot，make_stump移除旧workable再添加新workable，设置DIG、dig_up_stump和workleft=1。挖根完成的dig_up_stump调用SpawnLootPrefab(log)后Remove实体。",
+          "evidence_refs": [
+            "CW-S39",
+            "CW-S47",
+            "CW-S38",
+            "CW-S37",
+            "CW-S36",
+            "CW-S43",
+            "CW-S44",
+            "CW-S52"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-004-C02",
+          "kind": "EI",
+          "statement": "chop_down_tree返回后，原WorkedBy_Internal仍持有被卸下的旧self并继续发送workfinished及worker.finishedwork。后者action取旧self.action即CHOP，inst.components.workable此时可已是新DIG组件。旧组件字段、当前安装槽与事件target是三个可分别变化的引用，不能按新槽推成当前完成事件为DIG。",
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S37",
+            "CW-S38",
+            "CW-S31",
+            "CW-S30",
+            "CW-S52"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-004-C03",
+          "kind": "NSF",
+          "statement": "rocks的MINE组件使用OnWork承接workleft<=0的DropLoot/FX及通常Remove，没有配置统一onfinish才能掉落的要求。moon shell设置doNotRemoveOnWorkDone=true并监听workfinished，完成事件再创建moonrockseed、设persists=false/NOCLICK、播放break并安排ErodeAway。",
+          "evidence_refs": [
+            "CW-S40",
+            "CW-S41",
+            "CW-S42",
+            "CW-S32",
+            "CW-S44"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-004-C04",
+          "kind": "EI",
+          "statement": "onwork可删目标或改变workleft，Internal在其后重新读取旧self.workleft判完成；onfinish后没有IsValid后检，继续尝试后续PushEvent。直接Internal不设完成闩锁也不检查CanBeWorked，若重复调用仍有self.workleft<=0可再次进入完成分支。普通动作入口的CanBeWorked/目标有效性门槛是另一阶段。",
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S21",
+            "CW-S22",
+            "CW-S40",
+            "CW-S36"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-004-C05",
+          "kind": "NSF",
+          "statement": "SetWorkLeft先设workable=true并把输入限制到至少1，再视maxwork作上限，SetWorkAction/属性setter负责对应action_workable标签。SetOnWorkCallback/SetOnFinishCallback只是赋函数，不保存或执行回调。组件卸载清workrepairable与该旧action的workable标签。",
+          "evidence_refs": [
+            "CW-S30",
+            "CW-S31",
+            "CW-S33"
+          ]
+        },
+        {
+          "id": "EXP-CRAFT-004-C06",
+          "kind": "REC",
+          "statement": "扩展采集产物前追到具体prefab的onwork/onfinish/workfinished，核对已有掉落责任。组件替换或回调删除后仍需继续的代码使用明确的旧/新组件身份，验证完成事件动作、存续目标和掉落次数。",
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S36",
+            "CW-S37",
+            "CW-S38",
+            "CW-S40",
+            "CW-S42"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Workable:SetWorkLeft",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "work为数值或nil/false缺省10。"
+          ],
+          "returns": "正常nil。",
+          "preconditions": [
+            "self.maxwork为可比较数值；标签属性setter与repairable接口满足标准构造合同。"
+          ],
+          "side_effects": [
+            "先self.workable=true，再设置workleft；maxwork>0时clamp(work或10,1,maxwork)，否则max(1,work或10)。",
+            "workable/workleft属性setter更新action_workable标签，并在repairable存在时调用SetWorkRepairable。"
+          ],
+          "lifecycle": [
+            "用于make_stump新DIG组件设为1。传0会夹到1，不能经该方法直接表达完成0。",
+            "SetMaxWork只写至少1的maxwork，不即时重夹现有workleft。"
+          ],
+          "evidence_refs": [
+            "CW-S31",
+            "CW-S30",
+            "CW-S37"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:SetWorkAction",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "act为Action对象或nil；标准实例默认CHOP。"
+          ],
+          "returns": "正常nil。",
+          "preconditions": [
+            "非nil act应有id，当前workable/workleft可比较。"
+          ],
+          "side_effects": [
+            "写self.action。仅在workleft>0且workable时属性setter移除旧action_workable并添加新action_workable标签。"
+          ],
+          "lifecycle": [
+            "配置树的CHOP与树桩的DIG；CanBeWorked仅状态门槛，DoToolWork另比较本次action。",
+            "组件卸载按其自身action清标签，当前安装槽替换不改变正在执行旧组件的self.action。"
+          ],
+          "evidence_refs": [
+            "CW-S31",
+            "CW-S30",
+            "CW-S37",
+            "CW-S39",
+            "CW-S21",
+            "CW-S32"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:SetOnWorkCallback",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "fn为回调或nil；实际调用参数(inst,worker,当前workleft,最终numworks)。"
+          ],
+          "returns": "setter正常nil。回调返回值在执行时被忽略。",
+          "preconditions": [
+            "非nil fn应可调用，执行时worker与业务所需组件有效。setter自身不检查函数类型。"
+          ],
+          "side_effects": [
+            "仅将self.onwork=fn，尚不扣work或调用fn。执行时在working/worked事件之后直接调用。"
+          ],
+          "lifecycle": [
+            "rocks将掉落/删除挂在该回调。它可改self.workleft影响后续完成判定，也可能删除宿主，异常中断后续完成阶段。"
+          ],
+          "evidence_refs": [
+            "CW-S33",
+            "CW-S32",
+            "CW-S40",
+            "CW-S41"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:SetOnFinishCallback",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "fn为回调或nil；实际调用参数(inst,worker)。"
+          ],
+          "returns": "setter正常nil。完成回调返回值在Internal中被忽略。",
+          "preconditions": [
+            "非nil fn应可调用，setter没有类型检查。业务须已建立其掉落/转换依赖。"
+          ],
+          "side_effects": [
+            "仅将self.onfinish=fn。Internal在onwork后当前旧self.workleft<=0才调用。"
+          ],
+          "lifecycle": [
+            "普通树完成回调替换旧组件为DIG；树桩回调生成log后删除宿主。",
+            "回调之后外层旧组件继续发workfinished/finishedwork及预先符合条件的plantkilled。没有完成锁或自动有效性重检。"
+          ],
+          "evidence_refs": [
+            "CW-S33",
+            "CW-S32",
+            "CW-S36",
+            "CW-S37",
+            "CW-S38",
+            "CW-S39"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "Workable:WorkedBy_Internal",
+          "source_file": "scripts/components/workable.lua",
+          "visibility": "原版服务器组件Lua实例方法，限本条具名调用链与来源版本。",
+          "parameters": [
+            "worker为带PushEvent的实体；numworks缺省1，可被本组件workmultiplierfn(inst,worker,numworks)乘数再次调整。"
+          ],
+          "returns": "正常nil，不返回完成或产物；回调/事件异常沿当前栈外抛。",
+          "preconditions": [
+            "内部入口，常规Action已处理recoil；直接调用不检查CanBeWorked/action/workable/目标有效性。",
+            "worker、GetTime、TheWorld和业务回调依赖有效。"
+          ],
+          "side_effects": [
+            "只有最终numworks>0才扣work，旧workleft<=1直接0，否则相减且结果<0.01置0。所有量都更新lastworktime/lastworker、发working/worked并调用onwork。",
+            "onwork后重新读取self.workleft，<=0时先捕获plant条件/位置，再onfinish、workfinished、worker.finishedwork，最后满足先前条件则plantkilled。"
+          ],
+          "lifecycle": [
+            "同步事件/回调可修改状态或移除/替换组件。onfinish后仍使用旧self.action构造完成事件，组件安装槽不会自动重绑定当前self。",
+            "没有完成闩锁、重入锁、回滚或IsValid后检，正常外层动作门槛与直接重复调用边界各自核对。"
+          ],
+          "evidence_refs": [
+            "CW-S32",
+            "CW-S33",
+            "CW-S45",
+            "CW-S21",
+            "CW-S36",
+            "CW-S37",
+            "CW-S38",
+            "CW-S40",
+            "CW-S42"
+          ],
+          "unknowns": [
+            "仅静态核对所列Lua链，原生内部、动态Hook和实际跨端结果尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "普通prefab server构造将CHOP/MINE动作接到具体工作与完成回调。",
+          "evidence_refs": [
+            "CW-S39",
+            "CW-S41",
+            "CW-S31",
+            "CW-S33"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "树完成回调掉落并替换workable为DIG，旧Internal继续发CHOP完成事件；后续DIG可生成log后Remove。",
+          "evidence_refs": [
+            "CW-S38",
+            "CW-S37",
+            "CW-S36",
+            "CW-S32",
+            "CW-S43",
+            "CW-S44"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "矿石在onwork处掉落，moon shell保留实体直到workfinished消费者生成种子并登记演出退出。",
+          "evidence_refs": [
+            "CW-S40",
+            "CW-S41",
+            "CW-S42",
+            "CW-S32"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CW-S39",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:SetOnWorkCallback、Workable:SetOnFinishCallback",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01"
+            ]
+          },
+          {
+            "ref": "CW-S47",
+            "role": "定义/调用或消费者依赖，定位符号为chop_tree",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01"
+            ]
+          },
+          {
+            "ref": "CW-S38",
+            "role": "定义/调用或消费者依赖，定位符号为chop_down_tree",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01",
+              "EXP-CRAFT-004-C02",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S37",
+            "role": "定义/调用或消费者依赖，定位符号为make_stump",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01",
+              "EXP-CRAFT-004-C02",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S36",
+            "role": "定义/调用或消费者依赖，定位符号为dig_up_stump、chop_down_burnt_tree",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01",
+              "EXP-CRAFT-004-C04",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S43",
+            "role": "定义/调用或消费者依赖，定位符号为LootDropper:SpawnLootPrefab",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01"
+            ]
+          },
+          {
+            "ref": "CW-S44",
+            "role": "定义/调用或消费者依赖，定位符号为LootDropper:DropLoot",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01",
+              "EXP-CRAFT-004-C03"
+            ]
+          },
+          {
+            "ref": "CW-S52",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:AddComponent、EntityScript:RemoveComponent",
+            "claim_ids": [
+              "EXP-CRAFT-004-C01",
+              "EXP-CRAFT-004-C02"
+            ]
+          },
+          {
+            "ref": "CW-S32",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:WorkedBy、Workable:WorkedBy_Internal",
+            "claim_ids": [
+              "EXP-CRAFT-004-C02",
+              "EXP-CRAFT-004-C03",
+              "EXP-CRAFT-004-C04",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S31",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:SetWorkAction、Workable:SetWorkLeft、Workable:CanBeWorked、Workable:Destroy",
+            "claim_ids": [
+              "EXP-CRAFT-004-C02",
+              "EXP-CRAFT-004-C05"
+            ]
+          },
+          {
+            "ref": "CW-S30",
+            "role": "定义/调用或消费者依赖，定位符号为Workable、onworkable、onaction、Workable:OnRemoveFromEntity",
+            "claim_ids": [
+              "EXP-CRAFT-004-C02",
+              "EXP-CRAFT-004-C05"
+            ]
+          },
+          {
+            "ref": "CW-S40",
+            "role": "定义/调用或消费者依赖，定位符号为OnWork",
+            "claim_ids": [
+              "EXP-CRAFT-004-C03",
+              "EXP-CRAFT-004-C04",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S41",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:SetWorkAction、Workable:SetOnWorkCallback",
+            "claim_ids": [
+              "EXP-CRAFT-004-C03"
+            ]
+          },
+          {
+            "ref": "CW-S42",
+            "role": "定义/调用或消费者依赖，定位符号为OnRockMoonCapsuleWorkFinished、rock_moon_shell",
+            "claim_ids": [
+              "EXP-CRAFT-004-C03",
+              "EXP-CRAFT-004-C06"
+            ]
+          },
+          {
+            "ref": "CW-S21",
+            "role": "定义/调用或消费者依赖，定位符号为DoToolWork、ValidToolWork、ACTIONS.CHOP.fn、ACTIONS.MINE.fn、ACTIONS.DIG.fn",
+            "claim_ids": [
+              "EXP-CRAFT-004-C04"
+            ]
+          },
+          {
+            "ref": "CW-S22",
+            "role": "定义/调用或消费者依赖，定位符号为BufferedAction:Do、BufferedAction:IsValid",
+            "claim_ids": [
+              "EXP-CRAFT-004-C04"
+            ]
+          },
+          {
+            "ref": "CW-S33",
+            "role": "定义/调用或消费者依赖，定位符号为Workable:SetOnWorkCallback、Workable:SetOnFinishCallback、Workable:ShouldRecoil",
+            "claim_ids": [
+              "EXP-CRAFT-004-C05"
+            ]
+          },
+          {
+            "ref": "CW-S45",
+            "role": "定义/调用或消费者依赖，定位符号为EntityScript:PushEvent_Internal、EntityScript:PushEvent、EntityScript:PushEventImmediate",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "列举本条实际使用的Lua定义、调用者与消费者，动态Hook、其他prefab与原生行为保留未知。"
+        ]
+      },
+      "unknowns": [
+        "未运行砍倒/挖根/矿壳、组件替换、回调重入或重复直接Internal。Remove后的原生事件可见性、IsValid/Retire及动画/任务实际推进仍未知。",
+        "树的plantkilled位置/条件是在onfinish前捕获，原生碰撞、Treeguard概率与全部regrowth/保存恢复不由本条证明。",
+        "LootDropper仅核对具名调用与实际生成入口，概率、FlingItem/native物理和季节追加产物仍须按目标另查。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "CW-S01",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 475,
+      "line_end": 517,
+      "range_sha256": "2679f90c9b660b2e515ff911d9358456aa56efe3a83d561bc3eb865f4a114aeb",
+      "symbols": [
+        "Builder:GetIngredientWetness",
+        "Builder:GetIngredients"
+      ]
+    },
+    {
+      "id": "CW-S02",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 519,
+      "line_end": 591,
+      "range_sha256": "6748325ffdb335fd7625b984d949592854e2c03f36859346e066dc4a8ef4feba",
+      "symbols": [
+        "Builder:CheckIngredientsForMimic",
+        "Builder:CheckDiscountEquipsForMimic",
+        "Builder:RemoveIngredients"
+      ]
+    },
+    {
+      "id": "CW-S03",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 593,
+      "line_end": 627,
+      "range_sha256": "d8bae9689ed0272db3af3dea2bb846759dfa5949f0360416c21df71a32142179",
+      "symbols": [
+        "Builder:HasCharacterIngredient",
+        "Builder:HasTechIngredient"
+      ]
+    },
+    {
+      "id": "CW-S04",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 918,
+      "line_end": 952,
+      "range_sha256": "29cd3650adddacf0b3abf167e4b3cefb9adea2e570ac580b8b6b15bfeface99d",
+      "symbols": [
+        "Builder:HasIngredients",
+        "Builder:CanBuild"
+      ]
+    },
+    {
+      "id": "CW-S05",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 629,
+      "line_end": 655,
+      "range_sha256": "2e6561e96d1930d7fad2e5274a690d0f17381661351cf2d5987a8d183e70a955",
+      "symbols": [
+        "Builder:MakeRecipe",
+        "GiveOrDropItem"
+      ]
+    },
+    {
+      "id": "CW-S06",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 657,
+      "line_end": 721,
+      "range_sha256": "8abf41664d524d2613f192d2226e5a19ebfeb57d38ab7d14185099eda55a516a",
+      "symbols": [
+        "Builder:DoBuild"
+      ]
+    },
+    {
+      "id": "CW-S07",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 723,
+      "line_end": 797,
+      "range_sha256": "41bbb8a73d919cababc7de2221c1cae2c91829a16e70a620d856289d0706b1e2",
+      "symbols": [
+        "Builder:DoBuild",
+        "GiveOrDropItem"
+      ]
+    },
+    {
+      "id": "CW-S08",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 798,
+      "line_end": 839,
+      "range_sha256": "b36ce39ae63efd7f41b1126563aeb4d52f76a5cfbc7d1d20c534d5b3ef79e8f5",
+      "symbols": [
+        "Builder:DoBuild"
+      ]
+    },
+    {
+      "id": "CW-S09",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 1041,
+      "line_end": 1111,
+      "range_sha256": "14be1a4d9946be6f0bc4cf52848d0a3845f2486d1e90e89a2fbb346cad014c28",
+      "symbols": [
+        "Builder:MakeRecipeFromMenu"
+      ]
+    },
+    {
+      "id": "CW-S10",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1507,
+      "line_end": 1549,
+      "range_sha256": "a3672263530628cf41b8a0d50c7127c8af555732723f6118ad2b4ffebc19442e",
+      "symbols": [
+        "Inventory:Has"
+      ]
+    },
+    {
+      "id": "CW-S11",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1697,
+      "line_end": 1754,
+      "range_sha256": "d4ebca4de8408575b380e437c607c511e30e83dcdbe5497ce521df0376d7d865",
+      "symbols": [
+        "Inventory:GetCraftingIngredient"
+      ]
+    },
+    {
+      "id": "CW-S12",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1454,
+      "range_sha256": "bb0484fc26f6775af0147e3eb1b0cb2ddb8d801189aab319cbb1e3d290872dee",
+      "symbols": [
+        "Inventory:RemoveItem"
+      ]
+    },
+    {
+      "id": "CW-S13",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 146,
+      "line_end": 185,
+      "range_sha256": "cb2b677c1cd196878424fa42091c83025199e4b4c77761c5c1bb5109c6028526",
+      "symbols": [
+        "onequip_green",
+        "onunequip_green",
+        "onequiptomodel_green"
+      ]
+    },
+    {
+      "id": "CW-S14",
+      "source_file": "scripts/components/itemmimic.lua",
+      "file_sha256": "f850fcdf4e3c4bb8f7c47db621ae5d39ff7deae4f0a47d34bc0bb3c2826e86ab",
+      "line_start": 201,
+      "line_end": 229,
+      "range_sha256": "c4f47f4c2e84bd812d88837b0c05a0ddd72cd5b03af1787ed094a198091b0cb9",
+      "symbols": [
+        "ItemMimic:TurnEvil"
+      ]
+    },
+    {
+      "id": "CW-S15",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1718,
+      "line_end": 1728,
+      "range_sha256": "02326be180fbe87e511c21b5e3152f6147c469e73ea2edc2820db9b9a3335cea",
+      "symbols": [
+        "EntityScript:OnBuilt"
+      ]
+    },
+    {
+      "id": "CW-S16",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 987,
+      "line_end": 1017,
+      "range_sha256": "840ff2d8a804feefcc153814d1d9334ec7de34da0cec36ba161d1f7469d3b149",
+      "symbols": [
+        "top_convert_to_magician"
+      ]
+    },
+    {
+      "id": "CW-S17",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 1031,
+      "line_end": 1071,
+      "range_sha256": "64b7fd0ff12efd6bf3579c5c3d5f2131b0feb1e90402d6f9ec62552b4b8ce52a",
+      "symbols": [
+        "top_onprebuilt",
+        "fns.top"
+      ]
+    },
+    {
+      "id": "CW-S18",
+      "source_file": "scripts/prefabs/mapscroll.lua",
+      "file_sha256": "57a026b4e09036e637adfb1ce9fea59248aca09a4694561be0b00f66e603265d",
+      "line_start": 8,
+      "line_end": 10,
+      "range_sha256": "a0019091017dd4d01c0f4787c39bf890f196e09e7e5ef77d9fdf9c7b17b82e1d",
+      "symbols": [
+        "OnBuilt"
+      ]
+    },
+    {
+      "id": "CW-S19",
+      "source_file": "scripts/prefabs/mapscroll.lua",
+      "file_sha256": "57a026b4e09036e637adfb1ce9fea59248aca09a4694561be0b00f66e603265d",
+      "line_start": 64,
+      "line_end": 100,
+      "range_sha256": "2e0502d1fc10b06a010b135bcec02cd5f72ab6a6eb1cfb65f85a02d13361d759",
+      "symbols": [
+        "common_serverfn",
+        "fn"
+      ]
+    },
+    {
+      "id": "CW-S20",
+      "source_file": "scripts/components/maprecorder.lua",
+      "file_sha256": "3e034544167d83ec7518c39f7df96dd411c0c2b055218ed0cf465240f2f38e5f",
+      "line_start": 13,
+      "line_end": 66,
+      "range_sha256": "49e765bb84d947c6336fc537d726aba5c8ef8f0498c73481239a6fd30660a2a0",
+      "symbols": [
+        "GetMapExplorer",
+        "MapRecorder:HasData",
+        "MapRecorder:ClearMap",
+        "MapRecorder:RecordMap"
+      ]
+    },
+    {
+      "id": "CW-S21",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1693,
+      "line_end": 1804,
+      "range_sha256": "5f0d9f503aa4ea4e1286b4a3d95cddeb11a3c4067cb008b75fd54c0d9a3fc992",
+      "symbols": [
+        "DoToolWork",
+        "ValidToolWork",
+        "ACTIONS.CHOP.fn",
+        "ACTIONS.MINE.fn",
+        "ACTIONS.DIG.fn"
+      ]
+    },
+    {
+      "id": "CW-S22",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 22,
+      "line_end": 47,
+      "range_sha256": "09e622963a03964d78c73842cb0d57ccbbdd795afefcc243c3e18bb266abc1d6",
+      "symbols": [
+        "BufferedAction:Do",
+        "BufferedAction:IsValid"
+      ]
+    },
+    {
+      "id": "CW-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1811,
+      "line_end": 1817,
+      "range_sha256": "9d6094ad63da20d330402ec8e87d282ea5aba96f9167810df276e147950f5288",
+      "symbols": [
+        "EntityScript:OnUsedAsItem"
+      ]
+    },
+    {
+      "id": "CW-S24",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 27,
+      "line_end": 38,
+      "range_sha256": "0d05266cf96a206f4af972f2c2b79d935a6947af7fa346a4e24606bd78e45fa0",
+      "symbols": [
+        "FiniteUses:SetConsumption",
+        "FiniteUses:ClearAllConsumptions"
+      ]
+    },
+    {
+      "id": "CW-S25",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 64,
+      "line_end": 87,
+      "range_sha256": "12b05a492608f3368ff7d50b4fbc42a2221b32adac6f3da5d4baf2df5a25f1ea",
+      "symbols": [
+        "FiniteUses:SetUses",
+        "FiniteUses:Use"
+      ]
+    },
+    {
+      "id": "CW-S26",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 97,
+      "line_end": 118,
+      "range_sha256": "58b2cf52d395c1fae3536c3f4b8cfa72c811ecc47e3fb541d755b3bf811f15fa",
+      "symbols": [
+        "FiniteUses:SetModifyUseConsumption",
+        "FiniteUses:OnUsedAsItem",
+        "FiniteUses:GetPercent"
+      ]
+    },
+    {
+      "id": "CW-S27",
+      "source_file": "scripts/components/tool.lua",
+      "file_sha256": "ec086e8fd11cf1ca93b1a47894028dd2b9a27df57fe508ab3c42a313f7fb0ada",
+      "line_start": 1,
+      "line_end": 51,
+      "range_sha256": "df83774fad73da7f32634748a699443446f2ad9c969be0ab5887faf90c46cc71",
+      "symbols": [
+        "Tool",
+        "PercentChanged",
+        "Tool:SetAction",
+        "Tool:GetEffectiveness",
+        "Tool:CanDoAction"
+      ]
+    },
+    {
+      "id": "CW-S28",
+      "source_file": "scripts/components/worker.lua",
+      "file_sha256": "69e9c65c4bbece84ee847dcd0ad29e37873c51ee335f8651a7ae808f8a0af237",
+      "line_start": 1,
+      "line_end": 18,
+      "range_sha256": "25dfeb998eeee064aaf8aabfce819db5b0c9c970261efad229c1f63e1f8c5cd4",
+      "symbols": [
+        "Worker:GetEffectiveness",
+        "Worker:SetAction"
+      ]
+    },
+    {
+      "id": "CW-S29",
+      "source_file": "scripts/components/workmultiplier.lua",
+      "file_sha256": "3ff044fa35dc645b9b7af6df24d8d5a73c6f879fc78005d786e40d55d2cfbdbc",
+      "line_start": 3,
+      "line_end": 33,
+      "range_sha256": "170e87fd7e989736412e15ea1e188fb94ba4aa2ed0f69ddb2baf1153d944f981",
+      "symbols": [
+        "WorkMultiplier:GetMultiplier",
+        "WorkMultiplier:ResolveSpecialWorkAmount"
+      ]
+    },
+    {
+      "id": "CW-S30",
+      "source_file": "scripts/components/workable.lua",
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "line_start": 1,
+      "line_end": 53,
+      "range_sha256": "18a8b371c286f1b0719713de05f7c828715814c2e5bf993b6c55ddefc2b32617",
+      "symbols": [
+        "Workable",
+        "onworkable",
+        "onaction",
+        "Workable:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "CW-S31",
+      "source_file": "scripts/components/workable.lua",
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "line_start": 61,
+      "line_end": 104,
+      "range_sha256": "758452cff58c3af3c2fc2383f737254d73a1eb48482d27f25e3afb947735fbcd",
+      "symbols": [
+        "Workable:SetWorkAction",
+        "Workable:SetWorkLeft",
+        "Workable:CanBeWorked",
+        "Workable:Destroy"
+      ]
+    },
+    {
+      "id": "CW-S32",
+      "source_file": "scripts/components/workable.lua",
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "line_start": 123,
+      "line_end": 171,
+      "range_sha256": "2e8a23ede0d53088ca514c1d646718697a1d65f2b5b3251cf9a0169e97c093dd",
+      "symbols": [
+        "Workable:WorkedBy",
+        "Workable:WorkedBy_Internal"
+      ]
+    },
+    {
+      "id": "CW-S33",
+      "source_file": "scripts/components/workable.lua",
+      "file_sha256": "407f9073a498ed678ab4bf7ef028555816399e6f633ea4ca198b646bcfbe5733",
+      "line_start": 173,
+      "line_end": 206,
+      "range_sha256": "0c28878357f0581c92234af504ae0ae1937e0ac6f4fdae9a1b9c5801572a0b59",
+      "symbols": [
+        "Workable:SetOnWorkCallback",
+        "Workable:SetOnFinishCallback",
+        "Workable:ShouldRecoil"
+      ]
+    },
+    {
+      "id": "CW-S34",
+      "source_file": "scripts/prefabs/axe.lua",
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "line_start": 95,
+      "line_end": 121,
+      "range_sha256": "5394779e012ff117374197ac00d322526a95222faad49662063ecbf905adcdf4",
+      "symbols": [
+        "Tool:SetAction",
+        "FiniteUses:SetConsumption"
+      ]
+    },
+    {
+      "id": "CW-S35",
+      "source_file": "scripts/prefabs/axe.lua",
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "line_start": 179,
+      "line_end": 192,
+      "range_sha256": "f8b2184792e81f3115f8a3a42ed7117d1906f3ed5ae599dae0340e2e89006c11",
+      "symbols": [
+        "glass_master_postinit",
+        "Tool:SetAction",
+        "FiniteUses:SetConsumption"
+      ]
+    },
+    {
+      "id": "CW-S36",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 137,
+      "line_end": 165,
+      "range_sha256": "0b3632aa79b2d45d0ee458568d9c51e44e5282ea68989df70b1bfb33f222f0a1",
+      "symbols": [
+        "dig_up_stump",
+        "chop_down_burnt_tree"
+      ]
+    },
+    {
+      "id": "CW-S37",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 459,
+      "line_end": 487,
+      "range_sha256": "00e643c0bfda7b37d285b17e5cb86d3b25d767e90e7000ae94f4a3af5aa4b660",
+      "symbols": [
+        "make_stump"
+      ]
+    },
+    {
+      "id": "CW-S38",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 498,
+      "line_end": 549,
+      "range_sha256": "d34accb817210fce2e04e6d7cdcf61c45709320790c0b06346ba14efc7cfafd3",
+      "symbols": [
+        "chop_down_tree"
+      ]
+    },
+    {
+      "id": "CW-S39",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 864,
+      "line_end": 895,
+      "range_sha256": "8c0c51595434cfbb05893445cc6c329f1d32b3c289a5400d2b0d3b5a299959a3",
+      "symbols": [
+        "Workable:SetOnWorkCallback",
+        "Workable:SetOnFinishCallback"
+      ]
+    },
+    {
+      "id": "CW-S40",
+      "source_file": "scripts/prefabs/rocks.lua",
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "line_start": 168,
+      "line_end": 200,
+      "range_sha256": "82bbb9f8d39deefc56932215060e99446305e90a2aa1604766d2bbfbfa1c3f33",
+      "symbols": [
+        "OnWork"
+      ]
+    },
+    {
+      "id": "CW-S41",
+      "source_file": "scripts/prefabs/rocks.lua",
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "line_start": 282,
+      "line_end": 296,
+      "range_sha256": "552bcdb256bd886574a50578d57820fc6e6122bb3032826ef7186d98afca1980",
+      "symbols": [
+        "Workable:SetWorkAction",
+        "Workable:SetOnWorkCallback"
+      ]
+    },
+    {
+      "id": "CW-S42",
+      "source_file": "scripts/prefabs/rocks.lua",
+      "file_sha256": "44e0cb5a1f8feb84c47c0d5e57560d92ec6cba4cab4e5b5956d741d64ac44ed1",
+      "line_start": 391,
+      "line_end": 423,
+      "range_sha256": "3fa8e45b9ca785aaac7ef23d638919ffa2b7cb9f63ba8518850c0553a7344893",
+      "symbols": [
+        "OnRockMoonCapsuleWorkFinished",
+        "rock_moon_shell"
+      ]
+    },
+    {
+      "id": "CW-S43",
+      "source_file": "scripts/components/lootdropper.lua",
+      "file_sha256": "96fc79e21ac17401cf54bdd1db2dc92a8b603b8eb1cfecf8a4ce9a9a2194883c",
+      "line_start": 382,
+      "line_end": 412,
+      "range_sha256": "e3708f2cd6b31329241a95be007eb511340994f95486fca4f276c34a8aa86b4b",
+      "symbols": [
+        "LootDropper:SpawnLootPrefab"
+      ]
+    },
+    {
+      "id": "CW-S44",
+      "source_file": "scripts/components/lootdropper.lua",
+      "file_sha256": "96fc79e21ac17401cf54bdd1db2dc92a8b603b8eb1cfecf8a4ce9a9a2194883c",
+      "line_start": 415,
+      "line_end": 468,
+      "range_sha256": "799f36ad67e73e935435c5bf4930aa1aa70bd5b238bd692b050d0f3e406cdd66",
+      "symbols": [
+        "LootDropper:DropLoot"
+      ]
+    },
+    {
+      "id": "CW-S45",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent",
+        "EntityScript:PushEventImmediate"
+      ]
+    },
+    {
+      "id": "CW-S46",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 2622,
+      "line_end": 2626,
+      "range_sha256": "78f7c280dc84c435dafb4f73dda8276a16184f8106120f2fd097955cfbeafa41",
+      "symbols": [
+        "ACTIONS.BUILD.fn"
+      ]
+    },
+    {
+      "id": "CW-S47",
+      "source_file": "scripts/prefabs/evergreens.lua",
+      "file_sha256": "021d09b40cd4dbed1913d921df6734105ab3936a060329fbeca29d785b4d9f90",
+      "line_start": 391,
+      "line_end": 420,
+      "range_sha256": "414a6327cd5bb6437193940605ab37b286ec4926d6199ac95d4882009130e964",
+      "symbols": [
+        "chop_tree"
+      ]
+    },
+    {
+      "id": "CW-S48",
+      "source_file": "scripts/brains/mermbrain.lua",
+      "file_sha256": "f3eade44979093b6e46b30bdebcd0c38136572e664cb914a0f25ed21b90ec301",
+      "line_start": 294,
+      "line_end": 298,
+      "range_sha256": "5a6c3c229031600ec66b42695c0a8d3bcfaa7b2dcf61cf5294981e5b3bc56694",
+      "symbols": [
+        "HasDigTool",
+        "Tool:CanDoAction"
+      ]
+    },
+    {
+      "id": "CW-S49",
+      "source_file": "scripts/brains/mermbrain.lua",
+      "file_sha256": "f3eade44979093b6e46b30bdebcd0c38136572e664cb914a0f25ed21b90ec301",
+      "line_start": 469,
+      "line_end": 479,
+      "range_sha256": "12a4dd5cb3f19ad25d6f3926186870cb0a410377da482ba361e4d2877538d07b",
+      "symbols": [
+        "HasDigTool",
+        "BrainCommon.NodeAssistLeaderDoAction"
+      ]
+    },
+    {
+      "id": "CW-S50",
+      "source_file": "scripts/prefabs/wolfgang.lua",
+      "file_sha256": "220d3a75b7974580ad9ca30b22b2172de226e19c6ee0f04c44a0e428469921e1",
+      "line_start": 185,
+      "line_end": 201,
+      "range_sha256": "27f7234e7dbbbb4a1aedae29dc411df009e400d5bb0cb7e49e21bc2f0bfb653b",
+      "symbols": [
+        "SpecialWorkMultiplierFn"
+      ]
+    },
+    {
+      "id": "CW-S51",
+      "source_file": "scripts/prefabs/wolfgang.lua",
+      "file_sha256": "220d3a75b7974580ad9ca30b22b2172de226e19c6ee0f04c44a0e428469921e1",
+      "line_start": 673,
+      "line_end": 677,
+      "range_sha256": "e19fbfe36ca83f09c66f0859b94d0e5f8b32a41fec0c009f17a34a69898fc27f",
+      "symbols": [
+        "WorkMultiplier:SetSpecialMultiplierFn"
+      ]
+    },
+    {
+      "id": "CW-S52",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 632,
+      "line_end": 685,
+      "range_sha256": "ab938e47edb98506a108ab8c140077839339c101ce9adf7701d6e9763410b814",
+      "symbols": [
+        "EntityScript:AddComponent",
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "REV-CW-A01",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 521,
+      "line_end": 539,
+      "range_sha256": "d64d0b6f56b62970546c9bd4aa5b50a5406881fa0535cbe731a4b8b66fa88224",
+      "symbols": [
+        "green",
+        "onequip_green",
+        "onunequip_green",
+        "onequiptomodel_green"
+      ]
+    },
+    {
+      "id": "REV-CW-A02",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 629,
+      "line_end": 629,
+      "range_sha256": "02e003429f94054d47868b85134cd72fb91a2ce6f56d4b7cb6e5521774afbef8",
+      "symbols": [
+        "green",
+        "greenamulet"
+      ]
+    },
+    {
+      "id": "REV-CW-A03",
+      "source_file": "scripts/prefabs/axe.lua",
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "line_start": 38,
+      "line_end": 45,
+      "range_sha256": "b106a4e023291d59787e8170a68886f741b29ae9cd4a94ee7f6b2a5a7c434fb8",
+      "symbols": [
+        "MakeAxe"
+      ]
+    },
+    {
+      "id": "REV-CW-A04",
+      "source_file": "scripts/prefabs/axe.lua",
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "line_start": 123,
+      "line_end": 132,
+      "range_sha256": "2b9b1cf2bf1fb274ba5f3adae4f7dfc0497305988bb93eab12c13bcdea419a99",
+      "symbols": [
+        "MakeAxe",
+        "master_postinit"
+      ]
+    },
+    {
+      "id": "REV-CW-A05",
+      "source_file": "scripts/prefabs/axe.lua",
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "line_start": 291,
+      "line_end": 294,
+      "range_sha256": "4e8012345d3dea2a9689ed9f8f32daa41ac4bc7f7b06c47d41f01cf605bff124",
+      "symbols": [
+        "MakeAxe",
+        "glass_master_postinit"
+      ]
+    },
+    {
+      "id": "REV-CW-A06",
+      "source_file": "scripts/recipes.lua",
+      "file_sha256": "7c8f6b73fed18c134e16e81ca8540bc530522bbf58325fc9e573bcf17852d1e9",
+      "line_start": 294,
+      "line_end": 294,
+      "range_sha256": "aa4a78fe904125e004a49b60c9d76c7f2cad51f25856f97aad84ea03eb8ae0a5",
+      "symbols": [
+        "Recipe2",
+        "tophat_magician"
+      ]
+    },
+    {
+      "id": "REV-CW-A07",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 16,
+      "line_end": 20,
+      "range_sha256": "27467ab66e2254ab92c59fc6f0adbc30e499fda2d8c0657d16297aadc0a66816",
+      "symbols": [
+        "MakeHat"
+      ]
+    },
+    {
+      "id": "REV-CW-A08",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 6760,
+      "line_end": 6768,
+      "range_sha256": "4c32f6e48d71edf5595ea9160bcfb317a9df28338d4dba2c28804e1274d56d38",
+      "symbols": [
+        "MakeHat",
+        "fns.top"
+      ]
+    },
+    {
+      "id": "REV-CW-A09",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 6984,
+      "line_end": 6987,
+      "range_sha256": "a96636b1e748351385fe53512daf111eeddcb7ac28a3e02852f4485bcf9156b6",
+      "symbols": [
+        "MakeHat"
+      ]
+    },
+    {
+      "id": "REV-CW-A10",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 7860,
+      "line_end": 7862,
+      "range_sha256": "4163cfc1de08501dd6202a0d3a2f731f00bcaffb70eaecd1f417468ee491f214",
+      "symbols": [
+        "MakeHat"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "Builder GetIngredients RemoveIngredients consumeingredients greenamulet 折扣湿度",
+      "expected_entry_ids": [
+        "EXP-CRAFT-001"
+      ],
+      "purpose": "材料API与额外消费者"
+    },
+    {
+      "query": "HasCharacterIngredient HasTechIngredient 当前值 返回成本",
+      "expected_entry_ids": [
+        "EXP-CRAFT-001"
+      ],
+      "purpose": "角色/科技只读门槛"
+    },
+    {
+      "query": "DoBuild OnBuiltFn 多产物 mapscroll RecordMap 失败返回",
+      "expected_entry_ids": [
+        "EXP-CRAFT-002"
+      ],
+      "purpose": "交付与初始化完整链"
+    },
+    {
+      "query": "onPreBuilt top_onprebuilt tophat_magician 制作失败副作用",
+      "expected_entry_ids": [
+        "EXP-CRAFT-002"
+      ],
+      "purpose": "具名制作初始化与失败阶段"
+    },
+    {
+      "query": "CHOP MINE DIG Tool SetAction ShouldRecoil 工作量 磨损",
+      "expected_entry_ids": [
+        "EXP-CRAFT-003"
+      ],
+      "purpose": "工作与工具次数交接"
+    },
+    {
+      "query": "WorkMultiplier ResolveSpecialWorkAmount WorkedBy OnUsedAsItem 零work",
+      "expected_entry_ids": [
+        "EXP-CRAFT-003"
+      ],
+      "purpose": "作用量与成功消费边界"
+    },
+    {
+      "query": "Workable WorkedBy_Internal make_stump 旧组件 CHOP DIG 完成事件",
+      "expected_entry_ids": [
+        "EXP-CRAFT-004"
+      ],
+      "purpose": "组件替换后的执行栈"
+    },
+    {
+      "query": "rocks moon shell workfinished OnWork 掉落 完成回调",
+      "expected_entry_ids": [
+        "EXP-CRAFT-004"
+      ],
+      "purpose": "采集实际消费者"
+    }
+  ],
+  "limitations": [
+    "静态读取本轮提供的合法本地源码归档，file SHA为ZIP成员原字节，range SHA为UTF8 splitlines后LF连接且无末尾换行。",
+    "research/restricted/hold，runtime_verified=false；候选需独立审阅并绑定精确SHA后由维护者登记。",
+    "本轮证据版本保留历史Scope，构建器接受显式source/epoch/build参数，后续官方源码变更需逐引用核对。",
+    "原生生成/复制/有效性、地图记录、动画与调度内部，以及动态Hook和真实游戏结果保留未知。"
+  ]
+}

@@ -131,10 +131,10 @@ def envelope(record, pointer='', assessment_detail=True):
     return result
 
 
-def bounded(record, pointer='', max_bytes=24000):
+def bounded(record, pointer='', max_bytes=24000, *, assessment_detail=True):
     if type(max_bytes) is not int or not 1000 <= max_bytes <= 64000:
         raise KBError('INVALID_ARGUMENT', 'Mechanism max_bytes must be 1000..64000')
-    value = envelope(record, pointer)
+    value = envelope(record, pointer, assessment_detail=assessment_detail)
     # Charge every mandatory field, not just claim prose.
     delivered = value | {'whole_value_delivered': True}
     if len(json.dumps(delivered, ensure_ascii=False).encode()) <= max_bytes:
@@ -242,6 +242,31 @@ def navigation_units(entry):
             units.append(('/' + field + '/' + str(index),
                           content if isinstance(content, str) else json.dumps(content, ensure_ascii=False)))
     return units
+
+
+def ranked_units(entry, query):
+    """Rank original units for an already admitted research record."""
+    from .retrieval_v2 import intent
+    positive = intent(query)['original_positive']
+    terms = navigation_terms(positive)
+    names = {match.group().lower() for match in re.finditer(
+        r'(?<![A-Za-z0-9_.:])' + NAME + r'(?![A-Za-z0-9_.:])', positive)}
+    names.update(('require("' + match['module'] + '").' + match['member']).lower()
+                 for match in re.finditer(MODULE, positive))
+    choices = []
+    for pointer, text in navigation_units(entry):
+        overlap = terms & navigation_terms(text)
+        if not overlap:
+            continue
+        field, index = pointer.strip('/').split('/')
+        value = entry[field][int(index)]
+        identity = api_identity(value) if field == 'api_contracts' else None
+        exact = identity is not None and (identity['symbol'].lower() in names
+                  or positive.strip().lower() == identity['leaf'].lower())
+        choices.append({'pointer': pointer, 'exact_declaration': exact, 'matched_terms': overlap})
+    return sorted(choices, key=lambda row: (not row['exact_declaration'],
+                  -len(row['matched_terms']), row['pointer'].rsplit('/', 1)[0],
+                  int(row['pointer'].rsplit('/', 1)[1])))
 
 
 def navigation_terms(text):

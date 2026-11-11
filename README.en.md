@@ -1,12 +1,12 @@
 # DST Mod Engineering
 
-`v2026.11.11` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
+`v2026.11.12` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
 
-The package has **247 registered records: 64 foundation, 13 Native AI, 110 Native Core and 60 mechanism research records**. This release adds timer, entity-reference and reward-queue recovery research, improves complete API and multi-step retrieval, and automatically removes temporary test mods. See [release changes](docs/phase10-recovery-delivery.md). Detailed technical guides are mainly in Chinese.
+The package has **267 registered records: 64 foundation, 13 Native AI, 110 Native Core and 80 mechanism research records**. This release adds 20 research records and 96 API contracts across combat, inventory and equipment, crafting and work, movement and relationships, and worlds and shards. It also improves multi-topic retrieval. See [release changes](docs/phase11-native-expansion.md). Detailed technical guides are mainly in Chinese.
 
 ## Download and setup
 
-Download [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.11/dst-mod-engineering.zip) from [v2026.11.11](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.11.11) and compare it with that release's `SHA256SUMS.txt`. Extract the complete directory containing `SKILL.md`; install it in your agent's supported skill location. See [installation](docs/install-and-use.md).
+Download [dst-mod-engineering.zip](https://github.com/Zechariah0121/dst-mod-engineering/releases/download/v2026.11.12/dst-mod-engineering.zip) from [v2026.11.12](https://github.com/Zechariah0121/dst-mod-engineering/releases/tag/v2026.11.12) and compare it with that release's `SHA256SUMS.txt`. Extract the complete directory containing `SKILL.md`; install it in your agent's supported skill location. See [installation](docs/install-and-use.md).
 
 Invoke `dst-mod-engineering` with the task, mod directory and authorized game source. For full MCP, use Python 3.10+ with SQLite FTS5 and run from the package root:
 
@@ -25,7 +25,7 @@ Read Scope, claim type, version, corrections and admission together. Native AI C
 
 The package excludes game Lua, private projects and third-party executables. Restored source excerpts and machine-specific state stay in local `cache/`. Public `$dst_source_payload_slot` values mark source to restore locally.
 
-Report source research, automated checks and game observations by their tested scope. See [testing](references/testing-release.md), [release changes](docs/phase10-recovery-delivery.md) and [limits](docs/public-limits.md).
+Report source research, automated checks and game observations by their tested scope. See [testing](references/testing-release.md), [release changes](docs/phase11-native-expansion.md) and [limits](docs/public-limits.md).
 
 Use [SKILL.md](SKILL.md) for topic routing, [module architecture](references/complex-mod-architecture.md) for ownership and [action integration](references/action-lifecycle-architecture.md) for cancellable interactions.
 

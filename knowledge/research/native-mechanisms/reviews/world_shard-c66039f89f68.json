@@ -1,0 +1,675 @@
+{
+  "schema_version": "dst-independent-static-review/1",
+  "topic": "world_shard",
+  "candidate_sha256": "452de4ff6dd78ab04315cce393405f1d10284dba9e4a892480d8d98fa84801ab",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "source_locator_review": {
+    "verdict": "EXACT_FILE_RANGE_ALL",
+    "references_checked": 56,
+    "method": "合法本地ZIP成员原字节file SHA及UTF8 splitlines/LF无末尾换行range SHA独立重算，语义审核另列。"
+  },
+  "catalog_review": {
+    "entries_scanned": 247,
+    "related_entries_read": [
+      "FACT-DST-006",
+      "AI-N001-05",
+      "AI-N001-06",
+      "AI-N001-12",
+      "AI-N001-13",
+      "NC-N002-FINAL-07",
+      "NC-N002-FINAL-08",
+      "N006-READY-F02",
+      "N006-READY-F04",
+      "N006-WC-06",
+      "SPATIAL-CODE-FAILURE-POLICY",
+      "EXP-SAVE-001",
+      "EXP-SAVE-003",
+      "EXP-LIFE-008"
+    ],
+    "conclusion": "四条均包含可区分的新调用链/分支与API合同，重复前置事实未作为唯一增量。"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-WORLD-001",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "相对N006-READY-F02和EXP-LIFE-008，新增具体phase字段可见中间态、自解绑A/B索引推导和整组解绑当前轮区别，保留已有基础作为前置。",
+      "claims": [
+        {
+          "claim_id": "EXP-WORLD-001-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Clock phasechanged生产者、worldstate cave选择、逐键SetVariable和普通/toggle派发顺序一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS03",
+            "WS08",
+            "WS13"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-001-C02",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "EI所限定的无额外状态修改路径成立，phase写入及派发早于后续布尔键写入。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS13"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-001-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "pairs实体分组、ipairs原数组、append及原位table.remove与源码一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-001-C04",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "在明确A/B数组条件下，删除A移动B索引，当前ipairs可跳过B。整组移映射保留当前数组局部引用的局部推导成立。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS07"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-001-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "具名玩家注册、读键/布尔参数消费、显式初始化及Remove后onremove顺序均对应源码。",
+          "evidence_refs": [
+            "WS09",
+            "WS10",
+            "WS11",
+            "WS12"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-001-C06",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC直接对应逐字段和解绑身份边界，未规定未经授权的业务数值或框架。",
+          "evidence_refs": [
+            "WS01",
+            "WS02",
+            "WS04",
+            "WS06",
+            "WS09"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "EntityScript:WatchWorldState",
+          "source_file": "scripts/entityscript.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "实体receiver、普通/toggle参数、登记不初次调用、重复追加、nil返回与Remove清理一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS10",
+            "WS11",
+            "WS12"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopWatchingWorldState",
+          "source_file": "scripts/entityscript.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "同var/fn/self匹配、RemoveByValue清宿主记录、原位数组删除和组件target差异一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS07",
+            "WS14"
+          ]
+        },
+        {
+          "symbol": "EntityScript:StopAllWatchingWorldStates",
+          "source_file": "scripts/entityscript.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "逐登记变量整组移映射、清宿主表和局部数组仍可存活一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06",
+            "WS12"
+          ]
+        },
+        {
+          "symbol": "WorldState:AddWatcher",
+          "source_file": "scripts/components/worldstate.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "闭包内self方法、inst分组/target参数、无去重无初次派发及nil返回一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06"
+          ]
+        },
+        {
+          "symbol": "WorldState:RemoveWatcher",
+          "source_file": "scripts/components/worldstate.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "fn/可选target筛选、fn=nil整组删除、原位删除和空表释放一致。",
+          "evidence_refs": [
+            "WS01",
+            "WS04",
+            "WS05",
+            "WS06"
+          ]
+        }
+      ],
+      "unknown_boundary_assessment": "原生传输、会话创建、落盘、分片交付、回调重入/异常及真实运行边界均保留；静态研究接受无需凭空要求全量Runtime。"
+    },
+    {
+      "entry_id": "EXP-WORLD-002",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "相对FACT-DST-006、NC-N002-FINAL-07/08和N006-READY-F04，新增同名覆盖/旧id、大小写元表、缺项查询、禁发重绑和Shard入队函数值定向合同。",
+      "claims": [
+        {
+          "claim_id": "EXP-WORLD-002-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "小写元表、namespace创建、函数数组append及name覆盖一致。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C02",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "正常函数输入时旧数组与旧id引用保留，新名字查找使用新表。跨分片编号只按本地追加生成。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC03",
+            "RPC05"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "接收时保存fn/sender/data/tick，消费时读取fn；可用来源/timeline分支、WallUpdate及StaticUpdate对应可见Lua。",
+          "evidence_refs": [
+            "RPC04",
+            "RPC06",
+            "RPC10",
+            "RPC11",
+            "RPC12"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C04",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "入队时绑定函数值的推导成立，后续名字覆盖未重写队列。",
+          "evidence_refs": [
+            "RPC02",
+            "RPC04",
+            "RPC06"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "发送assert/不透明变参转交、禁发替换及modutil预先读字段均一致，DeactivateWorld为可见调用者。",
+          "evidence_refs": [
+            "RPC03",
+            "RPC07",
+            "RPC08",
+            "RPC09",
+            "RPC15"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C06",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "SendRPCToShard目标形状被明确归于注释与具名调用，未泛化到Mod包装或交付保证。",
+          "evidence_refs": [
+            "RPC13",
+            "RPC14"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-002-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC与本地编号及队列身份依据一致，原生传输和业务权威仍为待定。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC03",
+            "RPC04",
+            "RPC05",
+            "RPC06"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "AddShardModRPCHandler",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局定义及env转发可见，注册追加/覆盖、nil返回、旧队列fn生命周期一致。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC04",
+            "RPC05",
+            "RPC08"
+          ]
+        },
+        {
+          "symbol": "GetShardModRPC",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "返回表本身、缺name为nil/缺namespace索引错误、旧表仍被持有及元表行为一致。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC05",
+            "RPC09"
+          ]
+        },
+        {
+          "symbol": "GetShardModRPCHandler",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "名字映射到数组当前fn、缺项可抛错、正常查询无写入一致。",
+          "evidence_refs": [
+            "RPC01",
+            "RPC02",
+            "RPC04",
+            "RPC05",
+            "RPC08"
+          ]
+        },
+        {
+          "symbol": "SendModRPCToShard",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "本地assert、TheNet转交及不return、禁发全局替换与env包装预读字段一致。",
+          "evidence_refs": [
+            "RPC02",
+            "RPC03",
+            "RPC07",
+            "RPC09",
+            "RPC15"
+          ]
+        },
+        {
+          "symbol": "SendRPCToShard",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局正常定义与assert、shards注释、world_id/MASTER实例和禁发重绑定一致。",
+          "evidence_refs": [
+            "RPC13",
+            "RPC14",
+            "RPC07",
+            "RPC15"
+          ]
+        },
+        {
+          "symbol": "HandleShardModRPC",
+          "source_file": "scripts/networkclientrpc.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局接收入口、未知namespace/code打印跳过、fn入队及消费分支一致，原生解包未知保留。",
+          "evidence_refs": [
+            "RPC04",
+            "RPC06",
+            "RPC10",
+            "RPC11",
+            "RPC12"
+          ]
+        }
+      ],
+      "unknown_boundary_assessment": "原生传输、会话创建、落盘、分片交付、回调重入/异常及真实运行边界均保留；静态研究接受无需凭空要求全量Runtime。"
+    },
+    {
+      "entry_id": "EXP-WORLD-003",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "相对N006-WC-06和AI-N001-12/13，源字段方向及保存→Remove→StartMigration为已有事实，新增Activate重复离场返回分支、wall tween→static任务、角色钩子/public清理时点和完整API。",
+      "claims": [
+        {
+          "claim_id": "EXP-WORLD-003-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "ACTIONS.MIGRATE存在性检查及Activate缺目标/player/_despawning分支、事件payload和返回值一致。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG14"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "玩家禁控制/停移动、wall tween、回调清标记、PlayerRemove零延迟static任务到ready分支的顺序一致。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG04",
+            "MIG05",
+            "MIG06",
+            "MIG13"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "OnDespawn、源migration字段、Serialize请求、Remove、目标StartMigration的Lua顺序及字段方向一致。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG09",
+            "MIG12"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "master_postinit后保存_OnDespawn并安装公共包装，角色钩子早于公共清理，迁移分支丢irreplaceable和公共OnSave吻合。",
+          "evidence_refs": [
+            "MIG07",
+            "MIG08",
+            "MIG12"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "Serialize guard及严格true、GetSaveRecord/GetPersistData组件先于实体OnSave、原生返回未转发均一致。",
+          "evidence_refs": [
+            "MIG09",
+            "MIG10",
+            "MIG11",
+            "MIG12"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "返回true与后续异步/原生阶段区分成立，可见Lua没有全链异常回滚，未推导磁盘或分布式保证。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG02",
+            "MIG03",
+            "MIG05",
+            "MIG07",
+            "MIG09"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-003-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC阶段记录及角色钩子时点来自明确链路，无额外设计政策。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG07",
+            "MIG08",
+            "MIG09"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "WorldMigrator:Activate",
+          "source_file": "scripts/components/worldmigrator.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "限定player/缺目标分支的可见性、参数、返回和事件到延迟清理一致。",
+          "evidence_refs": [
+            "MIG01",
+            "MIG02",
+            "MIG03",
+            "MIG04",
+            "MIG14",
+            "WS13"
+          ]
+        },
+        {
+          "symbol": "PlayerRemove",
+          "source_file": "scripts/components/playerspawner.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "file-local身份准确，ready参数分流、归宿主static task和ready顺序一致，重复与错误未被包装。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG03",
+            "MIG07",
+            "MIG09",
+            "MIG13",
+            "WS12"
+          ]
+        },
+        {
+          "symbol": "SerializeUserSession",
+          "source_file": "scripts/networking.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局guard、save record/refs、metadata和原生写入请求返回边界一致。",
+          "evidence_refs": [
+            "MIG02",
+            "MIG09",
+            "MIG10",
+            "MIG11",
+            "MIG12"
+          ]
+        }
+      ],
+      "unknown_boundary_assessment": "原生传输、会话创建、落盘、分片交付、回调重入/异常及真实运行边界均保留；静态研究接受无需凭空要求全量Runtime。"
+    },
+    {
+      "entry_id": "EXP-WORLD-004",
+      "verdict": "PASS_STATIC_RESEARCH",
+      "incremental_coverage": "相对AI-N001-13、N006-WC-06、EXP-SAVE-003和SPATIAL-CODE-FAILURE-POLICY，普通恢复入口与落点fallback已有，新增migration preload/pets生产消费、同源分片路径、临时字段清理和不同重试入口。",
+      "claims": [
+        {
+          "claim_id": "EXP-WORLD-004-C01",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "server和Ents现有实体路径、加载保护、位置及virtualroom调整后SpawnAtLocation顺序和返回一致。",
+          "evidence_refs": [
+            "ARR01"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C02",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "OnPreLoad先于组件OnLoad，migrationpets重建早于Inventory加载物品后递归收集具名宠物源。",
+          "evidence_refs": [
+            "ARR02",
+            "ARR03",
+            "MIG08",
+            "ARR11"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C03",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "跨源worldid条件、有效宠物搬位、同源保留位置和两支清临时字段后Teleport顺序一致。",
+          "evidence_refs": [
+            "ARR04"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C04",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "首匹配门、override优先、缓存后ActivatedByOther、齐全坐标和默认位置分支一致。",
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR09",
+            "ARR10"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C05",
+          "kind": "NSF",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "普通DoTaskInTime、缺id分配及已有id冲突提前退出、正常登记事件与门状态更新顺序一致。OnLoad历史拼写兼容和本方法不调用ValidateAndPushEvents亦正确。",
+          "evidence_refs": [
+            "ARR07",
+            "ARR08",
+            "ARR12",
+            "MIG04"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C06",
+          "kind": "EI",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "清迁移字段早于玩家Teleport，直接重调与重新SetPersistData重放的入口差异成立，通常一词保留Hook未知。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR02",
+            "ARR03",
+            "ARR04"
+          ]
+        },
+        {
+          "claim_id": "EXP-WORLD-004-C07",
+          "kind": "REC",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "REC链路依据成立，记录完整恢复或单次落点调用可准确定位已发生副作用。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR03",
+            "ARR04",
+            "ARR05",
+            "ARR07",
+            "ARR08"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ResumeExistingUserSession",
+          "source_file": "scripts/mainfunctions.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局入口消费现有guid，未在函数中建实体或postpass，返回classified.entity及重复副作用一致。",
+          "evidence_refs": [
+            "ARR01",
+            "ARR02",
+            "ARR03",
+            "ARR04"
+          ]
+        },
+        {
+          "symbol": "PlayerSpawner:SpawnAtLocation",
+          "source_file": "scripts/components/playerspawner.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "mastersim assert、world inst/player参数、迁移/pets清理及加载静态任务一致。",
+          "evidence_refs": [
+            "ARR04",
+            "ARR05",
+            "ARR03",
+            "ARR11",
+            "ARR13"
+          ]
+        },
+        {
+          "symbol": "GetMigrationPortalFromMigrationData",
+          "source_file": "scripts/componentutil.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "定义、首匹配返回/nil、当前ShardPortals及无激活副作用一致。unknowns准确保留普通门init任务与原生会话加载总序未验证。",
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR08",
+            "ARR12"
+          ]
+        },
+        {
+          "symbol": "GetMigrationPortalLocation",
+          "source_file": "scripts/componentutil.lua",
+          "verdict": "PASS_STATIC_RESEARCH",
+          "assessment": "全局定义、override优先、缓存后门激活及fallback一致。有门分支offset存在或缺失均固定y=0，返回描述现已逐分支对应源码。",
+          "evidence_refs": [
+            "ARR05",
+            "ARR06",
+            "ARR07",
+            "ARR09",
+            "ARR10"
+          ]
+        }
+      ],
+      "unknown_boundary_assessment": "原生传输、会话创建、落盘、分片交付、回调重入/异常及真实运行边界均保留；静态研究接受无需凭空要求全量Runtime。"
+    }
+  ],
+  "limitations": [
+    "未运行游戏、未进行真实分片/迁移/异常注入，runtime_verified保持false。",
+    "审阅针对精确候选字节及给定源码基线，后续候选变更需重新绑定并定向补核。"
+  ],
+  "resolved_findings": [
+    {
+      "id": "WORLD-R1",
+      "verdict": "RESOLVED",
+      "assessment": "GetMigrationPortalFromMigrationData unknowns已明确门init为DoTaskInTime普通零延迟任务，仍保留与原生会话加载总序未知。",
+      "evidence": [
+        {
+          "source_file": "scripts/components/worldmigrator.lua",
+          "line_start": 38,
+          "line_end": 54
+        },
+        {
+          "source_file": "scripts/entityscript.lua",
+          "line_start": 1525,
+          "line_end": 1555
+        }
+      ]
+    },
+    {
+      "id": "WORLD-R2",
+      "verdict": "RESOLVED",
+      "assessment": "C05已逐分支说明缺id分配、已有id冲突打印并提前return、通过ID处理才发登记事件及更新门状态。",
+      "evidence": [
+        {
+          "source_file": "scripts/components/worldmigrator.lua",
+          "line_start": 21,
+          "line_end": 36
+        }
+      ]
+    }
+  ],
+  "revision_review": {
+    "targeted_changes_checked": 4,
+    "assessment": "独立比较冻结字节，仅EXP-WORLD-004四指针改变。两个阻断及返回值/旧覆盖前置澄清均已解决。其余条目、API与56处来源定位字节内容保持一致。",
+    "resolved_clarifications": [
+      "GetMigrationPortalLocation returns现明确cached x,0,z及offset路径y固定0。",
+      "scope已承认SPATIAL-CODE-FAILURE-POLICY既有落点缓存、门替换和fallback链。"
+    ]
+  }
+}

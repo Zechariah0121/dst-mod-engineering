@@ -20,6 +20,12 @@ EntityScript:Remove 的 Lua 顺序是全局 Lua OnRemoveEntity → onremove → 
 
 **工程建议。** 普通模块停止时只释放自己持有的订阅、任务和表现。把“卸载组件”“隐藏复制视图”“移除实体”列成不同阶段，按实际调用链决定谁释放资源。
 
+## 世界状态按字段派发
+
+762172 的[世界状态研究 EXP-WORLD-001](../knowledge/research/native-mechanisms/world_shard-452de4ff6dd7.json)表明，地表 `phasechanged` handler 依次处理 phase、isday、isdusk、isnight 和月相布尔值；每个键的新值非 nil 且与旧值不同时，写入后立即派发。读取组合状态的监听者应按实际键与派发时点判断，不能把一次 phasechanged 当成全部派生字段已更新。
+
+派发中 `RemoveWatcher` 修改原数组，整宿主 `StopAll` 删除组映射；二者对已进入的派发影响不同。不要套用 EntityScript 事件快照的解绑语义。
+
 ## Replica 存在、可见、附着与退出分别审查
 
 | 入口 | 冻结源码的关键边界 | 工程含义 |

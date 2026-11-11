@@ -1,0 +1,1802 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "combat_damage",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-COMBAT-001",
+      "title": "装备护甲的普通吸收、特殊防御分摊与破损阶段",
+      "aliases": [
+        "Inventory:ApplyDamage",
+        "Armor:TakeDamage",
+        "Armor:SetCondition",
+        "多护甲吸收",
+        "特殊防御分摊",
+        "armorbroke",
+        "armordamaged"
+      ],
+      "engineering_question": "多件护甲与特殊防御如何分摊一次攻击，耐久破损在生命提交与回调之前发生什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮核对源码归档SHA与逐文件/范围SHA，版本仅标识证据身份。后续源码目标需按实际差分复核。",
+        "environment": "服务端权威combat/inventory/armor/health及具名原版装备或生物消费者。所有结论为选定Lua分支静态研究。",
+        "increment_over_existing": "NC-N004-FINAL-01/03已有Combat/Health主链。本条新增Inventory内部最高吸收、耐久权重、特殊防御分摊与Armor破损生命周期的完整合同。",
+        "exclusions": [
+          "物品归属/装备接线的通用生命周期由本轮B研究覆盖。",
+          "已有Health死亡顺序仅作为后继上下文，未独立计为本轮新增。",
+          "本条不穷举所有物品的onfinished或Mod改变槽表的行为。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COMBAT-001-C01",
+          "kind": "NSF",
+          "statement": "Inventory收集装备Armor的GetAbsorption结果，普通damage先乘装备类型抗性连乘值。absorbed_percent取最高吸收率，absorbed_damage=damage*最高值。total_absorption>0时每件耐久账为absorbed_damage*本件吸收率/总吸收率，再加该件GetBonusDamage。普通剩余量为damage-absorbed_damage。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S06",
+            "CD-S24"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C02",
+          "kind": "NSF",
+          "statement": "特殊伤害逐类型在原table中处理，先乘装备类型抗性。所有该类型def>0的装备进入容量表，每轮以当前dmg/count等分，扣完容量的装备退出下一轮，直到伤害或容量耗尽。抵挡量只对带armor的防御物品累加耐久账，无armor的特殊防御装备仍可减去伤害。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S09"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C03",
+          "kind": "NSF",
+          "statement": "Inventory先完成普通与特殊耐久账，再pairs调用Armor:TakeDamage。TakeDamage先乘conditionlossmultipliers，再SetCondition，返回后执行ontakedamage与armordamaged。SetCondition先钳耐久并发percentusedchange，零耐久构造监听可对owner发armorbroke，随后统计、onfinished和可选Remove。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S03",
+            "CD-S05",
+            "CD-S06",
+            "CD-S10"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C04",
+          "kind": "NSF",
+          "statement": "SetCondition在indestructible时早退，TakeDamage后继回调与armordamaged仍在函数中。保留的零耐久Armor重复SetCondition(0)仍可到达onfinished，源码没有正耐久到零的过渡门禁。OnLoad(data.condition)也进入SetCondition。",
+          "evidence_refs": [
+            "CD-S04",
+            "CD-S05",
+            "CD-S06"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C05",
+          "kind": "NSF",
+          "statement": "Combat在有health、damage非nil且无重定向的本体分支执行Inventory防御，装备攻击isequipped或inventory.ignorecombat等门禁按源码决定是否调用。Inventory返回后才进入本体抗性、Health:IsInvincible判断及DoDelta，DoDelta又经自己的吸收与SetVal进入生命/死亡事件。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S07"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C06",
+          "kind": "EI",
+          "statement": "在所列默认调用路径上，目标Health无敌或其redirect拒绝生命变化仍可能已经损耗装备耐久。单次吸收率先被收集，因此该次破损不会在同次Inventory普通剩余量计算中按剩余耐久重新分配。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S05",
+            "CD-S07"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-001-C07",
+          "kind": "REC",
+          "statement": "排查护甲数值时分别记录输入普通/特殊伤害、装备类型抗性、最高吸收量、各件耐久账与Health提交口径。破损回调需要继续读取物品时，按SetCondition至TakeDamage后继阶段核对其实际生命期。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S05",
+            "CD-S06",
+            "CD-S07"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Inventory:ApplyDamage",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "原版组件Lua方法，身份为Inventory组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "damage为普通伤害数值，attacker/weapon为实体或nil。spdamage为按特殊类型索引的可变table或nil。"
+          ],
+          "returns": "返回普通剩余伤害、特殊剩余table或nil。Resistance短路返回0,nil。正常路径不返回生命变化值。",
+          "preconditions": [
+            "inventory已安装，装备槽ID表已初始化，已装备Armor的吸收率/耐久与特殊防御组件已正确配置。",
+            "由GetAttacked_Internal调用时，已通过有health、damage非nil、无重定向、非自身装备攻击及非ignorecombat等分支。"
+          ],
+          "side_effects": [
+            "按EquipSlot ID检查装备。第一个匹配Resistance且ShouldResistDamage为真时执行ResistDamage并立即返回。",
+            "普通伤害乘装备类型抗性连乘值，采用最高护甲吸收率，按各吸收率占总吸收率的比例加weakness bonus分配耐久。",
+            "特殊伤害逐类型乘装备类型抗性，逐轮等分给剩余特殊防御容量，并把实际抵挡量累计至该物品armor耐久账。原spdamage表原地删改。",
+            "计算完成后pairs遍历armor_damage调用TakeDamage，再返回普通/特殊剩余量。"
+          ],
+          "lifecycle": [
+            "单次结算先收集护甲与容量，再扣耐久。TakeDamage可删除装备并触发回调，后续结算仍沿已保存的armor引用表继续。",
+            "该方法自身没有持久化事务或回滚。后续Combat倍率、Health无敌检查与生命提交在它返回之后。"
+          ],
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S03",
+            "CD-S05",
+            "CD-S06",
+            "CD-S08",
+            "CD-S09"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Armor:InitCondition",
+          "source_file": "scripts/components/armor.lua",
+          "visibility": "原版组件Lua方法，身份为Armor组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "amount为最大/当前耐久数值，absorb_percent为吸收率。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "armor已安装，调用者提供适合本装备的数值。"
+          ],
+          "side_effects": [
+            "直接设置condition、maxcondition与absorb_percent，未在此方法发percentusedchange。"
+          ],
+          "lifecycle": [
+            "原版木雕帽在master构造调用。此方法不清除已有indestructible标记，重初始化既有护甲需检查当前模式。"
+          ],
+          "evidence_refs": [
+            "CD-S03",
+            "CD-S04",
+            "CD-S17"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Armor:GetAbsorption",
+          "source_file": "scripts/components/armor.lua",
+          "visibility": "原版组件Lua方法，身份为Armor组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "attacker/weapon为实体或nil。"
+          ],
+          "returns": "CanResist为真时返回absorb_percent，否则返回nil。",
+          "preconditions": [
+            "armor吸收率已配置，tags可为nil或按ipairs遍历的标签表。"
+          ],
+          "side_effects": [
+            "只经CanResist检查attacker标签或weapon标签，tags=nil直接通过。有tags时attacker=nil不会单独检查weapon。"
+          ],
+          "lifecycle": [
+            "Inventory将返回值写入absorbers[armor]，nil会移除该键。读取未在此处依condition裁剪吸收率。"
+          ],
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S04",
+            "CD-S06"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Armor:GetBonusDamage",
+          "source_file": "scripts/components/armor.lua",
+          "visibility": "原版组件Lua方法，身份为Armor组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "attacker/weapon为实体或nil。"
+          ],
+          "returns": "返回匹配weakness中的最大数值，无weakness或attacker=nil时返回0。",
+          "preconditions": [
+            "weakness由AddWeakness等配置为标签到正伤害映射。"
+          ],
+          "side_effects": [
+            "遍历所有weakness，以attacker或weapon的标签匹配并取最大值。"
+          ],
+          "lifecycle": [
+            "Inventory仅在total_absorption>0时给absorbers里的护甲建立普通耐久账并加此值。此值加入的是护甲耐久损失。"
+          ],
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S05",
+            "CD-S06"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Armor:TakeDamage",
+          "source_file": "scripts/components/armor.lua",
+          "visibility": "原版组件Lua方法，身份为Armor组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "damage_amount为耐久损失数值。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "armor存在，conditionlossmultipliers可读，SetCondition相关回调与宿主删除行为由装备配置负责。"
+          ],
+          "side_effects": [
+            "先乘conditionlossmultipliers:Get，再SetCondition(condition-damage_amount)，随后ontakedamage(item,已乘倍率的damage_amount)，最后PushEvent armordamaged同一数值。"
+          ],
+          "lifecycle": [
+            "SetCondition可在ontakedamage和armordamaged前完成onfinished及Remove。indestructible只使SetCondition早退，TakeDamage后续回调/事件仍可到达。",
+            "当前方法不验证输入正负，负值经SetCondition可增加耐久。"
+          ],
+          "evidence_refs": [
+            "CD-S03",
+            "CD-S05",
+            "CD-S06",
+            "CD-S10"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Armor:SetCondition",
+          "source_file": "scripts/components/armor.lua",
+          "visibility": "原版组件Lua方法，身份为Armor组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "amount为目标耐久数值。"
+          ],
+          "returns": "正常返回nil，indestructible时立即返回。",
+          "preconditions": [
+            "maxcondition与回调已由装备初始化。"
+          ],
+          "side_effects": [
+            "将condition钳到0..maxcondition并推percentusedchange。构造监听可在percent<=0时对当前owner推armorbroke。",
+            "condition<=0时写统计并调用onfinished(item)，随后读取keeponfinished决定Remove。"
+          ],
+          "lifecycle": [
+            "零耐久路径每次到达都可执行onfinished，源码没有仅首次从正变零的门禁。onfinished可调整keeponfinished影响同次后续Remove。",
+            "OnLoad(data.condition)和Repair也进入此方法。回调异常会保留已提交condition及更早事件，方法没有回滚。"
+          ],
+          "evidence_refs": [
+            "CD-S03",
+            "CD-S05",
+            "CD-S06",
+            "CD-S10"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "Combat门禁进入Inventory，按EquipSlot ID取得当前装备及Resistance/Armor/类型抗性。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "计算普通最高吸收与比例耐久账，再按每种特殊防御容量分摊并原地写回spdamage。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S06",
+            "CD-S09"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "逐护甲扣耐久，percentusedchange/armorbroke先于onfinished/Remove，之后仍有ontakedamage与armordamaged。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S03",
+            "CD-S05",
+            "CD-S06",
+            "CD-S10"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "返回Combat继续后续防御和Health生命/死亡阶段。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S07"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CD-S01",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S02",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S03",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S04",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S05",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S06",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S07",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S08",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S09",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S10",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S17",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S24",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          }
+        ],
+        "unknowns": [
+          "原生Remove后句柄可调用安全性、各Mod回调异常与多人可见时序尚待实际环境验证。",
+          "pairs遍历护甲耐久账的先后没有固定物品顺序，本文保留单件内部顺序。"
+        ]
+      },
+      "unknowns": [
+        "原生Remove后句柄可调用安全性、各Mod回调异常与多人可见时序尚待实际环境验证。",
+        "pairs遍历护甲耐久账的先后没有固定物品顺序，本文保留单件内部顺序。"
+      ]
+    },
+    {
+      "id": "EXP-COMBAT-002",
+      "title": "Resistance装备短路与骨甲短护盾、充能恢复闭环",
+      "aliases": [
+        "Resistance:HasResistance",
+        "Resistance:ShouldResistDamage",
+        "Resistance:ResistDamage",
+        "armor_skeleton",
+        "damageresisted",
+        "骨甲护盾"
+      ],
+      "engineering_question": "Resistance如何决定整次装备防御短路，骨甲一次抵挡后的回调、短窗口和充能如何配合？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮核对源码归档SHA与逐文件/范围SHA，版本仅标识证据身份。后续源码目标需按实际差分复核。",
+        "environment": "服务端权威combat/inventory/armor/health及具名原版装备或生物消费者。所有结论为选定Lua分支静态研究。",
+        "increment_over_existing": "全247条中未有Resistance完整合同。NC-N004-FINAL-07已覆盖Cooldown机制，本条只引用它作为骨甲充能的后继依赖，新增标签/谓词/通知与具名装备闭环。",
+        "exclusions": [
+          "Cooldown普通保存、重复启动、LongUpdate和加载合同已由NC-N004-FINAL-07覆盖。",
+          "装备/卸装和owner建立的通用接线由本轮B覆盖。",
+          "护盾FX、燃料完整消费与原生时间推进仅列依赖。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COMBAT-002-C01",
+          "kind": "NSF",
+          "statement": "Resistance构造空tags，AddResistance以tag作键和值，RemoveResistance清该键。HasResistance仅attacker非nil时扫描，匹配attacker或weapon任一登记标签即返回true，未匹配落到nil。ShouldResistDamage在无回调时true，否则直接返回shouldresistfn(item)。",
+          "evidence_refs": [
+            "CD-S11"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C02",
+          "kind": "NSF",
+          "statement": "Inventory按初始化后的EquipSlot ID扫描，第一个同时HasResistance和ShouldResistDamage为真值的物品执行ResistDamage(damage,attacker)，随即返回0,nil。该返回发生在本轮普通抗性乘算、护甲耐久账与特殊防御分摊之前。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S08",
+            "CD-S11"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C03",
+          "kind": "NSF",
+          "statement": "ResistDamage先可选onresistdamage(item,damage_amount,attacker)，再发物品damageresisted。该方法不自行检查标签或shouldresist，也不直接扣耐久。木雕帽把回调接到Armor:TakeDamage，故匹配Resistance的短路仍可由消费者安排耐久损失。",
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S17",
+            "CD-S06",
+            "CD-S10"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C04",
+          "kind": "NSF",
+          "statement": "骨甲master安装Resistance的ShouldResistFn/OnResistDamage及独立Cooldown。ShouldResistFn要求IsEquipped、owner存在且owner装备未带forcefield。OnChargedFn添加RESISTANCES整组标签。首次OnResistDamage建立SHIELD_DURATION短任务、清onresistdamage、扣MED_FUEL，onchargedfn仍存在时开始充能。",
+          "evidence_refs": [
+            "CD-S12",
+            "CD-S13",
+            "CD-S15",
+            "CD-S16"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C05",
+          "kind": "NSF",
+          "statement": "骨甲短任务OnShieldOver清task、移除整组标签并恢复OnResistDamage。OnChargedFn若短任务仍存在则取消并恢复回调，再添加标签。卸装与equiptomodel清onchargedfn、取消短任务并撤销标签；onequip有燃料时按较大的首充等待/剩余充能调用StartCharging。nofuel先清onchargedfn再FinishCharging。",
+          "evidence_refs": [
+            "CD-S13",
+            "CD-S14",
+            "CD-S16"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C06",
+          "kind": "EI",
+          "statement": "骨甲短窗口内标签和shouldresist仍可使后续命中进入ResistDamage，清onresistdamage只抑制该业务回调。此期间damageresisted仍可发出，直到短任务或其他退出路径撤掉标签。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S11",
+            "CD-S13"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-002-C07",
+          "kind": "REC",
+          "statement": "自定义抵挡装备分别决定匹配标签、动态条件、一次触发副作用、短窗口和再充能责任。跟踪damageresisted时结合业务回调是否当前安装，按真实退出路径撤销状态。",
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S13",
+            "CD-S14",
+            "CD-S16"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Resistance:AddResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "tag为标签键。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "resistance已安装。"
+          ],
+          "side_effects": [
+            "赋tags[tag]=tag，同键重复写入覆盖同一成员。"
+          ],
+          "lifecycle": [
+            "组件构造tags为空，骨甲在OnChargedFn逐项添加，退出装备/护盾结束逐项RemoveResistance。该表在所查组件中无OnSave/OnLoad。"
+          ],
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S13",
+            "CD-S14",
+            "CD-S15"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Resistance:RemoveResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "tag为先前登记的标签键。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "resistance已安装。"
+          ],
+          "side_effects": [
+            "将tags[tag]置nil。"
+          ],
+          "lifecycle": [
+            "移除一个标签不改变shouldresistfn或onresistdamage。骨甲在短护盾任务结束、卸装和模型展示分支撤销整组标签。"
+          ],
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S13",
+            "CD-S14"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Resistance:HasResistance",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "attacker/weapon为实体或nil。"
+          ],
+          "returns": "attacker非nil且其自身或weapon匹配任一登记标签时返回true，未匹配正常落到nil。",
+          "preconditions": [
+            "tags来自组件登记。"
+          ],
+          "side_effects": [
+            "只读标签。attacker=nil时跳过整段扫描。"
+          ],
+          "lifecycle": [
+            "Inventory在ShouldResistDamage之前调用此方法，只有其返回真值才调用动态谓词。此方法自身不结算伤害和冷却。"
+          ],
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S11"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Resistance:ShouldResistDamage",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [],
+          "returns": "未设置shouldresistfn时返回true，否则直接返回shouldresistfn(item)结果。",
+          "preconditions": [
+            "shouldresistfn若存在须适合单参item调用。"
+          ],
+          "side_effects": [
+            "调用动态谓词。骨甲谓词要求实际装备且owner存在，并检查owner装备forcefield标签。"
+          ],
+          "lifecycle": [
+            "Inventory在标签匹配后调用，真值才进入ResistDamage。谓词可能执行自身业务副作用，组件不提供纯函数保证。"
+          ],
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S11",
+            "CD-S13"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Resistance:ResistDamage",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "damage_amount为输入普通伤害数值，attacker为实体或nil。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "调用者已决定要抵挡，本方法不重复调用HasResistance或ShouldResistDamage。"
+          ],
+          "side_effects": [
+            "先调用onresistdamage(item,damage_amount,attacker)，再对物品推damageresisted，载荷为damage_amount和attacker。",
+            "Inventory调用处传的是装备抗性乘算和护甲分摊之前的普通damage，未把weapon/spdamage传给此回调。"
+          ],
+          "lifecycle": [
+            "骨甲回调生成护盾、替换独立短任务、清自身onresistdamage、扣燃料并按当前onchargedfn决定开始cooldown。短护盾内后续ResistDamage仍发damageresisted。",
+            "木雕帽回调直接Armor:TakeDamage(damage)。Inventory短路后仍可能发生这种消费者安排的耐久损耗。"
+          ],
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S11",
+            "CD-S13",
+            "CD-S16",
+            "CD-S17",
+            "CD-S10"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Resistance:SetOnResistDamageFn",
+          "source_file": "scripts/components/resistance.lua",
+          "visibility": "原版组件Lua方法，身份为Resistance组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "fn为回调(item,damage_amount,attacker)或nil。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "resistance已安装。"
+          ],
+          "side_effects": [
+            "直接替换onresistdamage引用。"
+          ],
+          "lifecycle": [
+            "骨甲初始安装OnResistDamage，触发后置nil，OnShieldOver或相应退出/恢复路径再安装。清此回调时标签匹配和damageresisted仍独立存在。"
+          ],
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S13",
+            "CD-S14",
+            "CD-S15"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master构造安装Resistance回调、装备退出回调及Cooldown。",
+          "evidence_refs": [
+            "CD-S15",
+            "CD-S13",
+            "CD-S14"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "装备充能完成添加标签，Inventory依槽ID短路到ResistDamage。",
+          "evidence_refs": [
+            "CD-S13",
+            "CD-S16",
+            "CD-S02",
+            "CD-S08",
+            "CD-S11"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "首次抵挡生成短护盾并清业务回调，后续抵挡仍可发送物品事件。",
+          "evidence_refs": [
+            "CD-S11",
+            "CD-S13"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "短任务撤销标签，充能完成恢复标签。卸装/模型/燃料耗尽沿各自退出分支处理。",
+          "evidence_refs": [
+            "CD-S13",
+            "CD-S14",
+            "CD-S16"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CD-S02",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S06",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S08",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S10",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S11",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S12",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S13",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S14",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S15",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S16",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S17",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          }
+        ],
+        "unknowns": [
+          "实际帧边界、FX/燃料原生交互以及充能与短任务同帧竞争尚未运行验证。",
+          "本条未穷举骨甲存档载入时所有装备恢复分发顺序，沿已登记Cooldown合同保留其加载回调边界。"
+        ]
+      },
+      "unknowns": [
+        "实际帧边界、FX/燃料原生交互以及充能与短任务同帧竞争尚未运行验证。",
+        "本条未穷举骨甲存档载入时所有装备恢复分发顺序，沿已登记Cooldown合同保留其加载回调边界。"
+      ]
+    },
+    {
+      "id": "EXP-COMBAT-003",
+      "title": "反伤来源收集、回调默认值与完成通知的数据生命周期",
+      "aliases": [
+        "Combat:CalcReflectedDamage",
+        "DamageReflect:GetReflectedDamage",
+        "DamageReflect:SetReflectDamageFn",
+        "onreflectdamage",
+        "armor_lunarplant",
+        "反伤表别名"
+      ],
+      "engineering_question": "反伤由哪些实体和装备贡献，预先收集的table与事后onreflectdamage通知如何关联？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮核对源码归档SHA与逐文件/范围SHA，版本仅标识证据身份。后续源码目标需按实际差分复核。",
+        "environment": "服务端权威combat/inventory/armor/health及具名原版装备或生物消费者。所有结论为选定Lua分支静态研究。",
+        "increment_over_existing": "NC-N004-FINAL-01已有DoAttack先收集后提交反伤的框架。本条新增具体来源枚举、骑乘替换、回调默认值、Merge别名与装备通知消费者完整合同。",
+        "exclusions": [
+          "CalcDamage普通/特殊倍率、DoAttack命中资格与Health死亡链沿既有N004结论复核。",
+          "骑乘建立/移速以及物品归属由本轮A/B覆盖。",
+          "未将孤立GetDamageReflect旧方法当作本条实际执行入口。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COMBAT-003-C01",
+          "kind": "NSF",
+          "statement": "DamageReflect初始defaultdamage=10。GetReflectedDamage有回调时以(item,attacker,damage,weapon,stimuli,spdamage)调用，返回回调第一值or defaultdamage及第二值。回调返回0可保留零普通反伤，返回nil/false则采用defaultdamage。无回调直接返回defaultdamage。",
+          "evidence_refs": [
+            "CD-S20"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C02",
+          "kind": "NSF",
+          "statement": "CalcReflectedDamage在ignoredamagereflect时返回0,nil。普通目标先读本体damagereflect，再pairs遍历EQUIPSLOTS读取其装备damagereflect。骑乘目标改为收集mount与saddle，二者各自仍经过同一本体/装备helper。helper对nil实体返回0。",
+          "evidence_refs": [
+            "CD-S18"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C03",
+          "kind": "NSF",
+          "statement": "helper对每源普通反伤>0或特殊table非nil才累加并append记录，记录含反伤源inst、原攻击者attacker、该源普通量和该源特殊table。MergeSpDamage在两表均存在时原地加到第一表，一表nil时直接返回另一表。",
+          "evidence_refs": [
+            "CD-S18",
+            "CD-S09"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C04",
+          "kind": "NSF",
+          "statement": "DoAttack在projectile=nil时先收集，目标GetAttacked_Internal之后继续Weapon:OnAttack、可选范围攻击、清临时状态并记录lastdoattacktime。此后仅反伤量/特殊table满足门槛且攻击者有health并未死时，才向自身Internal提交，再按reflect_list逐源IsValid发送onreflectdamage。",
+          "evidence_refs": [
+            "CD-S19",
+            "CD-S29",
+            "CD-S01"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C05",
+          "kind": "NSF",
+          "statement": "armor_lunarplant的ReflectDamageFn返回0和新planar table，依据攻击者shadow_aligned标签选择调优量。master安装反伤组件与监听OnReflectDamage。通知消费者检查data.attacker有效后生成hitsparks_reflect_fx，源位置取当前inventoryitem.owner或物品本身。",
+          "evidence_refs": [
+            "CD-S21",
+            "CD-S22"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C06",
+          "kind": "EI",
+          "statement": "反伤聚合特殊table可与首个非nil来源记录reflected_spdmg共享引用，后续来源合并和反伤受击的Inventory/ApplySpDefense可继续修改该表。通知中的table字段因此可能反映后继阶段状态，源记录普通reflected_dmg仍为当时缓存数值。",
+          "evidence_refs": [
+            "CD-S09",
+            "CD-S18",
+            "CD-S19",
+            "CD-S02",
+            "CD-S01"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C07",
+          "kind": "EI",
+          "statement": "onreflectdamage到达依赖反伤尾部执行和来源当时IsValid，其载荷记录源贡献。攻击者反伤被格挡或最终生命差为零时，该尾部仍可在Internal返回后通知有效来源。目标本击破甲造成来源失效可使该源通知跳过。",
+          "evidence_refs": [
+            "CD-S18",
+            "CD-S19",
+            "CD-S01",
+            "CD-S05"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-003-C08",
+          "kind": "REC",
+          "statement": "反伤需求分别核对收集时机、源身份、回调默认值和事后通知条件。需要保留逐源原始特殊量时，在拥有该数据的边界明确采样并验证，保持原版可变table调用关系。",
+          "evidence_refs": [
+            "CD-S18",
+            "CD-S19",
+            "CD-S20",
+            "CD-S09"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:CalcReflectedDamage",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版组件Lua方法，身份为Combat组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "targ为目标实体，dmg为普通伤害数值，weapon/stimuli为来源上下文，reflect_list为本次可写数组，spdmg为特殊伤害table或nil。"
+          ],
+          "returns": "返回普通反伤总量和特殊反伤table或nil。ignoredamagereflect为真返回0,nil。",
+          "preconditions": [
+            "攻击方combat已安装，targ及其组件可读。反伤源回调须返回可加和的普通数值和可选table，reflect_list可table.insert。",
+            "骑乘分支依赖rider:IsRiding/GetMount/GetSaddle，物品归属/骑乘建立合同另查对应研究。"
+          ],
+          "side_effects": [
+            "非骑乘目标收集本体damagereflect再遍历EQUIPSLOTS中的装备damagereflect。骑乘目标改为依次收集mount与saddle，各自又可含装备。",
+            "每个源dmg1>0或spdmg1~=nil时累加数值、MergeSpDamage，并append含inst/attacker/reflected_dmg/reflected_spdmg的记录。"
+          ],
+          "lifecycle": [
+            "DoAttack直接结算且projectile=nil时，在目标受击毁甲之前调用，之后才执行目标受击、Weapon:OnAttack和范围攻击。",
+            "收集过程可执行回调并原地合并table，方法自身不向攻击方提交反伤、不发送onreflectdamage。"
+          ],
+          "evidence_refs": [
+            "CD-S18",
+            "CD-S19",
+            "CD-S20",
+            "CD-S09"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "DamageReflect:GetReflectedDamage",
+          "source_file": "scripts/components/damagereflect.lua",
+          "visibility": "原版组件Lua方法，身份为DamageReflect组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "attacker为被反伤的攻击者，damage/weapon/stimuli/spdamage为本次攻击上下文。"
+          ],
+          "returns": "有回调时返回其普通返回值或defaultdamage，以及其第二返回值。无回调时仅返回defaultdamage。Lua数值0保留，nil/false会回退默认值。",
+          "preconditions": [
+            "component已安装，defaultdamage初值10或经配置，回调形态为(item,attacker,damage,weapon,stimuli,spdamage)。"
+          ],
+          "side_effects": [
+            "调用reflectdamagefn并直接透传第二返回table，方法不复制table、不根据输入damage自动计算比例。"
+          ],
+          "lifecycle": [
+            "其调用发生在目标受击之前。armor_lunarplant回调明确返回0和新planar table，按攻击者shadow_aligned标签选伤害。",
+            "回调可被多次调用，没有本方法自带的单次消费/冷却。"
+          ],
+          "evidence_refs": [
+            "CD-S20",
+            "CD-S18",
+            "CD-S19",
+            "CD-S21",
+            "CD-S22"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "DamageReflect:SetReflectDamageFn",
+          "source_file": "scripts/components/damagereflect.lua",
+          "visibility": "原版组件Lua方法，身份为DamageReflect组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "fn为上述反伤回调或nil。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "component已安装。"
+          ],
+          "side_effects": [
+            "直接替换reflectdamagefn。"
+          ],
+          "lifecycle": [
+            "armor_lunarplant在master构造设置回调并独立安装onreflectdamage监听。setter不创建监听、任务或保存字段。"
+          ],
+          "evidence_refs": [
+            "CD-S20",
+            "CD-S21",
+            "CD-S22"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "直接结算预先收集目标或坐骑/鞍具的本体与装备贡献，记录来源与特殊table引用。",
+          "evidence_refs": [
+            "CD-S18",
+            "CD-S19",
+            "CD-S20"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "目标受击可破甲，武器回调/耐久及范围攻击继续执行。",
+          "evidence_refs": [
+            "CD-S19",
+            "CD-S01",
+            "CD-S02",
+            "CD-S05",
+            "CD-S29"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "攻击者仍活着时提交反伤，沿自己的Inventory/Health防御链。",
+          "evidence_refs": [
+            "CD-S19",
+            "CD-S01",
+            "CD-S02",
+            "CD-S07"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "逐条验证源仍有效并发onreflectdamage，lunarplant消费者生成命中特效。",
+          "evidence_refs": [
+            "CD-S19",
+            "CD-S21",
+            "CD-S22"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CD-S01",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S02",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S05",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S07",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S09",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S18",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S19",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S20",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S21",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S22",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S29",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          }
+        ],
+        "unknowns": [
+          "反伤回调、装备删除与其他Mod重入修改的完整组合未实测。",
+          "骑乘来源采用该分支静态枚举，实际有效mount/saddle身份与原生实体生命期待运行核查。",
+          "特殊table别名后续可变值需在目标场景采样，本文未把通知字段作为实际HP损失证明。"
+        ]
+      },
+      "unknowns": [
+        "反伤回调、装备删除与其他Mod重入修改的完整组合未实测。",
+        "骑乘来源采用该分支静态枚举，实际有效mount/saddle身份与原生实体生命期待运行核查。",
+        "特殊table别名后续可变值需在目标场景采样，本文未把通知字段作为实际HP损失证明。"
+      ]
+    },
+    {
+      "id": "EXP-COMBAT-004",
+      "title": "条件减伤回调身份、空表残留与类型抗性通道",
+      "aliases": [
+        "Combat:AddConditionExternalDamageTakenMultiplier",
+        "Combat:RemoveConditionExternalDamageTakenMultiplier",
+        "Combat:ApplyConditionExternalDamageTakenMultiplier",
+        "DamageTypeResist:GetResist",
+        "YOTH_GetDamageTakenMultiplier",
+        "条件减伤空表"
+      ],
+      "engineering_question": "条件减伤回调如何登记/撤销，类型抗性在条件表存在时如何进入普通与特殊结算？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_local_archive_static_lua",
+        "observed_date": "2026-11-12",
+        "runtime_verified": false,
+        "source_identity": "本轮核对源码归档SHA与逐文件/范围SHA，版本仅标识证据身份。后续源码目标需按实际差分复核。",
+        "environment": "服务端权威combat/inventory/armor/health及具名原版装备或生物消费者。所有结论为选定Lua分支静态研究。",
+        "increment_over_existing": "既有N004只概述condition/external倍率。本条新增函数对象身份、重新登记顺序、空表残留及与本体类型抗性的准确乘算，附knight消费者和完整API合同。",
+        "exclusions": [
+          "SourceModifierList内部运算、来源自动清理由本轮A研究覆盖。",
+          "Health吸收、deltamodifierfn及死亡事件沿NC-N004-FINAL-03已有链。",
+          "本条仅静态描述现存乘算，不提出平衡数值或修改原版策略。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-COMBAT-004-C01",
+          "kind": "NSF",
+          "statement": "AddConditionExternalDamageTakenMultiplier按需创建数组，先以相同fn移除再插到末尾。Remove只调用table.removearrayvalue，后者按ipairs删除首个等于传入函数的成员。移除最后一项保留空table，未将组件字段置nil。",
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S25"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C02",
+          "kind": "NSF",
+          "statement": "ApplyConditionExternalDamageTakenMultiplier按ipairs依次调用fn(victim,attacker,weapon)，将每个返回值or 1相乘，再乘输入damage。0作为乘数保留，nil/false回退1。函数自身未对nil数组、回调错误或非数值返回进行校验。",
+          "evidence_refs": [
+            "CD-S23"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C03",
+          "kind": "NSF",
+          "statement": "Combat本体先取damagetypemult。条件数组非nil时，先令damage=damagetypemult*ApplyConditionExternalDamageTakenMultiplier(damage,attacker,weapon)，随后无条件执行damage=damage*damagetypemult*externaldamagetakenmultipliers:Get()。特殊伤害在后面的防御/加总阶段只在本处乘一次damagetypemult。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S23",
+            "CD-S09"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C04",
+          "kind": "NSF",
+          "statement": "DamageTypeResist:GetResist在attacker非nil时对其自身或weapon匹配的每个标签列表Get值连乘，同标签一次，多标签分别乘。attacker=nil返回1。Inventory先对装备类型抗性连乘，本体Combat再单独取自身组件抗性。",
+          "evidence_refs": [
+            "CD-S24",
+            "CD-S02",
+            "CD-S01"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C05",
+          "kind": "NSF",
+          "statement": "knight的YOTH master初始化登记YOTH_GetDamageTakenMultiplier，回调直接读attacker.isplayer并选择调优值。所查回调自身未处理attacker=nil。armor_lunarplant套装启停以同一setbonus键添加/移除lunar_aligned贡献，提供类型抗性的具名业务接线。",
+          "evidence_refs": [
+            "CD-S26",
+            "CD-S27",
+            "CD-S30",
+            "CD-S22",
+            "CD-S24"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C06",
+          "kind": "EI",
+          "statement": "仅按这些表达式、普通输入damage=100、本体类型倍率0.5、外部倍率1、条件乘积1时，条件表nil给出50，非nil空表给出25。首次登记再撤销最后一项会保留后一个分支。因此撤销回调后结算行为是否回到最初状态还取决于本体类型倍率。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S23",
+            "CD-S25"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C07",
+          "kind": "EI",
+          "statement": "条件回调在装备ApplyDamage之后执行，抛错会留下更早耐久/Resistance副作用并阻止本次后续Health提交。具名knight回调假定attacker存在，直接或环境伤害接入该路径须核对实际输入。",
+          "evidence_refs": [
+            "CD-S01",
+            "CD-S02",
+            "CD-S23",
+            "CD-S26"
+          ]
+        },
+        {
+          "id": "EXP-COMBAT-004-C08",
+          "kind": "REC",
+          "statement": "临时条件回调保存原函数对象并按该对象撤销，检查首次登记和最后撤销后的数组状态。多标签抗性与特殊通道分开验证，采用当前源码实际分支计算预期值。",
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S25",
+            "CD-S24",
+            "CD-S01"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:AddConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版组件Lua方法，身份为Combat组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "fn为回调(victim,attacker,weapon)，返回乘数或nil/false。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "fn为后续可调用函数，combat组件已安装。"
+          ],
+          "side_effects": [
+            "按需创建数组，先RemoveConditionExternalDamageTakenMultiplier(fn)，再table.insert到末尾。相同函数对象重新登记会调整至末尾。"
+          ],
+          "lifecycle": [
+            "函数引用承担登记身份，调用者应保留该对象用于撤销。首次登记后表保持非nil，撤销最后一项后仍为空表。",
+            "knight的YOTH master分支登记具名函数，读取attacker.isplayer选择倍率。所列初始化范围没有对应撤销。"
+          ],
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S25",
+            "CD-S26",
+            "CD-S27"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Combat:RemoveConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版组件Lua方法，身份为Combat组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "fn为原登记的函数对象。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "combat已安装，表可为nil。"
+          ],
+          "side_effects": [
+            "表非nil时调用table.removearrayvalue，删除首个与fn相等的值。未命中保留数组。"
+          ],
+          "lifecycle": [
+            "删除最后一个回调不会将conditionexternaldamagetakenmultipliers设回nil，Internal继续进入其非nil分支。",
+            "构造同形新闭包与原函数身份不同。Combat:OnRemoveFromEntity所列清理集中于目标/任务/监听，未逐项调用本撤销方法。"
+          ],
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S25",
+            "CD-S28",
+            "CD-S01"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "Combat:ApplyConditionExternalDamageTakenMultiplier",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "原版组件Lua方法，身份为Combat组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "damage为普通伤害数值，attacker/weapon为上下文实体或nil，逐项传给回调。"
+          ],
+          "returns": "返回damage乘以所有(fn(victim,attacker,weapon) or 1)的乘积。",
+          "preconditions": [
+            "conditionexternaldamagetakenmultipliers须为可ipairs遍历的table，直接调用于尚未登记的nil表会失败。回调须支持当前attacker可缺省等输入。"
+          ],
+          "side_effects": [
+            "按数组顺序调用回调，nil/false回退1，数值0保留。没有本方法的伤害提交或数值范围校验。"
+          ],
+          "lifecycle": [
+            "Internal仅在表非nil时调用，位于装备/鞍具防御之后、bonusdamagefn及特殊伤害总和之前。回调抛错将打断后续结算，先前装备耐久扣减保留。",
+            "正在ipairs遍历的数组没有快照复制，回调中修改同一数组的行为需按实际索引变化单独验证。"
+          ],
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S01",
+            "CD-S02",
+            "CD-S26"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        },
+        {
+          "symbol": "DamageTypeResist:GetResist",
+          "source_file": "scripts/components/damagetyperesist.lua",
+          "visibility": "原版组件Lua方法，身份为DamageTypeResist组件方法。合同限所列权威组件调用环境，未据此授予任意Hook或公共兼容保证。",
+          "parameters": [
+            "attacker/weapon为实体或nil。"
+          ],
+          "returns": "返回匹配标签的每个modifier列表Get值的乘积，初值1。attacker=nil时返回1。",
+          "preconditions": [
+            "组件tags为标签到modifier列表映射，由AddResist/RemoveResist维护。SourceModifierList内部身份/退出机制由其专门研究提供。"
+          ],
+          "side_effects": [
+            "attacker存在时逐标签检查attacker或weapon是否匹配，同一标签的两者均匹配也只乘该标签一次，多标签分别相乘。"
+          ],
+          "lifecycle": [
+            "Inventory对各装备分别调用并连乘到普通和特殊伤害。Combat本体另调用一次，普通伤害在条件表非nil分支再乘入本体类型值。",
+            "armor_lunarplant的套装回调用setbonus键添加与移除独立lunar_aligned贡献。"
+          ],
+          "evidence_refs": [
+            "CD-S24",
+            "CD-S02",
+            "CD-S01",
+            "CD-S30",
+            "CD-S22"
+          ],
+          "unknowns": [
+            "仅静态核对该Lua调用链，动态Mod覆盖与原生实体/网络行为尚待目标环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master配置具名条件回调，独立的类型抗性贡献由其所属业务维护。",
+          "evidence_refs": [
+            "CD-S27",
+            "CD-S26",
+            "CD-S30",
+            "CD-S24"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Inventory完成装备阶段，本体Combat读取类型倍率与条件数组是否非nil。",
+          "evidence_refs": [
+            "CD-S02",
+            "CD-S01",
+            "CD-S24"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按函数数组顺序计算普通倍率，再经普通后继加成及特殊防御合入Health输入。",
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S01",
+            "CD-S09",
+            "CD-S07"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "撤销按原函数对象移除，保留空数组，后续攻击继续沿表存在的分支。",
+          "evidence_refs": [
+            "CD-S23",
+            "CD-S25",
+            "CD-S01"
+          ]
+        }
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "CD-S01",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S02",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S07",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S09",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S22",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S23",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S24",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S25",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S26",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S27",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S28",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          },
+          {
+            "ref": "CD-S30",
+            "role": "本条结算链的所列定义、直接调用方或具名消费者"
+          }
+        ],
+        "unknowns": [
+          "回调中增删同一数组、并发Mod包装和真实攻击帧时序未运行验证。",
+          "这里的100/0.5/1为表达式推导用例，未作为游戏实测数值或玩法配置。",
+          "未证明所有普通原版调用都保证attacker非nil，knight缺省输入风险保留待测。"
+        ]
+      },
+      "unknowns": [
+        "回调中增删同一数组、并发Mod包装和真实攻击帧时序未运行验证。",
+        "这里的100/0.5/1为表达式推导用例，未作为游戏实测数值或玩法配置。",
+        "未证明所有普通原版调用都保证attacker非nil，knight缺省输入风险保留待测。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "CD-S01",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 570,
+      "line_end": 737,
+      "range_sha256": "864fef5869e6241302716db63bff148dae76fa32609783471cd02b289122b936",
+      "symbols": [
+        "Combat:GetAttacked",
+        "Combat:GetAttacked_Internal"
+      ]
+    },
+    {
+      "id": "CD-S02",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 408,
+      "line_end": 500,
+      "range_sha256": "8d43b45a92402e4f0ef877b0b43ff60fa867cbccfc5cf3bfa1ac13672eb894dd",
+      "symbols": [
+        "Inventory:ApplyDamage"
+      ]
+    },
+    {
+      "id": "CD-S03",
+      "source_file": "scripts/components/armor.lua",
+      "file_sha256": "81eafcf7328af8e15cdd9332846da0586b8d6b3775927afa36bc3823d9081dde",
+      "line_start": 1,
+      "line_end": 43,
+      "range_sha256": "7fe971cde565d1635c698ace1d7fd986f66283c2c19c1c1ec96d4d855fd6d4e3",
+      "symbols": [
+        "Armor constructor",
+        "PercentChanged",
+        "Armor:InitCondition",
+        "Armor:SetKeepOnFinished"
+      ]
+    },
+    {
+      "id": "CD-S04",
+      "source_file": "scripts/components/armor.lua",
+      "file_sha256": "81eafcf7328af8e15cdd9332846da0586b8d6b3775927afa36bc3823d9081dde",
+      "line_start": 45,
+      "line_end": 64,
+      "range_sha256": "4ea34f3237f31ff57e12810712f86a8b2282292f71bf2d3c313a60dddcb153b5",
+      "symbols": [
+        "Armor:InitIndestructible",
+        "Armor:GetPercent",
+        "Armor:SetTags"
+      ]
+    },
+    {
+      "id": "CD-S05",
+      "source_file": "scripts/components/armor.lua",
+      "file_sha256": "81eafcf7328af8e15cdd9332846da0586b8d6b3775927afa36bc3823d9081dde",
+      "line_start": 66,
+      "line_end": 124,
+      "range_sha256": "ad6850201c0484ac63fabd4249076f9ce17be7b0660af6b287762dc6e5e2c222",
+      "symbols": [
+        "Armor:AddWeakness",
+        "Armor:SetCondition",
+        "Armor:OnSave",
+        "Armor:OnLoad"
+      ]
+    },
+    {
+      "id": "CD-S06",
+      "source_file": "scripts/components/armor.lua",
+      "file_sha256": "81eafcf7328af8e15cdd9332846da0586b8d6b3775927afa36bc3823d9081dde",
+      "line_start": 126,
+      "line_end": 171,
+      "range_sha256": "284df1e67a4671f5a89cc79a6dbd7113c3f8fdb2b19e116cf73622f74ea4841c",
+      "symbols": [
+        "Armor:CanResist",
+        "Armor:GetAbsorption",
+        "Armor:GetBonusDamage",
+        "Armor:TakeDamage",
+        "Armor:Repair"
+      ]
+    },
+    {
+      "id": "CD-S07",
+      "source_file": "scripts/components/health.lua",
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "line_start": 565,
+      "line_end": 649,
+      "range_sha256": "9421d6c41b4b812b4d85f368b42d839de0526acec7440dd9a6e5396ad2a91274",
+      "symbols": [
+        "Health:SetVal",
+        "Health:DoDelta"
+      ]
+    },
+    {
+      "id": "CD-S08",
+      "source_file": "scripts/equipslotutil.lua",
+      "file_sha256": "321f08598f2d3b79a6b5272078c81e1e7380404d153add83c8ebc93ae514a14a",
+      "line_start": 1,
+      "line_end": 50,
+      "range_sha256": "50613c9987ae918772f99bc98e0a6f9c69f304b5cd5f42d793150f674e8df667",
+      "symbols": [
+        "InitializeSlots",
+        "EquipSlotFromID",
+        "GetCount"
+      ]
+    },
+    {
+      "id": "CD-S09",
+      "source_file": "scripts/components/spdamageutil.lua",
+      "file_sha256": "e4f07769309562b8ee9ca775674ee7cd079a5dbcb772c305f9eaf1b86d641a3c",
+      "line_start": 22,
+      "line_end": 114,
+      "range_sha256": "2a0cf648abe696206c65ba94994900685f5464e4e2ab0a03cf14b5ae7a604d6a",
+      "symbols": [
+        "SpDamageUtil.GetSpDefenseForType",
+        "SpDamageUtil.MergeSpDamage",
+        "SpDamageUtil.ApplySpDefense"
+      ]
+    },
+    {
+      "id": "CD-S10",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "CD-S11",
+      "source_file": "scripts/components/resistance.lua",
+      "file_sha256": "e667a498c69c8d492afe765eb4cec7962ba453b5aec28796e4d721fc99ac4e76",
+      "line_start": 1,
+      "line_end": 47,
+      "range_sha256": "df0132af6d80b67be9be16db1f7c39b7062cfc04bbb39161713945fe082c3b15",
+      "symbols": [
+        "Resistance:AddResistance",
+        "Resistance:RemoveResistance",
+        "Resistance:HasResistance",
+        "Resistance:ShouldResistDamage",
+        "Resistance:ResistDamage"
+      ]
+    },
+    {
+      "id": "CD-S12",
+      "source_file": "scripts/prefabs/armor_skeleton.lua",
+      "file_sha256": "68663e1f5bf129698acef867a978434a67e3ecec01f1db7ddbf35109c5f3a08a",
+      "line_start": 8,
+      "line_end": 21,
+      "range_sha256": "afbd3a61476c7c4ee0811608445bb1b4a50945930da1b8e90997bf5db067cae6",
+      "symbols": [
+        "RESISTANCES",
+        "SHIELD_DURATION"
+      ]
+    },
+    {
+      "id": "CD-S13",
+      "source_file": "scripts/prefabs/armor_skeleton.lua",
+      "file_sha256": "68663e1f5bf129698acef867a978434a67e3ecec01f1db7ddbf35109c5f3a08a",
+      "line_start": 49,
+      "line_end": 98,
+      "range_sha256": "bacd71e29a2acdc31b87aa6a19acbdce7fc1cb3bdcddb9d7d255cd6c0de8fcf1",
+      "symbols": [
+        "OnShieldOver",
+        "OnResistDamage",
+        "ShouldResistFn",
+        "OnChargedFn",
+        "nofuel"
+      ]
+    },
+    {
+      "id": "CD-S14",
+      "source_file": "scripts/prefabs/armor_skeleton.lua",
+      "file_sha256": "68663e1f5bf129698acef867a978434a67e3ecec01f1db7ddbf35109c5f3a08a",
+      "line_start": 123,
+      "line_end": 179,
+      "range_sha256": "a8b75bc9feb09e7fd760cc72f849639343bb99a546371b96f1e2e41f5576faf2",
+      "symbols": [
+        "ontakefuel",
+        "onequip",
+        "onunequip",
+        "onequiptomodel"
+      ]
+    },
+    {
+      "id": "CD-S15",
+      "source_file": "scripts/prefabs/armor_skeleton.lua",
+      "file_sha256": "68663e1f5bf129698acef867a978434a67e3ecec01f1db7ddbf35109c5f3a08a",
+      "line_start": 213,
+      "line_end": 258,
+      "range_sha256": "1e3756fb9e3dd5834ac8b6ea8ac0990c804f74d9ca65f4ce6359c88c777c4dd1",
+      "symbols": [
+        "fn master branch",
+        "resistance callbacks",
+        "cooldown duration"
+      ]
+    },
+    {
+      "id": "CD-S16",
+      "source_file": "scripts/components/cooldown.lua",
+      "file_sha256": "f9448eca6669f511d9ace66054571af890baa22f50b056fa91d2c73370d4e06b",
+      "line_start": 1,
+      "line_end": 95,
+      "range_sha256": "242e03bd52357e645ac09778db4655440d64bc21c2934120df005515c8191cf5",
+      "symbols": [
+        "Cooldown:StartCharging",
+        "donecharging",
+        "Cooldown:OnLoad",
+        "Cooldown:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "CD-S17",
+      "source_file": "scripts/prefabs/hats.lua",
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "line_start": 395,
+      "line_end": 416,
+      "range_sha256": "80ef7e3ec40eac6570de2291f14e99deafc9d5dd1afb37dc470bfe90f96bfaf4",
+      "symbols": [
+        "woodcarved_onhitbyquakedebris",
+        "woodcarved master branch"
+      ]
+    },
+    {
+      "id": "CD-S18",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 966,
+      "line_end": 1012,
+      "range_sha256": "927f94d51b9841864ede922611124352ee8478e6a70ba440e949d77143bfea07",
+      "symbols": [
+        "_CalcReflectedDamage",
+        "Combat:CalcReflectedDamage"
+      ]
+    },
+    {
+      "id": "CD-S19",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1192,
+      "line_end": 1242,
+      "range_sha256": "e02c53e9cd3e5ecd73b056d98ad2c8e2c523f3e60624fb32dd96fe38ea56401f",
+      "symbols": [
+        "Combat:DoAttack direct settlement and reflection tail"
+      ]
+    },
+    {
+      "id": "CD-S20",
+      "source_file": "scripts/components/damagereflect.lua",
+      "file_sha256": "78bda20ea911b9df2af061e5effb6d2bce439034828bfbf700444dae4fea318a",
+      "line_start": 1,
+      "line_end": 26,
+      "range_sha256": "cb000012c6deae146ace012b4f9d230b8a0f0551de27e40474cccdf0077e1ceb",
+      "symbols": [
+        "DamageReflect:SetReflectDamageFn",
+        "DamageReflect:SetDefaultDamage",
+        "DamageReflect:GetReflectedDamage"
+      ]
+    },
+    {
+      "id": "CD-S21",
+      "source_file": "scripts/prefabs/armor_lunarplant.lua",
+      "file_sha256": "2cc8d967455737e02553235bf8c9c871f9905258253db58438d543a9d0c29a95",
+      "line_start": 134,
+      "line_end": 168,
+      "range_sha256": "73323b33262e9cf458be85085183c26ebf46c15c68a11fdf246cfb7fb55633b0",
+      "symbols": [
+        "OnBroken",
+        "OnRepaired",
+        "ReflectDamageFn",
+        "OnReflectDamage"
+      ]
+    },
+    {
+      "id": "CD-S22",
+      "source_file": "scripts/prefabs/armor_lunarplant.lua",
+      "file_sha256": "2cc8d967455737e02553235bf8c9c871f9905258253db58438d543a9d0c29a95",
+      "line_start": 197,
+      "line_end": 228,
+      "range_sha256": "880b637c178243f8a4e3fa228b6cedd8680ff95b1a84c20fc41b3eaa75da16d0",
+      "symbols": [
+        "commonfn master branch",
+        "damagereflect listener and callback"
+      ]
+    },
+    {
+      "id": "CD-S23",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1273,
+      "line_end": 1293,
+      "range_sha256": "04b09f8165ac3c3a6264b5502024573ea0b83120f9d9de0990fb1bc19f179490",
+      "symbols": [
+        "Combat:AddConditionExternalDamageTakenMultiplier",
+        "Combat:RemoveConditionExternalDamageTakenMultiplier",
+        "Combat:ApplyConditionExternalDamageTakenMultiplier"
+      ]
+    },
+    {
+      "id": "CD-S24",
+      "source_file": "scripts/components/damagetyperesist.lua",
+      "file_sha256": "d5710fb2e7874daa0b1fc7e6420212d750bd713263db43ca0916b95a664b1bfe",
+      "line_start": 1,
+      "line_end": 42,
+      "range_sha256": "d4b7a47a307976a28945b2f26925ee7c7ddcddb652c6a9e173b0eaf040b10f2d",
+      "symbols": [
+        "DamageTypeResist:AddResist",
+        "DamageTypeResist:RemoveResist",
+        "DamageTypeResist:GetResist"
+      ]
+    },
+    {
+      "id": "CD-S25",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 185,
+      "line_end": 191,
+      "range_sha256": "8d598432deb5d1e50e533640ea7c7012156c1dfc05b2721cceb5e4e4cce862b4",
+      "symbols": [
+        "table.removearrayvalue"
+      ]
+    },
+    {
+      "id": "CD-S26",
+      "source_file": "scripts/prefabs/knight.lua",
+      "file_sha256": "d57578d47e37400498b0e6f07b53d21ed5cfe7764ae1e473d96e674c7673a647",
+      "line_start": 449,
+      "line_end": 452,
+      "range_sha256": "69c24b0b8e8bb2a62ac2288d3ebf820ed9fc4f8614060b72dcb8af88407202a1",
+      "symbols": [
+        "YOTH_GetDamageTakenMultiplier"
+      ]
+    },
+    {
+      "id": "CD-S27",
+      "source_file": "scripts/prefabs/knight.lua",
+      "file_sha256": "d57578d47e37400498b0e6f07b53d21ed5cfe7764ae1e473d96e674c7673a647",
+      "line_start": 560,
+      "line_end": 585,
+      "range_sha256": "208c939f15b6da2f5d8854e5779f53c39c56490f4138b4835a134a7f5a6d9046",
+      "symbols": [
+        "YOTH_master_postinit conditional multiplier registration"
+      ]
+    },
+    {
+      "id": "CD-S28",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1359,
+      "line_end": 1374,
+      "range_sha256": "d9e4e8e478acb22a19f3a028038db7200eda1ba5f1d0de8d20a414b5311c9a5f",
+      "symbols": [
+        "Combat:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "CD-S29",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 105,
+      "line_end": 121,
+      "range_sha256": "1c71c219fe517cca57e87a5ea791504069e6b3ca4d56761bac3ce06e9e460e89",
+      "symbols": [
+        "Weapon:OnAttack"
+      ]
+    },
+    {
+      "id": "CD-S30",
+      "source_file": "scripts/prefabs/armor_lunarplant.lua",
+      "file_sha256": "2cc8d967455737e02553235bf8c9c871f9905258253db58438d543a9d0c29a95",
+      "line_start": 49,
+      "line_end": 55,
+      "range_sha256": "5a2ca98ff3749ab9a591788b47407dabefcda06ccd498f5d3d89c869ca4fa7bb",
+      "symbols": [
+        "OnEnabledSetBonus",
+        "OnDisabledSetBonus"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "Inventory ApplyDamage 多护甲 最高吸收 特殊防御 耐久 破甲",
+      "expected_entry_ids": [
+        "EXP-COMBAT-001"
+      ],
+      "purpose": "护甲分摊及破损阶段"
+    },
+    {
+      "query": "Resistance ResistDamage 骨甲 短护盾 damageresisted 冷却",
+      "expected_entry_ids": [
+        "EXP-COMBAT-002"
+      ],
+      "purpose": "标签/谓词与恢复闭环"
+    },
+    {
+      "query": "CalcReflectedDamage DamageReflect onreflectdamage 骑乘 反伤 table",
+      "expected_entry_ids": [
+        "EXP-COMBAT-003"
+      ],
+      "purpose": "来源枚举与完成通知数据"
+    },
+    {
+      "query": "AddConditionExternalDamageTakenMultiplier Remove 条件减伤 空表 类型抗性",
+      "expected_entry_ids": [
+        "EXP-COMBAT-004"
+      ],
+      "purpose": "回调身份及通道乘算"
+    }
+  ],
+  "limitations": [
+    "本轮762172/build26474873归档只用于证据身份，逐文件SHA使用ZIP成员原字节，range SHA使用UTF-8 splitlines后LF连接且无末尾换行。",
+    "仅静态研究，runtime_verified=false，维持research/restricted/hold，待主控安排独立审核。",
+    "证据定位为源文件/行范围/hash，候选不包含完整Lua或本机源码路径。",
+    "已有N004的CalcDamage/GetAttacked/Health死亡主链及Cooldown合同保留各自Scope，新增候选按具体增量计数。",
+    "动态Mod覆盖、原生调度/实体删除和多人网络可见性依各条unknowns处理。"
+  ]
+}

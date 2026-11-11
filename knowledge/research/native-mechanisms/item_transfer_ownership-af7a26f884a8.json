@@ -1,0 +1,2742 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "item_transfer_ownership",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-ITEM-001",
+      "title": "背包交付、移除与掉落的返回值和物品归属",
+      "engineering_question": "GiveItem如何选择格/容器并处理剩余，移除与掉落事件读到哪个阶段的owner？",
+      "aliases": [
+        "Inventory:GiveItem",
+        "Inventory:RemoveItem",
+        "Inventory:DropItem",
+        "GetNextAvailableSlot",
+        "prevcontainer",
+        "itemget",
+        "itemlose"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "build": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_archive_static_lua",
+        "bounds": [
+          "服务端Inventory完整所列方法及InventoryItem关联回调，含BODY overflow与特殊口袋容器。",
+          "实际采集产物和装备替换为调用者，库存最终显示/物理及具体mod回调在unknowns。"
+        ],
+        "increment_over_existing": "NC-N004-FINAL-04已有归属及多结果边界，FINAL-09已有拆堆先于成员查找。新增选位完整分流、被忽略的容器返回、具体事件写入窗口与Drop接收者/直接owner分工。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ITEM-001-C01",
+          "kind": "NSF",
+          "statement": "GiveItem先读inst.components.inventoryitem并检查有效性，当前已装备物会先尝试Unequip。跨直接owner时先RemoveFromOwner(true)，随后OnPickup；OnPickup先处理落地/阴燃及onpickup事件，再调用onpickupfn，其真值使GiveItem立即nil返回。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PICKUP",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-UNEQUIP"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C02",
+          "kind": "NSF",
+          "statement": "无显式slot时GiveItem可采用prevslot，或在prevcontainer有效且对当前玩家打开时尝试返还原空格/并回兼容堆。失败会清这两个提示并重新选位。建议slot只有在<=maxslots、空格或兼容堆且CanTakeItemInSlot通过时才采用，否则转GetNextAvailableSlot。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ADMIT",
+            "ITEM-STACK",
+            "ITEM-CT-OPEN"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C03",
+          "kind": "NSF",
+          "statement": "GetNextAvailableSlot先考虑可并入的equipstack装备堆，再按普通物品格、BODY overflow优先级与特殊容器候选选择可并堆处，随后寻找优先overflow空格、特殊容器空格、普通空格。返回slot与所属itemslots/equipslots表或Container组件，失败返回nil,itemslots。特殊容器由priorityfn及打开/可打开条件筛选，扫描普通/装备堆使用pairs。",
+          "evidence_refs": [
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-ADMIT",
+            "ITEM-CT-PRIORITY",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C04",
+          "kind": "NSF",
+          "statement": "普通空格接收先写itemslots[slot]，再OnPutInInventory，后发itemget；对应equippable的ToPocket在该分支随后无owner实参调用。选中overflow/特殊容器空格时GiveItem调用该容器GiveItem后直接true，未用其返回值决定此true；并堆剩余物则递归GiveItem，ignorefull可把剩余拒绝传成false。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-OWNER",
+            "ITEM-EQUIPPABLE",
+            "ITEM-CT-GIVE",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C05",
+          "kind": "NSF",
+          "statement": "常规选位失败后，GiveItem先以drop_on_fail=false尝试overflow，再处理ignorefull=false分支。允许的空active可直接接收，HandleLeftoversFn存在时只调用它；否则可并入活动堆并递归剩余物，或根据HandleLeftoversShouldDropFn决定DropItem。返回值为slot、true、false或早退nil，HandleLeftoversFn结果未转为returnvalue。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-STACK",
+            "ITEM-INV-DROP"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C06",
+          "kind": "NSF",
+          "statement": "RemoveItem的单件拆堆先于成员查找，拆出物OnRemoved并记prevslot。整件路径先清itemslots或active指针并发itemlose，再OnRemoved；装备路径强制Unequip后OnRemoved。之后尝试overflow及checkallcontainers的打开容器，未匹配返回原item。Container未找到也返回原item，故overflow的非nil可结束后续搜索。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-ON-PUT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-CT-REMOVE",
+            "ITEM-INV-SPECIAL",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C07",
+          "kind": "NSF",
+          "statement": "DropItem先拒绝缺inventoryitem或锁格且整件/非可拆堆物，再从物品直接owner调用RemoveFromOwner，返回nil时回退原item。随后设传入pos或self宿主位置、调用OnDropped(randomdir)、清prevslot/prevcontainer，向self宿主发dropitem并返回dropped。OnDropped会从当时owner或物品取位置，再OnRemoved、物理处理、ondropfn、ondropped及内装物事件。",
+          "evidence_refs": [
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ON-DROP"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C08",
+          "kind": "EI",
+          "statement": "itemlose回调可在所属槽已清、直接owner尚未被OnRemoved清掉的阶段读取物品。GiveItem的普通itemget则发生在slot与OnPutInInventory之后。DropItem的接收者用于默认落点和dropitem事件，移除委托跟随物品的直接owner；调用方应按该接收关系追踪最终成员位置。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ENTITY-EVENT"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-001-C09",
+          "kind": "REC",
+          "statement": "奖励/采集消费者按本次路径的返回值、仍存活的源实体数量和最终槽位/owner处理后续动作。选位提示和当前成员位置分别读取，入口返回后需要展示结果时沿实际itemget/活动物/掉落分支接线。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-PICK-DELIVERY",
+            "ITEM-ON-PUT"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Inventory:GiveItem",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "inst必需实体，正常调用需inventoryitem及IsValid，nil会在字段读取处报错。",
+            "slot可选普通背包格提示，prevslot/prevcontainer可参与选位。",
+            "src_pos可选，用于入格/堆叠动画及容器转交。"
+          ],
+          "returns": "常规接收返回slot，容器/active等分支可true，ignorefull/落地等可false，OnPickup真值或无效物可nil。",
+          "preconditions": [
+            "服务端Inventory及合法物品结构，关联容器、replica和回调已初始化。"
+          ],
+          "side_effects": [
+            "可脱离旧owner、调用OnPickup、并堆删源、换owner/格、创建容器提示实体或掉落。"
+          ],
+          "lifecycle": {
+            "sequence": "预处理与拾取→旧位提示→选择位置→格/容器/堆交付→递归剩余→active/自定义剩余/掉落。",
+            "cleanup": "原生移交函数负责成员与owner，部分路径在仍有剩余时递归，所有者回调同步发生。",
+            "errors": "方法体直接调用回调及关联方法。回调异常会停在已经完成的写入阶段。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ADMIT",
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-ON-PICKUP",
+            "ITEM-ON-PUT",
+            "ITEM-FROM-OWNER",
+            "ITEM-CT-GIVE",
+            "ITEM-STACK",
+            "ITEM-EQUIPPABLE",
+            "ITEM-INV-DROP",
+            "ITEM-INV-QUERY",
+            "ITEM-INV-SLOT-QUERY",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:GetNextAvailableSlot",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item为待接收实体，stackable、inventoryitem等参与选择。"
+          ],
+          "returns": "slot, container。其中container为itemslots/equipslots原表或Container组件，失败nil,itemslots。",
+          "preconditions": [
+            "当前Inventory/容器内容可查询，priorityfn、CanStackWith等谓词可运行。"
+          ],
+          "side_effects": [
+            "查询priorityfn、兼容性和准入，可触发这些自定义谓词副作用。"
+          ],
+          "lifecycle": {
+            "sequence": "先合堆候选，再空格候选，特殊容器优先关系见本条NSF。",
+            "cleanup": "该方法返回当前候选，后续GiveItem负责交付。",
+            "errors": "谓词异常向外传播，pairs候选顺序按Lua表遍历。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-CT-PRIORITY",
+            "ITEM-INV-ADMIT",
+            "ITEM-STACK"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:RemoveItem",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item可nil。",
+            "wholestack假且为多件堆时拆一件。",
+            "checkallcontainers真才尝试打开的额外可制作用容器。",
+            "keepoverstacked透传容器移除分支。"
+          ],
+          "returns": "nil输入返回nil，拆堆返回新实体，匹配整件返回原实体，搜索未命中仍返回原item。",
+          "preconditions": [
+            "服务端Inventory，所传实体与组件结构有效，拆堆支路以实体本身为操作对象。"
+          ],
+          "side_effects": [
+            "可先改堆量，或清成员槽/活动物/装备，再发事件、OnRemoved并写返回提示。"
+          ],
+          "lifecycle": {
+            "sequence": "拆一件→普通格→active→装备→overflow→可选打开容器→原样返回。",
+            "cleanup": "整件移除走OnRemoved清直接owner/场景，拆件只脱离新实体。",
+            "errors": "itemlose/Unequip/拆堆回调异常可中断后续owner或提示写入。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-STACK",
+            "ITEM-CT-REMOVE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-INV-SPECIAL",
+            "ITEM-INV-POCKET-QUERY",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:DropItem",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item可nil，需inventoryitem。",
+            "wholestack和keepoverstacked传给直接owner移除。",
+            "randomdir传OnDropped。",
+            "pos可选含Get()的Vector3式位置。"
+          ],
+          "returns": "拒绝分支nil，执行路径返回实际dropped实体，可能为拆出的新物。",
+          "preconditions": [
+            "服务端Inventory和物品的直接owner接口可用。"
+          ],
+          "side_effects": [
+            "设置落点、解除持有、调用掉落物理/回调、清提示、发dropitem。"
+          ],
+          "lifecycle": {
+            "sequence": "锁格判定→直接owner移除或回退原物→位置/OnDropped→清提示→dropitem。",
+            "cleanup": "OnDropped负责owner/场景退出，调用接收者自身并未先统一验证成员归属。",
+            "errors": "锁格在dev分支assert，物理/回调异常会中断后续步骤。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ON-DROP",
+            "ITEM-ACTION-DROP"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "采集消费者或装备替换调用GiveItem，拾取与旧owner处理后选择普通/装备堆或容器。",
+          "evidence_refs": [
+            "ITEM-PICK-DELIVERY",
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PICKUP",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-SELECT",
+            "ITEM-INV-SPECIAL",
+            "ITEM-CT-PRIORITY"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "实际写槽、OnPutInInventory、合堆或递归剩余，并按活动物/剩余处理/掉落分支结束。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-STACK",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-INV-DROP"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "RemoveItem/DropItem沿成员或直接owner退出，事件发生在具体清槽/清owner阶段。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-FROM-OWNER",
+            "ITEM-ON-PUT",
+            "ITEM-ON-DROP",
+            "ITEM-ENTITY-EVENT"
+          ]
+        }
+      ],
+      "unknowns": [
+        "原生物理、库存复制与UI送达未实测，src_pos动画效果按实际客户端验证。",
+        "回调中的任意移除、重入或异常后结果取决于当前已完成阶段。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ITEM-INV-GIVE",
+            "role": "服务端交付入口、旧槽/容器提示及递归剩余物处理",
+            "claim_ids": [
+              "EXP-ITEM-001-C01",
+              "EXP-ITEM-001-C02",
+              "EXP-ITEM-001-C04",
+              "EXP-ITEM-001-C05",
+              "EXP-ITEM-001-C08",
+              "EXP-ITEM-001-C09"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-ADMIT",
+            "role": "背包格准入与锁格堆叠例外",
+            "claim_ids": [
+              "EXP-ITEM-001-C02",
+              "EXP-ITEM-001-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-SELECT",
+            "role": "背包/装备/溢出/特殊容器候选选择",
+            "claim_ids": [
+              "EXP-ITEM-001-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-SPECIAL",
+            "role": "BODY溢出与特殊口袋容器生产者",
+            "claim_ids": [
+              "EXP-ITEM-001-C03",
+              "EXP-ITEM-001-C05",
+              "EXP-ITEM-001-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-REMOVE",
+            "role": "拆单件、普通/活动/装备/外部容器移除",
+            "claim_ids": [
+              "EXP-ITEM-001-C06",
+              "EXP-ITEM-001-C08",
+              "EXP-ITEM-001-C09"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-DROP",
+            "role": "直接owner移除、落点和dropitem消费者",
+            "claim_ids": [
+              "EXP-ITEM-001-C05",
+              "EXP-ITEM-001-C07",
+              "EXP-ITEM-001-C08",
+              "EXP-ITEM-001-C09"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-ACTIVE",
+            "role": "活动物接收与OnPickup/OnPut回调",
+            "claim_ids": [
+              "EXP-ITEM-001-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-EQUIP",
+            "role": "新旧装备、重物、拆堆与替换去向",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-UNEQUIP",
+            "role": "装备退出、active指针写入与事件",
+            "claim_ids": [
+              "EXP-ITEM-001-C01",
+              "EXP-ITEM-001-C05",
+              "EXP-ITEM-001-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-QUERY",
+            "role": "活动物与装备对象身份查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-POCKET-QUERY",
+            "role": "普通口袋成员位置查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-SLOT-QUERY",
+            "role": "装备/普通格当前对象查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-OWNER",
+            "role": "直接owner字段写入",
+            "claim_ids": [
+              "EXP-ITEM-001-C04"
+            ]
+          },
+          {
+            "ref": "ITEM-ON-PUT",
+            "role": "直接owner/父子/场景状态与回调",
+            "claim_ids": [
+              "EXP-ITEM-001-C04",
+              "EXP-ITEM-001-C06",
+              "EXP-ITEM-001-C08",
+              "EXP-ITEM-001-C09"
+            ]
+          },
+          {
+            "ref": "ITEM-ON-DROP",
+            "role": "掉落回调、事件与物理调用边界",
+            "claim_ids": [
+              "EXP-ITEM-001-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-ON-PICKUP",
+            "role": "OnPickup真值早退及直接持有谓词",
+            "claim_ids": [
+              "EXP-ITEM-001-C01"
+            ]
+          },
+          {
+            "ref": "ITEM-FROM-OWNER",
+            "role": "向直接owner委托移除及销毁清索引",
+            "claim_ids": [
+              "EXP-ITEM-001-C01",
+              "EXP-ITEM-001-C06",
+              "EXP-ITEM-001-C07",
+              "EXP-ITEM-001-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-GIVE",
+            "role": "容器特殊溢出/并堆/落格/失败兜底",
+            "claim_ids": [
+              "EXP-ITEM-001-C04"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-PRIORITY",
+            "role": "特殊容器优先级谓词",
+            "claim_ids": [
+              "EXP-ITEM-001-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-REMOVE",
+            "role": "readonly、拆堆/过堆、槽清空与OnRemoved",
+            "claim_ids": [
+              "EXP-ITEM-001-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-OPEN",
+            "role": "源/目标容器开放关系",
+            "claim_ids": [
+              "EXP-ITEM-001-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-STACK",
+            "role": "堆叠类型、拆合、回调与实体身份",
+            "claim_ids": [
+              "EXP-ITEM-001-C02",
+              "EXP-ITEM-001-C03",
+              "EXP-ITEM-001-C04",
+              "EXP-ITEM-001-C05",
+              "EXP-ITEM-001-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-EQUIPPABLE",
+            "role": "装备标志和业务/物品事件回调",
+            "claim_ids": [
+              "EXP-ITEM-001-C04"
+            ]
+          },
+          {
+            "ref": "ITEM-ACTION-DROP",
+            "role": "锁装备和强制拆单件到DropItem的调用者",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-PICK-DELIVERY",
+            "role": "实际采集产物交Inventory:GiveItem的调用点",
+            "claim_ids": [
+              "EXP-ITEM-001-C09"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-EVENT",
+            "role": "物品/槽位同步事件执行阶段",
+            "claim_ids": [
+              "EXP-ITEM-001-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-CHILD",
+            "role": "物品入袋/退出时Lua父子与原生parent接线",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ENTITY-SCENE",
+            "role": "物品入袋/退出时场景状态与enter/exitlimbo事件",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举到本卡声明的Lua调用边界，原生复制、物理、资产生成及回调业务留在Scope所列边界。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ITEM-002",
+      "title": "容器准入、槽位交付和客户端转移请求",
+      "engineering_question": "容器准入何时检查，部分交付如何取出或返还，客户端请求怎样进入服务器？",
+      "aliases": [
+        "Container:CanTakeItemInSlot",
+        "Container:GiveItem",
+        "Container:RemoveItemBySlot",
+        "Container:RemoveItem",
+        "MoveItemFromAllOfSlot",
+        "readonlycontainer",
+        "itemtestfn"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "build": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_archive_static_lua",
+        "bounds": [
+          "服务端Container所列方法，客户端CanTake与整格移动的具体replica/classified/RPC入口。",
+          "客户端ReceiveItem/ProxyItem内部预测算法及全部半堆/按数量请求留在unknowns，服务器Give/Remove/Move主链完整列出。"
+        ],
+        "increment_over_existing": "复用NC-N004-FINAL-04部分交付/未找到原样返回，补准入与占位关系、fallback格选择、readonly/无限堆取出、源/目标开放检查和返还剩余链。EXP-ARCH-004的classified附着仅作去重。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ITEM-002-C01",
+          "kind": "NSF",
+          "statement": "CanTakeItemInSlot先检查inventoryitem的容器/口袋限制及readonly，再处理模式禁装备和slot范围。占用格仅在锁格且无法向其未满兼容堆并入时拒绝，最后调用itemtestfn(self,item,slot)。GetSpecificSlotForItem只在usespecificslotsforitems且有itemtestfn时逐格取首个通过值。",
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C02",
+          "kind": "NSF",
+          "statement": "GiveItem先以传入slot做CanTakeItemInSlot，再采用传入slot或GetSpecificSlotForItem。slot仍nil时可向优先特殊内装容器交付，再按接受堆叠规则尝试指定堆/遍历堆，随后选择空格。fallback普通空格循环本身只检查槽为空和usespecificslotsforitems条件，未在该循环逐格再调itemtestfn。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SPECIAL",
+            "ITEM-CT-PRIORITY",
+            "ITEM-CT-OVERFLOW"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C03",
+          "kind": "NSF",
+          "statement": "容器常规接收先写slots，再处理无限堆上限、OnPutInInventory和itemget，之后可通知携带该容器的直接owner gotnewitem。本方法没有Inventory:GiveItem前段的RemoveFromOwner或OnPickup调用。实际MoveItemFromAllOfSlot调用者会先从源移除/拆堆并清返回提示，再GiveItem。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-MOVE",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C04",
+          "kind": "NSF",
+          "statement": "不接受整堆的容器遇多件堆时可拆一件、写slots、OnPutInInventory并发itemget后false返回。达到函数末尾才按drop_on_fail~=false执行过堆处理、移动到容器位置及OnDropped，提前返回跳过这段。并堆返回true表示该处Put得到nil，部分并堆后可继续找空格或走末尾。",
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-DROP"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C05",
+          "kind": "NSF",
+          "statement": "RemoveItemBySlot以指定格取物后交RemoveItem_Internal，readonly时nil。多件堆在wholestack假时取1，keepoverstacked且过堆时取originalmaxsize，返回拆件并记prevslot/prevcontainer，原槽保留。整件先清slots，处理无限堆上限/多余物，再itemlose、OnRemoved及提示。RemoveItem按对象寻槽，未找到返回原item。",
+          "evidence_refs": [
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C06",
+          "kind": "NSF",
+          "statement": "客户端container replica的CanTakeItemInSlot用物品replica字段与本地itemtestfn作同类准入。MoveItemFromAllOfSlot replica有组件时直接调用服务端组件方法并传ThePlayer，否则交classified。classified在源/目标非busy且有物品时调用目标ReceiveItem预测，remainder非nil才更新本地源预览并发MoveItemFromAllOfSlot RPC。",
+          "evidence_refs": [
+            "ITEM-CT-REPLICA",
+            "ITEM-CT-REPLICA-MOVE",
+            "ITEM-CT-CLIENT",
+            "ITEM-CT-BUSY",
+            "ITEM-RPC-SEND"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C07",
+          "kind": "NSF",
+          "statement": "该RPC检查slot的uint形态、源实体和可选目标形态，要求源container:IsOpenedBy(player)，缺目标用player。组件MoveItemFromAllOfSlot再要求非readonly、源物未锁、目标组件对opener打开并可接收。它移除或限制过堆数量，暂设ignorefull/overflow等标记，目标GiveItem假时把当前剩余物Give回原格，正常尾部将这些标记与currentuser清掉。",
+          "evidence_refs": [
+            "ITEM-RPC-MOVE",
+            "ITEM-RPC-SHAPE",
+            "ITEM-CT-MOVE",
+            "ITEM-CT-OPEN",
+            "ITEM-INV-OPEN",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-002-C08",
+          "kind": "EI",
+          "statement": "普通未锁占用格可通过CanTakeItemInSlot，最终接收仍取决于并堆和空格分支。直接调用Container:GiveItem时，旧成员槽的移除由调用方负责，OnPutInInventory只改变owner/父子/场景并运行回调。Move方法的返还消费的是当时剩余实体，正常尾部标记写false而非恢复任意先前值。",
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-MOVE",
+            "ITEM-STACK"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Container:CanTakeItemInSlot",
+          "source_file": "scripts/components/container.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item为inventoryitem实体。",
+            "slot可nil，非nil需可数值比较且在1..numslots。"
+          ],
+          "returns": "guard拒绝false，末尾返回itemtestfn结果或true。",
+          "preconditions": "服务端Container及itemtestfn可用。",
+          "side_effects": [
+            "可调用itemtestfn(self,item,slot)。"
+          ],
+          "lifecycle": {
+            "sequence": "物品限制→readonly/模式→slot范围及锁格→itemtestfn。",
+            "cleanup": "准入结果供后续GiveItem选择并堆/空格。",
+            "errors": "本方法未统一校验slot整数或item:IsValid，回调异常向外传播。"
+          },
+          "evidence_refs": [
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Container:GiveItem",
+          "source_file": "scripts/components/container.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item可nil。",
+            "slot可选目标格，nil启用特定槽/自动选位。",
+            "src_pos可选事件与堆叠动画位置。",
+            "drop_on_fail缺省真，显式false抑制末尾掉落。"
+          ],
+          "returns": "true为命中特殊容器返回真、Put返回nil或常规落格等控制流分支的结果。前向筛选用源堆CanStackWith(接收堆)，Put用接收堆CanStackWith(源物)；自定义谓词非对称时，反向不兼容返回nil也会使本方法true。单凭该true无法确定整堆接收状态。拒绝/无位false，单件部分接收也false。",
+          "preconditions": "服务端Container及inventoryitem/stackable结构就绪。原持有槽由调用方移除。",
+          "side_effects": [
+            "可把源并入目标堆并删除源、拆一件写槽、改无限堆上限、换owner、发itemget或掉落。"
+          ],
+          "lifecycle": {
+            "sequence": "准入→特定槽/特殊内装容器→并堆→空格→末尾失败处理。",
+            "cleanup": "部分交付可保留剩余源，RemoveItem路径负责后续取出与上限恢复。",
+            "errors": "itemtestfn、物品回调及关联容器方法直接执行，异常保留已完成的写入。"
+          },
+          "evidence_refs": [
+            "ITEM-CT-GIVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-PRIORITY",
+            "ITEM-CT-SPECIAL",
+            "ITEM-CT-OVERFLOW",
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-DROP",
+            "ITEM-OWNER",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Container:RemoveItemBySlot",
+          "source_file": "scripts/components/container.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "slot可nil，指当前slots的精确格。",
+            "keepoverstacked真时可限制过堆取出量。"
+          ],
+          "returns": "空槽nil，非空交内部移除，可能nil、拆出物或原物。",
+          "preconditions": "服务端Container，对应物品组件可用。",
+          "side_effects": [
+            "内部执行拆堆或清槽/owner/事件，并写返回提示。"
+          ],
+          "lifecycle": {
+            "sequence": "按格取物→RemoveItem_Internal。",
+            "cleanup": "readonly拒绝，整件/拆件与无限堆分支分别收尾。",
+            "errors": "回调异常可中断后置owner/提示处理。"
+          },
+          "evidence_refs": [
+            "ITEM-CT-SLOT",
+            "ITEM-CT-REMOVE",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Container:RemoveItem",
+          "source_file": "scripts/components/container.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item可nil。",
+            "wholestack假对多件堆拆一件。",
+            "_checkallcontainers_签名保留，本体未使用。",
+            "keepoverstacked用于内部过堆支路。"
+          ],
+          "returns": "nil输入nil，找到则返回内部结果，未找到原样返回item。",
+          "preconditions": "服务端Container及所传对象符合组件结构。",
+          "side_effects": [
+            "可能改堆量、清槽/owner及发itemlose。"
+          ],
+          "lifecycle": {
+            "sequence": "按对象寻槽→内部移除，未匹配原样返回。",
+            "cleanup": "拆件保留原槽，整件重置无限上限并可掉落多余数量。",
+            "errors": "内部方法及回调错误向外传播。"
+          },
+          "evidence_refs": [
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-SLOT",
+            "ITEM-STACK",
+            "ITEM-CT-EXCESS",
+            "ITEM-ON-PUT"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Container:MoveItemFromAllOfSlot",
+          "source_file": "scripts/components/container.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "slot为当前源格。",
+            "container为目标实体，取其container或inventory。",
+            "opener为本次玩家，目标需IsOpenedBy(opener)。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": "源非readonly、物品未锁，opener和目标组件结构可用。RPC调用者另检查源对player打开。",
+          "side_effects": [
+            "源移除/拆堆、目标交付或剩余返还、修改临时标记及currentuser。"
+          ],
+          "lifecycle": {
+            "sequence": "目标开放/准入→取源物→设忽略标记→目标GiveItem→失败返还源格→清标记/currentuser。",
+            "cleanup": "正常返回时临时标记按源码写false或nil。",
+            "errors": "无局部finally，异常可跳过临时标记清理。"
+          },
+          "evidence_refs": [
+            "ITEM-CT-MOVE",
+            "ITEM-RPC-MOVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-CT-OPEN",
+            "ITEM-INV-OPEN",
+            "ITEM-STACK"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "实际客户端整格转移从replica进入classified，按预测接收结果选择发送RPC。",
+          "evidence_refs": [
+            "ITEM-CT-REPLICA-MOVE",
+            "ITEM-CT-CLIENT",
+            "ITEM-CT-BUSY",
+            "ITEM-CT-REPLICA",
+            "ITEM-RPC-SEND"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "服务器RPC检查源开放，组件检查目标开放/准入，再取出物品。",
+          "evidence_refs": [
+            "ITEM-RPC-MOVE",
+            "ITEM-RPC-SHAPE",
+            "ITEM-CT-OPEN",
+            "ITEM-INV-OPEN",
+            "ITEM-CT-MOVE",
+            "ITEM-CT-ADMIT",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-SLOT"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "目标GiveItem并堆或落格，剩余返回源格，正常尾部清临时标记。",
+          "evidence_refs": [
+            "ITEM-CT-MOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS"
+          ]
+        }
+      ],
+      "unknowns": [
+        "原生RPC编码/实体映射/送达及实际UI预测未实测。",
+        "itemtestfn与移交回调的项目行为按调用点判断，客户端预测ReceiveItem内部未作完整API研究。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ITEM-INV-GIVE",
+            "role": "服务端交付入口、旧槽/容器提示及递归剩余物处理",
+            "claim_ids": [
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-OPEN",
+            "role": "目标玩家背包在容器转移中的开放条件",
+            "claim_ids": [
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-OWNER",
+            "role": "直接owner字段写入",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ON-PUT",
+            "role": "直接owner/父子/场景状态与回调",
+            "claim_ids": [
+              "EXP-ITEM-002-C03",
+              "EXP-ITEM-002-C04",
+              "EXP-ITEM-002-C05",
+              "EXP-ITEM-002-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-ON-DROP",
+            "role": "掉落回调、事件与物理调用边界",
+            "claim_ids": [
+              "EXP-ITEM-002-C04"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-GIVE",
+            "role": "容器特殊溢出/并堆/落格/失败兜底",
+            "claim_ids": [
+              "EXP-ITEM-002-C02",
+              "EXP-ITEM-002-C03",
+              "EXP-ITEM-002-C04",
+              "EXP-ITEM-002-C07",
+              "EXP-ITEM-002-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-ADMIT",
+            "role": "口袋限制/readonly/锁格/itemtestfn准入",
+            "claim_ids": [
+              "EXP-ITEM-002-C01",
+              "EXP-ITEM-002-C02",
+              "EXP-ITEM-002-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-PRIORITY",
+            "role": "特殊容器优先级谓词",
+            "claim_ids": [
+              "EXP-ITEM-002-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-SPECIAL",
+            "role": "内置特殊容器发现",
+            "claim_ids": [
+              "EXP-ITEM-002-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-OVERFLOW",
+            "role": "容器内特殊溢出的物品限制",
+            "claim_ids": [
+              "EXP-ITEM-002-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-REMOVE",
+            "role": "readonly、拆堆/过堆、槽清空与OnRemoved",
+            "claim_ids": [
+              "EXP-ITEM-002-C05",
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-SLOT",
+            "role": "精确槽读取/移除与按对象寻槽",
+            "claim_ids": [
+              "EXP-ITEM-002-C01",
+              "EXP-ITEM-002-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-EXCESS",
+            "role": "无限堆容器取出时分批处理多余物",
+            "claim_ids": [
+              "EXP-ITEM-002-C04",
+              "EXP-ITEM-002-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-MOVE",
+            "role": "已打开容器之间转移、返还剩余与临时标记收尾",
+            "claim_ids": [
+              "EXP-ITEM-002-C03",
+              "EXP-ITEM-002-C07",
+              "EXP-ITEM-002-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-OPEN",
+            "role": "源/目标容器开放关系",
+            "claim_ids": [
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-STACK",
+            "role": "堆叠类型、拆合、回调与实体身份",
+            "claim_ids": [
+              "EXP-ITEM-002-C01",
+              "EXP-ITEM-002-C03",
+              "EXP-ITEM-002-C04",
+              "EXP-ITEM-002-C05",
+              "EXP-ITEM-002-C07",
+              "EXP-ITEM-002-C08"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-REPLICA",
+            "role": "实际客户端准入字段及slot/itemtestfn",
+            "claim_ids": [
+              "EXP-ITEM-002-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-REPLICA-MOVE",
+            "role": "组件或classified分流的公开客户端入口",
+            "claim_ids": [
+              "EXP-ITEM-002-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-CLIENT",
+            "role": "客户端预测接收结果到RPC发送的限定分支",
+            "claim_ids": [
+              "EXP-ITEM-002-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-BUSY",
+            "role": "客户端容器busy/parent门禁",
+            "claim_ids": [
+              "EXP-ITEM-002-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-RPC-MOVE",
+            "role": "服务端按源容器开放关系处理请求",
+            "claim_ids": [
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-RPC-SHAPE",
+            "role": "容器RPC参数形态依赖",
+            "claim_ids": [
+              "EXP-ITEM-002-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-RPC-SEND",
+            "role": "客户端到原生发送边界",
+            "claim_ids": [
+              "EXP-ITEM-002-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-CHILD",
+            "role": "物品入袋/退出时Lua父子与原生parent接线",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ENTITY-SCENE",
+            "role": "物品入袋/退出时场景状态与enter/exitlimbo事件",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举到本卡声明的Lua调用边界，原生复制、物理、资产生成及回调业务留在Scope所列边界。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ITEM-003",
+      "title": "堆叠兼容、拆合实体身份与数量事件时序",
+      "engineering_question": "Put的nil怎样解读，Get生成物何时继承状态，槽位成员在哪个消费者写入？",
+      "aliases": [
+        "Stackable:Get",
+        "Stackable:Put",
+        "Stackable:CanStackWith",
+        "ondestack",
+        "stacksizechange",
+        "originalmaxsize"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "build": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_archive_static_lua",
+        "bounds": [
+          "冻结Stackable完整拆合路径及Inventory/Container消费者，客户端仅CanStackWith的真实分支。",
+          "腐烂/湿温/chill读取限定到所列稀释方法，完整温度/充能/诅咒业务与数值政策留在unknowns。"
+        ],
+        "increment_over_existing": "拆分与owner继承、稀释基础为旧事实，当前版本重算引用。新增兼容判断的双端差异、Put不兼容nil、源删除/数量事件早于目标赋值及消费者成员接线。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ITEM-003-C01",
+          "kind": "NSF",
+          "statement": "服务端CanStackWith依次比较prefab、skinname，再调用接收堆实体的stackable_CanStackWithFn(self.inst,item)，默认true。replica在有组件时委托组件，否则先比较prefab，再仅在双方AnimState均存在时比较GetSkinBuild。缺少任一AnimState则跳过皮肤比较，前述检查未拒绝时继续同名自定义谓词。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-STACK-REPLICA"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-003-C02",
+          "kind": "NSF",
+          "statement": "Put在CanStackWith为假时直接返回初始nil且不进入并堆分支。兼容时按源stacksize求总数与实际numberadded，先稀释状态，能全装下时Remove源实体，剩余时先改源数量并发源stacksizechange，最后写目标数量并发目标stacksizechange。返回nil或剩余源实体。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-WRAP",
+            "ITEM-DILUTE-TEMP-WRAP",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL",
+            "ITEM-ENTITY-REMOVE"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-003-C03",
+          "kind": "EI",
+          "statement": "Put的nil返回覆盖兼容全并与不兼容早退，调用者需结合其前置CanStackWith分支解读。正常全并时源的onremove执行早于目标堆最终数量赋值，部分并时源stacksizechange也早于目标数量更新。接收堆稀释回调同样位于数量赋值之前。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ENTITY-REMOVE",
+            "ITEM-ENTITY-EVENT",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-003-C04",
+          "kind": "NSF",
+          "statement": "Get默认num=1，仅stacksize>num时Spawn同prefab/skin的新实体，先改源/新堆数量，再ondestack(new,source)，随后复制perishable、curseditem、未充满rechargeable及inventoryitem相关状态。源有owner时新物OnPutInInventory同owner，之后继承湿度/温度，最终返回新物，否则返回源实体。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ON-PUT"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-003-C05",
+          "kind": "NSF",
+          "statement": "Inventory/Container的拆件移除消费者会对Get结果OnRemoved，而Container不接受堆叠的Give分支会把拆件重新OnPutInInventory并写槽。Get本体继承owner时没有登记任何Inventory/Container槽，槽位成员由这些消费者处理。无限堆容器取出还可按originalmaxsize分批，并将整件上限状态复原。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-003-C06",
+          "kind": "REC",
+          "statement": "处理拆合时保留接收堆、源堆和Get返回实体三个实际身份。源被全并删除、部分并后仍存活，以及Get返原物的支路分别消费，按所选容器/库存调用者完成成员登记。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-INV-GIVE"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Stackable:CanStackWith",
+          "source_file": "scripts/components/stackable.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item为可读prefab/skinname的目标实体。"
+          ],
+          "returns": "prefab/skin/custom拒绝false，否则true。",
+          "preconditions": "接收者为Stackable，item及自定义谓词结构可用。",
+          "side_effects": [
+            "可能执行接收实体的自定义兼容谓词。"
+          ],
+          "lifecycle": {
+            "sequence": "prefab→skinname→自定义谓词。",
+            "cleanup": "该方法只决定兼容条件，后续Put按容量处理。",
+            "errors": "item为nil或自定义回调异常会向外抛出。"
+          },
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-STACK-REPLICA"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Stackable:Get",
+          "source_file": "scripts/components/stackable.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "num缺省1，传入值参与大小比较、减法和SetStackSize。"
+          ],
+          "returns": "源数量>num返回新实体，其他路径返回源实体。",
+          "preconditions": "源/新prefab的stackable及待复制组件结构合法，SpawnPrefab应产生预期物品。",
+          "side_effects": [
+            "改源与新堆数量、调用ondestack、复制部分组件状态、可继承直接owner。"
+          ],
+          "lifecycle": {
+            "sequence": "Spawn→源/新数量→ondestack→选定组件复制→owner/湿温继承→返回。",
+            "cleanup": "库存/容器消费者另行OnRemoved或OnPutInInventory完成成员迁移。",
+            "errors": "本体未验证num正整数或Spawn返回，异常发生前的数量/回调变化已完成。"
+          },
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ON-PUT",
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-OWNER",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Stackable:Put",
+          "source_file": "scripts/components/stackable.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item为兼容待并物品实体，正常并堆要求stackable及对称的稀释组件。",
+            "source_pos可选传到拾取位置与stacksizechange。"
+          ],
+          "returns": "不兼容nil，兼容且全并nil并删除源，兼容部分并返回剩余源。",
+          "preconditions": "接收堆与源为独立正常物品，容量/数量符合调用者规则。入口assert比较item与组件self。",
+          "side_effects": [
+            "先改稀释状态，再删除/减源，最后写目标数量并同步发事件。"
+          ],
+          "lifecycle": {
+            "sequence": "CanStackWith→实际加入数→稀释→处理源→更新目标数量。",
+            "cleanup": "全并Remove源，InventoryItem的退出消费者负责旧owner索引清理。",
+            "errors": "源缺stackable/配套perishable等可报错，自定义谓词及同步事件异常向外传播。"
+          },
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-ENTITY-REMOVE",
+            "ITEM-FROM-OWNER",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-WRAP",
+            "ITEM-DILUTE-TEMP-WRAP",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "库存/容器先以兼容谓词选择目标堆，再调用Put，或按需Get拆出。",
+          "evidence_refs": [
+            "ITEM-INV-GIVE",
+            "ITEM-CT-GIVE",
+            "ITEM-STACK",
+            "ITEM-STACK-REPLICA"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Put先处理稀释和源实体，再写目标数量，Get按选定字段复制。",
+          "evidence_refs": [
+            "ITEM-STACK",
+            "ITEM-DILUTE-PERISH",
+            "ITEM-DILUTE-WRAP",
+            "ITEM-DILUTE-TEMP-WRAP",
+            "ITEM-DILUTE-MOIST",
+            "ITEM-DILUTE-TEMP",
+            "ITEM-DILUTE-CHILL",
+            "ITEM-ENTITY-REMOVE"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "拆件返回给库存/容器消费者，完成OnRemoved或写槽/OnPutInInventory。",
+          "evidence_refs": [
+            "ITEM-INV-REMOVE",
+            "ITEM-CT-REMOVE",
+            "ITEM-CT-GIVE",
+            "ITEM-ON-PUT",
+            "ITEM-CT-EXCESS"
+          ]
+        }
+      ],
+      "unknowns": [
+        "自定义ondestack/兼容谓词及同步事件的改量/重入未运行。",
+        "原生Spawn/Remove及客户端堆量显示未实测，数量合法域由实际消费者供给。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ITEM-INV-GIVE",
+            "role": "服务端交付入口、旧槽/容器提示及递归剩余物处理",
+            "claim_ids": [
+              "EXP-ITEM-003-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-REMOVE",
+            "role": "拆单件、普通/活动/装备/外部容器移除",
+            "claim_ids": [
+              "EXP-ITEM-003-C05",
+              "EXP-ITEM-003-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-OWNER",
+            "role": "直接owner字段写入",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ON-PUT",
+            "role": "直接owner/父子/场景状态与回调",
+            "claim_ids": [
+              "EXP-ITEM-003-C04",
+              "EXP-ITEM-003-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-FROM-OWNER",
+            "role": "向直接owner委托移除及销毁清索引",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-CT-GIVE",
+            "role": "容器特殊溢出/并堆/落格/失败兜底",
+            "claim_ids": [
+              "EXP-ITEM-003-C05",
+              "EXP-ITEM-003-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-REMOVE",
+            "role": "readonly、拆堆/过堆、槽清空与OnRemoved",
+            "claim_ids": [
+              "EXP-ITEM-003-C05",
+              "EXP-ITEM-003-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-CT-EXCESS",
+            "role": "无限堆容器取出时分批处理多余物",
+            "claim_ids": [
+              "EXP-ITEM-003-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-STACK",
+            "role": "堆叠类型、拆合、回调与实体身份",
+            "claim_ids": [
+              "EXP-ITEM-003-C01",
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03",
+              "EXP-ITEM-003-C04",
+              "EXP-ITEM-003-C05",
+              "EXP-ITEM-003-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-STACK-REPLICA",
+            "role": "客户端皮肤兼容判断与服务端方法委托",
+            "claim_ids": [
+              "EXP-ITEM-003-C01"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-REMOVE",
+            "role": "全并堆删除源物的onremove和组件退出消费者",
+            "claim_ids": [
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-EVENT",
+            "role": "物品/槽位同步事件执行阶段",
+            "claim_ids": [
+              "EXP-ITEM-003-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-CHILD",
+            "role": "物品入袋/退出时Lua父子与原生parent接线",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ENTITY-SCENE",
+            "role": "物品入袋/退出时场景状态与enter/exitlimbo事件",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-DILUTE-WRAP",
+            "role": "堆叠湿度稀释委托",
+            "claim_ids": [
+              "EXP-ITEM-003-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-DILUTE-TEMP-WRAP",
+            "role": "堆叠温度稀释委托",
+            "claim_ids": [
+              "EXP-ITEM-003-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-DILUTE-PERISH",
+            "role": "目标堆数量更新前的腐烂稀释与perishchange",
+            "claim_ids": [
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-DILUTE-MOIST",
+            "role": "按旧目标数和实际加入数加权湿度",
+            "claim_ids": [
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-DILUTE-TEMP",
+            "role": "按旧目标数和实际加入数加权温度",
+            "claim_ids": [
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03"
+            ]
+          },
+          {
+            "ref": "ITEM-DILUTE-CHILL",
+            "role": "按实际加入数稀释chill的有界消费者",
+            "claim_ids": [
+              "EXP-ITEM-003-C02",
+              "EXP-ITEM-003-C03"
+            ]
+          }
+        ],
+        "unknowns": [
+          "依赖枚举到本卡声明的Lua调用边界，原生复制、物理、资产生成及回调业务留在Scope所列边界。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-ITEM-004",
+      "title": "装备替换、回调阶段与客户端活动物请求",
+      "engineering_question": "旧装备和余堆去哪里，同物再次Equip会怎样，客户端装备请求使用哪端的活动物？",
+      "aliases": [
+        "Inventory:Equip",
+        "Inventory:Unequip",
+        "EquipActionItem",
+        "EquipActiveItem",
+        "old_to_active",
+        "equipslots",
+        "onequipfn",
+        "onunequipfn"
+      ],
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "build": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_archive_static_lua",
+        "bounds": [
+          "服务端装备安装/卸载及实际物品归属路径，客户端限定EquipActiveItem入口。",
+          "护甲耐久、伤害分摊、特殊抗性、反伤和战斗数值由其他研究处理。"
+        ],
+        "increment_over_existing": "旧NC-N004-FINAL-04/05已有基础装备回调和owner次序。本条补旧物/余堆去向、同物再次Equip、捕获旧对象与后置写槽、以及客户端预测到服务器当前active的请求链。"
+      },
+      "claims": [
+        {
+          "id": "EXP-ITEM-004-C01",
+          "kind": "NSF",
+          "statement": "Equip先检查item/equippable/有效性、普通或读档限制及禁重物条件，再捕获槽名和olditem，旧物防卸下则早退。之后处理prevslot/prevcontainer、控制器交换提示、重物与手持物互斥，再按持有/地面堆叠路径移除或拆出本次物品。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-INV-GIVE",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C02",
+          "kind": "NSF",
+          "statement": "olditem与处理后的item不同时，Equip先安排leftovers，再Unequip旧物、ToPocket旧物，并按不可入袋/old_to_active/普通GiveItem选择旧物去向。随后新物OnPutInInventory、Equippable:Equip，再写equipslots，更新overflow/重物/手持标志，发布equip后更新setbonus并返回true。old_to_active还影响onequipfn的from_ground参数。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-DROP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C03",
+          "kind": "NSF",
+          "statement": "Unequip在防卸条件未阻挡时，先Equippable:Unequip，再清槽并发布unequip、更新setbonus，返回原物；空槽仍写nil并发含item=nil的unequip。Equippable先改isequipped再运行各owner回调/物品equipped或unequipped事件，Equip还可在equipped事件之后调用equipmentmodel回调。",
+          "evidence_refs": [
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C04",
+          "kind": "EI",
+          "statement": "在正常单件、可卸下、当前已经装备于本Inventory且回调未改引用的条件下，再次Equip同一实体会先经RemoveFromOwner/RemoveItem强制Unequip并OnRemoved，随后olditem==item使主体安装分支跳过，最终nil返回。EquipActionItem调用者显式检查IsEquipped再决定是否Equip。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-EQUIP-ENTRY"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C05",
+          "kind": "EI",
+          "statement": "Equip缓存olditem早于持有移除和各退出/入袋回调，新物装备回调早于最终写槽。回调正常返回且改动同一槽时，外层后续仍依照其局部olditem与item继续执行，最终equipslots[eslot]=item没有独立身份比较。可观察阶段应按当前回调点读取，旧owner退出与新owner安装的基本顺序沿用已有事实。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-ENTITY-EVENT"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C06",
+          "kind": "NSF",
+          "statement": "客户端inventory replica的EquipActiveItem有组件时交组件，否则交classified。classified先以SlotEquip保存当前活动物、PushNewActiveItem/PushEquip更新本地预览并发equip事件，然后发送无物品参数的EquipActiveItem RPC。服务器RPC读取当前inventory，EquipActiveItem重新读取服务器active，仅在可装备且目标槽空时Equip(active,true,slot)。",
+          "evidence_refs": [
+            "ITEM-INV-REPLICA-EQUIP",
+            "ITEM-INV-CLIENT-EQUIP",
+            "ITEM-INV-CLIENT-BUSY",
+            "ITEM-INV-CLIENT-PREVIEW",
+            "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+            "ITEM-RPC-EQUIP",
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-INV-EQUIP",
+            "ITEM-RPC-SEND"
+          ]
+        },
+        {
+          "id": "EXP-ITEM-004-C07",
+          "kind": "NSF",
+          "statement": "EquipActionItem给定item时要求其inventoryitem:GetGrandOwner()==玩家，自取active路径另行处理。HANDS可装备物且未装备时，多件非equipstack先Get(stacksize-1)并GiveItem剩余，再Equip原保留物，若该物仍为active则SetActiveItem(nil)。普通EQUIP动作直接转Inventory:Equip，UNEQUIP动作则走GiveItem或DropItem并在调用正常返回后true。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-FROM-OWNER",
+            "ITEM-STACK",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-ACTION-EQUIP",
+            "ITEM-INV-DROP"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Inventory:Equip",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item为有效equippable/inventoryitem实体。",
+            "old_to_active决定旧物/剩余物去active的分支，也参与from_ground。",
+            "no_animation写入最终equip事件。",
+            "force_ui_anim为旧物/剩余物GiveItem选择src_pos。"
+          ],
+          "returns": "主体安装完成true，guard拒绝或olditem==处理后item路径nil。",
+          "preconditions": "服务端Inventory及物品owner/限制/拆堆相关组件就绪。",
+          "side_effects": [
+            "可先脱离原owner、卸旧装备、拆堆、归还/掉落旧物、回调并最终写新槽。"
+          ],
+          "lifecycle": {
+            "sequence": "入口限制→捕获旧槽→旧位提示/重物互斥→取本次item→剩余与旧物去向→新物owner/装备回调→写槽和equip。",
+            "cleanup": "Unequip只处理装备成员，旧物的入袋/活动/掉落由后续分支处理。",
+            "errors": "回调/Spawn/关联移除异常向外传播并中断后续步骤。相关调用正常返回时，外层才继续使用局部olditem/item并执行后置槽写入。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-FROM-OWNER",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ON-PUT",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ACTIVE",
+            "ITEM-INV-DROP",
+            "ITEM-STACK",
+            "ITEM-INV-POCKET-QUERY",
+            "ITEM-INV-QUERY",
+            "ITEM-INV-SLOT-QUERY",
+            "ITEM-INV-RETURN-ACTIVE",
+            "ITEM-ENTITY-CHILD",
+            "ITEM-ENTITY-SCENE"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:Unequip",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "equipslot为槽键。",
+            "slip写进unequip事件。",
+            "force真绕过ShouldPreventUnequipping。"
+          ],
+          "returns": "防卸早退nil，其他路径返回原item或空槽nil。",
+          "preconditions": "服务端Inventory，对应物品equippable/setbonus方法可用。",
+          "side_effects": [
+            "改isequipped、运行退出回调、清槽和重物/手持标志，发unequip并更新setbonus。"
+          ],
+          "lifecycle": {
+            "sequence": "取旧物→防卸→物品退出→清槽→owner事件→setbonus。",
+            "cleanup": "直接owner由后续OnRemoved或其他移交方法处理。",
+            "errors": "回调错误发生在清槽前，后续事件和setbonus可能尚未运行。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-UNEQUIP",
+            "ITEM-EQUIPPABLE",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-ON-PUT"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:EquipActionItem",
+          "source_file": "scripts/components/inventory.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [
+            "item可nil，nil时从当前active读取；给定实体需GrandOwner为self.inst。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": "服务端Inventory，item/replica相关结构可用且为HANDS装备候选。",
+          "side_effects": [
+            "可拆出原堆的大部分交GiveItem、装备保留物，再清active指针。"
+          ],
+          "lifecycle": {
+            "sequence": "当前物/外部传物归属→HANDS/equipped检查→拆出余堆→Equip→按身份清active。",
+            "cleanup": "余堆交库存正常处理，装备物按Equip生命周期退出。",
+            "errors": "拆堆/GiveItem/Equip回调错误向外传播。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-FROM-OWNER",
+            "ITEM-STACK",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        },
+        {
+          "symbol": "Inventory:EquipActiveItem",
+          "source_file": "scripts/components/inventory_replica.lua",
+          "visibility": "Lua组件/replica实例方法，端别和接收者以source_file及前提为准",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": "实际接收者为inventory replica，有服务端组件或客户端classified。",
+          "side_effects": [
+            "服务端交组件，客户端可先更新预览与本地equip事件，再发无物品实参的RPC。"
+          ],
+          "lifecycle": {
+            "sequence": "replica分流→classified活动物预览→RPC→服务器重读active/空槽→Equip。",
+            "cleanup": "预览刷新与服务器成员变化各由其当前数据路径处理。",
+            "errors": "缺组件且无classified时无操作，classified结构/回调错误可传播。"
+          },
+          "evidence_refs": [
+            "ITEM-INV-REPLICA-EQUIP",
+            "ITEM-INV-CLIENT-EQUIP",
+            "ITEM-INV-CLIENT-BUSY",
+            "ITEM-INV-CLIENT-PREVIEW",
+            "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+            "ITEM-RPC-EQUIP",
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-INV-EQUIP",
+            "ITEM-RPC-SEND"
+          ],
+          "unknowns": [
+            "本卡为冻结Lua静态合同，具体mod回调与实际引擎/联网结果待按用例验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "实际动作或客户端装备请求进入当前服务器Inventory入口，检查物品限制和持有关系。",
+          "evidence_refs": [
+            "ITEM-ACTION-EQUIP",
+            "ITEM-INV-REPLICA-EQUIP",
+            "ITEM-INV-CLIENT-EQUIP",
+            "ITEM-RPC-EQUIP",
+            "ITEM-INV-EQUIP-ENTRY",
+            "ITEM-EQUIP-RESTRICT",
+            "ITEM-FROM-OWNER"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "装备入口处理拆堆/重物/旧位，卸旧物并安排旧物与余堆去向。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-INV-REMOVE",
+            "ITEM-INV-DROP",
+            "ITEM-INV-GIVE",
+            "ITEM-INV-ACTIVE",
+            "ITEM-STACK"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "新物OnPut及装备回调后写槽、发布equip，后续卸下先物品回调再清槽。",
+          "evidence_refs": [
+            "ITEM-INV-EQUIP",
+            "ITEM-INV-UNEQUIP",
+            "ITEM-ON-PUT",
+            "ITEM-EQUIPPABLE",
+            "ITEM-ENTITY-EVENT"
+          ]
+        }
+      ],
+      "unknowns": [
+        "原生库存复制和实际客户端预览/刷新时序未实测，ProxyItem/QueueRefresh内部未完整研究。",
+        "setbonus、equipmentmodel及具体装备回调只到调用边界，护甲计算另有独立范围。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "ITEM-INV-GIVE",
+            "role": "服务端交付入口、旧槽/容器提示及递归剩余物处理",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-REMOVE",
+            "role": "拆单件、普通/活动/装备/外部容器移除",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-DROP",
+            "role": "直接owner移除、落点和dropitem消费者",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-ACTIVE",
+            "role": "活动物接收与OnPickup/OnPut回调",
+            "claim_ids": [
+              "EXP-ITEM-004-C02"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-EQUIP",
+            "role": "新旧装备、重物、拆堆与替换去向",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C05",
+              "EXP-ITEM-004-C06",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-UNEQUIP",
+            "role": "装备退出、active指针写入与事件",
+            "claim_ids": [
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C03",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C05",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-EQUIP-ENTRY",
+            "role": "实际装备格命令到Equip的调用者",
+            "claim_ids": [
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C06",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-QUERY",
+            "role": "活动物与装备对象身份查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-POCKET-QUERY",
+            "role": "普通口袋成员位置查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-SLOT-QUERY",
+            "role": "装备/普通格当前对象查询",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-INV-RETURN-ACTIVE",
+            "role": "GiveActiveItem接收前处理原active的消费者",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ON-PUT",
+            "role": "直接owner/父子/场景状态与回调",
+            "claim_ids": [
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-FROM-OWNER",
+            "role": "向直接owner委托移除及销毁清索引",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-STACK",
+            "role": "堆叠类型、拆合、回调与实体身份",
+            "claim_ids": [
+              "EXP-ITEM-004-C01",
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-EQUIPPABLE",
+            "role": "装备标志和业务/物品事件回调",
+            "claim_ids": [
+              "EXP-ITEM-004-C02",
+              "EXP-ITEM-004-C03",
+              "EXP-ITEM-004-C04",
+              "EXP-ITEM-004-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-EQUIP-RESTRICT",
+            "role": "角色/归属/读档限制和防卸标记",
+            "claim_ids": [
+              "EXP-ITEM-004-C01"
+            ]
+          },
+          {
+            "ref": "ITEM-RPC-SEND",
+            "role": "客户端到原生发送边界",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-REPLICA-EQUIP",
+            "role": "客户端装备入口分流",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-CLIENT-EQUIP",
+            "role": "客户端先预演活动物/装备再发送RPC",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-CLIENT-BUSY",
+            "role": "客户端背包busy/parent门禁",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-CLIENT-PREVIEW",
+            "role": "客户端活动物预测指针及事件",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+            "role": "客户端装备预测表与本地equip事件",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-RPC-EQUIP",
+            "role": "请求到服务器当前活动物/持有物装备消费者",
+            "claim_ids": [
+              "EXP-ITEM-004-C06"
+            ]
+          },
+          {
+            "ref": "ITEM-ACTION-EQUIP",
+            "role": "普通动作对装备及Give/Drop的调用者",
+            "claim_ids": [
+              "EXP-ITEM-004-C07"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-EVENT",
+            "role": "物品/槽位同步事件执行阶段",
+            "claim_ids": [
+              "EXP-ITEM-004-C05"
+            ]
+          },
+          {
+            "ref": "ITEM-ENTITY-CHILD",
+            "role": "物品入袋/退出时Lua父子与原生parent接线",
+            "claim_ids": []
+          },
+          {
+            "ref": "ITEM-ENTITY-SCENE",
+            "role": "物品入袋/退出时场景状态与enter/exitlimbo事件",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "依赖枚举到本卡声明的Lua调用边界，原生复制、物理、资产生成及回调业务留在Scope所列边界。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "ITEM-INV-GIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1029,
+      "line_end": 1217,
+      "range_sha256": "c0507018eafa5b7ff608dff6e9ce9ade64ddae2444dcad6f766a0c5434452d36",
+      "symbols": [
+        "Inventory:GiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-ADMIT",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 231,
+      "line_end": 252,
+      "range_sha256": "a99ac91d114673df73b53b24de1d031f31f999914cfa536a4f72edba8d8ac2fa",
+      "symbols": [
+        "Inventory:CanTakeItemInSlot"
+      ]
+    },
+    {
+      "id": "ITEM-INV-SELECT",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 801,
+      "line_end": 909,
+      "range_sha256": "be6b0f948f55749910b96b2e509eb75495ab9f11df971cca573c0335e3992ddd",
+      "symbols": [
+        "ValidateItemForOverflow",
+        "Inventory:GetNextAvailableSlot"
+      ]
+    },
+    {
+      "id": "ITEM-INV-SPECIAL",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1459,
+      "line_end": 1494,
+      "range_sha256": "b66e7d45c339f0ac940e7a22e4564c28f00c4106e7dc8951475ad29a4b5818d2",
+      "symbols": [
+        "Inventory:GetOverflowContainer",
+        "ValidateSpecializedContainer",
+        "Inventory:GetSpecializedContainers"
+      ]
+    },
+    {
+      "id": "ITEM-INV-REMOVE",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1454,
+      "range_sha256": "bb0484fc26f6775af0147e3eb1b0cb2ddb8d801189aab319cbb1e3d290872dee",
+      "symbols": [
+        "Inventory:RemoveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-DROP",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 713,
+      "line_end": 753,
+      "range_sha256": "e6f5d31d453e015ee6dd1085b74b085a9a7ed2d926c7c3227ee7dfdf0d34fd9e",
+      "symbols": [
+        "Inventory:RemoveItemBySlot",
+        "Inventory:DropItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-ACTIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1012,
+      "line_end": 1027,
+      "range_sha256": "236cdc0cd9638b284d12ba5380d39cf044c47a970b1c89ec5cf2996734a3c0fd",
+      "symbols": [
+        "Inventory:GiveActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-EQUIP",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1266,
+      "line_end": 1388,
+      "range_sha256": "218b833a9101549d6e66b75cb172e02c601fed7184dfaa2c974275ded60eb292",
+      "symbols": [
+        "Inventory:Equip"
+      ]
+    },
+    {
+      "id": "ITEM-INV-UNEQUIP",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1219,
+      "line_end": 1264,
+      "range_sha256": "70688ac3916403c668eb5f0cc703f94cddfdb09a574ca2d94b60302fee8f024c",
+      "symbols": [
+        "Inventory:Unequip",
+        "Inventory:SetActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-EQUIP-ENTRY",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 2452,
+      "line_end": 2494,
+      "range_sha256": "413402eb493d9de561ca2197c9b67e442d0e1b7b572367349ba2727983769ec7",
+      "symbols": [
+        "Inventory:EquipActiveItem",
+        "Inventory:EquipActionItem",
+        "Inventory:SwapEquipWithActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-OPEN",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 2015,
+      "line_end": 2017,
+      "range_sha256": "ca6a4de78b61cc8994d18bf49bbc1ca61a79b54f66ed696aca58b55fb7465a70",
+      "symbols": [
+        "Inventory:IsOpenedBy"
+      ]
+    },
+    {
+      "id": "ITEM-INV-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 502,
+      "line_end": 512,
+      "range_sha256": "f1397436cda71e29156a204202ae11298b389c0c9b4e8ac277e6f6e51d867cf1",
+      "symbols": [
+        "Inventory:GetActiveItem",
+        "Inventory:IsItemEquipped"
+      ]
+    },
+    {
+      "id": "ITEM-INV-POCKET-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 592,
+      "line_end": 598,
+      "range_sha256": "b91f3be062dbff16f8e298f708b113f39f40e739cbc75af6969ab98dfab7bc66",
+      "symbols": [
+        "Inventory:GetItemSlot"
+      ]
+    },
+    {
+      "id": "ITEM-INV-SLOT-QUERY",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 773,
+      "line_end": 779,
+      "range_sha256": "bd2301f552a3baa61d5b4c01d1b2f39902124e1f78cccfcf1afc62ad872ad51e",
+      "symbols": [
+        "Inventory:GetEquippedItem",
+        "Inventory:GetItemInSlot"
+      ]
+    },
+    {
+      "id": "ITEM-INV-RETURN-ACTIVE",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 570,
+      "line_end": 586,
+      "range_sha256": "c635ecf53da90389d7fbd0f4163e8bed2011372dfdbd6a6b8b7d4edae70c9289",
+      "symbols": [
+        "Inventory:ReturnActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-OWNER",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 285,
+      "line_end": 291,
+      "range_sha256": "52e080e70168191a05359fe7c983b70423e9215c9316f900f92dc6ca30313f92",
+      "symbols": [
+        "InventoryItem:SetOwner",
+        "InventoryItem:ClearOwner"
+      ]
+    },
+    {
+      "id": "ITEM-ON-PUT",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 319,
+      "line_end": 376,
+      "range_sha256": "5b0ba63e6b08b0a5c4df9dfe279bb7138f50704e67811a6fc8324b5d7c047a47",
+      "symbols": [
+        "InventoryItem:GetSlotNum",
+        "InventoryItem:OnPutInInventory",
+        "InventoryItem:OnRemoved"
+      ]
+    },
+    {
+      "id": "ITEM-ON-DROP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 378,
+      "line_end": 434,
+      "range_sha256": "5e8e6980fc04e907a2093765afb2cc77de47e2f057f781f34163915060cdcb00",
+      "symbols": [
+        "InventoryItem:OnDropped",
+        "InventoryItem:DoDropPhysics"
+      ]
+    },
+    {
+      "id": "ITEM-ON-PICKUP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 436,
+      "line_end": 468,
+      "range_sha256": "a5ea162dd00a106a54e1dfe234f34bfebf19c88243777c35c954526f6ea4af5a",
+      "symbols": [
+        "InventoryItem:OnPickupStopSmoldering",
+        "InventoryItem:OnPickup",
+        "InventoryItem:IsHeld"
+      ]
+    },
+    {
+      "id": "ITEM-FROM-OWNER",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 475,
+      "line_end": 506,
+      "range_sha256": "7c11f4c3d8183d0fc27eab00c93fd427f260c792561c53e4439e4d06b05e2b48",
+      "symbols": [
+        "InventoryItem:RemoveFromOwner",
+        "InventoryItem:OnRemoveEntity",
+        "InventoryItem:GetGrandOwner"
+      ]
+    },
+    {
+      "id": "ITEM-CT-GIVE",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 447,
+      "line_end": 567,
+      "range_sha256": "b9f5773cfa835932b0eaf4b488a2b7b8031585be266a1ea03ec3d62fb8d407c4",
+      "symbols": [
+        "Container:GiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-CT-ADMIT",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 269,
+      "line_end": 305,
+      "range_sha256": "3802cc4c8d97f22b6794610b6aa893bde2ccc48de3406c2492af2156a0b0dd93",
+      "symbols": [
+        "Container:CanTakeItemInSlot",
+        "Container:GetSpecificSlotForItem"
+      ]
+    },
+    {
+      "id": "ITEM-CT-PRIORITY",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 308,
+      "line_end": 324,
+      "range_sha256": "cef68899ac62fe69b7c768cdba8b27643dd6b1ebc9c5f6ee7b3dcf91ac12a1e0",
+      "symbols": [
+        "Container:ShouldPrioritizeContainer",
+        "Container:AcceptsStacks"
+      ]
+    },
+    {
+      "id": "ITEM-CT-SPECIAL",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 789,
+      "line_end": 814,
+      "range_sha256": "1ce5a7247841119f9f433c62e0bb09d431d29d1c23d9ffd52677ab0cd2e4183e",
+      "symbols": [
+        "ValidateSpecializedContainer",
+        "Container:GetSpecializedContainers"
+      ]
+    },
+    {
+      "id": "ITEM-CT-OVERFLOW",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 367,
+      "line_end": 374,
+      "range_sha256": "e9f4cd29de12ff99824cde9fc69d62ea687cfed5f503cbe8f0ea3155d972e203",
+      "symbols": [
+        "ValidateItemForOverflow"
+      ]
+    },
+    {
+      "id": "ITEM-CT-REMOVE",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 1009,
+      "line_end": 1053,
+      "range_sha256": "a5e5990ff7fac212418ec8ed03d1d4882d2ead38a6ce1d547fb2978781b876bd",
+      "symbols": [
+        "Container:RemoveItem",
+        "Container:RemoveItem_Internal"
+      ]
+    },
+    {
+      "id": "ITEM-CT-SLOT",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 569,
+      "line_end": 604,
+      "range_sha256": "eab35cca8f7e7e67f2a680db84e8b3a7d6f40df395c990976fe82337f0d5739a",
+      "symbols": [
+        "Container:RemoveItemBySlot",
+        "Container:GetNumSlots",
+        "Container:GetItemInSlot",
+        "Container:GetItemSlot"
+      ]
+    },
+    {
+      "id": "ITEM-CT-EXCESS",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 228,
+      "line_end": 244,
+      "range_sha256": "079687179a00df4c4212349f6e15fce53d08987aea672cdacb58679610d34d5d",
+      "symbols": [
+        "Container:DropOverstackedExcess"
+      ]
+    },
+    {
+      "id": "ITEM-CT-MOVE",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 1332,
+      "line_end": 1410,
+      "range_sha256": "0844ca1468879ac6189d201ed831b4998ea4ef66aba8fb0a195f543a3e777288",
+      "symbols": [
+        "Container:MoveItemFromAllOfSlot"
+      ]
+    },
+    {
+      "id": "ITEM-CT-OPEN",
+      "source_file": "scripts/components/container.lua",
+      "file_sha256": "f593c100098c116c00a627dde34a97f76b1ecfa87240d16943e1260411ceb961",
+      "line_start": 727,
+      "line_end": 729,
+      "range_sha256": "8b4949762267d44ab0cca9e6bdf1bfdda2161687df0eff1974e6003ab42589d5",
+      "symbols": [
+        "Container:IsOpenedBy"
+      ]
+    },
+    {
+      "id": "ITEM-STACK",
+      "source_file": "scripts/components/stackable.lua",
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "line_start": 1,
+      "line_end": 204,
+      "range_sha256": "ffad7ad8ea08225a755f0961e258505201e5f896f4100cb1b9fe1cf61b1bd958",
+      "symbols": [
+        "Stackable constructor",
+        "Stackable:CanStackWith",
+        "Stackable:Get",
+        "Stackable:Put",
+        "Stackable:SetStackSize",
+        "Stackable:SetIgnoreMaxSize"
+      ]
+    },
+    {
+      "id": "ITEM-STACK-REPLICA",
+      "source_file": "scripts/components/stackable_replica.lua",
+      "file_sha256": "6ad4c63c07955aa4be30d3d144705fbf12915a6842981b1e66e8f666349ccfa5",
+      "line_start": 130,
+      "line_end": 150,
+      "range_sha256": "825a970a917e41f771e2397e0eda59b0b9981a699d8deb2f1a150d39fc9057a2",
+      "symbols": [
+        "Stackable:CanStackWith replica"
+      ]
+    },
+    {
+      "id": "ITEM-EQUIPPABLE",
+      "source_file": "scripts/components/equippable.lua",
+      "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "line_start": 68,
+      "line_end": 123,
+      "range_sha256": "0e7109993d22e0769fb163c8a7a82046e176fa7ff3244414fbf18211fa9cc687",
+      "symbols": [
+        "Equippable:Equip",
+        "Equippable:Unequip",
+        "Equippable:ToPocket"
+      ]
+    },
+    {
+      "id": "ITEM-EQUIP-RESTRICT",
+      "source_file": "scripts/components/equippable.lua",
+      "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "line_start": 147,
+      "line_end": 194,
+      "range_sha256": "da8c28d6a5ac7635640372b91e444c345767f81bcd26f4a15c4eeb2c22656d57",
+      "symbols": [
+        "Equippable:IsRestricted",
+        "Equippable:IsRestricted_FromLoad",
+        "Equippable:ShouldPreventUnequipping"
+      ]
+    },
+    {
+      "id": "ITEM-CT-REPLICA",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 340,
+      "line_end": 384,
+      "range_sha256": "19545d4606a3a1793f4ba45c361220d6166cbbb3ef2a9766b4deaa59446ec3e1",
+      "symbols": [
+        "Container:CanTakeItemInSlot replica",
+        "Container:GetSpecificSlotForItem replica"
+      ]
+    },
+    {
+      "id": "ITEM-CT-REPLICA-MOVE",
+      "source_file": "scripts/components/container_replica.lua",
+      "file_sha256": "ac79c455c222644b0200480f3194f711e317963a219ca52c4b9fb7e2533cba91",
+      "line_start": 621,
+      "line_end": 627,
+      "range_sha256": "0ac5427a53502d922d047266d5d082bc17dd66931259074e06fa92b889e347c1",
+      "symbols": [
+        "Container:MoveItemFromAllOfSlot replica"
+      ]
+    },
+    {
+      "id": "ITEM-CT-CLIENT",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 732,
+      "line_end": 789,
+      "range_sha256": "21c23ab8e3af949e1b3ecc6c1f966ebce5b5f109bd9dac54a92ceef1a1c42abd",
+      "symbols": [
+        "MoveItemFromAllOfSlot"
+      ]
+    },
+    {
+      "id": "ITEM-CT-BUSY",
+      "source_file": "scripts/prefabs/container_classified.lua",
+      "file_sha256": "f7f9e1f70e8f579b6cd718e0865d903775929fc982ffb99f33f4bfc0c251844c",
+      "line_start": 78,
+      "line_end": 80,
+      "range_sha256": "552f930ddb43bf00b0efa3a6f1291b6d2f523926707aa2b0871cc4880dbc29c4",
+      "symbols": [
+        "IsBusy"
+      ]
+    },
+    {
+      "id": "ITEM-RPC-MOVE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 897,
+      "line_end": 908,
+      "range_sha256": "d6ca9c15c8f21d8fa008d75cdb77c0c22ab7fc44a449fe61d35ab4f19a35fe3d",
+      "symbols": [
+        "RPC_HANDLERS.MoveItemFromAllOfSlot"
+      ]
+    },
+    {
+      "id": "ITEM-RPC-SHAPE",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 4,
+      "line_end": 13,
+      "range_sha256": "e6da3166f08db53c6efd787f881ce684fdb5bbdf39f5924f40df28b13b98c643",
+      "symbols": [
+        "checkuint",
+        "checkentity",
+        "optentity"
+      ]
+    },
+    {
+      "id": "ITEM-RPC-SEND",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 1640,
+      "line_end": 1643,
+      "range_sha256": "a42275ab1fc6e693f4cf5bf15adb407b718d5f70637933cc5389d763516b467a",
+      "symbols": [
+        "SendRPCToServer"
+      ]
+    },
+    {
+      "id": "ITEM-INV-REPLICA-EQUIP",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "line_start": 552,
+      "line_end": 574,
+      "range_sha256": "10431f0a71d8b9ed33dd20463059f80c1750cfa401832aa0aec7efef9eb680be",
+      "symbols": [
+        "Inventory:EquipActiveItem replica",
+        "Inventory:EquipActionItem replica",
+        "Inventory:SwapEquipWithActiveItem replica"
+      ]
+    },
+    {
+      "id": "ITEM-INV-CLIENT-EQUIP",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 1035,
+      "line_end": 1042,
+      "range_sha256": "0270c70a0c471ce43c2ee0f060254168aa199924a63dce6174860552df0915e2",
+      "symbols": [
+        "EquipActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-CLIENT-BUSY",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 89,
+      "line_end": 91,
+      "range_sha256": "552f930ddb43bf00b0efa3a6f1291b6d2f523926707aa2b0871cc4880dbc29c4",
+      "symbols": [
+        "IsBusy"
+      ]
+    },
+    {
+      "id": "ITEM-INV-CLIENT-PREVIEW",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 606,
+      "line_end": 621,
+      "range_sha256": "ab39f7eb63e588ecccdebdae1142badf47f27ca0ae5c740aaf47c5d94593aa7e",
+      "symbols": [
+        "SlotEquip",
+        "PushNewActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-INV-CLIENT-PREVIEW-EQUIP",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 658,
+      "line_end": 669,
+      "range_sha256": "1e92b04f97c2b67408fb24efb675e683fed65f21f60663745e98b342790a0b66",
+      "symbols": [
+        "PushEquip"
+      ]
+    },
+    {
+      "id": "ITEM-RPC-EQUIP",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 824,
+      "line_end": 847,
+      "range_sha256": "0d24c69b43aa8ef39af35f21f58cc2d16a1683ef842200d05f06e09434700746",
+      "symbols": [
+        "RPC_HANDLERS.EquipActiveItem",
+        "RPC_HANDLERS.EquipActionItem",
+        "RPC_HANDLERS.SwapEquipWithActiveItem"
+      ]
+    },
+    {
+      "id": "ITEM-ACTION-EQUIP",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 858,
+      "line_end": 885,
+      "range_sha256": "6aab49d3cd58dd910d44574970d8a5f6ed641088778ca1a92c34bda2a343ea3b",
+      "symbols": [
+        "ACTIONS.EQUIP.fn",
+        "ACTIONS.UNEQUIP.fn"
+      ]
+    },
+    {
+      "id": "ITEM-ACTION-DROP",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1168,
+      "line_end": 1189,
+      "range_sha256": "2b4ed323af1909efee785cd92f2a23c3a703d59b062054263440c9777daf63f6",
+      "symbols": [
+        "ACTIONS.DROP.fn"
+      ]
+    },
+    {
+      "id": "ITEM-PICK-DELIVERY",
+      "source_file": "scripts/components/pickable.lua",
+      "file_sha256": "59e58f8edfd10b9742aa85b2d722ee8f30854174eea7f7d7f73f4d9ee9449902",
+      "line_start": 493,
+      "line_end": 518,
+      "range_sha256": "f5f371343c3a7f51705c6cf8ac879ae2472417fee697f636e7cc89a0b064c48d",
+      "symbols": [
+        "Pickable:SpawnProductLoot ordinary product branch"
+      ]
+    },
+    {
+      "id": "ITEM-ENTITY-REMOVE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "ITEM-ENTITY-EVENT",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "ITEM-ENTITY-CHILD",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 935,
+      "range_sha256": "a7c13cd2083fc0213528d405192cbdd1e89629a68884852a523c0d02cdab1731",
+      "symbols": [
+        "EntityScript:RemoveChild",
+        "EntityScript:AddChild"
+      ]
+    },
+    {
+      "id": "ITEM-ENTITY-SCENE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 348,
+      "line_end": 413,
+      "range_sha256": "34e8cc5f9e28d226db2966e2e5c360fc6ce588293857afdcb9dc7bc9acbdd979",
+      "symbols": [
+        "EntityScript:RemoveFromScene",
+        "EntityScript:ReturnToScene"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-WRAP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 166,
+      "line_end": 170,
+      "range_sha256": "bfb219d43d2ef972dfdc4ac2a12f16c0402022c7ef76f2037005ab766a9bbfe7",
+      "symbols": [
+        "InventoryItem:DiluteMoisture"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-TEMP-WRAP",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 254,
+      "line_end": 258,
+      "range_sha256": "3ec918522c4433fd52677438a27f7e2fe540c41a39c741a9251053d4e2fc6d89",
+      "symbols": [
+        "InventoryItem:DiluteTemperature"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-PERISH",
+      "source_file": "scripts/components/perishable.lua",
+      "file_sha256": "e279626c62b0ce5b8071f4b40889731f0e47eccc2f13d62ab0d857d306029116",
+      "line_start": 168,
+      "line_end": 178,
+      "range_sha256": "e73daee1fe084383c67d1dfc60d9a5be91f7496f2e12b5442dc9f3d5d1f89662",
+      "symbols": [
+        "Perishable:Dilute"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-MOIST",
+      "source_file": "scripts/components/inventoryitemmoisture.lua",
+      "file_sha256": "ecf88c1d8240dff1dc12bf55a0422202b763c72e4d9fc437c6aa729d425b7182",
+      "line_start": 126,
+      "line_end": 131,
+      "range_sha256": "c64efbe99e450b71a2f5be699e8653fffbdc29cbbd1be726d7270525f1123454",
+      "symbols": [
+        "InventoryItemMoisture:DiluteMoisture"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-TEMP",
+      "source_file": "scripts/components/inventoryitemtemperature.lua",
+      "file_sha256": "c470c1adff1a3290887db53866523ac6b71407ca9d1d1360352a59ac0545e9b2",
+      "line_start": 113,
+      "line_end": 118,
+      "range_sha256": "c1392944b498d942ca858a658f3cc254b3f5cc7916ca2d07e8cc8088481adf3a",
+      "symbols": [
+        "InventoryItemTemperature:DiluteTemperature"
+      ]
+    },
+    {
+      "id": "ITEM-DILUTE-CHILL",
+      "source_file": "scripts/components/edible.lua",
+      "file_sha256": "37e8a6ef067cbd35cbd131eca55d4e9bfe962778f9cee06f3316d34ea6d07aa6",
+      "line_start": 244,
+      "line_end": 249,
+      "range_sha256": "800c53773f66b4b37cc31a596b1319f863affd8edf4d3536dc567e8c4c2e9cf6",
+      "symbols": [
+        "Edible:DiluteChill"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "GiveItem返回false或slot时物品可能在哪，prevcontainer怎样返还？",
+      "expected_entry_ids": [
+        "EXP-ITEM-001"
+      ],
+      "purpose": "完整交付分支及返回值"
+    },
+    {
+      "query": "Container:CanTakeItemInSlot通过后GiveItem一定占到指定格吗？",
+      "expected_entry_ids": [
+        "EXP-ITEM-002"
+      ],
+      "purpose": "准入/占位/部分接收"
+    },
+    {
+      "query": "Container整格转移从客户端到服务器怎样检查开放并返还剩余？",
+      "expected_entry_ids": [
+        "EXP-ITEM-002"
+      ],
+      "purpose": "实际replica/classified/RPC消费者"
+    },
+    {
+      "query": "Stackable:Put返回nil可能没合堆吗，回调看到哪个数量？",
+      "expected_entry_ids": [
+        "EXP-ITEM-003"
+      ],
+      "purpose": "兼容早退和源/目标事件顺序"
+    },
+    {
+      "query": "Stackable:Get返回新物后owner和槽位怎样接线？",
+      "expected_entry_ids": [
+        "EXP-ITEM-001",
+        "EXP-ITEM-002",
+        "EXP-ITEM-003"
+      ],
+      "purpose": "拆件消费者"
+    },
+    {
+      "query": "再次Equip同一件已装备物会怎样，旧物去active还是背包？",
+      "expected_entry_ids": [
+        "EXP-ITEM-004"
+      ],
+      "purpose": "装备替换具体分支"
+    },
+    {
+      "query": "客户端装备活动物的本地equip事件与服务器重读active有什么关系？",
+      "expected_entry_ids": [
+        "EXP-ITEM-004"
+      ],
+      "purpose": "双端当前对象边界"
+    }
+  ],
+  "limitations": [
+    "来源为授权原包762172/build26474873，文件哈希取原始成员bytes，范围哈希取UTF-8 decode/splitlines闭区间LF连接且无尾换行。",
+    "本轮仅静态研究，runtime_verified=false，research/restricted/hold。独立审阅和登记由主控处理。",
+    "基线247条已按目录指针扫描，旧记录来源身份、Scope、原始事实及HOLD按原值保留，重合事实在dedup.json逐原子映射。",
+    "原生复制/物理/资产生成、实际客户端表现和具体mod回调需按项目场景核验，本文覆盖所列Lua调用边界。"
+  ]
+}

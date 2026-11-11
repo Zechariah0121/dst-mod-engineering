@@ -1,0 +1,2232 @@
+{
+  "schema_version": "dst-independent-mechanism-review/1",
+  "topic": "crafting_work",
+  "candidate_sha256": "c262f04f7209c2eaee3c1ad6a7a0cd6aa624f5b1948bc91bc89c4e630c42ef5f",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "runtime_verified": false,
+  "verdict": "PASS_STATIC_RESEARCH",
+  "review_scope": "首轮已独立核对全部26 claims、20 API合同、52来源范围及相关调用者。本次仅复核10个新增接线ref、claim/API/步骤/依赖挂接、原事实不变与数据合同/哈希，沿用未变部分的首轮语义结论。",
+  "summary": "三组具名消费者接线补证全部完成。四条机制、26条claims、20个API合同通过限定来源版本下的独立静态研究审核，保持research/restricted/hold及runtime_verified=false。",
+  "blockers": [],
+  "source_integrity": {
+    "candidate_snapshot_exact": true,
+    "archive_exact": true,
+    "candidate_source_references_checked": 62,
+    "member_file_hashes_exact": 62,
+    "line_range_hashes_exact": 62,
+    "range_hash_convention": "UTF-8 decode, splitlines, LF join, no trailing newline",
+    "mechanism_contract_valid": true,
+    "local_absolute_path_leak": false,
+    "meaning": "这些机械结果仅核对来源承诺，语义结论由逐项定义/调用者审阅形成。"
+  },
+  "entries": [
+    {
+      "entry_id": "EXP-CRAFT-001",
+      "conclusion": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "claim_id": "EXP-CRAFT-001-C01",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "HasIngredients字符串解析/freebuild/有限次数/三类材料门槛与GetIngredients仅正amount计划分别成立。普通查询最少1与选择计划跳过非正amount可直接对照。",
+          "source_locations": [
+            {
+              "id": "CW-S01",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 475,
+              "line_end": 517
+            },
+            {
+              "id": "CW-S03",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 593,
+              "line_end": 627
+            },
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            },
+            {
+              "id": "CW-S10",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1507,
+              "line_end": 1549
+            },
+            {
+              "id": "CW-S11",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1697,
+              "line_end": 1754
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-001-C02",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "health/sanity先ceil且分别严格大于/允许相等，MAX成本返回1-penalty。科技查询剥_material后取等级，消费函数没有科技扣减循环。",
+          "source_locations": [
+            {
+              "id": "CW-S03",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 593,
+              "line_end": 627
+            },
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-001-C03",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "返回的是按数量加权总和，未除总件数。主产品将正值传InheritMoisture，额外非堆叠实体无同段继承调用。",
+          "source_locations": [
+            {
+              "id": "CW-S01",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 475,
+              "line_end": 517
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-001-C04",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "实体逐件删除、容器倾倒、角色成本和consumeingredients顺序成立。新增green服务器构造及greenamulet具名导出把装备/卸装/模型回调、有限次数耗尽Remove接到实际prefab。",
+          "source_locations": [
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S12",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "id": "CW-S13",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 146,
+              "line_end": 185
+            },
+            {
+              "id": "CW-S25",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 64,
+              "line_end": 87
+            },
+            {
+              "id": "REV-CW-A01",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 521,
+              "line_end": 539
+            },
+            {
+              "id": "REV-CW-A02",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 629,
+              "line_end": 629
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-001-C05",
+          "kind": "EI",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "同步consumeingredients监听可在builditem与交付之前调用护符Use。具名装备绑定已补入候选，消费函数没有补偿返回或回滚段，推导保持限定。",
+          "source_locations": [
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S13",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 146,
+              "line_end": 185
+            },
+            {
+              "id": "CW-S45",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "REV-CW-A01",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 521,
+              "line_end": 539
+            },
+            {
+              "id": "REV-CW-A02",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 629,
+              "line_end": 629
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-001-C06",
+          "kind": "REC",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "实体计划、discounted与消费入口一致性的建议有直接链路依据。greenamulet消费者接线已补齐，建议的异常/耗尽验证仍保持未实测。",
+          "source_locations": [
+            {
+              "id": "CW-S01",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 475,
+              "line_end": 517
+            },
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S13",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 146,
+              "line_end": 185
+            },
+            {
+              "id": "REV-CW-A01",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 521,
+              "line_end": 539
+            },
+            {
+              "id": "REV-CW-A02",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 629,
+              "line_end": 629
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Builder:HasIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "配方对象/字符串、布尔返回及freebuild短路准确。getlimitedrecipecount按recipe方法调用，查询不预留实体。",
+          "source_locations": [
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            },
+            {
+              "id": "CW-S03",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 593,
+              "line_end": 627
+            },
+            {
+              "id": "CW-S09",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 1041,
+              "line_end": 1111
+            },
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S10",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1507,
+              "line_end": 1549
+            }
+          ]
+        },
+        {
+          "symbol": "Builder:GetIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "有效配方返回type→实体数量计划与discounted，无配方隐式nil。普通正amount、同type覆盖及不保证足量的边界准确。",
+          "source_locations": [
+            {
+              "id": "CW-S01",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 475,
+              "line_end": 517
+            },
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S11",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1697,
+              "line_end": 1754
+            }
+          ]
+        },
+        {
+          "symbol": "Builder:RemoveIngredients",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "计划形状、freebuild隐式nil、逐件消费/角色成本/同步consumeingredients及异常沿栈外抛准确。greenamulet具名装备/耗尽接线已加入候选引用。",
+          "source_locations": [
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S12",
+              "source_file": "scripts/components/inventory.lua",
+              "line_start": 1390,
+              "line_end": 1454
+            },
+            {
+              "id": "CW-S13",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 146,
+              "line_end": 185
+            },
+            {
+              "id": "CW-S45",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "REV-CW-A01",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 521,
+              "line_end": 539
+            },
+            {
+              "id": "REV-CW-A02",
+              "source_file": "scripts/prefabs/amulet.lua",
+              "line_start": 629,
+              "line_end": 629
+            }
+          ]
+        },
+        {
+          "symbol": "Builder:HasCharacterIngredient",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "各类型第一/第二返回、oldage换算、ceil当前值和严格health比较均准确。未替代health/sanity内部合同。",
+          "source_locations": [
+            {
+              "id": "CW-S03",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 593,
+              "line_end": 627
+            },
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            },
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            }
+          ]
+        },
+        {
+          "symbol": "Builder:HasTechIngredient",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "IsTechIngredient且_material后缀、技术键大写、缺级0、布尔及level返回准确，局部无扣级。",
+          "source_locations": [
+            {
+              "id": "CW-S03",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 593,
+              "line_end": 627
+            },
+            {
+              "id": "CW-S04",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 918,
+              "line_end": 952
+            },
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            }
+          ]
+        },
+        {
+          "symbol": "Builder:GetIngredientWetness",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "按内表数量加权的总值、无平均、缺省湿度分支和调用阶段准确。",
+          "source_locations": [
+            {
+              "id": "CW-S01",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 475,
+              "line_end": 517
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            }
+          ]
+        }
+      ],
+      "mechanism_steps_conclusion": "所述机制步骤与具名Lua调用顺序一致。此次新增消费者接线ref已挂到对应步骤，其他步骤及事实描述保持原字节。"
+    },
+    {
+      "entry_id": "EXP-CRAFT-002",
+      "conclusion": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "claim_id": "EXP-CRAFT-002-C01",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "BUILD直接return DoBuild。库存主产品moisture/prebuilt/consume/builditem/delivery顺序成立。新增配方product=tophat、MakeHat(top)导出和fns.top实际选择，连通具名top_onprebuilt转换消费者。",
+          "source_locations": [
+            {
+              "id": "CW-S46",
+              "source_file": "scripts/actions.lua",
+              "line_start": 2622,
+              "line_end": 2626
+            },
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S16",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 987,
+              "line_end": 1017
+            },
+            {
+              "id": "CW-S17",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 1031,
+              "line_end": 1071
+            },
+            {
+              "id": "REV-CW-A06",
+              "source_file": "scripts/recipes.lua",
+              "line_start": 294,
+              "line_end": 294
+            },
+            {
+              "id": "REV-CW-A07",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 16,
+              "line_end": 20
+            },
+            {
+              "id": "REV-CW-A08",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6760,
+              "line_end": 6768
+            },
+            {
+              "id": "REV-CW-A09",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6984,
+              "line_end": 6987
+            },
+            {
+              "id": "REV-CW-A10",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 7860,
+              "line_end": 7862
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C02",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "override结果按Lua truthiness回退，stackable主产品扩堆，额外非堆叠产物逐次无skin/userid生成。该局部没有逐额外实体的prebuilt/湿度/builditem/OnBuilt。",
+          "source_locations": [
+            {
+              "id": "CW-S05",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 629,
+              "line_end": 655
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C03",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "onBuild在交付之后且先于主prod:OnBuilt。组件pairs回调及OnBuiltFn均忽略返回。mapscroll包装忽略RecordMap失败值，原生地图内部保留未知。",
+          "source_locations": [
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "CW-S19",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 64,
+              "line_end": 100
+            },
+            {
+              "id": "CW-S20",
+              "source_file": "scripts/components/maprecorder.lua",
+              "line_start": 13,
+              "line_end": 66
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C04",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "非库存分支buffer消费保护、位置/转向、两类事件及最后回调顺序成立。初始prod=nil与缺inventory清理分支均隐式nil。",
+          "source_locations": [
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S08",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 798,
+              "line_end": 839
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C05",
+          "kind": "EI",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "限定所示直接调用的正常返回/抛错路径推导合理。没有把false初始化结果当成DoBuild失败，也没有假定多件交付具备全批恢复。",
+          "source_locations": [
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S08",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 798,
+              "line_end": 839
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "CW-S20",
+              "source_file": "scripts/components/maprecorder.lua",
+              "line_start": 13,
+              "line_end": 66
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C06",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "buffer清除、hungrybuilder副作用和refreshcrafting位于mimic与生成前。TurnEvil直接体可先drop/replace/jump/startled/理智变化再ITEMMIMIC返回。",
+          "source_locations": [
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S02",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 519,
+              "line_end": 591
+            },
+            {
+              "id": "CW-S14",
+              "source_file": "scripts/components/itemmimic.lua",
+              "line_start": 201,
+              "line_end": 229
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-002-C07",
+          "kind": "REC",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "材料读取和完成初始化的阶段建议有源码依据。tophat配方产品/构造绑定已补齐，额外非堆叠产品缺省不走主产品初始化仍需按实际配方需求判断。",
+          "source_locations": [
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S08",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 798,
+              "line_end": 839
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S17",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 1031,
+              "line_end": 1071
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "REV-CW-A06",
+              "source_file": "scripts/recipes.lua",
+              "line_start": 294,
+              "line_end": 294
+            },
+            {
+              "id": "REV-CW-A07",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 16,
+              "line_end": 20
+            },
+            {
+              "id": "REV-CW-A08",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6760,
+              "line_end": 6768
+            },
+            {
+              "id": "REV-CW-A09",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6984,
+              "line_end": 6987
+            },
+            {
+              "id": "REV-CW-A10",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 7860,
+              "line_end": 7862
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Builder:DoBuild",
+          "source_file": "scripts/components/builder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "签名、false/可选reason/nil/true边界、普通资格职责、buffer/制造站/库存/结构/多件阶段和回调部分副作用准确。tophat配方产品与实际构造选择已补证。",
+          "source_locations": [
+            {
+              "id": "CW-S06",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 657,
+              "line_end": 721
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S08",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 798,
+              "line_end": 839
+            },
+            {
+              "id": "CW-S05",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 629,
+              "line_end": 655
+            },
+            {
+              "id": "CW-S46",
+              "source_file": "scripts/actions.lua",
+              "line_start": 2622,
+              "line_end": 2626
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S14",
+              "source_file": "scripts/components/itemmimic.lua",
+              "line_start": 201,
+              "line_end": 229
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "CW-S20",
+              "source_file": "scripts/components/maprecorder.lua",
+              "line_start": 13,
+              "line_end": 66
+            },
+            {
+              "id": "REV-CW-A06",
+              "source_file": "scripts/recipes.lua",
+              "line_start": 294,
+              "line_end": 294
+            },
+            {
+              "id": "REV-CW-A07",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 16,
+              "line_end": 20
+            },
+            {
+              "id": "REV-CW-A08",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6760,
+              "line_end": 6768
+            },
+            {
+              "id": "REV-CW-A09",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 6984,
+              "line_end": 6987
+            },
+            {
+              "id": "REV-CW-A10",
+              "source_file": "scripts/prefabs/hats.lua",
+              "line_start": 7860,
+              "line_end": 7862
+            }
+          ]
+        },
+        {
+          "symbol": "EntityScript:OnBuilt",
+          "source_file": "scripts/entityscript.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "pairs遍历当前components后实体OnBuiltFn，正常nil且忽略回调返回。无端别或有效性守卫，主产品调用阶段准确。",
+          "source_locations": [
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            },
+            {
+              "id": "CW-S08",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 798,
+              "line_end": 839
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "CW-S19",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 64,
+              "line_end": 100
+            }
+          ]
+        },
+        {
+          "symbol": "MapRecorder:RecordMap",
+          "source_file": "scripts/components/maprecorder.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "NOEXPLORER与BLANK失败、成功返回、数据字段/清理和ondatachangedfn调用准确。ClearMap未清maplocation，候选仅列实际清除字段。",
+          "source_locations": [
+            {
+              "id": "CW-S20",
+              "source_file": "scripts/components/maprecorder.lua",
+              "line_start": 13,
+              "line_end": 66
+            },
+            {
+              "id": "CW-S18",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 8,
+              "line_end": 10
+            },
+            {
+              "id": "CW-S19",
+              "source_file": "scripts/prefabs/mapscroll.lua",
+              "line_start": 64,
+              "line_end": 100
+            },
+            {
+              "id": "CW-S15",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1718,
+              "line_end": 1728
+            },
+            {
+              "id": "CW-S07",
+              "source_file": "scripts/components/builder.lua",
+              "line_start": 723,
+              "line_end": 797
+            }
+          ]
+        }
+      ],
+      "mechanism_steps_conclusion": "所述机制步骤与具名Lua调用顺序一致。此次新增消费者接线ref已挂到对应步骤，其他步骤及事实描述保持原字节。"
+    },
+    {
+      "entry_id": "EXP-CRAFT-003",
+      "conclusion": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "claim_id": "EXP-CRAFT-003-C01",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "Tool优先、Worker其次、缺省1与workmultiplier、ShouldRecoil、specialfn、Internal顺序一致。0在Lua中保留，Tool缺映射0不会回退。",
+          "source_locations": [
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S28",
+              "source_file": "scripts/components/worker.lua",
+              "line_start": 1,
+              "line_end": 18
+            },
+            {
+              "id": "CW-S29",
+              "source_file": "scripts/components/workmultiplier.lua",
+              "line_start": 3,
+              "line_end": 33
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C02",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "普通Action传invobject而WorkedBy传当前HANDS。直接WorkedBy无CanBeWorked重查，Internal零work仍更新lastwork并通知/回调。自定义recoil非nil分支及缺省返回准确。",
+          "source_locations": [
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C03",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "服务器最终IsValid包含action.validfn。action.fn正常truthy返回后，仍有效invobject才分派OnUsedAsItem，FiniteUses消费位于普通工作/回调之后。",
+          "source_locations": [
+            {
+              "id": "CW-S22",
+              "source_file": "scripts/bufferedaction.lua",
+              "line_start": 22,
+              "line_end": 47
+            },
+            {
+              "id": "CW-S23",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1811,
+              "line_end": 1817
+            },
+            {
+              "id": "CW-S26",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 97,
+              "line_end": 118
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C04",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "Tool/FiniteUses独立映射及percentusedchange的owner/rechargeable条件成立。新增MakeAxe参数、master_postinit执行和axe/moonglassaxe具名导出连通真实有效量与消费配置。",
+          "source_locations": [
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S34",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 95,
+              "line_end": 121
+            },
+            {
+              "id": "CW-S35",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 179,
+              "line_end": 192
+            },
+            {
+              "id": "CW-S24",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 27,
+              "line_end": 38
+            },
+            {
+              "id": "CW-S25",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 64,
+              "line_end": 87
+            },
+            {
+              "id": "CW-S26",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 97,
+              "line_end": 118
+            },
+            {
+              "id": "REV-CW-A03",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 38,
+              "line_end": 45
+            },
+            {
+              "id": "REV-CW-A04",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 123,
+              "line_end": 132
+            },
+            {
+              "id": "REV-CW-A05",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 291,
+              "line_end": 294
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C05",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "mermbrain具名HasDigTool直接调用CanDoAction，DIG行为使用该条件。Wolfgang特殊回调接线、Mighty/recoil/零量条件、99999返回与nil回退均成立。",
+          "source_locations": [
+            {
+              "id": "CW-S48",
+              "source_file": "scripts/brains/mermbrain.lua",
+              "line_start": 294,
+              "line_end": 298
+            },
+            {
+              "id": "CW-S49",
+              "source_file": "scripts/brains/mermbrain.lua",
+              "line_start": 469,
+              "line_end": 479
+            },
+            {
+              "id": "CW-S50",
+              "source_file": "scripts/prefabs/wolfgang.lua",
+              "line_start": 185,
+              "line_end": 201
+            },
+            {
+              "id": "CW-S51",
+              "source_file": "scripts/prefabs/wolfgang.lua",
+              "line_start": 673,
+              "line_end": 677
+            },
+            {
+              "id": "CW-S29",
+              "source_file": "scripts/components/workmultiplier.lua",
+              "line_start": 3,
+              "line_end": 33
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C06",
+          "kind": "EI",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "普通工具动作资格失败且无reason时外层仍true，validfn是另一阶段。零work并非自动失败，回调删工具可跳过磨损，抛错沿当前栈终止后续消费/Succeed。",
+          "source_locations": [
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S22",
+              "source_file": "scripts/bufferedaction.lua",
+              "line_start": 22,
+              "line_end": 47
+            },
+            {
+              "id": "CW-S23",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1811,
+              "line_end": 1817
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S45",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-003-C07",
+          "kind": "REC",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "有效量和次数成本分别配置的建议成立。新增axe/moonglassaxe具名构造与master_postinit接线，故障观察仍按工作和成功后磨损两个阶段核验。",
+          "source_locations": [
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S22",
+              "source_file": "scripts/bufferedaction.lua",
+              "line_start": 22,
+              "line_end": 47
+            },
+            {
+              "id": "CW-S26",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 97,
+              "line_end": 118
+            },
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S34",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 95,
+              "line_end": 121
+            },
+            {
+              "id": "CW-S35",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 179,
+              "line_end": 192
+            },
+            {
+              "id": "REV-CW-A03",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 38,
+              "line_end": 45
+            },
+            {
+              "id": "REV-CW-A04",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 123,
+              "line_end": 132
+            },
+            {
+              "id": "REV-CW-A05",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 291,
+              "line_end": 294
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Tool:SetAction",
+          "source_file": "scripts/components/tool.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "Action身份、TOOLACTIONS断言、effectiveness or 1及工具标签准确，0保留。新增斧头具名构造/后处理绑定支持实际消费者引用。",
+          "source_locations": [
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S34",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 95,
+              "line_end": 121
+            },
+            {
+              "id": "CW-S35",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 179,
+              "line_end": 192
+            },
+            {
+              "id": "CW-S24",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 27,
+              "line_end": 38
+            },
+            {
+              "id": "REV-CW-A03",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 38,
+              "line_end": 45
+            },
+            {
+              "id": "REV-CW-A04",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 123,
+              "line_end": 132
+            },
+            {
+              "id": "REV-CW-A05",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 291,
+              "line_end": 294
+            }
+          ]
+        },
+        {
+          "symbol": "Tool:GetEffectiveness",
+          "source_file": "scripts/components/tool.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "Action对象键、缺映射0及DoToolWork优先分支保留0准确。axe/moonglassaxe实际构造与glass_master_postinit执行已补证。",
+          "source_locations": [
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S34",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 95,
+              "line_end": 121
+            },
+            {
+              "id": "CW-S35",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 179,
+              "line_end": 192
+            },
+            {
+              "id": "REV-CW-A03",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 38,
+              "line_end": 45
+            },
+            {
+              "id": "REV-CW-A04",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 123,
+              "line_end": 132
+            },
+            {
+              "id": "REV-CW-A05",
+              "source_file": "scripts/prefabs/axe.lua",
+              "line_start": 291,
+              "line_end": 294
+            }
+          ]
+        },
+        {
+          "symbol": "Tool:CanDoAction",
+          "source_file": "scripts/components/tool.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "判断映射~=nil，0仍true，不看次数或目标。mermbrain的真实调用及行为条件已覆盖。",
+          "source_locations": [
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S24",
+              "source_file": "scripts/components/finiteuses.lua",
+              "line_start": 27,
+              "line_end": 38
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S48",
+              "source_file": "scripts/brains/mermbrain.lua",
+              "line_start": 294,
+              "line_end": 298
+            },
+            {
+              "id": "CW-S49",
+              "source_file": "scripts/brains/mermbrain.lua",
+              "line_start": 469,
+              "line_end": 479
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:ShouldRecoil",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "自定义非nil recoil选择分支与remainingworks缺省、默认tough检测及返回形状准确，函数本身不消费工具。",
+          "source_locations": [
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S27",
+              "source_file": "scripts/components/tool.lua",
+              "line_start": 1,
+              "line_end": 51
+            },
+            {
+              "id": "CW-S29",
+              "source_file": "scripts/components/workmultiplier.lua",
+              "line_start": 3,
+              "line_end": 33
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:WorkedBy",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "worker前提、HANDS读取、ShouldRecoil后只传第二值到Internal、正常nil及不重查资格准确。",
+          "source_locations": [
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S22",
+              "source_file": "scripts/bufferedaction.lua",
+              "line_start": 22,
+              "line_end": 47
+            }
+          ]
+        },
+        {
+          "symbol": "WorkMultiplier:ResolveSpecialWorkAmount",
+          "source_file": "scripts/components/workmultiplier.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "specialfn参数顺序、0保留及nil/false回退准确。调用阶段在recoil判断后，Wolfgang真实接线有证据。",
+          "source_locations": [
+            {
+              "id": "CW-S29",
+              "source_file": "scripts/components/workmultiplier.lua",
+              "line_start": 3,
+              "line_end": 33
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S50",
+              "source_file": "scripts/prefabs/wolfgang.lua",
+              "line_start": 185,
+              "line_end": 201
+            },
+            {
+              "id": "CW-S51",
+              "source_file": "scripts/prefabs/wolfgang.lua",
+              "line_start": 673,
+              "line_end": 677
+            }
+          ]
+        }
+      ],
+      "mechanism_steps_conclusion": "所述机制步骤与具名Lua调用顺序一致。此次新增消费者接线ref已挂到对应步骤，其他步骤及事实描述保持原字节。"
+    },
+    {
+      "entry_id": "EXP-CRAFT-004",
+      "conclusion": "PASS_STATIC_RESEARCH",
+      "claims": [
+        {
+          "claim_id": "EXP-CRAFT-004-C01",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "常青树server设置CHOP/onwork/onfinish，chop_down_tree先掉落再make_stump。后者卸旧组件并装DIG、回调和workleft=1，挖根生成log后Remove。",
+          "source_locations": [
+            {
+              "id": "CW-S39",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 864,
+              "line_end": 895
+            },
+            {
+              "id": "CW-S47",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 391,
+              "line_end": 420
+            },
+            {
+              "id": "CW-S38",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 498,
+              "line_end": 549
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S36",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 137,
+              "line_end": 165
+            },
+            {
+              "id": "CW-S43",
+              "source_file": "scripts/components/lootdropper.lua",
+              "line_start": 382,
+              "line_end": 412
+            },
+            {
+              "id": "CW-S44",
+              "source_file": "scripts/components/lootdropper.lua",
+              "line_start": 415,
+              "line_end": 468
+            },
+            {
+              "id": "CW-S52",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 632,
+              "line_end": 685
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-004-C02",
+          "kind": "EI",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "旧Internal栈的self保持旧组件对象，RemoveComponent清槽后AddComponent创建新组件。标准树转换不改旧action，因此finishedwork从旧self.action读CHOP，当前槽已可为DIG。",
+          "source_locations": [
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S38",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 498,
+              "line_end": 549
+            },
+            {
+              "id": "CW-S31",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 61,
+              "line_end": 104
+            },
+            {
+              "id": "CW-S30",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 1,
+              "line_end": 53
+            },
+            {
+              "id": "CW-S52",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 632,
+              "line_end": 685
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-004-C03",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "rocks掉落/通常Remove在OnWork，onfinish不是统一掉落门槛。Moon shell保留实体到workfinished消费者，生成种子并改变持久/点击/动画状态后登记延时ErodeAway。",
+          "source_locations": [
+            {
+              "id": "CW-S40",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 168,
+              "line_end": 200
+            },
+            {
+              "id": "CW-S41",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 282,
+              "line_end": 296
+            },
+            {
+              "id": "CW-S42",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 391,
+              "line_end": 423
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S44",
+              "source_file": "scripts/components/lootdropper.lua",
+              "line_start": 415,
+              "line_end": 468
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-004-C04",
+          "kind": "EI",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "Internal在onwork后重读旧self.workleft。onfinish后无IsValid后检，继续尝试事件。直接Internal无完成锁/CanBeWorked前置，条件满足时可再入完成段，实际事件可见性仍未知。",
+          "source_locations": [
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S22",
+              "source_file": "scripts/bufferedaction.lua",
+              "line_start": 22,
+              "line_end": 47
+            },
+            {
+              "id": "CW-S40",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 168,
+              "line_end": 200
+            },
+            {
+              "id": "CW-S36",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 137,
+              "line_end": 165
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-004-C05",
+          "kind": "NSF",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "SetWorkLeft重新启用且至少1，再按正maxwork夹上限。属性setter维护action_workable，回调setter仅赋值，卸载清workrepairable及旧action标签。",
+          "source_locations": [
+            {
+              "id": "CW-S30",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 1,
+              "line_end": 53
+            },
+            {
+              "id": "CW-S31",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 61,
+              "line_end": 104
+            },
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            }
+          ]
+        },
+        {
+          "claim_id": "EXP-CRAFT-004-C06",
+          "kind": "REC",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "掉落责任与组件身份建议对应该树、rocks、moon shell实际消费者。没有扩展到全部采集对象或规定通用事务/补偿。",
+          "source_locations": [
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S36",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 137,
+              "line_end": 165
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S38",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 498,
+              "line_end": 549
+            },
+            {
+              "id": "CW-S40",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 168,
+              "line_end": 200
+            },
+            {
+              "id": "CW-S42",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 391,
+              "line_end": 423
+            }
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Workable:SetWorkLeft",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "nil/false缺省10、先workable=true、下界1和maxwork上界准确，setter副作用与SetMaxWork不重夹边界一致。",
+          "source_locations": [
+            {
+              "id": "CW-S31",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 61,
+              "line_end": 104
+            },
+            {
+              "id": "CW-S30",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 1,
+              "line_end": 53
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:SetWorkAction",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "写action及属性setter仅在可工作且剩余正时换标签准确，卸载旧组件后旧self.action仍独立。",
+          "source_locations": [
+            {
+              "id": "CW-S31",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 61,
+              "line_end": 104
+            },
+            {
+              "id": "CW-S30",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 1,
+              "line_end": 53
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S39",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 864,
+              "line_end": 895
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:SetOnWorkCallback",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "setter正常nil，执行参数(inst,worker,workleft,numworks)、事件后执行及返回忽略准确。rocks实际使用已覆盖。",
+          "source_locations": [
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S40",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 168,
+              "line_end": 200
+            },
+            {
+              "id": "CW-S41",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 282,
+              "line_end": 296
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:SetOnFinishCallback",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "setter和执行参数准确，onwork后重读剩余量，树回调可替换组件，之后旧栈继续通知。",
+          "source_locations": [
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            },
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S36",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 137,
+              "line_end": 165
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S38",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 498,
+              "line_end": 549
+            },
+            {
+              "id": "CW-S39",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 864,
+              "line_end": 895
+            }
+          ]
+        },
+        {
+          "symbol": "Workable:WorkedBy_Internal",
+          "source_file": "scripts/components/workable.lua",
+          "semantic_conclusion": "SUPPORTED_WITHIN_STATIC_SCOPE",
+          "evidence_conclusion": "PASS",
+          "reason": "缺省工作量、目标乘数、只对正量扣work、lastwork/事件/onwork/完成/plantkilled顺序准确。直接调用和回调重入边界保持限定。",
+          "source_locations": [
+            {
+              "id": "CW-S32",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 123,
+              "line_end": 171
+            },
+            {
+              "id": "CW-S33",
+              "source_file": "scripts/components/workable.lua",
+              "line_start": 173,
+              "line_end": 206
+            },
+            {
+              "id": "CW-S45",
+              "source_file": "scripts/entityscript.lua",
+              "line_start": 1312,
+              "line_end": 1349
+            },
+            {
+              "id": "CW-S21",
+              "source_file": "scripts/actions.lua",
+              "line_start": 1693,
+              "line_end": 1804
+            },
+            {
+              "id": "CW-S36",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 137,
+              "line_end": 165
+            },
+            {
+              "id": "CW-S37",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 459,
+              "line_end": 487
+            },
+            {
+              "id": "CW-S38",
+              "source_file": "scripts/prefabs/evergreens.lua",
+              "line_start": 498,
+              "line_end": 549
+            },
+            {
+              "id": "CW-S40",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 168,
+              "line_end": 200
+            },
+            {
+              "id": "CW-S42",
+              "source_file": "scripts/prefabs/rocks.lua",
+              "line_start": 391,
+              "line_end": 423
+            }
+          ]
+        }
+      ],
+      "mechanism_steps_conclusion": "所述机制步骤与具名Lua调用顺序一致。此次新增消费者接线ref已挂到对应步骤，其他步骤及事实描述保持原字节。"
+    }
+  ],
+  "deduplication": {
+    "baseline_catalog_count": 247,
+    "catalog_scan": "按每条file/pointer读取登记正文，扫描具名新增消费者，并直接阅读下列已有相关事实。",
+    "directly_compared_entries": [
+      "FACT-DST-003",
+      "FACT-DST-009",
+      "FACT-DST-010",
+      "NC-N002-FINAL-02",
+      "NC-N004-FINAL-08",
+      "NC-N004-FINAL-09",
+      "RC-C01",
+      "RC-C02",
+      "RC-C05",
+      "RC-C06",
+      "ID-C01",
+      "ID-C02",
+      "EXP-ACT-001",
+      "EXP-ACT-002",
+      "EXP-ACT-003",
+      "EXP-GROW-001",
+      "EXP-GROW-002"
+    ],
+    "conclusion": "四条新增范围成立，已有事实的必要复述用于保持完整链。",
+    "entry_deltas": [
+      {
+        "entry_id": "EXP-CRAFT-001",
+        "existing": "Builder门槛/实体计划/逐件删除/Provider由FACT与NC既有记录覆盖。",
+        "new": "完整材料API原子、角色/科技第二返回量、湿度实际总和及greenamulet消费消费者。"
+      },
+      {
+        "entry_id": "EXP-CRAFT-002",
+        "existing": "NC-N004-FINAL-08已含主要DoBuild阶段、缓冲及多件失败边界。",
+        "new": "完整DoBuild/OnBuilt/RecordMap API，主/额外实体初始化差异，tophat转换和mapscroll忽略失败的实际初始化链。"
+      },
+      {
+        "entry_id": "EXP-CRAFT-003",
+        "existing": "RC已有作用量/recoil/动作true，ID已有FiniteUses消费，EXP-ACT已有BufferedAction整体执行与回调。",
+        "new": "Tool与recoil完整API、工作到成功后磨损的具体工具链，axe/moonglassaxe配置、merm能力查询和Wolfgang特殊倍率消费者。"
+      },
+      {
+        "entry_id": "EXP-CRAFT-004",
+        "existing": "RC已有Internal事件/回调顺序及保存，成长族已含make_stump停止成长。",
+        "new": "完整设置/执行API，常青树旧CHOP组件卸载而旧栈继续、新DIG槽与完成action身份，rocks/Moon shell具体掉落/退出消费者。"
+      }
+    ]
+  },
+  "unresolved_boundaries": [
+    "原生SpawnPrefab、MapExplorer、湿度复制、IsValid/实体移除后的事件可见性及真实网络/动画/调度结果保持未知。",
+    "尚无游戏中材料变化、护符耗尽、初始/额外产品失败、地图记录失败、零work/recoil、回调删除/替换组件或工具、重入及异常注入实测。",
+    "此审阅只证明列举来源版本下的静态Lua事实与限定推导，全部条目保持research/restricted/hold。"
+  ],
+  "resolved_findings": [
+    {
+      "id": "CW-REV-01",
+      "entry_id": "EXP-CRAFT-001",
+      "status": "RESOLVED",
+      "resolution": "已将独立核实的具名消费者接线范围及哈希追加到候选，并关联指定claim/API/机制步骤及compatibility依赖。原事实、合同与步骤文字、旧52 refs保持不变。",
+      "source_locations": [
+        {
+          "id": "REV-CW-A01",
+          "source_file": "scripts/prefabs/amulet.lua",
+          "line_start": 521,
+          "line_end": 539
+        },
+        {
+          "id": "REV-CW-A02",
+          "source_file": "scripts/prefabs/amulet.lua",
+          "line_start": 629,
+          "line_end": 629
+        }
+      ]
+    },
+    {
+      "id": "CW-REV-02",
+      "entry_id": "EXP-CRAFT-003",
+      "status": "RESOLVED",
+      "resolution": "已将独立核实的具名消费者接线范围及哈希追加到候选，并关联指定claim/API/机制步骤及compatibility依赖。原事实、合同与步骤文字、旧52 refs保持不变。",
+      "source_locations": [
+        {
+          "id": "REV-CW-A03",
+          "source_file": "scripts/prefabs/axe.lua",
+          "line_start": 38,
+          "line_end": 45
+        },
+        {
+          "id": "REV-CW-A04",
+          "source_file": "scripts/prefabs/axe.lua",
+          "line_start": 123,
+          "line_end": 132
+        },
+        {
+          "id": "REV-CW-A05",
+          "source_file": "scripts/prefabs/axe.lua",
+          "line_start": 291,
+          "line_end": 294
+        }
+      ]
+    },
+    {
+      "id": "CW-REV-03",
+      "entry_id": "EXP-CRAFT-002",
+      "status": "RESOLVED",
+      "resolution": "已将独立核实的具名消费者接线范围及哈希追加到候选，并关联指定claim/API/机制步骤及compatibility依赖。原事实、合同与步骤文字、旧52 refs保持不变。",
+      "source_locations": [
+        {
+          "id": "REV-CW-A06",
+          "source_file": "scripts/recipes.lua",
+          "line_start": 294,
+          "line_end": 294
+        },
+        {
+          "id": "REV-CW-A07",
+          "source_file": "scripts/prefabs/hats.lua",
+          "line_start": 16,
+          "line_end": 20
+        },
+        {
+          "id": "REV-CW-A08",
+          "source_file": "scripts/prefabs/hats.lua",
+          "line_start": 6760,
+          "line_end": 6768
+        },
+        {
+          "id": "REV-CW-A09",
+          "source_file": "scripts/prefabs/hats.lua",
+          "line_start": 6984,
+          "line_end": 6987
+        },
+        {
+          "id": "REV-CW-A10",
+          "source_file": "scripts/prefabs/hats.lua",
+          "line_start": 7860,
+          "line_end": 7862
+        }
+      ]
+    }
+  ],
+  "consumer_wiring_source_references": [
+    {
+      "id": "REV-CW-A01",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "line_start": 521,
+      "line_end": 539,
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "range_sha256": "d64d0b6f56b62970546c9bd4aa5b50a5406881fa0535cbe731a4b8b66fa88224",
+      "purpose": "green服务器构造绑定装备/卸装/模型回调及finiteuses耗尽Remove"
+    },
+    {
+      "id": "REV-CW-A02",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "line_start": 629,
+      "line_end": 629,
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "range_sha256": "02e003429f94054d47868b85134cd72fb91a2ce6f56d4b7cb6e5521774afbef8",
+      "purpose": "greenamulet具名Prefab选择green构造"
+    },
+    {
+      "id": "REV-CW-A03",
+      "source_file": "scripts/prefabs/axe.lua",
+      "line_start": 38,
+      "line_end": 45,
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "range_sha256": "b106a4e023291d59787e8170a68886f741b29ae9cd4a94ee7f6b2a5a7c434fb8",
+      "purpose": "MakeAxe参数与data.nofiniteuses读取"
+    },
+    {
+      "id": "REV-CW-A04",
+      "source_file": "scripts/prefabs/axe.lua",
+      "line_start": 123,
+      "line_end": 132,
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "range_sha256": "2b9b1cf2bf1fb274ba5f3adae4f7dfc0497305988bb93eab12c13bcdea419a99",
+      "purpose": "MakeAxe执行master_postinit并用fn返回具名Prefab"
+    },
+    {
+      "id": "REV-CW-A05",
+      "source_file": "scripts/prefabs/axe.lua",
+      "line_start": 291,
+      "line_end": 294,
+      "file_sha256": "aaaad3f106b9b6aa9ed1ee30a3e3aeca2cd68d7fc45c6df04aad80bc4725c22c",
+      "range_sha256": "4e8012345d3dea2a9689ed9f8f32daa41ac4bc7f7b06c47d41f01cf605bff124",
+      "purpose": "axe与moonglassaxe具名构造选择，后者传glass_master_postinit"
+    },
+    {
+      "id": "REV-CW-A06",
+      "source_file": "scripts/recipes.lua",
+      "line_start": 294,
+      "line_end": 294,
+      "file_sha256": "7c8f6b73fed18c134e16e81ca8540bc530522bbf58325fc9e573bcf17852d1e9",
+      "range_sha256": "aa4a78fe904125e004a49b60c9d76c7f2cad51f25856f97aad84ea03eb8ae0a5",
+      "purpose": "tophat_magician配方将product设置为tophat"
+    },
+    {
+      "id": "REV-CW-A07",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 16,
+      "line_end": 20,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "27467ab66e2254ab92c59fc6f0adbc30e499fda2d8c0657d16297aadc0a66816",
+      "purpose": "MakeHat从name构造prefabname"
+    },
+    {
+      "id": "REV-CW-A08",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 6760,
+      "line_end": 6768,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "4c32f6e48d71edf5595ea9160bcfb317a9df28338d4dba2c28804e1274d56d38",
+      "purpose": "top分支实际选择fns.top"
+    },
+    {
+      "id": "REV-CW-A09",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 6984,
+      "line_end": 6987,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "a96636b1e748351385fe53512daf111eeddcb7ac28a3e02852f4485bcf9156b6",
+      "purpose": "MakeHat使用选定fn返回Prefab"
+    },
+    {
+      "id": "REV-CW-A10",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 7860,
+      "line_end": 7862,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "4163cfc1de08501dd6202a0d3a2f731f00bcaffb70eaecd1f417468ee491f214",
+      "purpose": "文件导出MakeHat(top)"
+    }
+  ],
+  "revision_verification": {
+    "prior_candidate_sha256": "7e5d5f88feb2e06f6e5a592a84989242b79f8a9af80e221ab14ef2f32a3416c0",
+    "added_source_references": 10,
+    "original_52_source_references_unchanged": true,
+    "all_other_candidate_fields_unchanged": true,
+    "fact_api_and_step_text_utf8_bytes_unchanged": true,
+    "requested_claim_api_step_dependency_links_exact": true,
+    "new_source_ranges_match_independently_reviewed_locations_and_hashes": true,
+    "mechanism_contract_valid": true
+  }
+}

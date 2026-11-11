@@ -18,6 +18,17 @@
 
 自定义投掷动作要完成“客户端选动作 → 发送目标/落点 → 客户端预览 SG → 服务端 SG → action.fn/发射 → 命中与移除”全链。`BufferedAction.pos` 是 `DynamicPosition`，用 `GetActionPoint()` 取得世界落点；`canforce` 涉及强制动作和范围处理，**不是保证坐标同步的必填开关**。当前服务端某些 canforce 分支还会重写动作点。旧 throw-chain 示例未给 `_my_target` 赋值，不能当完整模板。只在权威端发射和扣费，声音/画面同步逐个按所选实体与实际路径验证，不把“所有 SoundEmitter 都不跨端”当结论。玩家动作注册/中断参见 `characters-brains-stategraphs.md`。
 
+## 转移、堆叠与装备替换
+
+762172 的[物品归属研究](../knowledge/research/native-mechanisms/item_transfer_ownership-af7a26f884a8.json)按调用者、物品实体和成员位置区分结果。
+
+| 接入点 | 需要核对的行为 | 研究 ID |
+|---|---|---|
+| Inventory 交付 | 普通格、装备堆、溢出容器、活动物和掉落有不同去向；读取返回值时同时核对剩余实体、数量与 owner | EXP-ITEM-001 |
+| Container 转移 | 源取出、目标交付、剩余返还分阶段执行；`GiveItem` 的 true 是控制流值，自定义兼容谓词非对称时不能据此承诺全接收 | EXP-ITEM-002 |
+| Stackable 拆并 | 区分源、目标与拆出的新实体；源退出或数量事件早于目标最终数量写入 | EXP-ITEM-003 |
+| Equip / Unequip | onequip 早于最终写新槽，onunequip 早于清旧槽；回调抛错会中断后续写槽 | EXP-ITEM-004 |
+
 ## 修复机制：先选原版合同，再验证菜单
 
 | 需求 | 当前入口 | 应检查的边界 |
@@ -53,6 +64,17 @@ end
 - `blueprint.lua` 只为满足 `CanBlueprintSpecificRecipe` 的配方创建具体蓝图；`nounlock` 或 `builder_tag` 会排除，至少一个科技值大于 0 只是另一条件。先确认具体蓝图已注册再加掉落。
 - 改解锁方式时追踪旧掉落、teacher 与存档已学配方，不能机械删除所有旧代码；是否迁移由项目设计决定。
 - Inventory `imagename`、配方 `image`、XML Element 名与注册接口对 `.tex` 的约定不同。逐处追消费者；图标可映射到不同图集，不要求所有文件名完全相同。
+
+## 材料消费、制作回调与采集
+
+762172 的[制作与工作研究](../knowledge/research/native-mechanisms/crafting_work-c262f04f7209.json)补全从查询到实际消费的调用链。
+
+| 问题 | 原版阶段 | 研究 ID |
+|---|---|---|
+| 材料与折扣 | `HasIngredients`、`GetIngredients` 与 `RemoveIngredients` 分别查询、规划实体数量和消费；计划不构成预留，折扣护符另监听消费事件扣次数 | EXP-CRAFT-001 |
+| 产物初始化 | onPreBuilt 读取消费前计划；主产物交付或结构事件后再进入 OnBuilt/OnBuiltFn，普通非堆叠额外产物不经过同一主产物初始化段 | EXP-CRAFT-002 |
+| 工具消耗 | Tool 能力、Workable 工作量和 FiniteUses 动作次数各有入口；普通动作先工作及回调，再对仍有效的工具通知 OnUsedAsItem | EXP-CRAFT-003 |
+| 工作完成 | 树倒后可替换为 DIG Workable，而旧 CHOP 回调栈继续完成；矿石和月壳的掉落分别追各自 onwork/onfinish/workfinished | EXP-CRAFT-004 |
 
 ## 锅料理：配方数据与可食实体是两层
 

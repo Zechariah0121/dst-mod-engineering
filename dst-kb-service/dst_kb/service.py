@@ -9,7 +9,7 @@ from collections import Counter, OrderedDict
 from datetime import datetime,timezone
 from typing import Protocol
 from .config import KBError,settings
-from .source_epoch_runtime import resolve_epoch, bind_epoch, epoch_bound
+from .source_epoch_runtime import resolve_epoch, bind_epoch, epoch_bound, epoch_arguments
 from .validation import signature,validate,RELATIONS
 from . import native,nativecore,native_mechanism
 from .retrieval_v2 import Ranker, record_family, VERSION as RETRIEVAL_VERSION
@@ -425,7 +425,7 @@ class Service:
         mechanism=self._mechanisms().get(id)
         if mechanism is not None:
             if projection!='reviewer':return {'id':id,'entry':None,'withheld':True,'reason':'restricted_research_requires_explicit_reviewer','governance':{id:native_mechanism.STATES}}
-            return self._mechanism_read(mechanism,pointer,max_bytes)
+            return self._mechanism_read(mechanism,pointer,max_bytes,assessment_detail=view!='decision')
         if pointer or max_bytes!=24000:raise KBError('INVALID_ARGUMENT','pointer/max_bytes applies only to registered mechanism research')
         if view is not None:
             row=self.db.execute('SELECT json FROM entries WHERE id=?',(id,)).fetchone()
@@ -469,14 +469,16 @@ class Service:
             self._mechanism_records=(self.loaded_signature,native_mechanism.load(self.root))
         return self._mechanism_records[1]
 
-    def _mechanism_read(self,record,pointer='',maximum=24000):
+    def _mechanism_read(self,record,pointer='',maximum=24000,*,assessment_detail=True):
         environment=self.epoch_context.metadata() if self.epoch_context is not None else None
         wrapper={'projection':'reviewer','evidence_status':'LOCATOR_HASH_ONLY'}
         if environment is not None:wrapper['source_environment']=environment
         reserve=len(json.dumps(dict(wrapper,entry=None),ensure_ascii=False).encode())
         if type(maximum) is not int or not 1000<=maximum<=64000:raise KBError('INVALID_ARGUMENT','max_bytes must be 1000..64000')
         if maximum-reserve<1000:return {'id':record['entry']['id'],'withheld':True,'reason':'REQUIRED_CONTEXT_EXCEEDS_BUDGET'}
-        entry=native_mechanism.bounded(record,pointer,maximum-reserve)
+        outer_sources=(environment or {}).get('source_input_assessment',{}).get('sources')
+        entry=native_mechanism.bounded(record,pointer,maximum-reserve,
+                                      assessment_detail=assessment_detail or not bool(outer_sources))
         return dict(wrapper,entry=entry)
 
     def _mechanism_matches(self,query,projection,mode,filters,scope_logic='and'):
@@ -573,39 +575,21 @@ class Service:
         """A whole admitted atom with its own required closure, never prose slices."""
         from .retrieval_v2 import words, intent
         positive=intent(query)['original_positive'];terms=native_mechanism.navigation_terms(positive)
-        # Parse complete names before matching declarations. A shorter method
-        # is never an exact identity inside an extended name or another owner.
-        requested_names={m.group().lower() for m in re.finditer(
-            r'(?<![A-Za-z0-9_.:])'+native_mechanism.NAME+r'(?![A-Za-z0-9_.:])',positive)}
-        requested_names.update(('require("'+m['module']+'").'+m['member']).lower()
-            for m in re.finditer(native_mechanism.MODULE,positive))
         if positive.strip().lower()==card['id'].lower():return card
         if card.get('family')=='native_mechanism':
             record=self._mechanisms()[card['id']]
-            choices=[]
-            claim_terms=set()
-            for pointer,text in native_mechanism.navigation_units(record['entry']):
-                field,index=pointer.strip('/').split('/');index=int(index)
-                overlap=terms&native_mechanism.navigation_terms(text)
-                if not overlap:continue
-                if field=='claims':claim_terms.update(overlap)
-                value=record['entry'][field][index]
-                # Exact declarations outrank incidental mentions; ranking
-                # this original unit does not verify the task assertion.
-                identity=native_mechanism.api_identity(value) if field=='api_contracts' else None
-                declared=identity['symbol'].lower() if identity is not None else ''
-                bare=positive.strip().lower()
-                exact=declared in requested_names or (identity is not None and bare==identity['leaf'].lower())
-                choices.append((not exact,-len(overlap),field,index))
+            choices=native_mechanism.ranked_units(record['entry'],query)
             if not choices:return card
-            not_exact,negative_overlap,field,index=min(choices)
-            single_pointer='/'+field+'/'+str(index)
+            best=choices[0]
+            claim_terms=set().union(*(row['matched_terms'] for row in choices
+                                     if row['pointer'].startswith('/claims/')))
+            single_pointer=best['pointer']
             pointer=single_pointer
             # A multi-step question can need several claims from one record.
             # Deliver the exact authored claims array (each typed atom intact),
             # never a synthetic summary or an incomplete API. The caller still
             # charges this one record, every reference and its complete Scope.
-            if grouped and not_exact and len(claim_terms)>=max(4,-negative_overlap+2):
+            if grouped and not best['exact_declaration'] and len(claim_terms)>=max(4,len(best['matched_terms'])+2):
                 pointer='/claims'
             metadata={key:card[key] for key in ('score','match_reason','expansion') if key in card}
             atom=native_mechanism.envelope(record,pointer,assessment_detail=False)|metadata
@@ -675,6 +659,55 @@ class Service:
         except (ValueError,KeyError,TypeError,AttributeError):
             # An unavailable closure plan is not permission to strip Scope.
             return project_l1_card(projection_v2.bundle_decision_card(card),public_contract=True)
+
+    def _research_coverage(self,card,query):
+        """Navigation coverage of delivered original values, never admission."""
+        from .retrieval_v2 import intent,extract_symbols
+        positive=intent(query)['original_positive']
+        if card.get('family')=='native_mechanism':
+            pointer=card.get('pointer','')
+            entry=self._mechanisms()[card['id']]['entry']
+            texts=[text for location,text in native_mechanism.navigation_units(
+                entry)
+                if not pointer or location==pointer or location.startswith(pointer+'/')]
+            owners=' '.join(re.split(r'[.:][^.:]+$',name)[0]
+                for api in entry['api_contracts'] for name in declared_navigation_symbols(api)
+                if ':' in name or '.' in name)
+            focus=entry['title']+' '+owners
+        else:
+            decoded=expand_l1_metadata(card)
+            texts=[json.dumps(atom.get('statement',''),ensure_ascii=False)
+                   for atom in decoded.get('decision',[]) if isinstance(atom,dict)]
+            document=next((row for row in self._ranker_v2().documents if row['id']==card['id']),None)
+            focus=document['entry']['title'] if document is not None else card.get('title','')
+        text=' '.join(texts)
+        return ({'topic:'+topic for topic in native_mechanism.navigation_topics(positive)&
+                 native_mechanism.navigation_topics(text)&native_mechanism.navigation_topics(focus)} |
+                {'symbol:'+name for name in extract_symbols(positive)&extract_symbols(text)})
+
+    def _research_followup(self,card,query,maximum,delivered=None,covered=()):
+        if card.get('family')!='native_mechanism':
+            return card.get('expansion',{}).get('reviewer')
+        record=self._mechanisms()[card['id']]
+        pointer=delivered.get('pointer') if delivered is not None else None
+        choices=native_mechanism.ranked_units(record['entry'],query)
+        from .retrieval_v2 import intent
+        exact=intent(query)['original_positive'].strip().lower()==card['id'].lower()
+        if pointer=='':return None
+        if exact or not choices:
+            return {'tool':'get_entry','arguments':epoch_arguments({
+                'id':card['id'],'projection':'reviewer','view':'decision',
+                'pointer':'','max_bytes':maximum})}
+        remaining=[row for row in choices if pointer is None or
+                   (pointer and row['pointer']!=pointer and not row['pointer'].startswith(pointer+'/'))]
+        if pointer is None and choices and choices[0]['exact_declaration']:
+            remaining=[row for row in remaining if row['exact_declaration']]
+        if not remaining:return None
+        remaining.sort(key=lambda row:-len(self._research_coverage({
+            'id':card['id'],'family':'native_mechanism','pointer':row['pointer']},query)-set(covered)))
+        return {'tool':'get_entry','arguments':epoch_arguments({
+            'id':card['id'],'projection':'reviewer','view':'decision',
+            'pointer':remaining[0]['pointer'],'max_bytes':maximum})}
 
     def _mechanism_results(self,records,query,count,maximum):
         payload={'results':[],'withheld_atoms':[],'query':query,'projection':'reviewer','family':'native_mechanism',
@@ -1016,18 +1049,49 @@ class Service:
                 proposed=dict(payload,results=payload['results']+[seed])
                 return serialized_payload_cost(proposed)+200<=64000
 
-            for item in candidates:
-                if len(payload['results'])>=top_k:break
-                seed=(self._research_seed_view(rich_by_id[item['id']],query,fits=fits_seed)
+            pending=[]
+            for rank,item in enumerate(candidates):
+                seed=(self._research_seed_view(rich_by_id[item['id']],query,grouped=False)
                       if view=='decision' else item)
+                coverage=self._research_coverage(seed,query) if view=='decision' else set()
+                rich=rich_by_id[item['id']]
+                admitted=set(rich.get('record_context_delivery',{}).get('seed_record_pointers',[]))
+                direct={atom.get('record_pointer') for atom in rich.get('decision',[])
+                        if isinstance(atom,dict) and atom.get('kind') in ('NSF','RV')}
+                complementary=len(admitted&direct)>1
+                pending.append((rank,item,seed,coverage,complementary))
+            covered=set()
+            while pending and len(payload['results'])<top_k:
+                # Preserve the first original-ranked task record. Afterwards,
+                # complementary requested topics precede repeated load/context
+                # matches. Coverage only orders already admitted whole values.
+                choice=(min(range(len(pending)),key=lambda index:(
+                    not pending[index][4],
+                    0 if pending[index][4] else -len(pending[index][3]-covered),pending[index][0]))
+                    if payload['results'] else 0)
+                rank,item,seed,coverage,complementary=pending.pop(choice)
+                if view=='decision' and item.get('family')!='native_mechanism':
+                    # Preserve a closed multi-operation task group, including
+                    # original conditions, before incidental cross-record fill.
+                    seed=self._research_seed_view(rich_by_id[item['id']],query,fits=fits_seed)
                 if fits_seed(seed):
                     payload['results'].append(seed)
+                    if view=='decision':covered.update(self._research_coverage(seed,query))
                 else:
                     deferred.append({'id':item['id'],
                         'reason':'WHOLE_ENTRY_AND_REQUIRED_CONTEXT_EXCEED_BUDGET',
-                        'followup':{'tool':'get_entry','id':item['id'],'projection':'reviewer'}})
-            # Every record receives a first atom attempt before a whole-card
-            # refill. Keep the common navigation order and the same byte cap.
+                        'followup':{'tool':'get_entry','id':item['id'],'projection':'reviewer',
+                                    **(self._research_followup(rich_by_id[item['id']],query,64000) or {})}})
+            # Native claims arrays refill after complementary record seeds.
+            if view=='decision':
+                for position,item in enumerate(payload['results']):
+                    if item.get('family')!='native_mechanism':continue
+                    def fits_group(group):
+                        proposed=dict(payload,results=payload['results'][:position]+[group]+payload['results'][position+1:])
+                        return serialized_payload_cost(proposed)+200<=64000
+                    group=self._research_seed_view(rich_by_id[item['id']],query,fits=fits_group)
+                    if fits_group(group):payload['results'][position]=group
+            # Whole-card refill follows direct, complementary task coverage.
             full_by_id={item['id']:item for item in candidates}
             for position,item in enumerate(payload['results']):
                 full=full_by_id[item['id']]
@@ -1348,6 +1412,13 @@ class Service:
                 navigation_context=registry.context_for(record) if registry is not None else None,
                 supplement_context=supplements.context_for(record) if supplements is not None else None)
         rendered_cards={}
+        research_allocation=mode=='research' and projection=='reviewer' and view=='decision'
+        navigation_cache={}
+        def navigation_for(card,delivered,covered):
+            key=(card['id'],delivered.get('pointer') if delivered is not None else None,tuple(sorted(covered)))
+            if key not in navigation_cache:
+                navigation_cache[key]=self._research_followup(card,task_description,maximum,delivered,covered)
+            return navigation_cache[key]
         def render(card):
             if view!='decision':
                 return card
@@ -1405,18 +1476,36 @@ class Service:
                              'task_local_only':True,'contexts':atomic_withheld,
                              'withheld_content_delivered':False,'entire_task_completion_proven':False})
             navigation = []
+            selected_by_id={entry['id']:entry for entry in selected}
+            covered=set().union(*(self._research_coverage(entry,task_description) for entry in selected)) if research_allocation else set()
             if view == 'decision':
+                navigation_candidates=[]
                 for rank, entry in enumerate(original_search_results, 1):
-                    if entry['id'] not in selected_ids and entry.get('expansion', {}).get('reviewer'):
-                        navigation.append({'id': entry['id'], 'title': entry['title'],
-                            'original_search_rank': rank, 'read_original': entry['expansion']['reviewer']})
-                        if len(navigation) == 3:
-                            break
+                    delivered=selected_by_id.get(entry['id'])
+                    partial_native=(entry.get('family')=='native_mechanism' and delivered is not None
+                                    and bool(delivered.get('pointer')))
+                    followup=(navigation_for(entry,delivered,covered) if research_allocation else
+                              entry.get('expansion',{}).get('reviewer'))
+                    if (entry['id'] not in selected_ids or partial_native) and followup:
+                        missing=set()
+                        if research_allocation:
+                            target=(dict(entry,pointer=followup['arguments']['pointer'])
+                                    if entry.get('family')=='native_mechanism' else entry)
+                            missing=self._research_coverage(target,task_description)-covered
+                        navigation_candidates.append((-len(missing),rank,{
+                            'id':entry['id'],'title':entry['title'],
+                            'original_search_rank':rank,'read_original':followup}))
+                navigation=[row[2] for row in sorted(navigation_candidates,key=lambda row:row[:2])[:3]]
             followup = ({'deferred_knowledge_navigation': {
                 'kind': 'ORIGINAL_RECORD_NAVIGATION_ONLY', 'content_delivered': False,
                 'entire_task_completion_proven': False, 'records': navigation}}
                 if navigation else {})
             result={'mode':mode,'budget':budget,'projection':projection,'view':view,'entries':selected,'kb_version':search['kb_version'],'retrieval_version':RETRIEVAL_VERSION,'truncated':bool(byte_ids or context_withheld or supplement_withheld or atomic_withheld),'catalog_results_truncated':bool(search.get('results_truncated') or count_ids),'max_payload_bytes':maximum,'budget_applies_to':'complete_structured_payload_utf8','budget_withheld_count':len(withheld) if reserve else len(byte_ids),'card_limit_withheld_count':len(withheld) if reserve else len(count_ids),'context_budget_withheld_count':sum(len(row['donor_entry_ids']) for row in context_withheld)+sum(len(row['relations']) for row in supplement_withheld),'knowledge_gaps':gaps,**followup,'notice':'Decision cards first. For Native API research or existing-code review use explicit reviewer admission, then reviewer/evidence views; Coding HOLD remains unchanged.',**self._governance([entry['id'] for entry in selected])}
+            partial=[entry['id'] for entry in selected if entry.get('family')=='native_mechanism' and entry.get('pointer')]
+            if partial:
+                result['truncated']=True
+                result['knowledge_gaps']=gaps+[{'status':'whole_original_record_partially_delivered',
+                    'entry_ids':partial,'entire_task_completion_proven':False}]
             if atomic_withheld:
                 result['atomic_budget_withheld_count']=sum(row['withheld_atom_count'] for row in atomic_withheld)
             result['entries']=[render(entry) for entry in selected]
@@ -1435,6 +1524,15 @@ class Service:
             base=supplement_trial(primary,[]) if optional else primary
             row={'original':entry,'primary':primary,'base':base,'optional':optional,
                  'included':[],'contexts':[],'supplements':[],'position':None,'plan':None,'attempted':set()}
+            if research_allocation and entry.get('family')=='native_mechanism':
+                record=self._mechanisms()[entry['id']]
+                choices=native_mechanism.ranked_units(record['entry'],task_description)
+                row['native_requested']=bool(choices and choices[0]['exact_declaration'])
+                if choices and choices[0]['exact_declaration']:
+                    choices=[choice for choice in choices if choice['exact_declaration']]
+                metadata={key:entry[key] for key in ('score','match_reason','expansion') if key in entry}
+                row['native_units']=[native_mechanism.envelope(record,choice['pointer'],assessment_detail=False)|metadata
+                                     for choice in choices]
             if view=='decision' and task_description.strip():
                 try:
                     record,options=atomic_options(base)
@@ -1465,6 +1563,14 @@ class Service:
         schedule=[]
         for rank,row in enumerate(rows):
             plan=row['plan']
+            if row.get('native_units'):
+                for turn,trial in enumerate(row['native_units']):
+                    value=trial['value']
+                    kind=value.get('kind','NSF' if trial['pointer'].startswith('/api_contracts/') else 'REC')
+                    size=serialized_payload_cost(render(trial))
+                    key=admitted_atom_unit_key(kind,size,rank,turn,row['native_requested'])
+                    schedule.append((key,row,None,trial))
+                continue
             if plan is None:
                 kind=next((atom.get('kind','') for atom in row['base'].get('decision',[]) if isinstance(atom,dict)),'')
                 size=len(json.dumps(row['base'],ensure_ascii=False).encode('utf-8'))
@@ -1493,10 +1599,28 @@ class Service:
                 size=len(json.dumps(render(trial),ensure_ascii=False).encode('utf-8'))
                 requested=requested_method_identity_match(task_description,contexts.get(pointer,{}))
                 schedule.append((admitted_atom_unit_key(kinds.get(pointer,''),size,rank,turn,requested),row,pointer,trial))
-        for _,row,pointer,initial in sorted(schedule,key=lambda item:item[0]):
+        pending=sorted(schedule,key=lambda item:item[0])
+        coverage_cache={}
+        covered=set()
+        while pending:
+            if research_allocation:
+                def allocation_key(index):
+                    key,row,pointer,trial=pending[index]
+                    marker=id(trial)
+                    if marker not in coverage_cache:
+                        coverage_cache[marker]=self._research_coverage(trial,task_description)
+                    if not entries:
+                        return (key[0],key[3],key[4],key[1],key[2])
+                    return (key[0],key[1],-len(coverage_cache[marker]-covered),key[3],key[4],key[2])
+                choice=min(range(len(pending)),key=allocation_key)
+            else:
+                choice=0
+            _,row,pointer,initial=pending.pop(choice)
             plan=row['plan']
             if pointer is None:
-                accept(row,initial)
+                if row.get('native_units') and row['position'] is not None:continue
+                if accept(row,initial) and research_allocation:
+                    covered.update(self._research_coverage(initial,task_description))
                 continue
             included=list(dict.fromkeys(row['included']+(list(pointer) if isinstance(pointer,tuple) else [pointer])))
             represented=frozenset(value for unit in plan['units']
@@ -1508,6 +1632,7 @@ class Service:
                 row['base'],row['record'],included,plan,**row['options']))
             if accept(row,trial):
                 row['included']=included
+                if research_allocation:covered.update(self._research_coverage(trial,task_description))
         # Adjacent contexts never create a new result or task seed. Their
         # unverified necessity stays visible if they cannot be delivered.
         for row in rows:

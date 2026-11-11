@@ -1,0 +1,2696 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "movement_relationships",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-MOVE-001",
+      "title": "来源修正器与预测移速的聚合、回调及释放",
+      "aliases": [
+        "SourceModifierList",
+        "source/key",
+        "SetModifier",
+        "RemoveModifier",
+        "SetPredictExternalSpeedMultiplier",
+        "preview_channelcast"
+      ],
+      "engineering_question": "来源列表如何精确更新和释放，预测列表怎样接到客户端速度，以及真实预演消费者如何退出？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "current_local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "SourceModifierList、locomotor预测包装与SGwilson_client的channelcast预演。列表基础规则作为已登记Core的前置。",
+        "exclusions": [
+          "NC-N004-FINAL-05/10已有聚合、key粒度与PlayerSpeedMult缓存事实，本条补完整API及预测移动消费者。",
+          "伤害/护甲/health的数值通道、其他全部修正器消费者及原生预测算法。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-MOVE-001-C01",
+          "kind": "NSF",
+          "statement": "SourceModifierList默认base=1和乘法，也接收显式base/reducer/dirtycb。SetModifier省略key使用固定key，nil source早退，nil值或等于_base的值转为移除此key。实体来源只有首次建立来源记录时登记onremove。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S19"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C02",
+          "kind": "NSF",
+          "statement": "RecalculateModifier按pairs从_base折叠，先写缓存结果再调用dirtycb。相同已存值跳过重算，Reset即使空表也回调dirtycb。RemoveModifier删不存在key但来源仍有其他key时仍会重算。",
+          "evidence_refs": [
+            "MR-S01"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C03",
+          "kind": "EI",
+          "statement": "自定义reducer若依赖遍历顺序，结果受pairs实际顺序影响。dirtycb同步执行且可以重入，修改表、监听与回调之间沿此路径缺少统一回滚。Get读取的是缓存结果。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S11",
+            "MR-S12"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C04",
+          "kind": "NSF",
+          "statement": "locomotor普通外部速度表自行维护multipliers和来源监听，预测包装则创建SourceModifierList并交换包装参数次序。GetPredictExternalSpeedMultipler忽略声明的source/key，读取整个预测列表。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S04"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C05",
+          "kind": "NSF",
+          "statement": "客户端ExternalSpeedMultiplier取classified外部值或本地后备，再乘预测列表。channelcast预演固定key可写正向或逆向倍率，Stop在任务字段存在时取消任务、清字段、解绑performaction并移除key，任务超时调用同一Stop。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S08",
+            "MR-S09",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S46"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-001-C06",
+          "kind": "REC",
+          "statement": "在实际支持来源身份的接口上保存source/key及所属列表。预测效果按本次消费者的开始、确认、超时和卸载配对释放，并分别核对权威来源与预测来源的聚合。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S03",
+            "MR-S04",
+            "MR-S08",
+            "MR-S09",
+            "MR-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SourceModifierList:SetModifier",
+          "source_file": "scripts/util/sourcemodifierlist.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为来源对象或名字，nil直接返回。m为贡献值，key缺省为字符串key。"
+          ],
+          "returns": "正常返回nil，相同已存值跳过重算。聚合函数、监听或dirtycb错误会外抛。",
+          "preconditions": [
+            "列表由SourceModifierList(inst,base,fn,dirtycb)建立，inst在实体来源分支可登记事件。m须适用于所选聚合函数。"
+          ],
+          "side_effects": [
+            "m为nil或等于本列表_base时转RemoveModifier(source,key)。其他值覆盖对应source/key。",
+            "新实体来源登记一份onremove闭包，删除时去掉整个source并重算。字符串来源通过名字持有贡献。",
+            "重算从_base按pairs折叠全部贡献，先写_modifier，再直接调用dirtycb(inst,result)。"
+          ],
+          "lifecycle": [
+            "基础聚合规则复用NC-N004-FINAL-05。本条完整合同接到locomotor预测列表。",
+            "写表、登记监听及dirty回调依次发生，发生异常时此前写入沿当前路径保留。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S11",
+            "MR-S12",
+            "MR-S19"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "SourceModifierList:RemoveModifier",
+          "source_file": "scripts/util/sourcemodifierlist.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为原来源，key可选。给key只去该贡献，省略key去整个source。"
+          ],
+          "returns": "正常返回nil，缺来源直接返回。",
+          "preconditions": [
+            "列表内部来源记录保持构造形状，实体来源原监听函数可用于解绑。"
+          ],
+          "side_effects": [
+            "删除后还有同source其他key则重算后返回。最后一个key或整source删除会先解绑实体监听再删source并重算。"
+          ],
+          "lifecycle": [
+            "重复移除缺来源无动作。删除不存在key但该来源还有其他key时仍会重算并调用dirtycb。",
+            "普通事件已形成的回调快照沿既有EXP-ARCH-001合同执行。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S11",
+            "MR-S12",
+            "MR-S45"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "SourceModifierList:Reset",
+          "source_file": "scripts/util/sourcemodifierlist.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "本列表拥有全部待释放来源，实体监听保持原记录身份。"
+          ],
+          "side_effects": [
+            "遍历所有来源并解绑其实体onremove监听，清表，将_modifier直接写回_base，再调用dirtycb(inst,base)。"
+          ],
+          "lifecycle": [
+            "空列表也调用dirtycb。locomotor组件卸载对其预测列表调用本方法。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S03",
+            "MR-S11"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:SetPredictExternalSpeedMultiplier",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source、key、m按此包装顺序传入，内部转成SourceModifierList:SetModifier(source,m,key)。"
+          ],
+          "returns": "正常返回nil，首次使用创建预测列表。",
+          "preconditions": [
+            "self.inst和SourceModifierList可用。有效值及来源语义沿所建默认乘法列表。"
+          ],
+          "side_effects": [
+            "按需建立predictexternalspeedmultiplier，再更新该来源/key聚合。"
+          ],
+          "lifecycle": [
+            "包装自身没有master/client端别早退。普通客户端读取路径将此聚合乘到classified外部速度值上。",
+            "SGwilson_client的channelcast预演用本实体作source，以固定key加入正向或逆向倍率，并由performaction/超时清理。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S02",
+            "MR-S03",
+            "MR-S04",
+            "MR-S08",
+            "MR-S09",
+            "MR-S11",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S46"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:RemovePredictExternalSpeedMultiplier",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为原来源，key可选，省略时移除该source全部预测贡献。"
+          ],
+          "returns": "正常返回nil，尚未创建列表时无动作。",
+          "preconditions": [
+            "存在列表时按SourceModifierList的来源与key身份释放。"
+          ],
+          "side_effects": [
+            "委托RemoveModifier，保留已创建的预测列表对象。"
+          ],
+          "lifecycle": [
+            "预演停止释放固定key，组件卸载Reset预测列表。任务取消、业务字段与监听由预演Stop另行释放。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S03",
+            "MR-S04",
+            "MR-S08",
+            "MR-S09",
+            "MR-S11",
+            "MR-S13",
+            "MR-S14"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:GetPredictExternalSpeedMultipler",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "声明中的source/key参数在此实现未被读取。"
+          ],
+          "returns": "返回整张预测列表的缓存聚合，未建列表返回1。",
+          "preconditions": [
+            "存在列表时须提供Get方法。"
+          ],
+          "side_effects": [
+            "读取缓存值，此调用不重算列表。"
+          ],
+          "lifecycle": [
+            "名称保留源码中的Multipler拼写。ClientExternalSpeedMultiplier使用该全量结果。"
+          ],
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S02",
+            "MR-S04"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "来源更新写入列表并重算缓存，可同步进入dirty回调或登记来源退出监听。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S11",
+            "MR-S19"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "channelcast预演通过预测包装写列表，客户端速度消费者将其乘入外部速度聚合。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S08",
+            "MR-S09",
+            "MR-S46"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "预演确认/超时解除业务key与任务，来源实体移除和locomotor卸载分别清理来源或整列表。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S03",
+            "MR-S08",
+            "MR-S11",
+            "MR-S13",
+            "MR-S14",
+            "MR-S18"
+          ]
+        }
+      ],
+      "unknowns": [
+        "原生预测、网络送达及客户端运动结果尚未运行验证。",
+        "只展开具名channelcast消费者。PlayerSpeedMult的四张列表与base缓存沿NC-N004-FINAL-10原Scope。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "MR-S01",
+            "role": "来源列表构造、聚合、key操作、实体清理和导出",
+            "claim_ids": [
+              "EXP-MOVE-001-C01",
+              "EXP-MOVE-001-C02",
+              "EXP-MOVE-001-C03",
+              "EXP-MOVE-001-C04",
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S02",
+            "role": "来源列表导入、端别函数绑定、速度计算与属性setter",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S03",
+            "role": "locomotor组件卸载释放来源监听及预测列表",
+            "claim_ids": [
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S04",
+            "role": "普通及预测来源速度API",
+            "claim_ids": [
+              "EXP-MOVE-001-C04",
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S08",
+            "role": "预测channelcast来源安装、超时及performaction清理",
+            "claim_ids": [
+              "EXP-MOVE-001-C05",
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S09",
+            "role": "预测来源具名SG调用者",
+            "claim_ids": [
+              "EXP-MOVE-001-C05",
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S10",
+            "role": "权威channelcast来源安装与成对清理",
+            "claim_ids": [
+              "EXP-MOVE-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S11",
+            "role": "来源、leader与rider监听身份及整实体双向清理",
+            "claim_ids": [
+              "EXP-MOVE-001-C03"
+            ]
+          },
+          {
+            "ref": "MR-S12",
+            "role": "同步普通回调及SG事件转交",
+            "claim_ids": [
+              "EXP-MOVE-001-C03"
+            ]
+          },
+          {
+            "ref": "MR-S13",
+            "role": "任务归属、延后执行生产者和完成移键",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S14",
+            "role": "Periodic构造、Cancel与Cleanup",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S15",
+            "role": "相对任务到tick生产者",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S16",
+            "role": "任务回调执行及重排消费者",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S18",
+            "role": "实体删除事件、任务、组件与子实体退出",
+            "claim_ids": []
+          },
+          {
+            "ref": "MR-S19",
+            "role": "Class属性先写值再调用setter及实体来源身份检测",
+            "claim_ids": [
+              "EXP-MOVE-001-C01"
+            ]
+          },
+          {
+            "ref": "MR-S45",
+            "role": "按监听函数身份删除callee",
+            "claim_ids": []
+          },
+          {
+            "ref": "MR-S46",
+            "role": "预测清理TIMEOUT常量绑定",
+            "claim_ids": [
+              "EXP-MOVE-001-C05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "逐引用枚举本条定义、调用者、消费者和清理入口。可选业务hook及原生接口的内部合同限本条unknowns。",
+          "历史条目保留各自Scope，本次适用范围绑定所列762172字节。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-MOVE-002",
+      "title": "外部移速到步行、奔跑与骑乘速度的消费链",
+      "aliases": [
+        "SetExternalSpeedMultiplier",
+        "GetExternalSpeedMultiplier",
+        "GetWalkSpeed",
+        "GetRunSpeed",
+        "骑乘速度",
+        "motor"
+      ],
+      "engineering_question": "来源倍率怎样进入权威与客户端运动速度，装备、坐骑和接近目标分支分别消费什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "current_local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "locomotor端别绑定、普通外部速度表、classified/预测读取、装备与鞍速度getter及直接motor边界。",
+        "exclusions": [
+          "NC-N004-FINAL-10已有PlayerSpeedMult缓存，EXP-AI-007/EXP-ACT已有动作分发。本条只补速度数值消费与完整API。",
+          "库存移交、战斗数值、完整寻路/跳平台、原生物理速度与预测误差。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-MOVE-002-C01",
+          "kind": "NSF",
+          "statement": "locomotor构造按ismastersim绑定RunSpeed、ExternalSpeedMultiplier和GetSpeedMultiplier，并初始化普通来源表。master属性setter写classified，client移除相应setter，客户端读取classified外部值乘预测聚合。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S19",
+            "MR-S20"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C02",
+          "kind": "NSF",
+          "statement": "普通外部Set要求显式key，nil/1贡献转移除。新source直接登记事件监听，当前实现没有SourceModifierList按EntityScript类型区分来源的分支。查询GetExternalSpeedMultiplier只查询指定source/key。",
+          "evidence_refs": [
+            "MR-S01",
+            "MR-S04",
+            "MR-S11"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C03",
+          "kind": "NSF",
+          "statement": "服务端GetSpeedMultiplier从外部聚合开始，有inventory且骑乘时用鞍的速度getter，否则inventory开放时乘已装备物品getter，mighty分支把小于1的物品因子提升到1。最后乘临时地面或当前地面乘数及throttle。客户端以replica和相应getter实施对应读取。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S05",
+            "MR-S21",
+            "MR-S22",
+            "MR-S23",
+            "MR-S24"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C04",
+          "kind": "NSF",
+          "statement": "GetWalkSpeed用self.walkspeed，GetRunSpeed用绑定RunSpeed。master骑乘RunSpeed读坐骑runspeed，客户端经rider replica读取当前坐骑或classified速度。RunForward/WalkForward把计算结果交SetMotorSpeed，再委托原生Physics接口。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S05",
+            "MR-S06",
+            "MR-S20",
+            "MR-S24"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C05",
+          "kind": "NSF",
+          "statement": "OnUpdate最后的非平台扫描分支在当前motor speed大于0且CheckDrownable返回假值时重算速度，若有效dest距离平方不大于.25，会把局部speed_mult替换为max(.33,sqrt(dsq))，再写desired_speed乘该值。该分支与GetRunSpeed的一般返回值分别存在。",
+          "evidence_refs": [
+            "MR-S07",
+            "MR-S48"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C06",
+          "kind": "EI",
+          "statement": "骑乘路径选择坐骑run base和骑手乘数的具体组合。仅更改坐骑自己的外部速度表，不能由所查GetRunSpeed表达式推导骑手自动使用该表。物理最终位移还受具体更新分支和原生行为影响。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S05",
+            "MR-S06",
+            "MR-S07",
+            "MR-S24"
+          ]
+        },
+        {
+          "id": "EXP-MOVE-002-C07",
+          "kind": "REC",
+          "statement": "定位移速问题时沿所属实体、普通/预测来源、run base、装备/鞍、地面与最终motor调用逐项核对，并使用对应source/key退出接口。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S03",
+            "MR-S04",
+            "MR-S05",
+            "MR-S06",
+            "MR-S07",
+            "MR-S10"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "LocoMotor:SetExternalSpeedMultiplier",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为可作为事件源的实体对象，key必须非nil，m为乘法贡献值。"
+          ],
+          "returns": "正常返回nil。key=nil早退，m=nil或1转移除该key。",
+          "preconditions": [
+            "source应满足ListenForEvent的事件源接口，数值须可乘。此包装没有SourceModifierList的实体类型分流，也没有nil-source保护。"
+          ],
+          "side_effects": [
+            "新来源存multipliers与onremove闭包并登记监听，同source/key变更后重算externalspeedmultiplier。",
+            "externalspeedmultiplier属性setter在player_classified存在时写对应netvar。"
+          ],
+          "lifecycle": [
+            "未设置master端早退，但构造仅在master保留该属性setter。由权威消费者按其端别调用。",
+            "来源移除回调删除整source，显式移除最后key会解绑来源监听。组件卸载也解绑普通表的所有来源监听。"
+          ],
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S03",
+            "MR-S04",
+            "MR-S10",
+            "MR-S11",
+            "MR-S19",
+            "MR-S20"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:RemoveExternalSpeedMultiplier",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为原来源，key可选，省略key移除整来源。"
+          ],
+          "returns": "正常返回nil，来源缺失直接返回。",
+          "preconditions": [
+            "来源记录由对应Set包装建立，保存的事件函数仍可用于解绑。"
+          ],
+          "side_effects": [
+            "删key后尚有其他贡献时重算并保留监听，否则解绑来源、删记录并重算。"
+          ],
+          "lifecycle": [
+            "ChannelCaster Stop及卸载回调使用同一source/key。整表和预测列表有不同的清理路径。"
+          ],
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S03",
+            "MR-S04",
+            "MR-S10",
+            "MR-S11"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:GetExternalSpeedMultiplier",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "source为要查询的单一来源，key可选。"
+          ],
+          "returns": "缺来源返回1，省略key返回该来源各key乘积，给key返回该项或1。",
+          "preconditions": [
+            "查询的是普通外部速度表，已存值须可用于乘法。"
+          ],
+          "side_effects": [
+            "按需遍历该来源，函数本身不修改聚合字段。"
+          ],
+          "lifecycle": [
+            "该结果只代表指定来源的普通外部贡献。GetRunSpeed另结合所有来源与其他速度通道。"
+          ],
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S05"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:GetWalkSpeed",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "返回walkspeed乘当前绑定GetSpeedMultiplier的结果。",
+          "preconditions": [
+            "相关端别的装备/鞍/地面/预测接口可用，读取值适用于数值乘法。"
+          ],
+          "side_effects": [
+            "调用聚合getter，临时地面getter过期时会清缓存字段，装备getter可能调用已配置业务修正函数。"
+          ],
+          "lifecycle": [
+            "本方法使用self.walkspeed，骑乘run base的选择属于RunSpeed路径。WalkForward把本结果传SetMotorSpeed。"
+          ],
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S05",
+            "MR-S06",
+            "MR-S21",
+            "MR-S22",
+            "MR-S23",
+            "MR-S24"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "LocoMotor:GetRunSpeed",
+          "source_file": "scripts/components/locomotor.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "返回当前绑定RunSpeed乘GetSpeedMultiplier。",
+          "preconditions": [
+            "master骑乘分支要求坐骑locomotor，客户端依实际rider replica/classified条件读取。"
+          ],
+          "side_effects": [
+            "读取当前乘数，临时地面缓存和业务装备getter可能有其所列副作用。"
+          ],
+          "lifecycle": [
+            "master骑乘时run base来自mount.components.locomotor.runspeed，普通外部乘数仍由骑手self读取。",
+            "客户端骑乘优先rider replica坐骑速度，非骑乘可用autopredict的predictrunspeed或classified runspeed。",
+            "RunForward传结果到motor。OnUpdate另有到达和平台分支，其最终motor写入须按该分支检查。"
+          ],
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S05",
+            "MR-S06",
+            "MR-S07",
+            "MR-S20",
+            "MR-S21",
+            "MR-S22",
+            "MR-S23",
+            "MR-S24",
+            "MR-S48"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "权威channelcast按固定source/key设置普通来源，属性setter更新复制载体。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S04",
+            "MR-S10",
+            "MR-S19",
+            "MR-S20"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "端别getter组合base与外部、装备/鞍、地面及throttle，骑乘base由rider链提供。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S05",
+            "MR-S20",
+            "MR-S21",
+            "MR-S22",
+            "MR-S23",
+            "MR-S24"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "直接前进与OnUpdate分支读取速度并委托motor，来源停止或组件卸载释放自己的监听。",
+          "evidence_refs": [
+            "MR-S03",
+            "MR-S04",
+            "MR-S06",
+            "MR-S07",
+            "MR-S10",
+            "MR-S11",
+            "MR-S48"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行步行、奔跑、骑乘、mighty、地面与近目标分支的实际速度对比。",
+        "装备交接由物品专题研究，本条只读取具名速度getter。原生motor、碰撞、网络和路径调度内部未验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "MR-S01",
+            "role": "来源列表构造、聚合、key操作、实体清理和导出",
+            "claim_ids": [
+              "EXP-MOVE-002-C02"
+            ]
+          },
+          {
+            "ref": "MR-S02",
+            "role": "来源列表导入、端别函数绑定、速度计算与属性setter",
+            "claim_ids": [
+              "EXP-MOVE-002-C01",
+              "EXP-MOVE-002-C03",
+              "EXP-MOVE-002-C04",
+              "EXP-MOVE-002-C06",
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S03",
+            "role": "locomotor组件卸载释放来源监听及预测列表",
+            "claim_ids": [
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S04",
+            "role": "普通及预测来源速度API",
+            "claim_ids": [
+              "EXP-MOVE-002-C01",
+              "EXP-MOVE-002-C02",
+              "EXP-MOVE-002-C06",
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S05",
+            "role": "速度getter和地面/临时地面乘数callee",
+            "claim_ids": [
+              "EXP-MOVE-002-C03",
+              "EXP-MOVE-002-C04",
+              "EXP-MOVE-002-C06",
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S06",
+            "role": "速度到原生motor边界的直接消费者",
+            "claim_ids": [
+              "EXP-MOVE-002-C04",
+              "EXP-MOVE-002-C06",
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S07",
+            "role": "OnUpdate实际速度读取及近目标替换分支",
+            "claim_ids": [
+              "EXP-MOVE-002-C05",
+              "EXP-MOVE-002-C06",
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S10",
+            "role": "权威channelcast来源安装与成对清理",
+            "claim_ids": [
+              "EXP-MOVE-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S11",
+            "role": "来源、leader与rider监听身份及整实体双向清理",
+            "claim_ids": [
+              "EXP-MOVE-002-C02"
+            ]
+          },
+          {
+            "ref": "MR-S19",
+            "role": "Class属性先写值再调用setter及实体来源身份检测",
+            "claim_ids": [
+              "EXP-MOVE-002-C01"
+            ]
+          },
+          {
+            "ref": "MR-S20",
+            "role": "骑乘及移动netvar载体定义与初值",
+            "claim_ids": [
+              "EXP-MOVE-002-C01",
+              "EXP-MOVE-002-C04"
+            ]
+          },
+          {
+            "ref": "MR-S21",
+            "role": "装备速度getter必要callee，交接机制由其他专题覆盖",
+            "claim_ids": [
+              "EXP-MOVE-002-C03"
+            ]
+          },
+          {
+            "ref": "MR-S22",
+            "role": "鞍速度属性同步及getter必要callee",
+            "claim_ids": [
+              "EXP-MOVE-002-C03"
+            ]
+          },
+          {
+            "ref": "MR-S23",
+            "role": "客户端装备/鞍速度编码与读取必要callee",
+            "claim_ids": [
+              "EXP-MOVE-002-C03"
+            ]
+          },
+          {
+            "ref": "MR-S24",
+            "role": "rider复制字段、动作过滤和坐骑/鞍/速度读取闭包",
+            "claim_ids": [
+              "EXP-MOVE-002-C03",
+              "EXP-MOVE-002-C04",
+              "EXP-MOVE-002-C06"
+            ]
+          },
+          {
+            "ref": "MR-S48",
+            "role": "最终速度分支的溺水判定委托边界",
+            "claim_ids": [
+              "EXP-MOVE-002-C05"
+            ]
+          }
+        ],
+        "unknowns": [
+          "逐引用枚举本条定义、调用者、消费者和清理入口。可选业务hook及原生接口的内部合同限本条unknowns。",
+          "历史条目保留各自Scope，本次适用范围绑定所列762172字节。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-REL-001",
+      "title": "跟随关系的双向登记、移交与忠诚退出",
+      "aliases": [
+        "Leader:AddFollower",
+        "Leader:RemoveFollower",
+        "Follower:SetLeader",
+        "Follower:GetLeader",
+        "AddLoyaltyTime",
+        "跟随移交",
+        "keepdeadleader"
+      ],
+      "engineering_question": "leader索引和follower指针如何建立、移交及退出，忠诚任务、物品来源和实际Follow行为分别承担什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "current_local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Leader/Follower及replica、leash与忠诚任务、物品来源helper、具名猪人接受食物与PigBrain/Follow消费者。",
+        "exclusions": [
+          "EXP-LIFE-001/006/008与EXP-SAVE-001的通用事件、任务、删除和GUID合同只作前置。",
+          "战斗决策、完整食物/库存交接、所有Brain及followermemory业务和跨分片关系协议。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-REL-001-C01",
+          "kind": "NSF",
+          "statement": "Leader AddFollower先写followers索引和计数，再SetLeader，随后startfollowing、业务回调及目标死亡/移除监听。RemoveFollower先删索引、解绑并调用onremovefollower，invalid假值分支才发布stopfollowing及SetLeader(nil)。",
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S25",
+            "MR-S26"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C02",
+          "kind": "NSF",
+          "statement": "SetLeader换源时清旧leader/leash/来源监听/忠诚任务，再建立新源、可选物品owner来源、新leader索引和移除监听，末尾调用关系hook及leaderchanged。相同源的changed分支不执行，互调通过当前索引和指针条件收束。",
+          "evidence_refs": [
+            "MR-S19",
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S28",
+            "MR-S34"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C03",
+          "kind": "NSF",
+          "statement": "GetLeader优先itemowner，随后leader，replica采用对应读取。物品来源helper跟踪入袋、掉落、容器owner及移除，调用Follower的OnItemSourceNewOwner/Removed维护itemowner和leader的itemfollowers表。",
+          "evidence_refs": [
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S28"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C04",
+          "kind": "NSF",
+          "statement": "AddLoyaltyTime按leader倍率和maxfollowtime夹取截止时间，先发布gainloyalty再替换句柄。到期StopFollowing受neverexpire/IsValid条件控制，发布loseloyalty后SetLeader(nil)。Leash另持睡眠/leader wake监听和porttask。",
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S26"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C05",
+          "kind": "NSF",
+          "statement": "leader死亡移除不带keepdeadleader的目标，组件卸载RemoveAllFollowers，实体OnRemoveEntity也映射该整清。Follower组件卸载停止任务及订阅但没有调用leader RemoveFollower，也未把leader字段清nil，宿主整事件清理另由EntityScript Remove处理。",
+          "evidence_refs": [
+            "MR-S17",
+            "MR-S18",
+            "MR-S25",
+            "MR-S26"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C06",
+          "kind": "EI",
+          "statement": "单独卸载Follower组件时，原leader索引沿该局部hook可能保留，后续普通RemoveFollower路径又需要follower组件。项目若主动卸载该组件，应先沿自己持有的关系入口解除并核对退出。同步业务回调重入或异常可留下此前已提交阶段。",
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S17",
+            "MR-S25",
+            "MR-S26"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C07",
+          "kind": "NSF",
+          "statement": "非玩家leader保存follower GUID并在LoadPostPass经映射AddFollower，玩家leader自身不在该函数保存列表。Follower保存剩余忠诚与玩家用户标识缓存，加入/新玩家事件按当前缓存条件重接或清理。该路径与实时关系分别存在。",
+          "evidence_refs": [
+            "MR-S25",
+            "MR-S26"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C08",
+          "kind": "NSF",
+          "statement": "猪人master构造配置maxfollowtime和接受物品回调，具名接受路径可AddFollower并AddLoyaltyTime。PigBrain GetLeader将当前目标交给Follow，Follow经FunctionOrValue调用该目标函数，再检查有效性、距离和状态后请求locomotor靠近、后退或停止。",
+          "evidence_refs": [
+            "MR-S29",
+            "MR-S30",
+            "MR-S31",
+            "MR-S32",
+            "MR-S33",
+            "MR-S47"
+          ]
+        },
+        {
+          "id": "EXP-REL-001-C09",
+          "kind": "REC",
+          "statement": "按普通leader、物品来源owner和当前getter目标追踪关系，使用匹配的添加/移交/解除入口。退出时核对leader索引、follower字段、忠诚任务及leash订阅，并以实际Follow消费者验证移动结果。",
+          "evidence_refs": [
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S28",
+            "MR-S33"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Leader:AddFollower",
+          "source_file": "scripts/components/leader.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "follower为带follower组件的实体。"
+          ],
+          "returns": "正常返回nil。已有本leader索引或目标没有follower组件时不进入添加分支。",
+          "preconditions": [
+            "目标可读取components，当前leader、follower replica、事件及可选业务hook可用。"
+          ],
+          "side_effects": [
+            "先写followers[follower]并递增numfollowers，再调用目标SetLeader(self.inst)，随后发布startfollowing、进度统计及可选onfolloweradded。",
+            "后段登记目标death（keepdeadleader除外）和onremove监听，并执行具名成就统计条件。"
+          ],
+          "lifecycle": [
+            "索引写入早于指针及后段监听。回调异常可留下已经写入的阶段。已有索引分支没有核对和修复另一侧指针。",
+            "目标死亡通常RemoveFollower，目标onremove以invalid=true释放，leader死亡另按keepdeadleader选择。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S19",
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S29",
+            "MR-S30"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Leader:RemoveFollower",
+          "source_file": "scripts/components/leader.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "follower为原目标，invalid可选，truthy时跳过目标stopfollowing和SetLeader(nil)。"
+          ],
+          "returns": "正常返回nil，nil目标或无本leader索引时无动作。",
+          "preconditions": [
+            "记录存在时对应监听函数可解绑。普通invalid假值分支要求目标当前仍有follower组件。"
+          ],
+          "side_effects": [
+            "先删索引、减计数并解绑death/onremove，调用onremovefollower，普通分支再发布stopfollowing并SetLeader(nil)。"
+          ],
+          "lifecycle": [
+            "onremovefollower及事件均可同步进入业务。方法后段没有关系身份复核或回滚。",
+            "invalid=true用于目标实体移除时的leader侧清理，保留了与普通主动解除不同的调用边界。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S25",
+            "MR-S26"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Follower:SetLeader",
+          "source_file": "scripts/components/follower.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "new_leader为新源实体或nil。可带leader组件，也支持所查inventoryitem来源分支。"
+          ],
+          "returns": "正常返回nil，同一原leader直接应用时没有changed分支的关系变更。",
+          "preconditions": [
+            "相关原leader、replica、事件及物品来源helper保持有效。新源须满足所走分支的实体接口。"
+          ],
+          "side_effects": [
+            "换源先请求旧leader RemoveFollower，停止leash、解绑旧源onremove、取消忠诚计时并清旧leader和物品来源。",
+            "新源阶段清玩家缓存，写leader，按需建立物品来源，回调新leader AddFollower，登记源onremove并按条件StartLeashing。",
+            "changed时再调用可选followermemory/OnChangedLeader、相应combat关系处理并发布leaderchanged。leader属性写入同步调用replica setter。"
+          ],
+          "lifecycle": [
+            "Leader与Follower的互调由现有索引/相同leader条件限制重复进入。切换时可出现中间nil关系及同步事件。",
+            "事件、hook、leash任务与物品owner接线各有阶段，方法没有统一事务回滚。",
+            "普通组件卸载hook只停止本组件任务和部分订阅，完整关系解除应沿实际Leader/Follower入口核对。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S19",
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S28",
+            "MR-S34"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Follower:GetLeader",
+          "source_file": "scripts/components/follower.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "返回itemowner or leader，二者均缺失则nil。",
+          "preconditions": [
+            "self为follower组件，itemowner和leader由对应关系入口维护。"
+          ],
+          "side_effects": [
+            "读取当前字段，此方法不检查目标IsValid。"
+          ],
+          "lifecycle": [
+            "物品来源分支可使实际交互/Follow目标优先为owner。replica getter采用对应优先级。",
+            "PigBrain把此getter交给Follow行为，行为随后检查目标有效性并请求locomotor移动。"
+          ],
+          "evidence_refs": [
+            "MR-S26",
+            "MR-S27",
+            "MR-S28",
+            "MR-S31",
+            "MR-S32",
+            "MR-S33",
+            "MR-S47"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Follower:AddLoyaltyTime",
+          "source_file": "scripts/components/follower.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "time为参与算术的时间增量，可被当前leader.loyaltyeffectiveness缩放。"
+          ],
+          "returns": "正常返回nil，neverexpire真时早退。",
+          "preconditions": [
+            "maxfollowtime及time满足算术和clamp要求。未设maxfollowtime时上限按0处理。宿主调度可用。"
+          ],
+          "side_effects": [
+            "已有targettime以max(now,targettime)+time夹在now到now+maxfollowtime，首次则将time夹在0到上限。",
+            "先发布gainloyalty，再取消旧task并按新targettime创建stopfollow任务。"
+          ],
+          "lifecycle": [
+            "stopfollow调用StopFollowing，后者受neverexpire和宿主有效性条件控制。换leader会CancelLoyaltyTask清截止与句柄。",
+            "OnLoad把保存time再交本方法，玩家leader还通过用户标识缓存路径重接。具体时序依本次调用者。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S25",
+            "MR-S26",
+            "MR-S29",
+            "MR-S30"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Follower:StopFollowing",
+          "source_file": "scripts/components/follower.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "正常返回nil，neverexpire真或宿主无效时不执行解除段。",
+          "preconditions": [
+            "有效宿主解除段要求当前关系、事件和SetLeader依赖满足其合同。"
+          ],
+          "side_effects": [
+            "有效且可过期时先清targettime，再发布loseloyalty，随后SetLeader(nil)。"
+          ],
+          "lifecycle": [
+            "普通忠诚到期入口，强制关系变化可另走SetLeader或leader RemoveFollower。",
+            "任务取消不打断已进入的回调，gainloyalty/loseloyalty与关系事件的业务副作用同步发生。"
+          ],
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S16",
+            "MR-S25",
+            "MR-S26"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "具名交互调用leader AddFollower，双方索引和指针经互调建立并更新replica。",
+          "evidence_refs": [
+            "MR-S19",
+            "MR-S25",
+            "MR-S26",
+            "MR-S27",
+            "MR-S29",
+            "MR-S30"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "忠诚任务、leash和物品来源各持有自己的资源，Brain通过GetLeader进入实际Follow移动请求。",
+          "evidence_refs": [
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S26",
+            "MR-S28",
+            "MR-S31",
+            "MR-S32",
+            "MR-S33",
+            "MR-S47"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "死亡、换源、到期、组件卸载和实体移除分别触发所列清理，保存恢复另按具名映射/用户缓存接回。",
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S17",
+            "MR-S18",
+            "MR-S25",
+            "MR-S26",
+            "MR-S34"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行关系移交、忠诚到期、玩家重连、物品owner变化、组件卸载或猪人跟随。",
+        "Follow后续完整寻路、传送位置搜索、战斗和followermemory业务hook内部结果只作为具名外部依赖。",
+        "进度/成就函数为AddFollower的直接副作用调用点，其原生持久化和回调失败恢复未验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "MR-S11",
+            "role": "来源、leader与rider监听身份及整实体双向清理",
+            "claim_ids": [
+              "EXP-REL-001-C01",
+              "EXP-REL-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S12",
+            "role": "同步普通回调及SG事件转交",
+            "claim_ids": [
+              "EXP-REL-001-C01",
+              "EXP-REL-001-C04",
+              "EXP-REL-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S13",
+            "role": "任务归属、延后执行生产者和完成移键",
+            "claim_ids": [
+              "EXP-REL-001-C04"
+            ]
+          },
+          {
+            "ref": "MR-S14",
+            "role": "Periodic构造、Cancel与Cleanup",
+            "claim_ids": [
+              "EXP-REL-001-C04"
+            ]
+          },
+          {
+            "ref": "MR-S15",
+            "role": "相对任务到tick生产者",
+            "claim_ids": [
+              "EXP-REL-001-C04"
+            ]
+          },
+          {
+            "ref": "MR-S16",
+            "role": "任务回调执行及重排消费者",
+            "claim_ids": [
+              "EXP-REL-001-C04"
+            ]
+          },
+          {
+            "ref": "MR-S17",
+            "role": "组件卸载钩子调用与槽位先清",
+            "claim_ids": [
+              "EXP-REL-001-C05",
+              "EXP-REL-001-C06"
+            ]
+          },
+          {
+            "ref": "MR-S18",
+            "role": "实体删除事件、任务、组件与子实体退出",
+            "claim_ids": [
+              "EXP-REL-001-C05"
+            ]
+          },
+          {
+            "ref": "MR-S19",
+            "role": "Class属性先写值再调用setter及实体来源身份检测",
+            "claim_ids": [
+              "EXP-REL-001-C02"
+            ]
+          },
+          {
+            "ref": "MR-S25",
+            "role": "leader索引、事件、死亡/卸载清理与存档接线",
+            "claim_ids": [
+              "EXP-REL-001-C01",
+              "EXP-REL-001-C02",
+              "EXP-REL-001-C03",
+              "EXP-REL-001-C05",
+              "EXP-REL-001-C06",
+              "EXP-REL-001-C07",
+              "EXP-REL-001-C09"
+            ]
+          },
+          {
+            "ref": "MR-S26",
+            "role": "follower指针、物品来源、leash、忠诚与恢复退出闭包",
+            "claim_ids": [
+              "EXP-REL-001-C01",
+              "EXP-REL-001-C02",
+              "EXP-REL-001-C03",
+              "EXP-REL-001-C04",
+              "EXP-REL-001-C05",
+              "EXP-REL-001-C06",
+              "EXP-REL-001-C07",
+              "EXP-REL-001-C09"
+            ]
+          },
+          {
+            "ref": "MR-S27",
+            "role": "follower字段复制callee及读取优先级",
+            "claim_ids": [
+              "EXP-REL-001-C02",
+              "EXP-REL-001-C03",
+              "EXP-REL-001-C09"
+            ]
+          },
+          {
+            "ref": "MR-S28",
+            "role": "物品来源leader接线与退出必要callee",
+            "claim_ids": [
+              "EXP-REL-001-C02",
+              "EXP-REL-001-C03",
+              "EXP-REL-001-C09"
+            ]
+          },
+          {
+            "ref": "MR-S29",
+            "role": "具名食物接受调用者安装关系与延长忠诚",
+            "claim_ids": [
+              "EXP-REL-001-C08"
+            ]
+          },
+          {
+            "ref": "MR-S30",
+            "role": "master门、follower上限初始化及trader调用绑定",
+            "claim_ids": [
+              "EXP-REL-001-C08"
+            ]
+          },
+          {
+            "ref": "MR-S31",
+            "role": "实际Brain对GetLeader的转发consumer",
+            "claim_ids": [
+              "EXP-REL-001-C08"
+            ]
+          },
+          {
+            "ref": "MR-S32",
+            "role": "Follow行为与GetLeader连接consumer",
+            "claim_ids": [
+              "EXP-REL-001-C08"
+            ]
+          },
+          {
+            "ref": "MR-S33",
+            "role": "实际跟随目标读取与locomotor移动请求consumer",
+            "claim_ids": [
+              "EXP-REL-001-C08",
+              "EXP-REL-001-C09"
+            ]
+          },
+          {
+            "ref": "MR-S34",
+            "role": "SetLeader可选原版业务hook边界",
+            "claim_ids": [
+              "EXP-REL-001-C02"
+            ]
+          },
+          {
+            "ref": "MR-S47",
+            "role": "Follow目标函数实际调用的身份桥接",
+            "claim_ids": [
+              "EXP-REL-001-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "逐引用枚举本条定义、调用者、消费者和清理入口。可选业务hook及原生接口的内部合同限本条unknowns。",
+          "历史条目保留各自Scope，本次适用范围绑定所列762172字节。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-REL-002",
+      "title": "骑乘建立、状态复制与下马清理的双向接线",
+      "aliases": [
+        "Rider:Mount",
+        "Rider:Dismount",
+        "Rider:ActualDismount",
+        "Rideable:SetRider",
+        "Rideable:TestRider",
+        "Rideable:Buck",
+        "riderchanged"
+      ],
+      "engineering_question": "骑手和坐骑状态怎样分阶段建立，动作返回、复制字段、下马事件和实际清理分别表示什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "current_local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "Rider/Rideable、rider replica/classified、ACTIONS.MOUNT/DISMOUNT、SGwilson具名骑乘状态及玩家Despawn清理。",
+        "exclusions": [
+          "NC-N004-FINAL-01和EXP-ACT已有动作资格/提交分层，EXP-ARCH-002已有切态重入，EXP-LIFE-003/008已有复制与删除框架。本条补实际骑乘关系闭包。",
+          "库存/鞍的完整归属移交、伤害重定向计算、所有角色/坐骑自定义hook及全部死亡/迁移路径。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-REL-002-C01",
+          "kind": "NSF",
+          "statement": "ACTIONS.MOUNT有canride、占用和具名状态门，调用Rider:Mount后返回true。Mount自身的正常路径均无显式值，还可因obedience/custom test拒绝并发事件，动作true不单独报告该方法是否完成骑乘。",
+          "evidence_refs": [
+            "MR-S35",
+            "MR-S36",
+            "MR-S37"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C02",
+          "kind": "NSF",
+          "statement": "Mount先设target_mount和riding，再切态，后续才建立child/场景关系、跟踪saddle、写mount并SetRider。riding、mount、saddle属性的setter转发replica，replica按classified条件设置坐骑、鞍和速度字段。",
+          "evidence_refs": [
+            "MR-S19",
+            "MR-S20",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C03",
+          "kind": "EI",
+          "statement": "骑乘状态由多个先后写入组成，观察到riding=true的同步回调可能仍处于mount尚未写入阶段。切态/事件可重入，外层Mount后段按原栈继续，异常前已完成写入沿此路径保留。",
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S19",
+            "MR-S24",
+            "MR-S35",
+            "MR-S40"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C04",
+          "kind": "NSF",
+          "statement": "Rideable:SetRider先更新本侧字段，再移除旧骑手攻击事件订阅，新骑手启动一份周期任务并订阅，nil分支停止任务并更新lastridetime，最后发布riderchanged。相同rider重复应用仍发布事件。",
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S36"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C05",
+          "kind": "NSF",
+          "statement": "Dismount和Buck是事件请求。SGwilson消费dismount/bucked后进入相应状态，dismount/falloff/bucked的onexit调用ActualDismount。实际清理先riding=false，随后解除rideable占用、父子/场景、鞍跟踪，最后mount=nil并发dismounted。",
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S19",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S38",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C06",
+          "kind": "NSF",
+          "statement": "玩家OnDespawn调用ActualDismount，构造安装了该回调。Rider:OnRemoveFromEntity仅取消提示任务和StopTracking，Rideable:OnRemoveFromEntity停止riddentask并去tag。Rider保存时可嵌套mount记录，OnLoad直接SpawnSaveRecord后Mount(...,true)，自身不调用postpass。",
+          "evidence_refs": [
+            "MR-S13",
+            "MR-S14",
+            "MR-S17",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S43",
+            "MR-S44"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C07",
+          "kind": "EI",
+          "statement": "直接Rideable:SetRider只维护本侧占用和事件资源，不能由该调用推导另一侧Rider字段、child或场景已建立。组件单独卸载的局部hook也不能替代完整下马链。",
+          "evidence_refs": [
+            "MR-S17",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S41",
+            "MR-S42"
+          ]
+        },
+        {
+          "id": "EXP-REL-002-C08",
+          "kind": "REC",
+          "statement": "普通骑乘交互沿实际资格入口与Rider建立链接入，按SG/清理入口处理退出。诊断时分别读riding、mount、rideable.rider、复制载体与任务/场景阶段，并验证具名mounted/dismounted消费者。",
+          "evidence_refs": [
+            "MR-S20",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S37",
+            "MR-S38",
+            "MR-S39",
+            "MR-S41",
+            "MR-S42",
+            "MR-S43"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Rider:Mount",
+          "source_file": "scripts/components/rider.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "target为坐骑实体，instant的truthy值决定切idle，假值切mount。"
+          ],
+          "returns": "所有正常路径返回nil，包含拒绝和完成路径。拒绝可发布refusedmount/refusedrider。",
+          "preconditions": [
+            "本方法检查当前riding、目标rideable及占用，再检查TestObedience/TestRider。ACTIONS.MOUNT还负责其额外canride/战斗/死亡/冻结/拴住等入口条件。",
+            "正常建立要求骑手rider replica、SG、Transform、AnimState、DynamicShadow、pinnable及所走分支的combat/其他接口，目标正常路径提供locomotor等坐骑接口。"
+          ],
+          "side_effects": [
+            "先存target_mount并设riding=true，改表现后同步切态，随后继续处理遮蔽标志、伤害重定向字段和pin能力。",
+            "把target设为骑手child并RemoveFromScene，安装saddlechanged跟踪，写mount、清target_mount，再调用目标Rideable:SetRider。",
+            "最后调整骑手位置/朝向、建立受伤提示任务并发布mounted。字段setter同步转发replica，写入坐骑/鞍及速度复制载体。"
+          ],
+          "lifecycle": [
+            "riding为真早于mount正式写入，切态和业务事件期间可观察到中间阶段。切态后半段没有状态身份复核。",
+            "成功后通过Dismount事件/SG退出进入ActualDismount，玩家Despawn也直接使用实际清理。",
+            "Rider组件卸载仅取消提示任务并StopTracking，本hook没有完整ActualDismount调用。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S19",
+            "MR-S20",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S37",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42",
+            "MR-S43",
+            "MR-S44"
+          ],
+          "unknowns": [
+            "原生动画、父子物理、网络目标和实际骑乘呈现尚未验证。异常或任意切态/事件重入后的恢复需按已完成阶段审查。",
+            "伤害重定向只记录字段安装/清除位置，计算规则由战斗专题负责。"
+          ]
+        },
+        {
+          "symbol": "Rider:Dismount",
+          "source_file": "scripts/components/rider.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "正常返回nil，仅调用PushEvent(dismount)。",
+          "preconditions": [
+            "宿主可发布事件，具名SG消费要求对应rider/状态已存在。"
+          ],
+          "side_effects": [
+            "发布本地dismount事件，方法本身不写riding/mount。"
+          ],
+          "lifecycle": [
+            "SGwilson在未dismounting且IsRiding时切dismount，状态onexit调用ActualDismount。具体完成时点取决于事件与SG路径。"
+          ],
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S35",
+            "MR-S38",
+            "MR-S39",
+            "MR-S40"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Rider:ActualDismount",
+          "source_file": "scripts/components/rider.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [],
+          "returns": "未骑乘时返回nil，正常完整清理后返回原mount实体。",
+          "preconditions": [
+            "riding真时要求mount、rideable及骑手/坐骑表现、父子和replica接口满足所查正常清理路径。源码注释限定为SG或清理调用。"
+          ],
+          "side_effects": [
+            "先设riding=false并取消提示任务，恢复表现和遮蔽/pin字段，按坐骑条件清重定向字段。",
+            "调用Rideable:SetRider(nil)，解除child并ReturnToScene，再放置坐骑，处理其Brain/SG分支，StopTracking后清mount并发布dismounted。"
+          ],
+          "lifecycle": [
+            "riding=false早于mount=nil。没有保存/恢复任意旧写者字段快照，也没有全链回滚。",
+            "普通dismount、falloff、bucked的onexit以及玩家Despawn是本条具名调用者。",
+            "ReturnToScene的brain/SG恢复及物理调用是独立callee，原生执行和所有退出路径仍按其边界验证。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S19",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36",
+            "MR-S38",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42",
+            "MR-S43",
+            "MR-S44"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Rideable:TestRider",
+          "source_file": "scripts/components/rideable.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "potential_rider原样传给已配置custom_rider_test(self.inst,potential_rider)。"
+          ],
+          "returns": "没有自定义函数返回true，有则原样返回其结果。",
+          "preconditions": [
+            "自定义test非nil时须可调用，其输入及业务条件由该回调定义。"
+          ],
+          "side_effects": [
+            "同步调用可选test，本方法不设置rider或开启骑乘任务。"
+          ],
+          "lifecycle": [
+            "Rider:Mount将此结果按Lua真假处理，另行执行TestObedience及占用检查。"
+          ],
+          "evidence_refs": [
+            "MR-S35",
+            "MR-S36"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Rideable:SetRider",
+          "source_file": "scripts/components/rideable.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "rider为新骑手或nil，此方法是rideable侧接线入口。"
+          ],
+          "returns": "正常返回nil，同一rider重复调用仍执行该路径并发布riderchanged。",
+          "preconditions": [
+            "非nil来源可作为事件源，调用者维护与另一侧Rider的完整关系。此方法自身不进行Mount资格检查。"
+          ],
+          "side_effects": [
+            "先保存oldrider并写新rider，解绑旧骑手onattackother。非nil时按需启动riddentask并订阅新骑手，nil时停止task并更新lastridetime。",
+            "最后发布riderchanged，周期回调更新最后骑乘时间、发布beingridden并按条件调用技能业务hook。"
+          ],
+          "lifecycle": [
+            "StartRiddenTick按任务字段限制重复创建，重复同对象SetRider仍解绑/重绑并发事件。",
+            "此方法只改rideable侧，Rider:Mount/ActualDismount负责另一侧字段与场景。组件卸载只停止周期任务并移除列出的tag。"
+          ],
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S15",
+            "MR-S16",
+            "MR-S35",
+            "MR-S36"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        },
+        {
+          "symbol": "Rideable:Buck",
+          "source_file": "scripts/components/rideable.lua",
+          "visibility": "原版Lua方法，合同限本条具名来源、端别及消费者。",
+          "parameters": [
+            "gentle作为bucked事件data.gentle传递。"
+          ],
+          "returns": "正常返回nil，有rider且其rider组件存在才发布事件。",
+          "preconditions": [
+            "骑手可发布事件，实际反应由其SG消费者决定。"
+          ],
+          "side_effects": [
+            "向当前骑手PushEvent(bucked,{gentle=gentle})，本方法不直接调用ActualDismount。"
+          ],
+          "lifecycle": [
+            "SGwilson按gentle选择falloff或bucked，两状态退出均ActualDismount。"
+          ],
+          "evidence_refs": [
+            "MR-S12",
+            "MR-S35",
+            "MR-S36",
+            "MR-S38",
+            "MR-S39",
+            "MR-S40"
+          ],
+          "unknowns": [
+            "动态Mod覆写、原生内部执行与游戏结果仍待对应环境验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "动作门进入Rider，资格test通过后开始分阶段字段、SG与场景接线。",
+          "evidence_refs": [
+            "MR-S35",
+            "MR-S36",
+            "MR-S37",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "字段setter驱动replica/classified，本侧Rideable占用驱动周期任务和riderchanged，移动getter从该关系取坐骑base。",
+          "evidence_refs": [
+            "MR-S02",
+            "MR-S19",
+            "MR-S20",
+            "MR-S24",
+            "MR-S35",
+            "MR-S36"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "Dismount/Buck由SG消费并在onexit实际下马，Despawn另直接清理，组件卸载按各自局部hook处理。",
+          "evidence_refs": [
+            "MR-S11",
+            "MR-S12",
+            "MR-S13",
+            "MR-S14",
+            "MR-S17",
+            "MR-S35",
+            "MR-S36",
+            "MR-S38",
+            "MR-S39",
+            "MR-S40",
+            "MR-S41",
+            "MR-S42",
+            "MR-S43",
+            "MR-S44"
+          ]
+        }
+      ],
+      "unknowns": [
+        "尚未运行正常骑乘、拒绝、下马、Buck、Despawn、读档或远端呈现。",
+        "netvar/SetClassifiedTarget、物理父子、动画/声音与native预测内部行为仍未知。",
+        "原版可选ApplyBuildOverrides、鞍FX、followermemory、技能、Brain/SG、统计等业务依赖保留各自边界，未穷举全部角色和坐骑。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "MR-S02",
+            "role": "来源列表导入、端别函数绑定、速度计算与属性setter",
+            "claim_ids": []
+          },
+          {
+            "ref": "MR-S11",
+            "role": "来源、leader与rider监听身份及整实体双向清理",
+            "claim_ids": [
+              "EXP-REL-002-C04"
+            ]
+          },
+          {
+            "ref": "MR-S12",
+            "role": "同步普通回调及SG事件转交",
+            "claim_ids": [
+              "EXP-REL-002-C03",
+              "EXP-REL-002-C04",
+              "EXP-REL-002-C05"
+            ]
+          },
+          {
+            "ref": "MR-S13",
+            "role": "任务归属、延后执行生产者和完成移键",
+            "claim_ids": [
+              "EXP-REL-002-C04",
+              "EXP-REL-002-C06"
+            ]
+          },
+          {
+            "ref": "MR-S14",
+            "role": "Periodic构造、Cancel与Cleanup",
+            "claim_ids": [
+              "EXP-REL-002-C04",
+              "EXP-REL-002-C06"
+            ]
+          },
+          {
+            "ref": "MR-S15",
+            "role": "相对任务到tick生产者",
+            "claim_ids": [
+              "EXP-REL-002-C04"
+            ]
+          },
+          {
+            "ref": "MR-S16",
+            "role": "任务回调执行及重排消费者",
+            "claim_ids": [
+              "EXP-REL-002-C04"
+            ]
+          },
+          {
+            "ref": "MR-S17",
+            "role": "组件卸载钩子调用与槽位先清",
+            "claim_ids": [
+              "EXP-REL-002-C06",
+              "EXP-REL-002-C07"
+            ]
+          },
+          {
+            "ref": "MR-S19",
+            "role": "Class属性先写值再调用setter及实体来源身份检测",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C03",
+              "EXP-REL-002-C05"
+            ]
+          },
+          {
+            "ref": "MR-S20",
+            "role": "骑乘及移动netvar载体定义与初值",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S24",
+            "role": "rider复制字段、动作过滤和坐骑/鞍/速度读取闭包",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C03",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C06",
+              "EXP-REL-002-C07",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S35",
+            "role": "Rider建立、跟踪、下马、卸载与保存恢复",
+            "claim_ids": [
+              "EXP-REL-002-C01",
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C03",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C06",
+              "EXP-REL-002-C07",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S36",
+            "role": "Rideable资格、占用、tick和鞍变化必要依赖",
+            "claim_ids": [
+              "EXP-REL-002-C01",
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C04",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C06",
+              "EXP-REL-002-C07",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S37",
+            "role": "MOUNT与DISMOUNT上层业务调用者",
+            "claim_ids": [
+              "EXP-REL-002-C01",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S38",
+            "role": "dismount/bucked事件转状态消费者",
+            "claim_ids": [
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S39",
+            "role": "mount、dismount、falloff、bucked状态及退出提交",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S40",
+            "role": "切态同步onexit/onenter及外层继续边界",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C03",
+              "EXP-REL-002-C05"
+            ]
+          },
+          {
+            "ref": "MR-S41",
+            "role": "骑乘父子接线和解除callee",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C07",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S42",
+            "role": "坐骑入/出场景Lua调用与原生边界",
+            "claim_ids": [
+              "EXP-REL-002-C02",
+              "EXP-REL-002-C05",
+              "EXP-REL-002-C07",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S43",
+            "role": "玩家Despawn具名清理调用者",
+            "claim_ids": [
+              "EXP-REL-002-C06",
+              "EXP-REL-002-C08"
+            ]
+          },
+          {
+            "ref": "MR-S44",
+            "role": "玩家Despawn回调安装身份",
+            "claim_ids": [
+              "EXP-REL-002-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "逐引用枚举本条定义、调用者、消费者和清理入口。可选业务hook及原生接口的内部合同限本条unknowns。",
+          "历史条目保留各自Scope，本次适用范围绑定所列762172字节。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "MR-S01",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 1,
+      "line_end": 185,
+      "range_sha256": "98f6f66efd058defd7a87477556b7d042c51577f8f3e745d8008dc78afe0913b",
+      "symbols": [
+        "SourceModifierList",
+        "SourceModifierList:SetModifier",
+        "SourceModifierList:RemoveModifier",
+        "SourceModifierList:Reset",
+        "SourceModifierList:Get"
+      ]
+    },
+    {
+      "id": "MR-S02",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1,
+      "line_end": 350,
+      "range_sha256": "ab2437bef011b2131d7ad4ca9d873bd887fab2cb756c51672c135ecade89574f",
+      "symbols": [
+        "LocoMotor",
+        "ServerRunSpeed",
+        "ClientRunSpeed",
+        "ServerGetSpeedMultiplier",
+        "ClientGetSpeedMultiplier",
+        "onexternalspeedmultiplier"
+      ]
+    },
+    {
+      "id": "MR-S03",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 387,
+      "line_end": 401,
+      "range_sha256": "2949504dca4ee011bb287e23ff69afe8f9b8c238d34555db6723c22e41d638d5",
+      "symbols": [
+        "LocoMotor:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "MR-S04",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 480,
+      "line_end": 565,
+      "range_sha256": "133f6907d166c1790b5d8a3be6b481ab096e047c733960fcadd85e870db4084c",
+      "symbols": [
+        "LocoMotor:SetExternalSpeedMultiplier",
+        "LocoMotor:RemoveExternalSpeedMultiplier",
+        "LocoMotor:GetExternalSpeedMultiplier",
+        "LocoMotor:SetPredictExternalSpeedMultiplier",
+        "LocoMotor:RemovePredictExternalSpeedMultiplier",
+        "LocoMotor:GetPredictExternalSpeedMultipler"
+      ]
+    },
+    {
+      "id": "MR-S05",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 589,
+      "line_end": 680,
+      "range_sha256": "1a64464d7f97a373120773c58af5db9ed40866d5e0318976f73f09bcebff6d31",
+      "symbols": [
+        "LocoMotor:GetWalkSpeed",
+        "LocoMotor:GetRunSpeed",
+        "LocoMotor:UpdateGroundSpeedMultiplier",
+        "LocoMotor:TempGroundSpeedMultiplier"
+      ]
+    },
+    {
+      "id": "MR-S06",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 721,
+      "line_end": 754,
+      "range_sha256": "09c8d8b59eea5df31cc60892c1f83b2db2b9152fd9d7e5726808da1e91bae862",
+      "symbols": [
+        "SetMotorVelRelToStrafeDir",
+        "LocoMotor:SetMotorSpeed",
+        "LocoMotor:WalkForward",
+        "LocoMotor:RunForward"
+      ]
+    },
+    {
+      "id": "MR-S07",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1424,
+      "line_end": 1760,
+      "range_sha256": "fcc76f3d199c56597e55c1067caa5795359490e2b3abbee36281a5c97faea602",
+      "symbols": [
+        "LocoMotor:OnUpdate"
+      ]
+    },
+    {
+      "id": "MR-S08",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 90,
+      "line_end": 134,
+      "range_sha256": "b13a953a56c9705eae96a6df32a1ebcdf09ccee18c847a6889c787f27a93d637",
+      "symbols": [
+        "StartPreviewChannelCast",
+        "StopPreviewChannelCast",
+        "CheckPreviewChannelCastAction"
+      ]
+    },
+    {
+      "id": "MR-S09",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 5773,
+      "line_end": 5852,
+      "range_sha256": "2936dee8f8bd66deb00570e6ab48f7015ee461bb3d540d387d9c4aec6052788e",
+      "symbols": [
+        "start_channelcast",
+        "stop_channelcast"
+      ]
+    },
+    {
+      "id": "MR-S10",
+      "source_file": "scripts/components/channelcaster.lua",
+      "file_sha256": "6e5df3d668e780ac1555ca8e37c401f4bdf9c3e5df0d62ef2858fc9e8952c553",
+      "line_start": 1,
+      "line_end": 102,
+      "range_sha256": "f18d8c5e45b4cf3c60f05535115ea8bbdb34991b40b8b8786ac8d875a125511c",
+      "symbols": [
+        "ChannelCaster:StartChanneling",
+        "ChannelCaster:StopChanneling",
+        "OnNewState"
+      ]
+    },
+    {
+      "id": "MR-S11",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1288,
+      "range_sha256": "707388ce83331e7e5c582d024abff6cce4725e5863efe99750bf3dbd44629aec",
+      "symbols": [
+        "EntityScript:ListenForEvent",
+        "EntityScript:RemoveEventCallback",
+        "EntityScript:RemoveAllEventCallbacks"
+      ]
+    },
+    {
+      "id": "MR-S12",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1349,
+      "range_sha256": "615ef72e1f126f80dccf0a5c1ca19f93791213b6cd41a1276c40c58f89e39854",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "MR-S13",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1494,
+      "line_end": 1555,
+      "range_sha256": "2d08c548b3e41205cae4d94c5c060ee52fc45b86148815f76a988b8eca611718",
+      "symbols": [
+        "EntityScript:CancelAllPendingTasks",
+        "EntityScript:DoTaskInTime",
+        "EntityScript:DoPeriodicTask",
+        "task_finish"
+      ]
+    },
+    {
+      "id": "MR-S14",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 45,
+      "line_end": 95,
+      "range_sha256": "c42df9745caa288c40ad937be16360bf31f654179cb5ea432f96b0741849fed2",
+      "symbols": [
+        "Periodic",
+        "Periodic:Cancel"
+      ]
+    },
+    {
+      "id": "MR-S15",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 276,
+      "line_end": 301,
+      "range_sha256": "668d7ce5cd699d740a0022774d27c7e2d984826a4f266a5e489f0788b23207be",
+      "symbols": [
+        "Scheduler:ExecuteInTime",
+        "Scheduler:ExecutePeriodic"
+      ]
+    },
+    {
+      "id": "MR-S16",
+      "source_file": "scripts/scheduler.lua",
+      "file_sha256": "46d2925bb7738dac17b80178d1f465ef7c8bccb6f44021eeac30253c79c1c0de",
+      "line_start": 164,
+      "line_end": 216,
+      "range_sha256": "018d11f784bda3fa3bda6c54b95c9c488e6c155988c871196a30970f42c7981c",
+      "symbols": [
+        "Scheduler:OnTick"
+      ]
+    },
+    {
+      "id": "MR-S17",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "MR-S18",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "MR-S19",
+      "source_file": "scripts/class.lua",
+      "file_sha256": "eff1a5280260c73c9fc4c8bdff95ae31a35c80f62764749722bfc123f8694454",
+      "line_start": 1,
+      "line_end": 214,
+      "range_sha256": "613465104fab1d47d3291e6632a6a033896d05345cd8dcd187b1669409cd9ff4",
+      "symbols": [
+        "Class",
+        "__newindex",
+        "_is_a"
+      ]
+    },
+    {
+      "id": "MR-S20",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1595,
+      "line_end": 1622,
+      "range_sha256": "02facc8e88b7ce785cf09c5bc5887a6e4f8954e171706584a164bdfa2dc757ac",
+      "symbols": [
+        "ridermount",
+        "ridersaddle",
+        "riderrunspeed",
+        "riderfasteronroad",
+        "runspeed",
+        "externalspeedmultiplier"
+      ]
+    },
+    {
+      "id": "MR-S21",
+      "source_file": "scripts/components/equippable.lua",
+      "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "line_start": 126,
+      "line_end": 144,
+      "range_sha256": "4e431d159f35a665abeca3c21a647920e532a9daea3c67cb03eecf1d48c0cf43",
+      "symbols": [
+        "Equippable:GetWalkSpeedMult"
+      ]
+    },
+    {
+      "id": "MR-S22",
+      "source_file": "scripts/components/saddler.lua",
+      "file_sha256": "4a4796417353822b5127f345730cb74353ca05361148bd3d4d163cb7b2ed9d9c",
+      "line_start": 1,
+      "line_end": 50,
+      "range_sha256": "15c816de76021a9cb0bb1aa49c49760baaf98f89bfc4e991a905b35f48c2716d",
+      "symbols": [
+        "Saddler:GetBonusSpeedMult",
+        "onspeedmult"
+      ]
+    },
+    {
+      "id": "MR-S23",
+      "source_file": "scripts/components/inventoryitem_replica.lua",
+      "file_sha256": "ec930cca232eaab16525fc1eb57f1ee597269f89024086766784dbd6f080f22d",
+      "line_start": 391,
+      "line_end": 429,
+      "range_sha256": "368be88ebccef9b7abfde9da33b64b5993c860cc522f7e4fd70f3de176393b4e",
+      "symbols": [
+        "InventoryItem:SetWalkSpeedMult",
+        "InventoryItem:GetWalkSpeedMult"
+      ]
+    },
+    {
+      "id": "MR-S24",
+      "source_file": "scripts/components/rider_replica.lua",
+      "file_sha256": "0c5da58ac5ad82aa283753bcc908ee9bbd85756ad6d6261d554f62b14e345fcd",
+      "line_start": 1,
+      "line_end": 273,
+      "range_sha256": "8dbf3d44b6360d95f1baf3da3e17a419e942d3cceaef99f24572ee39771a4634",
+      "symbols": [
+        "Rider:SetRiding",
+        "Rider:SetMount",
+        "Rider:SetSaddle",
+        "Rider:GetMountRunSpeed",
+        "Rider:GetSaddle"
+      ]
+    },
+    {
+      "id": "MR-S25",
+      "source_file": "scripts/components/leader.lua",
+      "file_sha256": "761f7c36465824a99f2e7bee2135f833db7fb0b82f7390a5b30686b5c713797a",
+      "line_start": 1,
+      "line_end": 312,
+      "range_sha256": "761e3f15f8d19a092a1128d03551524fc40193bf28c82fbd4eaa331b9b392d87",
+      "symbols": [
+        "Leader:AddFollower",
+        "Leader:RemoveFollower",
+        "Leader:RemoveAllFollowers",
+        "Leader:LoadPostPass"
+      ]
+    },
+    {
+      "id": "MR-S26",
+      "source_file": "scripts/components/follower.lua",
+      "file_sha256": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+      "line_start": 1,
+      "line_end": 532,
+      "range_sha256": "4f1c06a039e10f1e229b3d593fe053d541c48c9507d9d1697f8431e01f72445c",
+      "symbols": [
+        "Follower:SetLeader",
+        "Follower:GetLeader",
+        "Follower:AddLoyaltyTime",
+        "Follower:StopFollowing",
+        "Follower:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "MR-S27",
+      "source_file": "scripts/components/follower_replica.lua",
+      "file_sha256": "4d95c672f8b0ac25c4e3af2e3f9ff7fc6d7b7b9c09ce3cf10ca8677e0d21184c",
+      "line_start": 1,
+      "line_end": 20,
+      "range_sha256": "4d95c672f8b0ac25c4e3af2e3f9ff7fc6d7b7b9c09ce3cf10ca8677e0d21184c",
+      "symbols": [
+        "Follower:SetLeader",
+        "Follower:SetItemOwner",
+        "Follower:GetLeader"
+      ]
+    },
+    {
+      "id": "MR-S28",
+      "source_file": "scripts/componentutil.lua",
+      "file_sha256": "c16f7ab5be64e5eb606a00cbf2a44ce440cd1f343dddc02b05a65cab81a84a90",
+      "line_start": 1777,
+      "line_end": 1855,
+      "range_sha256": "b49fe8bf767ca4c425217639f2e6efdf73f0879761317de8fa9c77cfb8fb3e7b",
+      "symbols": [
+        "MakeComponentAnInventoryItemSource",
+        "RemoveComponentInventoryItemSource"
+      ]
+    },
+    {
+      "id": "MR-S29",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 80,
+      "line_end": 135,
+      "range_sha256": "948b9482351c42a27eb51c3130f082bf7355a82fd65513c4955726651def1190",
+      "symbols": [
+        "OnGetItemFromPlayer"
+      ]
+    },
+    {
+      "id": "MR-S30",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 804,
+      "line_end": 881,
+      "range_sha256": "4818c0c98e0ab89e6782cb47582d9fc058bcd0f8bec5655bf45660fe37493efb",
+      "symbols": [
+        "common"
+      ]
+    },
+    {
+      "id": "MR-S31",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 121,
+      "line_end": 123,
+      "range_sha256": "fc439ae98235e6c3a1fe5d6fba9615607bc82a085afc514ee451a6b6aee7acb0",
+      "symbols": [
+        "GetLeader"
+      ]
+    },
+    {
+      "id": "MR-S32",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 334,
+      "line_end": 349,
+      "range_sha256": "fe9e0cbf0e11429dd4859ffcafb9afe34130edca634617bf9814d7a247ea110f",
+      "symbols": [
+        "PigBrain:OnStart"
+      ]
+    },
+    {
+      "id": "MR-S33",
+      "source_file": "scripts/behaviours/follow.lua",
+      "file_sha256": "e75dbbd17d48244d2669174fe0d1a01695180e3d86dc35aefe92c3919a0e0348",
+      "line_start": 1,
+      "line_end": 165,
+      "range_sha256": "58e7fd958c3ce5361b9869b5c8fb80f996685c479e58d49a8a0a8ee1c4a1037f",
+      "symbols": [
+        "Follow:GetTarget",
+        "Follow:Visit"
+      ]
+    },
+    {
+      "id": "MR-S34",
+      "source_file": "scripts/components/followermemory.lua",
+      "file_sha256": "b8959e19a79d36d7bcbcfe81b5d2dad5c6a4e7bf574bebcd787c77d72c9200ea",
+      "line_start": 178,
+      "line_end": 192,
+      "range_sha256": "bf2bcdfd4aec3697d8fb082f505bbc810c133ccb7dd56af617bc7e9337b04328",
+      "symbols": [
+        "FollowerMemory:OnChangedLeader"
+      ]
+    },
+    {
+      "id": "MR-S35",
+      "source_file": "scripts/components/rider.lua",
+      "file_sha256": "54318bbedb142a91988eae0cc23fe866dc10b64ee5b6b65034186cead6f8500a",
+      "line_start": 1,
+      "line_end": 270,
+      "range_sha256": "14f6fcc0832fb4162488da99c3b78b4e3b6b39eb278d69990b6b650896b4d00c",
+      "symbols": [
+        "Rider:Mount",
+        "Rider:Dismount",
+        "Rider:ActualDismount",
+        "Rider:StartTracking",
+        "Rider:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "MR-S36",
+      "source_file": "scripts/components/rideable.lua",
+      "file_sha256": "7ad10d4a5439edc68ce5566574cb10de5b95da90a225abd08ae2e24ad3a6f37a",
+      "line_start": 1,
+      "line_end": 239,
+      "range_sha256": "9797d20cb8368f4df3f76fc146d7d1d5046a3b81a5cc0d5586b853e42dd816d0",
+      "symbols": [
+        "Rideable:TestRider",
+        "Rideable:SetRider",
+        "Rideable:Buck",
+        "Rideable:SetSaddle"
+      ]
+    },
+    {
+      "id": "MR-S37",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 4141,
+      "line_end": 4172,
+      "range_sha256": "581bcf0e701e7734350da4b9a9a07f0fd99ee7410b34ea79ffd704ce6b08def5",
+      "symbols": [
+        "ACTIONS.MOUNT.fn",
+        "ACTIONS.DISMOUNT.fn"
+      ]
+    },
+    {
+      "id": "MR-S38",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 2388,
+      "line_end": 2399,
+      "range_sha256": "b10a52458b35f77540d56a0f4255a933a26ae25b1a66bf6b72548b45f94dd480",
+      "symbols": [
+        "dismount",
+        "bucked"
+      ]
+    },
+    {
+      "id": "MR-S39",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 19611,
+      "line_end": 19777,
+      "range_sha256": "c7bd701bba22dcdaaa0e68c29cd56be5cc7732602b59b924904d52b8405f7a38",
+      "symbols": [
+        "mount",
+        "dismount",
+        "falloff",
+        "bucked"
+      ]
+    },
+    {
+      "id": "MR-S40",
+      "source_file": "scripts/stategraph.lua",
+      "file_sha256": "714a86523d5f0855ce00884f009053fc64392a4a86edd0c0b515e0e42ea8ecc8",
+      "line_start": 529,
+      "line_end": 600,
+      "range_sha256": "2e16fa777429b58180f8620072bf89c683e7f853711755fb598fae17abb26a01",
+      "symbols": [
+        "StateGraphInstance:GoToState"
+      ]
+    },
+    {
+      "id": "MR-S41",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 935,
+      "range_sha256": "a7c13cd2083fc0213528d405192cbdd1e89629a68884852a523c0d02cdab1731",
+      "symbols": [
+        "EntityScript:RemoveChild",
+        "EntityScript:AddChild"
+      ]
+    },
+    {
+      "id": "MR-S42",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 348,
+      "line_end": 413,
+      "range_sha256": "34e8cc5f9e28d226db2966e2e5c360fc6ce588293857afdcb9dc7bc9acbdd979",
+      "symbols": [
+        "EntityScript:RemoveFromScene",
+        "EntityScript:ReturnToScene"
+      ]
+    },
+    {
+      "id": "MR-S43",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1417,
+      "line_end": 1437,
+      "range_sha256": "5d6bb8a9df830cb0a8fad7e56a0fbc7a1a74935555967218441b5bc2fbb2172d",
+      "symbols": [
+        "OnDespawn"
+      ]
+    },
+    {
+      "id": "MR-S44",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 2936,
+      "line_end": 2944,
+      "range_sha256": "b1c9f0e28d19e14feb9314f96a87fa1bb529a55416edef4e9b4433072d107755",
+      "symbols": [
+        "inst.OnDespawn"
+      ]
+    },
+    {
+      "id": "MR-S45",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 238,
+      "line_end": 246,
+      "range_sha256": "a9c39d840eafcaebaddaa4a6ef672ccc73f02b88763a3ec99c3080757322e5d4",
+      "symbols": [
+        "RemoveByValue"
+      ]
+    },
+    {
+      "id": "MR-S46",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 1,
+      "line_end": 7,
+      "range_sha256": "acb09d767d781c7d357d4bd741d39916b6a03ebc0cb6805fbb11733bc3df67e8",
+      "symbols": [
+        "TIMEOUT"
+      ]
+    },
+    {
+      "id": "MR-S47",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 1718,
+      "line_end": 1724,
+      "range_sha256": "ea2a44a1a999fe0dcdc9871864a52c0b5f0721a40060cb92673cf93757ca04af",
+      "symbols": [
+        "FunctionOrValue"
+      ]
+    },
+    {
+      "id": "MR-S48",
+      "source_file": "scripts/components/locomotor.lua",
+      "file_sha256": "b8e383d9cdf24db51b1bdb554ae8c68f6bc501522232219724a0200114148fdc",
+      "line_start": 1416,
+      "line_end": 1422,
+      "range_sha256": "232624c9210d0e59352407d7ae5466109e44d5caa01e537bb281e1e20727e57b",
+      "symbols": [
+        "LocoMotor:CheckDrownable"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "SourceModifierList source key dirtycb Reset 完整API",
+      "expected_entry_ids": [
+        "EXP-MOVE-001"
+      ],
+      "purpose": "来源列表完整合同与回调"
+    },
+    {
+      "query": "SetPredictExternalSpeedMultiplier channelcast 预测清理",
+      "expected_entry_ids": [
+        "EXP-MOVE-001"
+      ],
+      "purpose": "实际预测移动消费者"
+    },
+    {
+      "query": "SetExternalSpeedMultiplier source key 普通 预测",
+      "expected_entry_ids": [
+        "EXP-MOVE-002"
+      ],
+      "purpose": "不同速度包装的参数与来源"
+    },
+    {
+      "query": "GetRunSpeed 骑乘 坐骑runspeed 骑手multiplier motor",
+      "expected_entry_ids": [
+        "EXP-MOVE-002"
+      ],
+      "purpose": "实际速度聚合与消费"
+    },
+    {
+      "query": "Leader AddFollower Follower SetLeader 移交 退出",
+      "expected_entry_ids": [
+        "EXP-REL-001"
+      ],
+      "purpose": "关系两侧和完整API"
+    },
+    {
+      "query": "Follower AddLoyaltyTime neverexpire OnRemoveFromEntity",
+      "expected_entry_ids": [
+        "EXP-REL-001"
+      ],
+      "purpose": "忠诚与卸载生命周期"
+    },
+    {
+      "query": "Rider Mount Dismount ActualDismount 返回值 状态",
+      "expected_entry_ids": [
+        "EXP-REL-002"
+      ],
+      "purpose": "动作请求与实际提交"
+    },
+    {
+      "query": "Rideable SetRider Buck riderchanged 重复调用 replica",
+      "expected_entry_ids": [
+        "EXP-REL-002"
+      ],
+      "purpose": "坐骑侧占用与消费者"
+    }
+  ],
+  "limitations": [
+    "当前本机源码762172/build26474873的逐引用静态研究，runtime_verified=false。",
+    "新增研究保持research/restricted/hold，候选待独立审核。全部247条去重盘点见coverage-plan。",
+    "整文件SHA取ZIP成员原字节，范围SHA取UTF8 splitlines后LF连接且无尾换行。",
+    "各条具名依赖之外的动态hook、跨实体时序和原生执行范围按unknowns处理。"
+  ]
+}

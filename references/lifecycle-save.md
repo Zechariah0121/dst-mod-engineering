@@ -55,6 +55,12 @@ Buff 的 `persists=false` 不等于一定不存档：当前 `debuffable:OnSave` 
 
 临时出口可能持有玩家抵达、镜头恢复等任务。到期时先关闭新入口，再按原版 `pocketwatch_portal.CloseExit`：`IsBusy()` 为 false 才删除出口，否则只登记一次 `doneteleporting` 监听继续等待。直接 Remove 出口会取消其 pending tasks。配对入口删除、超时关闭和外部删除均要纳入测试。
 
+## 跨分片迁移与抵达
+
+762172 的[迁移研究 EXP-WORLD-003/004](../knowledge/research/native-mechanisms/world_shard-452de4ff6dd7.json)把迁移分为激活、颜色 tween、静态任务、角色及公共 OnDespawn、会话保存请求、Remove 和 StartMigration。激活返回与后续迁移完成分开观察，日志保留来源与目标 shard 的字段方向。
+
+抵达按已有 GUID 实体、迁移 preload、当前 shard、已登记门和可选坐标继续分支。`SpawnAtLocation` 对同源 worldid 保留输入位置，跨源时依次考虑门、显式坐标与默认位置；临时迁移字段在玩家 Teleport 前清理。排查重试时明确是重放完整恢复记录还是只重试落点，先核对已经执行的副作用。
+
 ## 验证证据分层
 
 - 纯 Lua/替身：迁移、函数签名、幂等和清理；不能证明引擎保存或渲染。
