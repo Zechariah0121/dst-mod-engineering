@@ -1,0 +1,139 @@
+{
+  "candidate_sha256": "98c6b94f692d923d14d8e8357ac3a11b563d5f4c90480d660c7cc83d90a05009",
+  "guide_sha256": "2c397c73c011f7dcef736ec564b8bdad931cab3206cc79f5c81e8ea4ab778550",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "runtime_verified": false,
+  "summary": "三条海钓候选、11项API及指南的具名源码合同和实际消费者相符。静态审阅通过，research/restricted/hold状态保持。",
+  "coverage": {
+    "entry_ids": [
+      "EXP-FISH-001",
+      "EXP-FISH-002",
+      "EXP-FISH-003"
+    ],
+    "claims_reviewed": 23,
+    "api_contracts_reviewed": 11,
+    "source_references_verified": 47,
+    "supplemental_source_references": 8,
+    "guide_reviewed": true,
+    "mechanism_contract": "PASS",
+    "frozen_candidate_identity": "MATCH",
+    "frozen_guide_identity": "MATCH",
+    "archive_identity": "MATCH",
+    "candidate_ids_unique": true,
+    "registered_id_collisions": [],
+    "focus": [
+      "拟饵/浮标装槽与完整SetupLure数据",
+      "竿/钩/鱼双向交接和钓具消费",
+      "fishcaught与落地库存形态生成",
+      "fish/school共享表与Prefab导出加载时序",
+      "鱼群排程、成员、休眠与寿命退出"
+    ]
+  },
+  "supplemental_source_references": [
+    {
+      "id": "REVIEW-FISH-S48",
+      "source_file": "scripts/prefabs/oceanfishingrod.lua",
+      "line_start": 12,
+      "line_end": 53,
+      "file_sha256": "b1894018a7e1ef2fe76edd8b0a867594a950ec883e4b86544eea6ec4e8dd9004",
+      "range_sha256": "08cbcec69ad2481c967e48f84217370d39494c4c99230543b0bacf4008feed9b",
+      "symbols": [
+        "onequip",
+        "onunequip",
+        "onequiptomodel"
+      ],
+      "explanation": "指南的装备打开容器、卸装/模特关闭容器的具体消费者。"
+    },
+    {
+      "id": "REVIEW-FISH-S49",
+      "source_file": "scripts/components/oceanfishable.lua",
+      "line_start": 2,
+      "line_end": 8,
+      "file_sha256": "c4e528a9ea35b8218af8c08d3a91e1e25f80ae9d545e861a0f1e9c0ac28b8a85",
+      "range_sha256": "9aa234eddacc74dd90b524b380155d94caac5a920e0ff81d23c3e1a004e8de4c",
+      "symbols": [
+        "OceanFishable",
+        "rod_onremove"
+      ],
+      "explanation": "SetRod合同提及竿onremove解绑回调，构造保存当前引用判断后调用SetRod(nil)。"
+    },
+    {
+      "id": "REVIEW-FISH-S50",
+      "source_file": "scripts/components/oceanfishingrod.lua",
+      "line_start": 381,
+      "line_end": 383,
+      "file_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+      "range_sha256": "974b5464d10edd387b9b367ed158b1df37cbf2d4be5985714979d98beba37dec",
+      "symbols": [
+        "OceanFishingRod:GetExtraStaminaDrain"
+      ],
+      "explanation": "lure_data.stamina_drain的实际读取，连接鱼CalcStaminaDrainRate。"
+    },
+    {
+      "id": "REVIEW-FISH-S51",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "line_start": 54,
+      "line_end": 79,
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "range_sha256": "d0eb1963e674d665f0356bcafc0f3b7af1cf2d15e5cff8965fb70669270ddb13",
+      "symbols": [
+        "OnInventoryLanded",
+        "onpickup"
+      ],
+      "explanation": "库存形态后继落地及拾取消费者，与fishcaught及水中实体转换的终点区别。"
+    },
+    {
+      "id": "REVIEW-FISH-S52",
+      "source_file": "scripts/components/schoolspawner.lua",
+      "line_start": 4,
+      "line_end": 22,
+      "file_sha256": "c466669c677744bc8a6cabd37a2563a43b449085be3bc95138e988323de3f0fe",
+      "range_sha256": "8adbaa4f59268e72f677fcff1466c65de9df7390373c001b4fead9a4ee802d5f",
+      "symbols": [
+        "SchoolSpawner"
+      ],
+      "explanation": "shared FISH_DATA的require、仅master断言及world实例和任务表归属。"
+    },
+    {
+      "id": "REVIEW-FISH-S53",
+      "source_file": "scripts/actions.lua",
+      "line_start": 1450,
+      "line_end": 1475,
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "range_sha256": "42bb4904e29ec2d69912ca6c91aacfbfdcf0e319ef32166222c660e95bf66321",
+      "symbols": [
+        "ACTIONS.CHANGE_TACKLE.fn"
+      ],
+      "explanation": "换钓具的实际动作执行及具体槽移交入口。"
+    },
+    {
+      "id": "REVIEW-FISH-S54",
+      "source_file": "scripts/components/malbatrossspawner.lua",
+      "line_start": 92,
+      "line_end": 100,
+      "file_sha256": "064e1463bef3b69ea6983378ba89ab9cf09ff2305295ed0c2174b42248c736b2",
+      "range_sha256": "2d6e447b9be435e4b426cd1b8cc1d6458463e132c14c183fcfdbaa903c09069b",
+      "symbols": [
+        "OnFishShoalAdded"
+      ],
+      "explanation": "指南所述固定鱼点世界登记被其他海洋业务读取的具体消费者。"
+    },
+    {
+      "id": "REVIEW-FISH-S55",
+      "source_file": "scripts/components/malbatrossspawner.lua",
+      "line_start": 285,
+      "line_end": 288,
+      "file_sha256": "064e1463bef3b69ea6983378ba89ab9cf09ff2305295ed0c2174b42248c736b2",
+      "range_sha256": "5371a7ca94d2cd3e9c134cd8ab2d34d3d5af417b4d4924166b7d7b3ae29d0912",
+      "symbols": [
+        "ms_registerfishshoal listener"
+      ],
+      "explanation": "世界鱼点登记/注销及钩鱼事件监听接线。"
+    }
+  ],
+  "limitations": [
+    "仅指定762172源码ZIP的静态Lua审阅。",
+    "游戏内装槽、抛竿、咬钩、断线、库存转换与群生成尚未运行验证。"
+  ]
+}

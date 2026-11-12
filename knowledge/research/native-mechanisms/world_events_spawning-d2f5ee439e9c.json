@@ -1,0 +1,1755 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "world_events_spawning",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-WEVENT-001",
+      "title": "世界袭击配置、周期规划与玩家预警的完整接入",
+      "aliases": [
+        "hounded",
+        "SetSpawnData",
+        "SpawnModeMed",
+        "hounded_forceplannewattack",
+        "猎犬预警",
+        "洞穴蠕虫波"
+      ],
+      "engineering_question": "怎样从world接入已存在的hounded，提供完整配置并理解周期、预警、重规划的实际生效时点？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "forest/cave master-world hounded and explicitly cited consumers",
+        "exclusions": [
+          "实际运行、原生地图判点与实体生成结果。",
+          "波次数值、玩家资格和保存策略由项目需求决定。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WEVENT-001-C01",
+          "kind": "NSF",
+          "statement": "hounded构造断言TheWorld.ismastersim。forest的master_postinit添加它；cave添加同组件后立即SetSpawnData(wormspawn)，并调整max_thieved_spawn_per_thief。构造时从AllPlayers建立活动玩家列表、注册世界事件、StartUpdatingComponent并PlanNextAttack。",
+          "evidence_refs": [
+            "WE01",
+            "WE05",
+            "WE07",
+            "WE08"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C02",
+          "kind": "NSF",
+          "statement": "SetSpawnData只替换_spawndata引用。五个attack_levels各提供warnduration(preupgraded)与无参数numspawns()，attack_delays回调返回base和variance两个秒数，规划直接相加。当前delay/warn函数另有缓存，SetSpawnData自身不更新它们、不重排倒计时。cave完整表展示旧rare/occasional/frequent延迟键与升级回调。",
+          "evidence_refs": [
+            "WE02",
+            "WE03",
+            "WE04",
+            "WE06",
+            "WE09"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C03",
+          "kind": "NSF",
+          "statement": "默认escalating以活动玩家平均年龄天数选择delay/warn函数，个人numspawns另按个人年龄阈值选择。SpawnModeMed切constant并绑定med或occasional延迟及med警告函数；SpawnModeNormal切escalating。两者调用的PlanNextAttack在剩余时间>0且无force时提前返回。",
+          "evidence_refs": [
+            "WE03",
+            "WE04",
+            "WE10"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C04",
+          "kind": "NSF",
+          "statement": "hounded_forceplannewattack由世界上具名ForcePlanNewAttack(src,data)转PlanNextAttack(true,data)。有玩家时可重算时长，支持multtimetoattack与choosemintime。无玩家时每次安排1秒后重试，闭包只转传force，data未被转传。ClearLocationImmunity在上述提前返回之前执行。",
+          "evidence_refs": [
+            "WE04",
+            "WE08"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C05",
+          "kind": "NSF",
+          "statement": "OnUpdate先处理逐玩家延迟波，随后在有活动玩家且attackplanned时推进全局时间。全局时间<warnduration时进入警告，<0时建立组配额并逐组释放，组清空后PlanNextAttack。LongUpdate直接别名到OnUpdate，一次调用每个组至多尝试一次释放。GetAttacking只判断time<=0与planned。",
+          "evidence_refs": [
+            "WE09",
+            "WE13",
+            "WE14",
+            "WE22"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C06",
+          "kind": "NSF",
+          "statement": "warning_speech可为字符串键或函数(preupgraded)，消费者GetString后用玩家talker:Say。warning_sound_thresholds可为数组或函数(preupgraded)，实际只传一个参数。DoWarningSound以pairs遍历，采用首个time阈值命中的记录并break，对缓存为land的玩家PushEvent(houndwarning,HOUNDWARNINGTYPE[sound])；延迟波另走个人分支。",
+          "evidence_refs": [
+            "WE11",
+            "WE12"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C07",
+          "kind": "NSF",
+          "statement": "玩家player_classified监听其父玩家的houndwarning，OnHoundWarning将类型写入houndwarningevent net_smallbyte；本地houndwarningdirty消费者在有父玩家HUD时按枚举生成对应houndwarning/wormwarning声音prefab。这条具名链连接服务器预警与本地声音消费。",
+          "evidence_refs": [
+            "WE34",
+            "WE35",
+            "WE36",
+            "WE37",
+            "WE38"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C08",
+          "kind": "EI",
+          "statement": "在cave的hounded组件PostInit内替换配置，随后仍会遇到cave工厂自己的SetSpawnData(wormspawn)。需要最终更改洞穴既有配置时，应选择cave prefab构造完成后的接入点，并复用已有Hook合同核对加载阶段。即使切换模式，正数剩余时间也可能保留到下次规划。",
+          "evidence_refs": [
+            "WE07",
+            "WE32",
+            "WE33",
+            "WE04",
+            "WE10",
+            "WE39",
+            "WE40"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-001-C09",
+          "kind": "REC",
+          "statement": "先明确需求是否修改既有袭击。修改时可在单一forest或cave的master Hook提供完整数据并使用所需模式。已有倒计时按项目决定保留或显式重规划。独立事件可以采用自己的小组件或任务及自定警告/产出，不必复制hounded全部升级与分组逻辑。",
+          "evidence_refs": [
+            "WE05",
+            "WE07",
+            "WE09",
+            "WE10",
+            "WE04"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Hounded:SetSpawnData(data)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "world master组件公开方法，文件返回匿名Class内的self方法",
+          "parameters": {
+            "data": "完整表，整体赋值。base_prefab/winter_prefab/summer_prefab为生成名称，季节分支会直接读取所选字段。",
+            "attack_levels": "intro/light/med/heavy/crazy每项包含warnduration(preupgraded)->秒数与numspawns()->数量。warnduration规划时调用，numspawns在计算个人波大小时无参数调用。",
+            "attack_delays": "函数集合，默认键intro/light/med/heavy/crazy，部分读取点支持rare/occasional/frequent兼容键。每次调用返回base_seconds,variance_seconds，规划相加，资格计算只读取第一返回。",
+            "warning_speech": "字符串本地化键，或function(preupgraded)->键。",
+            "warning_sound_thresholds": "{time=秒阈值,sound=HOUNDWARNINGTYPE键,quake=可选布尔}数组，或function(preupgraded)->数组。实际调用只有一个参数。",
+            "specialupgradecheck": "可选function(previous_preupgraded,override_chance,override_settings,stored_upgraded_record)->new_preupgraded,new_override_chance，PlanNextAttack先将preupgraded清nil。",
+            "upgrade_spawn_and_ShouldUpgrade": "upgrade_spawn可选。两字段都存在才调用ShouldUpgrade(remaining_count,preupgraded)->upgrade_bool,houndcount,new_preupgraded。升级扣houndcount or 5，普通扣1，new_preupgraded为used会清除所有相关preupgraded标记。"
+          },
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "master hounded已构造。",
+            "调用者提供所走分支需要的完整结构和可调用函数。"
+          ],
+          "side_effects": [
+            "只替换_spawndata。",
+            "后续计算数量、选prefab和警告使用新表，已缓存delay/warn函数及既有时间另受模式/规划路径控制。"
+          ],
+          "lifecycle": "表由本world组件闭包持有。cave工厂在AddComponent返回后会另行设置wormspawn。OnSave没有保存此表。",
+          "evidence_refs": [
+            "WE02",
+            "WE03",
+            "WE04",
+            "WE06",
+            "WE07",
+            "WE09",
+            "WE10",
+            "WE11",
+            "WE12",
+            "WE15",
+            "WE19",
+            "WE22",
+            "WE31"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Hounded:SpawnModeMed()",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "world master组件公开self方法",
+          "parameters": [],
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "_spawndata有med或occasional延迟回调及attack_levels.med.warnduration。"
+          ],
+          "side_effects": [
+            "设_spawnmode=constant，立即绑定相应delay/warn函数，再PlanNextAttack。",
+            "已有正数剩余时间可使PlanNextAttack提前返回，_warnduration本轮数值也保留。"
+          ],
+          "lifecycle": "后续周期沿当前绑定函数。模式选择本身未写入hounded OnSave。",
+          "evidence_refs": [
+            "WE04",
+            "WE10",
+            "WE31"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "ForcePlanNewAttack(src, data)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "hounded构造闭包内local事件处理器，经world事件hounded_forceplannewattack消费",
+          "parameters": {
+            "src": "事件源world，由事件分发传入。",
+            "data": "可nil。可选multtimetoattack乘数、choosemintime布尔。"
+          },
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "world上hounded监听已注册。",
+            "配置回调对当前模式有效。"
+          ],
+          "side_effects": [
+            "PlanNextAttack(true,data)绕过正数时间提前返回，但仍需活动玩家。",
+            "非never模式计算周期、设置warning时长并将warning清false。choosemintime取当前时间与新时间较小者。",
+            "无活动玩家时安排1秒重试，该重试不保留data。"
+          ],
+          "lifecycle": "直接local函数身份限本组件构造实例。外部用world:PushEvent传入数据。事件不承诺清理已生成实体或重建全部队列。",
+          "evidence_refs": [
+            "WE04",
+            "WE08"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "world master构造既有hounded；洞穴再覆盖为wormspawn完整配置。",
+          "evidence_refs": [
+            "WE01",
+            "WE05",
+            "WE07",
+            "WE08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "在选定安装阶段设置完整数据，按需要选择模式并决定本轮剩余时间是否保留。",
+          "evidence_refs": [
+            "WE09",
+            "WE10",
+            "WE04",
+            "WE32",
+            "WE33",
+            "WE39",
+            "WE40"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "PlanNextAttack按当前模式、平均年龄和升级回调计算下次时间与警告区间；无活动玩家进入1秒重试。",
+          "evidence_refs": [
+            "WE03",
+            "WE04"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "OnUpdate进入预警并通过talker与houndwarning事件触发玩家表现；player_classified将类型送往本地声音消费者。",
+          "evidence_refs": [
+            "WE11",
+            "WE12",
+            "WE13",
+            "WE14",
+            "WE34",
+            "WE35",
+            "WE36",
+            "WE37",
+            "WE38"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "到期后建立实际玩家配额并释放，组全部结束才规划下一波。",
+          "evidence_refs": [
+            "WE14",
+            "WE15",
+            "WE16",
+            "WE22"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行实际联机预警声音、升级实体与计时。",
+        "未穷举全部world settings覆盖顺序。显式重规划的保存时点和玩法影响由项目决定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "WE01",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C01"
+            ]
+          },
+          {
+            "ref": "WE02",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C02"
+            ]
+          },
+          {
+            "ref": "WE03",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C02",
+              "EXP-WEVENT-001-C03"
+            ]
+          },
+          {
+            "ref": "WE04",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C02",
+              "EXP-WEVENT-001-C03",
+              "EXP-WEVENT-001-C04",
+              "EXP-WEVENT-001-C08",
+              "EXP-WEVENT-001-C09"
+            ]
+          },
+          {
+            "ref": "WE05",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C01",
+              "EXP-WEVENT-001-C09"
+            ]
+          },
+          {
+            "ref": "WE06",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C02"
+            ]
+          },
+          {
+            "ref": "WE07",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C01",
+              "EXP-WEVENT-001-C08",
+              "EXP-WEVENT-001-C09"
+            ]
+          },
+          {
+            "ref": "WE08",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C01",
+              "EXP-WEVENT-001-C04"
+            ]
+          },
+          {
+            "ref": "WE09",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C02",
+              "EXP-WEVENT-001-C05",
+              "EXP-WEVENT-001-C09"
+            ]
+          },
+          {
+            "ref": "WE10",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C03",
+              "EXP-WEVENT-001-C08",
+              "EXP-WEVENT-001-C09"
+            ]
+          },
+          {
+            "ref": "WE11",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C06"
+            ]
+          },
+          {
+            "ref": "WE12",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C06"
+            ]
+          },
+          {
+            "ref": "WE13",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C05"
+            ]
+          },
+          {
+            "ref": "WE14",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C05"
+            ]
+          },
+          {
+            "ref": "WE15",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": []
+          },
+          {
+            "ref": "WE16",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": []
+          },
+          {
+            "ref": "WE19",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": []
+          },
+          {
+            "ref": "WE22",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C05"
+            ]
+          },
+          {
+            "ref": "WE31",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": []
+          },
+          {
+            "ref": "WE32",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C08"
+            ]
+          },
+          {
+            "ref": "WE33",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C08"
+            ]
+          },
+          {
+            "ref": "WE34",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C07"
+            ]
+          },
+          {
+            "ref": "WE35",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C07"
+            ]
+          },
+          {
+            "ref": "WE36",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C07"
+            ]
+          },
+          {
+            "ref": "WE37",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C07"
+            ]
+          },
+          {
+            "ref": "WE38",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C07"
+            ]
+          },
+          {
+            "ref": "WE39",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C08"
+            ]
+          },
+          {
+            "ref": "WE40",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-001-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本次静态证据依赖，额外Mod包装与运行环境未验证。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-WEVENT-002",
+      "title": "袭击的玩家配额、目标加权与实际生成结果",
+      "aliases": [
+        "houndedtarget",
+        "ForceReleaseSpawn",
+        "SummonSpawn",
+        "hounded_overridelocation",
+        "猎犬目标权重"
+      ],
+      "engineering_question": "整波怎样按玩家资格和权重分配，再找到落点并产出实体；单次生成接口能返回什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "forest/cave master-world hounded and explicitly cited consumers",
+        "exclusions": [
+          "实际运行、原生地图判点与实体生成结果。",
+          "波次数值、玩家资格和保存策略由项目需求决定。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WEVENT-002-C01",
+          "kind": "NSF",
+          "statement": "全局GetWaveAmounts排除已有延迟波玩家，按IsNear距离20建立分组。玩家只有preupgraded=available，或本次入场时间>warnduration且生存年龄秒数>=本次delay回调第一返回时，才进入正数配额计算。个人基础量由年龄档numspawns决定。",
+          "evidence_refs": [
+            "WE03",
+            "WE15"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C02",
+          "kind": "NSF",
+          "statement": "每个合格玩家的目标权重为sqrt(个人基础量)乘houndedtarget:GetTargetWeight()，无组件乘1。组总数由组大小与基础量总和做幂和取整，随后按权重随机分配整数配额。IsHoundThief另收集偷取目标、从组配额拆出额外分配，并受max_thieved_spawn_per_thief控制。",
+          "evidence_refs": [
+            "WE15",
+            "WE16",
+            "WE23"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C03",
+          "kind": "NSF",
+          "statement": "HoundedTarget暴露target_weight_mult和hound_thief_sources两份SourceModifierList；GetTargetWeight返回前者Get，IsHoundThief返回后者Get或旧hound_thief字段。Wes master构造以自己和wes_misfortune键设置两项。LuckUser负运气时使用misfortune键设置，两项在非负分支按同source/key删除。",
+          "evidence_refs": [
+            "WE23",
+            "WE24",
+            "WE25"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C04",
+          "kind": "NSF",
+          "statement": "CheckForLocationImmunity仅在该GUID未缓存状态时，按arena/vault/charliearena/land/water顺序记录。ReleaseSpawn只接受缓存nil或land，拿目标当前位置SummonSpawn；有实体后直接调用其combat:SuggestTarget(target)。SuggestTarget的接受结果未参与ReleaseSpawn的true返回。",
+          "evidence_refs": [
+            "WE20",
+            "WE19"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C05",
+          "kind": "NSF",
+          "statement": "局部SummonSpawn先找候选点，再选季节或升级prefab并生成。可调用实体方法spawn:hounded_overridelocation(center_pt)->新点以覆盖候选点，随后Teleport或SetPosition、FacePoint，存在spawnfader则FadeIn。公开SummonSpawn(pt,radius_override)传upgrade=nil，返回实体或nil；公开ForceReleaseSpawn(target)调用局部ReleaseSpawn但没有return。",
+          "evidence_refs": [
+            "WE18",
+            "WE19",
+            "WE21"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C06",
+          "kind": "NSF",
+          "statement": "HandleSpawnInfoRec每次将组timetonext减dt，到期按剩余配额选玩家并先扣普通1或升级houndcount or 5，之后才ReleaseSpawn，忽略其返回。失败的找点/生成及地点状态拒绝仍可能消耗配额，随后按组平均年龄设置下一次释放间隔。",
+          "evidence_refs": [
+            "WE22",
+            "WE19"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C07",
+          "kind": "EI",
+          "statement": "公开单次SummonSpawn与ForceReleaseSpawn均直接进入生成辅助路径，没有全局warning、spawnmode或pausesources检查，也没有修改整波配额。SummonSpawn本身没有SuggestTarget调用。项目若需要准确计数或自定目标，应从实际返回实体和需要的combat调用构造自己的小流程，并确认实体具备combat。",
+          "evidence_refs": [
+            "WE19",
+            "WE21",
+            "WE22"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-002-C08",
+          "kind": "REC",
+          "statement": "对现有整波调整玩家吸引关系，可沿用houndedtarget的具名source/key修改并在效果结束时撤回自己那一项。自有事件需要确定prefab、点位或返回判定时，可直接使用自己的SpawnPrefab与位置/目标逻辑。是否重试生成失败及如何记数，应由业务结果要求决定。",
+          "evidence_refs": [
+            "WE23",
+            "WE24",
+            "WE25",
+            "WE19",
+            "WE21",
+            "WE22"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Hounded:SummonSpawn(pt, radius_override)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "公开self方法；区别于同文件local SummonSpawn(pt,upgrade,radius_override)",
+          "parameters": {
+            "pt": "可nil，非nil为带x/y/z和Get()的世界位置Vector3。",
+            "radius_override": "可nil，nil用30。用于围绕中心扇形找点半径。"
+          },
+          "returns": "entity或nil。pt=nil、未找到候选点或SpawnPrefab未生成时为nil。",
+          "preconditions": [
+            "master hounded已构造，地图判点相关依赖可用。",
+            "所选季节/base prefab可构造。"
+          ],
+          "side_effects": [
+            "按当前_spawndata与季节随机选普通prefab。",
+            "先找点，再生成；实体可提供hounded_overridelocation(self,center_pt)->替代位置/nil。",
+            "定位、朝向中心，存在spawnfader时FadeIn。该公开调用未分配目标或改变波次配额。"
+          ],
+          "lifecycle": "生成物走其自身实体生命周期。直接调用路径不读spawnmode/pausesources，也不写本组件整波队列。",
+          "evidence_refs": [
+            "WE18",
+            "WE19",
+            "WE21"
+          ],
+          "unknowns": [
+            "原生地图判点及生成prefab的自有副作用未运行。"
+          ]
+        },
+        {
+          "symbol": "Hounded:ForceReleaseSpawn(target)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "公开self方法，内部委托local ReleaseSpawn(target,upgrade)",
+          "parameters": {
+            "target": "可nil。非nil需有效GUID和GetPosition()，通常玩家实体。"
+          },
+          "returns": "始终无显式返回，Lua nil，不能以返回值判断成功。",
+          "preconditions": [
+            "master hounded已构造。",
+            "实际生成物需具备combat组件供SuggestTarget调用。"
+          ],
+          "side_effects": [
+            "target非nil时，仅缓存状态nil或land可尝试生成。",
+            "生成成功后combat:SuggestTarget(target)，不会传播内部bool。",
+            "不会扣整波配额或检查全局暂停/模式。"
+          ],
+          "lifecycle": "目标地点缓存由hounded规划/检查路径管理，本方法没有先强制刷新地点状态。生成后实体归其自身生命周期。",
+          "evidence_refs": [
+            "WE19",
+            "WE20",
+            "WE21"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "排除延迟波玩家，依据距离、年龄和警告暴露时间建立正数合格玩家集合。",
+          "evidence_refs": [
+            "WE03",
+            "WE15"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "以sqrt量乘目标权重分配组整数配额，并消费thief额外分配规则。",
+          "evidence_refs": [
+            "WE15",
+            "WE16",
+            "WE23",
+            "WE24",
+            "WE25"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按组释放时钟选目标，尝试升级并先扣本次配额。",
+          "evidence_refs": [
+            "WE22"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "地点缓存允许时找点与生成，处理可选override-location、定位、朝向和淡入，再SuggestTarget。",
+          "evidence_refs": [
+            "WE18",
+            "WE19",
+            "WE20"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "按实际需求选可返回实体的公开SummonSpawn或无返回的ForceReleaseSpawn，整波失败继续消耗配额的事实单独保留。",
+          "evidence_refs": [
+            "WE21",
+            "WE22"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行复杂地图、海洋/洞穴落点与combat实际选敌。",
+        "未遍历所有houndedtarget修改者，也未把静态配额当成实际已存在袭击者数量。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "WE03",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C01"
+            ]
+          },
+          {
+            "ref": "WE15",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C01",
+              "EXP-WEVENT-002-C02"
+            ]
+          },
+          {
+            "ref": "WE16",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C02"
+            ]
+          },
+          {
+            "ref": "WE18",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C05"
+            ]
+          },
+          {
+            "ref": "WE19",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C04",
+              "EXP-WEVENT-002-C05",
+              "EXP-WEVENT-002-C06",
+              "EXP-WEVENT-002-C07",
+              "EXP-WEVENT-002-C08"
+            ]
+          },
+          {
+            "ref": "WE20",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C04"
+            ]
+          },
+          {
+            "ref": "WE21",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C05",
+              "EXP-WEVENT-002-C07",
+              "EXP-WEVENT-002-C08"
+            ]
+          },
+          {
+            "ref": "WE22",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C06",
+              "EXP-WEVENT-002-C07",
+              "EXP-WEVENT-002-C08"
+            ]
+          },
+          {
+            "ref": "WE23",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C02",
+              "EXP-WEVENT-002-C03",
+              "EXP-WEVENT-002-C08"
+            ]
+          },
+          {
+            "ref": "WE24",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C03",
+              "EXP-WEVENT-002-C08"
+            ]
+          },
+          {
+            "ref": "WE25",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-002-C03",
+              "EXP-WEVENT-002-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本次静态证据依赖，额外Mod包装与运行环境未验证。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-WEVENT-003",
+      "title": "袭击暂停、禁用、玩家离场与读档恢复的边界",
+      "aliases": [
+        "pausehounded",
+        "unpausehounded",
+        "SpawnModeNever",
+        "hounded OnSave OnLoad",
+        "延迟玩家袭击"
+      ],
+      "engineering_question": "暂停和禁用分别改变哪些路径，玩家离开与读档后哪些计时/配额会恢复，哪些源码结构需要特别核对？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "evidence": "current_frozen_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "forest/cave master-world hounded and explicitly cited consumers",
+        "exclusions": [
+          "实际运行、原生地图判点与实体生成结果。",
+          "波次数值、玩家资格和保存策略由项目需求决定。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-WEVENT-003-C01",
+          "kind": "NSF",
+          "statement": "pausehounded/unpausehounded在world注册local处理器，data及data.source非nil时对_pausesources以source/reason设置true或删除。该表以false为base、boolean组合。atrium_gate插钥匙时用source=inst暂停，取钥匙时用同source恢复。",
+          "evidence_refs": [
+            "WE26",
+            "WE27",
+            "WE08",
+            "WE28"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C02",
+          "kind": "NSF",
+          "statement": "OnUpdate先推进延迟玩家波，再检查全局有玩家且已规划，接着先扣全局time。只有pause为真、warning为假，且time>=0或spawninfo为nil时才进入暂停分支。若此时time<0还会PlanNextAttack。因此暂停期间时间仍递减，已警告/已排队的某些波和延迟波仍可继续。",
+          "evidence_refs": [
+            "WE13",
+            "WE14"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C03",
+          "kind": "NSF",
+          "statement": "SpawnModeNever先将模式设never再调用PlanNextAttack。OnUpdate入口直接因never返回，覆盖全局和延迟波推进。PlanNextAttack本身可能因正数time提前返回。公开单次生成方法独立调用辅助函数，不受OnUpdate入口的never检查控制。",
+          "evidence_refs": [
+            "WE04",
+            "WE10",
+            "WE13",
+            "WE19",
+            "WE21"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C04",
+          "kind": "NSF",
+          "statement": "OnPlayerLeft按userid保存警告/已到期或有配额的状态，非worldsave时会移除该玩家的活动配额或延迟表，并清地点缓存和活动玩家列表。OnPlayerJoined去重后加入，再消费missing记录。当前已警告且历史记录无_spawninfo时，LoadSaveDataFromMissingSpawnInfo让其参加当前波。",
+          "evidence_refs": [
+            "WE27",
+            "WE29",
+            "WE30"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C05",
+          "kind": "NSF",
+          "statement": "OnSave深拷贝missing记录并对AllPlayers保存个人进度，返回全局warning/time/warnduration/planned、missing以及三项升级字段。返回表没有spawnmode、spawndata、pausesources、wave_override_settings或已生成实体列表。OnLoad恢复所列标量；planned且time<warnduration时把time改为warnduration+5，未planned则PlanNextAttack。",
+          "evidence_refs": [
+            "WE31"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C06",
+          "kind": "NSF",
+          "statement": "762172中GetDelayedPlayerWaveAmounts把data._spawninfo建为数组并table.insert组记录。LoadSaveDataFromMissingSpawnInfo在存在保存的_spawninfo时却将其还原成含players/timetonext/averageplayerage的直接记录；延迟OnUpdate仍对data._spawninfo使用ipairs并检查#长度。GenerateSaveDataFromDelayedSpawnInfo同样直接读取_spawninfo.players等字段。",
+          "evidence_refs": [
+            "WE17",
+            "WE29",
+            "WE30",
+            "WE13"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C07",
+          "kind": "EI",
+          "statement": "沿上述还原分支获得的直接记录没有整数数组元素，延迟OnUpdate的ipairs不会处理其中players配额，#为0时删除该延迟条目。另一路从GetDelayedPlayerWaveAmounts产生的数组若被GenerateSaveDataFromDelayedSpawnInfo保存，会将count取0且丢失组的timetonext/averageplayerage。仅凭本版本Lua结构不能承诺延迟波精确恢复。",
+          "evidence_refs": [
+            "WE17",
+            "WE29",
+            "WE30",
+            "WE13"
+          ]
+        },
+        {
+          "id": "EXP-WEVENT-003-C08",
+          "kind": "REC",
+          "statement": "临时活动沿具名pause/unpause source/reason配对处理，并依据C02选择适合的实际效果。需要全面停止既有OnUpdate推进可用SpawnModeNever，恢复时选业务模式并核对保留时间。自有事件仅在需求要求时保存必要时间/阶段与状态，按实际句柄取消任务、解除监听。",
+          "evidence_refs": [
+            "WE27",
+            "WE28",
+            "WE10",
+            "WE13",
+            "WE04",
+            "WE31"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "OnPauseHounded(src, data)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "组件构造闭包local，world事件pausehounded的已注册处理器",
+          "parameters": {
+            "src": "world事件源。",
+            "data": "可nil。有效时为{source=修改来源,reason=可选键}。"
+          },
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "world hounded已注册事件监听。"
+          ],
+          "side_effects": [
+            "有效data时_pausesources:SetModifier(data.source,true,data.reason)。",
+            "后续OnUpdate的具体条件分支才消费聚合暂停值。"
+          ],
+          "lifecycle": "修改项由source/reason标识，配套unpause使用同身份。OnSave返回表不含_pausesources。",
+          "evidence_refs": [
+            "WE26",
+            "WE27",
+            "WE08",
+            "WE13",
+            "WE31"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "OnUnpauseHounded(src, data)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "组件构造闭包local，world事件unpausehounded的已注册处理器",
+          "parameters": {
+            "src": "world事件源。",
+            "data": "可nil。有效时为{source=原修改来源,reason=原可选键}。"
+          },
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "world hounded已注册事件监听。"
+          ],
+          "side_effects": [
+            "有效data时_pausesources:RemoveModifier(data.source,data.reason)。",
+            "其余来源仍可使聚合暂停值为真。"
+          ],
+          "lifecycle": "仅撤回匹配修改项。atrium_gate以同inst成对发送两事件。",
+          "evidence_refs": [
+            "WE26",
+            "WE27",
+            "WE08",
+            "WE28"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Hounded:SpawnModeNever()",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "world master组件公开self方法",
+          "parameters": [],
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "已构造hounded。"
+          ],
+          "side_effects": [
+            "将_spawnmode设never再PlanNextAttack。",
+            "以后OnUpdate在首行模式检查处返回，延迟与全局时间均不推进。",
+            "该方法没有移除已生成实体或禁止公开单次生成。"
+          ],
+          "lifecycle": "模式留在本组件闭包。正数time可能令PlanNextAttack提前返回而保留planned。恢复要另选业务模式，OnSave不保存模式。",
+          "evidence_refs": [
+            "WE04",
+            "WE10",
+            "WE13",
+            "WE19",
+            "WE21",
+            "WE31"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Hounded:OnSave()",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "组件保存回调self方法",
+          "parameters": [],
+          "returns": "保存数据table，无refs第二返回。",
+          "preconditions": [
+            "实体/组件保存流程可调用。",
+            "AllPlayers中的玩家具备此实现使用的userid等字段。"
+          ],
+          "side_effects": [
+            "深拷贝missing并将活动玩家状态投影到userid记录。",
+            "isworldsave=true时保存玩家记录不会从活动配额中移除玩家。"
+          ],
+          "lifecycle": "保存标量与延迟记录。保存结构与当前延迟数组消费存在C06/C07所述不一致。已生成实体的自身保存由其实体生命周期负责。",
+          "evidence_refs": [
+            "WE29",
+            "WE30",
+            "WE31",
+            "WE17",
+            "WE13"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Hounded:OnLoad(data)",
+          "source_file": "scripts/components/hounded.lua",
+          "visibility": "组件加载回调self方法",
+          "parameters": {
+            "data": "非nil保存table。warning/warnduration/timetoattack/attackplanned/missingplayerspawninfo与升级字段按or默认值恢复。"
+          },
+          "returns": "无显式返回，Lua nil",
+          "preconditions": [
+            "hounded已构造且适用的spawndata和world配置另由工厂/Mod接入。"
+          ],
+          "side_effects": [
+            "恢复保存字段并执行warning时间修整。",
+            "planned且time<warnduration时将time增至warnduration+5，未planned则PlanNextAttack。",
+            "个人missing记录待玩家加入时消费，存在保存_spawninfo的还原形态须结合C06/C07核对。"
+          ],
+          "lifecycle": "不恢复模式、配置表、暂停表或已生成实体列表。未承诺按离线时长逐个补发所有生成物。",
+          "evidence_refs": [
+            "WE31",
+            "WE30",
+            "WE04",
+            "WE13",
+            "WE17",
+            "WE29"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "活动以自己的source/reason对world发送pausehounded，结束时以同身份unpause。",
+          "evidence_refs": [
+            "WE26",
+            "WE27",
+            "WE28",
+            "WE08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "按OnUpdate真实顺序区分延迟波、全局倒计时和pause分支；需要时选择never模式控制组件更新入口。",
+          "evidence_refs": [
+            "WE13",
+            "WE14",
+            "WE10",
+            "WE04"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "玩家离开将符合条件的全局/延迟进度投影到userid并撤销当前配额，重入消费missing记录。",
+          "evidence_refs": [
+            "WE27",
+            "WE29",
+            "WE30"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "world保存返回时间与missing字段，读档修整警告时间，再在玩家加入时还原个人条目。",
+          "evidence_refs": [
+            "WE31",
+            "WE30"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "对存在个人待释放配额的恢复路径核对直接记录与数组消费者的不一致。精确延迟补发需求需针对该路径修复并实际验证。",
+          "evidence_refs": [
+            "WE17",
+            "WE29",
+            "WE30",
+            "WE13"
+          ]
+        }
+      ],
+      "unknowns": [
+        "C07为静态结构推导，尚未做实际玩家退出/重入或读档复现。",
+        "不穷举所有pausehounded监听者和外部Mod协作，世界事件可能被额外消费者监听。",
+        "已有world组件被运行中移除/重加的完整清理路径未审计。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "WE04",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C03",
+              "EXP-WEVENT-003-C08"
+            ]
+          },
+          {
+            "ref": "WE08",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C01"
+            ]
+          },
+          {
+            "ref": "WE10",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C03",
+              "EXP-WEVENT-003-C08"
+            ]
+          },
+          {
+            "ref": "WE13",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C02",
+              "EXP-WEVENT-003-C03",
+              "EXP-WEVENT-003-C06",
+              "EXP-WEVENT-003-C07",
+              "EXP-WEVENT-003-C08"
+            ]
+          },
+          {
+            "ref": "WE14",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C02"
+            ]
+          },
+          {
+            "ref": "WE17",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C06",
+              "EXP-WEVENT-003-C07"
+            ]
+          },
+          {
+            "ref": "WE19",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C03"
+            ]
+          },
+          {
+            "ref": "WE21",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C03"
+            ]
+          },
+          {
+            "ref": "WE26",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C01"
+            ]
+          },
+          {
+            "ref": "WE27",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C01",
+              "EXP-WEVENT-003-C04",
+              "EXP-WEVENT-003-C08"
+            ]
+          },
+          {
+            "ref": "WE28",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C01",
+              "EXP-WEVENT-003-C08"
+            ]
+          },
+          {
+            "ref": "WE29",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C04",
+              "EXP-WEVENT-003-C06",
+              "EXP-WEVENT-003-C07"
+            ]
+          },
+          {
+            "ref": "WE30",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C04",
+              "EXP-WEVENT-003-C06",
+              "EXP-WEVENT-003-C07"
+            ]
+          },
+          {
+            "ref": "WE31",
+            "role": "本entry已引用的具名源码实现或直接消费者",
+            "claim_ids": [
+              "EXP-WEVENT-003-C05",
+              "EXP-WEVENT-003-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "仅枚举本次静态证据依赖，额外Mod包装与运行环境未验证。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "WE01",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 5,
+      "line_end": 7,
+      "range_sha256": "345f42770c4fe6e8620f02e3707c039ee261087765ebc6a01bb571ef0a203152",
+      "symbols": [
+        "Hounded constructor master assertion"
+      ]
+    },
+    {
+      "id": "WE02",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 44,
+      "line_end": 103,
+      "range_sha256": "24004cfc808fd7ab9274681d258ba24004fe1e86dc5bceb4867bb142fa34ca21",
+      "symbols": [
+        "_spawndata",
+        "_attackdelayfn",
+        "_warndurationfn"
+      ]
+    },
+    {
+      "id": "WE03",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 112,
+      "line_end": 149,
+      "range_sha256": "d72d1b9bc2a297530d64edc431ffae508f9dc88913bc1d9b4d7df1c38f5f5225",
+      "symbols": [
+        "GetAveragePlayerAgeInDays",
+        "CalcEscalationLevel",
+        "CalcPlayerAttackSize"
+      ]
+    },
+    {
+      "id": "WE04",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 151,
+      "line_end": 205,
+      "range_sha256": "c1e49e774741bf6b276770e8923da271acd3f705062e18bd868149d269a8a390",
+      "symbols": [
+        "ClearLocationImmunity",
+        "PlanNextAttack"
+      ]
+    },
+    {
+      "id": "WE05",
+      "source_file": "scripts/prefabs/forest.lua",
+      "file_sha256": "3f204cc9b29ca05d2ae934e508f32bd0fb730f55bef7adf3a856f9b3962e5964",
+      "line_start": 639,
+      "line_end": 645,
+      "range_sha256": "a8339172956b008dea853c3e9aea27597bb443bbc78220ea49fb72765508a27f",
+      "symbols": [
+        "master_postinit"
+      ]
+    },
+    {
+      "id": "WE06",
+      "source_file": "scripts/prefabs/cave.lua",
+      "file_sha256": "3322c2df3bf584c3df81ccb55ed669c07bb6866b92b12bd1583693beea46fddb",
+      "line_start": 240,
+      "line_end": 322,
+      "range_sha256": "43eed4a68ce8f68e4c73548e91c6e474435b44e288518a945cba8afc060e6e6e",
+      "symbols": [
+        "wormspawn"
+      ]
+    },
+    {
+      "id": "WE07",
+      "source_file": "scripts/prefabs/cave.lua",
+      "file_sha256": "3322c2df3bf584c3df81ccb55ed669c07bb6866b92b12bd1583693beea46fddb",
+      "line_start": 551,
+      "line_end": 555,
+      "range_sha256": "059cb8918104740884100cb2fa50ada4774269aef42c083f36eb53fe2577438f",
+      "symbols": [
+        "master_postinit hounded setup"
+      ]
+    },
+    {
+      "id": "WE08",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 700,
+      "line_end": 730,
+      "range_sha256": "30e66b9f1582423a25149183f85471f42d80644e54f551ddfcb215769a629574",
+      "symbols": [
+        "ForcePlanNewAttack",
+        "hounded initialization"
+      ]
+    },
+    {
+      "id": "WE09",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 736,
+      "line_end": 750,
+      "range_sha256": "5ad2e988fd3389079b673f91b23dbca1084d3c9aa72d01b84f97c3cd1d22e7ab",
+      "symbols": [
+        "GetTimeToAttack",
+        "GetWarning",
+        "GetAttacking",
+        "SetSpawnData"
+      ]
+    },
+    {
+      "id": "WE10",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 790,
+      "line_end": 820,
+      "range_sha256": "56c8c19db669dc6e28d5553a754960b3a8bf538e7d9ac235ae2119de9a6f6fd9",
+      "symbols": [
+        "SpawnModeNever",
+        "SpawnModeLight",
+        "SpawnModeNormal",
+        "SpawnModeMed",
+        "SpawnModeHeavy"
+      ]
+    },
+    {
+      "id": "WE11",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 843,
+      "line_end": 889,
+      "range_sha256": "94dae3999e237f94c6c8a54cccc42dfcb11c86537e27051807bfe2280891f545",
+      "symbols": [
+        "_DoWarningSpeech",
+        "DoWarningSpeech",
+        "GetWarningSoundList"
+      ]
+    },
+    {
+      "id": "WE12",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 891,
+      "line_end": 925,
+      "range_sha256": "bde21da28eefa537efeedaaad256de2887fef73e30c9e63a6dbb1b4e07c9cb2c",
+      "symbols": [
+        "DoWarningSound",
+        "DoDelayedWarningSpeech",
+        "DoDelayedWarningSound"
+      ]
+    },
+    {
+      "id": "WE13",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 994,
+      "line_end": 1062,
+      "range_sha256": "e4a41e035b422a182dda7b5634d1d23290ce129a994c3968787cf04d2e91db1a",
+      "symbols": [
+        "OnUpdate delayed waves and pause branch"
+      ]
+    },
+    {
+      "id": "WE14",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 1064,
+      "line_end": 1119,
+      "range_sha256": "29dd82cabd8640e42771badbe0a2586c4962e3b505f7f6aff4e451f7550c01da",
+      "symbols": [
+        "OnUpdate global wave and warning",
+        "LongUpdate"
+      ]
+    },
+    {
+      "id": "WE15",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 207,
+      "line_end": 291,
+      "range_sha256": "8688ec7c0ca61e3b99f62cf940928ad117f3f6eb480122ee974a65bff8cb1825",
+      "symbols": [
+        "GetWaveAmounts qualification and weights"
+      ]
+    },
+    {
+      "id": "WE16",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 294,
+      "line_end": 341,
+      "range_sha256": "493774e7e86ba5be4a4aa57f579d7e53070d48f508e92cb05727fda327f4e757",
+      "symbols": [
+        "GetWaveAmounts group count and theft"
+      ]
+    },
+    {
+      "id": "WE17",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 343,
+      "line_end": 357,
+      "range_sha256": "4f3b42b28c416eb0283ab2bc12027ae0adbd9ede03af5e99cccee342b7cea5ed",
+      "symbols": [
+        "GetDelayedPlayerWaveAmounts"
+      ]
+    },
+    {
+      "id": "WE18",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 360,
+      "line_end": 393,
+      "range_sha256": "ffe455670501dccef9530844e0c12fe8ca34de2be254fe3177a932a2483a75af",
+      "symbols": [
+        "NoHoles",
+        "GetSpawnPoint"
+      ]
+    },
+    {
+      "id": "WE19",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 395,
+      "line_end": 469,
+      "range_sha256": "93179a9fba5d83d1eb9608404f06a75bb704e189ab8e433ee0f045ae7ef89ec2",
+      "symbols": [
+        "GetSpecialSpawnChance",
+        "GetSpawnPrefab",
+        "SummonSpawn local",
+        "ReleaseSpawn"
+      ]
+    },
+    {
+      "id": "WE20",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 624,
+      "line_end": 648,
+      "range_sha256": "2412e3cd760dffca2e234425f457e5c7fc6c2d01d705652c88939e315d4f76f2",
+      "symbols": [
+        "CheckForLocationImmunity",
+        "CheckForLocationImmunityAllPlayers"
+      ]
+    },
+    {
+      "id": "WE21",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 823,
+      "line_end": 833,
+      "range_sha256": "7ad10ca3dfa21e34ec55faf0e7cda43905de4fb97618d33e497e83c758df7d2d",
+      "symbols": [
+        "ForceReleaseSpawn",
+        "SummonSpawn public"
+      ]
+    },
+    {
+      "id": "WE22",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 928,
+      "line_end": 991,
+      "range_sha256": "45d525d4f3ef6008a78024e0cffa91fa3bef1fbb1b92cd83c0b3ad7399a053be",
+      "symbols": [
+        "HandleSpawnInfoRec"
+      ]
+    },
+    {
+      "id": "WE23",
+      "source_file": "scripts/components/houndedtarget.lua",
+      "file_sha256": "ec836812ac4a394cea5ecc3582da6c82e12bea41b09fcb251146a99310829176",
+      "line_start": 1,
+      "line_end": 20,
+      "range_sha256": "686972d0261b14b9d2ba91ba32a61e2cb51d37e2d8c9aa7660eeac797a6005dc",
+      "symbols": [
+        "HoundedTarget",
+        "GetTargetWeight",
+        "IsHoundThief"
+      ]
+    },
+    {
+      "id": "WE24",
+      "source_file": "scripts/prefabs/wes.lua",
+      "file_sha256": "f13f7903da8e7b34fe2f9d73afa692527ba649e8d09938e47061095a0a92bdbc",
+      "line_start": 32,
+      "line_end": 42,
+      "range_sha256": "3c5d5656bd1dd3bf843ab5943bafe1a061f8653e251bcbf852455bdea41b227d",
+      "symbols": [
+        "master_postinit houndedtarget modifiers"
+      ]
+    },
+    {
+      "id": "WE25",
+      "source_file": "scripts/components/luckuser.lua",
+      "file_sha256": "61bb661768e8333af008675a1415d958d1fa7ff8a6aa592bea9de120b57ac2fb",
+      "line_start": 20,
+      "line_end": 35,
+      "range_sha256": "053c1b5e471209d2d2d38bf3d6aa5fdaf81855342f1c2b74431b9c45e4f6d597",
+      "symbols": [
+        "LuckUser:_UpdateLuck_Internal"
+      ]
+    },
+    {
+      "id": "WE26",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 31,
+      "line_end": 39,
+      "range_sha256": "f9b6eb9faf78d78dd1e2afecf200568e4da7d5c7721bacfca816f4dda3897790",
+      "symbols": [
+        "_pausesources"
+      ]
+    },
+    {
+      "id": "WE27",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 588,
+      "line_end": 622,
+      "range_sha256": "9a58e8457b29bae3b6c05bc81b67522b416b6c2e879ac40e26294d29c45e5c6f",
+      "symbols": [
+        "OnPlayerJoined",
+        "OnPlayerLeft",
+        "OnPauseHounded",
+        "OnUnpauseHounded"
+      ]
+    },
+    {
+      "id": "WE28",
+      "source_file": "scripts/prefabs/atrium_gate.lua",
+      "file_sha256": "c6118a35330e1cc9b0cbd94088c5db90277891ad73361bcd9668781d29ba7107",
+      "line_start": 202,
+      "line_end": 239,
+      "range_sha256": "137b227c3e836e77bd278d9d537c3ffabd1f182f47787ff25bc68db4fa843c6c",
+      "symbols": [
+        "key-in pausehounded",
+        "OnKeyTaken unpausehounded"
+      ]
+    },
+    {
+      "id": "WE29",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 472,
+      "line_end": 532,
+      "range_sha256": "136a753cb51af1c714795a21e3cea35568c75017e0d399538685eb088753121e",
+      "symbols": [
+        "RemovePendingSpawns",
+        "GenerateSaveDataFromDelayedSpawnInfo",
+        "GenerateSaveDataFromSpawnInfo"
+      ]
+    },
+    {
+      "id": "WE30",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 534,
+      "line_end": 581,
+      "range_sha256": "458dd9e24dbc6a441a4d256cd13f36c222a1b930e5292a531248c57543e68f94",
+      "symbols": [
+        "LoadSaveDataFromMissingSpawnInfo",
+        "LoadPlayerSpawnInfo",
+        "SavePlayerSpawnInfo"
+      ]
+    },
+    {
+      "id": "WE31",
+      "source_file": "scripts/components/hounded.lua",
+      "file_sha256": "14d47db75e4c65529bf55a22bcb442d42b0a39646bdf43c480161694f66a5b25",
+      "line_start": 1125,
+      "line_end": 1166,
+      "range_sha256": "0e82348fd2ebf01e8fd31af8fdf98519147897ba82723ccab3d6e9b5ecd7810f",
+      "symbols": [
+        "OnSave",
+        "OnLoad"
+      ]
+    },
+    {
+      "id": "WE32",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 566,
+      "line_end": 573,
+      "range_sha256": "005fc62d5929821a75a5a837842df28046ca29d78d894448dd4b8b5b6f2ea405",
+      "symbols": [
+        "AddComponentPostInit"
+      ]
+    },
+    {
+      "id": "WE33",
+      "source_file": "scripts/modutil.lua",
+      "file_sha256": "997fbec6558ae705671d8c7005a004d80fc19e1c3427224af0701fb8970cb8af",
+      "line_start": 592,
+      "line_end": 599,
+      "range_sha256": "ecfb11dd2ee872cc22dd6b5092d436120a0e37ca123e5307542a42b825399411",
+      "symbols": [
+        "AddPrefabPostInit"
+      ]
+    },
+    {
+      "id": "WE34",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 160,
+      "line_end": 162,
+      "range_sha256": "a3a73a113ab4b6138e0476c0fe987d58fd572b7b0ee66f9d259702ddfc4fd168",
+      "symbols": [
+        "OnHoundWarning"
+      ]
+    },
+    {
+      "id": "WE35",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1048,
+      "line_end": 1074,
+      "range_sha256": "ada2c01e8068d3919f274f99e339f0a4713a1d60aaf440369a28a6ec7a1ae1c5",
+      "symbols": [
+        "OnHoundWarningDirty"
+      ]
+    },
+    {
+      "id": "WE36",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1183,
+      "line_end": 1197,
+      "range_sha256": "25c1e4dfc6e7cb766a0f98bf12bb88debc462fed353f75cfa08ca4ece6263484",
+      "symbols": [
+        "RegisterNetListeners server houndwarning listener"
+      ]
+    },
+    {
+      "id": "WE37",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1263,
+      "line_end": 1267,
+      "range_sha256": "03452a51e90db2922e05e4b041b32f8bebe821a6ded257d4c61a9abe10276ec3",
+      "symbols": [
+        "RegisterNetListeners_local houndwarningdirty"
+      ]
+    },
+    {
+      "id": "WE38",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1510,
+      "line_end": 1513,
+      "range_sha256": "5be58ba01848982613352ed8249d3cc48045781839cb8ed8d20a3b6fa48bd0f9",
+      "symbols": [
+        "houndwarningevent net_smallbyte"
+      ]
+    },
+    {
+      "id": "WE39",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 648,
+      "line_end": 668,
+      "range_sha256": "edc60ebe5eb495efe1ea834cc76d18058b22b83d984a8391979f5972eeaa4510",
+      "symbols": [
+        "EntityScript:AddComponent constructor and ComponentPostInit order"
+      ]
+    },
+    {
+      "id": "WE40",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 387,
+      "line_end": 411,
+      "range_sha256": "7dab0cdc705c0a6dc958eef3561f7e034ddba82c9f10df9d91cff4337daf25ee",
+      "symbols": [
+        "SpawnPrefabFromSim prefab construction and PostInit order"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "hounded SetSpawnData完整数据和警告回调怎么配置",
+      "expected_entry_ids": [
+        "EXP-WEVENT-001"
+      ],
+      "purpose": "配置结构、回调参数、缓存函数和生效时点"
+    },
+    {
+      "query": "世界事件周期预告后怎么选玩家并实际生成",
+      "expected_entry_ids": [
+        "EXP-WEVENT-001",
+        "EXP-WEVENT-002"
+      ],
+      "purpose": "从规划预警接到分组配额、落点与combat消费者"
+    },
+    {
+      "query": "ForceReleaseSpawn返回成功吗 SummonSpawn能否选目标",
+      "expected_entry_ids": [
+        "EXP-WEVENT-002"
+      ],
+      "purpose": "区分两个公开单次生成入口的参数、返回与副作用"
+    },
+    {
+      "query": "houndedtarget怎么修改猎犬目标权重与hound thief",
+      "expected_entry_ids": [
+        "EXP-WEVENT-002"
+      ],
+      "purpose": "复用Wes/LuckUser具名SourceModifierList消费者"
+    },
+    {
+      "query": "pausehounded会冻结时间吗 SpawnModeNever和读档有什么差异",
+      "expected_entry_ids": [
+        "EXP-WEVENT-003"
+      ],
+      "purpose": "暂停条件、禁用入口和保存字段边界"
+    },
+    {
+      "query": "玩家离开再回来hounded延迟波数组怎么恢复",
+      "expected_entry_ids": [
+        "EXP-WEVENT-003"
+      ],
+      "purpose": "具名还原结构与延迟消费者的静态不一致"
+    }
+  ],
+  "limitations": [
+    "冻结762172/build26474873归档的静态Lua研究，全部entry维持research/restricted/hold。",
+    "复用N006-READY-F03的Hook阶段、EXP-WORLD-001的WorldState和EXP-LIFE-001/006的事件/任务生命周期。其原Scope保持独立。",
+    "EXP-GROW-003/004的再生/繁殖及其他窗口巢穴/海钓未重复展开。",
+    "本次没有制作可运行Mod，guide代码为参数化工程示例，玩法数值由项目传入。",
+    "事件、方法与回调分别标出公开self入口或文件构造闭包local身份，未宣称稳定官方API版本兼容。"
+  ]
+}

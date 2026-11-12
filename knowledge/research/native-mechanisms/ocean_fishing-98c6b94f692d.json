@@ -1,0 +1,1814 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "topic": "ocean_fishing",
+  "entries": [
+    {
+      "id": "EXP-FISH-001",
+      "title": "海钓竿、浮标与鱼饵的配置及抛竿接线",
+      "aliases": [
+        "oceanfishingrod",
+        "oceanfishingtackle",
+        "海钓浮标",
+        "SetupLure",
+        "海钓抛竿"
+      ],
+      "engineering_question": "新增鱼饵、浮标或海钓竿时，数据怎样进入两槽容器、权威抛竿与落水钩实体？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_frozen_zip_direct_static_lua",
+        "environment": "原版oceanfishingrod、oceanfishinglure、oceanfishingbobber、组件动作与SGwilson。",
+        "exclusions": [
+          "普通动作/RPC执行基础沿NC-N003-INT-02/04。",
+          "完整客户端预测SG、皮肤资源、虚拟海洋实现及非原版玩家SG。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FISH-001-C01",
+          "kind": "NSF",
+          "statement": "原版竿common建立网络和reticule，master安装oceanfishingrod、两槽container、inventoryitem及equippable。file-local GetTackle返回槽1 bobber、槽2 lure。容器按oceanfishing_bobber/oceanfishing_lure标签筛槽，acceptsstacks=false；itemget/itemlose回调更新客户端最大距离。 换钓具动作还读取手持竿accepts_oceanfishingtackle标签、容器对玩家已打开且可接收该物品。",
+          "evidence_refs": [
+            "FISH-S03",
+            "FISH-S04",
+            "FISH-S31",
+            "FISH-S47"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C02",
+          "kind": "NSF",
+          "statement": "SetDefaults保存默认projectile、casting/lure数据与lure_setup，deepcopy一份casting_data。每次Cast调用gettackledatafn并缓存钓具。casting_base现有各键取base加浮标casting_data加鱼饵lure_data同名值后钳至少0。浮标组件决定projectile_prefab，lure_data与lure_setup由鱼饵整份替换或回到默认。",
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S02",
+            "FISH-S03",
+            "FISH-S04",
+            "FISH-S32"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C03",
+          "kind": "NSF",
+          "statement": "物品公共标签与master oceanfishingtackle分别决定可入槽和可读配置。浮标SetCastingData指定投掷加成和projectile名，鱼饵SetupLure存data.lure_data及整份setup。原版浮标文件另外导出_projectile和_floater，库存物品可选；这些工厂均为file-local函数。",
+          "evidence_refs": [
+            "FISH-S02",
+            "FISH-S07",
+            "FISH-S08",
+            "FISH-S09"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C04",
+          "kind": "NSF",
+          "statement": "右键动作收集读取rod replica target，无target且通过CanCastFishingNetAtPoint时提供CAST。SGwilson oceanfishing_cast在13*FRAMES执行BufferedAction，动作取invobject或手持竿、ActionPoint或target位置，调用Cast。Cast先按最大名义距离裁输入，再乘随机精度并设至少2的距离及角偏移，生成带complexprojectile的投掷物，SetTarget并启动竿更新，最后调用oncastfn。",
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S26",
+            "FISH-S27",
+            "FISH-S28"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C05",
+          "kind": "NSF",
+          "statement": "浮标投掷物的file-local OnProjectileLand从owningweapon取竿。海洋或虚拟海洋处生成floater、SetRod并把竿lure_data/fns交给oceanfishinghook。可通行陆地触发badcast并生成短暂侵蚀表现，void触发badcast与水花；原投掷物最终Remove。浮标SetRod(nil)的消费者Remove自身。",
+          "evidence_refs": [
+            "FISH-S05",
+            "FISH-S06"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C06",
+          "kind": "NSF",
+          "statement": "hook魅力由charm加reel_charm*reel_mod，再乘新鲜度、timeofday、fish_def.lures[style]、天气与可选charm_mod_fn(fish)。兴趣按鱼GUID累积或锁为0。原版鱼Brain先查附近海洋钩与兴趣半径，NibbleFoodAction更新兴趣，再按阈值/随机与尝试次数决定EAT或WALKTO。",
+          "evidence_refs": [
+            "FISH-S10",
+            "FISH-S11",
+            "FISH-S32"
+          ]
+        },
+        {
+          "id": "EXP-FISH-001-C07",
+          "kind": "REC",
+          "statement": "新增鱼饵沿标签加SetupLure的单个prefab接入，先提供完整lure_data与所需setup。只改现成浮标的投掷参数可保留其原版projectile；需要新落水表现时再定义自己的projectile/floater对。新增竿按自己的容器取钓具，配置SetDefaults与实际回调，复用已有动作和状态机。",
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S02",
+            "FISH-S04",
+            "FISH-S05",
+            "FISH-S07",
+            "FISH-S08",
+            "FISH-S09",
+            "FISH-S31"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "OceanFishingRod:SetDefaults",
+          "source_file": "scripts/components/oceanfishingrod.lua",
+          "visibility": "原版Lua组件公开实例方法，执行端与上下文按所列实际消费者。",
+          "parameters": [
+            "default_projectile_prefab为可生成的投掷Prefab名。",
+            "default_casting_tuning为含dist_max/dist_min_accuracy/dist_max_accuracy/max_angle_offset的数值表，常规消费者使用TUNING.OCEANFISHING_TACKLE.BASE。",
+            "default_lure_tuning为hook消费的完整lure数据表。default_lure_setup为表，消费者读取可选build/symbol/fns。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master rod组件已安装。UpdateClientMaxCastDistance可先于gettackledatafn赋值，届时按空钓具更新。"
+          ],
+          "side_effects": [
+            "写默认及当前projectile、base引用和casting deepcopy。lure_base/lure_data及setup保留传入表引用。",
+            "立即更新replica最大距离，取非负base dist_max与装备加成之和并由replica floor。"
+          ],
+          "lifecycle": [
+            "原版master构造调用，后续Cast每次重新缓存当前钓具。调优数据的共享引用由调用者管理。"
+          ],
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S03",
+            "FISH-S04",
+            "FISH-S30",
+            "FISH-S32"
+          ],
+          "unknowns": [
+            "静态Lua核对，原生调用内部和游戏实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingTackle:SetCastingData",
+          "source_file": "scripts/components/oceanfishingtackle.lua",
+          "visibility": "原版Lua组件公开实例方法，执行端与上下文按所列实际消费者。",
+          "parameters": [
+            "data为投掷加成表。缓存消费仅遍历竿casting_base已有键。",
+            "projectile_prefab为所选投掷Prefab名。原版浮标提供可用名称。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master oceanfishingtackle已安装，数据字段能参与竿数值加法。",
+            "用作bobber时可指定projectile名，缺省或假值沿竿的default_projectile_prefab回退。"
+          ],
+          "side_effects": [
+            "直接保存data与projectile_prefab引用。"
+          ],
+          "lifecycle": [
+            "原版浮标库存构造调用。竿通过槽1读取，在下一次Cast缓存；显示距离另由item事件更新。"
+          ],
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S02",
+            "FISH-S07",
+            "FISH-S31"
+          ],
+          "unknowns": [
+            "静态Lua核对，原生调用内部和游戏实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingTackle:SetupLure",
+          "source_file": "scripts/components/oceanfishingtackle.lua",
+          "visibility": "原版Lua组件公开实例方法，执行端与上下文按所列实际消费者。",
+          "parameters": [
+            "data为setup表，lure_data含charm/reel_charm/radius和按需求的style/timeofday/weather/dist_max/stamina_drain。",
+            "setup可含build/symbol、fns.charm_mod_fn(fish)和single_use。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "data及lure_data完整供hook消费。原版钩直接对charm/reel_charm作运算、radius用于距离测试。"
+          ],
+          "side_effects": [
+            "保存data.lure_data及整份data引用。IsSingleUse透出setup.single_use的真值或false。",
+            "选中鱼饵的lure_data整体交给hook。字段缺省沿具体consumer表达式处理，timeofday缺失得到0倍率；数值charm/reel_charm和radius由正常配置提供。"
+          ],
+          "lifecycle": [
+            "原版鱼饵master构造调用。竿在Cast缓存并将fns传给落水hook，单次鱼饵消费由竿onnewtargetfn的具名消费者执行。"
+          ],
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S02",
+            "FISH-S04",
+            "FISH-S09",
+            "FISH-S10",
+            "FISH-S32"
+          ],
+          "unknowns": [
+            "静态Lua核对，原生调用内部和游戏实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingRod:Cast",
+          "source_file": "scripts/components/oceanfishingrod.lua",
+          "visibility": "原版Lua组件公开实例方法，执行端与上下文按所列实际消费者。",
+          "parameters": [
+            "fisher为持竿角色，具备Transform/ForceFacePoint/事件及正常钓鱼SG上下文。",
+            "targetpos为Vector3，供偏移与Get()使用。"
+          ],
+          "returns": "返回self.target ~= nil。所列生成流程依赖SpawnPrefab成功。",
+          "preconditions": [
+            "master rod已SetDefaults并配置可调用gettackledatafn。",
+            "projectile支持AnimState/Transform/complexprojectile，ApplyBobberSkin等原版依赖已就绪。"
+          ],
+          "side_effects": [
+            "取当前钓具并缓存，计算随机终点，写fisher，生成并发射投掷物再SetTarget。",
+            "可覆盖lure符号，StartUpdatingComponent并调用oncastfn(inst,fisher,target)。回调返回被丢弃。"
+          ],
+          "lifecycle": [
+            "原版CAST由SG指定帧提交。组件Cast按所列代码直接执行，环境准入由动作/输入及落水回调共同承担。",
+            "SetTarget、落地替换与StopFishing的后续生命周期见EXP-FISH-002。"
+          ],
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S04",
+            "FISH-S05",
+            "FISH-S26",
+            "FISH-S27",
+            "FISH-S28"
+          ],
+          "unknowns": [
+            "静态Lua核对，原生调用内部和游戏实际运行结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "物品公共标签通过两槽准入，master组件提供投掷或鱼饵配置。",
+          "evidence_refs": [
+            "FISH-S02",
+            "FISH-S07",
+            "FISH-S09",
+            "FISH-S31"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "SG提交CAST，竿缓存当前配置并生成投掷物。",
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S27",
+            "FISH-S28"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "落水生成钩并绑定竿和鱼饵配置，鱼Brain开始寻饵。",
+          "evidence_refs": [
+            "FISH-S05",
+            "FISH-S06",
+            "FISH-S10",
+            "FISH-S11"
+          ]
+        }
+      ],
+      "unknowns": [
+        "实际客户端预测、落点物理、网络复制及皮肤资源尚未运行。",
+        "鱼饵强度/精度/距离与新增竿平衡由具体功能决定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FISH-S01",
+            "role": "SetDefaults/_CacheTackleData/Cast及抛射调用",
+            "claim_ids": [
+              "EXP-FISH-001-C02",
+              "EXP-FISH-001-C04",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S02",
+            "role": "SetCastingData/SetupLure/IsSingleUse",
+            "claim_ids": [
+              "EXP-FISH-001-C02",
+              "EXP-FISH-001-C03",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S03",
+            "role": "file-local GetTackle/OnTackleChanged",
+            "claim_ids": [
+              "EXP-FISH-001-C01",
+              "EXP-FISH-001-C02"
+            ]
+          },
+          {
+            "ref": "FISH-S04",
+            "role": "file-local钓竿回调及公共/master构造",
+            "claim_ids": [
+              "EXP-FISH-001-C01",
+              "EXP-FISH-001-C02",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S05",
+            "role": "file-local OnProjectileLand/OnSetRod/OnEaten/projectile_fn",
+            "claim_ids": [
+              "EXP-FISH-001-C05",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S06",
+            "role": "file-local浮标速度与floater_fn",
+            "claim_ids": [
+              "EXP-FISH-001-C05"
+            ]
+          },
+          {
+            "ref": "FISH-S07",
+            "role": "file-local浮标库存item_fn",
+            "claim_ids": [
+              "EXP-FISH-001-C03",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S08",
+            "role": "浮标projectile/floater/item的Prefab导出循环",
+            "claim_ids": [
+              "EXP-FISH-001-C03",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S09",
+            "role": "file-local鱼饵item_fn",
+            "claim_ids": [
+              "EXP-FISH-001-C03",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S10",
+            "role": "SetLureData/_ClacCharm/兴趣维护和测试",
+            "claim_ids": [
+              "EXP-FISH-001-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S11",
+            "role": "file-local FindFoodAction/NibbleFoodAction",
+            "claim_ids": [
+              "EXP-FISH-001-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S26",
+            "role": "oceanfishingrod右键动作收集",
+            "claim_ids": [
+              "EXP-FISH-001-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S27",
+            "role": "海钓CAST/REEL/STOP/CATCH动作",
+            "claim_ids": [
+              "EXP-FISH-001-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S28",
+            "role": "oceanfishing_cast执行帧与idle入口",
+            "claim_ids": [
+              "EXP-FISH-001-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S30",
+            "role": "target/张力档位/max距离netvar与读写",
+            "claim_ids": []
+          },
+          {
+            "ref": "FISH-S31",
+            "role": "oceanfishingrod两槽布局和itemtestfn",
+            "claim_ids": [
+              "EXP-FISH-001-C01",
+              "EXP-FISH-001-C07"
+            ]
+          },
+          {
+            "ref": "FISH-S32",
+            "role": "投掷/鱼饵/鱼种偏好数据形状",
+            "claim_ids": [
+              "EXP-FISH-001-C02",
+              "EXP-FISH-001-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S47",
+            "role": "oceanfishingtackle的CHANGE_TACKLE动作收集",
+            "claim_ids": [
+              "EXP-FISH-001-C01"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举本条声明、实际调用者与退出的静态Lua依赖，原生接口内部保持调用边界。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FISH-002",
+      "title": "鱼咬钩、挣扎、收线到库存形态的实体交接",
+      "aliases": [
+        "oceanfishable",
+        "海钓收线",
+        "海钓脱钩",
+        "partiallyhooked",
+        "CatchFish"
+      ],
+      "engineering_question": "新海鱼要配置哪些真实组件和回调，才能从咬钩进入挣扎并在成功或中断时正确交接实体与鱼饵？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_frozen_zip_direct_static_lua",
+        "environment": "oceanfish_small_1的数据和oceanfish公共工厂、原版竿/浮标、鱼Brain与SGoceanfish。",
+        "exclusions": [
+          "FC-P04普通食物EAT合同保留其原Scope，本条只补双oceanfishable分支。",
+          "完整非鱼可钓漂浮物、所有inventory落地/浮水系统和自定义钓鱼SG。",
+          "通用ComplexProjectile投射基础与物品所有权沿既有合同。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FISH-002-C01",
+          "kind": "NSF",
+          "statement": "水中鱼common安装网络/物理和oceanfish、oceanfishable、oceanfishinghookable等标签，master设置fish_def、locomotor、oceanfishable、eater、knownlocations、herdmember及weighable，绑定OnMakeProjectile/OnReelingIn/OnSetRod并StrugglingSetup，最后装SGoceanfish和oceanfishbrain。代表鱼种数据提供速度、stamina、set_hook_time、lures与水中/库存资源参数。所列工厂及回调为file-local。",
+          "evidence_refs": [
+            "FISH-S15",
+            "FISH-S16",
+            "FISH-S33"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C02",
+          "kind": "NSF",
+          "statement": "Brain的NibbleFoodAction可选EAT，鱼SG按目标具有oceanfishable选择bitehook_pre并执行BufferedAction。ACTIONS.EAT在edible/eater和soul/souleater优先分支后，双oceanfishable分支调用吃者SetRod(目标GetRod())。SetRod回连竿SetTarget，原目标的WasEatenByA回调后Remove原目标。新鱼OnSetRod加partiallyhooked，竿onnewtargetfn在目标无hook且非projectile时移除容器内IsSingleUse钓具。",
+          "evidence_refs": [
+            "FISH-S04",
+            "FISH-S11",
+            "FISH-S12",
+            "FISH-S13",
+            "FISH-S14",
+            "FISH-S15",
+            "FISH-S17",
+            "FISH-S20"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C03",
+          "kind": "NSF",
+          "statement": "partiallyhooked时Brain站定。Reel先调OnReelingIn，原版鱼移除partiallyhooked并ResetStruggling，随后按张力缩短line_dist、重算张力。bitehook_loop按fish_def.set_hook_time设置超时，提钩前超时进入逃脱并StopFishing(linetooloose)。正式挣扎由Brain切换struggle/tired wander，oceanfishable按高张力耗体力、低张力恢复体力及计时维护pending状态。",
+          "evidence_refs": [
+            "FISH-S14",
+            "FISH-S15",
+            "FISH-S17",
+            "FISH-S18",
+            "FISH-S19",
+            "FISH-S24"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C04",
+          "kind": "NSF",
+          "statement": "竿OnUpdate根据角色有效性、装备/SG、MAX_HOOK_DIST决定停止，通常中断且已有非hook非projectile目标或距离过远会传lost_tackle=true。Reel在此前已高张力且本次达到REELING_SNAP_TENSION时StopFishing(linesnapped,true)。StopFishing先调用ondonefishing，再发角色与目标停止事件，最后清fisher并SetTarget(nil)。原版竿完成回调在lost_tackle真时DestroyContents；鱼SG收到停止事件后置leaving。",
+          "evidence_refs": [
+            "FISH-S04",
+            "FISH-S13",
+            "FISH-S19",
+            "FISH-S20",
+            "FISH-S21"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C05",
+          "kind": "NSF",
+          "statement": "oceanfishable按竿库存GrandOwner及catch_distance判距离，在更新中设置oceanfishing_catchable。GetFishingAction在玩家fishing_idle且目标非projectile时，近处hook给STOP，其他可收获目标给CATCH，其余给REEL。CATCH动作先切人物oceanfishing_catch再调用CatchFish。",
+          "evidence_refs": [
+            "FISH-S18",
+            "FISH-S25",
+            "FISH-S27"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C06",
+          "kind": "NSF",
+          "statement": "CatchFish停止竿更新，以目标MakeProjectile得到待抛实体，设置weighable玩家owner、用complexprojectile抛向靠近玩家的目标点，调用ondonefishing(success,false,fisher,fish)，发fishcaught后SetTarget(nil)。原版鱼OnMakeProjectile把原水中实体改投掷态并暂停Brain。落在可通行地面时生成fish_def.prefab.._inv，复制称重数据并移除水中实体；落水则恢复游动层/Brain、清称重owner并标leaving。",
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S17",
+            "FISH-S21",
+            "FISH-S22",
+            "FISH-S23"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C07",
+          "kind": "EI",
+          "statement": "本条正常海鱼路径的fishcaught发生在鱼投掷后、库存形态生成前。收获通知、世界上出现库存鱼与玩家实际拾取分别有各自消费者，接奖励或收集判定时按所需终点选择事件。",
+          "evidence_refs": [
+            "FISH-S21",
+            "FISH-S22",
+            "FISH-S23"
+          ]
+        },
+        {
+          "id": "EXP-FISH-002-C08",
+          "kind": "REC",
+          "statement": "自定义水中鱼先复用组件/Brain/SG合同，提供其所读取的fish_def和动画。需要相同收获方式时在自己的makeprojectilefn完成投掷态转换，并在落地消费者交接库存形态。单次鱼饵与lost_tackle已由所选竿回调处理时，项目额外效果沿真实目标切换/收获回调接入，避免重复消费。",
+          "evidence_refs": [
+            "FISH-S04",
+            "FISH-S15",
+            "FISH-S16",
+            "FISH-S17",
+            "FISH-S21",
+            "FISH-S22",
+            "FISH-S23",
+            "FISH-S33"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "OceanFishable:StrugglingSetup",
+          "source_file": "scripts/components/oceanfishable.lua",
+          "visibility": "原版Lua组件公开实例方法。仅按master正常海钓消费者及本文前提使用。",
+          "parameters": [
+            "walk_speed、run_speed为后续UpdateRunSpeed使用的基础速度。",
+            "stamina_def含drain_rate/recover_rate、struggle_times/tired_times；时间表均含low/high/r_low/r_high。原版Brain的疲劳方向还读取stamina_def.tiredout_angles。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master fishable及正常鱼locomotor/Brain/SG已配置。数值表满足后续乘法和Lerp。"
+          ],
+          "side_effects": [
+            "保存基础速度和stamina_def引用，将体力置1、两个挣扎状态置false、计时置0。"
+          ],
+          "lifecycle": [
+            "原版水中鱼构造调用。首次提钩由OnReelingIn调用ResetStruggling，随后组件更新体力/计时，Brain消费pending状态。"
+          ],
+          "evidence_refs": [
+            "FISH-S15",
+            "FISH-S16",
+            "FISH-S17",
+            "FISH-S18",
+            "FISH-S24",
+            "FISH-S33"
+          ],
+          "unknowns": [
+            "静态Lua范围，原生物理/网络和目标Mod实际结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishable:SetRod",
+          "source_file": "scripts/components/oceanfishable.lua",
+          "visibility": "原版Lua组件公开实例方法。仅按master正常海钓消费者及本文前提使用。",
+          "parameters": [
+            "rod为带oceanfishingrod的竿实体或nil。"
+          ],
+          "returns": "rod改变的分支在完成更新后返回self.rod ~= nil。传同一引用时正常返回nil。",
+          "preconditions": [
+            "master fishable。正常上钩消费者给原来无竿的鱼绑定有效竿，停止给nil。",
+            "自定义onsetrodfn承接所列重入时序和退出，浮标nil回调会Remove自身。"
+          ],
+          "side_effects": [
+            "先清catchable标签、写self.rod，再停止旧更新/解绑旧竿onremove并令旧竿SetTarget(nil)，调用onsetrodfn(inst,nil)。",
+            "非nil新竿分支监听其onremove、回连SetTarget(inst)、启动组件更新并onsetrodfn(inst,rod)，最后UpdateRunSpeed。"
+          ],
+          "lifecycle": [
+            "双向调用依引用相等检查终止正常递归。鱼钩被吃后的旧target由竿SetTarget的WasEatenByA路径处理。",
+            "组件OnRemoveFromEntity调SetRod(nil)，竿实体onremove回调也据当前引用解除。跨竿直接非nil替换包含旧竿回调重入，应按实际业务先明确解除再绑定。"
+          ],
+          "evidence_refs": [
+            "FISH-S05",
+            "FISH-S12",
+            "FISH-S15",
+            "FISH-S17",
+            "FISH-S20"
+          ],
+          "unknowns": [
+            "静态Lua范围，原生物理/网络和目标Mod实际结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingRod:Reel",
+          "source_file": "scripts/components/oceanfishingrod.lua",
+          "visibility": "原版Lua组件公开实例方法。仅按master正常海钓消费者及本文前提使用。",
+          "parameters": [],
+          "returns": "有效fishable目标和有效fisher分支返回not snapped，否则false。",
+          "preconditions": [
+            "master rod处于正常Cast建立的fisher/target会话。",
+            "目标oceanfishable及回调满足当前SG/实体状态。"
+          ],
+          "side_effects": [
+            "先OnReelingIn(fisher)，按locomotor与当前张力缩短line_dist并重算，符合双重高张力条件时StopFishing(linesnapped,true)。",
+            "仍对保存的target调用OnReelingInPst(self.fisher)。断线会先清fisher，故此post回调可收到nil doer。"
+          ],
+          "lifecycle": [
+            "原版REEL动作由人物reel状态进入时执行。第一次有效收线会让原版partiallyhooked鱼完成提钩。"
+          ],
+          "evidence_refs": [
+            "FISH-S15",
+            "FISH-S17",
+            "FISH-S19",
+            "FISH-S21",
+            "FISH-S27",
+            "FISH-S29"
+          ],
+          "unknowns": [
+            "静态Lua范围，原生物理/网络和目标Mod实际结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingRod:CatchFish",
+          "source_file": "scripts/components/oceanfishingrod.lua",
+          "visibility": "原版Lua组件公开实例方法。仅按master正常海钓消费者及本文前提使用。",
+          "parameters": [],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master rod有正常会话fisher，目标含oceanfishable且满足调用方收获条件。",
+            "MakeProjectile结果必须有效，支持complexprojectile/Transform。原版makeprojectilefn会安装该组件并返回当前鱼。"
+          ],
+          "side_effects": [
+            "先停止更新。有效目标分支记录统计、算抛向角色附近终点、MakeProjectile、可选设置称重owner、发射。",
+            "调用ondonefishing(inst,success,false,fisher,fish)，随后向fisher发fishcaught，再SetTarget(nil)。缺fishable目标时改走StopFishing。"
+          ],
+          "lifecycle": [
+            "近距离标签由fishable更新，动作收集据此给CATCH。此方法本身按所列有效目标分支执行。",
+            "原版落地回调继续产生库存形态或恢复水中离开态。成功分支保留fisher字段，target被清，直至后继业务覆盖/停止。"
+          ],
+          "evidence_refs": [
+            "FISH-S01",
+            "FISH-S18",
+            "FISH-S21",
+            "FISH-S22",
+            "FISH-S25",
+            "FISH-S27"
+          ],
+          "unknowns": [
+            "静态Lua范围，原生物理/网络和目标Mod实际结果尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "OceanFishingRod:StopFishing",
+          "source_file": "scripts/components/oceanfishingrod.lua",
+          "visibility": "原版Lua组件公开实例方法。仅按master正常海钓消费者及本文前提使用。",
+          "parameters": [
+            "reason为统计/停止事件原因，可nil。",
+            "lost_tackle为传给ondonefishing的丢失标志，可nil/false/true。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "master rod组件及相关回调对象处于所列正常会话，回调执行时fisher/target仍为当时字段。"
+          ],
+          "side_effects": [
+            "停止更新，调用ondonefishing(inst,reason,lost_tackle,fisher,target)。",
+            "对非nil fisher记录统计并发oceanfishing_stoppedfishing，对非nil target也发同名payload，最后fisher=nil、SetTarget(nil)。"
+          ],
+          "lifecycle": [
+            "原版竿ondonefishing仅在lost_tackle真时DestroyContents，满足装备条件再重开容器。",
+            "目标SetRod(nil)按自身回调退出。鱼SG收到停止事件标leaving，浮标解除竿时移除。实体删除事件或更新检测触发的实际入口各按所列代码。"
+          ],
+          "evidence_refs": [
+            "FISH-S04",
+            "FISH-S05",
+            "FISH-S13",
+            "FISH-S17",
+            "FISH-S20",
+            "FISH-S21"
+          ],
+          "unknowns": [
+            "静态Lua范围，原生物理/网络和目标Mod实际结果尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "鱼Brain选EAT并由鱼SG提交，双fishable绑定把竿目标从钩换到鱼，旧钩退出。",
+          "evidence_refs": [
+            "FISH-S11",
+            "FISH-S12",
+            "FISH-S13",
+            "FISH-S17",
+            "FISH-S20"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "人物REEL完成提钩并进入张力/体力交互，停止事件释放双方绑定。",
+          "evidence_refs": [
+            "FISH-S14",
+            "FISH-S15",
+            "FISH-S18",
+            "FISH-S19",
+            "FISH-S20",
+            "FISH-S21",
+            "FISH-S24",
+            "FISH-S29"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "近距离CATCH把鱼抛出，落地消费者生成库存形态或安排鱼游离。",
+          "evidence_refs": [
+            "FISH-S18",
+            "FISH-S21",
+            "FISH-S22",
+            "FISH-S23",
+            "FISH-S25",
+            "FISH-S27"
+          ]
+        }
+      ],
+      "unknowns": [
+        "实际落船/海岸判定、网络送达和拾取结果需游戏验证。",
+        "自定义竿/鱼的直接跨竿替换、回调抛错和其他Mod重写的状态一致性未验证。",
+        "海钓进行中保存/恢复未作为本轮功能要求扩展。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FISH-S01",
+            "role": "SetDefaults/_CacheTackleData/Cast及抛射调用",
+            "claim_ids": [
+              "EXP-FISH-002-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S04",
+            "role": "file-local钓竿回调及公共/master构造",
+            "claim_ids": [
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C04",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S05",
+            "role": "file-local OnProjectileLand/OnSetRod/OnEaten/projectile_fn",
+            "claim_ids": []
+          },
+          {
+            "ref": "FISH-S11",
+            "role": "file-local FindFoodAction/NibbleFoodAction",
+            "claim_ids": [
+              "EXP-FISH-002-C02"
+            ]
+          },
+          {
+            "ref": "FISH-S12",
+            "role": "ACTIONS.EAT.fn的优先分支与SetRod",
+            "claim_ids": [
+              "EXP-FISH-002-C02"
+            ]
+          },
+          {
+            "ref": "FISH-S13",
+            "role": "EAT状态选择与停止钓鱼事件",
+            "claim_ids": [
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S14",
+            "role": "bitehook_pre/loop执行及提钩超时",
+            "claim_ids": [
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C03"
+            ]
+          },
+          {
+            "ref": "FISH-S15",
+            "role": "file-local OnReelingIn/OnSetRod",
+            "claim_ids": [
+              "EXP-FISH-002-C01",
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C03",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S16",
+            "role": "file-local water_common公共/master及组件/SG/Brain安装",
+            "claim_ids": [
+              "EXP-FISH-002-C01",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S17",
+            "role": "卸载/MakeProjectile/StrugglingSetup/SetRod/速度",
+            "claim_ids": [
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C03",
+              "EXP-FISH-002-C06",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S18",
+            "role": "体力/可收获距离/挣扎状态/放线速率",
+            "claim_ids": [
+              "EXP-FISH-002-C03",
+              "EXP-FISH-002-C05"
+            ]
+          },
+          {
+            "ref": "FISH-S19",
+            "role": "张力状态与Reel",
+            "claim_ids": [
+              "EXP-FISH-002-C03",
+              "EXP-FISH-002-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S20",
+            "role": "SetTarget及OnUpdate终止/放线分支",
+            "claim_ids": [
+              "EXP-FISH-002-C02",
+              "EXP-FISH-002-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S21",
+            "role": "CalcCatchDest/CatchFish/StopFishing",
+            "claim_ids": [
+              "EXP-FISH-002-C04",
+              "EXP-FISH-002-C06",
+              "EXP-FISH-002-C07",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S22",
+            "role": "file-local OnProjectileLand/OnMakeProjectile",
+            "claim_ids": [
+              "EXP-FISH-002-C06",
+              "EXP-FISH-002-C07",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S23",
+            "role": "file-local inv_common库存鱼构造与on_landed绑定",
+            "claim_ids": [
+              "EXP-FISH-002-C06",
+              "EXP-FISH-002-C07",
+              "EXP-FISH-002-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S24",
+            "role": "file-local方向回调、已钩鱼BT与出生home记忆",
+            "claim_ids": [
+              "EXP-FISH-002-C03"
+            ]
+          },
+          {
+            "ref": "FISH-S25",
+            "role": "file-local GetFishingAction",
+            "claim_ids": [
+              "EXP-FISH-002-C05"
+            ]
+          },
+          {
+            "ref": "FISH-S27",
+            "role": "海钓CAST/REEL/STOP/CATCH动作",
+            "claim_ids": [
+              "EXP-FISH-002-C05"
+            ]
+          },
+          {
+            "ref": "FISH-S29",
+            "role": "oceanfishing_reel提交与退出",
+            "claim_ids": []
+          },
+          {
+            "ref": "FISH-S33",
+            "role": "oceanfish_small_1代表鱼种全部定义",
+            "claim_ids": [
+              "EXP-FISH-002-C01",
+              "EXP-FISH-002-C08"
+            ]
+          }
+        ],
+        "unknowns": [
+          "枚举本条声明、实际调用者与退出的静态Lua依赖，原生接口内部保持调用边界。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-FISH-003",
+      "title": "新海鱼的鱼种表、游动群与固定鱼点生成接线",
+      "aliases": [
+        "schoolspawner",
+        "oceanfishdef",
+        "schoolherd",
+        "海洋鱼群",
+        "oceanfish_shoalspawner"
+      ],
+      "engineering_question": "新鱼怎样进入按季节海域选择的游动群，固定补员鱼点和net用fishschool又各使用什么实际消费者？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "evidence": "authorized_frozen_zip_direct_static_lua",
+        "environment": "forest master现存schoolspawner、oceanfish_small_1数据、schoolherd及固定oceanfish_shoalspawner。antchovies_group仅用于辨明fishschool消费者。",
+        "exclusions": [
+          "ChildSpawner完整生成/回巢/存档沿EXP-AI-009/010、EXP-SAVE-002，并在完整补员需求涉及时另查组件合同。",
+          "构造期热重装schoolspawner、捕食者专有AI、拖网完整捕获与海域生成算法。",
+          "通用保存/GUID/计时器恢复沿既有合同。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-FISH-003-C01",
+          "kind": "NSF",
+          "statement": "forest在master_postinit添加schoolspawner，组件按玩家加入安排玩家持有的延时尝试、离开取消句柄，尝试后再排下一次。ShouldSpawnANewSchoolForPlayer按海面比例、blocker数量、附近同时具oceanfish/oceanfishable标签的鱼数及随机决定资格；GetSpawnPoint以扇形搜索海洋且存在可选鱼种的点。",
+          "evidence_refs": [
+            "FISH-S36",
+            "FISH-S38",
+            "FISH-S45"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C02",
+          "kind": "NSF",
+          "statement": "PickSchool是schoolspawner内部局部函数，按TheWorld.state.season与GetTileAtPoint取FISH_DATA.school权重，weighted_random_choice得到key后读取FISH_DATA.fish[key]。oceanfishdef返回fish/school共享表和SpecialEventSetup函数，冬春夏表在模块执行时从秋表deepcopy后添加季节鱼。",
+          "evidence_refs": [
+            "FISH-S34",
+            "FISH-S36"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C03",
+          "kind": "NSF",
+          "statement": "SpawnSchool生成schoolherd_..schooldata.prefab，选schoolmin/max数量并在可游位置内分散。首个有效候选立即生成，其他候选由world任务延时生成。file-local DoSpawnFish先查herd有效，再生成鱼、Teleport、启用herdmember、设置herdprefab与arrive状态并AddMember。count统计有效offset的排程数。count>0产生临时blocker与schoolspawned事件，并在SWELL/ROUGH检查延迟捕食者生成；0则删除herd。",
+          "evidence_refs": [
+            "FISH-S36",
+            "FISH-S37",
+            "FISH-S45"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C04",
+          "kind": "NSF",
+          "statement": "schoolherd文件为每个fish表项导出schoolherd_<prefab>，工厂为file-local。它用鱼种的导航/群寿命参数维护knownlocations和timer，并给成员写herd_offset。lifetime到期向成员发doleave并Remove群，全体成员休眠时直接移除成员和群。普通鱼休眠延迟回调在有效home、非leaving且persists时GoHome，否则Remove；Wake会取消等待。",
+          "evidence_refs": [
+            "FISH-S39",
+            "FISH-S40",
+            "FISH-S41"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C05",
+          "kind": "NSF",
+          "statement": "oceanfish文件的file-local MakeFish在模块执行的pairs(FISH_DATA.fish)循环中导出水中prefab及同名_inv。schoolherd同样在自己的模块执行循环中导出群Prefab。运行时PickSchool继续读取共享fish/school表，而上述Prefab导出循环各发生在对应模块执行时。",
+          "evidence_refs": [
+            "FISH-S34",
+            "FISH-S35",
+            "FISH-S36",
+            "FISH-S39"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C06",
+          "kind": "NSF",
+          "statement": "固定oceanfish_shoalspawner在master配置childspawner.childname=oceanfish_medium_2、wateronly和补员/放出周期，Wake安排短延时ReleaseAllChildren，Sleep取消这份任务，初始化向世界发ms_registerfishshoal。antchovies_group安装的是另一个fishschool组件，on_pre_net按fish_level在网处生成NettedPrefab并发on_caught_in_net，再清数量，StartReplenish周期补数量。",
+          "evidence_refs": [
+            "FISH-S42",
+            "FISH-S43",
+            "FISH-S44"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C07",
+          "kind": "EI",
+          "statement": "新增共享fish/school数据可改变后续随机选鱼。Prefab导出具有各自模块执行时序，因此登记新物种还需让水中实体、库存实体和其schoolherd定义按实际加载入口可解析。只更新季节权重无法独立证明这三个Prefab已注册。",
+          "evidence_refs": [
+            "FISH-S34",
+            "FISH-S35",
+            "FISH-S36",
+            "FISH-S39"
+          ]
+        },
+        {
+          "id": "EXP-FISH-003-C08",
+          "kind": "REC",
+          "statement": "新鱼沿自己的普通Prefab登记提供水中、库存与需要的群体定义，并让共享fish表以实际prefab名作key、school季节/海域权重指向该key。只需固定鱼点时可用自己的childspawner配置目标鱼；已有森林world的schoolspawner提供正常游动群调度入口。鱼种概率、群大小、寿命与返场政策由项目决定。",
+          "evidence_refs": [
+            "FISH-S16",
+            "FISH-S23",
+            "FISH-S33",
+            "FISH-S34",
+            "FISH-S35",
+            "FISH-S36",
+            "FISH-S38",
+            "FISH-S39",
+            "FISH-S44"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "SchoolSpawner:SpawnSchool",
+          "source_file": "scripts/components/schoolspawner.lua",
+          "visibility": "原版schoolspawner模块返回Class实例上的公开Lua方法，源码以function self定义。",
+          "parameters": [
+            "spawnpoint为Vector3，按此处季节/地皮重新选schooldata。",
+            "target为玩家上下文，正常玩家任务传入该player。SWELL/ROUGH分支会把它传给TryLuckRoll的特殊生成检查。",
+            "override_spawn_offset为可选Vector3，加到spawnpoint作为群体分散中心；缺省按多个半径找可游偏移，再以零向量回退。"
+          ],
+          "returns": "无可选schooldata时nil，否则返回count。count为成功找到offset并安排生成的候选数量，含尚未执行的任务。",
+          "preconditions": [
+            "master world现存schoolspawner，共享fish/school表和指定schoolherd/鱼/blocker Prefab可用。",
+            "鱼有Physics、herdmember、SG及所需arrive状态，群具有herd。schoolmin/max/range可供math.random和位置计算。"
+          ],
+          "side_effects": [
+            "生成群并定位，首鱼即时、其余world延时任务。DoSpawnFish在任务执行时检查群有效。",
+            "有候选时生成blocker、PushEvent schoolspawned，并按海域触发可选捕食者检查和任务；无候选删除群。"
+          ],
+          "lifecycle": [
+            "玩家延时尝试在资格和出生点选择后调用，API自身从PickSchool开始，外层玩家密度资格由调用方处理。",
+            "群member/sleep/lifetime继续由schoolherd和鱼本身推进，任务返回count的时点早于全部鱼实际出现。"
+          ],
+          "evidence_refs": [
+            "FISH-S36",
+            "FISH-S37",
+            "FISH-S38",
+            "FISH-S39",
+            "FISH-S45"
+          ],
+          "unknowns": [
+            "真实生成时点、原生地形/物理和多Mod动态数据改写尚未运行验证。"
+          ]
+        },
+        {
+          "symbol": "SchoolSpawner:GetFishPrefabAtPoint",
+          "source_file": "scripts/components/schoolspawner.lua",
+          "visibility": "原版schoolspawner模块返回Class实例上的公开Lua方法，源码以function self定义。",
+          "parameters": [
+            "spawnpoint为Vector3，以它的季节/地皮执行一次随机PickSchool。"
+          ],
+          "returns": "有候选返回schooldata.prefab字符串，否则nil。",
+          "preconditions": [
+            "master world已有schoolspawner、Map与共享数据。"
+          ],
+          "side_effects": [
+            "只读季节/地皮和数据表并进行随机选择；当前调用返回物种名。"
+          ],
+          "lifecycle": [
+            "oceantrawler:SimulateCatchFish在模拟睡眠捕获时实际调用。每次调用独立选择，后续SpawnSchool会另作选择。"
+          ],
+          "evidence_refs": [
+            "FISH-S34",
+            "FISH-S36",
+            "FISH-S46"
+          ],
+          "unknowns": [
+            "真实生成时点、原生地形/物理和多Mod动态数据改写尚未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "鱼与群Prefab按各自模块导出，季节海域权重连接到完整鱼种定义。",
+          "evidence_refs": [
+            "FISH-S33",
+            "FISH-S34",
+            "FISH-S35",
+            "FISH-S39"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "现存world组件按玩家尝试资格和出生点选群，立即或延时生成成员。",
+          "evidence_refs": [
+            "FISH-S36",
+            "FISH-S37",
+            "FISH-S38",
+            "FISH-S45"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "群体与个体分别处理导航、寿命和休眠，固定鱼点沿自身childspawner继续补员。",
+          "evidence_refs": [
+            "FISH-S39",
+            "FISH-S40",
+            "FISH-S41",
+            "FISH-S44"
+          ]
+        }
+      ],
+      "unknowns": [
+        "新Mod定义注入与Prefab预加载的具体时序需在目标Mod核验。",
+        "schoolspawner构造时已有玩家循环中的变量引用问题属于运行中重装时需定点处理的分支，本条接入沿forest正常master初始化。",
+        "固定shoal的完整补员计数/存档合同超出本条，鱼群移动/寿命实际运行尚未验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "FISH-S16",
+            "role": "file-local water_common公共/master及组件/SG/Brain安装",
+            "claim_ids": [
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S23",
+            "role": "file-local inv_common库存鱼构造与on_landed绑定",
+            "claim_ids": [
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S33",
+            "role": "oceanfish_small_1代表鱼种全部定义",
+            "claim_ids": [
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S34",
+            "role": "季节海域权重及返回共享数据表",
+            "claim_ids": [
+              "EXP-FISH-003-C02",
+              "EXP-FISH-003-C05",
+              "EXP-FISH-003-C07",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S35",
+            "role": "file-local MakeFish与water/inv一次导出循环",
+            "claim_ids": [
+              "EXP-FISH-003-C05",
+              "EXP-FISH-003-C07",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S36",
+            "role": "玩家任务/季节选择/生成资格/SpawnSchool/GetFishPrefabAtPoint",
+            "claim_ids": [
+              "EXP-FISH-003-C01",
+              "EXP-FISH-003-C02",
+              "EXP-FISH-003-C03",
+              "EXP-FISH-003-C05",
+              "EXP-FISH-003-C07",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S37",
+            "role": "file-local拖网修正和特殊捕食者延时生成",
+            "claim_ids": [
+              "EXP-FISH-003-C03"
+            ]
+          },
+          {
+            "ref": "FISH-S38",
+            "role": "master_postinit安装schoolspawner",
+            "claim_ids": [
+              "EXP-FISH-003-C01",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S39",
+            "role": "file-local导航/寿命/成员睡眠与herd工厂导出",
+            "claim_ids": [
+              "EXP-FISH-003-C04",
+              "EXP-FISH-003-C05",
+              "EXP-FISH-003-C07",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S40",
+            "role": "file-local HandleEntitySleep",
+            "claim_ids": [
+              "EXP-FISH-003-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S41",
+            "role": "file-local鱼Wake/Sleep/Save/Load",
+            "claim_ids": [
+              "EXP-FISH-003-C04"
+            ]
+          },
+          {
+            "ref": "FISH-S42",
+            "role": "net用FishSchool组件完整定义",
+            "claim_ids": [
+              "EXP-FISH-003-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S43",
+            "role": "fishschool真实安装消费者",
+            "claim_ids": [
+              "EXP-FISH-003-C06"
+            ]
+          },
+          {
+            "ref": "FISH-S44",
+            "role": "file-local固定shoal构造/childspawner/Wake/Sleep",
+            "claim_ids": [
+              "EXP-FISH-003-C06",
+              "EXP-FISH-003-C08"
+            ]
+          },
+          {
+            "ref": "FISH-S45",
+            "role": "出生阻挡器计时移除",
+            "claim_ids": [
+              "EXP-FISH-003-C01",
+              "EXP-FISH-003-C03"
+            ]
+          },
+          {
+            "ref": "FISH-S46",
+            "role": "GetFishPrefabAtPoint的实际模拟捕获调用者",
+            "claim_ids": []
+          }
+        ],
+        "unknowns": [
+          "枚举本条声明、实际调用者与退出的静态Lua依赖，原生接口内部保持调用边界。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "FISH-S01",
+      "source_file": "scripts/components/oceanfishingrod.lua",
+      "file_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+      "line_start": 77,
+      "line_end": 187,
+      "range_sha256": "d54e1430e1bce773e8276ef60bad971304f34a45fff42bcd03b2401bdc526d4f",
+      "symbols": [
+        "SetDefaults/_CacheTackleData/Cast及抛射调用"
+      ]
+    },
+    {
+      "id": "FISH-S02",
+      "source_file": "scripts/components/oceanfishingtackle.lua",
+      "file_sha256": "5e99cb6bed8d3b3e1a2af620517d31b1964b6f01d2e123459428a098a4f5241c",
+      "line_start": 1,
+      "line_end": 33,
+      "range_sha256": "e638efdbc18714b30e24ee020e05714240ca671a70fc3a14907f51bd93c69db9",
+      "symbols": [
+        "SetCastingData/SetupLure/IsSingleUse"
+      ]
+    },
+    {
+      "id": "FISH-S03",
+      "source_file": "scripts/prefabs/oceanfishingrod.lua",
+      "file_sha256": "b1894018a7e1ef2fe76edd8b0a867594a950ec883e4b86544eea6ec4e8dd9004",
+      "line_start": 55,
+      "line_end": 68,
+      "range_sha256": "e907ad6ef87c6d2bb1a1bbec8fc065897da4c02c6005d82c07d1e40d92bad7af",
+      "symbols": [
+        "file-local GetTackle/OnTackleChanged"
+      ]
+    },
+    {
+      "id": "FISH-S04",
+      "source_file": "scripts/prefabs/oceanfishingrod.lua",
+      "file_sha256": "b1894018a7e1ef2fe76edd8b0a867594a950ec883e4b86544eea6ec4e8dd9004",
+      "line_start": 102,
+      "line_end": 210,
+      "range_sha256": "c552c44b7ebb7510dde4a4cb5e9d5c32c8446304d97b04443fb30d0aa42fb05a",
+      "symbols": [
+        "file-local钓竿回调及公共/master构造"
+      ]
+    },
+    {
+      "id": "FISH-S05",
+      "source_file": "scripts/prefabs/oceanfishingbobber.lua",
+      "file_sha256": "68bf769978cfe8cb1a3a7e0869a3d775bf6e2aa5f0f21e8a31176ea234ac4d16",
+      "line_start": 36,
+      "line_end": 143,
+      "range_sha256": "648b887ac2a52219d1ed169a8362daab1a0ed45c9ee618eb39908837cdcd5f46",
+      "symbols": [
+        "file-local OnProjectileLand/OnSetRod/OnEaten/projectile_fn"
+      ]
+    },
+    {
+      "id": "FISH-S06",
+      "source_file": "scripts/prefabs/oceanfishingbobber.lua",
+      "file_sha256": "68bf769978cfe8cb1a3a7e0869a3d775bf6e2aa5f0f21e8a31176ea234ac4d16",
+      "line_start": 149,
+      "line_end": 239,
+      "range_sha256": "0d17d46101c796449a98cf90a81247ad85070221bdbcc991ac69e307efb1210a",
+      "symbols": [
+        "file-local浮标速度与floater_fn"
+      ]
+    },
+    {
+      "id": "FISH-S07",
+      "source_file": "scripts/prefabs/oceanfishingbobber.lua",
+      "file_sha256": "68bf769978cfe8cb1a3a7e0869a3d775bf6e2aa5f0f21e8a31176ea234ac4d16",
+      "line_start": 244,
+      "line_end": 284,
+      "range_sha256": "bb5f36d10148194cdbe5b0841fe5bac05687cf398c0b900af27b8c96a833386d",
+      "symbols": [
+        "file-local浮标库存item_fn"
+      ]
+    },
+    {
+      "id": "FISH-S08",
+      "source_file": "scripts/prefabs/oceanfishingbobber.lua",
+      "file_sha256": "68bf769978cfe8cb1a3a7e0869a3d775bf6e2aa5f0f21e8a31176ea234ac4d16",
+      "line_start": 321,
+      "line_end": 355,
+      "range_sha256": "bfd94851c18d4998ecb3220011fa383ec9b33a122651635904ce01a6430e23a6",
+      "symbols": [
+        "浮标projectile/floater/item的Prefab导出循环"
+      ]
+    },
+    {
+      "id": "FISH-S09",
+      "source_file": "scripts/prefabs/oceanfishinglure.lua",
+      "file_sha256": "31c1f4a6dd037049c5c020a311e193e3ab4fb2f738b3e8948d7563e3f4cb90b1",
+      "line_start": 41,
+      "line_end": 101,
+      "range_sha256": "35240a8b1d8d0ed1bd397cc44fec3b542ea85aad8d05fa1008a241817c08f9dc",
+      "symbols": [
+        "file-local鱼饵item_fn"
+      ]
+    },
+    {
+      "id": "FISH-S10",
+      "source_file": "scripts/components/oceanfishinghook.lua",
+      "file_sha256": "6cb1c7f397ff3590e7bb1e01569dde78557f5a39cf2aa0f8fc26c617de916dcf",
+      "line_start": 21,
+      "line_end": 86,
+      "range_sha256": "1ad885ae308175bbe81a50fdacdd94a6f2cd35c1d05a35ad773bae35139d4918",
+      "symbols": [
+        "SetLureData/_ClacCharm/兴趣维护和测试"
+      ]
+    },
+    {
+      "id": "FISH-S11",
+      "source_file": "scripts/brains/oceanfishbrain.lua",
+      "file_sha256": "516e596feaf84e0ed70c8b9b5a226161fc6f3df8eb9fbed58f90329b4649f219",
+      "line_start": 90,
+      "line_end": 145,
+      "range_sha256": "5eb401fc29dc73d852cd2ef557ef8da0fe6a2e49c50c915045356ec74a66a25a",
+      "symbols": [
+        "file-local FindFoodAction/NibbleFoodAction"
+      ]
+    },
+    {
+      "id": "FISH-S12",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 799,
+      "line_end": 810,
+      "range_sha256": "543bc2b26281bc7e846c47f4c8bbc64de7e91c4e3f910b2338113f052e328f80",
+      "symbols": [
+        "ACTIONS.EAT.fn的优先分支与SetRod"
+      ]
+    },
+    {
+      "id": "FISH-S13",
+      "source_file": "scripts/stategraphs/SGoceanfish.lua",
+      "file_sha256": "85427994881c685ef5bad14518acefe51cff6e4c0bd42ac9061ee403271945a0",
+      "line_start": 3,
+      "line_end": 30,
+      "range_sha256": "3cc3541ce1cc840db4bbcc097ef7f2606217cc87f95907cebd59634672ea812c",
+      "symbols": [
+        "EAT状态选择与停止钓鱼事件"
+      ]
+    },
+    {
+      "id": "FISH-S14",
+      "source_file": "scripts/stategraphs/SGoceanfish.lua",
+      "file_sha256": "85427994881c685ef5bad14518acefe51cff6e4c0bd42ac9061ee403271945a0",
+      "line_start": 151,
+      "line_end": 209,
+      "range_sha256": "b5b05f9dc0be458b80eb4013d9b1450fbfa5d92a8ed42f72c9ab31784c3986b5",
+      "symbols": [
+        "bitehook_pre/loop执行及提钩超时"
+      ]
+    },
+    {
+      "id": "FISH-S15",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 151,
+      "line_end": 173,
+      "range_sha256": "39c628eb1866ccef0b00a94720e5ad388b4b3786ad713f6366e2f3d43bac3c6a",
+      "symbols": [
+        "file-local OnReelingIn/OnSetRod"
+      ]
+    },
+    {
+      "id": "FISH-S16",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 275,
+      "line_end": 406,
+      "range_sha256": "acdd6476aae861120a099b5ea0832484aa5ebb42e60cd2c3d67120b70330c15b",
+      "symbols": [
+        "file-local water_common公共/master及组件/SG/Brain安装"
+      ]
+    },
+    {
+      "id": "FISH-S17",
+      "source_file": "scripts/components/oceanfishable.lua",
+      "file_sha256": "c4e528a9ea35b8218af8c08d3a91e1e25f80ae9d545e861a0f1e9c0ac28b8a85",
+      "line_start": 28,
+      "line_end": 118,
+      "range_sha256": "8e90865dcd3550558e2938b8fcb334ccb0a39190bac25eed6668ae7483906d5c",
+      "symbols": [
+        "卸载/MakeProjectile/StrugglingSetup/SetRod/速度"
+      ]
+    },
+    {
+      "id": "FISH-S18",
+      "source_file": "scripts/components/oceanfishable.lua",
+      "file_sha256": "c4e528a9ea35b8218af8c08d3a91e1e25f80ae9d545e861a0f1e9c0ac28b8a85",
+      "line_start": 120,
+      "line_end": 188,
+      "range_sha256": "aea28a34887b9031b8e0f97c4a84e6cf43a032e0ec207f848d1a58e8f29b0c53",
+      "symbols": [
+        "体力/可收获距离/挣扎状态/放线速率"
+      ]
+    },
+    {
+      "id": "FISH-S19",
+      "source_file": "scripts/components/oceanfishingrod.lua",
+      "file_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+      "line_start": 190,
+      "line_end": 258,
+      "range_sha256": "34637ac80310e7f172a074ef520e43e5e274b8ff15ea4f315c0accef0a7e4bb4",
+      "symbols": [
+        "张力状态与Reel"
+      ]
+    },
+    {
+      "id": "FISH-S20",
+      "source_file": "scripts/components/oceanfishingrod.lua",
+      "file_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+      "line_start": 260,
+      "line_end": 330,
+      "range_sha256": "1e9480b7dfa9b5d917d20b1930e8218a0957521be4b1debfcfe080d9b1aa8910",
+      "symbols": [
+        "SetTarget及OnUpdate终止/放线分支"
+      ]
+    },
+    {
+      "id": "FISH-S21",
+      "source_file": "scripts/components/oceanfishingrod.lua",
+      "file_sha256": "b5b90eb2f8c6dfdc7cb77531d577b8ad84fc0886ab12c3a80bb9d6832813122e",
+      "line_start": 332,
+      "line_end": 379,
+      "range_sha256": "c1dc599f35852cbcf1b95f339227e41f317b589126ba54b088110c923dbfb2e9",
+      "symbols": [
+        "CalcCatchDest/CatchFish/StopFishing"
+      ]
+    },
+    {
+      "id": "FISH-S22",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 81,
+      "line_end": 138,
+      "range_sha256": "0a68b7705839689a63ef97486f93700c73546f4a26822cb47bc2e2cfe15760db",
+      "symbols": [
+        "file-local OnProjectileLand/OnMakeProjectile"
+      ]
+    },
+    {
+      "id": "FISH-S23",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 415,
+      "line_end": 572,
+      "range_sha256": "cbc85392f488bfa2ab1b4c81f5683e6ae2c167fe891301313913b0203f56798c",
+      "symbols": [
+        "file-local inv_common库存鱼构造与on_landed绑定"
+      ]
+    },
+    {
+      "id": "FISH-S24",
+      "source_file": "scripts/brains/oceanfishbrain.lua",
+      "file_sha256": "516e596feaf84e0ed70c8b9b5a226161fc6f3df8eb9fbed58f90329b4649f219",
+      "line_start": 147,
+      "line_end": 229,
+      "range_sha256": "bb2b958aba75378a1a2b74f3a8c8a631956ac04fa012a3def0aac720a3b74265",
+      "symbols": [
+        "file-local方向回调、已钩鱼BT与出生home记忆"
+      ]
+    },
+    {
+      "id": "FISH-S25",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 86,
+      "line_end": 99,
+      "range_sha256": "0c4d09d82fc78445fee6f8df205828e48f00aaab295509b417890b9c1edd05fc",
+      "symbols": [
+        "file-local GetFishingAction"
+      ]
+    },
+    {
+      "id": "FISH-S26",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 2160,
+      "line_end": 2177,
+      "range_sha256": "93b66fef8d7f3e8aaa8f1c9ab544bea54fcd95c8296c41f5a25cc473fe0179cd",
+      "symbols": [
+        "oceanfishingrod右键动作收集"
+      ]
+    },
+    {
+      "id": "FISH-S27",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1398,
+      "line_end": 1439,
+      "range_sha256": "3da924ce8df7b5a8e82d3e19fc6fabd203ca13890e40d1f227cd18c7082bfb43",
+      "symbols": [
+        "海钓CAST/REEL/STOP/CATCH动作"
+      ]
+    },
+    {
+      "id": "FISH-S28",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 13991,
+      "line_end": 14038,
+      "range_sha256": "ec11353b4a35f251d83273ec0c88892738858f16595c7ca0242a3890f8af6130",
+      "symbols": [
+        "oceanfishing_cast执行帧与idle入口"
+      ]
+    },
+    {
+      "id": "FISH-S29",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 14097,
+      "line_end": 14152,
+      "range_sha256": "4d85c41e1c46d47d157a528d95c23417182a39dd912b25ac6e3005c278578c97",
+      "symbols": [
+        "oceanfishing_reel提交与退出"
+      ]
+    },
+    {
+      "id": "FISH-S30",
+      "source_file": "scripts/components/oceanfishingrod_replica.lua",
+      "file_sha256": "b5bce1c2a87bf300a76861adde3de61474f1a421ee6d21d808cedbaf275f6a41",
+      "line_start": 1,
+      "line_end": 41,
+      "range_sha256": "82d91b6d518bcfcfc9f4d0dd85a1ec5566316bf5786ef2148f0fcbd900ecd484",
+      "symbols": [
+        "target/张力档位/max距离netvar与读写"
+      ]
+    },
+    {
+      "id": "FISH-S31",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 1318,
+      "line_end": 1346,
+      "range_sha256": "eea518a59428cbd98c0653ed35b19c66c8f1c3b6306ceb849d9622511080ca3e",
+      "symbols": [
+        "oceanfishingrod两槽布局和itemtestfn"
+      ]
+    },
+    {
+      "id": "FISH-S32",
+      "source_file": "scripts/tuning.lua",
+      "file_sha256": "a5172ab9bc3b29a9fc59a6a399fd47a182ea0d25fedccb1292fe18e855b3b92c",
+      "line_start": 263,
+      "line_end": 334,
+      "range_sha256": "45b3833bafb103d223e01fab1c62fbd33028138e93e3e0283319427b6c5c57ae",
+      "symbols": [
+        "投掷/鱼饵/鱼种偏好数据形状"
+      ]
+    },
+    {
+      "id": "FISH-S33",
+      "source_file": "scripts/prefabs/oceanfishdef.lua",
+      "file_sha256": "0e182e1673c709b4b585b20c5f792b7088ae89a0666cf5b3eb1fd896bbe973f3",
+      "line_start": 184,
+      "line_end": 232,
+      "range_sha256": "06dfad3e350b6af99ebeb4cfffd40fc1f58595b0ed41865b6aa20df8b93023e4",
+      "symbols": [
+        "oceanfish_small_1代表鱼种全部定义"
+      ]
+    },
+    {
+      "id": "FISH-S34",
+      "source_file": "scripts/prefabs/oceanfishdef.lua",
+      "file_sha256": "0e182e1673c709b4b585b20c5f792b7088ae89a0666cf5b3eb1fd896bbe973f3",
+      "line_start": 1030,
+      "line_end": 1109,
+      "range_sha256": "c32eece11b76a4dd64176358fc3c83e70d653f02f717047bfd8f7607098bf058",
+      "symbols": [
+        "季节海域权重及返回共享数据表"
+      ]
+    },
+    {
+      "id": "FISH-S35",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 577,
+      "line_end": 607,
+      "range_sha256": "9ac131d8de4a5a234fd43d29b18b1a1de98bc29443905acece6575496ba039ad",
+      "symbols": [
+        "file-local MakeFish与water/inv一次导出循环"
+      ]
+    },
+    {
+      "id": "FISH-S36",
+      "source_file": "scripts/components/schoolspawner.lua",
+      "file_sha256": "c466669c677744bc8a6cabd37a2563a43b449085be3bc95138e988323de3f0fe",
+      "line_start": 95,
+      "line_end": 269,
+      "range_sha256": "5099bf02822dd7e977474cb975f080592e0f4f98a4727e26af652a9da6576495",
+      "symbols": [
+        "玩家任务/季节选择/生成资格/SpawnSchool/GetFishPrefabAtPoint"
+      ]
+    },
+    {
+      "id": "FISH-S37",
+      "source_file": "scripts/components/schoolspawner.lua",
+      "file_sha256": "c466669c677744bc8a6cabd37a2563a43b449085be3bc95138e988323de3f0fe",
+      "line_start": 27,
+      "line_end": 93,
+      "range_sha256": "0282f703de0d4024b1cdeed7c19ecff5c0920d9a17b0d384a14e4b7e7e16539a",
+      "symbols": [
+        "file-local拖网修正和特殊捕食者延时生成"
+      ]
+    },
+    {
+      "id": "FISH-S38",
+      "source_file": "scripts/prefabs/forest.lua",
+      "file_sha256": "3f204cc9b29ca05d2ae934e508f32bd0fb730f55bef7adf3a856f9b3962e5964",
+      "line_start": 639,
+      "line_end": 646,
+      "range_sha256": "606b729525959802487eb6b35a793514cf4009b2be243c3b37d39fc6d5319192",
+      "symbols": [
+        "master_postinit安装schoolspawner"
+      ]
+    },
+    {
+      "id": "FISH-S39",
+      "source_file": "scripts/prefabs/schoolherd.lua",
+      "file_sha256": "86952ca7b6c5cababb40f76200d23b6bac9842d43e6e3b232f614fa7a1b1f772",
+      "line_start": 1,
+      "line_end": 180,
+      "range_sha256": "364aa21f3c30c629b0a26a8090627e8f7a9b301e7e9805a5d25921bbc34ee725",
+      "symbols": [
+        "file-local导航/寿命/成员睡眠与herd工厂导出"
+      ]
+    },
+    {
+      "id": "FISH-S40",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 181,
+      "line_end": 189,
+      "range_sha256": "5214c1f816fd06193dca32263bf586eb1d243cc39416063de04ba0cfa9b52cf4",
+      "symbols": [
+        "file-local HandleEntitySleep"
+      ]
+    },
+    {
+      "id": "FISH-S41",
+      "source_file": "scripts/prefabs/oceanfish.lua",
+      "file_sha256": "f189192c162def467dfe58cacb4e47627bc044b5882bb200224733e22f3a756e",
+      "line_start": 244,
+      "line_end": 274,
+      "range_sha256": "6b4bef64544cbcea54617dd64be2f4cc7d70f57db4543b91c9479d82c26266ac",
+      "symbols": [
+        "file-local鱼Wake/Sleep/Save/Load"
+      ]
+    },
+    {
+      "id": "FISH-S42",
+      "source_file": "scripts/components/fishschool.lua",
+      "file_sha256": "11f311bc4d790b49b2c5229d40773c86450b62de59c369aaa330776bc143a1e1",
+      "line_start": 1,
+      "line_end": 58,
+      "range_sha256": "ae66b29f3f26c5c338701feaec523d46fc8bcd9c36c5c1853d17a93275d02111",
+      "symbols": [
+        "net用FishSchool组件完整定义"
+      ]
+    },
+    {
+      "id": "FISH-S43",
+      "source_file": "scripts/prefabs/antchovies_group.lua",
+      "file_sha256": "249aafcdefe136d7d5f6e32c6c0a86061d2fa7085c48a8da30220c692021e8f9",
+      "line_start": 28,
+      "line_end": 42,
+      "range_sha256": "54a039b2e3fe4113927aa9bc8f05de90cbe93ad9c11db72adf736f2495c8b097",
+      "symbols": [
+        "fishschool真实安装消费者"
+      ]
+    },
+    {
+      "id": "FISH-S44",
+      "source_file": "scripts/prefabs/oceanfish_shoalspawner.lua",
+      "file_sha256": "93042ec92bbf6388140025875ff02e149ed98d523fe99a0410429ab940884ce5",
+      "line_start": 10,
+      "line_end": 71,
+      "range_sha256": "c5347716eb9545c2a003df75db92b7a88f370b4ce713b1347def25ed033137c9",
+      "symbols": [
+        "file-local固定shoal构造/childspawner/Wake/Sleep"
+      ]
+    },
+    {
+      "id": "FISH-S45",
+      "source_file": "scripts/prefabs/fishschoolspawnblocker.lua",
+      "file_sha256": "35943cbb653b18d43e9c5521448766e5a31145d2c8c1febfa97b4b3c2fccd7b9",
+      "line_start": 1,
+      "line_end": 26,
+      "range_sha256": "e395b17497d10d242d0d898ce0b472f7eec2e8a4726493dea40feb60752c2e25",
+      "symbols": [
+        "出生阻挡器计时移除"
+      ]
+    },
+    {
+      "id": "FISH-S46",
+      "source_file": "scripts/components/oceantrawler.lua",
+      "file_sha256": "534623b9e60a0af35c8f577d6c9b8d00ed808c027ef9483f8e209866f772b457",
+      "line_start": 307,
+      "line_end": 338,
+      "range_sha256": "26256f3da17128253f4cb37d4e1bd03440c51c236f72733f7ed1f6bf6117c22c",
+      "symbols": [
+        "GetFishPrefabAtPoint的实际模拟捕获调用者"
+      ]
+    },
+    {
+      "id": "FISH-S47",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 2824,
+      "line_end": 2831,
+      "range_sha256": "39df169ffb5fb4bff38e26a209a2576ee90faf20ff51a753d2aaafa900e3e5e6",
+      "symbols": [
+        "oceanfishingtackle的CHANGE_TACKLE动作收集"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "新增海钓浮标或鱼饵如何接原版竿的两个槽和投掷表现",
+      "expected_entry_ids": [
+        "EXP-FISH-001"
+      ],
+      "purpose": "定位标签、钓具数据、投掷/落水Prefab和抛竿实际提交。"
+    },
+    {
+      "query": "自定义海鱼咬钩后怎样提钩挣扎并生成可拾取的库存鱼",
+      "expected_entry_ids": [
+        "EXP-FISH-002"
+      ],
+      "purpose": "定位EAT换目标、Reel、单次鱼饵、停止与收获实体转换。"
+    },
+    {
+      "query": "新鱼种如何加入季节海域鱼群或固定补员鱼点",
+      "expected_entry_ids": [
+        "EXP-FISH-003"
+      ],
+      "purpose": "定位共享数据、Prefab导出时序和两种真实生成消费者。"
+    }
+  ],
+  "limitations": [
+    "指定762172/build26474873 ZIP的静态Lua合同，runtime_verified=false。",
+    "保持research/restricted/hold，独立复核与总控登记待完成。",
+    "file SHA为ZIP成员原字节，range SHA为UTF8 splitlines后以LF连接且无末尾换行。",
+    "原生物理/网络时点和具体Mod效果需运行验证，玩法数值由项目决定。"
+  ]
+}

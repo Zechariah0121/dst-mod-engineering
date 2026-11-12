@@ -48,6 +48,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 | Entity、Prefab、组件初始化、原版组件复用 | [entities-components.md](references/entities-components.md) |
 | 角色、自定义生物、Brain、Stategraph、移速、跟随与骑乘 | [characters-brains-stategraphs.md](references/characters-brains-stategraphs.md) |
 | 生物索敌、追击、逃跑、回到领地与入巢 | [creature-ai-practical.md](references/creature-ai-practical.md) |
+| 巢穴种群、生成补员、回巢与个体身份 | [nests-population.md](references/nests-population.md) |
 | 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](references/spells-and-custom-stats.md) |
 | netvar、Replica、RPC、Shard RPC、客户端与服务端 | [networking-rpc.md](references/networking-rpc.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](references/lifecycle-save.md) |
@@ -61,6 +62,8 @@ python -B -X utf8 run_kb.py update-sources ensure
 | 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](references/cooker-dishes.md) |
 | 农田水肥、照料、阶段压力、种子与作物收获 | [farming-crops.md](references/farming-crops.md) |
 | 船上装置、平台归属、推力、帆与制动 | [boats-platforms.md](references/boats-platforms.md) |
+| 世界阶段事件、袭击波、预警与暂停恢复 | [world-events-spawning.md](references/world-events-spawning.md) |
+| 海钓钓具、新鱼、收获形态与鱼群生成 | [ocean-fishing.md](references/ocean-fishing.md) |
 | 地图生成、布局、地皮、空间判定 | [worldgen-spatial.md](references/worldgen-spatial.md) |
 | TEX/XML、SCML、bank/build/symbol、编译资源 | [assets-animation.md](references/assets-animation.md) |
 | 角色换皮/拆件、手持装备、书籍外观与接入检查 | [character-and-equipment-art.md](references/character-and-equipment-art.md) |

@@ -1,0 +1,1542 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "nests_and_child_population",
+  "source_epoch": "762172 / Steam build 26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-NEST-001",
+      "title": "巢内库存、外部孩子与补充和放出的独立开关",
+      "aliases": [
+        "ChildSpawner",
+        "SetMaxChildren",
+        "AddChildrenInside",
+        "StartSpawning",
+        "DoRegen",
+        "巢穴库存"
+      ],
+      "engineering_question": "怎样给巢穴配置初始种群、定时放出并在死亡或捕获后补充，容量setter会怎样改变现有库存？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172 / Steam build 26474873",
+        "evidence": "指定冻结ZIP的静态Lua与具名prefab/Brain/SG消费者",
+        "execution_side": "所选巢穴和孩子在 prefab 的 master 分支配置权威组件、Brain及SG。",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-NEST-001-C01",
+          "kind": "NSF",
+          "statement": "普通总数 NumChildren 为 childreninside+numchildrenoutside。SetMaxChildren(max) 先将 inside 设为 max-CountChildrenOutside()，再写 maxchildren，将 inside 下限钳到0后更新调度；CountChildrenOutside 过滤无效普通孩子。它会立即重算/补齐巢内数量。AddChildrenInside(count) 只把 inside 上限钳到 maxchildren，不按外部数量扣空位，也没有下限钳制。onoccupied 在旧 inside==0 时先调用，onaddchild(inst,count) 在增量和钳制之后调用，收到请求量。",
+          "evidence_refs": [
+            "NEST-S04",
+            "NEST-S07",
+            "NEST-S19"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C02",
+          "kind": "NSF",
+          "statement": "组件默认 regening=true、spawning=false。SetSpawnPeriod(period,variance) 与 SetRegenPeriod(period,variance) 保存周期、以 variance or period*0.1 为抖动并重新随机剩余时间。StartSpawning 置 spawning=true、timetonextspawn=0 并安排更新，StopSpawning 只关闭放出。StartRegen 置 regening=true，未满时重设补充倒计时并安排更新；StopRegen 只关闭补充。",
+          "evidence_refs": [
+            "NEST-S02",
+            "NEST-S03",
+            "NEST-S04",
+            "NEST-S06"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C03",
+          "kind": "NSF",
+          "statement": "内置调度采用一次随机5到10秒的周期步长传给 OnUpdate；补充和放出分别在倒计时严格小于0时发生，每次 OnUpdate 最多一次 DoRegen 和一次普通放出，更新会重设该倒计时。DoRegen 在 regening 且相应总数未满时，普通池和应急池各补1。LongUpdate 仅调用一次 OnUpdate(dt)。useexternaltimer 模式由安装好的 start/stop/set 回调驱动，两种时钟不在本条扩成通用世界事件机制。 睡眠且不允许离屏生成时可 QueueSpawnChild；全局 OnEntityWake 遍历组件调用 OnEntityWake，ChildSpawner 以零延迟安排 DoQueuedSpawn，后者清 queued_spawn，仅 spawning 仍真时尝试 SpawnChild，再 StartUpdate。",
+          "evidence_refs": [
+            "NEST-S04",
+            "NEST-S05",
+            "NEST-S19",
+            "NEST-S38",
+            "NEST-S39",
+            "NEST-S12",
+            "NEST-S43"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C04",
+          "kind": "NSF",
+          "statement": "SpawnChild(target,prefab,radius) 先拒绝 health:IsInvincible 的目标，再按 CanSpawn 检查巢实体、inside>0、睡眠/离屏、巢死亡及 canspawnfn；CanSpawn 不读取 spawning。成功找偏移并生成后，先设位置/湿度/可选 combat 目标并 onspawned(inst,child)，返回到 SpawnChild 才扣 inside、处理可选混合池、TakeOwnership，最后 inside==0 可 onvacate。失败返回nil，普通 inside 的扣除只在成功分支。",
+          "evidence_refs": [
+            "NEST-S11",
+            "NEST-S12",
+            "NEST-S13",
+            "NEST-S16"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C05",
+          "kind": "NSF",
+          "statement": "tallbirdnest 在 master 分支设置 childname=tallbird、spawnoffscreen=true、周期和容量1，SetSpawnedFn(onvacate) 后 StartSpawning。该 file-local onvacate 会清空可采蛋并安排自己的产蛋任务；它由 onspawned 槽调用，不能由函数名字推断为组件 onvacate 时点。beehive 的 file-local Start/StopSpawning 则依据既有世界条件选择启停。",
+          "evidence_refs": [
+            "NEST-S20",
+            "NEST-S21",
+            "NEST-S22"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C06",
+          "kind": "NSF",
+          "statement": "保存基础沿用 EXP-SAVE-002：inside 数量与外部 GUID 分别保存，postpass 接回外部对象。当前 OnLoad 用 data.spawning or self.spawning 等表达式恢复布尔，保存的false不会把赋值时仍为true的当前标志改成false。自有可保存开关若改变构造默认值，需要按此实际输入合同处理。",
+          "evidence_refs": [
+            "NEST-S08",
+            "NEST-S09",
+            "NEST-S10"
+          ]
+        },
+        {
+          "id": "EXP-NEST-001-C07",
+          "kind": "REC",
+          "statement": "普通固定种群在构造时配置一次容量及周期，按功能条件启停放出/补充即可。需要按总容量奖励或投放库存时，使用 maxchildren-NumChildren 的实际缺口约束 AddChildrenInside；仅在设计确实要重算库存时调用 SetMaxChildren。回巢已由组件返还数量，业务反馈专注自身效果。",
+          "evidence_refs": [
+            "NEST-S04",
+            "NEST-S07",
+            "NEST-S19",
+            "NEST-S15"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ChildSpawner:SetMaxChildren",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "max 为目标普通容量，正常种群使用非负整数。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "本条用于权威巢穴，外部成员登记已反映当前所有权。"
+          ],
+          "side_effects": [
+            "inside 重设为 max-有效普通外部孩子数，下限0；maxchildren 写为 max。",
+            "随后 TryStopUpdate 和 StartUpdate。"
+          ],
+          "lifecycle": "构造配置会建立初始库存；运行时调用同样重算库存，不能当保留存量的纯上限赋值。",
+          "evidence_refs": [
+            "NEST-S07",
+            "NEST-S05",
+            "NEST-S20"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:StartSpawning",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [],
+          "returns": "无显式返回值；不直接返回孩子。",
+          "preconditions": [
+            "childname、容量、落点和所选时钟依赖已配置。",
+            "useexternaltimer=true 时提供 spawntimerstart 和 spawntimerset；regening 且至少一池未满时 StartUpdate 还会使用 regentimerstart。"
+          ],
+          "side_effects": [
+            "置 spawning=true 和剩余放出时间0，调用 StartUpdate。",
+            "外部模式额外 spawntimerset(inst,0)，该模式使用已安装的时钟。"
+          ],
+          "lifecycle": "与 StopSpawning 配对；StopSpawning 不改变 regening，手工 SpawnChild 也不依赖该标志。",
+          "evidence_refs": [
+            "NEST-S06",
+            "NEST-S05",
+            "NEST-S39",
+            "NEST-S16"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:SpawnChild",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "target 可选，存在 combat 的新孩子会 SetTarget(target)；有 health 的 invincible 目标先被拒绝。",
+            "prefab 可选，普通缺省为 childname；最终仍经过稀有/混合池选择和 FunctionOrValue(inst,false,target)。",
+            "radius 可选，缺省取 spawnradius 的数值/范围或0.5，找偏移时再加巢的物理半径。"
+          ],
+          "returns": "成功返回新孩子实体，拒绝、无偏移或生成失败返回nil。",
+          "preconditions": [
+            "巢实体有效、普通 inside>0、巢醒着或 spawnoffscreen，存在 health 时未死亡，canspawnfn 允许。",
+            "正常由服务器巢穴调用；onspawned 按生成时尚未接回 home 的阶段使用参数。"
+          ],
+          "side_effects": [
+            "偏移可由 overridespawnlocation(inst) 提供，随后尝试水域/可行走偏移；最终坐标取巢位置加 offset，y 用 spawn_height 或0。",
+            "选择的 rarechild 或 otherchildreninside 可先于覆盖/默认 prefab；混合池选择本身可修改其计数。",
+            "新孩子位置/湿度/战斗目标处理后先 onspawned(inst,child)，再扣 inside、ProcessOtherChildren、TakeOwnership，空池触发 onvacate(inst)。"
+          ],
+          "lifecycle": "返回实体用于当次外部活动；入巢走 GoHome 会删除它并返还库存，之后放出重新生成。高级稀有/混合池不构成失败零副作用保证。",
+          "evidence_refs": [
+            "NEST-S11",
+            "NEST-S12",
+            "NEST-S13",
+            "NEST-S16",
+            "NEST-S10",
+            "NEST-S42"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:DoRegen",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "按实际设计启用 regening；本方法内部检查该标志和两池各自是否已满。"
+          ],
+          "side_effects": [
+            "普通总数未满时 AddChildrenInside(1)，应急总数未满时 AddEmergencyChildrenInside(1)。"
+          ],
+          "lifecycle": "OnUpdate 和外部定时器均有具名调用；一次调用各池最多增加1，补充本身不生成外部实体。",
+          "evidence_refs": [
+            "NEST-S04",
+            "NEST-S19",
+            "NEST-S05",
+            "NEST-S38"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:AddChildrenInside",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "count 为普通巢内数量增量，本条正常补充提供正整数；0/负值仍会按方法体执行。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "调用方明确这次增加的数量及总容量政策。"
+          ],
+          "side_effects": [
+            "旧 inside==0 时先 onoccupied(inst)，再 inside+=count，并只按 maxchildren 钳制 inside 上限。",
+            "onaddchild(inst,count) 收到请求量，随后更新调度；无返回实际增量。"
+          ],
+          "lifecycle": "DoRegen 与正常 GoHome 的库存返回会使用；普通业务反馈无需再次返还同一孩子数量。",
+          "evidence_refs": [
+            "NEST-S19",
+            "NEST-S04",
+            "NEST-S15"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "服务器构造 childname、容量和两种周期，选择内置或已有外部时钟。",
+          "evidence_refs": [
+            "NEST-S20",
+            "NEST-S04",
+            "NEST-S39"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "按功能启停 spawning/regening，更新到期后决定放出或补充。",
+          "evidence_refs": [
+            "NEST-S03",
+            "NEST-S05",
+            "NEST-S06"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "生成成功后才进入普通 inside 扣除与外部登记；死亡/捕获等退出造成的缺口由补充机制处理。",
+          "evidence_refs": [
+            "NEST-S13",
+            "NEST-S10",
+            "NEST-S17",
+            "NEST-S04"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "存档继续沿组件记录与既有 postpass 接回；构造默认开关的真假与保存输入分别核对。",
+          "evidence_refs": [
+            "NEST-S08",
+            "NEST-S09",
+            "NEST-S10"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本条不展开全部世界事件、WorldSettingsTimer通用语义和原生寻路。",
+        "稀有或混合物种池的跨类型保持策略需按实际物种选择，本条普通示例使用固定childname。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "NEST-S02",
+            "role": "组件默认值与事件闭包"
+          },
+          {
+            "ref": "NEST-S03",
+            "role": "补充启停及组件退出"
+          },
+          {
+            "ref": "NEST-S04",
+            "role": "周期与两池补充"
+          },
+          {
+            "ref": "NEST-S05",
+            "role": "内置/外部时钟接口"
+          },
+          {
+            "ref": "NEST-S11",
+            "role": "内部生成和可选prefab选择"
+          },
+          {
+            "ref": "NEST-S12",
+            "role": "睡眠排队与混合池处理"
+          },
+          {
+            "ref": "NEST-S13",
+            "role": "成功生成的计数提交"
+          },
+          {
+            "ref": "NEST-S16",
+            "role": "生成资格边界"
+          },
+          {
+            "ref": "NEST-S19",
+            "role": "库存回调和单次LongUpdate"
+          },
+          {
+            "ref": "NEST-S20",
+            "role": "真实内部时钟巢穴构造"
+          },
+          {
+            "ref": "NEST-S21",
+            "role": "onspawned实际业务消费者"
+          },
+          {
+            "ref": "NEST-S22",
+            "role": "普通放出开关调用者"
+          },
+          {
+            "ref": "NEST-S38",
+            "role": "外部时钟完成消费者"
+          },
+          {
+            "ref": "NEST-S39",
+            "role": "外部时钟回调安装者"
+          },
+          {
+            "ref": "NEST-S08",
+            "role": "复用保存标量合同"
+          },
+          {
+            "ref": "NEST-S09",
+            "role": "保存false与构造默认的真实分支"
+          },
+          {
+            "ref": "NEST-S10",
+            "role": "复用外部引用接回"
+          },
+          {
+            "ref": "NEST-S42",
+            "role": "prefab函数值求值"
+          },
+          {
+            "ref": "NEST-S43",
+            "role": "唤醒到组件排队放出的实际调用者"
+          }
+        ],
+        "unknowns": [
+          "实际调度、落点可达性、客户端表现及第三方覆写未运行验证。",
+          "既有GOHOME和世界保存知识保留各自原Scope；本条只扩展所列巢穴接线。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-NEST-002",
+      "title": "外部所有权、回巢折算与孩子离场的计数时点",
+      "aliases": [
+        "TakeOwnership",
+        "GoHome",
+        "detachchild",
+        "childgoinghome",
+        "onspawned",
+        "homeseeker"
+      ],
+      "engineering_question": "新孩子何时取得 home，回巢保留什么，捕获和巢组件移除后哪些关系会退出？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172 / Steam build 26474873",
+        "evidence": "指定冻结ZIP的静态Lua与具名prefab/Brain/SG消费者",
+        "execution_side": "所选巢穴和孩子在 prefab 的 master 分支配置权威组件、Brain及SG。",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-NEST-002-C01",
+          "kind": "NSF",
+          "statement": "DoTakeOwnership 会给已有 knownlocations 写 home 坐标，补 homeseeker、SetHome 到巢，登记 ontrapped/death/onremove/detachchild 监听，再调用 ontakeownership(nest,child)。TakeOwnership 在这之后才登记普通 childrenoutside 并更新 numchildrenoutside，不扣 inside，也不从另一巢的表主动撤销登记。",
+          "evidence_refs": [
+            "NEST-S10",
+            "NEST-S01",
+            "NEST-S36",
+            "NEST-S37"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C02",
+          "kind": "NSF",
+          "statement": "生成的 onspawned 先于 inside 扣除和 TakeOwnership；ontakeownership 则位于 home/监听建立后、外部表加入前。GoHome 的 gohomevalidatefn 只接收巢参数，假值返回false；普通或应急外部表存在该 child 时才 TakeInChild 并返回true，非成员隐式nil。它没有在该函数检查抵达距离。",
+          "evidence_refs": [
+            "NEST-S11",
+            "NEST-S13",
+            "NEST-S10",
+            "NEST-S15"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C03",
+          "kind": "NSF",
+          "statement": "TakeInChild 依次发巢 childgoinghome({child})、孩子 goinghome({home})，执行 ongohome(nest,child)，撤外部成员，Remove 孩子，再给相应 inside 加1。普通 onoccupied 在旧 inside为0时、加量前执行，onaddchild在增量/钳制后执行。可选 save_in_foreign_childspawner 只额外登记异种prefab数量，普通回巢没有保存孩子的逐实体生命/装备/闭包。",
+          "evidence_refs": [
+            "NEST-S15",
+            "NEST-S19"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C04",
+          "kind": "NSF",
+          "statement": "beecommon.GoHomeAction 的局部实现经模块导出，检查有效home、childspawner存在且未燃烧，再构造GOHOME。BeeBrain 在相应夜晚、花粉充足等分支使用它，SGbee 的 action 状态 onenter 执行 PerformBufferedAction。beebox 的 master 监听 childgoinghome，读取返回孩子 pollinator 是否收集足够，满足时 Grow；这些读取发生在孩子 Remove 之前。",
+          "evidence_refs": [
+            "NEST-S28",
+            "NEST-S29",
+            "NEST-S30",
+            "NEST-S31",
+            "NEST-S32",
+            "NEST-S33",
+            "NEST-S26",
+            "NEST-S27",
+            "NEST-S40"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C05",
+          "kind": "NSF",
+          "statement": "OnChildKilled 是四种退出事件共用处理器。它先撤四种监听；普通成员从表中删除后调用 onchildkilledfn(nest,child)，再安排补充更新；应急成员只撤表并安排更新。蜜蜂 NET 完成的 file-local OnWorked 发 detachchild 后把同一蜜蜂交给操作者库存，说明该回调名称并不只表示死亡。",
+          "evidence_refs": [
+            "NEST-S01",
+            "NEST-S17",
+            "NEST-S34",
+            "NEST-S35"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C06",
+          "kind": "NSF",
+          "statement": "ChildSpawner:OnRemoveFromEntity 撤外部孩子的四种监听并取消 self.task，方法没有删除所有孩子或清它们的 home。Homeseeker 自己监听家实体 onremove；移除整个家时才走其对应清家分支。beehive 的死亡消费者单独 RemoveComponent(childspawner)。wake 时排队的零延迟生成任务未保存为 self.task，单组件卸载时其后态需按真实调用者核对。",
+          "evidence_refs": [
+            "NEST-S03",
+            "NEST-S36",
+            "NEST-S23",
+            "NEST-S12"
+          ]
+        },
+        {
+          "id": "EXP-NEST-002-C07",
+          "kind": "REC",
+          "statement": "普通巢穴让 SpawnChild 完成 home 和外部成员登记，生成回调需要巢信息时直接用第一个nest参数。业务需要回巢结算时，在 childgoinghome 或 ongohome 读取本次孩子数据，数量返还留给组件。需要保留同一个个体的生命/装备时先选择支持该身份寿命的收纳合同；仅设置 home 引用不会建立 ChildSpawner 的成员资格。",
+          "evidence_refs": [
+            "NEST-S10",
+            "NEST-S13",
+            "NEST-S15",
+            "NEST-S26",
+            "NEST-S36"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ChildSpawner:TakeOwnership",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "child 为有效且可被该巢管理的实体。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "调用方确保已有所有权交接与容量政策；SpawnChild 与 LoadPostPass 已调用它时无需再登记。"
+          ],
+          "side_effects": [
+            "已存在 knownlocations 时覆盖home位置，安装/设置homeseeker，登记四种退出监听。",
+            "ontakeownership(nest,child) 在普通外部表登记前执行，随后加入表并更新外部计数。",
+            "不自动减少 inside，不从其他巢表迁出；重复调用在成员表检查之前仍会执行前置接线和回调。"
+          ],
+          "lifecycle": "普通新生成和 postpass 接回的所有权入口；转家应按旧登记和新容量的实际责任组织。",
+          "evidence_refs": [
+            "NEST-S10",
+            "NEST-S01",
+            "NEST-S36",
+            "NEST-S37",
+            "NEST-S13"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:GoHome",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "child 为本次抵达巢的孩子实体。"
+          ],
+          "returns": "gohomevalidatefn(nest) 假值返回false；普通或应急成员正常完成收纳返回true；非成员隐式nil。",
+          "preconditions": [
+            "正常由已接线GOHOME动作在抵达后调用。",
+            "调用方保留该巢的外部成员资格；本方法不自行验证距离。"
+          ],
+          "side_effects": [
+            "先前置验证，再按普通/应急表选择 TakeInChild。",
+            "先 childgoinghome/goinghome/ongohome，撤外部表、Remove孩子，再返还相应inside。",
+            "异种数量保持仅在 child.save_in_foreign_childspawner 条件满足时执行。"
+          ],
+          "lifecycle": "该收纳把实体折算为库存，后续 SpawnChild 新建孩子；普通反馈发生于Remove前，实例引用不应自动带到下一次放出。",
+          "evidence_refs": [
+            "NEST-S15",
+            "NEST-S19",
+            "NEST-S40",
+            "NEST-S26"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:OnChildKilled",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "child 为被四种事件登记传入的事件源。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "作为该组件的退出事件处理器；名称不限定只有死亡。"
+          ],
+          "side_effects": [
+            "先RemoveChildListeners，再按普通/应急外部表删除成员及重算外部计数。",
+            "仅普通成员执行 onchildkilledfn(nest,child)，两种成员退出后均 StartUpdate。",
+            "不会立刻把同一实体放回inside，不会从这里清homeseeker.home。"
+          ],
+          "lifecycle": "捕获、移除、脱离和死亡沿同一登记退出；正常GoHome先撤外部表再Remove，库存返回由TakeInChild另行处理。",
+          "evidence_refs": [
+            "NEST-S01",
+            "NEST-S17",
+            "NEST-S15",
+            "NEST-S34",
+            "NEST-S35"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "SpawnChild先生成和通知，随后取得home、监听和外部成员资格。",
+          "evidence_refs": [
+            "NEST-S11",
+            "NEST-S13",
+            "NEST-S10"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "BeeBrain经导出的GoHomeAction、已有动作链和SGbee到达ChildSpawner:GoHome。",
+          "evidence_refs": [
+            "NEST-S28",
+            "NEST-S29",
+            "NEST-S30",
+            "NEST-S31",
+            "NEST-S40"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "回巢在Remove前结算本次业务信息，删除孩子并返还内部数量。",
+          "evidence_refs": [
+            "NEST-S26",
+            "NEST-S15",
+            "NEST-S19"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "捕获或其他退出从外部表撤回，补充机制处理总数缺口；家组件与家实体退出有不同责任。",
+          "evidence_refs": [
+            "NEST-S34",
+            "NEST-S35",
+            "NEST-S17",
+            "NEST-S03",
+            "NEST-S36"
+          ]
+        }
+      ],
+      "unknowns": [
+        "入巢后的逐个体状态保存和转家容量政策由实际玩法决定，普通计数库存不自动表达这些需求。",
+        "高级异种/稀有池的所有生成组合未逐物种枚举。",
+        "家组件单独移除与零延迟wake任务的真实可达交错未运行验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "NEST-S01",
+            "role": "成员表与四事件监听"
+          },
+          {
+            "ref": "NEST-S10",
+            "role": "所有权定义和既有postpass消费者"
+          },
+          {
+            "ref": "NEST-S11",
+            "role": "onspawned发生阶段"
+          },
+          {
+            "ref": "NEST-S13",
+            "role": "生成后登记调用者"
+          },
+          {
+            "ref": "NEST-S15",
+            "role": "普通/应急入巢的完整终态"
+          },
+          {
+            "ref": "NEST-S19",
+            "role": "返还库存和回调顺序"
+          },
+          {
+            "ref": "NEST-S26",
+            "role": "Remove前读取孩子数据的真实业务"
+          },
+          {
+            "ref": "NEST-S27",
+            "role": "beebox master监听与组件安装"
+          },
+          {
+            "ref": "NEST-S28",
+            "role": "经模块导出的回巢动作生成"
+          },
+          {
+            "ref": "NEST-S29",
+            "role": "Brain回巢消费者"
+          },
+          {
+            "ref": "NEST-S30",
+            "role": "GOHOME状态映射"
+          },
+          {
+            "ref": "NEST-S31",
+            "role": "SG动作执行"
+          },
+          {
+            "ref": "NEST-S32",
+            "role": "孩子SG主模拟边界"
+          },
+          {
+            "ref": "NEST-S33",
+            "role": "孩子Brain主模拟边界"
+          },
+          {
+            "ref": "NEST-S34",
+            "role": "捕网脱离的真实生产者"
+          },
+          {
+            "ref": "NEST-S35",
+            "role": "捕网回调安装者"
+          },
+          {
+            "ref": "NEST-S03",
+            "role": "组件退出资源范围"
+          },
+          {
+            "ref": "NEST-S36",
+            "role": "已有home关系合同"
+          },
+          {
+            "ref": "NEST-S37",
+            "role": "家位置记忆接口"
+          },
+          {
+            "ref": "NEST-S40",
+            "role": "已有动作分发合同"
+          }
+        ],
+        "unknowns": [
+          "实际调度、落点可达性、客户端表现及第三方覆写未运行验证。",
+          "既有GOHOME和世界保存知识保留各自原Scope；本条只扩展所列巢穴接线。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-NEST-003",
+      "title": "应急种群的玩家预算、批量放出与补充额度",
+      "aliases": [
+        "emergencychildren",
+        "ReleaseAllChildren",
+        "TrySpawnEmergencyChild",
+        "maxemergencycommit",
+        "防御蜂群"
+      ],
+      "engineering_question": "怎样按附近玩家限制防御孩子，普通与应急库存怎样放出，死亡后能否立刻重复派出？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172 / Steam build 26474873",
+        "evidence": "指定冻结ZIP的静态Lua与具名prefab/Brain/SG消费者",
+        "execution_side": "所选巢穴和孩子在 prefab 的 master 分支配置权威组件、Brain及SG。",
+        "runtime_verified": false
+      },
+      "claims": [
+        {
+          "id": "EXP-NEST-003-C01",
+          "kind": "NSF",
+          "statement": "应急池独立维护 inside、outside、maxemergencychildren。SetMaxEmergencyChildren(max) 以 max-numemergencychildrenoutside 重设inside并下限0。UpdateMaxEmergencyCommit 对 radius==0设0，否则查询半径内 player 且排除playerghost的实体数，用 RoundBiasedDown(数量*emergencychildrenperplayer) 设置 maxemergencycommit；该舍入为 ceil(x-0.5)，半值向下。",
+          "evidence_refs": [
+            "NEST-S02",
+            "NEST-S07",
+            "NEST-S14",
+            "NEST-S41"
+          ]
+        },
+        {
+          "id": "EXP-NEST-003-C02",
+          "kind": "NSF",
+          "statement": "CanEmergencySpawn 要求巢有效、canemergencyspawn真、应急inside>0、maxemergencychildren-inside 严格小于 maxemergencycommit、醒着或允许离屏、巢health未死亡。它不检查普通spawning/canspawnfn。计入预算的是外部及尚未补回的已消耗额度，孩子死亡只撤outside，补充inside才释放该已提交额度。",
+          "evidence_refs": [
+            "NEST-S16",
+            "NEST-S17",
+            "NEST-S04",
+            "NEST-S19"
+          ]
+        },
+        {
+          "id": "EXP-NEST-003-C03",
+          "kind": "NSF",
+          "statement": "TrySpawnEmergencyChild(target) 先重算玩家预算再 SpawnEmergencyChild。后者成功才扣应急inside、处理混合池、TakeEmergencyOwnership；使用共同DoSpawnChild落点和onspawned回调，没有普通SpawnChild开头的target IsInvincible拒绝。",
+          "evidence_refs": [
+            "NEST-S14",
+            "NEST-S13",
+            "NEST-S11",
+            "NEST-S10"
+          ]
+        },
+        {
+          "id": "EXP-NEST-003-C04",
+          "kind": "NSF",
+          "statement": "ReleaseAllChildren(target,prefab,radius) 对 target.health.invincible 真值先返回nil。否则先普通池，连续3次SpawnChild失败才停止该循环，成功重置失败次数；重算应急预算后再同样循环应急池。正常返回成功生成实体组成的数组，允许空数组。已有外部孩子没有由此方法统一重新指定目标。",
+          "evidence_refs": [
+            "NEST-S18",
+            "NEST-S13",
+            "NEST-S14"
+          ]
+        },
+        {
+          "id": "EXP-NEST-003-C05",
+          "kind": "NSF",
+          "statement": "beehive 在master配置普通bee、应急bee、每玩家预算、应急容量/半径和已有WorldSettings时钟；OnHit 调 ReleaseAllChildren(attacker,killerbee)，combat:SetOnHit 安装该回调。这会对本次新放出孩子提供prefab覆盖与目标。普通StartSpawning的环境条件位于独立file-local回调，停止普通周期不会自动禁止此次手工放出。",
+          "evidence_refs": [
+            "NEST-S24",
+            "NEST-S25",
+            "NEST-S23",
+            "NEST-S22",
+            "NEST-S16"
+          ]
+        },
+        {
+          "id": "EXP-NEST-003-C06",
+          "kind": "REC",
+          "statement": "需要按玩家规模防御时直接配置应急池并选择 TrySpawnEmergencyChild 或 ReleaseAllChildren；一次放出上限和补充速率分别设计。暂停普通活动、禁用手工防御和停止补充是各自政策，按所用入口已有字段/条件落实。普通小巢只配置普通池即可。",
+          "evidence_refs": [
+            "NEST-S14",
+            "NEST-S18",
+            "NEST-S16",
+            "NEST-S04",
+            "NEST-S24"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ChildSpawner:SetMaxEmergencyChildren",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "max 为应急容量，正常需求采用非负整数。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "已有应急外部计数与容量政策。"
+          ],
+          "side_effects": [
+            "inside 设 max-numemergencychildrenoutside，下限0，再写max并更新调度。"
+          ],
+          "lifecycle": "构造时建立应急库存；运行中改值也会重算库存，原已消耗额度可能随之改变。",
+          "evidence_refs": [
+            "NEST-S07",
+            "NEST-S05",
+            "NEST-S24"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:TrySpawnEmergencyChild",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "target 可选，交给新孩子的 combat 目标。"
+          ],
+          "returns": "返回 SpawnEmergencyChild 的新实体或nil。",
+          "preconditions": [
+            "canemergencyspawn 已按政策开启，应急库存/类型/半径已配置。",
+            "巢满足CanEmergencySpawn；附近玩家预算由本次调用更新。"
+          ],
+          "side_effects": [
+            "刷新半径内玩家预算，随后普通生成helper处理位置、目标与onspawned。",
+            "成功才扣应急inside、TakeEmergencyOwnership；不要求普通spawning/canspawnfn。"
+          ],
+          "lifecycle": "直接 SpawnEmergencyChild 使用现有预算；此包装适合需要本次先更新玩家预算的手工防御。",
+          "evidence_refs": [
+            "NEST-S14",
+            "NEST-S13",
+            "NEST-S16",
+            "NEST-S11",
+            "NEST-S10",
+            "NEST-S41"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        },
+        {
+          "symbol": "ChildSpawner:ReleaseAllChildren",
+          "source_file": "scripts/components/childspawner.lua",
+          "visibility": "require 导出的组件实例方法；组件不自行设定 master 门禁。",
+          "parameters": [
+            "target 可选；原始health.invincible真值会使整个方法早退。",
+            "prefab、radius 可选，分别透传普通和应急放出；仍经共享选择helper。"
+          ],
+          "returns": "早退nil；正常返回成功放出的实体数组，可为空。",
+          "preconditions": [
+            "普通/应急容量、条件及所用生成helper依赖已配置。",
+            "调用方理解普通池先放、之后重算应急玩家预算。"
+          ],
+          "side_effects": [
+            "普通循环到CanSpawn不满足或连续3次失败，应急循环同理，每次成功重置失败计数。",
+            "普通生成还检查 target.health:IsInvincible()，该条件与入口的原始invincible字段分开；应急生成沿自身检查。",
+            "仅对本次新生孩子按target设置combat，返回表不包含所有原外部成员。"
+          ],
+          "lifecycle": "可由受击或其他明确触发手工调用，和周期spawning开关独立；返回数组表达成功生成的实体集合。",
+          "evidence_refs": [
+            "NEST-S18",
+            "NEST-S13",
+            "NEST-S16",
+            "NEST-S11",
+            "NEST-S14",
+            "NEST-S23",
+            "NEST-S25"
+          ],
+          "unknowns": [
+            "任意 Mod 回调抛错或重入时不承诺原子操作；按实际变更点核对。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master配置普通与应急库存、每玩家额度及检测半径。",
+          "evidence_refs": [
+            "NEST-S24",
+            "NEST-S07"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "受击回调调用ReleaseAllChildren，普通池先尝试放出。",
+          "evidence_refs": [
+            "NEST-S25",
+            "NEST-S23",
+            "NEST-S18"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "重算附近玩家预算，再从应急池放出并取得应急所有权。",
+          "evidence_refs": [
+            "NEST-S14",
+            "NEST-S16",
+            "NEST-S13",
+            "NEST-S10"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "死亡或捕获撤外部成员，应急缺额由DoRegen补回inside后才释放相应提交额度。",
+          "evidence_refs": [
+            "NEST-S17",
+            "NEST-S04",
+            "NEST-S19"
+          ]
+        }
+      ],
+      "unknowns": [
+        "附近玩家预算按标签查询，原生网络可见性、地图几何与多人实际行为尚未运行验证。",
+        "稀有/异种选择与全部物种的防御优先级不由蜂巢示例统一规定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "NEST-S02",
+            "role": "独立应急池默认字段"
+          },
+          {
+            "ref": "NEST-S07",
+            "role": "应急上限与库存重算"
+          },
+          {
+            "ref": "NEST-S14",
+            "role": "玩家预算更新入口"
+          },
+          {
+            "ref": "NEST-S16",
+            "role": "普通和应急生成条件差异"
+          },
+          {
+            "ref": "NEST-S13",
+            "role": "两池成功后计数"
+          },
+          {
+            "ref": "NEST-S11",
+            "role": "两池共享内部生成helper"
+          },
+          {
+            "ref": "NEST-S10",
+            "role": "应急所有权"
+          },
+          {
+            "ref": "NEST-S17",
+            "role": "应急成员退出"
+          },
+          {
+            "ref": "NEST-S19",
+            "role": "应急库存补充"
+          },
+          {
+            "ref": "NEST-S04",
+            "role": "两池补充时点"
+          },
+          {
+            "ref": "NEST-S18",
+            "role": "批量放出循环和返回集合"
+          },
+          {
+            "ref": "NEST-S24",
+            "role": "真实master防御配置"
+          },
+          {
+            "ref": "NEST-S25",
+            "role": "受击回调安装"
+          },
+          {
+            "ref": "NEST-S23",
+            "role": "受击执行与巢死亡退出"
+          },
+          {
+            "ref": "NEST-S22",
+            "role": "普通开关的独立消费者"
+          },
+          {
+            "ref": "NEST-S41",
+            "role": "半值向下的舍入"
+          }
+        ],
+        "unknowns": [
+          "实际调度、落点可达性、客户端表现及第三方覆写未运行验证。",
+          "既有GOHOME和世界保存知识保留各自原Scope；本条只扩展所列巢穴接线。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "NEST-S01",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 8,
+      "line_end": 50,
+      "range_sha256": "7d41804b4000bb20d96a0c1fab2b124a84e978309a635af83e462ce4d0e598b9",
+      "symbols": [
+        "AddChildOutside",
+        "RemoveChildOutside",
+        "AddEmergencyChildOutside",
+        "RemoveEmergencyChildOutside",
+        "AddChildListeners",
+        "RemoveChildListeners"
+      ]
+    },
+    {
+      "id": "NEST-S02",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 52,
+      "line_end": 111,
+      "range_sha256": "54e1fb1f6f4b6ff0ebf72aa04d4189d9c7fd2b930ca0eb9fd753c507ab9c72c7",
+      "symbols": [
+        "ChildSpawner constructor"
+      ]
+    },
+    {
+      "id": "NEST-S03",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 121,
+      "line_end": 151,
+      "range_sha256": "c6cdb88ad5d5c0a4d01d0b9dc134739e1d5696cb13d21108d4035bd4bd23d212",
+      "symbols": [
+        "ChildSpawner:OnRemoveFromEntity",
+        "ChildSpawner:StartRegen",
+        "ChildSpawner:StopRegen"
+      ]
+    },
+    {
+      "id": "NEST-S04",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 153,
+      "line_end": 194,
+      "range_sha256": "8fa40072f52e8839c9ddd023f9e5b1ada64ab27060c9295a4692d6af3c9c64cc",
+      "symbols": [
+        "ChildSpawner:SetSpawnPeriod",
+        "ChildSpawner:SetRegenPeriod",
+        "ChildSpawner:NumChildren",
+        "ChildSpawner:IsFull",
+        "ChildSpawner:DoRegen"
+      ]
+    },
+    {
+      "id": "NEST-S05",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 196,
+      "line_end": 260,
+      "range_sha256": "cb08c420e00c0dc4c5f690e7cfe3daa51320b604ec6588ec7f8b7858ec165b43",
+      "symbols": [
+        "ChildSpawner:OnUpdate",
+        "ChildSpawner:ShouldUpdate",
+        "ChildSpawner:StartUpdate",
+        "ChildSpawner:TryStopUpdate"
+      ]
+    },
+    {
+      "id": "NEST-S06",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 262,
+      "line_end": 303,
+      "range_sha256": "aa9189e6caf908bb07c71054ceb50964f67cef4b1ffa7ba4033422893140cb3c",
+      "symbols": [
+        "ChildSpawner:StartSpawning",
+        "ChildSpawner:StopSpawning",
+        "ChildSpawner callback setters"
+      ]
+    },
+    {
+      "id": "NEST-S07",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 305,
+      "line_end": 330,
+      "range_sha256": "4d9a013067444a8cda8af9da1d47af705964cc9c3e7798d316d74a86cc36cdd9",
+      "symbols": [
+        "ChildSpawner:CountChildrenOutside",
+        "ChildSpawner:SetMaxChildren",
+        "ChildSpawner:SetMaxEmergencyChildren"
+      ]
+    },
+    {
+      "id": "NEST-S08",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 332,
+      "line_end": 377,
+      "range_sha256": "7797b49c0a957804d4976954af7c43b966a4b45a172afab86ffe8760cef5d0cf",
+      "symbols": [
+        "ChildSpawner:OnSave"
+      ]
+    },
+    {
+      "id": "NEST-S09",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 407,
+      "line_end": 455,
+      "range_sha256": "5930b3545b7b030b5764693643e73a7a5dcadb688933d7cdc503772478afede7",
+      "symbols": [
+        "ChildSpawner:OnLoad"
+      ]
+    },
+    {
+      "id": "NEST-S10",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 457,
+      "line_end": 503,
+      "range_sha256": "aa1aae94e0e62676b00c0b0c79e1ae23b6fdfa876aaaf66e8a5aa78a932809be",
+      "symbols": [
+        "ChildSpawner:DoTakeOwnership",
+        "ChildSpawner:TakeOwnership",
+        "ChildSpawner:TakeEmergencyOwnership",
+        "ChildSpawner:LoadPostPass"
+      ]
+    },
+    {
+      "id": "NEST-S11",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 505,
+      "line_end": 577,
+      "range_sha256": "db07b89bec99d60bec104e6c7c843880e6f72563aea70525e070a6395a448d2f",
+      "symbols": [
+        "NoHoles",
+        "WeightedTotal",
+        "ChildSpawner:GetChildPrefab",
+        "ChildSpawner:DoSpawnChild"
+      ]
+    },
+    {
+      "id": "NEST-S12",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 579,
+      "line_end": 613,
+      "range_sha256": "505e98e235c427c5658c6d0fd8b15eb9ac6f420572f57c307bb0a950b3ebd137",
+      "symbols": [
+        "ChildSpawner:QueueSpawnChild",
+        "ChildSpawner:OnEntityWake",
+        "ChildSpawner:DoQueuedSpawn",
+        "ChildSpawner:ProcessOtherChildren"
+      ]
+    },
+    {
+      "id": "NEST-S13",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 615,
+      "line_end": 647,
+      "range_sha256": "c1b737fa666ddb27a6802220103930dd553f124d29b2223b0ea22a342b575155",
+      "symbols": [
+        "ChildSpawner:SpawnChild",
+        "ChildSpawner:SpawnEmergencyChild"
+      ]
+    },
+    {
+      "id": "NEST-S14",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 649,
+      "line_end": 665,
+      "range_sha256": "b291f8fee3bdddee699ef5a461099aa764f2f5046518790b73234647cfc4ff88",
+      "symbols": [
+        "ChildSpawner:UpdateMaxEmergencyCommit",
+        "ChildSpawner:TrySpawnEmergencyChild"
+      ]
+    },
+    {
+      "id": "NEST-S15",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 668,
+      "line_end": 715,
+      "range_sha256": "fa3f8d011ad72bb36658343b8b1389630a14ea380dd7b3bc8a8b75fbf6d1d99d",
+      "symbols": [
+        "ChildSpawner:TakeInChild",
+        "ChildSpawner:GoHome"
+      ]
+    },
+    {
+      "id": "NEST-S16",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 717,
+      "line_end": 737,
+      "range_sha256": "7dc1c6e1cf220dafba0fa6912b8df365e2e806be34ff1143ae6f63d36ae58a09",
+      "symbols": [
+        "ChildSpawner:CanSpawnOffscreenOrAwake",
+        "ChildSpawner:CanSpawn",
+        "ChildSpawner:CanEmergencySpawn"
+      ]
+    },
+    {
+      "id": "NEST-S17",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 739,
+      "line_end": 756,
+      "range_sha256": "232f14c1bd7cbb5a8f6e2d3fc91a37c3c1bc763d68d496ffb14a0f1fb4f90983",
+      "symbols": [
+        "ChildSpawner:OnChildKilled"
+      ]
+    },
+    {
+      "id": "NEST-S18",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 758,
+      "line_end": 793,
+      "range_sha256": "c9ad4fff3895948491e2c1bad5ee0383d84783dbcebd2833bbb2ecc04d38b098",
+      "symbols": [
+        "ChildSpawner:ReleaseAllChildren"
+      ]
+    },
+    {
+      "id": "NEST-S19",
+      "source_file": "scripts/components/childspawner.lua",
+      "file_sha256": "ef6b637a2b8d1523483cd01c97d7317347b3a3f4f384461517f21a0425b51f9b",
+      "line_start": 795,
+      "line_end": 821,
+      "range_sha256": "36d79208ffcf198abe6ba2e350e586aaec6f3fccaf1526c9665bc0447c136b79",
+      "symbols": [
+        "ChildSpawner:AddChildrenInside",
+        "ChildSpawner:AddEmergencyChildrenInside",
+        "ChildSpawner:LongUpdate"
+      ]
+    },
+    {
+      "id": "NEST-S20",
+      "source_file": "scripts/prefabs/tallbirdnest.lua",
+      "file_sha256": "d14baa1092eb7cd0d012d6bd87ce31f6e9b8f4e9e4f2eb699bd24eb9181b17c8",
+      "line_start": 158,
+      "line_end": 182,
+      "range_sha256": "b7f548df8d9c7c7a0406024532b86202fae1faa3fd43fe17556da677764f508a",
+      "symbols": [
+        "tallbirdnest fn master setup"
+      ]
+    },
+    {
+      "id": "NEST-S21",
+      "source_file": "scripts/prefabs/tallbirdnest.lua",
+      "file_sha256": "d14baa1092eb7cd0d012d6bd87ce31f6e9b8f4e9e4f2eb699bd24eb9181b17c8",
+      "line_start": 78,
+      "line_end": 83,
+      "range_sha256": "af768ed041d013d0ad81d485626cb0e4cda5d459e03b70e35ca139231e46363c",
+      "symbols": [
+        "onvacate"
+      ]
+    },
+    {
+      "id": "NEST-S22",
+      "source_file": "scripts/prefabs/beehive.lua",
+      "file_sha256": "e8fbd69d03043ea75aeb7071cbb17d479afed801d18cb1433da7919089fbed2e",
+      "line_start": 25,
+      "line_end": 44,
+      "range_sha256": "3738298ac8304fa00bf2d7cddd6908cd26d169b4e68b2f769e0c8c006c195484",
+      "symbols": [
+        "StartSpawning",
+        "StopSpawning",
+        "OnIsDay"
+      ]
+    },
+    {
+      "id": "NEST-S23",
+      "source_file": "scripts/prefabs/beehive.lua",
+      "file_sha256": "e8fbd69d03043ea75aeb7071cbb17d479afed801d18cb1433da7919089fbed2e",
+      "line_start": 77,
+      "line_end": 96,
+      "range_sha256": "fa5aa486083145a026421eac096d514b2c97dcf96e07a51cabcd02b6bc0fdfb0",
+      "symbols": [
+        "OnKilled",
+        "OnHit"
+      ]
+    },
+    {
+      "id": "NEST-S24",
+      "source_file": "scripts/prefabs/beehive.lua",
+      "file_sha256": "e8fbd69d03043ea75aeb7071cbb17d479afed801d18cb1433da7919089fbed2e",
+      "line_start": 176,
+      "line_end": 201,
+      "range_sha256": "9c19d9f0c24ed22f6536a1368a902fd5316099cc7e7d7ae16aa688c52494ebfa",
+      "symbols": [
+        "beehive fn master ChildSpawner setup"
+      ]
+    },
+    {
+      "id": "NEST-S25",
+      "source_file": "scripts/prefabs/beehive.lua",
+      "file_sha256": "e8fbd69d03043ea75aeb7071cbb17d479afed801d18cb1433da7919089fbed2e",
+      "line_start": 220,
+      "line_end": 222,
+      "range_sha256": "90517e291450e974c0263e6bd126239161e41994fd57f7506da48b6ddcf2d3cd",
+      "symbols": [
+        "beehive combat/death callback installation"
+      ]
+    },
+    {
+      "id": "NEST-S26",
+      "source_file": "scripts/prefabs/beebox.lua",
+      "file_sha256": "510075e4fab45479834021d5762a09d628f962efd46cb5dac088ae2fceea7162",
+      "line_start": 144,
+      "line_end": 152,
+      "range_sha256": "346f3e1733d7cdd6139186189daa7fe2629d24d5b42e2714bd1b4e6377f141a4",
+      "symbols": [
+        "onchildgoinghome"
+      ]
+    },
+    {
+      "id": "NEST-S27",
+      "source_file": "scripts/prefabs/beebox.lua",
+      "file_sha256": "510075e4fab45479834021d5762a09d628f962efd46cb5dac088ae2fceea7162",
+      "line_start": 272,
+      "line_end": 297,
+      "range_sha256": "f4a480c7340c370941ba71827bec48fed21f836c35cec36eb6f77084a3549354",
+      "symbols": [
+        "MakeBeebox master ChildSpawner and harvestable installation"
+      ]
+    },
+    {
+      "id": "NEST-S28",
+      "source_file": "scripts/brains/beecommon.lua",
+      "file_sha256": "d64a7a7dbf82fbd6e5792feff063701e1e75f9ed472917166cd7de8bd1d0da9a",
+      "line_start": 41,
+      "line_end": 53,
+      "range_sha256": "7779eeef6e71e178e5bd3b763184e4c4371702b8b19ce95af7d5c1ffdad717c4",
+      "symbols": [
+        "GoHomeAction",
+        "module GoHomeAction export"
+      ]
+    },
+    {
+      "id": "NEST-S29",
+      "source_file": "scripts/brains/beebrain.lua",
+      "file_sha256": "52f88ac98ed95cd49b8d6712ec471357f827d98eb9e3f539ba322a9bb2088495",
+      "line_start": 63,
+      "line_end": 75,
+      "range_sha256": "930063a68af9f557b65afce5a9f5edff48963c7c2cac64582924bb6e232585ab",
+      "symbols": [
+        "BeeBrain:OnStart go-home branches"
+      ]
+    },
+    {
+      "id": "NEST-S30",
+      "source_file": "scripts/stategraphs/SGbee.lua",
+      "file_sha256": "1cce95b080778b85c4a653026bfe38e79ed7d2c13af66f125482392d3042eed6",
+      "line_start": 1,
+      "line_end": 7,
+      "range_sha256": "fc9bb34f32c74f3aa1717590d0ea7529e175e7515cd234bf179c8620c1efcbdb",
+      "symbols": [
+        "SGbee GOHOME ActionHandler"
+      ]
+    },
+    {
+      "id": "NEST-S31",
+      "source_file": "scripts/stategraphs/SGbee.lua",
+      "file_sha256": "1cce95b080778b85c4a653026bfe38e79ed7d2c13af66f125482392d3042eed6",
+      "line_start": 77,
+      "line_end": 92,
+      "range_sha256": "c7d6784972bc9740105d0b85a7c7771057b3182c446bdbb5569961a9d350563b",
+      "symbols": [
+        "SGbee action state"
+      ]
+    },
+    {
+      "id": "NEST-S32",
+      "source_file": "scripts/prefabs/bee.lua",
+      "file_sha256": "962168ad3edb222006338e9ee712c491642a5baa481567038049b895d6411614",
+      "line_start": 172,
+      "line_end": 185,
+      "range_sha256": "6f7e073b70d0a4fe85a091a953016dcfd99fe72a70d486dc8cfe4535e0a349e3",
+      "symbols": [
+        "commonfn master SG setup"
+      ]
+    },
+    {
+      "id": "NEST-S33",
+      "source_file": "scripts/prefabs/bee.lua",
+      "file_sha256": "962168ad3edb222006338e9ee712c491642a5baa481567038049b895d6411614",
+      "line_start": 260,
+      "line_end": 279,
+      "range_sha256": "1753b20adfaea496e90ca86a4165a7964b72f4d0bf3ceea1364d3c7853d17c3b",
+      "symbols": [
+        "workerbee master Brain installation"
+      ]
+    },
+    {
+      "id": "NEST-S34",
+      "source_file": "scripts/prefabs/bee.lua",
+      "file_sha256": "962168ad3edb222006338e9ee712c491642a5baa481567038049b895d6411614",
+      "line_start": 47,
+      "line_end": 54,
+      "range_sha256": "edd1b0e9f3a0e8c0982cef6eb4538fd7fba52f56fbff5fbb4a02e2df47b36601",
+      "symbols": [
+        "OnWorked"
+      ]
+    },
+    {
+      "id": "NEST-S35",
+      "source_file": "scripts/prefabs/bee.lua",
+      "file_sha256": "962168ad3edb222006338e9ee712c491642a5baa481567038049b895d6411614",
+      "line_start": 200,
+      "line_end": 203,
+      "range_sha256": "6c96c7330e46210cf38ee8b87fbbb88f2eadd50e1cb8bf07712f56c21ee467ad",
+      "symbols": [
+        "NET Workable OnWorked installation"
+      ]
+    },
+    {
+      "id": "NEST-S36",
+      "source_file": "scripts/components/homeseeker.lua",
+      "file_sha256": "eb832c53c649fadc8d58a062a482516b5c61f3e3b328fc0534270c39f9c38397",
+      "line_start": 1,
+      "line_end": 38,
+      "range_sha256": "e39bcc4e45cf523b8cf953dbcd6e8a329185c9f19c66e9802f26d1d17739a281",
+      "symbols": [
+        "HomeSeeker constructor",
+        "HomeSeeker:SetHome"
+      ]
+    },
+    {
+      "id": "NEST-S37",
+      "source_file": "scripts/components/knownlocations.lua",
+      "file_sha256": "c961fe110f9d3375428225f7f2b907ce3f469ddcfdbae887846775b53282f1dc",
+      "line_start": 61,
+      "line_end": 73,
+      "range_sha256": "11c8802ce7e905b149bd66fbc89e761590c89bd69839acee9eb0fe8f666eee75",
+      "symbols": [
+        "KnownLocations:RememberLocation",
+        "KnownLocations:GetLocation"
+      ]
+    },
+    {
+      "id": "NEST-S38",
+      "source_file": "scripts/worldsettingsutil.lua",
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "line_start": 34,
+      "line_end": 66,
+      "range_sha256": "fd5a11c6527cae329c4ba40b233e1a405167c94417e2aa7c0195b16967472ebb",
+      "symbols": [
+        "On_ChildSpawner_SpawnPeriod_TimerFinished",
+        "On_ChildSpawner_RegenPeriod_TimerFinished",
+        "Set_ChildSpawner_SpawnPeriod_Timer_Time"
+      ]
+    },
+    {
+      "id": "NEST-S39",
+      "source_file": "scripts/worldsettingsutil.lua",
+      "file_sha256": "6d93a389caaa3b00b093b33954f505c6b7626fb2181fb2340838fa97ea80cd5d",
+      "line_start": 87,
+      "line_end": 121,
+      "range_sha256": "92aef1cb6524796bbd784412bc67a26ce49bb96989063b7095fb003dbe78bfe2",
+      "symbols": [
+        "WorldSettings_ChildSpawner_SpawnPeriod",
+        "WorldSettings_ChildSpawner_RegenPeriod"
+      ]
+    },
+    {
+      "id": "NEST-S40",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 2956,
+      "line_end": 2976,
+      "range_sha256": "059004d1653dd4ebe46bd4765566442838d6fe3ea67b8b148c0d1bd77051888a",
+      "symbols": [
+        "ACTIONS.GOHOME.fn"
+      ]
+    },
+    {
+      "id": "NEST-S41",
+      "source_file": "scripts/mathutil.lua",
+      "file_sha256": "2b49f39aa117f4554d1816eb175500e998d02eb1cf109c47de2261d2e6b285ab",
+      "line_start": 30,
+      "line_end": 33,
+      "range_sha256": "5b319c32f7675ae27672df33d5541440fa4ae41c7239a92f0c82885af1abebab",
+      "symbols": [
+        "RoundBiasedDown"
+      ]
+    },
+    {
+      "id": "NEST-S42",
+      "source_file": "scripts/util.lua",
+      "file_sha256": "9c13ed09268532dcb596edbd91f5157c28775b2739b1e9cd1b89a149c9300f2a",
+      "line_start": 1718,
+      "line_end": 1724,
+      "range_sha256": "ea2a44a1a999fe0dcdc9871864a52c0b5f0721a40060cb92673cf93757ca04af",
+      "symbols": [
+        "FunctionOrValue"
+      ]
+    },
+    {
+      "id": "NEST-S43",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 725,
+      "line_end": 757,
+      "range_sha256": "79d750e04dc0a28e6292a2c545bb51bb41be12d81d03c017625485e7dcb9eb91",
+      "symbols": [
+        "OnEntityWake component dispatch"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "巢穴 childspawner SetMaxChildren 库存 补充 SpawnChild",
+      "expected_entry_ids": [
+        "EXP-NEST-001"
+      ],
+      "purpose": "区分容量重算、库存增加与外部生成"
+    },
+    {
+      "query": "回巢 GoHome 删除孩子 home 所有权 childgoinghome",
+      "expected_entry_ids": [
+        "EXP-NEST-002"
+      ],
+      "purpose": "接线成员资格、回巢结算和真实终态"
+    },
+    {
+      "query": "捕网 detachchild 死亡 OnChildKilled 巢穴卸载",
+      "expected_entry_ids": [
+        "EXP-NEST-002"
+      ],
+      "purpose": "撤回成员与资源所有者"
+    },
+    {
+      "query": "蜂巢应急 ReleaseAllChildren 玩家预算 死亡补充",
+      "expected_entry_ids": [
+        "EXP-NEST-003"
+      ],
+      "purpose": "按独立应急库存和提交额度部署防御"
+    }
+  ],
+  "limitations": [
+    "本轮为静态源码研究，research/restricted/hold，runtime_verified=false。",
+    "EXP-AI-009/010 的GOHOME/home/Brain分发与EXP-SAVE-002保存引用恢复继续按各自Scope复用。",
+    "普通示例采用固定物种，内置时钟与外部时钟仅核对本题需要的连接处。",
+    "候选只含自写说明、符号、范围和哈希，不含原版Lua正文。"
+  ]
+}

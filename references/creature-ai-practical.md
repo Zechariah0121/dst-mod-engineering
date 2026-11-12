@@ -51,6 +51,8 @@
 
 ## 回位与入巢按需求接线
 
+巢内数量、放出补员、捕获及回巢后的个体去向，接着读[巢穴与种群](nests-population.md)。
+
 只需回家附近时，给 Leash 提供现有位置 getter 即可。四项配置 `homelocation/max_dist/inner_return_dist/running` 均可用函数接收 inst，位置也可直接给 Point。无家位置时该分支 FAILED，让后续闲逛等分支继续选择。
 
 Leash 在 READY 出界时先 Stop 并进入 RUNNING，下次 Visit 才更新 GoToPoint。距离严格小于 max_dist 才算内侧，距离小于等于 inner_return_dist 即完成。希望形成清晰的回位滞回时，配置 `inner_return_dist < max_dist`。家位置 getter 同次 Visit 可被多次调用，应返回一致的位置。
