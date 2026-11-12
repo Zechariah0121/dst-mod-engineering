@@ -1,0 +1,1209 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "projectiles_impacts",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-PROJ-001",
+      "title": "自定义远程武器的发射、普通弹体检测与回收接线",
+      "aliases": [
+        "Weapon:LaunchProjectile",
+        "Projectile:Throw",
+        "projectile.has_damage_set",
+        "SetHoming",
+        "非跟踪弹体",
+        "猎犬牙吹管"
+      ],
+      "engineering_question": "如何复用原版远程武器发射一枚具有明确伤害来源、射程和结束行为的弹体？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "side": "具名prefab在SetPristine后的mastersim分支配置weapon/projectile，权威动作调用发射。",
+        "increment_over_existing": "NC-N004-FINAL-01/02已覆盖普通弹体默认伤害、归因与结束概述。本条新增可直接接自定义武器的完整API、houndstooth_blowpipe实际消费者及homing/非homing的目标检测与有限射程条件。",
+        "boundaries": [
+          "基础Combat/Health伤害通道沿既有记录各自Scope。",
+          "本条使用已受理的服务器攻击作为发射入口，玩家输入/预测的通用链沿NC-N003-INT-02/03与EXP-AI-007。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-PROJ-001-C01",
+          "kind": "NSF",
+          "statement": "houndstooth_blowpipe在master构造中安装weapon并注册OnProjectileLaunched，itemget/itemlose分别设置或清除projectile prefab、射程与blowpipe/rangedweapon标签。OnProjectileLaunched在发射后从容器取出一件并Remove；这是该物品的弹药消费策略。",
+          "evidence_refs": [
+            "PROJ-HLAUNCH",
+            "PROJ-HWEAPON"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C02",
+          "kind": "NSF",
+          "statement": "普通攻击经Combat:DoAttack的远程分支调用Weapon:LaunchProjectile并提前返回。LaunchProjectile在Spawn前调用onprojectilelaunch(item,attacker,target)，普通弹体分支定位后Throw(item,target,attacker)，复杂弹体分支Launch(target:GetPosition(),attacker,item)。随后调用onprojectilelaunched(item,attacker,target,proj)并发weapononprojectilelaunched，proj可因Spawn失败为nil。方法无显式返回。",
+          "evidence_refs": [
+            "PROJ-COMBAT",
+            "PROJ-WLAUNCH"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C03",
+          "kind": "NSF",
+          "statement": "houndstooth_proj在master分支安装自身weapon、planardamage与类型加成，projectile.has_damage_set=true，SetHoming(false)、range=30、SetHitDist(1.5)，命中和未命中均Remove。普通Hit按has_damage_set及弹体weapon选择伤害武器，onprehit在默认DoAttack之前运行，onhit在其后且弹体仍有效时运行。猎犬牙弹体用file-local Projectile_OnPreHit生成目标尚活着时的冲击FX。",
+          "evidence_refs": [
+            "PROJ-HAMMO",
+            "PROJ-HPREHIT",
+            "PROJ-END"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C04",
+          "kind": "NSF",
+          "statement": "projectile默认homing=true。OnUpdate仅在跟踪且目标有效非limbo时更新dest；DoUpdate跟踪分支还检查目标可见性及flight/invisible状态。非跟踪分支只对原目标有效且非limbo时进行近距Hit或CheckStuck，不搜索沿途其他敌人。先执行的range检查以start到当前位置距离严格大于range时Miss。",
+          "evidence_refs": [
+            "PROJ-DEFAULT",
+            "PROJ-THROW",
+            "PROJ-SLEEP",
+            "PROJ-UPDATE"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C05",
+          "kind": "EI",
+          "statement": "非跟踪、目标已无效且range为nil时，该DoUpdate分支没有本轮Hit/Miss退出，清醒更新可继续。因此希望非跟踪弹体有有限飞行距离时，可像猎犬牙弹体配置range；穿透沿途任意实体的玩法需要另外的命中检测。",
+          "evidence_refs": [
+            "PROJ-UPDATE",
+            "PROJ-HAMMO"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C06",
+          "kind": "NSF",
+          "statement": "Hit先缓存owner/伤害武器，再Stop并停止物理，随后走默认伤害及回调。Miss先解析可用攻击者再Stop并调用onmiss，Stop本身清更新/owner/target并恢复LIMITS碰撞，物理停步和删除由具体退出分支负责。有target时sleep安排2秒后Miss，wake取消。",
+          "evidence_refs": [
+            "PROJ-END",
+            "PROJ-SLEEP"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C07",
+          "kind": "EI",
+          "statement": "has_damage_set=true的猎犬牙命中使用弹体weapon，默认Weapon:OnAttack及其finiteuses路径也随该伤害武器执行。has_damage_set为假且owner为发射武器时，默认命中会调用发射武器OnAttack并按条件Use耐久；额外在发射时扣同一耐久会增加另一消费点。按发射次数消耗时，依需求替代或关闭该物品的默认战斗磨损，明确proj=nil的处理；猎犬牙吹管的发射后消费仅移除容器弹药。",
+          "evidence_refs": [
+            "PROJ-END",
+            "PROJ-COMBAT",
+            "PROJ-WHIT",
+            "PROJ-HLAUNCH",
+            "PROJ-HAMMO",
+            "PROJ-FINITE"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C08",
+          "kind": "REC",
+          "statement": "普通单目标远程攻击先复用weapon/projectile与现有攻击入口，按需求选择弹体自身伤害或发射武器当前伤害。命中回调只补所需表现或附加效果，回收在具体hit/miss/catch策略中配置。新SG仅用于现有状态无法表达的动作时序或中断需求。",
+          "evidence_refs": [
+            "PROJ-WLAUNCH",
+            "PROJ-END",
+            "PROJ-HAMMO",
+            "PROJ-SGDART",
+            "PROJ-SGSELECT"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-001-C09",
+          "kind": "EI",
+          "statement": "普通武器owner模式下，Hit通过发射器inventoryitem.owner重新取攻击者。若最后一次发射的消费提前Remove发射器，库存/装备的成功移除链会OnRemoved清owner，后续Hit可解析不到攻击者而跳过默认DoAttack；has_damage_set只选择伤害武器，仍经过同一攻击者解析。要求发射器消失后继续伤害时，可在权威发射点选择以攻击者为owner的Throw，并让弹体自带weapon；原版直接投掷吹箭沿该模式发射。",
+          "evidence_refs": [
+            "PROJ-END",
+            "PROJ-COMBAT",
+            "PROJ-IITEM",
+            "PROJ-IREMOVE",
+            "PROJ-INVREMOVE",
+            "PROJ-FINITE",
+            "PROJ-DART",
+            "PROJ-DARTPIPE"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Weapon:LaunchProjectile",
+          "source_file": "scripts/components/weapon.lua",
+          "visibility": "原版weapon组件Lua方法。具名prefab在服务端使用。",
+          "parameters": [
+            "attacker为执行攻击的实体，target为具有位置接口的目标实体。projectile字段先由SetProjectile(prefabname)配置。"
+          ],
+          "returns": "projectile未配置时早退，正常路径也无显式返回。新弹体通过发射后回调第四参和事件payload提供。",
+          "preconditions": [
+            "调用者已确定当前攻击资格及权威执行端。attacker/target的位置和所需实体接口有效，配置的prefab按projectile或complexprojectile合同实现。"
+          ],
+          "side_effects": [
+            "onprojectilelaunch(item,attacker,target)先于Spawn。Spawn成功时普通projectile优先，按projectile_offset或attacker当前位置定位，再Throw；projectiledelay非nil时调用DelayVisibility。否则complexprojectile定位并Launch。",
+            "随后执行onprojectilelaunched(item,attacker,target,proj)，发送weapononprojectilelaunched({attacker,target,projectile=proj})，这些步骤在Spawn返回nil时仍可到达。"
+          ],
+          "lifecycle": [
+            "此入口提交飞行，不直接运行该新弹体的命中伤害。组件方法本身没有总mastersim检查，实际调用链在权威端。",
+            "回调、Spawn和发射方法正常返回时才继续后续步骤，异常按调用栈传播。弹药/耐久由所选物品回调和命中武器路径承担。"
+          ],
+          "evidence_refs": [
+            "PROJ-WCONFIG",
+            "PROJ-WLAUNCH",
+            "PROJ-COMBAT",
+            "PROJ-HLAUNCH",
+            "PROJ-HWEAPON"
+          ],
+          "unknowns": [
+            "Spawn原生失败/异常映射与目标环境网络表现未运行。"
+          ]
+        },
+        {
+          "symbol": "Projectile:Throw",
+          "source_file": "scripts/components/projectile.lua",
+          "visibility": "原版projectile组件Lua方法，直接调用需在已受理的服务端发射路径。",
+          "parameters": [
+            "owner为持有本次发射归因的实体，target为单一目标，attacker为可选发射者参数。Weapon:LaunchProjectile传owner=发射武器、attacker=使用者；Combat直接投掷物品分支传owner=使用者并省略attacker。",
+            "speed通过SetSpeed预置。SetRange配置可选距离，SetHoming配置跟踪布尔，SetLaunchOffset配置x半径/y高度，SetHitDist配置命中余量。"
+          ],
+          "returns": "正常无显式返回。IsThrown依据target非nil。",
+          "preconditions": [
+            "实体具备Physics、Transform及更新/事件接口。owner和target可读位置，speed为运动接口可接受的数值。Hit正常流程依赖此前建立的owner。"
+          ],
+          "side_effects": [
+            "保存owner/target，start取overridestartpos或owner位置，dest取目标位置，清LIMITS碰撞。按attacker朝向施加launchoffset，再按launchangle或目标旋转，设置motor速度并启动更新。",
+            "加入activeprojectile，给自身发onthrown({thrower=owner,target})，给目标发hostileprojectile({thrower=owner,attacker,target})，再调用onthrown(projectile,owner,target,attacker)。可捕获弹体还通知target.catcher。"
+          ],
+          "lifecycle": [
+            "onprehit(projectile,attacker,target)在默认DoAttack前；onhit(projectile,attacker,target)在默认DoAttack后且弹体有效时；onmiss(projectile,attacker,target)在Stop后；oncaught(projectile,catcher)在Catch停步后。各回调通过对应SetOn*Fn配置。",
+            "Stop清owner/target和更新，Hit/Catch另停物理。Miss具体回调负责删除/返还等结束策略。跟踪目标失效、射程、卡住和sleep各按所列分支退出。",
+            "has_damage_set作用于武器owner的伤害武器选择。需要发射时快照的需求另外明确保存值及归属失效策略。",
+            "若发射器生命周期结束后仍需命中，以攻击者为owner且弹体自带weapon的直接Throw模式可减少对发射器当前持有关系的依赖；应在同一个已授权发射点完成，避免对已发射弹体再次Throw。"
+          ],
+          "evidence_refs": [
+            "PROJ-SET",
+            "PROJ-THROW",
+            "PROJ-END",
+            "PROJ-SLEEP",
+            "PROJ-UPDATE",
+            "PROJ-WLAUNCH",
+            "PROJ-COMBAT",
+            "PROJ-HAMMO",
+            "PROJ-DART",
+            "PROJ-DARTPIPE",
+            "PROJ-IITEM",
+            "PROJ-IREMOVE",
+            "PROJ-INVREMOVE"
+          ],
+          "unknowns": [
+            "原生物理、高速运动下的实际命中表现和其他Mod回调组合未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "权威攻击读取已配置的weapon，远程分支生成独立弹体并调用Throw。",
+          "evidence_refs": [
+            "PROJ-COMBAT",
+            "PROJ-WLAUNCH",
+            "PROJ-HWEAPON"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "弹体按所选跟踪方式更新，对目标或射程/退出条件分发Hit/Miss。",
+          "evidence_refs": [
+            "PROJ-THROW",
+            "PROJ-UPDATE",
+            "PROJ-SLEEP"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "Hit默认结算后调用附加回调，命中/未命中消费者结束弹体；发射器资源消耗按自身回调。",
+          "evidence_refs": [
+            "PROJ-END",
+            "PROJ-HLAUNCH",
+            "PROJ-HAMMO",
+            "PROJ-COMBAT"
+          ]
+        }
+      ],
+      "unknowns": [
+        "玩家远端输入/动画与高速物理命中未运行验证。",
+        "穿透、多目标及发射时属性快照按具体玩法设计。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PROJ-COMBAT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-DART",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-DARTPIPE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-DEFAULT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-END",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-FINITE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-HAMMO",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-HLAUNCH",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-HPREHIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-HWEAPON",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-IITEM",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-INVREMOVE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-IREMOVE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SET",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SGDART",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SGSELECT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SLEEP",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-THROW",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-UPDATE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-WCONFIG",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-WHIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-WLAUNCH",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          }
+        ],
+        "unknowns": [
+          "玩家远端输入/动画与高速物理命中未运行验证。",
+          "穿透、多目标及发射时属性快照按具体玩法设计。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PROJ-002",
+      "title": "按落点抛射、轨迹参数与自定义更新接管",
+      "aliases": [
+        "ComplexProjectile:Launch",
+        "ComplexProjectile:SetOnUpdate",
+        "ACTIONS.TOSS",
+        "落点投掷",
+        "抛物线"
+      ],
+      "engineering_question": "如何让可投掷物沿原版抛物线到指定位置，并选择默认落地或额外飞行检测？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "side": "服务器TOSS/Combat/weapon到complexprojectile及具名bomb/cannonball消费者。",
+        "increment_over_existing": "NC-N004-FINAL-01/02已有默认Hit只调回调、Launch保存归因等事实。本条新增TOSS真实输入/拆单件、轨迹可达性与moving-platform速度继承、SetOnUpdate完整接管合同。EXP-PRES-002保留火炬声音范围。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PROJ-002-C01",
+          "kind": "NSF",
+          "statement": "TOSS.fn从act.invobject或带special_action_toss的HANDS物品取弹体，要求complexprojectile并检查装备限制/防卸下及拟态。DropItem(item,false)后，实体target分支取其位置并把targetoffset设为y=1.5，否则取GetActionPoint，Launch(pos,doer)后返回true。已有SGwilson的TOSS handler选择throw/throw_keep_equip，普通throw时间线调用PerformBufferedAction。",
+          "evidence_refs": [
+            "PROJ-TOSS",
+            "PROJ-SGSELECT",
+            "PROJ-SGTOSS"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-002-C02",
+          "kind": "NSF",
+          "statement": "Launch保存attacker及owningweapon（缺省弹体自身），ForceFacePoint后按launchoffset偏移初始位置，直接把传入targetPos.y改为targetoffset.y或0，再CalculateTrajectory。若发射者当前平台有Physics，旋转换算平台速度并加到本地velocity.x/z。最后onlaunchfn(projectile,attacker,targetPos)，加入activeprojectile并启动更新。",
+          "evidence_refs": [
+            "PROJ-ARC"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-002-C03",
+          "kind": "NSF",
+          "statement": "CalculateTrajectory将horizontalSpeed当作speed求发射角与velocity，usehigharc选择两解高/低角。判别式为负时使用30度回退。CalculateMinimumSpeedForDistance按gravity、launch/target高度偏移计算可达速度；SetHorizontalSpeedForDistance使用该返回或fallback。没有由Launch返回值提供可达保证。",
+          "evidence_refs": [
+            "PROJ-PCONFIG",
+            "PROJ-ARC"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-002-C04",
+          "kind": "NSF",
+          "statement": "默认OnUpdate先运行onupdatefn(projectile)，truthy返回会跳过本轮motor设置、重力累积与落地检查；回调参数没有dt。默认下降且y<=0.05时Hit()，因此该落地回调的target为nil。Hit先Cancel再onhitfn(projectile,attacker,target)，Cancel清速度/更新而归因字段保留，实体最终去向由消费者处理。",
+          "evidence_refs": [
+            "PROJ-PCONFIG",
+            "PROJ-PEND"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-002-C05",
+          "kind": "NSF",
+          "statement": "bomb_lunarplant在master分支配置speed/gravity/launch offset、onlaunch和onhit；onlaunch将persists设false并改为飞行物理/表现，onhit交爆炸helper。cannonball另安装file-local OnUpdateProjectile扫描飞行路径附近实体，普通路径返回nil使默认抛物线更新继续。",
+          "evidence_refs": [
+            "PROJ-BOMBINIT",
+            "PROJ-BOMBTHROWN",
+            "PROJ-BOMB",
+            "PROJ-CANNONUPDATE",
+            "PROJ-CANNONINIT",
+            "PROJ-PEND"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-002-C06",
+          "kind": "REC",
+          "statement": "只有落点效果时，先配置默认抛物线和onhit，沿已有TOSS入口或已授权业务直接Launch。需要飞行中碰撞、穿透或自有轨迹时，再按真实需求接管更新。调用方还需使用原坐标时传入独立位置值，避免Launch改写共享targetPos.y。可达性、落地高度和是否留地由当前物品需求决定。",
+          "evidence_refs": [
+            "PROJ-TOSS",
+            "PROJ-ARC",
+            "PROJ-PEND",
+            "PROJ-BOMBINIT"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ComplexProjectile:Launch",
+          "source_file": "scripts/components/complexprojectile.lua",
+          "visibility": "原版complexprojectile组件Lua方法。所列消费者在mastersim配置和调用。",
+          "parameters": [
+            "targetPos为带Get及可写x/y/z的目标位置。attacker为可选发射实体，owningweapon为可选伤害武器身份，nil/false时取self.inst。",
+            "SetHorizontalSpeed配置求轨迹使用的speed，SetGravity配置重力，usehigharc缺省true。SetLaunchOffset用x朝向偏移/y高度，SetTargetOffset只消费y。"
+          ],
+          "returns": "正常无显式返回，轨迹状态写入velocity。判别式负值采用回退角，返回值不报告是否可达。",
+          "preconditions": [
+            "目标位置可读可写，实体提供位置/旋转/更新接口，正常飞行及Cancel要求Physics。speed和gravity满足所选轨迹计算需求，复杂度/退化输入由项目实际参数确定。"
+          ],
+          "side_effects": [
+            "保存归因、改变朝向和可选起点，改写targetPos.y，计算velocity并继承移动平台x/z速度。",
+            "执行onlaunchfn(projectile,attacker,targetPos)后登记activeprojectile及组件更新。配置onhitfn时收到(projectile,attacker,target)，owningweapon可从组件字段读取。"
+          ],
+          "lifecycle": [
+            "默认OnUpdate在下降至y<=0.05时Hit(nil)。Hit先Cancel再回调，Cancel停物理和更新、清速度，保留attacker/owningweapon。",
+            "callback自行决定删除、回收或落地继续存在。构造中的onmissfn没有本文件调用路径，使用所选OnHit/业务取消路径。",
+            "TOSS.fn会拆出单件并传入doer，目标实体分支还会预设targetoffset高度。Launch自身未实现TOSS的物品取出与装备资格检查。"
+          ],
+          "evidence_refs": [
+            "PROJ-PCONFIG",
+            "PROJ-ARC",
+            "PROJ-PEND",
+            "PROJ-TOSS",
+            "PROJ-BOMBINIT"
+          ],
+          "unknowns": [
+            "原生物理、地形/平台运动以及目标参数极端值的实际轨迹未运行。"
+          ]
+        },
+        {
+          "symbol": "ComplexProjectile:SetOnUpdate",
+          "source_file": "scripts/components/complexprojectile.lua",
+          "visibility": "原版组件Lua setter，用于有明确额外飞行行为的prefab。",
+          "parameters": [
+            "fn为fn(projectile)或nil。返回truthy表示本轮由该回调接管默认更新，nil/false则继续默认更新；没有dt形参。"
+          ],
+          "returns": "setter正常无显式返回，只赋onupdatefn。",
+          "preconditions": [
+            "回调正常返回后若允许默认更新继续，实体和Physics仍支持后续motor及落地处理。"
+          ],
+          "side_effects": [
+            "替换单个回调槽。每轮先调用该回调，再按返回值决定是否执行默认重力和落地链。"
+          ],
+          "lifecycle": [
+            "cannonball的file-local OnUpdateProjectile是实际消费者，附加扫描后普通路径nil允许继续默认弹道。完全自有轨迹可返回truthy并自行承担运动/结束。",
+            "停止本次飞行沿Cancel或具体业务结束入口处理，setter自身不创建任务或设置持久化。"
+          ],
+          "evidence_refs": [
+            "PROJ-PCONFIG",
+            "PROJ-PEND",
+            "PROJ-CANNONUPDATE",
+            "PROJ-CANNONINIT"
+          ],
+          "unknowns": [
+            "回调内移除/重入与原生物理操作的组合效果未实测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "现有TOSS动作取得实际投掷物和位置，DropItem取单件后Launch；自有业务可在已确定的权威点发射。",
+          "evidence_refs": [
+            "PROJ-TOSS",
+            "PROJ-SGSELECT",
+            "PROJ-SGTOSS"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "Launch应用位置/速度/平台偏移并启动默认更新或选定的自定义更新。",
+          "evidence_refs": [
+            "PROJ-ARC",
+            "PROJ-PEND"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "落地Hit先停本次飞行，再把落点后果和实体回收交给prefab回调。",
+          "evidence_refs": [
+            "PROJ-PEND",
+            "PROJ-BOMB"
+          ]
+        }
+      ],
+      "unknowns": [
+        "完整客户端TOSS候选/RPC与所有角色SG沿通用动作知识，本条只核具名服务端链。",
+        "原生碰撞、落点误差和离屏物理未运行验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PROJ-ARC",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMB",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMBINIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMBTHROWN",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-CANNONINIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-CANNONUPDATE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-PCONFIG",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-PEND",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SGSELECT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-SGTOSS",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-TOSS",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          }
+        ],
+        "unknowns": [
+          "完整客户端TOSS候选/RPC与所有角色SG沿通用动作知识，本条只核具名服务端链。",
+          "原生碰撞、落点误差和离屏物理未运行验证。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-PROJ-003",
+      "title": "落点范围攻击与爆炸环境后果的入口选择",
+      "aliases": [
+        "Explosive:OnBurnt",
+        "Explosive:SetAttacker",
+        "Explosive:SetPvpAttacker",
+        "落点范围效果",
+        "炮弹溅射",
+        "月亮炸弹"
+      ],
+      "engineering_question": "落地只伤敌人时怎样复用范围攻击，需要爆炸破坏/点火时如何使用explosive并解释归因？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "steam_buildid": "26474873",
+        "runtime_verified": false,
+        "side": "权威弹体prefab的落地回调到combat或explosive，file-local helper仅描述其消费者身份。",
+        "increment_over_existing": "NC-N004-FINAL-01/02已有DoAreaAttack伤害链与月亮炸弹helper概述。本条新增explosive完整入口/归因/PvP/环境副作用合同，以及cannonball落地复用中心实体的实际消费者。"
+      },
+      "claims": [
+        {
+          "id": "EXP-PROJ-003-C01",
+          "kind": "NSF",
+          "statement": "cannonball的file-local OnHit先用自身combat:DoAreaAttack(inst,radius,...,excludetags)做落点溅射，再处理船漏、海面物体/掉落物、特效和最终Remove。该prefab在master分支配置自身combat默认伤害与SetAreaDamage，实际溅射来源为炮弹实体。",
+          "evidence_refs": [
+            "PROJ-CANNONHIT",
+            "PROJ-CANNONINIT",
+            "PROJ-AREA"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-003-C02",
+          "kind": "NSF",
+          "statement": "DoAreaAttack的查询中心取首参target的位置，普通查询排除中心target和self.inst，validfn接收(candidate,self.inst)。它调用当前combat的CalcDamage并读取areahitdamagepercent，向受击者Internal传self.inst作为攻击者；首参中心实体与此攻击者可以不同。",
+          "evidence_refs": [
+            "PROJ-AREA"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-003-C03",
+          "kind": "NSF",
+          "statement": "月亮炸弹OnHit调用file-local ConfigureExplosive(inst,attacker,nil)，helper配置planardamage、类型加成、爆炸范围，普通伤害置0、关闭lightonexplode，再按ispvp设置pvpattacker或attacker并OnBurnt。OnBurnt结束会Remove炸弹，原OnHit提前缓存位置后生成爆炸FX。",
+          "evidence_refs": [
+            "PROJ-BOMB",
+            "PROJ-BOMBTHROWN",
+            "PROJ-EXPLODE"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-003-C04",
+          "kind": "NSF",
+          "statement": "Explosive:OnBurnt先可选相机闪光，再onexplodefn(inst)，按stacksize计算普通伤害，损伤当前位置dock并处理目标。未给target则以爆炸物位置FindEntities，排除INLIMBO/notarget；逐目标可WorkedBy、点火、普通/特殊伤害、击退及explosion事件，最后发世界explosion，爆炸物有health时发死亡事件，最终Remove。",
+          "evidence_refs": [
+            "PROJ-EXPLODE"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-003-C05",
+          "kind": "NSF",
+          "statement": "Explosive的SetAttacker/SetPvpAttacker只存字段。实际GetAttacked以爆炸物self.inst为attacker、weapon=nil，伤害从爆炸物组件取；存入的attacker或pvpattacker用于事后SuggestTarget。pvpattacker非nil时其他player的notpvp为假，自己及非player仍可在该条件内；forcepvp击退可开放外层处理，但伤害调用仍受notpvp约束。",
+          "evidence_refs": [
+            "PROJ-EXPLODE"
+          ]
+        },
+        {
+          "id": "EXP-PROJ-003-C06",
+          "kind": "REC",
+          "statement": "只需要普通落点范围战斗效果时，可在onhit中复用选定combat的DoAreaAttack，以弹体作中心并提供实际阵营筛选，然后完成本弹体回收。需要爆炸的workable、点火、栈数、相机和世界事件时再选explosive；SetAttacker的语义应按当前合同解释，具体玩法决定归因与环境影响。",
+          "evidence_refs": [
+            "PROJ-AREA",
+            "PROJ-CANNONHIT",
+            "PROJ-EXPLODE",
+            "PROJ-BOMB"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Explosive:OnBurnt",
+          "source_file": "scripts/components/explosive.lua",
+          "visibility": "原版explosive组件Lua方法，具名炸弹master回调直接调用。ConfigureExplosive/OnHit为bomb_lunarplant文件局部消费者。",
+          "parameters": [
+            "target可选，truthy时只处理该实体，缺省时在爆炸物当前位置按explosiverange查询。",
+            "组件配置包括explosiverange、explosivedamage、buildingdamage、lightonexplode、skip_camera_flash、onexplodefn及可选knockbackdata。SetAttacker/SetPvpAttacker存归因辅助字段。"
+          ],
+          "returns": "正常无显式返回，末尾Remove爆炸物实体。",
+          "preconditions": [
+            "在预期权威爆炸点调用，爆炸物实体和位置可用，TheWorld与目标组件支持实际处理分支。所选workable分支依赖其WorkedBy接收该爆炸物。",
+            "回调onexplodefn(inst)在处理目标前运行，其副作用应符合后续仍继续访问爆炸物的控制流。"
+          ],
+          "side_effects": [
+            "普通量为explosivedamage*stacksize；类型加成影响普通量和特殊量，特殊量从爆炸物收集并按栈数缩放。workable使用buildingdamage*stacksize*类型倍率，inventoryitem类workable另受数量预算和自身栈数影响。",
+            "依配置点火，检查explosiveresist并通知，调用目标公共GetAttacked(self.inst,dmg,nil,nil,spdmg)，可即时击退，再向仍活着且有效的combat目标SuggestTarget保存的攻击者。",
+            "可选相机效果、dock损伤、各目标explosion、每栈世界explosion事件以及爆炸物health分支死亡事件，末尾Remove。"
+          ],
+          "lifecycle": [
+            "目标先WorkedBy再重新检查有效/limbo后处理后继点火和伤害。PvP条件与forcepvp击退分别控制所列分支。",
+            "onexplodefn在读取栈数/位置和逐目标处理前调用。方法没有单次消费锁；调用者在其实际落地/引爆生命周期安排触发。",
+            "传入target只选择单个目标，前后的相机、dock和世界事件等外围后果仍在本方法中。SetAttacker会影响仇恨建议，实际伤害攻击者继续是爆炸物。"
+          ],
+          "evidence_refs": [
+            "PROJ-EXPLODE",
+            "PROJ-BOMB",
+            "PROJ-BOMBTHROWN",
+            "PROJ-BOMBINIT"
+          ],
+          "unknowns": [
+            "原生查询顺序、地图对象破坏、实际PvP表现及回调异常/重入组合未运行。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "复杂弹体落地回调取得仍存在的中心实体，选择战斗范围攻击或完整爆炸后果。",
+          "evidence_refs": [
+            "PROJ-PEND",
+            "PROJ-CANNONHIT",
+            "PROJ-BOMB"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "选定的combat或explosive处理目标与归因，范围中心和伤害来源由具体调用决定。",
+          "evidence_refs": [
+            "PROJ-AREA",
+            "PROJ-EXPLODE"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "由落地消费者结束实体，爆炸物在OnBurnt末尾Remove；表现使用预先保存的位置。",
+          "evidence_refs": [
+            "PROJ-CANNONHIT",
+            "PROJ-BOMB",
+            "PROJ-EXPLODE"
+          ]
+        }
+      ],
+      "unknowns": [
+        "PvP、盟友、地图破坏和多目标实际结果按具体选定方案验证。",
+        "此处不把hitcount、onhit回调或OnBurnt无返回解释为实际HP损失。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "PROJ-AREA",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMB",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMBINIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-BOMBTHROWN",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-CANNONHIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-CANNONINIT",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-EXPLODE",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          },
+          {
+            "ref": "PROJ-PEND",
+            "role": "本条选定定义、直接调用者或具名prefab消费者"
+          }
+        ],
+        "unknowns": [
+          "PvP、盟友、地图破坏和多目标实际结果按具体选定方案验证。",
+          "此处不把hitcount、onhit回调或OnBurnt无返回解释为实际HP损失。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "PROJ-WCONFIG",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 44,
+      "line_end": 86,
+      "range_sha256": "bfa7a690a312719705dcc0db248cd9b1c0cef3cb95f9da5d0a41a2906b6d20e7",
+      "symbols": [
+        "Weapon:SetDamage",
+        "Weapon:SetRange",
+        "Weapon:SetProjectile",
+        "Weapon:SetOnProjectileLaunched"
+      ]
+    },
+    {
+      "id": "PROJ-WLAUNCH",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 123,
+      "line_end": 157,
+      "range_sha256": "77723f57086d82038bff9c418650e635ec9d108d5e2e1e725415550a4847bbc0",
+      "symbols": [
+        "Weapon:LaunchProjectile"
+      ]
+    },
+    {
+      "id": "PROJ-WHIT",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 94,
+      "line_end": 121,
+      "range_sha256": "3842e2882318939e50975007c2f02d7da5ee4cb2fc5d4ec6a9078b5f9950bfdc",
+      "symbols": [
+        "Weapon:GetDamage",
+        "Weapon:OnAttack"
+      ]
+    },
+    {
+      "id": "PROJ-DEFAULT",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 11,
+      "line_end": 52,
+      "range_sha256": "6cbc612dfe969acdef8440122227f6ecb2a705e562c0f51798ee214637182717",
+      "symbols": [
+        "Projectile"
+      ]
+    },
+    {
+      "id": "PROJ-SET",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 93,
+      "line_end": 158,
+      "range_sha256": "18b99e8d6ca6100485f5c220b547f6140c4c8a88586af4f07d770b02382ea63a",
+      "symbols": [
+        "Projectile:SetSpeed",
+        "Projectile:SetRange",
+        "Projectile:SetHoming",
+        "Projectile:SetOnPreHitFn",
+        "Projectile:SetOnHitFn",
+        "Projectile:SetOnMissFn"
+      ]
+    },
+    {
+      "id": "PROJ-THROW",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 160,
+      "line_end": 192,
+      "range_sha256": "a79497e7517ca188b21dd4a3126c149bd6f4ca29fa5fc0894bffdf4892b778c6",
+      "symbols": [
+        "Projectile:Throw"
+      ]
+    },
+    {
+      "id": "PROJ-END",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 194,
+      "line_end": 266,
+      "range_sha256": "2e508d4b3e83fd140f5afc4c6af5b72ab0136c999a9b33173393b18b7892a83b",
+      "symbols": [
+        "Projectile:Catch",
+        "Projectile:Miss",
+        "Projectile:Stop",
+        "Projectile:Hit"
+      ]
+    },
+    {
+      "id": "PROJ-SLEEP",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 268,
+      "line_end": 301,
+      "range_sha256": "93a4f9da10d89b38b46b632714c3f5dc7f88267e3f1922b86819d52e58cb3ea5",
+      "symbols": [
+        "Projectile:OnEntitySleep",
+        "Projectile:OnEntityWake",
+        "CheckTarget"
+      ]
+    },
+    {
+      "id": "PROJ-UPDATE",
+      "source_file": "scripts/components/projectile.lua",
+      "file_sha256": "39e2fd3263d6f50e4409ea0d5ce26701cc560520c696d1feb1483b679d607af0",
+      "line_start": 315,
+      "line_end": 489,
+      "range_sha256": "1f8210188d7e3350110084916c05ab94df7da5cba6d37c949aaf0fbfefa0fac6",
+      "symbols": [
+        "CheckStuck",
+        "DoUpdate",
+        "Projectile:OnUpdate"
+      ]
+    },
+    {
+      "id": "PROJ-COMBAT",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1120,
+      "line_end": 1242,
+      "range_sha256": "e66e2f6c2ab74f2e691be7d47349c22a99201c80360e49bba696d8d4ec11b853",
+      "symbols": [
+        "Combat:DoAttack"
+      ]
+    },
+    {
+      "id": "PROJ-HLAUNCH",
+      "source_file": "scripts/prefabs/houndstooth_blowpipe.lua",
+      "file_sha256": "6cafeb1195de21c28b9fa190462cb97b206dce8c8e4a7e31545905b48fff177d",
+      "line_start": 69,
+      "line_end": 96,
+      "range_sha256": "b54280d146e82c917026951fbe13eac2c71c009f1189ebd12d689c7c8106fbda",
+      "symbols": [
+        "OnProjectileLaunched",
+        "OnAmmoLoaded",
+        "OnAmmoUnloaded"
+      ]
+    },
+    {
+      "id": "PROJ-HPREHIT",
+      "source_file": "scripts/prefabs/houndstooth_blowpipe.lua",
+      "file_sha256": "6cafeb1195de21c28b9fa190462cb97b206dce8c8e4a7e31545905b48fff177d",
+      "line_start": 144,
+      "line_end": 167,
+      "range_sha256": "754d7013733c1519dd8dc32f86f4802de4b450ecdea8f94ee0562e34f9dd0f7f",
+      "symbols": [
+        "Projectile_OnThrown",
+        "Projectile_OnPreHit",
+        "Projectile_SpawnImpactFx"
+      ]
+    },
+    {
+      "id": "PROJ-HWEAPON",
+      "source_file": "scripts/prefabs/houndstooth_blowpipe.lua",
+      "file_sha256": "6cafeb1195de21c28b9fa190462cb97b206dce8c8e4a7e31545905b48fff177d",
+      "line_start": 198,
+      "line_end": 232,
+      "range_sha256": "6025908aaad58eaa532bc36c6e9e1991f38f6a4f4e605d6be6706f518214b2ea",
+      "symbols": [
+        "WeaponFn"
+      ]
+    },
+    {
+      "id": "PROJ-HAMMO",
+      "source_file": "scripts/prefabs/houndstooth_blowpipe.lua",
+      "file_sha256": "6cafeb1195de21c28b9fa190462cb97b206dce8c8e4a7e31545905b48fff177d",
+      "line_start": 279,
+      "line_end": 317,
+      "range_sha256": "6ca4caaf031f34895c1d1dd9bc22abbc0b1913cb50f06cf5e8fa12c2e2a255b9",
+      "symbols": [
+        "ProjectileFn"
+      ]
+    },
+    {
+      "id": "PROJ-PCONFIG",
+      "source_file": "scripts/components/complexprojectile.lua",
+      "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+      "line_start": 1,
+      "line_end": 84,
+      "range_sha256": "ab38688beb4f37f6d11f0d2fbf90192bbbac8d9f6eb644b8a92cafaf58b3b9d2",
+      "symbols": [
+        "ComplexProjectile",
+        "ComplexProjectile:SetOnLaunch",
+        "ComplexProjectile:SetOnHit",
+        "ComplexProjectile:SetOnUpdate"
+      ]
+    },
+    {
+      "id": "PROJ-ARC",
+      "source_file": "scripts/components/complexprojectile.lua",
+      "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+      "line_start": 85,
+      "line_end": 180,
+      "range_sha256": "1bf0a7b41959d32c94831103c4b42fd0b707b439bc37b2e8c5f2f9f0a9b8c9cf",
+      "symbols": [
+        "ComplexProjectile:CalculateMinimumSpeedForDistance",
+        "ComplexProjectile:CalculateTrajectory",
+        "ComplexProjectile:Launch"
+      ]
+    },
+    {
+      "id": "PROJ-PEND",
+      "source_file": "scripts/components/complexprojectile.lua",
+      "file_sha256": "dfa87ebab5cd0ec8249d73c6d864a57d2a899225b4fdf664d561ab4e2528d513",
+      "line_start": 183,
+      "line_end": 211,
+      "range_sha256": "e88b3d42ec60ebf2a9dc9e8b5b15eceec4d1cfc10994a80045580aeb43c4a74c",
+      "symbols": [
+        "ComplexProjectile:Cancel",
+        "ComplexProjectile:Hit",
+        "ComplexProjectile:OnUpdate"
+      ]
+    },
+    {
+      "id": "PROJ-TOSS",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 3953,
+      "line_end": 3999,
+      "range_sha256": "126d26c83d0da0ac0e4740f482e68447f2d4592b70c0a6e56b8ea529352feaf7",
+      "symbols": [
+        "ACTIONS.TOSS.fn"
+      ]
+    },
+    {
+      "id": "PROJ-BOMB",
+      "source_file": "scripts/prefabs/bomb_lunarplant.lua",
+      "file_sha256": "22e51038a8e8e23198b735312462cd296f2034af1928b28adcbcc1a708064f76",
+      "line_start": 15,
+      "line_end": 50,
+      "range_sha256": "c19c38ba53915ff6f0b7c8620efab0c796aac4b4dbc1121691b2d4385f620974",
+      "symbols": [
+        "ConfigureExplosive",
+        "ExplodeOnChew",
+        "OnHit"
+      ]
+    },
+    {
+      "id": "PROJ-BOMBTHROWN",
+      "source_file": "scripts/prefabs/bomb_lunarplant.lua",
+      "file_sha256": "22e51038a8e8e23198b735312462cd296f2034af1928b28adcbcc1a708064f76",
+      "line_start": 138,
+      "line_end": 163,
+      "range_sha256": "e16f6aec9650110fbe734de3ea21dfa8fcb825768ce752fe2d8ea70299ab9f09",
+      "symbols": [
+        "onthrown"
+      ]
+    },
+    {
+      "id": "PROJ-BOMBINIT",
+      "source_file": "scripts/prefabs/bomb_lunarplant.lua",
+      "file_sha256": "22e51038a8e8e23198b735312462cd296f2034af1928b28adcbcc1a708064f76",
+      "line_start": 180,
+      "line_end": 249,
+      "range_sha256": "635058988afeed8291266f99896232855d1243eabdfde15341f8743e870e1698",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "PROJ-AREA",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1312,
+      "line_end": 1340,
+      "range_sha256": "c62eb8f72baf5d52b3ab071eb12734162194a82749d2e1602b21dc0ee71b9f39",
+      "symbols": [
+        "Combat:DoAreaAttack"
+      ]
+    },
+    {
+      "id": "PROJ-CANNONHIT",
+      "source_file": "scripts/prefabs/cannonballs.lua",
+      "file_sha256": "a9aef1d0ed152f34e45a03e795dae582fd848b03b643c2713d6f2e7b065263ea",
+      "line_start": 53,
+      "line_end": 140,
+      "range_sha256": "3c1214cca886580d55eefe7c4ed3182892e3b9b8175fd661960c88d35113e21c",
+      "symbols": [
+        "OnHit"
+      ]
+    },
+    {
+      "id": "PROJ-CANNONUPDATE",
+      "source_file": "scripts/prefabs/cannonballs.lua",
+      "file_sha256": "a9aef1d0ed152f34e45a03e795dae582fd848b03b643c2713d6f2e7b065263ea",
+      "line_start": 142,
+      "line_end": 177,
+      "range_sha256": "555c12465ae7228ad73b2e2d8053228b096194a2add396a9eb27172cc9a3d498",
+      "symbols": [
+        "OnUpdateProjectile"
+      ]
+    },
+    {
+      "id": "PROJ-CANNONINIT",
+      "source_file": "scripts/prefabs/cannonballs.lua",
+      "file_sha256": "a9aef1d0ed152f34e45a03e795dae582fd848b03b643c2713d6f2e7b065263ea",
+      "line_start": 214,
+      "line_end": 268,
+      "range_sha256": "29abe7eb76c81f58b787b92940f68b59279c5ef7ad96bd96e2a7d61c14d77d7f",
+      "symbols": [
+        "common_fn",
+        "cannonball_fn"
+      ]
+    },
+    {
+      "id": "PROJ-EXPLODE",
+      "source_file": "scripts/components/explosive.lua",
+      "file_sha256": "16a15701a27004efe98ae1e81640465d225f020afab78effc08063ea7d6a6a20",
+      "line_start": 1,
+      "line_end": 158,
+      "range_sha256": "e567e3333d122d277c35f1e353f0c4b0f45b7f32442ad4fd9e15456ed1875eea",
+      "symbols": [
+        "Explosive:SetAttacker",
+        "Explosive:SetPvpAttacker",
+        "Explosive:OnBurnt"
+      ]
+    },
+    {
+      "id": "PROJ-SGDART",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 10435,
+      "line_end": 10511,
+      "range_sha256": "ca262a63d0b1212d89696b5624069ddbbaa30958788afe9674f35f53e4c66cc2",
+      "symbols": [
+        "states.blowdart"
+      ]
+    },
+    {
+      "id": "PROJ-SGSELECT",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 1410,
+      "line_end": 1430,
+      "range_sha256": "7dec25d3a3400610810cb253de01dcf2ee6a87c36176d2f9be5e1c711aefa5ac",
+      "symbols": [
+        "actionhandlers.ATTACK",
+        "actionhandlers.TOSS"
+      ]
+    },
+    {
+      "id": "PROJ-SGTOSS",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 10663,
+      "line_end": 10731,
+      "range_sha256": "b6fb257a01040da1c47985b4d55f5625a845c3cc52d3c0019685b8ab401171db",
+      "symbols": [
+        "states.throw"
+      ]
+    },
+    {
+      "id": "PROJ-FINITE",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 64,
+      "line_end": 95,
+      "range_sha256": "f0730790fa877df1aae46810bb69feb62c3aebe813cce58699d9db8debcdbc6a",
+      "symbols": [
+        "FiniteUses:SetUses",
+        "FiniteUses:Use",
+        "FiniteUses:SetIgnoreCombatDurabilityLoss"
+      ]
+    },
+    {
+      "id": "PROJ-IITEM",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 369,
+      "line_end": 376,
+      "range_sha256": "daef783c37c1012908310dca7234279fb07a706796f00f0aa55563701b1d76f9",
+      "symbols": [
+        "InventoryItem:OnRemoved"
+      ]
+    },
+    {
+      "id": "PROJ-IREMOVE",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "line_start": 485,
+      "line_end": 499,
+      "range_sha256": "4184b9b8da2707a7296d900a88734126dd042820658b58d4f1f5b2ed15460507",
+      "symbols": [
+        "InventoryItem:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "PROJ-INVREMOVE",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1454,
+      "range_sha256": "bb0484fc26f6775af0147e3eb1b0cb2ddb8d801189aab319cbb1e3d290872dee",
+      "symbols": [
+        "Inventory:RemoveItem"
+      ]
+    },
+    {
+      "id": "PROJ-DART",
+      "source_file": "scripts/prefabs/blowdart.lua",
+      "file_sha256": "672829feaaeced879c21a50911fcef669450da001deff4def7d374ca165a1bfc",
+      "line_start": 31,
+      "line_end": 113,
+      "range_sha256": "df166c07ef0559aa6f694cea04ae4fd72d69e6aab7a2291e89b62219d5460f69",
+      "symbols": [
+        "onhit",
+        "common"
+      ]
+    },
+    {
+      "id": "PROJ-DARTPIPE",
+      "source_file": "scripts/prefabs/blowdart.lua",
+      "file_sha256": "672829feaaeced879c21a50911fcef669450da001deff4def7d374ca165a1bfc",
+      "line_start": 229,
+      "line_end": 250,
+      "range_sha256": "1c0cbefe4f9ea1761f7cd6c4ac9f219686f36aa8d545334bb87cdcfe4c4f777c",
+      "symbols": [
+        "pipethrown",
+        "pipe"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "自定义远程武器怎样发射、设置弹体伤害和回收",
+      "expected_entry_ids": [
+        "EXP-PROJ-001"
+      ],
+      "purpose": "连接weapon/projectile与实际prefab消费者"
+    },
+    {
+      "query": "投掷物怎样按坐标抛射和处理落地",
+      "expected_entry_ids": [
+        "EXP-PROJ-002"
+      ],
+      "purpose": "选择TOSS、Launch与默认/自有更新边界"
+    },
+    {
+      "query": "落点AOE和爆炸怎么选择并保留伤害归因",
+      "expected_entry_ids": [
+        "EXP-PROJ-003"
+      ],
+      "purpose": "选择DoAreaAttack中心与Explosive副作用合同"
+    }
+  ],
+  "limitations": [
+    "仅对762172/build26474873冻结ZIP做静态研究，runtime_verified=false。版本标识证据身份，未来来源按实际变化复核。",
+    "NSF为限定分支事实，EI为工程推断，REC为按需求选择的建议。",
+    "基础伤害链复用NC-N004-FINAL-01/02/03，火炬声音复用EXP-PRES-002，保留各自历史Scope。",
+    "range_sha256使用UTF-8 splitlines后选定一基闭区间、LF连接、无末尾换行；file_sha256使用ZIP成员原始字节。"
+  ]
+}

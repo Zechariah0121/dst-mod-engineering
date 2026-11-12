@@ -55,6 +55,9 @@ python -B -X utf8 run_kb.py update-sources ensure
 | 自定义弹窗、焦点、按键消费与本地 HUD 挂载 | [ui-screen-input.md](references/ui-screen-input.md) |
 | 伤害、Buff、容器、冷却、范围查询 | [combat-buffs-containers.md](references/combat-buffs-containers.md) |
 | 物品转移与堆叠、装备、投掷、维修、制作采集、锅料理、树木种植 | [items-food-plants.md](references/items-food-plants.md) |
+| 装备耐久、持续耗能、补燃料与材料修理 | [gear-fuel-repair.md](references/gear-fuel-repair.md) |
+| 远程武器、投射物、坐标抛射与范围命中 | [projectiles-hits.md](references/projectiles-hits.md) |
+| 建筑预览、套件部署、锤击拆除与累计施工 | [placement-buildings.md](references/placement-buildings.md) |
 | 新增独立锅料理、调味变体、图标与台词接入 | [cooker-dishes.md](references/cooker-dishes.md) |
 | 农田水肥、照料、阶段压力、种子与作物收获 | [farming-crops.md](references/farming-crops.md) |
 | 船上装置、平台归属、推力、帆与制动 | [boats-platforms.md](references/boats-platforms.md) |

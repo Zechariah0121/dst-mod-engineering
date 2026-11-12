@@ -1,0 +1,1441 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "topic": "placement_construction",
+  "entries": [
+    {
+      "id": "EXP-BUILD-001",
+      "title": "放置预览的测试、吸附坐标与附属表现归属",
+      "aliases": [
+        "placer",
+        "MakePlacer",
+        "放置吸附",
+        "override_build_point_fn",
+        "范围预览"
+      ],
+      "engineering_question": "怎样让自定义建筑/种植物的预览位置、允许显示与提交点一致，并让附属范围表现随预览退出？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "本地玩家PlayerController创建的配方/库存物品预览、Placer及moon_device和firesuppressor两个具名消费者。",
+        "exclusions": [
+          "DC-C01已有MakePlacer签名、CUSTOM公共predicate和replica门禁为前置。",
+          "完整RPC权威重建、所有轴对齐几何算法和第三方放置Mod兼容。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-BUILD-001-C01",
+          "kind": "NSF",
+          "statement": "MakePlacer构造非联网、非持久的预览。配方入口绑定builder replica的CanBuildAtPoint，物品入口绑定inventoryitem replica的CanDeploy并另给mouse_blocked。SetBuilder保存builder/recipe/invobject，本地ThePlayer分支读取轴对齐设置，可建立辅助表现，调用onbuilderset(inst)，然后StartWallUpdatingComponent。",
+          "evidence_refs": [
+            "BUILD-S01",
+            "BUILD-S03",
+            "BUILD-S07",
+            "BUILD-S08"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-001-C02",
+          "kind": "NSF",
+          "statement": "Placer先按鼠标/手柄和吸附选项更新变换，再处理fixedcameraoffset及onupdatetransform(inst)，之后TestCanBuild。override_testfn(inst)优先并完全取代testfn(pos,rot)，默认无两者返回true,false。can_build和mouse_blocked分别驱动可放置色调与隐藏。oncanbuild/oncannotbuild回调接(inst,mouse_blocked)，正常调用后直接返回本次OnUpdate，跳过默认显示和后续轴对齐辅助更新。",
+          "evidence_refs": [
+            "BUILD-S04",
+            "BUILD-S05",
+            "BUILD-S06",
+            "BUILD-S03"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-001-C03",
+          "kind": "NSF",
+          "statement": "配方鼠标及手柄提交读override_build_point_fn(placer)的真值结果，否则用placer位置。物品普通DoAction可先按轴对齐替换act位置，再按override_build_point_fn真值替换，最后写预览旋转。GetDeployAction自身从placer位置创建BufferedAction并写selected_pos，仅在onsuccess清selected_pos，没有在该方法调用TestCanBuild或CanDeploy。",
+          "evidence_refs": [
+            "BUILD-S03",
+            "BUILD-S09",
+            "BUILD-S10",
+            "BUILD-S11"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-001-C04",
+          "kind": "NSF",
+          "statement": "moon_device的file-local预览变换回调吸附moon_altar_link，override_build_point返回当前预览点，override_testfn保留mouse_blocked但用accept_placement替换默认can_build。这是该任务为指定节点放置采用的特殊准入，源码注释解释其进度取舍。",
+          "evidence_refs": [
+            "BUILD-S12"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-001-C05",
+          "kind": "NSF",
+          "statement": "LinkEntity只追加到linked并可设置lightoverride，默认OnUpdate给linked同步颜色/显示。该方法没有建立父子关系。firesuppressor另行SetParent后LinkEntity。Placer移除时处理图标通知与axisalignedhelpers，不遍历linked移除。PlayerController取消放置会移除placer。",
+          "evidence_refs": [
+            "BUILD-S02",
+            "BUILD-S03",
+            "BUILD-S06",
+            "BUILD-S13",
+            "BUILD-S22"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-001-C06",
+          "kind": "REC",
+          "statement": "普通放置先使用现有测试链。确需吸附时让预览变换和提交点共享同一几何规则，权威部署仍按实际点检验。附属表现可以按实际所有权成为placer子实体或在其退出回调释放，LinkEntity只用于显示关联。无需为单个预览新增管理器。",
+          "evidence_refs": [
+            "BUILD-S03",
+            "BUILD-S09",
+            "BUILD-S10",
+            "BUILD-S11",
+            "BUILD-S13",
+            "BUILD-S23",
+            "BUILD-S24"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Placer:TestCanBuild",
+          "source_file": "scripts/components/placer.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [],
+          "returns": "直接返回can_build,mouse_blocked，override/test的实际返回形状透传。没有测试函数时true,false。",
+          "preconditions": [
+            "placer实例已经处于待测试的位置。override_testfn/testfn存在时为可调用函数。"
+          ],
+          "side_effects": [
+            "override_testfn(inst)优先，否则testfn(inst:GetPosition(),inst:GetRotation())。自身不写can_build字段，OnUpdate把结果写入。",
+            "不消费材料或提交部署，测试回调的副作用由其实现决定。"
+          ],
+          "lifecycle": [
+            "PlayerController分别绑定配方与物品测试。onupdatetransform先于本次测试，override测试需自行保留所需默认约束。"
+          ],
+          "evidence_refs": [
+            "BUILD-S03",
+            "BUILD-S06",
+            "BUILD-S07",
+            "BUILD-S08",
+            "BUILD-S12"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "Placer:LinkEntity",
+          "source_file": "scripts/components/placer.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [
+            "ent为关联预览对象。lightoverride为nil或数值。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "默认lightoverride或正数分支需要ent.AnimState。默认显示分支也需要有效对象的AnimState/Show/Hide接口。"
+          ],
+          "side_effects": [
+            "将ent追加到linked。nil按1设置LightOverride，正数设置该值，0或负数保留原值。",
+            "不设置父级、不移动ent、不登记独立删除逻辑。重复调用会追加同一引用。"
+          ],
+          "lifecycle": [
+            "默认OnUpdate遍历linked应用显隐/颜色，自定义oncanbuild/oncannotbuild分支提前返回。",
+            "关联对象的创建、位置与退出由实际消费者接线，示例firesuppressor单独设置父级。"
+          ],
+          "evidence_refs": [
+            "BUILD-S02",
+            "BUILD-S03",
+            "BUILD-S06",
+            "BUILD-S13"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "Placer:GetDeployAction",
+          "source_file": "scripts/components/placer.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [],
+          "returns": "invobject非nil时返回新BufferedAction，否则nil。",
+          "preconditions": [
+            "builder/invobject和placer变换已由调用方配置。生成动作本身不核验可部署状态。"
+          ],
+          "side_effects": [
+            "把当前placer位置保存为selected_pos。常规动作DEPLOY，boatbuilder且ThePlayer inventory处于IsFloaterHeld时改DEPLOY_FLOATING。",
+            "构造参数包含builder、invobject、该点和当前旋转，onsuccess追加清selected_pos闭包。"
+          ],
+          "lifecycle": [
+            "已读手柄调用方先查can_build再请求动作。普通DoAction之后还可能按override_build_point_fn改动作点。",
+            "方法只有成功清点回调，预览取消/重建由PlayerController入口负责。"
+          ],
+          "evidence_refs": [
+            "BUILD-S03",
+            "BUILD-S11",
+            "BUILD-S22"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "PlayerController按配方或库存物品创建本地placer并绑定对应预测测试。",
+          "evidence_refs": [
+            "BUILD-S01",
+            "BUILD-S07",
+            "BUILD-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "预览变换后测试和显示，真实提交消费者选择最终点与旋转。",
+          "evidence_refs": [
+            "BUILD-S03",
+            "BUILD-S04",
+            "BUILD-S05",
+            "BUILD-S06",
+            "BUILD-S09",
+            "BUILD-S10",
+            "BUILD-S11",
+            "BUILD-S12"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "附属显示按linked更新，取消放置移除placer，拥有的子实体沿明确退出归属释放。",
+          "evidence_refs": [
+            "BUILD-S02",
+            "BUILD-S13",
+            "BUILD-S22",
+            "BUILD-S23",
+            "BUILD-S24"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行鼠标/手柄、轴对齐、遮挡、吸附或取消后的真实视觉。",
+        "这里只静态核对到提交动作点修正，不证明实际RPC到达和服务器接受。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "BUILD-S01",
+            "role": "非联网预览工厂，公共显示参数和postinit输入",
+            "claim_ids": [
+              "EXP-BUILD-001-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S02",
+            "role": "预览状态所有者与移除清理",
+            "claim_ids": [
+              "EXP-BUILD-001-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S03",
+            "role": "SetBuilder/LinkEntity/生成部署动作和测试的完整方法",
+            "claim_ids": [
+              "EXP-BUILD-001-C01",
+              "EXP-BUILD-001-C02",
+              "EXP-BUILD-001-C03",
+              "EXP-BUILD-001-C05",
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S04",
+            "role": "鼠标选点与格/米/轴对齐坐标分支",
+            "claim_ids": [
+              "EXP-BUILD-001-C02"
+            ]
+          },
+          {
+            "ref": "BUILD-S05",
+            "role": "手柄坐标、朝向及变换回调",
+            "claim_ids": [
+              "EXP-BUILD-001-C02"
+            ]
+          },
+          {
+            "ref": "BUILD-S06",
+            "role": "测试结果、显示回调及wall update",
+            "claim_ids": [
+              "EXP-BUILD-001-C02",
+              "EXP-BUILD-001-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S07",
+            "role": "配方预览创建与builder预测测试绑定",
+            "claim_ids": [
+              "EXP-BUILD-001-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S08",
+            "role": "物品预览创建与replica部署测试绑定",
+            "claim_ids": [
+              "EXP-BUILD-001-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S09",
+            "role": "手柄建造提交及失败预览回调",
+            "claim_ids": [
+              "EXP-BUILD-001-C03",
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S10",
+            "role": "鼠标建造提交读取override点",
+            "claim_ids": [
+              "EXP-BUILD-001-C03",
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S11",
+            "role": "普通部署动作实际点和旋转修正",
+            "claim_ids": [
+              "EXP-BUILD-001-C03",
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S12",
+            "role": "吸附预览、override点及项目特定测试实际消费者",
+            "claim_ids": [
+              "EXP-BUILD-001-C04"
+            ]
+          },
+          {
+            "ref": "BUILD-S13",
+            "role": "关联附属预览实际消费者与独立父级接线",
+            "claim_ids": [
+              "EXP-BUILD-001-C05",
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S22",
+            "role": "预览取消移除所有者",
+            "claim_ids": [
+              "EXP-BUILD-001-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S23",
+            "role": "原创示意附属预览的Lua父子所有权",
+            "claim_ids": [
+              "EXP-BUILD-001-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S24",
+            "role": "父实体移除时显式移除Lua跟踪子实体",
+            "claim_ids": [
+              "EXP-BUILD-001-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "所列声明、实际调用者和退出只覆盖本条具名流程。历史合同保持各自来源版本与HOLD。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-BUILD-002",
+      "title": "套件部署后的建筑初始化与拆除责任",
+      "aliases": [
+        "MakeDeployableKitItem",
+        "建筑套件",
+        "onbuilt和OnBuiltFn",
+        "拆除建筑"
+      ],
+      "engineering_question": "套件创建建筑后会发什么建造通知，通用部署与配方BUILD的初始化、消耗和拆除职责怎样区分？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "MakeDeployableKitItem默认ondeploy及yotb_sewingmachine套件/目标master构造和HAMMER消费者。",
+        "exclusions": [
+          "DC-C02/03已有Deploy门禁、一次移交单位和false返还合同复用。",
+          "EXP-CRAFT-002的Builder/EntityScript:OnBuilt分发与EXP-CRAFT-004的Workable本体复用。",
+          "可收起物的状态迁移、所有kit自定义ondeploy、建筑完整燃烧和容器所有权。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-BUILD-002-C01",
+          "kind": "NSF",
+          "statement": "MakeDeployableKitItem在公共构造安装custom_candeploy_fn及common_postinit，SetPristine后非master返回。master添加物品和deployable，选择传入ondeploy或默认实现，配置mode/spacing/restrictedtag/gridplacer，再执行master_postinit、hauntable、PostMasterSimfn，最后赋OnSave/OnLoad字段。",
+          "evidence_refs": [
+            "BUILD-S14"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-002-C02",
+          "kind": "NSF",
+          "statement": "默认file-local deployablekititem_ondeploy先SpawnPrefab目标并传皮肤，成功才定位，给新结构发onbuilt，payload为builder=deployer,pos=pt,rot=rot,deployable=inst，然后Remove所传kit实体。rot在事件中交给目标消费者；组件OnBuilt/实体OnBuiltFn分发需要独立调用EntityScript:OnBuilt。通用Deploy调用ondeploy后向doer发deployitem，物品有deployedplant标签时另发世界itemplanted，故本流程的onbuilt来自具体kit消费者。",
+          "evidence_refs": [
+            "BUILD-S14",
+            "BUILD-S18"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-002-C03",
+          "kind": "NSF",
+          "statement": "yotb_sewingmachine_item使用该默认kit工厂和独立MakePlacer导出。目标在master构造容器/业务组件、HAMMER Workable、onbuilt监听，onbuilt消费者播放摆放动画和声音。普通配方非库存结构则由Builder定位/旋转、发onbuilt，之后还调用onBuild与EntityScript:OnBuilt，后者分发组件OnBuilt及OnBuiltFn。",
+          "evidence_refs": [
+            "BUILD-S15",
+            "BUILD-S17",
+            "BUILD-S20",
+            "BUILD-S21"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-002-C04",
+          "kind": "NSF",
+          "statement": "普通DEPLOY先通过门禁并取得移交obj，默认kit成功后仅Remove该obj。生成失败时默认kit回调直接结束，通用Deploy仍可发通知并返回true。其ondeploy返回值不决定外层false返还。实例数、材料状态与动作结果须按既有DC合同解释。",
+          "evidence_refs": [
+            "BUILD-S14",
+            "BUILD-S18",
+            "BUILD-S19"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-002-C05",
+          "kind": "NSF",
+          "statement": "yotb_sewingmachine的onhammered先熄火，容器存在则DropEverything，再lootdropper:DropLoot、创建拆除FX并Remove主体。组件构造负责可用业务，拆除产物和内容释放归实际完成回调，部署工厂未自动为结构安装这些功能。",
+          "evidence_refs": [
+            "BUILD-S15",
+            "BUILD-S16"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-002-C06",
+          "kind": "REC",
+          "statement": "通用业务配置放目标prefab的master构造。配方和默认kit都需要的当次摆放效果可接onbuilt，只有需要组件OnBuilt/OnBuiltFn分发时再明确调用来源。要遵循kit预览旋转，在自己的部署或目标事件消费者读取rot并应用。只需生成/定位/消费的功能也可保留短小ondeploy，按需求配置目标拆除回调。",
+          "evidence_refs": [
+            "BUILD-S14",
+            "BUILD-S15",
+            "BUILD-S17",
+            "BUILD-S18",
+            "BUILD-S20",
+            "BUILD-S21"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "MakeDeployableKitItem",
+          "source_file": "scripts/prefabutil.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [
+            "name,prefab_to_deploy为套件与目标prefab名。bank/build/anim为物品动画，build缺省bank，anim缺省idle。assets原样传给Prefab。",
+            "floatable_data为nil/false或含size/y_offset/scale的表。tags为nil或可pairs遍历的标签表。burnable为nil/false或表，可含fuelvalue。",
+            "deployable_data为nil/false或表，读取custom_candeploy_fn、usedeployspacingasoffset、common_postinit、ondeploy、deploymode、deployspacing、restrictedtag、usegridplacer、deploytoss_symbol_override、master_postinit、OnSave、OnLoad。",
+            "stack_size真值时安装stackable并设maxsize。PostMasterSimfn为可选末尾master回调。"
+          ],
+          "returns": "返回Prefab定义。该Prefab工厂在各端创建实际库存物品，回调返回值未被当作工厂替换值。",
+          "preconditions": [
+            "所有使用的动画、目标prefab和正常物品依赖按项目注册。truthy burnable需为可取fuelvalue字段的表。",
+            "CUSTOM模式与custom_candeploy_fn按实际需要配套。只给函数而保留DEFAULT不会让DEFAULT执行它。"
+          ],
+          "side_effects": [
+            "公共构造创建网络/物理/动画，按需float、tags、deploykititem与公共hook，然后SetPristine。",
+            "master按参数选择可燃/传播、inspectable/inventoryitem、可选stackable、deployable和fuel，分别配置实例字段。无floatable_data时inventoryitem设Sinks(true)。",
+            "master_postinit在MakeHauntableLaunch之前，PostMasterSimfn在其后。最终OnSave/OnLoad赋deployable_data对应字段，可覆盖此前hook给这两个字段赋的值。",
+            "默认ondeploy对Spawn成功目标定位并发onbuilt，随后删除当前kit对象。目标生成nil时该回调无消费动作且无显式失败返回。默认实现只在事件中提供rot。"
+          ],
+          "lifecycle": [
+            "只创建套件定义，不创建placer或目标结构定义。选项属于此工具函数的实例构造，不构成所有可放置物品必须采用的架构。",
+            "传自定义ondeploy时材料消费和目标通知由该函数接管，普通DEPLOY交接对象合同仍由动作链决定。"
+          ],
+          "evidence_refs": [
+            "BUILD-S01",
+            "BUILD-S14",
+            "BUILD-S15",
+            "BUILD-S18",
+            "BUILD-S19"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "独立导出库存kit、目标结构和本地placer，公共规则与master业务分别装配。",
+          "evidence_refs": [
+            "BUILD-S01",
+            "BUILD-S14",
+            "BUILD-S15"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "权威普通DEPLOY移交本次对象，具体ondeploy创建结构并执行自己的通知与消费。",
+          "evidence_refs": [
+            "BUILD-S14",
+            "BUILD-S18",
+            "BUILD-S19"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "结构按构造与onbuilt承担各自初始化，拆除完成回调处理物品、产物及主体退出。",
+          "evidence_refs": [
+            "BUILD-S15",
+            "BUILD-S16",
+            "BUILD-S17",
+            "BUILD-S20",
+            "BUILD-S21"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行套件部署、生成失败、旋转、HAMMER或实际容器返还。",
+        "该目标的摆放/拆除只是一个消费者，具体退款、返还kit或保留业务进度是项目政策。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "BUILD-S01",
+            "role": "非联网预览工厂，公共显示参数和postinit输入",
+            "claim_ids": []
+          },
+          {
+            "ref": "BUILD-S14",
+            "role": "套件公共/master构造、默认部署及回调字段完整工厂",
+            "claim_ids": [
+              "EXP-BUILD-002-C01",
+              "EXP-BUILD-002-C02",
+              "EXP-BUILD-002-C04",
+              "EXP-BUILD-002-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S15",
+            "role": "套件目标的master业务、HAMMER及onbuilt接线和Prefab导出",
+            "claim_ids": [
+              "EXP-BUILD-002-C03",
+              "EXP-BUILD-002-C05",
+              "EXP-BUILD-002-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S16",
+            "role": "拆除实际消费者，容器/掉落/移除职责",
+            "claim_ids": [
+              "EXP-BUILD-002-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S17",
+            "role": "目标onbuilt的实际表现消费者",
+            "claim_ids": [
+              "EXP-BUILD-002-C03",
+              "EXP-BUILD-002-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S18",
+            "role": "既有部署合同的当前回调与外层通知顺序",
+            "claim_ids": [
+              "EXP-BUILD-002-C02",
+              "EXP-BUILD-002-C04",
+              "EXP-BUILD-002-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S19",
+            "role": "普通部署动作取得一个移交单位及复检返还分支",
+            "claim_ids": [
+              "EXP-BUILD-002-C04"
+            ]
+          },
+          {
+            "ref": "BUILD-S20",
+            "role": "配方非库存结构的定位/事件/OnBuilt调用对照",
+            "claim_ids": [
+              "EXP-BUILD-002-C03",
+              "EXP-BUILD-002-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S21",
+            "role": "组件OnBuilt和OnBuiltFn分发对照",
+            "claim_ids": [
+              "EXP-BUILD-002-C03",
+              "EXP-BUILD-002-C06"
+            ]
+          }
+        ],
+        "unknowns": [
+          "所列声明、实际调用者和退出只覆盖本条具名流程。历史合同保持各自来源版本与HOLD。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-BUILD-003",
+      "title": "施工现场的累计投料、提交与完成策略",
+      "aliases": [
+        "constructionsite",
+        "construction_container",
+        "OnConstruct",
+        "分阶段建筑",
+        "施工退料"
+      ],
+      "engineering_question": "需要原版分批投料界面时，材料计数、会话物品、完成回调与拆除退料分别由谁负责？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "ConstructionBuilder到ConstructionSite提交、普通construction_container界面、moon_device两阶段现场消费者。",
+        "exclusions": [
+          "普通即时BUILD/DEPLOY沿已有合同，本条仅用于确需累计材料的施工现场。",
+          "施工蓝图转换、全部UI复制/SG客户端分支、完整moon_device唯一性与boss事件。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-BUILD-003-C01",
+          "kind": "NSF",
+          "statement": "CONSTRUCTION_PLANS按现场prefab列出材料type/amount。moon_device在master给未完成阶段安装ConstructionSite，配置construction_container与OnConstructed。标准容器是非持久master容器，四槽布局按constructionbuilderuidata对应的ingredient筛物，提交按钮发APPLYCONSTRUCTION。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S31",
+            "BUILD-S33",
+            "BUILD-S34",
+            "BUILD-S35",
+            "BUILD-S36"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-003-C02",
+          "kind": "NSF",
+          "statement": "ConstructionBuilder:StartConstruction结束旧会话，拒绝被占用或burnt的目标，创建并打开现场指定容器。成功后把容器挂玩家且persists=false，现场OnStartConstruction登记builder，监听目标移除并切constructing。提交动作通过FinishConstruction转construct_pst，SG到时OnFinishConstruction取容器物品列表再调现场OnConstruct。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S28",
+            "BUILD-S29",
+            "BUILD-S30",
+            "BUILD-S39"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-003-C03",
+          "kind": "NSF",
+          "statement": "OnConstruct逐对象按当前数量调用AddMaterial，按remainder决定缩堆后返给self.builder玩家库存或丢在现场，完全接收则Remove。它随后清builder、统计IsComplete，再无条件调用已配置onconstructedfn(inst,doer)。moon_device的file-local OnConstructed自行核对所有需求已满才ReplacePrefab下一阶段。",
+          "evidence_refs": [
+            "BUILD-S26",
+            "BUILD-S27",
+            "BUILD-S32"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-003-C04",
+          "kind": "NSF",
+          "statement": "AddMaterial只修改现场数量和replica槽计数，不自行处理实物。OnSave保存材料数量，OnLoad按当前计划重接槽，并把计划外旧材料保留成无slot数量记录。移除组件的hook仅ForceStopConstruction，停止会话归还当前容器中的物品，现场已累计材料需显式调用DropAllMaterials才按其数量创建返还物。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S26",
+            "BUILD-S27",
+            "BUILD-S29"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-003-C05",
+          "kind": "NSF",
+          "statement": "标准现场classified构造四个net_byte槽，SetSlotCount对缺槽跳过，GetSlotCount缺槽返回0。标准construction_container布局同为四槽。新增计划材料类型时，需共同核对UI、槽计数与计划映射的容量。",
+          "evidence_refs": [
+            "BUILD-S34",
+            "BUILD-S37",
+            "BUILD-S38"
+          ]
+        },
+        {
+          "id": "EXP-BUILD-003-C06",
+          "kind": "REC",
+          "statement": "确需分次投料与持久进度时复用现场组件和现有会话。onconstructedfn先按实际计划判断完成，再执行项目选定的原地切阶段或替换。普通一次部署继续沿短小ondeploy实现。只在业务要求返还已存材料的拆除入口调用DropAllMaterials，避免把已提交计数与会话暂存物品重复发放。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S26",
+            "BUILD-S27",
+            "BUILD-S29",
+            "BUILD-S32"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "ConstructionSite:AddMaterial",
+          "source_file": "scripts/components/constructionsite.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [
+            "prefab为材料名，num为本次要添加的非负数值数量。"
+          ],
+          "returns": "返回未被计入的remainder数量。未知材料或无slot既有记录时返回全部num。",
+          "preconditions": [
+            "现场materials由构造/加载建立，CONSTRUCTION_PLANS[self.inst.prefab]用type/amount描述计划，replica可写槽。"
+          ],
+          "side_effects": [
+            "首次匹配计划项时接受min(num,需求)，建立amount/slot并写replica。已有slot记录则按当前该slot计划需求减已存量计算可接收数。",
+            "仅修改数量，不移除或拆分调用方物品，不调用完成回调。"
+          ],
+          "lifecycle": [
+            "OnConstruct是处理实物的标准调用者。改变计划或加载旧材料会影响slot关联，自己的数据调整要沿实际计划匹配。"
+          ],
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S26",
+            "BUILD-S27",
+            "BUILD-S31"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "ConstructionSite:OnConstruct",
+          "source_file": "scripts/components/constructionsite.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [
+            "doer透传统计和onconstructedfn。items为本次提交的实体顺序数组。"
+          ],
+          "returns": "正常返回nil，onconstructedfn的返回值被忽略。",
+          "preconditions": [
+            "site已装配计划和replica，items实体具备prefab，堆叠项具备stackable接口，过量落地项具备inventoryitem。self.builder由会话登记。",
+            "方法自身不检查enabled、距离或items来源，标准ConstructionBuilder在其入口选取会话物品。"
+          ],
+          "side_effects": [
+            "逐项按StackSize或1计入，收满则Remove，余量为正时将堆量设min(remainder,maxsize)。",
+            "过量优先GiveItem给self.builder且其为有inventory的player，否则RemoveFromOwner并DoDropPhysics到现场。doer参数不替代此self.builder选择。",
+            "全部处理后self.builder=nil，IsComplete用于统计，再调用onconstructedfn(inst,doer)，包括尚未收满的提交。"
+          ],
+          "lifecycle": [
+            "标准SG在construct_pst完成时经OnFinishConstruction调用。组件回调负责自己的完成政策。",
+            "此前的计数/物品处理按普通调用顺序执行，后续回调返回false不会返还已提交材料。"
+          ],
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S26",
+            "BUILD-S27",
+            "BUILD-S29",
+            "BUILD-S30",
+            "BUILD-S32",
+            "BUILD-S39"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        },
+        {
+          "symbol": "ConstructionSite:DropAllMaterials",
+          "source_file": "scripts/components/constructionsite.lua",
+          "visibility": "原版Lua公开方法/函数。具体执行端和上下文依本条合同。",
+          "parameters": [
+            "drop_pos可选Vector3式对象，提供Get；省略时使用现场当前位置。"
+          ],
+          "returns": "正常返回nil。",
+          "preconditions": [
+            "materials内需要返还的prefab可生成有效实体，堆叠/物品接口符合其相应分支。"
+          ],
+          "side_effects": [
+            "对每个当前材料条目先RemoveMaterial全部数量，再按数量循环SpawnPrefab。堆叠物每次按其maxsize创建一堆并减少剩余，非堆叠每次减1。",
+            "inventoryitem使用DoDropPhysics，其他实体直接SetPosition。没有物品库存接收方参数。"
+          ],
+          "lifecycle": [
+            "只返还现场数量，不处理constructioninst里的未提交物品，也不Remove现场。ForceStopConstruction/组件卸载不自动调用它。",
+            "需返还的拆除入口自行选择调用时点，生成和位置调用错误时已先移除的数量沿该路径保留。"
+          ],
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S27",
+            "BUILD-S29"
+          ],
+          "unknowns": [
+            "原生显示、网络送达、动态Mod改写及实际运行结果尚未验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "计划与现场master装配确定每类需求，玩家开启非持久投料会话。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S28",
+            "BUILD-S31",
+            "BUILD-S33",
+            "BUILD-S34",
+            "BUILD-S35",
+            "BUILD-S36"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "提交动作与SG确认后交给OnConstruct，现场计数和本次实物分别处理。",
+          "evidence_refs": [
+            "BUILD-S26",
+            "BUILD-S29",
+            "BUILD-S30",
+            "BUILD-S39"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "消费者检查完成并选择业务变化，取消会话与现场拆除按不同资源归属处理。",
+          "evidence_refs": [
+            "BUILD-S25",
+            "BUILD-S27",
+            "BUILD-S29",
+            "BUILD-S32"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行施工界面、多玩家占用、中断、超量材料、保存恢复或拆除退料。",
+        "此处仅核对标准四槽与具名材料流程，更多类型/自定义容器、原生net_byte编码和实际远端显示未验证。",
+        "ReplacePrefab的完整数据转移合同未在本条扩展，项目需保留的额外状态由其阶段转换约定决定。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "BUILD-S25",
+            "role": "现场属性复制、启停、卸载和会话归属",
+            "claim_ids": [
+              "EXP-BUILD-003-C01",
+              "EXP-BUILD-003-C02",
+              "EXP-BUILD-003-C04",
+              "EXP-BUILD-003-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S26",
+            "role": "提交物品、数量余量、每次回调及AddMaterial完整方法",
+            "claim_ids": [
+              "EXP-BUILD-003-C03",
+              "EXP-BUILD-003-C04",
+              "EXP-BUILD-003-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S27",
+            "role": "退料、完成判断和数量保存恢复",
+            "claim_ids": [
+              "EXP-BUILD-003-C03",
+              "EXP-BUILD-003-C04",
+              "EXP-BUILD-003-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S28",
+            "role": "实际施工会话创建及失败退出",
+            "claim_ids": [
+              "EXP-BUILD-003-C02"
+            ]
+          },
+          {
+            "ref": "BUILD-S29",
+            "role": "会话停止、提交动作到实际OnConstruct调用",
+            "claim_ids": [
+              "EXP-BUILD-003-C02",
+              "EXP-BUILD-003-C04",
+              "EXP-BUILD-003-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S30",
+            "role": "施工SG正常提交与打断清理实际消费者",
+            "claim_ids": [
+              "EXP-BUILD-003-C02"
+            ]
+          },
+          {
+            "ref": "BUILD-S31",
+            "role": "按现场prefab索引的真实施工材料计划",
+            "claim_ids": [
+              "EXP-BUILD-003-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S32",
+            "role": "每次提交后自行判完成再替换实体的消费者",
+            "claim_ids": [
+              "EXP-BUILD-003-C03",
+              "EXP-BUILD-003-C06"
+            ]
+          },
+          {
+            "ref": "BUILD-S33",
+            "role": "现场master安装和回调绑定",
+            "claim_ids": [
+              "EXP-BUILD-003-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S34",
+            "role": "标准四槽施工界面准入与提交按钮",
+            "claim_ids": [
+              "EXP-BUILD-003-C01",
+              "EXP-BUILD-003-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S35",
+            "role": "非持久临时容器实际工厂",
+            "claim_ids": [
+              "EXP-BUILD-003-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S36",
+            "role": "construction_container导出实例",
+            "claim_ids": [
+              "EXP-BUILD-003-C01"
+            ]
+          },
+          {
+            "ref": "BUILD-S37",
+            "role": "默认四计数槽和超范围读写边界",
+            "claim_ids": [
+              "EXP-BUILD-003-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S38",
+            "role": "默认四计数载体构造",
+            "claim_ids": [
+              "EXP-BUILD-003-C05"
+            ]
+          },
+          {
+            "ref": "BUILD-S39",
+            "role": "提交按钮到FinishConstruction的动作入口",
+            "claim_ids": [
+              "EXP-BUILD-003-C02"
+            ]
+          }
+        ],
+        "unknowns": [
+          "所列声明、实际调用者和退出只覆盖本条具名流程。历史合同保持各自来源版本与HOLD。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "BUILD-S01",
+      "source_file": "scripts/prefabutil.lua",
+      "file_sha256": "cdd6eb310e26f4e2d12015fe089df751ca76705841745d4f13736e5e84249b56",
+      "line_start": 1,
+      "line_end": 65,
+      "range_sha256": "2c9a1f2e2876eabe44587be41b5bf86b520b5b70cc0eaf9e57babde41a672b88",
+      "symbols": [
+        "MakePlacer"
+      ]
+    },
+    {
+      "id": "BUILD-S02",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 3,
+      "line_end": 41,
+      "range_sha256": "3edac6d912533fc700cd32a56bb358338f733adc96dc812da2ec08f36a5b9ca1",
+      "symbols": [
+        "Placer",
+        "Placer:OnRemoveEntity"
+      ]
+    },
+    {
+      "id": "BUILD-S03",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 136,
+      "line_end": 242,
+      "range_sha256": "024b0b4dad6317fb14e1453f35938fc2ec923654c313a4cb94894e53b4ae40a8",
+      "symbols": [
+        "Placer:SetBuilder",
+        "Placer:LinkEntity",
+        "Placer:GetDeployAction",
+        "Placer:TestCanBuild"
+      ]
+    },
+    {
+      "id": "BUILD-S04",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 403,
+      "line_end": 442,
+      "range_sha256": "7e7c51033107fc2985d4b091ef16faa35cce2fd66ea02a69140869ffc36a3ee7",
+      "symbols": [
+        "Placer:OnUpdate"
+      ]
+    },
+    {
+      "id": "BUILD-S05",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 453,
+      "line_end": 520,
+      "range_sha256": "b2d0066d83da55a5e9ebcc1be98f3184e9e93a8b4c9eb6ed4f8ed74f2dda176b",
+      "symbols": [
+        "Placer:OnUpdate"
+      ]
+    },
+    {
+      "id": "BUILD-S06",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 522,
+      "line_end": 585,
+      "range_sha256": "437de7789817fd6e7a03c616d0e7cdd314500022af5ea8afe6a99edbe0d9af25",
+      "symbols": [
+        "Placer:OnUpdate",
+        "Placer:OnWallUpdate"
+      ]
+    },
+    {
+      "id": "BUILD-S07",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 1547,
+      "line_end": 1565,
+      "range_sha256": "23fddac5c6cf635da1decd53e622d6018c8ea16fdd4da6d9938d0bce2b73bcb7",
+      "symbols": [
+        "PlayerController:StartBuildPlacementMode"
+      ]
+    },
+    {
+      "id": "BUILD-S08",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 2885,
+      "line_end": 2918,
+      "range_sha256": "5baffc5840a8751a71b6ea850015472988a13219a2fbf202762d09aeadad2f0b",
+      "symbols": [
+        "PlayerController:OnUpdate"
+      ]
+    },
+    {
+      "id": "BUILD-S09",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 794,
+      "line_end": 811,
+      "range_sha256": "cc92aef48677026ad9ed11ac217433a535d3f3907ae63d04bddc5f6828d5b4bd",
+      "symbols": [
+        "PlayerController:DoControllerActionButton"
+      ]
+    },
+    {
+      "id": "BUILD-S10",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4702,
+      "line_end": 4719,
+      "range_sha256": "06565b3f7bedf093cba50d4ff965dd2d45710022cc6eda2f91d54d9b085918ca",
+      "symbols": [
+        "PlayerController:OnLeftClick"
+      ]
+    },
+    {
+      "id": "BUILD-S11",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5038,
+      "line_end": 5053,
+      "range_sha256": "41cb08780848e31e0f54a65679a2015f157ad7e8c0c0267486f58ed4f28e7b2e",
+      "symbols": [
+        "PlayerController:DoAction"
+      ]
+    },
+    {
+      "id": "BUILD-S12",
+      "source_file": "scripts/prefabs/moon_device.lua",
+      "file_sha256": "0ba5f12486495eb405fd23e5df72e2a263c110a8c4d7de90d8acc8a06c0a2584",
+      "line_start": 511,
+      "line_end": 565,
+      "range_sha256": "a0b26ee5264ea95e47c6dcd5ff8a9990b5161a758c729aa0c8258ccc285eb998",
+      "symbols": [
+        "placer_onupdatetransform",
+        "placer_override_build_point",
+        "placer_override_testfn",
+        "placer_postinit_fn"
+      ]
+    },
+    {
+      "id": "BUILD-S13",
+      "source_file": "scripts/prefabs/firesuppressor.lua",
+      "file_sha256": "c5af1550216a430464605db9e24242fd59df7eaf8377476a00df1bf06b037fd3",
+      "line_start": 459,
+      "line_end": 490,
+      "range_sha256": "f13eaf1a73414cda3f702d423d85c3947684fb1db313fe877b7c7d2f97848e31",
+      "symbols": [
+        "placer_postinit_fn"
+      ]
+    },
+    {
+      "id": "BUILD-S14",
+      "source_file": "scripts/prefabutil.lua",
+      "file_sha256": "cdd6eb310e26f4e2d12015fe089df751ca76705841745d4f13736e5e84249b56",
+      "line_start": 67,
+      "line_end": 176,
+      "range_sha256": "5139690a463c291782b89e97af75396827b7655a7948f0ba65c404f1ff6f7359",
+      "symbols": [
+        "MakeDeployableKitItem",
+        "deployablekititem_ondeploy"
+      ]
+    },
+    {
+      "id": "BUILD-S15",
+      "source_file": "scripts/prefabs/yotb_sewingmachine.lua",
+      "file_sha256": "b2ddf51cbacf5e53ecc758001c20290e436ee54151179e1d17ec8ca9580c2bb2",
+      "line_start": 141,
+      "line_end": 212,
+      "range_sha256": "bac11eeb487eefdbad6e66cb1fbd2e2c47e37140f3920023b8cc4999b048d864",
+      "symbols": [
+        "fn",
+        "MakeDeployableKitItem",
+        "MakePlacer"
+      ]
+    },
+    {
+      "id": "BUILD-S16",
+      "source_file": "scripts/prefabs/yotb_sewingmachine.lua",
+      "file_sha256": "b2ddf51cbacf5e53ecc758001c20290e436ee54151179e1d17ec8ca9580c2bb2",
+      "line_start": 26,
+      "line_end": 55,
+      "range_sha256": "ee50c7e270b748e7f7fe8059f53b8b3d0dbdbe1e5933d6573aa872a036d4a800",
+      "symbols": [
+        "onhammered",
+        "onhit"
+      ]
+    },
+    {
+      "id": "BUILD-S17",
+      "source_file": "scripts/prefabs/yotb_sewingmachine.lua",
+      "file_sha256": "b2ddf51cbacf5e53ecc758001c20290e436ee54151179e1d17ec8ca9580c2bb2",
+      "line_start": 82,
+      "line_end": 86,
+      "range_sha256": "bbb5d9a9bcf09673ad43c21225b04897ad7a288b505dd2f72d5fb93c7fa3ca27",
+      "symbols": [
+        "onbuilt"
+      ]
+    },
+    {
+      "id": "BUILD-S18",
+      "source_file": "scripts/components/deployable.lua",
+      "file_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "line_start": 132,
+      "line_end": 147,
+      "range_sha256": "36a6c20931491e73d4381635df8c68eea47d0a122aff2d277fcbcc67246384eb",
+      "symbols": [
+        "Deployable:Deploy"
+      ]
+    },
+    {
+      "id": "BUILD-S19",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1607,
+      "line_end": 1641,
+      "range_sha256": "346ec8f7d126c77c211db3385e7f2a70bcb12de9c4f4522b55072e77f200c0d0",
+      "symbols": [
+        "ACTIONS.DEPLOY.fn"
+      ]
+    },
+    {
+      "id": "BUILD-S20",
+      "source_file": "scripts/components/builder.lua",
+      "file_sha256": "75fa4aef2cfde440e822dc58ed00cc5babe5211008b0a53f5788af28e53195a5",
+      "line_start": 817,
+      "line_end": 835,
+      "range_sha256": "7f0defd96310ab8b6d645673693daa8e1879045957450da9d4049a8b2043f421",
+      "symbols": [
+        "Builder:DoBuild"
+      ]
+    },
+    {
+      "id": "BUILD-S21",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1718,
+      "line_end": 1728,
+      "range_sha256": "02326be180fbe87e511c21b5e3152f6147c469e73ea2edc2820db9b9a3335cea",
+      "symbols": [
+        "EntityScript:OnBuilt"
+      ]
+    },
+    {
+      "id": "BUILD-S22",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 1521,
+      "line_end": 1545,
+      "range_sha256": "4107d021a90b207a6d319ff5dd5c590caf7d285674c8a2d45cba1d1c05ef0eb0",
+      "symbols": [
+        "PlayerController:CancelPlacement",
+        "PlayerController:CancelDeployPlacement"
+      ]
+    },
+    {
+      "id": "BUILD-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 913,
+      "line_end": 935,
+      "range_sha256": "a7c13cd2083fc0213528d405192cbdd1e89629a68884852a523c0d02cdab1731",
+      "symbols": [
+        "EntityScript:AddChild",
+        "EntityScript:RemoveChild"
+      ]
+    },
+    {
+      "id": "BUILD-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1779,
+      "line_end": 1784,
+      "range_sha256": "6ea77cdc4fbdd1510a63e20d413821359b1369fdaf035b0f1a438a4af0de62a3",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "BUILD-S25",
+      "source_file": "scripts/components/constructionsite.lua",
+      "file_sha256": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
+      "line_start": 1,
+      "line_end": 85,
+      "range_sha256": "38f43d85012c99be59ab17e286baa844bf4ecb6b85057f1f0d0eee88bc467c89",
+      "symbols": [
+        "ConstructionSite",
+        "ConstructionSite:ForceStopConstruction",
+        "ConstructionSite:OnStartConstruction",
+        "ConstructionSite:OnStopConstruction"
+      ]
+    },
+    {
+      "id": "BUILD-S26",
+      "source_file": "scripts/components/constructionsite.lua",
+      "file_sha256": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
+      "line_start": 87,
+      "line_end": 150,
+      "range_sha256": "951ea225b2d84e1566442a4c1a6ba215026f398124e1882791b6d7784607432f",
+      "symbols": [
+        "ConstructionSite:OnConstruct",
+        "ConstructionSite:AddMaterial"
+      ]
+    },
+    {
+      "id": "BUILD-S27",
+      "source_file": "scripts/components/constructionsite.lua",
+      "file_sha256": "f85285537328dd66d700ee3e6e7326da4a12965408e5a632aba62386c5ffad77",
+      "line_start": 152,
+      "line_end": 247,
+      "range_sha256": "588bd220c4694061c91015cef2e85945ab67700ae2e52858949c259ae5bc2c78",
+      "symbols": [
+        "ConstructionSite:DropAllMaterials",
+        "ConstructionSite:IsComplete",
+        "ConstructionSite:OnSave",
+        "ConstructionSite:OnLoad"
+      ]
+    },
+    {
+      "id": "BUILD-S28",
+      "source_file": "scripts/components/constructionbuilder.lua",
+      "file_sha256": "543d8b781a6c2c6c6d0cab897e37c31b2b488b1d03082a9e40b2fab7a33c2177",
+      "line_start": 42,
+      "line_end": 78,
+      "range_sha256": "a5f234842aa0c3f6c26e3941aa9e5c2f82fd7644533ca9ed73f466c4a2e0d5d5",
+      "symbols": [
+        "ConstructionBuilder:StartConstruction"
+      ]
+    },
+    {
+      "id": "BUILD-S29",
+      "source_file": "scripts/components/constructionbuilder.lua",
+      "file_sha256": "543d8b781a6c2c6c6d0cab897e37c31b2b488b1d03082a9e40b2fab7a33c2177",
+      "line_start": 80,
+      "line_end": 146,
+      "range_sha256": "3f1181c0ec3bd5aad07489384e7b62b8d150fc2eab7a0a5e6c3447911143c92e",
+      "symbols": [
+        "ConstructionBuilder:StopConstruction",
+        "ConstructionBuilder:FinishConstruction",
+        "ConstructionBuilder:OnFinishConstruction"
+      ]
+    },
+    {
+      "id": "BUILD-S30",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 20011,
+      "line_end": 20098,
+      "range_sha256": "d4a1114b317905654d98a5f8313dd1143d66b2a3d7ca2b0ea2ea5bb4ed59fe95",
+      "symbols": [
+        "constructing",
+        "construct_pst"
+      ]
+    },
+    {
+      "id": "BUILD-S31",
+      "source_file": "scripts/recipes.lua",
+      "file_sha256": "7c8f6b73fed18c134e16e81ca8540bc530522bbf58325fc9e573bcf17852d1e9",
+      "line_start": 1520,
+      "line_end": 1531,
+      "range_sha256": "4eea50d1df2f17ad9f4b98a0e9bb168f638f55c588e0dc72e2241d7eea80c878",
+      "symbols": [
+        "CONSTRUCTION_PLANS"
+      ]
+    },
+    {
+      "id": "BUILD-S32",
+      "source_file": "scripts/prefabs/moon_device.lua",
+      "file_sha256": "0ba5f12486495eb405fd23e5df72e2a263c110a8c4d7de90d8acc8a06c0a2584",
+      "line_start": 60,
+      "line_end": 88,
+      "range_sha256": "c614318686f17980ba410910dec5b735b7283e1189f9755dbe6267fe3071efcf",
+      "symbols": [
+        "OnConstructed"
+      ]
+    },
+    {
+      "id": "BUILD-S33",
+      "source_file": "scripts/prefabs/moon_device.lua",
+      "file_sha256": "0ba5f12486495eb405fd23e5df72e2a263c110a8c4d7de90d8acc8a06c0a2584",
+      "line_start": 434,
+      "line_end": 478,
+      "range_sha256": "6cfb99ab66ffdd1a43f50197f75b22456dae2653aeff964309f8174fa3585b6a",
+      "symbols": [
+        "MakeDeviceStage"
+      ]
+    },
+    {
+      "id": "BUILD-S34",
+      "source_file": "scripts/containers.lua",
+      "file_sha256": "72283247486dcdbdec39c2094a42ba433e955a4a947bd653510998cd72d0de41",
+      "line_start": 494,
+      "line_end": 540,
+      "range_sha256": "c323d3f8d8fddd34923d8bc345eacb28f84adab20a6ae58025af9531b17ccf4f",
+      "symbols": [
+        "construction_container.itemtestfn",
+        "construction_container.widget.buttoninfo.fn"
+      ]
+    },
+    {
+      "id": "BUILD-S35",
+      "source_file": "scripts/prefabs/bundle.lua",
+      "file_sha256": "492825a68ef4a13b625d18750ead3ee3bca77f78bf58aac0c2ec7920261f51cf",
+      "line_start": 70,
+      "line_end": 106,
+      "range_sha256": "f48efb3f6de92092e410b980c39facbd5bf8e230741e76cfc4d390dcb247d2bf",
+      "symbols": [
+        "MakeContainer"
+      ]
+    },
+    {
+      "id": "BUILD-S36",
+      "source_file": "scripts/prefabs/bundle.lua",
+      "file_sha256": "492825a68ef4a13b625d18750ead3ee3bca77f78bf58aac0c2ec7920261f51cf",
+      "line_start": 672,
+      "line_end": 675,
+      "range_sha256": "1479a07dd722ed26cb99f420d6f7b01a2b6299af7e8461d00ae5f115f9ac3155",
+      "symbols": [
+        "construction_container"
+      ]
+    },
+    {
+      "id": "BUILD-S37",
+      "source_file": "scripts/prefabs/constructionsite_classified.lua",
+      "file_sha256": "783b3bfa52727a3dff1d8ff65e536d47e4809303e08a5b720cddb98261b4f57d",
+      "line_start": 1,
+      "line_end": 22,
+      "range_sha256": "60926a11f70c97d124cbf0d2ac8d62d15dd760cfd0c3a401f5c9e33266c24920",
+      "symbols": [
+        "MAX_SLOTS",
+        "SetSlotCount",
+        "GetSlotCount"
+      ]
+    },
+    {
+      "id": "BUILD-S38",
+      "source_file": "scripts/prefabs/constructionsite_classified.lua",
+      "file_sha256": "783b3bfa52727a3dff1d8ff65e536d47e4809303e08a5b720cddb98261b4f57d",
+      "line_start": 49,
+      "line_end": 64,
+      "range_sha256": "d98a30b9c3a8829027166e4f8322e39c6c9c5e4d7ada57d09fc975bdb2edbc8e",
+      "symbols": [
+        "constructionsite_classified"
+      ]
+    },
+    {
+      "id": "BUILD-S39",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 4514,
+      "line_end": 4524,
+      "range_sha256": "432a6f4873ed35929f1eb4ede98d924c9ef4d296fe0a02144ff1a557b35be91f",
+      "symbols": [
+        "ACTIONS.APPLYCONSTRUCTION.fn"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "placer吸附了位置但实际建筑落在鼠标点，怎么连接预览与提交",
+      "expected_entry_ids": [
+        "EXP-BUILD-001"
+      ],
+      "purpose": "定位变换、测试与override提交点的不同消费者。"
+    },
+    {
+      "query": "MakeDeployableKitItem的onbuilt和OnBuiltFn一样吗，套件怎么旋转拆除",
+      "expected_entry_ids": [
+        "EXP-BUILD-002"
+      ],
+      "purpose": "选择套件、结构构造和建造通知的最小接线。"
+    },
+    {
+      "query": "constructionsite每次投料都会onconstructed吗，取消和拆除如何退材料",
+      "expected_entry_ids": [
+        "EXP-BUILD-003"
+      ],
+      "purpose": "区分累计计数、暂存会话和完成政策。"
+    }
+  ],
+  "limitations": [
+    "762172/build26474873指定ZIP静态Lua读取，runtime_verified=false。",
+    "research/restricted/hold保持，候选等待独立审核后由总控登记。",
+    "file SHA为ZIP成员原字节，range SHA为UTF8 splitlines后LF连接且无末尾换行。",
+    "源码合同说明兼容边界，工程建议按具体功能选择更小实现。"
+  ]
+}

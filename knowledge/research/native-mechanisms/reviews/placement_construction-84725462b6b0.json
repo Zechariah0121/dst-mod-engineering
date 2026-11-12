@@ -1,0 +1,43 @@
+{
+  "candidate_sha256": "4cae4883e62cb3276754cf127c8db931244d56881752d106f06b987f1589571f",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "blockers": [],
+  "runtime_verified": false,
+  "summary": "三条候选与指南的具名源码合同及实际消费者相符，research/restricted/hold状态保持。静态审阅通过，游戏运行结果仍待项目验证。",
+  "coverage": {
+    "entry_ids": [
+      "EXP-BUILD-001",
+      "EXP-BUILD-002",
+      "EXP-BUILD-003"
+    ],
+    "claims_reviewed": 18,
+    "api_contracts_reviewed": 7,
+    "source_references_verified": 39,
+    "guide_reviewed": true,
+    "mechanism_contract": "PASS",
+    "candidate_identity": "MATCH",
+    "archive_identity": "MATCH",
+    "focus": [
+      "预览变换、测试与提交点消费者",
+      "CUSTOM公共predicate及DEFAULT地图约束组合",
+      "kit ondeploy/onbuilt/EntityScript:OnBuilt与旋转",
+      "累计投料、实物处理及完成政策",
+      "预览/结构/施工会话退出与移除清理"
+    ]
+  },
+  "supplemental_source_references": [
+    {
+      "id": "REVIEW-BUILD-S40",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 815,
+      "line_end": 823,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "4933f75b7fec0f83a58cf02bbcb9d5aba77d3a6b1b5e6c278d14aac329a65850",
+      "symbols": [
+        "PlayerController:DoControllerActionButton",
+        "Placer:GetDeployAction"
+      ],
+      "explanation": "手柄库存部署的具体消费者先检查placer.can_build，再调用GetDeployAction。补足EXP-BUILD-001对应API生命周期说明的调用方证据。"
+    }
+  ]
+}

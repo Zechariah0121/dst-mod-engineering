@@ -1,0 +1,1076 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "gear_fuel_durability",
+  "source_epoch": "762172 / Steam build 26474873",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-GEAR-001",
+      "title": "装备耗能与补燃料的单位、段位和退出接线",
+      "aliases": [
+        "fueled",
+        "装备耗燃料",
+        "TakeFuelItem",
+        "fuelvalue",
+        "section",
+        "ADDFUEL"
+      ],
+      "engineering_question": "怎样让装备期间扣燃料、卸下停止，并通过单件材料补充，保存时保留哪些实际状态？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172 / Steam build 26474873",
+        "evidence": "指定冻结ZIP的静态 Lua 定义与具名消费者",
+        "execution_side": "所选 spear/amulet prefab 在 SetPristine 后的 mastersim 分支配置权威组件；组件方法本身无端别门禁。",
+        "runtime_verified": false,
+        "increment": "复用 ID-C03/C04 的组件算术与保存；新增同一 yellowamulet 的安装、装备/模型出口、补料和移除接线，连接 ADDFUEL 单件边界。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GEAR-001-C01",
+          "kind": "NSF",
+          "statement": "Fueled 默认 rate=1、period=1、sections=1、consuming=false、accepting=false。DoUpdate(dt) 在 consuming 时扣 dt*rate*rate_modifiers:Get()，空时 StopConsuming，最后 updatefn(inst)。因此 rate 的单位为每个 dt 时间单位消耗的 fuel 单位，rate=1 且倍率1时 fuel 数值才与秒数对应。LongUpdate 是 DoUpdate 的别名，其调用时机及 dt 来源另由调用者决定。",
+          "evidence_refs": [
+            "GEAR-S13",
+            "GEAR-S18",
+            "GEAR-S11"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C02",
+          "kind": "NSF",
+          "statement": "InitializeFuelLevel 可向上提升 maxfuel，再直接写 currentfuel，段位变化时调用 sectionfn(new,old,inst) 并通知 onfueldsectionchanged，不启动消费或调用 depleted。DoDelta(amount,doer) 则钳制到[0,maxfuel]；段位变化时依次 sectionfn(new,old,inst,doer)、段位事件、当时 currentfuel<=0 则 depleted(inst)，最后总发 percentusedchange。",
+          "evidence_refs": [
+            "GEAR-S17"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C03",
+          "kind": "NSF",
+          "statement": "GetPercent 钳制到[0,1]，空燃料的段位为0，非空为 min(floor(percent*sections)+1,sections)。段内比例为 percent*sections-section+1，空燃料时结果为1。ChangeSection(amount) 实际交给 DoDelta 的量为 amount*maxfuel/sections-1；精确燃料成本可用 DoDelta 的燃料单位配置。",
+          "evidence_refs": [
+            "GEAR-S15",
+            "GEAR-S16"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C04",
+          "kind": "NSF",
+          "statement": "StartConsuming 置 consuming，task 为空才安装以 period 为 dt 的周期任务。SetFirstPeriod 配置额外一次 wall-update 消费，满量时选 firstperiodfull 真值，否则 firstperiod；OnWallUpdate 在服务器暂停时返回，正常时使用保存的 firstperioddt。StopConsuming 清状态并取消周期任务及未执行的首期 wall 更新；OnRemoveFromEntity 也调用 StopConsuming。",
+          "evidence_refs": [
+            "GEAR-S13",
+            "GEAR-S16",
+            "GEAR-S18"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C05",
+          "kind": "NSF",
+          "statement": "amulet.lua 的 file-local yellow/onequip_yellow/onunequip_yellow/onequiptomodel_yellow 为真实装备消费者。yellow 在 master 分支设置 NIGHTMARE 燃料、接受补料、初始化容量和首期参数；装备开始消费，卸下或装备到模型停止并清灯。灯实体由退出回调清理，保存体只存非满时的 currentfuel；OnLoad 恢复零燃料不会直接重放 depleted 或恢复 consuming。",
+          "evidence_refs": [
+            "GEAR-S19",
+            "GEAR-S20",
+            "GEAR-S21",
+            "GEAR-S14"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C06",
+          "kind": "NSF",
+          "statement": "TakeFuelItem 先按 item or doer 检查 accepting 与 fuel/fueler 类型和可选 cantakefuelitemfn(inst,item,doer)。fuelvalue 乘 bonusmult、multfn(inst,fuel_obj)、湿燃料和 fuelmaster 倍率后先 DoDelta；随后 fuel:Taken、ontakefuelitemfn(inst,item,fuelvalue,doer)、item:Remove、ontakefuelfn(inst,fuelvalue)、takefuel 事件，成功返回true。提供 item 时整件 Remove；满量没有内建拒绝，fuelvalue 为计算的投入量，可能大于实际增加量。",
+          "evidence_refs": [
+            "GEAR-S15",
+            "GEAR-S25",
+            "GEAR-S26"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C07",
+          "kind": "NSF",
+          "statement": "普通 fuel 菜单按材料 *_fuel 与目标 *_fueled 标签和骑乘条件选择 ADDFUEL/ADDWETFUEL。ACTIONS.ADDFUEL 先从库存 RemoveItem，堆叠默认分一件，然后 TakeFuelItem；正常拒绝时尝试放回/合并，fueler 路径允许传 nil item 和 doer。该返还没有包裹任意回调异常。",
+          "evidence_refs": [
+            "GEAR-S23",
+            "GEAR-S22",
+            "GEAR-S24"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-001-C08",
+          "kind": "REC",
+          "statement": "装备与卸下通过现有 Equippable 回调启停同一个 Fueled，复用原版 ADDFUEL 单件提取与正常拒绝返还。需要禁止满量消耗时使用现成 cantakefuelitemfn；补燃料后是否重启消费按当前装备/开关政策处理。构造重建配置与表现，保存沿用燃料值；无需为灯和任务另建持久状态层。",
+          "evidence_refs": [
+            "GEAR-S19",
+            "GEAR-S20",
+            "GEAR-S22",
+            "GEAR-S14",
+            "GEAR-S15",
+            "GEAR-S27"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Fueled:StartConsuming",
+          "source_file": "scripts/components/fueled.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "本条在权威装备/开关入口调用，period/rate 配置已建立。",
+            "启用 firstperiod 时提供可用于 DoUpdate 的数值时间；firstperiodfull 为可选数值。"
+          ],
+          "side_effects": [
+            "置 consuming=true，task 为空才创建物品拥有的周期任务，DoUpdate 取得配置 period。",
+            "有 firstperiod 时再启一次 wall update，满量可选 firstperiodfull；暂停时该 wall 回调暂不执行。"
+          ],
+          "lifecycle": "重复调用不会重复已有周期任务；与 StopConsuming 成对。首期代表额外配置消费，启停策略需按功能选择。",
+          "evidence_refs": [
+            "GEAR-S16",
+            "GEAR-S18",
+            "GEAR-S19",
+            "GEAR-S20"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Fueled:StopConsuming",
+          "source_file": "scripts/components/fueled.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "本条运行于拥有 Fueled 的权威实例。"
+          ],
+          "side_effects": [
+            "置 consuming=false，取消并清 task；有 firstperioddt 时清值并停止首期 wall 更新。"
+          ],
+          "lifecycle": "装备退出与组件移除的清理入口；不直接清自有灯或其他 prefab 表现。",
+          "evidence_refs": [
+            "GEAR-S18",
+            "GEAR-S13",
+            "GEAR-S19"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Fueled:TakeFuelItem",
+          "source_file": "scripts/components/fueled.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [
+            "item 为交给本次消费的燃料实体，可为 nil。",
+            "doer 可选；item 为 nil 时 doer 需具备 fuel/fueler 契约。"
+          ],
+          "returns": "接收成功返回true；拒绝隐式nil。成功值只表达该接受与消费路径。",
+          "preconditions": [
+            "accepting 为真且 fuel_obj 拥有 fuel 或 fueler，并匹配 primary/secondary fueltype。",
+            "item 形态由调用方决定，直接传完整堆叠会在本方法 Remove 整个传入实体。",
+            "可选 cantakefuelitemfn(inst,item,doer) 决定进一步允许。"
+          ],
+          "side_effects": [
+            "按 fuelvalue*bonusmult*mult*wetmult*masterymult 得投入量并 DoDelta。",
+            "multfn(self.inst,fuel_obj) 真值返回用作倍数，nil/false回退1；fuelmaster 的 bonusfn 接收 doer,item,target。",
+            "Fuel:Taken 先发 fueltaken 再调用 ontaken(fuel_obj,target)。",
+            "有 item 时先 ontakefuelitemfn(inst,item,fuelvalue,doer) 后 Remove；再 ontakefuelfn(inst,fuelvalue) 和 takefuel 事件。",
+            "没有满量拒绝；投入量、燃料剩余和实际增量需按需求区分。"
+          ],
+          "lifecycle": "原版 ADDFUEL 先提取单件，普通拒绝再返还；接收后是否启动消费由 prefab 决定。",
+          "evidence_refs": [
+            "GEAR-S15",
+            "GEAR-S25",
+            "GEAR-S26",
+            "GEAR-S22",
+            "GEAR-S24"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "服务器构造燃料类型、容量、接受补料与耗尽政策，现成物品可参考 yellow 的配置。",
+          "evidence_refs": [
+            "GEAR-S20",
+            "GEAR-S21"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "装备开始消费，卸下和相关模型出口停止；普通效果由 prefab 回调清理。",
+          "evidence_refs": [
+            "GEAR-S19",
+            "GEAR-S27",
+            "GEAR-S18"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "周期按燃料单位扣量，段位及耗尽回调处理功能切换。",
+          "evidence_refs": [
+            "GEAR-S16",
+            "GEAR-S17",
+            "GEAR-S18"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "材料菜单经 ADDFUEL 先取单件，TakeFuelItem 先加量再消费材料；拒绝走原动作返还。",
+          "evidence_refs": [
+            "GEAR-S23",
+            "GEAR-S22",
+            "GEAR-S24",
+            "GEAR-S15"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "读档恢复燃料数值，装备状态/开关的实际消费者重新决定消费与表现。",
+          "evidence_refs": [
+            "GEAR-S14",
+            "GEAR-S19"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本条不把 LongUpdate 的 dt 等同现实离线时间。",
+        "自定义非满默认容量、额外开关或材料权限依目标需求设计；普通 fuel 接受和段位本身不提供通用业务授权。",
+        "未运行装备重载、首期消费、补料声音或远程菜单。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GEAR-S12",
+            "role": "燃料类型、接受和耗尽属性标签"
+          },
+          {
+            "ref": "GEAR-S13",
+            "role": "默认配置和组件退出"
+          },
+          {
+            "ref": "GEAR-S14",
+            "role": "保存/加载与耗尽回调注册"
+          },
+          {
+            "ref": "GEAR-S16",
+            "role": "段内比例、启动与首期消费者"
+          },
+          {
+            "ref": "GEAR-S18",
+            "role": "周期消费和停止"
+          },
+          {
+            "ref": "GEAR-S19",
+            "role": "file-local 装备/退出消费者"
+          },
+          {
+            "ref": "GEAR-S20",
+            "role": "file-local yellow prefab 权威设置"
+          },
+          {
+            "ref": "GEAR-S21",
+            "role": "共用 prefab 的 master 边界"
+          },
+          {
+            "ref": "GEAR-S22",
+            "role": "补料动作与普通失败返还"
+          },
+          {
+            "ref": "GEAR-S23",
+            "role": "补料菜单的标签筛选"
+          },
+          {
+            "ref": "GEAR-S24",
+            "role": "库存堆叠的单件取出"
+          },
+          {
+            "ref": "GEAR-S25",
+            "role": "材料 Taken 回调"
+          },
+          {
+            "ref": "GEAR-S26",
+            "role": "操作者补燃料倍率"
+          },
+          {
+            "ref": "GEAR-S27",
+            "role": "装备回调实际参数"
+          },
+          {
+            "ref": "GEAR-S11",
+            "role": "燃料速率来源倍率聚合"
+          }
+        ],
+        "unknowns": [
+          "换源或第三方覆写后按本条具名调用链复核。",
+          "本轮没有游戏运行、真实客户端或原生调度时序证据。"
+        ]
+      }
+    },
+    {
+      "id": "EXP-GEAR-002",
+      "title": "按材料维修次数耐久的标签、数值和消费时点",
+      "aliases": [
+        "repairable",
+        "repairer",
+        "MATERIALS",
+        "finiteusesrepairvalue",
+        "onrepaired",
+        "维修菜单"
+      ],
+      "engineering_question": "如何让一种材料修复现有耐久，维修菜单、实际修复量、单件消耗与回调分别在哪里发生？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172 / Steam build 26474873",
+        "evidence": "指定冻结ZIP的静态 Lua 定义与具名消费者",
+        "execution_side": "所选 spear/amulet prefab 在 SetPristine 后的 mastersim 分支配置权威组件；组件方法本身无端别门禁。",
+        "runtime_verified": false,
+        "increment": "复用 BTR-P01/P02 的菜单/执行入口、两种拒绝hook和单件消费；新增 finiteuses 效果分派、数值到资格标签及 orangeamulet/nightmarefuel 具体消费者。"
+      },
+      "claims": [
+        {
+          "id": "EXP-GEAR-002-C01",
+          "kind": "NSF",
+          "statement": "Repairer 的 repairmaterial 和正值修复字段通过属性钩子建立 work_/health_/freshen_/finiteuses_ 材料标签。Repairable 按 repairmaterial 和 finiteusesrepairable 等状态建立目标标签。repairable 构造只从已有 workable/health 初始化对应状态，没有读取 finiteuses；finiteuses 属性变化才会更新其 finiteusesrepairable。",
+          "evidence_refs": [
+            "GEAR-S31",
+            "GEAR-S28",
+            "GEAR-S01"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C02",
+          "kind": "NSF",
+          "statement": "USEITEM.repairer 仅在 right 且骑乘/持重条件允许时，遍历 MATERIALS，把材料类型标签与目标类型、可修状态配对后添加 REPAIR。ACTIONS.REPAIR 选择 invobject 或持重 BODY 材料；目标有 repairable 时调用 Repair，不存在时才进入 forgerepairable 分支。",
+          "evidence_refs": [
+            "GEAR-S32",
+            "GEAR-S33"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C03",
+          "kind": "NSF",
+          "statement": "Repairable:Repair 依序执行 testvalidrepairfn(target,repair_item)、repairer 与 repairmaterial 匹配、checkmaterialfn(target,repair_item)。checkmaterialfn 拒绝可返回 false,reason，其余所列前置拒绝返回false。接着 file-local address_repair_amount 按 health、workable、perishable、finiteuses 顺序选择首个满足修复字段的分支；该分支已满会直接拒绝。全部不匹配时回退 justrunonrepaired。",
+          "evidence_refs": [
+            "GEAR-S30",
+            "GEAR-S29"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C04",
+          "kind": "NSF",
+          "statement": "finiteusesrepairvalue 为绝对次数，走 finiteuses:Repair 并钳到 total；healthrepairpercent 与 perishrepairpercent 为比例，workrepairvalue 为工作量。NeedsRepairs 使用0.95门槛，具名消费者是 stringutil 的 ANNOUNCE_CANFIX 文案；它不是 Repair 的成功门槛或维修菜单的统一门禁。",
+          "evidence_refs": [
+            "GEAR-S29",
+            "GEAR-S04",
+            "GEAR-S37",
+            "GEAR-S32",
+            "GEAR-S30"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C05",
+          "kind": "NSF",
+          "statement": "修复量分支成功后，Repair 可先播 boatrepairsound，再对 stackable:Get():Remove 或整件 Remove，随后 onrepaired(target,doer,repair_item)，最后返回true。传给 onrepaired 的仍是原 repair_item；多件堆叠的 Get 分出新实体消费，单件返回原实体，所以回调时原材料可能已经被移除。",
+          "evidence_refs": [
+            "GEAR-S30",
+            "GEAR-S36"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C06",
+          "kind": "NSF",
+          "statement": "orangeamulet 在 master 分支配置 finiteuses 和 onfinished=inst.Remove 后添加 repairable，设置 MATERIALS.NIGHTMARE 与回调。nightmarefuel 同时配置 NIGHTMARE fuel 和独立的 MATERIALS.NIGHTMARE repairer，其 finiteusesrepairvalue 用 TUNING 配置。两种接收入口分别执行补燃料和维修次数。",
+          "evidence_refs": [
+            "GEAR-S34",
+            "GEAR-S35",
+            "GEAR-S21"
+          ]
+        },
+        {
+          "id": "EXP-GEAR-002-C07",
+          "kind": "REC",
+          "statement": "自有次数物品按需求选择既有 repairable/repairer 合同，材料设置绝对次数，目标可修标签由 finiteuses 数值驱动。初始已经受损且 repairable 后添加时，显式同步本次修理状态或调整构造顺序即可。反馈用 onrepaired 的 target/doer；需要的材料数据按具体回调生存期获取。按材料维修与套件式 forge 修满沿用现有 items-food-plants 选型。",
+          "evidence_refs": [
+            "GEAR-S01",
+            "GEAR-S28",
+            "GEAR-S30",
+            "GEAR-S34",
+            "GEAR-S35"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Repairable:Repair",
+          "source_file": "scripts/components/repairable.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [
+            "doer 为本次维修操作者，传给最终 onrepaired。",
+            "repair_item 为有效材料实体，需要 repairer；回调检查收到原材料引用。"
+          ],
+          "returns": "拒绝 false，可选 checkmaterialfn 的拒绝原因作为第二返回；成功消费及 onrepaired 正常结束后返回true。",
+          "preconditions": [
+            "本条用于服务器实际维修动作，目标/材料由正常动作提供。",
+            "材料枚举及可修状态满足设计；该方法不复用客户端菜单的骑乘、持重等全部筛选。"
+          ],
+          "side_effects": [
+            "testvalidrepairfn(inst,item) → 类型匹配 → checkmaterialfn(inst,item) → address_repair_amount。",
+            "修复顺序为 health/workable/perishable/finiteuses 首个合适字段；已满分支返回false；无分支可由 justrunonrepaired 许可。",
+            "成功时先修复数值，再可选声音，消费单件材料，最后 onrepaired(inst,doer,原repair_item)。",
+            "finiteuses 的次数更新可同步触发百分比事件；onrepaired 不应假定原材料仍存活。"
+          ],
+          "lifecycle": "该组件没有自己的 OnSave/OnLoad；耐久保存在被修复组件，材料与回调配置由 prefab 重建。异常发生在回调/分拆等点时不保证回滚。",
+          "evidence_refs": [
+            "GEAR-S28",
+            "GEAR-S29",
+            "GEAR-S30",
+            "GEAR-S36",
+            "GEAR-S33"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Repairable:NeedsRepairs",
+          "source_file": "scripts/components/repairable.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [],
+          "returns": "按 health、workable、perishable、finiteuses 的分支顺序检查低于0.95，其他false；workable还要求 workable。",
+          "preconditions": [
+            "对应分支的组件与最大值合法。"
+          ],
+          "side_effects": [],
+          "lifecycle": "原版 ANNOUNCE_CANFIX 文案消费者使用；实际 Repair 的满量门槛另行计算。",
+          "evidence_refs": [
+            "GEAR-S29",
+            "GEAR-S37",
+            "GEAR-S30"
+          ],
+          "unknowns": []
+        },
+        {
+          "symbol": "Repairable:SetFiniteUsesRepairable",
+          "source_file": "scripts/components/repairable.lua",
+          "visibility": "require 导出的组件类实例方法；方法体没有自行检查执行端。",
+          "parameters": [
+            "repairable 按 truthiness 设置当前有限次数可维修状态。"
+          ],
+          "returns": "无显式返回值。",
+          "preconditions": [
+            "目标已经有 repairable。",
+            "初始状态或 finiteuses 属性钩子向本组件提供 current<total。"
+          ],
+          "side_effects": [
+            "写 finiteusesrepairable，经属性钩子添加或移除 finiteusesrepairable 标签。"
+          ],
+          "lifecycle": "finiteuses current/total 变化驱动；添加组件时若数值已经受损，要核对该状态是否初始化。",
+          "evidence_refs": [
+            "GEAR-S28",
+            "GEAR-S01"
+          ],
+          "unknowns": []
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "配置目标 MATERIALS 类型和材料 repairer 正值次数，建立菜单需要的匹配标签。",
+          "evidence_refs": [
+            "GEAR-S28",
+            "GEAR-S31",
+            "GEAR-S34",
+            "GEAR-S35"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "当前有限次数变化使目标 finiteusesrepairable 更新；右键菜单按标签与实际姿态挑选动作。",
+          "evidence_refs": [
+            "GEAR-S01",
+            "GEAR-S32"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "服务器 REPAIR 选材料并调用 Repair，按自己的检验函数和实际数值再判定。",
+          "evidence_refs": [
+            "GEAR-S33",
+            "GEAR-S30",
+            "GEAR-S29"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "先修复耐久，再消费一件材料，最后执行反馈回调；保存继续走原有限次数组件。",
+          "evidence_refs": [
+            "GEAR-S30",
+            "GEAR-S36",
+            "GEAR-S03"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本条覆盖普通 repairable；forge 套件、护甲与缝纫组件继续按现有指南和具体原版消费者选择。",
+        "操作者权限属于目标功能设计；testvalidrepairfn/checkmaterialfn 均未接收 doer，需要权限时在具有操作者的真实入口落实。",
+        "尚未运行目标物品、材料动作和真实客户端菜单。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "GEAR-S01",
+            "role": "数值到有限次数可修状态的属性钩子"
+          },
+          {
+            "ref": "GEAR-S03",
+            "role": "现有有限次数保存合同"
+          },
+          {
+            "ref": "GEAR-S04",
+            "role": "绝对次数 Repair 与上界"
+          },
+          {
+            "ref": "GEAR-S28",
+            "role": "目标标签和构造状态"
+          },
+          {
+            "ref": "GEAR-S29",
+            "role": "file-local 数值分派与通知门槛"
+          },
+          {
+            "ref": "GEAR-S31",
+            "role": "材料属性到匹配标签"
+          },
+          {
+            "ref": "GEAR-S32",
+            "role": "右键维修菜单消费者"
+          },
+          {
+            "ref": "GEAR-S33",
+            "role": "权威维修动作消费者"
+          },
+          {
+            "ref": "GEAR-S34",
+            "role": "file-local orange 真实目标配置"
+          },
+          {
+            "ref": "GEAR-S35",
+            "role": "真实材料的双用途配置"
+          },
+          {
+            "ref": "GEAR-S36",
+            "role": "堆叠分单件身份"
+          },
+          {
+            "ref": "GEAR-S37",
+            "role": "NeedsRepairs 的实际文案消费者"
+          }
+        ],
+        "unknowns": [
+          "换源或第三方覆写后按本条具名调用链复核。",
+          "本轮没有游戏运行、真实客户端或原生调度时序证据。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "GEAR-S01",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 1,
+      "line_end": 25,
+      "range_sha256": "e8847b5f3b2a6e2ebe4cadd9734fc069dadad08db385204a80f0332fb6286605",
+      "symbols": [
+        "onfiniteuses",
+        "FiniteUses constructor",
+        "FiniteUses:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "GEAR-S02",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 27,
+      "line_end": 38,
+      "range_sha256": "0d05266cf96a206f4af972f2c2b79d935a6947af7fa346a4e24606bd78e45fa0",
+      "symbols": [
+        "FiniteUses:SetConsumption",
+        "FiniteUses:ClearAllConsumptions"
+      ]
+    },
+    {
+      "id": "GEAR-S03",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 44,
+      "line_end": 79,
+      "range_sha256": "b87745e710bafe6dbabab01f7898626feef7402e0edfa4f44cb18b489ff4a71a",
+      "symbols": [
+        "FiniteUses:SetDoesNotStartFull",
+        "FiniteUses:OnSave",
+        "FiniteUses:OnLoad",
+        "FiniteUses:SetMaxUses",
+        "FiniteUses:SetUses"
+      ]
+    },
+    {
+      "id": "GEAR-S04",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 81,
+      "line_end": 130,
+      "range_sha256": "eb78511ace7bf70a4e0382c298cdefd459d2dc0dc9cd7b3a97b2feef0c884ac8",
+      "symbols": [
+        "FiniteUses:Use",
+        "FiniteUses:SetIgnoreCombatDurabilityLoss",
+        "FiniteUses:SetModifyUseConsumption",
+        "FiniteUses:OnUsedAsItem",
+        "FiniteUses:GetPercent",
+        "FiniteUses:SetPercent",
+        "FiniteUses:SetOnFinished",
+        "FiniteUses:Repair"
+      ]
+    },
+    {
+      "id": "GEAR-S05",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 11,
+      "line_end": 34,
+      "range_sha256": "953de853b1c0a6fbb971373af07542b3b69d52f8e092cc51709215f50b59c0eb",
+      "symbols": [
+        "Weapon constructor"
+      ]
+    },
+    {
+      "id": "GEAR-S06",
+      "source_file": "scripts/components/weapon.lua",
+      "file_sha256": "f893a488cae8b49e6f476a58686e723067df87f57e1cca0ef8e49d1baacc8d4f",
+      "line_start": 105,
+      "line_end": 121,
+      "range_sha256": "1c71c219fe517cca57e87a5ea791504069e6b3ca4d56761bac3ce06e9e460e89",
+      "symbols": [
+        "Weapon:OnAttack"
+      ]
+    },
+    {
+      "id": "GEAR-S07",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1147,
+      "line_end": 1189,
+      "range_sha256": "97b4641d75f8f18e3240f92990158296f63ea60814161d2d6d106ec6dfb0a5d9",
+      "symbols": [
+        "Combat:DoAttack miss and launch exits"
+      ]
+    },
+    {
+      "id": "GEAR-S08",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1192,
+      "line_end": 1225,
+      "range_sha256": "1844cfeb8510574ea9dd522e66f0176ed10487dddf815fb5929b32d7c4d5b0c5",
+      "symbols": [
+        "Combat:DoAttack normal target resolution and Weapon:OnAttack consumer"
+      ]
+    },
+    {
+      "id": "GEAR-S09",
+      "source_file": "scripts/prefabs/spear.lua",
+      "file_sha256": "c1dfa83a36b408988eab4c7e1ce91cb5490fd4fc8b25a75a279457944d035f8b",
+      "line_start": 49,
+      "line_end": 72,
+      "range_sha256": "041cce1ab19a47cca02ebf7ded9a2215a8bd98c42d8c1bf02b4c436bf618bf23",
+      "symbols": [
+        "spear fn authority boundary and finiteuses setup"
+      ]
+    },
+    {
+      "id": "GEAR-S10",
+      "source_file": "scripts/components/efficientuser.lua",
+      "file_sha256": "a311c084fa4f3cfdb8929af95a87297a72e4eb7f16b463ec7ed8095b1f0714ab",
+      "line_start": 14,
+      "line_end": 16,
+      "range_sha256": "dbcc78327251a120653b4347738258baa7459b859c97ff8de125bba43f999405",
+      "symbols": [
+        "EfficientUser:GetMultiplier"
+      ]
+    },
+    {
+      "id": "GEAR-S11",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 8,
+      "line_end": 58,
+      "range_sha256": "0111c520c0e3cbc37088152db7416da415a44393ddeeac5e2335ed0f5f2f3e12",
+      "symbols": [
+        "SourceModifierList constructor",
+        "SourceModifierList:Get",
+        "SourceModifierList:RecalculateModifier"
+      ]
+    },
+    {
+      "id": "GEAR-S12",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 5,
+      "line_end": 80,
+      "range_sha256": "c17cbfa6921b57f7d4f9b94d91d75d7380e2c19721a911f84011af6fe6b69826",
+      "symbols": [
+        "onfueltype",
+        "onsecondaryfueltype",
+        "onaccepting",
+        "onmaxfuel",
+        "oncurrentfuel"
+      ]
+    },
+    {
+      "id": "GEAR-S13",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 83,
+      "line_end": 125,
+      "range_sha256": "f0714025913cf96c24eaf5777b53cdd6614ff47209e058e9922e92e8e6a38dac",
+      "symbols": [
+        "Fueled constructor",
+        "Fueled:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "GEAR-S14",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 127,
+      "line_end": 163,
+      "range_sha256": "4e3ef956ee7e7692a1d6a6380a0e967a8693e91ab5d4c699982027cac9b3f28e",
+      "symbols": [
+        "Fueled:MakeEmpty",
+        "Fueled:OnSave",
+        "Fueled:OnLoad",
+        "Fueled:SetSectionCallback",
+        "Fueled:SetDepletedFn",
+        "Fueled:SetSections"
+      ]
+    },
+    {
+      "id": "GEAR-S15",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 165,
+      "line_end": 230,
+      "range_sha256": "59ea9e92a212014ea970873e0c2f4a2f28e52b09f6ab164c03a49c5e57972ccf",
+      "symbols": [
+        "Fueled:SetMultiplierFn",
+        "Fueled:CanAcceptFuelItem",
+        "Fueled:GetCurrentSection",
+        "Fueled:ChangeSection",
+        "Fueled:SetCanTakeFuelItemFn",
+        "Fueled:SetTakeFuelItemFn",
+        "Fueled:SetTakeFuelFn",
+        "Fueled:TakeFuelItem"
+      ]
+    },
+    {
+      "id": "GEAR-S16",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 247,
+      "line_end": 287,
+      "range_sha256": "1c4407ec263d89158ec78badb45044d73d2420ec761be8c56f51bc599a33e2e7",
+      "symbols": [
+        "Fueled:GetSectionPercent",
+        "Fueled:GetPercent",
+        "Fueled:SetPercent",
+        "Fueled:SetFirstPeriod",
+        "OnDoUpdate",
+        "Fueled:StartConsuming",
+        "Fueled:OnWallUpdate"
+      ]
+    },
+    {
+      "id": "GEAR-S17",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 289,
+      "line_end": 323,
+      "range_sha256": "47770078c608184150c84e38ffc6f79b31fd7a58d92161e93fed31364deaac6c",
+      "symbols": [
+        "Fueled:InitializeFuelLevel",
+        "Fueled:DoDelta"
+      ]
+    },
+    {
+      "id": "GEAR-S18",
+      "source_file": "scripts/components/fueled.lua",
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "line_start": 325,
+      "line_end": 351,
+      "range_sha256": "902329ede9464b02f05079d05eee94146d9adec9e5c4557f8adb67451daa0862",
+      "symbols": [
+        "Fueled:DoUpdate",
+        "Fueled:StopConsuming",
+        "Fueled.LongUpdate"
+      ]
+    },
+    {
+      "id": "GEAR-S19",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 253,
+      "line_end": 323,
+      "range_sha256": "a7b27fd2af620e953b937507dd76ebfb693273e290918c043340f9db183244c2",
+      "symbols": [
+        "onequip_yellow",
+        "turnoff_yellow",
+        "onunequip_yellow",
+        "onequiptomodel_yellow"
+      ]
+    },
+    {
+      "id": "GEAR-S20",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 571,
+      "line_end": 598,
+      "range_sha256": "99b3971025914c5bc1d89a9716ae339ffa92a6dd99fa1940fbbd9e8aaa934a41",
+      "symbols": [
+        "yellow"
+      ]
+    },
+    {
+      "id": "GEAR-S21",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 401,
+      "line_end": 422,
+      "range_sha256": "217ffea037e4e06aa20ca4bc105453cc5049cb910fc7d239a629c738758feabc",
+      "symbols": [
+        "commonfn master boundary and equippable"
+      ]
+    },
+    {
+      "id": "GEAR-S22",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 2188,
+      "line_end": 2213,
+      "range_sha256": "1657312512f15decc9ea3fa1cb7033fb7fe13842d780ad6b2b3ca7779bd9bcb4",
+      "symbols": [
+        "ACTIONS.ADDFUEL.fn",
+        "ACTIONS.ADDWETFUEL.fn"
+      ]
+    },
+    {
+      "id": "GEAR-S23",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 1301,
+      "line_end": 1320,
+      "range_sha256": "c79541cec90e4d86fa83f413d20c95110da9fafd5f29c4b282757af3596761b8",
+      "symbols": [
+        "USEITEM.fuel"
+      ]
+    },
+    {
+      "id": "GEAR-S24",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1413,
+      "range_sha256": "f598de90d0b32ed4265c39d2b1710bf83c9a40c3d64b16ed61fe1f92dd27da02",
+      "symbols": [
+        "Inventory:RemoveItem stack single-item branch"
+      ]
+    },
+    {
+      "id": "GEAR-S25",
+      "source_file": "scripts/components/fuel.lua",
+      "file_sha256": "bb03776d9b9fb53064b6ac636bb9becd0e92e734760f6ad6e98f5bcd37354902",
+      "line_start": 1,
+      "line_end": 36,
+      "range_sha256": "70bf089b0d794169aed8ebea5a262dd041da1300167537819ac3775070516905",
+      "symbols": [
+        "Fuel constructor",
+        "Fuel:Taken"
+      ]
+    },
+    {
+      "id": "GEAR-S26",
+      "source_file": "scripts/components/fuelmaster.lua",
+      "file_sha256": "7cfb3041a3ee5ac665b5615f1ea65e9e6a21e13def572aa3c48b36568e2dd2be",
+      "line_start": 1,
+      "line_end": 17,
+      "range_sha256": "95ac6a6dddf77d7de70019db028284b195a8d1f58969834427b0b84d72dfcb37",
+      "symbols": [
+        "FuelMaster constructor",
+        "FuelMaster:GetBonusMult"
+      ]
+    },
+    {
+      "id": "GEAR-S27",
+      "source_file": "scripts/components/equippable.lua",
+      "file_sha256": "afa5d4d0c26c216a20834bcd844660fbefc45517360e6150076660556fcdcf52",
+      "line_start": 68,
+      "line_end": 123,
+      "range_sha256": "0e7109993d22e0769fb163c8a7a82046e176fa7ff3244414fbf18211fa9cc687",
+      "symbols": [
+        "Equippable:SetOnEquip",
+        "Equippable:SetOnUnequip",
+        "Equippable:SetOnEquipToModel",
+        "Equippable:Equip",
+        "Equippable:Unequip"
+      ]
+    },
+    {
+      "id": "GEAR-S28",
+      "source_file": "scripts/components/repairable.lua",
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "line_start": 1,
+      "line_end": 88,
+      "range_sha256": "dded258c4f3fb0428f28cc53a0450369d377baf65a141b7bb6557b45e7f6714e",
+      "symbols": [
+        "onrepairmaterial",
+        "onfiniteusesrepairable",
+        "Repairable constructor",
+        "Repairable:SetFiniteUsesRepairable",
+        "Repairable:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "GEAR-S29",
+      "source_file": "scripts/components/repairable.lua",
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "line_start": 90,
+      "line_end": 146,
+      "range_sha256": "67f4ab4531ade15fc51623e912e97784476f76398eae0db58f675f28986edcc9",
+      "symbols": [
+        "Repairable:NeedsRepairs",
+        "address_repair_amount"
+      ]
+    },
+    {
+      "id": "GEAR-S30",
+      "source_file": "scripts/components/repairable.lua",
+      "file_sha256": "951ee07ab26a9dab992e1b8c4ab70fcb2a720fc1710601e9057e2e684c25ff6c",
+      "line_start": 148,
+      "line_end": 183,
+      "range_sha256": "6f247b512d76f0a37fb8d81eea0762ed0b3f9eb1bdf1f706c1e49fc9234b96fb",
+      "symbols": [
+        "Repairable:Repair"
+      ]
+    },
+    {
+      "id": "GEAR-S31",
+      "source_file": "scripts/components/repairer.lua",
+      "file_sha256": "ab821139a99128c2b9d1c09cd0d65ea1c6093ea69431ccc32086000aa34fc9f1",
+      "line_start": 1,
+      "line_end": 60,
+      "range_sha256": "cb4d4018ca08e53706aceb4ba79d237651726cb773039bd251235ebdb541c145",
+      "symbols": [
+        "onrepairvalue",
+        "onrepairmaterial",
+        "Repairer constructor",
+        "Repairer:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "GEAR-S32",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 1679,
+      "line_end": 1700,
+      "range_sha256": "c4e5cf8de7f6f5cb77faae482a094c9923d2134d26654741d039655cfc2694a7",
+      "symbols": [
+        "USEITEM.repairer"
+      ]
+    },
+    {
+      "id": "GEAR-S33",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 984,
+      "line_end": 1007,
+      "range_sha256": "e06209cb281a58b05e1a8a90855bd9c8e58ab0fbd42792ce6000e5eddf86a5bc",
+      "symbols": [
+        "ACTIONS.REPAIR.fn"
+      ]
+    },
+    {
+      "id": "GEAR-S34",
+      "source_file": "scripts/prefabs/amulet.lua",
+      "file_sha256": "207d8978277d0ff3b944ded920205fe0109f010c053a24359a17502dcc065405",
+      "line_start": 542,
+      "line_end": 569,
+      "range_sha256": "fd9a8b5bf9f20629ae993a801069387ae2d022461ad87def85cc7d766c87fcc6",
+      "symbols": [
+        "orange"
+      ]
+    },
+    {
+      "id": "GEAR-S35",
+      "source_file": "scripts/prefabs/nightmarefuel.lua",
+      "file_sha256": "5ad5444f3a60f3404be0abdf3867496a45d94e75630211bc457e52ec8d818649",
+      "line_start": 63,
+      "line_end": 93,
+      "range_sha256": "94c0baee1231d8fbe285f3b6bbb83844646aab44cf89447470a02d8307327cd3",
+      "symbols": [
+        "nightmarefuel fn master boundary, fuel and repairer setup"
+      ]
+    },
+    {
+      "id": "GEAR-S36",
+      "source_file": "scripts/components/stackable.lua",
+      "file_sha256": "bdadd8741422b9d82ae60b23b0126c5729621d5acf8f3aafcfb6e5a513d265c1",
+      "line_start": 109,
+      "line_end": 153,
+      "range_sha256": "91cbfafbef6b85862e8a72d3c055f7086413635d6e4fedb9856300706fb3c72c",
+      "symbols": [
+        "Stackable:Get"
+      ]
+    },
+    {
+      "id": "GEAR-S37",
+      "source_file": "scripts/stringutil.lua",
+      "file_sha256": "3dc37f692dd59086273a76dd67a3ca64e2f23e1b976de474aa70a7cd5cab451d",
+      "line_start": 352,
+      "line_end": 354,
+      "range_sha256": "cdc656f2be4c943534c4f2b2058e11e1a18c8f55e34bc4a45587e14155556b45",
+      "symbols": [
+        "repairable NeedsRepairs announcement consumer"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "装备 fueled rate sections 启停 补燃料 ADDFUEL 单件",
+      "expected_entry_ids": [
+        "EXP-GEAR-001"
+      ],
+      "purpose": "按实际燃料单位及装备生命周期接线"
+    },
+    {
+      "query": "repairable repairer finiteusesrepairvalue onrepaired 材料回调",
+      "expected_entry_ids": [
+        "EXP-GEAR-002"
+      ],
+      "purpose": "按材料维修及消费时点"
+    },
+    {
+      "query": "NeedsRepairs 95% 修理菜单 初始受损标签",
+      "expected_entry_ids": [
+        "EXP-GEAR-002"
+      ],
+      "purpose": "区分文案阈值与实际维修资格"
+    }
+  ],
+  "limitations": [
+    "静态源码研究，research/restricted/hold，未运行游戏。",
+    "旧 ID-C01..04 继续保留各自历史来源，本轮以当前指定冻结源码闭合新增实际消费者。",
+    "候选仅含自写说明、符号、文件位置和哈希。",
+    "原版 file-local 消费者仅作接线证据，未作为公共 API。",
+    "NC-N004-FINAL-01 的攻击磨损与 BTR-P01/P02 的维修入口/消费继续沿用，各自更正与历史Scope保留；候选的通用事实用于本次具体闭环依赖。"
+  ]
+}
