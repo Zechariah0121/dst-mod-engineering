@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.12.3`：296 条登记知识（64 基础 + 13 Native AI + 110 Core + 109 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase14-usage-retrieval.md) · [English](README.en.md)
+`v2026.11.12.4`：300 条登记知识（64 基础 + 13 Native AI + 110 Core + 113 机制研究），配套开发脚本、源码更新助手与只读 MCP。本轮统一 ID/API 审阅与完整对象续读，新增主动技能、装备、可收起建筑和两态生物的有限功能链。[安装](docs/install-and-use.md) · [本轮更新](docs/phase15-unified-chains.md) · [English](README.en.md)
 
 ## 工作顺序
 
@@ -26,6 +26,8 @@ python -B -X utf8 run_kb.py update-sources ensure
 
 优先使用已连接 MCP；无服务时，可用 `python -B -X utf8 run_kb.py find "任务或符号"` 定位，再用 `run_kb.py read ID` 审阅所选记录，或从 `knowledge/CATALOG.json` 按 file/pointer 文件读取。两条简短命令统一登记族的目录阅读，不恢复源码、不交付 Coding 上下文。读实际正文与证据，保留 Scope、类型、版本、更正和三轴状态。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整准入、预算与证据规则统一见[检索策略](references/kb-retrieval.md)。
 
+完整服务的统一审阅使用 `get_entry(id=..., projection="reviewer", purpose="review")`，按符号定位用 `lookup_api(symbol=..., projection="reviewer", family="all")` 并执行返回的 `results[].followup`。命令行可用 `run_kb.py review ID` / `run_kb.py review --api "符号"`，两种形式均要求已准备完整来源；对象超预算时原样执行 `continuation`。pointer/cursor和预算见[知识读取](docs/knowledge-integration.md)。四条具名链各自保留 Scope、演示政策及待验项，研究状态继续按上段处理。
+
 ## 按问题读取
 
 首次接入或技能未识别时读 [Agent 接入](references/agent-setup.md)；缺少素材工具时读 [工具安装与首次验证](references/tool-bootstrap.md)，选择适合平台和当前产物的最小方案。
@@ -35,6 +37,10 @@ python -B -X utf8 run_kb.py update-sources ensure
 | 当前任务 | 参考文件 |
 |---|---|
 | 常见开发任务已有依据、局部缺口与项目所需信息 | [task-map.md](references/task-map.md) |
+| 黄杖普通鼠标地面施法、执行帧、末次消费与星体退出 | [chain-active-skill.md](references/chain-active-skill.md) |
+| Molehat 装备标签、夜视消费者、耗能与正燃料恢复 | [chain-equipment.md](references/chain-equipment.md) |
+| Portabletent 部署/收起、耐久交接与稳定形态保存 | [chain-deployable.md](references/chain-deployable.md) |
+| 普通猪人两态、Brain/SG消费者、回退与恢复边界 | [chain-creature-stage.md](references/chain-creature-stage.md) |
 | 跨组件问题、首读与条件化补读、预算不足后的读取 | [complex-task-reading.md](references/complex-task-reading.md) |
 | 登记知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |

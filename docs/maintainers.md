@@ -1,6 +1,6 @@
 # 维护与构建
 
-当前工作版本 `v2026.11.12.3` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，296 条知识与 MCP 共用 knowledge/。用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
+当前工作版本 `v2026.11.12.4` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，300 条知识与 MCP 共用 knowledge/，机制族登记420项 API 合同。统一读取与四条有限链见[本轮说明](phase15-unified-chains.md)，用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
 
 ```text
 python -B -m unittest discover -s tests -v
@@ -10,11 +10,15 @@ python -B scripts/build_release.py
 python -B scripts/build_release.py --check
 ```
 
-生成器核对 `knowledge/PACKAGE-MANIFEST.json` 的每个文件、FAMILY-REGISTRY 生成的目录计数（当前 64 + 13 + 110 + 109 = 296 个唯一记录），以及单一证据环境，再从明确允许的文件构建 `dist/release/`。ZIP 内 `RELEASE-MANIFEST.json` 提供版本、记录计数和逐文件哈希；清单不对自身形成循环哈希。固定路径顺序、时间和 ZIP 元数据，使用 DEFLATE 压缩；相同 Python/压缩库下，同一源文件得到相同字节。跨压缩库比较时应以包内逐文件哈希核对内容。`build_web_bundle.py` 是同一命令的兼容入口，不再生成网页或独立 Skill 分包。
+生成器核对 `knowledge/PACKAGE-MANIFEST.json` 的每个文件、FAMILY-REGISTRY 生成的目录计数（当前 64 + 13 + 110 + 113 = 300 个唯一记录），以及单一证据环境，再从明确允许的文件构建 `dist/release/`。ZIP 内 `RELEASE-MANIFEST.json` 提供版本、记录计数和逐文件哈希；清单不对自身形成循环哈希。固定路径顺序、时间和 ZIP 元数据，使用 DEFLATE 压缩；相同 Python/压缩库下，同一源文件得到相同字节。跨压缩库比较时应以包内逐文件哈希核对内容。`build_web_bundle.py` 是同一命令的兼容入口，不再生成网页或独立 Skill 分包。
 
 构建排除缓存、游戏源码、本地客户端配置、测试夹具、旧知识副本和构建产物。`dist/` 只放发行 ZIP 与校验文件，不复制源码树。不要把含本地恢复 Lua 的 `cache/` 提交或上传。已有生成物被修改或目录中有未知文件时，构建器拒绝覆盖；应先检查差异，或选择新的输出目录。
 
 修改知识或证据必须保留事实、Scope、角色、类型、版本、更正与来源边界，重新绑定公开证据的真实哈希。来源槽必须由用户合法来源恢复；不能绕过原校验器或 Coding HOLD。更新来源另做版本差异维护，不能把历史证据改名为当前来源。
+
+本轮登记维护核对四条 `EXP-CHAIN-*` 的候选/独立审阅哈希、来源引用与原记录身份，复算机制族113条及420项 `api_contracts`。构建后核对四篇 `chain-*.md`、其中自写示例与实际登记ID链接，并按对应范围报告静态、替身、专服和客户端结果。示例的数值与政策保留演示身份。研究正文中的 `runtime_verified=false` 与后续独立运行证据分别维护，运行观察仍绑定具体功能和环境。
+
+统一读取复用九工具。维护时兼顾原调用形状、Native AI Coding十字段/五条限制、Core与机制HOLD、四族完整对象、API消歧、总字节预算、失效cursor、来源缺口与更正，具体协议见[检索策略](../references/kb-retrieval.md#四族完整对象审阅)。公开版继续包含[源码更新助手](../references/source-update-assist.md)。
 
 检索性能定位可使用仓库中的 `scripts/profile_retrieval.py`（维护脚本，不随运行包分发）。`--runtime-root` 选择来源准备返回的 `runtime_build` 目录，而非未恢复来源的公开包根；`--code-root` 选择待测实现，`--output` 保存隔离索引、计时及响应。先通过 `--help` 查看请求文件格式与选项，同一输入分别测基线和候选；全量追踪有额外开销，用户可见耗时另用 `--no-profile` 比较。优化需要同时核对返回内容、预算、权限与失效行为，不能用仅看文件时间戳的缓存代替内容完整性检查。
 

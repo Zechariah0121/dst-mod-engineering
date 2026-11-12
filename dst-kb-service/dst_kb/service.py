@@ -418,9 +418,14 @@ class Service:
 
     @epoch_bound
     @analyzed_request
-    def get_entry(self,id,projection='coding',view=None,pointer='',max_bytes=24000):
+    def get_entry(self,id,projection='coding',view=None,pointer='',max_bytes=24000,purpose=None,cursor=''):
         self.ready()
         native.projection(projection)
+        if purpose is not None and purpose!='review':raise KBError('INVALID_ARGUMENT','Unknown entry purpose')
+        if purpose=='review':
+            if projection!='reviewer':raise KBError('ADMISSION_DENIED','Whole-object review requires explicit projection=reviewer')
+            return self._review_entry(id,pointer,cursor,max_bytes)
+        if cursor:raise KBError('INVALID_ARGUMENT','cursor requires purpose=review')
         if view is not None and view not in ('decision','reviewer','evidence'):raise KBError('INVALID_ARGUMENT','Unknown view')
         mechanism=self._mechanisms().get(id)
         if mechanism is not None:
@@ -462,6 +467,46 @@ class Service:
                 if c.get('status')=='superseded':warnings.append({'claim':c,'use_as_evidence':False})
         return {'kb_version':self.db.execute('SELECT value FROM meta WHERE key=?',('kb_version',)).fetchone()[0],
             'entry':e,'source_registry':sources,'correction_warnings':warnings}
+
+    def _review_entry(self,id,pointer,cursor,maximum):
+        from . import review_reader
+        mechanism=self._mechanisms().get(id)
+        if mechanism is not None:
+            # Reuse the research envelope, including all local evidence and
+            # source assessment. No restored Lua or runtime proof is inferred.
+            context=native_mechanism.envelope(mechanism,pointer)
+            context.pop('value')
+            record=mechanism['entry']
+            family='native_mechanism'
+            context.pop('pointer',None);context.pop('requested_pointer',None)
+        else:
+            row=self.db.execute('SELECT json FROM entries WHERE id=?',(id,)).fetchone()
+            if row is None:raise KBError('INVALID_ID','Unknown knowledge '+id)
+            if not self._native_allowed(id,'reviewer'):
+                raise KBError('ADMISSION_DENIED','Gate A or Reviewer admission excludes this record')
+            record=json.loads(row[0]);family=record_family(record)
+            body={'details','summary','native_fact','ai_coding_impact','common_ai_failure',
+                  'recommended_reasoning','claims','api_contracts','mechanism_steps'}
+            context={'record_context':{k:v for k,v in record.items() if k not in body},
+                     'evidence_navigation':{'tool':'get_entry','arguments':epoch_arguments({
+                         'id':id,'projection':'reviewer','view':'evidence'})},**self._governance([id])}
+            if family=='legacy':
+                # Older records interleave conditions, execution status and
+                # conclusions in details, without a typed boundary schema.
+                context['detail_boundaries']=record.get('details',{})
+                context['correction_warnings']=self.get_entry(id,projection='reviewer').get('correction_warnings',[])
+            if family=='n001':
+                research=json.loads(self.db.execute('SELECT json FROM native_research WHERE id=?',(id,)).fetchone()[0])
+                record=native.reviewer(record,research)
+                context['research_boundaries']={k:v for k,v in research.items()
+                    if k not in ('source_locators','detailed_evidence','runtime_evidence_records')}
+        catalog=self.root/'CATALOG.json'
+        if catalog.is_file():
+            registration=next((row for row in json.loads(catalog.read_text(encoding='utf-8-sig'))['entries']
+                               if row['id']==id),None)
+            if registration is not None:context['entry_registration']=registration
+        if self.epoch_context is not None:context['source_environment']=self.epoch_context.metadata()
+        return review_reader.read(record,family,context,pointer,cursor,maximum)
 
     def _mechanisms(self):
         if not hasattr(self,'root') or not (self.root/'FAMILY-REGISTRY.json').is_file():return {}
@@ -1127,10 +1172,12 @@ class Service:
     @epoch_bound
     @analyzed_request
     def lookup_api(self,symbol,top_k=5,projection='reviewer',view='decision',source_file=None,
-                   family='legacy',owner=None,identity_kind=None,max_bytes=24000):
+                   family='legacy',owner=None,identity_kind=None,max_bytes=24000,_navigation_only=False):
         self.ready();native.projection(projection)
         if view not in ['decision','reviewer','evidence']:raise KBError('INVALID_ARGUMENT','Unknown view')
-        if family not in ('legacy','native_mechanism'):raise KBError('INVALID_ARGUMENT','Unknown lookup family')
+        if family not in ('legacy','native_mechanism','all'):raise KBError('INVALID_ARGUMENT','Unknown lookup family')
+        if family=='all':
+            return self._lookup_all_api(symbol,top_k,projection,view,source_file,owner,identity_kind,max_bytes)
         if family=='native_mechanism':
             return self._lookup_mechanism_api(symbol,top_k,projection,view,source_file,owner,identity_kind,max_bytes)
         if owner is not None or identity_kind is not None:
@@ -1152,7 +1199,72 @@ class Service:
                     'returned_mapping_groups_complete':False,'catalog_results_truncated':False,
                     'full_method_contract_verified':False,'public_api_inferred':False,
                     'symbol_scope_notice':'Select an exact original source_file for same-name declarations. A catalog scope gap does not establish API absence. File-local declarations remain file-local; identity never proves behavior.'}
+            if _navigation_only:return self._lookup_api_for_source(symbol,top_k,projection,view,navigation_only=True)
             return self._lookup_api_for_source(symbol,top_k,projection,view)
+
+    def _lookup_all_api(self,symbol,top_k,projection,view,source_file,owner,identity_kind,maximum):
+        """One explicit Reviewer navigation, preserving both identity systems."""
+        from . import review_reader
+        if projection!='reviewer':raise KBError('ADMISSION_DENIED','Cross-family API review requires explicit projection=reviewer')
+        # Let the exact research route validate shared selectors and syntax.
+        research=self._lookup_mechanism_api(symbol,top_k,projection,view,source_file,owner,identity_kind,64000)
+        legacy=None
+        if re.fullmatch(native_mechanism.NAME,symbol) and owner is None and identity_kind is None:
+            legacy=self.lookup_api(symbol,top_k,projection,view,source_file,family='legacy',_navigation_only=True)
+        branches={'native_mechanism':research}
+        if legacy is not None:branches['legacy']=legacy
+        payload={'symbol':symbol,'family':'all','projection':'reviewer','view':view,
+                 'results':[],'branches':{},'declaration_candidates':[],
+                 'disambiguation_required':False,'knowledge_gap':True,
+                 'coding_admission_granted':False,'full_method_contract_verified':False,
+                 'public_api_inferred':False,'navigation_only':True,
+                 'results_truncated':False,'withheld_count':0,
+                 'notice':'Read selected complete objects with the supplied get_entry calls. Identity, Scope gaps and static research retain their original evidence limits.'}
+        if self.epoch_context is not None:payload['source_environment']=self.epoch_context.metadata()
+        if type(maximum) is not int or not 1000<=maximum<=64000:raise KBError('INVALID_ARGUMENT','max_bytes must be 1000..64000')
+        for name,branch in branches.items():
+            payload['branches'][name]={k:branch[k] for k in ('contract_status','total_matches',
+                'total_identity_matches','catalog_results_truncated','results_truncated','candidate_list_truncated') if k in branch}
+            payload['disambiguation_required'] |= bool(branch.get('disambiguation_required'))
+        candidates=[]
+        for name,branch in branches.items():
+            candidates.extend(dict(row,family=name) for row in branch.get('declaration_candidates',[]))
+            if payload['disambiguation_required']:
+                candidates.extend(dict(row['api_identity'],id=row['id'],family=name,pointer=row.get('pointer',''))
+                    for row in branch.get('results',[]) if 'api_identity' in row)
+        # Never silently choose a research identity when the physical declaration
+        # path still requires disambiguation (or vice versa).
+        selected=[] if payload['disambiguation_required'] else [
+            (name,row) for name,branch in branches.items() for row in branch.get('results',[])]
+        for name,row in selected:
+            arguments={'id':row['id'],'projection':'reviewer','purpose':'review','max_bytes':maximum}
+            if name=='native_mechanism':arguments['pointer']=row['pointer']
+            item={k:row[k] for k in ('id','title','family','api_identity','pointer') if k in row}
+            item['followup']={'tool':'get_entry','arguments':epoch_arguments(arguments)}
+            candidates.append(item)
+        if not payload['disambiguation_required']:
+            for row in research.get('withheld_atoms',[]):
+                candidates.append({'id':row['id'],'family':'native_mechanism','pointer':row['pointer'],
+                    'withheld_reason':row['reason'],
+                    'followup':{'tool':'get_entry','arguments':epoch_arguments({
+                        'id':row['id'],'pointer':row['pointer'],'projection':'reviewer',
+                        'purpose':'review','max_bytes':64000})}})
+        payload['navigation_followup']={'tool':'lookup_api','arguments':epoch_arguments({
+            'symbol':symbol,'projection':'reviewer','family':'all','top_k':30,'max_bytes':64000,
+            **({'source_file':source_file} if source_file else {}),
+            **({'owner':owner} if owner else {}),
+            **({'identity_kind':identity_kind} if identity_kind else {})})}
+        if review_reader.size(payload)>maximum:
+            return {'results':[],'family':'all','knowledge_gap':True,'withheld':True,
+                    'reason':'REQUIRED_CONTEXT_EXCEEDS_BUDGET','coding_admission_granted':False}
+        field='declaration_candidates' if payload['disambiguation_required'] else 'results'
+        for item in candidates:
+            proposed=dict(payload,**{field:payload[field]+[item]})
+            if review_reader.size(proposed)+100<=maximum:payload=proposed
+            else:payload['withheld_count']+=1;payload['results_truncated']=True
+        payload['knowledge_gap']=not bool(payload['results'])
+        payload['results_truncated'] |= any(branch.get('catalog_results_truncated') or branch.get('results_truncated') or branch.get('candidate_list_truncated') for branch in branches.values())
+        return payload
 
     def _lookup_mechanism_api(self,symbol,top_k,projection,view,source_file,owner,identity_kind,maximum):
         if projection!='reviewer':raise KBError('ADMISSION_DENIED','Mechanism API research requires explicit Reviewer role')
@@ -1211,7 +1323,7 @@ class Service:
         if matches and payload['results_truncated']:payload['contract_status']='RESEARCH_CONTRACT_PARTIAL' if payload['results'] else 'RESEARCH_CONTRACT_WITHHELD'
         return payload
 
-    def _lookup_api_for_source(self,symbol,top_k=5,projection='reviewer',view='decision'):
+    def _lookup_api_for_source(self,symbol,top_k=5,projection='reviewer',view='decision',*,navigation_only=False):
         self.ready();native.projection(projection)
         if view not in ['decision','reviewer','evidence']:raise KBError('INVALID_ARGUMENT','Unknown view')
         if not isinstance(symbol,str) or len(symbol)>256 or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*(?:[.:][A-Za-z_][A-Za-z0-9_]*)*',symbol.strip()):raise KBError('INVALID_ARGUMENT','Use a bare or qualified API symbol without parameter signature')
@@ -1223,6 +1335,11 @@ class Service:
                 row['document']['entry'],row['document']['family'],symbol.strip())]
             diagnosis={**diagnosis,'candidate_matches':len(rows)}
             rows=rows[:top_k]
+        if navigation_only:
+            return {'results':[{'id':r['document']['id'],'family':r['document']['family'],
+                                'title':r['document']['entry']['title']} for r in rows],
+                    'contract_status':'IDENTITY_NAVIGATION_ONLY','total_matches':diagnosis['candidate_matches'],
+                    'catalog_results_truncated':diagnosis['candidate_matches']>len(rows)}
         results=[]
         for r in rows:
             record,family=r['document']['entry'],r['document']['family']

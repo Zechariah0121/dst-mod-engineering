@@ -1,0 +1,593 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "candidate_sha256": "1e3795ce754fae647584d5732430276ce0ab43b4a4d885edaae616219942736d",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "候选静态研究通过",
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "独立直接读取当前安装且与762172冻结身份相同的scripts.zip，逐引用文件/行范围hash和逐claim/API/step语义反查，审阅指南与自写最小示例，独立Lua5.1编译及只读重执行作者替身检查。",
+  "accepted_scope": {
+    "source_epoch": "762172",
+    "runtime_verified": false,
+    "evidence": "authorized_frozen_archive_static_lua",
+    "object": "molehat",
+    "bounds": [
+      "普通 Equippable HEAD 与 Inventory 成员路径，正燃料正常创建/保存记录。",
+      "视野链止于 PostProcessor 与 TheSim 的原生表现调用。",
+      "复用 EXP-ITEM-004、EXP-GEAR-001、EXP-LIFE-001、EXP-LIFE-006、EXP-LIFE-008 的既有合同。"
+    ],
+    "exclusions": [
+      "死亡掉落模式、换角、玩家session外部读写、跨分片、全部帽子及第三方覆盖。",
+      "异常零燃料存活记录的产品修复政策。",
+      "真实网络送达、颜色纹理呈现与原生内部实现。"
+    ]
+  },
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": true,
+    "candidate_sha256_verified": true,
+    "archive_identity_verified": true,
+    "source_file_and_range_hashes": "all_match",
+    "governance": "research/restricted/hold preserved",
+    "public_distribution": "candidate无私人绝对路径或原版Lua载荷",
+    "guide_and_example": "PASS_STATIC_AND_LUA51_SUBSTITUTES",
+    "runtime": "not_run"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-CHAIN-GEAR-001",
+      "claim_reviews": [
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C01",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "custom_init在SetPristine前打标签，master分支安装HEAD与Fueled，通用帽子equip/unequip回调启停消费，nightvision由装备表派生。",
+          "evidence_refs": [
+            "EQ-HAT-CONSTRUCT",
+            "EQ-HAT-BASE",
+            "EQ-HAT-MODEL",
+            "EQ-MOLE",
+            "EQ-INV-TAGS"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C02",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "equip提交槽后发事件，unequip回调后清槽再发事件。replica桥、classified net_entity和延迟dirty链正确，未保证原生送达。",
+          "evidence_refs": [
+            "EQ-INV-EQUIP-COMMIT",
+            "EQ-INV-UNEQUIP",
+            "EQ-REPLICA-BRIDGE",
+            "EQ-CLASSIFIED-SET",
+            "EQ-CLASSIFIED-NET",
+            "EQ-CLASSIFIED-DIRTY",
+            "EQ-CLASSIFIED-LISTEN",
+            "EQ-CLASSIFIED-GET",
+            "EQ-REPLICA-TAGS"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C03",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "playervision在master早退前安装。OnInit监听并查询当前装备，force开启时仍更新nightvision字段，HasNightVision保留force分支。",
+          "evidence_refs": [
+            "EQ-PLAYER-VISION",
+            "EQ-PLAYER-MASTER",
+            "EQ-VISION-INIT",
+            "EQ-VISION-CC",
+            "EQ-REPLICA-TAGS",
+            "EQ-CLASSIFIED-GET"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C04",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "UpdateCCTable优先级、事件条件与colourcube激活快照/事件/Blend/PostProcessor链，以及ambientlighting激活查询/事件/TheSim链一致。",
+          "evidence_refs": [
+            "EQ-VISION-INIT",
+            "EQ-VISION-CC",
+            "EQ-CC-EVENT",
+            "EQ-CC-ACTIVE",
+            "EQ-CC-BLEND",
+            "EQ-CC-UPDATE",
+            "EQ-AMBIENT",
+            "EQ-AMBIENT-ACTIVE",
+            "EQ-DARK-QUERY"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C05",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "mole_perish先关闭声再Remove，经InventoryItem RemoveItem(force Unequip)再关闭声。Fueled停止周期与墙钟更新已查，未宣称声音恰好一次。",
+          "evidence_refs": [
+            "EQ-MOLE",
+            "EQ-HAT-BASE",
+            "EQ-ITEM-REMOVE",
+            "EQ-INV-REMOVE",
+            "EQ-INV-UNEQUIP",
+            "EQ-VISION-INIT",
+            "EQ-FUEL-CONSUME"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C06",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "Fueled非满保存且InitializeFuelLevel加载，Inventory GetSaveRecord/SpawnSaveRecord后Equip，正燃料恢复消费与视野成立。玩家session/落盘重启未验。",
+          "evidence_refs": [
+            "EQ-MOLE",
+            "EQ-FUEL-ACCEPT",
+            "EQ-FUEL-SAVE",
+            "EQ-FUEL-CONSUME",
+            "EQ-INV-SAVE",
+            "EQ-INV-LOAD",
+            "EQ-VISION-INIT"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-GEAR-001-C07",
+          "kind": "EI",
+          "result": "PASS_STATIC",
+          "semantic_basis": "EI由InitializeFuelLevel不调用depleted，DoDelta仅section变化才depleted，空DoUpdate停消费推得。异常零燃料政策未知且排除于正常闭包。",
+          "evidence_refs": [
+            "EQ-MOLE",
+            "EQ-FUEL-SAVE",
+            "EQ-FUEL-CONSUME",
+            "EQ-INV-LOAD",
+            "EQ-VISION-INIT"
+          ]
+        }
+      ],
+      "api_reviews": [
+        {
+          "symbol": "PlayerVision:HasNightVision",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读对应声明及本条具名消费者，参数/返回/副作用/生命周期与visibility均保留限定，未把file-local或原生边界提升为公共保证。",
+          "evidence_refs": [
+            "EQ-VISION-INIT",
+            "EQ-VISION-CC",
+            "EQ-DARK-QUERY"
+          ]
+        },
+        {
+          "symbol": "PlayerVision:UpdateCCTable",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读对应声明及本条具名消费者，参数/返回/副作用/生命周期与visibility均保留限定，未把file-local或原生边界提升为公共保证。",
+          "evidence_refs": [
+            "EQ-VISION-CC",
+            "EQ-CC-EVENT",
+            "EQ-CC-ACTIVE",
+            "EQ-CC-BLEND"
+          ]
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-HAT-CONSTRUCT",
+            "EQ-MOLE",
+            "EQ-INV-EQUIP-COMMIT"
+          ]
+        },
+        {
+          "step": 2,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-HAT-BASE",
+            "EQ-MOLE",
+            "EQ-REPLICA-BRIDGE",
+            "EQ-CLASSIFIED-SET",
+            "EQ-CLASSIFIED-NET",
+            "EQ-CLASSIFIED-DIRTY"
+          ]
+        },
+        {
+          "step": 3,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-VISION-INIT",
+            "EQ-VISION-CC",
+            "EQ-AMBIENT-ACTIVE",
+            "EQ-CC-ACTIVE"
+          ]
+        },
+        {
+          "step": 4,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-CC-EVENT",
+            "EQ-CC-BLEND",
+            "EQ-CC-UPDATE",
+            "EQ-AMBIENT"
+          ]
+        },
+        {
+          "step": 5,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-MOLE",
+            "EQ-ITEM-REMOVE",
+            "EQ-INV-REMOVE",
+            "EQ-INV-UNEQUIP",
+            "EQ-VISION-INIT"
+          ]
+        },
+        {
+          "step": 6,
+          "result": "PASS_STATIC",
+          "semantic_basis": "已对照实际入口、具名所有者/消费者与退出/恢复段，描述与所列证据一致。",
+          "evidence_refs": [
+            "EQ-FUEL-ACCEPT",
+            "EQ-FUEL-SAVE",
+            "EQ-INV-SAVE",
+            "EQ-INV-LOAD",
+            "EQ-MOLE",
+            "EQ-VISION-INIT"
+          ]
+        }
+      ],
+      "classification_review": "NSF限当前字节可见Lua事实，EI明确推导，REC明确演示选择，private context保持未知，未引入私有项目推断。",
+      "unknowns_review": "原生内部、实际复制/客户端/磁盘重启/跨分片与第三方组合保留未验。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "EQ-HAT-BASE",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 30,
+      "line_end": 114,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "826c209b0c04a7edd5a3943732ac6bc6979696a912886f6735d446baf0716788",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-HAT-MODEL",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 173,
+      "line_end": 177,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "ae07ef0e4f9d0324c57693d68fe705ce0f977b3a8d94e1c6029b5068533bc6f3",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-HAT-CONSTRUCT",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 188,
+      "line_end": 235,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "865396f393559089fa766b1c396ca2a9b9141df7aa2dfa9c2997266e07745dce",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-MOLE",
+      "source_file": "scripts/prefabs/hats.lua",
+      "line_start": 1785,
+      "line_end": 1839,
+      "file_sha256": "298fa077add36e2307df1133c4e1fcb596372e76304301d2c0f299d5e1622048",
+      "range_sha256": "758d356adc7270419f14787d6ec7b61dfe9b857e3346ec8f2a7ccd739d33b519",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-VISION-INIT",
+      "source_file": "scripts/components/playervision.lua",
+      "line_start": 9,
+      "line_end": 144,
+      "file_sha256": "424fd18d163366428abb80494e9491ecaca25633f8aaf454cd1fd0a2682f87fa",
+      "range_sha256": "6437ed079468bd2473fe40ebe82092e6eadf6d1f0dcebe6379aa1ff3192107e6",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-VISION-CC",
+      "source_file": "scripts/components/playervision.lua",
+      "line_start": 167,
+      "line_end": 220,
+      "file_sha256": "424fd18d163366428abb80494e9491ecaca25633f8aaf454cd1fd0a2682f87fa",
+      "range_sha256": "0710ad0273d459b748e63b4ac60fd441086c36c0e482bd47151636bed0ad51c1",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-TAGS",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 384,
+      "line_end": 390,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "ce504739ab25e0568165eaa6b85971c1f6400355280199596ec21d5d2c8c9fde",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-REPLICA-TAGS",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "line_start": 248,
+      "line_end": 258,
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "range_sha256": "2557a18686cbb787a95559a64b4836aa4fa28bc0f24b67dc223598da9b89720b",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-REPLICA-BRIDGE",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "line_start": 9,
+      "line_end": 34,
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "range_sha256": "1da788d6bb51878da9bb87bb564d4b0d173552e3577cfd830450d1709ddb9369",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CLASSIFIED-SET",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 41,
+      "line_end": 51,
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "f14bc59a9912557f11bdcbe3c216230da63e6c36bd9c55a3a7ecbf9305248c73",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CLASSIFIED-GET",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 191,
+      "line_end": 203,
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "09a83f3b862f0fb03f1f012a682300997e8cd3f1820b612a0d344c5d3904e863",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CLASSIFIED-DIRTY",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 499,
+      "line_end": 510,
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "c8017bb289eb30a8f73086c546994536548ff9d4d8ffdf40289fc3880acf4467",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CLASSIFIED-LISTEN",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 565,
+      "line_end": 588,
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "360879a4b8583432bc33c097426a415268a3f96474c6da3d6777376ab71a6af3",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CLASSIFIED-NET",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 1573,
+      "line_end": 1602,
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "06db0d0d4497fc382ab3c66735f793d60028fbceaac0ee60284e357f5f0cd881",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-PLAYER-VISION",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "line_start": 2487,
+      "line_end": 2495,
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "range_sha256": "d17f9552defbeb8d18ba5047a8d0e9c1598d2ad5a2708a483f4e4df46b4f6c67",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-PLAYER-MASTER",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "line_start": 2611,
+      "line_end": 2622,
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "range_sha256": "0741e4932cb3380ad192ee74ebbdcd0532387c53d0ac21a5e234d6c690a0f8f3",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-AMBIENT",
+      "source_file": "scripts/components/ambientlighting.lua",
+      "line_start": 115,
+      "line_end": 194,
+      "file_sha256": "69e2efe8edc2e07599b034717a04d30a2ed253a73fd482f953128e02a5ef5498",
+      "range_sha256": "2432fb70a2ce54a6e71742b596fdf4fe13dfe25e48ec88bc13f796e27ff8fa81",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-AMBIENT-ACTIVE",
+      "source_file": "scripts/components/ambientlighting.lua",
+      "line_start": 226,
+      "line_end": 246,
+      "file_sha256": "69e2efe8edc2e07599b034717a04d30a2ed253a73fd482f953128e02a5ef5498",
+      "range_sha256": "5d2e6afe7a599072cede27e35220ad685b00b54b9818a6d4ce239f7b5fa5f3fa",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CC-BLEND",
+      "source_file": "scripts/components/colourcube.lua",
+      "line_start": 129,
+      "line_end": 211,
+      "file_sha256": "7c3062b02e39aef6f546fecc91b0043c18240a2dafd1d30818cb04193d914c00",
+      "range_sha256": "410ce675b8497f4878a9ac69b7325f89cb9e05e290bd7c4c3e73242fda15dc6a",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CC-EVENT",
+      "source_file": "scripts/components/colourcube.lua",
+      "line_start": 281,
+      "line_end": 308,
+      "file_sha256": "7c3062b02e39aef6f546fecc91b0043c18240a2dafd1d30818cb04193d914c00",
+      "range_sha256": "c3150bb2cbf39f42137f637db0d47f8dd67213e0f9e5de051d6e31159412d953",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CC-ACTIVE",
+      "source_file": "scripts/components/colourcube.lua",
+      "line_start": 330,
+      "line_end": 368,
+      "file_sha256": "7c3062b02e39aef6f546fecc91b0043c18240a2dafd1d30818cb04193d914c00",
+      "range_sha256": "3d67dd072762528b09e063a05651f09512d01a2181187af150da5685c35ea629",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-CC-UPDATE",
+      "source_file": "scripts/components/colourcube.lua",
+      "line_start": 450,
+      "line_end": 477,
+      "file_sha256": "7c3062b02e39aef6f546fecc91b0043c18240a2dafd1d30818cb04193d914c00",
+      "range_sha256": "3d3f73d9aa3f241f7b8c66943758eca801e25ac7952273562cef22d5a17d2a19",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-DARK-QUERY",
+      "source_file": "scripts/simutil.lua",
+      "line_start": 502,
+      "line_end": 515,
+      "file_sha256": "13815df52c2ba681b88eea0f84c83fecd15934af921c180e7c48a824e8497f7e",
+      "range_sha256": "efbcbd55d691aca518d8844bf50c4c8b1599cc7b9106ae33597e51f87de8ee70",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-ITEM-REMOVE",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 485,
+      "line_end": 499,
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "range_sha256": "4184b9b8da2707a7296d900a88734126dd042820658b58d4f1f5b2ed15460507",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-REMOVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1390,
+      "line_end": 1432,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "e1c58bc5143aea07db229d97c2ff8007ccb995ee5b03dc286e6ff64a19fa1222",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-UNEQUIP",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1219,
+      "line_end": 1248,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "dd6db820c264aa348508423b204d0e852460b26fcd68995e93fb18dad924c901",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-EQUIP-COMMIT",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1364,
+      "line_end": 1388,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "c11eb8e230e96c788c475a20e17cb25fdc5bd3d1366493ff2f0d12bec7c6ca9a",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-FUEL-SAVE",
+      "source_file": "scripts/components/fueled.lua",
+      "line_start": 116,
+      "line_end": 151,
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "range_sha256": "feace6415ad948a5b1adf6dd71e0187650a33747b0964427e5901834a956c152",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-FUEL-ACCEPT",
+      "source_file": "scripts/components/fueled.lua",
+      "line_start": 153,
+      "line_end": 230,
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "range_sha256": "fab73a7ad827fd134ccfd55a21026d6343f547276d8b27797b54e636d6b20aa6",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-FUEL-CONSUME",
+      "source_file": "scripts/components/fueled.lua",
+      "line_start": 265,
+      "line_end": 349,
+      "file_sha256": "b96ace1b18ead4600f7b7e2013939f286cdde8113805c0dfb1a083e4f3d3d91a",
+      "range_sha256": "494eb9f93dac1ed51c53b0a5166358b91d76c20282e98bdbf467cbfe7f4b5c32",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-SAVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 192,
+      "line_end": 229,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "5bb1c18742ac7cb2053fc7f12886485b89facf652a1bc5bfcb41b86c93001e65",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "EQ-INV-LOAD",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 293,
+      "line_end": 325,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "22fbb47ac95caa49c6afe5fcebdf544ef23b03897478d251de8f077b1fc6ea80",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    }
+  ],
+  "artifact_reviews": {
+    "guide": {
+      "relative_path": "stage3-chains/equipment/guide.md",
+      "sha256": "e9f42339428cba9eefef9a295aa74182236fa8c92abc95e2a801f851def9a34c",
+      "final_destination": "references/chain-equipment.md"
+    },
+    "example": {
+      "relative_path": "stage3-chains/equipment/example.lua",
+      "sha256": "3d491ff3a0876ea6c25ac042245306706433d43909ab38bd5aacde72a868dd20"
+    },
+    "guide_example_exact_bytes": true,
+    "guide_embedded_sha_matches": true,
+    "public_private_path_scan": "PASS",
+    "vanilla_payload_review": "指南只内嵌自写example，candidate与review只保留scripts定位及hash，没有大段原版Lua。",
+    "semantic_basis": "指南将标签装备表、PlayerVision派生、Fueled权威数值与实际表现消费者分别注明，普通正燃料恢复及异常零记录边界明确。完整prefab例有公共标签/SetPristine和master早退，装备/卸装/模型回调启停Fueled，耗尽删除。穿戴外观、配方、台词及真实复制/磁盘待验明确。",
+    "verification": "独立Lua5.1编译通过，重执行作者替身检查通过。重执行时将来源指定为当前安装ZIP，结果仅写verification/chains。",
+    "limits": "替身对象及手动驱动不证明实际游戏调度、输入、复制、动画物理、磁盘保存或跨分片。",
+    "distribution_links": "已核对现有references兄弟链接，内容寻址研究链接指向本次candidate的topic/hash预期登记位置，实际登记由总控执行。"
+  },
+  "freeze_receipt": {
+    "candidate_guide_example_match_final_result": true,
+    "runtime_verified": false,
+    "review_bytes_final": true,
+    "actual_runtime_evidence": "separate_named_evidence_by_parent"
+  }
+}

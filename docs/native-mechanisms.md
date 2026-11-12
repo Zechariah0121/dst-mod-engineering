@@ -1,12 +1,22 @@
 # 独立原版机制研究族
 
-`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充、表现、事件/SG、加载/Replica、生命周期/恢复、动作执行，以及战斗、物品装备、制作采集、移动关系、世界分片，以及 UI 输入、生物 AI、农作和船体机制，以及装备耗能/维修、投射物、建筑施工、巢穴种群、世界袭击和海钓，独立机制研究族共 109 条；与历史三族合计 296 条，实际登记数量读目录 counts。
+`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究按实际登记验收。当前机制族113条，与历史三族合计300条，机制族的 `api_contracts` 共420项。已有Brain、世界生成、料理/调味、成长/再生、生存/表现、事件/加载、生命周期/恢复、动作、战斗、物品、制作、移动、世界分片、UI、生物AI、农作、船体、装备、投射物、建筑、种群、袭击和海钓研究，本轮再补四条具名功能链。实际登记数量读目录 `counts`，合同数按该族登记记录逐项复算。
 
 机制研究为 `research/restricted/hold`；审阅绑定精确候选 SHA。来源引用提供限定归档的文件/范围定位与 hash，原生与动态依赖按条目 unknowns 保留。通用准入见[检索策略](../references/kb-retrieval.md)。
 
 ## 查询和完整读取
 
+完整服务可按 ID 使用统一对象审阅，或按 API 跨族导航后执行返回的 `results[].followup`，无需先选择知识族。下列入口保留显式 Reviewer、HOLD、身份歧义、Scope、更正、来源状态与未知。
+
+```json
+{"id":"EXP-CHAIN-SPELL-001","projection":"reviewer","purpose":"review","max_bytes":24000}
+```
+
+上例传给 `get_entry`。`lookup_api` 使用 `symbol`、`family="all"`、`projection="reviewer"`，按响应给出的实际ID/pointer补读。对象分页时原样使用 `continuation`，总预算为1000–64000字节；pointer可直接选对象，cursor绑定原选择、记录与环境。原子子字段归一到完整owner，必需上下文无法交付时保留withheld，达到上限后转文件阅读。命令行 `run_kb.py review ID` / `run_kb.py review --api "符号"` 均要求已准备完整来源，详见[统一读取](knowledge-integration.md)与[检索策略](../references/kb-retrieval.md#四族完整对象审阅)。
+
 目录模式：`search_catalog(query="具名停止")` 或实际符号；`read_public_entry(id="EXP-AI-003", purpose="review", pointer="/claims/0")`。只能显式 review；同一原子携带完整 entry Scope、unknowns、顶层 source_epoch/archive_sha256/limitations 及该原子的实际 local refs。
+
+无需来源时，命令行可继续用 `find/read` 进行上述公开目录阅读，按响应的 `child_pointers` 与24000字节上限处理。公开目录与完整服务各按自身响应字段读取。
 
 完整服务：显式 `projection="reviewer"`。`search_kb(query="PriorityNode", mode="research", projection="reviewer")` 或精确 ID 可进入独立研究查询；默认任务检索不混入 restricted 研究，Coding 始终拒绝。研究查询采用有界词项导航，不表示语义任务契约已被证明；结果保留完整原文和 Scope。它不改动旧三族的物理声明、行为契约或任务投影 guards。
 
@@ -14,9 +24,9 @@
 {"id":"EXP-AI-003","projection":"reviewer","view":"reviewer","max_bytes":64000}
 ```
 
-上述是 `get_entry` 的完整条目读取参数。按原子读取可加 `pointer="/claims/0"`、`/api_contracts/0` 或 `/mechanism_steps/0`；新族的 max_bytes 可在 1000..64000 内显式选择。若请求 `/claims/0/statement`，服务会校验该指针后交付整个 `/claims/0`，避免把 statement 从 kind、条件和证据拆开。API 契约也可通过这一路读取。`lookup_api` 默认 `family="legacy"`，继续使用旧物理声明/行为映射 guards；只有显式选择 `family="native_mechanism"` 才查询研究 API 契约，且必须 `projection="reviewer"`。不会因为来源 symbols 数组有同名字符串而授予公共 API 身份。
+上述是原有 `get_entry` 按机制族读取的兼容参数。按原子读取可加 `pointer="/claims/0"`、`/api_contracts/0` 或 `/mechanism_steps/0`；新族的 max_bytes 可在 1000..64000 内显式选择。若请求 `/claims/0/statement`，服务会校验该指针后交付整个 `/claims/0`，避免把 statement 从 kind、条件和证据拆开。API 契约也可通过这一路读取。`lookup_api` 默认 `family="legacy"`，继续使用旧物理声明/行为映射 guards；机制研究可显式选择 `family="native_mechanism"`，或用 `family="all"` 统一导航，均保留 `projection="reviewer"` 的要求。来源 symbols 的同名字符串仅用于来源提示，API身份由相应声明/合同路径核对。
 
-研究 API 身份入口示例（CLI 的 `call --tool lookup_api --arguments '<JSON>'` 使用同一参数）：
+研究 API 身份入口示例，参数传给 MCP 的 `lookup_api`。统一命令行可用 `python -B -X utf8 run_kb.py review --api "Growable:Pause"`。
 
 ```json
 {"symbol":"Growable:Pause","family":"native_mechanism","projection":"reviewer","max_bytes":24000}
@@ -52,12 +62,25 @@
 
 生存补充与表现机制的新增范围见[本阶段说明](phase5-survival-presentation.md)。
 
-本轮检索改进和新增特效研究范围见[阶段说明](phase6-retrieval-fx.md)。
+阶段6的检索改进和特效研究范围见[阶段说明](phase6-retrieval-fx.md)。
 
 复杂架构与原版执行链新增范围见[阶段说明](phase7-architecture-native.md)。
 
 事件/Replica、组件任务与存档恢复新增范围见[本阶段说明](phase8-lifecycle-persistence.md)。
 
-实体 Remove 与普通动作执行见[阶段 9](phase9-action-closure.md)；计时器重放、实体引用重接和奖励队列恢复见[阶段 10](phase10-recovery-delivery.md)；五类常用原版机制扩展见[阶段 11](phase11-native-expansion.md)；UI、生物 AI、农作与船体见[本轮更新](phase12-practical-native.md)。
+实体 Remove 与普通动作执行见[阶段 9](phase9-action-closure.md)；计时器重放、实体引用重接和奖励队列恢复见[阶段 10](phase10-recovery-delivery.md)；五类常用原版机制扩展见[阶段 11](phase11-native-expansion.md)；UI、生物 AI、农作与船体见[阶段 12](phase12-practical-native.md)。
 
 装备、建筑、生态、海钓与复杂开发问题的实用扩展见[阶段 13](phase13-practical-expansion.md)。
+
+## 四条有限功能链
+
+本轮增加以下762172具名链，复用既有合同并补缺失消费者和接线，合计新增4条研究与16项API合同。各链保持 `research/restricted/hold`。指南内含自写最小示例，其数值、消费与恢复政策按演示身份使用。
+
+| 登记 ID | 有限范围与新增合同 | 指南 |
+|---|---|---|
+| EXP-CHAIN-SPELL-001 | yellowstaff普通鼠标地面空点CASTSPELL，至执行帧、末次消费、stafflight退出与组件恢复；2项SpellCaster API | [主动技能链](../references/chain-active-skill.md) |
+| EXP-CHAIN-GEAR-001 | molehat普通HEAD装备、夜视消费者、耗能/卸下和正燃料记录；2项PlayerVision API | [装备效果链](../references/chain-equipment.md) |
+| EXP-CHAIN-DEPLOY-001 | portabletent_item/portabletent普通部署与收起、uses交接、稳定形态保存，并记录收起动画中恢复缺口；5项API | [可收起建筑链](../references/chain-deployable.md) |
+| EXP-CHAIN-STAGE-001 | 普通pigman的normal/werepig两态，至属性、Brain/SG、回退、卸载和恢复字段；7项WereBeast API | [阶段生物链](../references/chain-creature-stage.md) |
+
+候选已有静态和Lua替身检查记录，研究正文保留 `runtime_verified=false`。四个自写示例完成有限专服验证，装备、建筑和生物示例另完成同一隔离存档重启，范围见[本轮说明](phase15-unified-chains.md)。这些具名运行不提升整条源码研究为运行保证。真实客户端、链外特殊角色/变体、完整Boss、技能树、跨分片和第三方组合继续按具体缺口核查。

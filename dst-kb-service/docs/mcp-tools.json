@@ -158,7 +158,7 @@
     },
     {
       "name": "lookup_api",
-      "description": "Look up an exact API identity. Default family=legacy finds preserved physical declarations and mapped claims; contract_delivery reports whether behavior claims were delivered. Explicit family=native_mechanism requires projection=reviewer and returns complete research API atoms under max_bytes. Use source_file to disambiguate sources; owner and identity_kind narrow native_mechanism only. Bare names and qualified identities such as require(\"module\").field are supported; signatures and dynamic expressions are not. File-local functions retain their visibility. A declaration or catalog gap alone does not establish a method contract, public API or absence. Defaults to reviewer projection and compact decision view.",
+      "description": "Look up an exact API identity. Explicit family=all with projection=reviewer navigates all four families and returns executable complete-object review calls, preserving source ambiguity and evidence limits. Default family=legacy finds preserved physical declarations and mapped claims; contract_delivery reports whether behavior claims were delivered. Explicit family=native_mechanism requires projection=reviewer and returns complete research API atoms under max_bytes. Use source_file to disambiguate sources; owner and identity_kind narrow native_mechanism only. Bare names and qualified identities such as require(\"module\").field are supported; signatures and dynamic expressions are not. File-local functions retain their visibility. A declaration or catalog gap alone does not establish a method contract, public API or absence. Defaults to reviewer projection and compact decision view.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -189,7 +189,8 @@
             "type": "string",
             "enum": [
               "legacy",
-              "native_mechanism"
+              "native_mechanism",
+              "all"
             ],
             "default": "legacy"
           },
@@ -241,7 +242,7 @@
     },
     {
       "name": "get_entry",
-      "description": "Read a selected knowledge ID. view=decision is compact; reviewer adds detail; evidence adds source navigation. Omitting view preserves the legacy response. projection controls admission independently. For mechanism research, pointer selects a whole typed atom and max_bytes bounds delivery.",
+      "description": "Read a selected knowledge ID. Explicit purpose=review with projection=reviewer reads complete original objects across all four families under max_bytes. Follow continuation.arguments unchanged for content-bound paging, or select a record-relative pointer. Typed owner atoms and required Scope remain whole. view=decision is compact; reviewer adds detail; evidence adds source navigation. Omitting view preserves the legacy response. projection controls admission independently. For mechanism research, pointer selects a whole typed atom and max_bytes bounds delivery.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -263,6 +264,16 @@
               "reviewer",
               "evidence"
             ]
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "review"
+            ]
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 2000
           },
           "pointer": {
             "type": "string",

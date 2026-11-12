@@ -1,12 +1,12 @@
 # DST Mod Engineering
 
-`v2026.11.12.3` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
+`v2026.11.12.4` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
 
-The knowledge base has **296 registered records: 64 foundation, 13 Native AI, 110 Native Core and 109 mechanism research records**. This update adds a development task map and short find/read commands, and reduces retrieval overhead to help AI locate relevant evidence and identify remaining checks. See [changes](docs/phase14-usage-retrieval.md). Detailed technical guides are mainly in Chinese.
+The knowledge base has **300 registered records: 64 foundation, 13 Native AI, 110 Native Core and 113 mechanism research records**. This update adds unified ID/API review with whole-object continuation and four bounded feature chains linking input, authoritative execution, consumers, cleanup and recovery. See [changes](docs/phase15-unified-chains.md). Detailed technical guides are mainly in Chinese.
 
-The mechanism research family contains 404 API contracts, counted from its records' `api_contracts` arrays. A whole-library API inventory and a source-coverage denominator have yet to be established.
+The mechanism research family contains 420 API contracts, counted from its records' `api_contracts` arrays. A whole-library API inventory and a source-coverage denominator have yet to be established.
 
-Existing guides connect multi-component retrieval, timed-effect recovery and practical optimization. The previous topic expansion is documented in [phase 13](docs/phase13-practical-expansion.md).
+The chains cover yellowstaff's ordinary ground cast, Molehat night vision, Portabletent deployment/packing and ordinary pigman normal/werepig transitions. Each includes an independent minimal example and explicit limits. The examples passed targeted dedicated-server checks; equipment, structure and creature fixtures also passed process restarts from the same isolated save. Real clients and cross-shard behavior remain untested. See the scoped [validation results](docs/phase15-unified-chains.md#验证状态). The task map and progressive retrieval are documented in [phase 14](docs/phase14-usage-retrieval.md).
 
 ## Download and setup
 
@@ -19,7 +19,7 @@ python -B -X utf8 run_kb.py update-sources ensure --source "<absolute path to sc
 python -B -X utf8 run_kb.py mcp-config --mode full
 ```
 
-Apply the printed configuration in your client, then check nine tools and a real query. The Skill calls `update-sources ensure` before substantive KB use, reusing the remembered path; identical successful inputs return quickly. Follow `reconnect_required` when activation changes. The assistant maintains local bindings/cache; client configuration and live connections stay under your control. See the [update workflow](references/source-update-assist.md).
+Apply the printed configuration in your client, then check nine tools and a real query. The Skill calls `update-sources ensure` before work requiring current source evidence, reusing the remembered path; identical successful inputs return quickly. Follow `reconnect_required` when activation changes. The assistant maintains local bindings/cache; client configuration and live connections stay under your control. See the [update workflow](references/source-update-assist.md).
 
 ## Knowledge and evidence
 
@@ -27,10 +27,14 @@ Without MCP, use `run_kb.py find` / `read` to locate and review public records, 
 
 Read Scope, claim type, version, corrections and admission together. Native AI Coding uses its ten-field projection and at most five records per task. Core retains Coding HOLD; mechanism research remains research/restricted/hold and needs explicit Reviewer access. A declaration or search hit is navigation; read the relevant contract and evidence before using it. Private context marked `UNK` remains unknown. Exact parameters, budgets and identity rules are in [retrieval](references/kb-retrieval.md); source identities and compatibility states are in [source maintenance](docs/source-compatibility.md).
 
+Unified review uses explicit Reviewer/purpose on `get_entry`, or `lookup_api(family="all")`. CLI equivalents are `run_kb.py review ID` and `run_kb.py review --api "symbol"`, both requiring prepared full service. Follow the returned `continuation` when the byte budget requires further pages. Parameters are in [knowledge access](docs/knowledge-integration.md).
+
 The package excludes game Lua, private projects and third-party executables. Restored source excerpts and machine-specific state stay in local `cache/`. Public `$dst_source_payload_slot` values mark source to restore locally.
 
-Report source research, automated checks and game observations by their tested scope. See [testing](references/testing-release.md), [release changes](docs/phase14-usage-retrieval.md) and [limits](docs/public-limits.md).
+Report source research, automated checks and game observations by their tested scope. See [testing](references/testing-release.md), [release changes](docs/phase15-unified-chains.md) and [limits](docs/public-limits.md).
 
 Use the [development task map](references/task-map.md) to find existing record IDs, guides, partial coverage, project dependencies and next validation steps. Use [SKILL.md](SKILL.md) for topic routing, [module architecture](references/complex-mod-architecture.md) for ownership and [action integration](references/action-lifecycle-architecture.md) for cancellable interactions.
+
+Read the bounded chains for [active skills](references/chain-active-skill.md), [equipment](references/chain-equipment.md), [deployable structures](references/chain-deployable.md) and [two-state creatures](references/chain-creature-stage.md).
 
 Project-owned material uses the [custom non-commercial LICENSE](LICENSE). Commercial use requires separate written permission; valid historical MIT grants and third-party terms remain in force. See [licensing](docs/licensing.md).

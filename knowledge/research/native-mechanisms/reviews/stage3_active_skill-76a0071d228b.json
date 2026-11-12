@@ -1,0 +1,686 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "candidate_sha256": "ff810d89ff512d4bf03476f32e92892597beb59f7131fc9fe3eac9323a9993c7",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "候选静态研究通过",
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "独立直接读取当前安装且与762172冻结身份相同的scripts.zip，逐引用文件/行范围hash和逐claim/API/step语义反查，审阅指南与自写最小示例，独立Lua5.1编译及只读重执行作者替身检查。",
+  "accepted_scope": {
+    "source_epoch": "762172",
+    "runtime_verified": false,
+    "evidence": "frozen_archive_static_lua_and_isolated_lua_substitutes",
+    "bounds": [
+      "普通人形玩家，装备yellowstaff，地面空点鼠标右键，无活动物品/特殊右键覆盖，无第三方覆写。",
+      "主链预测客户端与master，非预测发送位置仅核静态分支。",
+      "闭合到星体独立生命周期及组件保存/加载，热/烹饪/理智范围公式排除。"
+    ],
+    "reused_entry_ids": [
+      "EXP-ACT-001",
+      "EXP-ACT-002",
+      "EXP-ACT-003",
+      "EXP-LIFE-008",
+      "EXP-SAVE-004",
+      "EXP-GEAR-002"
+    ],
+    "increment": "复用通用动作/重入、Remove、Timer加载和次数保存研究导航；补CASTSPELL右键分支、spellcaster双API、yellowstaff消费者与stafflight有限链。"
+  },
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": true,
+    "candidate_sha256_verified": true,
+    "archive_identity_verified": true,
+    "source_file_and_range_hashes": "all_match",
+    "governance": "research/restricted/hold preserved",
+    "public_distribution": "candidate无私人绝对路径或原版Lua载荷",
+    "guide_and_example": "PASS_STATIC_AND_LUA51_SUBSTITUTES",
+    "runtime": "not_run"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-CHAIN-SPELL-001",
+      "claim_reviews": [
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C01",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "commonfn公共网络/SetPristine及master组件、yellow两端reticule和权威spellcaster/finiteuses回调符合来源，瞄准未负责消费。",
+          "evidence_refs": [
+            "SPELL-STAFF",
+            "SPELL-YELLOW",
+            "SPELL-CONFIG"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C02",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "无active/target/覆盖的手装备路径与POINT collector、sort/filter、Vector3 BufferedAction构造均可查。POINT基于标签/地图/船状态，执行仍须CanCast。",
+          "evidence_refs": [
+            "SPELL-PICKER",
+            "SPELL-POINT",
+            "SPELL-SORT",
+            "SPELL-COLLECT",
+            "SPELL-TAGS"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C03",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "CONTROL_SECONDARY接OnRightClick，缓存来自DoGetMouseActions。预测路径先按下nil请求后preview_cb完整请求，非预测non_preview_cb及抬起RemoteStopControl语义准确。",
+          "evidence_refs": [
+            "SPELL-CONTROL",
+            "SPELL-CACHE",
+            "SPELL-GETTER",
+            "SPELL-RIGHT"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C04",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "RPC形态/坐标/范围/rotation与master controller重建code/mod匹配后DoAction可反查，CASTSPELL定义和通用合同Scope被保留。",
+          "evidence_refs": [
+            "SPELL-RPC",
+            "SPELL-REMOTE",
+            "SPELL-ACTION-DEF"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C05",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "两端handler无特殊标签时选castspell，client preview/timeout与server第53/69帧、controller及statemem FX/light清理符合，没有强加自动清槽退款。",
+          "evidence_refs": [
+            "SPELL-SERVER-HANDLER",
+            "SPELL-CLIENT-HANDLER",
+            "SPELL-SERVER-SG",
+            "SPELL-CLIENT-SG"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C06",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "Action资格门禁与CanCast点分支、CastSpell不自验且忽略回调返回、后置回调/事件顺序准确，未把CanCast扩成统一业务验证。",
+          "evidence_refs": [
+            "SPELL-ACTION",
+            "SPELL-CAN",
+            "SPELL-CAST"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C07",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "createlight先生成定位，再rechargeable或Use，之后才取owner并扣staffsanity/sanity。无nil guard或补偿，黄杖常规为次数分支。",
+          "evidence_refs": [
+            "SPELL-EFFECT",
+            "SPELL-YELLOW",
+            "SPELL-CONFIG",
+            "SPELL-CAST"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C08",
+          "kind": "EI",
+          "result": "PASS_STATIC",
+          "semantic_basis": "EI经有限次数同步onfinished/Remove与inventoryitem OnRemoveEntity→RemoveItem→OnRemoved→ClearOwner成立，正常末次可能跳过理智，已生成星体独立。",
+          "evidence_refs": [
+            "SPELL-EFFECT",
+            "SPELL-USES",
+            "SPELL-STAFF",
+            "SPELL-OWNER-EXIT",
+            "SPELL-INVENTORY-REMOVE",
+            "SPELL-OWNER-REMOVED",
+            "SPELL-OWNER-CLEAR"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C09",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "stafflight公共pulse/Light与master效果/timer可查，timer先清后发，kill退出事件/动画/声音/延迟Remove/persists=false与ForceExtinguish门禁准确。",
+          "evidence_refs": [
+            "SPELL-STAR",
+            "SPELL-TIMER",
+            "SPELL-STAR-EXIT",
+            "SPELL-STAR-FORCE"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C10",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "FiniteUses数据和构造回调恢复、Timer同名Stop再Start及timeleft/paused/initial_time一致。没有重施法恢复或保存SG FX。",
+          "evidence_refs": [
+            "SPELL-USES",
+            "SPELL-YELLOW",
+            "SPELL-STAR",
+            "SPELL-STAR-EXIT",
+            "SPELL-TIMER-SAVE"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SPELL-001-C11",
+          "kind": "EI",
+          "result": "PASS_STATIC",
+          "semantic_basis": "EI限定不再执行53帧时效果尚未发生，执行后无回滚。引用释放后的staffcastfx animover移除及castinglight计数/任务/延迟移除均符合来源。",
+          "evidence_refs": [
+            "SPELL-SERVER-SG",
+            "SPELL-CLIENT-SG",
+            "SPELL-EFFECT",
+            "SPELL-CAST-FX",
+            "SPELL-CAST-LIGHT"
+          ]
+        }
+      ],
+      "api_reviews": [
+        {
+          "symbol": "SpellCaster:CanCast",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "SPELL-CAN",
+            "SPELL-ACTION",
+            "SPELL-CONFIG"
+          ]
+        },
+        {
+          "symbol": "SpellCaster:CastSpell",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "SPELL-CAST",
+            "SPELL-ACTION",
+            "SPELL-EFFECT",
+            "SPELL-USES"
+          ]
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-STAFF",
+            "SPELL-YELLOW",
+            "SPELL-CONFIG"
+          ]
+        },
+        {
+          "step": 2,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-PICKER",
+            "SPELL-POINT",
+            "SPELL-SORT",
+            "SPELL-COLLECT",
+            "SPELL-CACHE"
+          ]
+        },
+        {
+          "step": 3,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-RIGHT",
+            "SPELL-CLIENT-SG"
+          ]
+        },
+        {
+          "step": 4,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-RPC",
+            "SPELL-REMOTE",
+            "SPELL-ACTION-DEF"
+          ]
+        },
+        {
+          "step": 5,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-SERVER-SG",
+            "SPELL-ACTION",
+            "SPELL-CAN",
+            "SPELL-CAST"
+          ]
+        },
+        {
+          "step": 6,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-EFFECT",
+            "SPELL-USES",
+            "SPELL-OWNER-EXIT",
+            "SPELL-INVENTORY-REMOVE",
+            "SPELL-OWNER-REMOVED",
+            "SPELL-OWNER-CLEAR"
+          ]
+        },
+        {
+          "step": 7,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-SERVER-SG",
+            "SPELL-CAST-FX",
+            "SPELL-CAST-LIGHT",
+            "SPELL-STAR-EXIT",
+            "SPELL-STAR-FORCE",
+            "SPELL-TIMER"
+          ]
+        },
+        {
+          "step": 8,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "SPELL-USES",
+            "SPELL-YELLOW",
+            "SPELL-STAR",
+            "SPELL-TIMER-SAVE"
+          ]
+        }
+      ],
+      "classification_review": "NSF限定快照Lua事实，EI明确推导及前提，REC保留项目选择，私有上下文未知，未虚构运行事实。",
+      "unknowns_review": "实际复制/客户端/动画/磁盘重启/跨分片/原生内部/第三方组合保留未验。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "SPELL-STAFF",
+      "source_file": "scripts/prefabs/staff.lua",
+      "line_start": 13,
+      "line_end": 124,
+      "file_sha256": "9a9764308882c255edd0017745d19e47a95cdbe25dec2bb8c6931911ae511add",
+      "range_sha256": "b9b3e7a86391c366e9cea61c136863a06e7dcc26b327827aa117387a15cb669a",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-YELLOW",
+      "source_file": "scripts/prefabs/staff.lua",
+      "line_start": 204,
+      "line_end": 229,
+      "file_sha256": "9a9764308882c255edd0017745d19e47a95cdbe25dec2bb8c6931911ae511add",
+      "range_sha256": "8bdd9a04ec0ef7463ba0603dcb00d59d0dc41aa2b8167a2f3c4f42ce5b8cf445",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CONFIG",
+      "source_file": "scripts/prefabs/staff_common.lua",
+      "line_start": 825,
+      "line_end": 853,
+      "file_sha256": "22d04b8ba0c793bd08e4b4d649ab0ed2c80615b15951d8f609865f3f907bfa44",
+      "range_sha256": "b3d30cc6373fa038f03eae7b6a665bc79a3148445afa510fe024f99f165fcf11",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-EFFECT",
+      "source_file": "scripts/prefabs/staff_common.lua",
+      "line_start": 788,
+      "line_end": 806,
+      "file_sha256": "22d04b8ba0c793bd08e4b4d649ab0ed2c80615b15951d8f609865f3f907bfa44",
+      "range_sha256": "bb44eb36e0c925e7e0c1ce8dec68a206afecf53935904088ca26bfe29503b86a",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-TAGS",
+      "source_file": "scripts/components/spellcaster.lua",
+      "line_start": 1,
+      "line_end": 125,
+      "file_sha256": "5eda6145e1587515a16648b71f55cbbeacd144dfdbaa69d5c6c6a0f40d66bbe2",
+      "range_sha256": "8281b1b870e983110d81cb10a855c5d267364c53503805d666ee898989a67bfb",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CAN",
+      "source_file": "scripts/components/spellcaster.lua",
+      "line_start": 152,
+      "line_end": 201,
+      "file_sha256": "5eda6145e1587515a16648b71f55cbbeacd144dfdbaa69d5c6c6a0f40d66bbe2",
+      "range_sha256": "8c692e0219c30d5206b30e1ca3f8599a8a6989df2c4f43898954dedde2590af8",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CAST",
+      "source_file": "scripts/components/spellcaster.lua",
+      "line_start": 134,
+      "line_end": 143,
+      "file_sha256": "5eda6145e1587515a16648b71f55cbbeacd144dfdbaa69d5c6c6a0f40d66bbe2",
+      "range_sha256": "c953347d221a725734477bedd3172400dad2e6910e312238eddd08114aec6a78",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-COLLECT",
+      "source_file": "scripts/componentactions.lua",
+      "line_start": 2193,
+      "line_end": 2222,
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "range_sha256": "9aa7b86ca0987189237c2c5a09d810720cc77a44518531419f5f07c6c709f247",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-SORT",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "line_start": 84,
+      "line_end": 107,
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "range_sha256": "b444e1a13bc0a3a4d1609a873234f3a0c60ea8492a4fba3e8b55ad90972d0018",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-POINT",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "line_start": 207,
+      "line_end": 223,
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "range_sha256": "8db50e542af56347d506c2f9f823e4ac2f59294b5526f12257feaca9e99b3b34",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-PICKER",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "line_start": 388,
+      "line_end": 489,
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "range_sha256": "f99313aa22b3ea27ead093331c9f94bef71c0ff63a93b8341aad052a260933b2",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-MOUSE",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "line_start": 558,
+      "line_end": 559,
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "range_sha256": "98e719909c5fba96d022fcfc6fe8a88eea8fa8238efa00d5e176161144e5d84c",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CONTROL",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 645,
+      "line_end": 656,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "16c1adaf0371e0c49fd9ec8f1ccbcc488024866bba787042896d9312c63ff510",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CACHE",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 2818,
+      "line_end": 2835,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "ba2fc7e3dc970c399230c59587df7c820edc49649b1b7a2eebe7521b87c726c4",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-GETTER",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 5328,
+      "line_end": 5330,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "c57466faa41be49ee7939b606ea35cdfff4490282fd6f62df47890c92e3abc0c",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-RIGHT",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 4981,
+      "line_end": 5089,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "4e782f3cf39578b9a23f390d5c096796a1f235879b4222641c0f326c5b14fc88",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-REMOTE",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 5092,
+      "line_end": 5123,
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "948a161882e978f669da2f55a9bd71f793f96b6e7a381471657e60c4718c5b28",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-RPC",
+      "source_file": "scripts/networkclientrpc.lua",
+      "line_start": 113,
+      "line_end": 161,
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "range_sha256": "115888c9c671677f8616cf078dbcaca911734cc7de615fc3d9247fb9f4ad15a0",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-ACTION-DEF",
+      "source_file": "scripts/actions.lua",
+      "line_start": 455,
+      "line_end": 455,
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "range_sha256": "402d8d26b6b040953390a06cf54ddf0c86e36cad32de36038468169439b6802b",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-ACTION",
+      "source_file": "scripts/actions.lua",
+      "line_start": 3441,
+      "line_end": 3473,
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "range_sha256": "4e2a0ccddeb483ea78faa5e408db8dfb01072113cda98679c045a3679906b051",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-SERVER-HANDLER",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 1303,
+      "line_end": 1315,
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "range_sha256": "97d68e6c09fdee77e4ee1abfa395436d5385379345b1942d4d9f8157f477ef21",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CLIENT-HANDLER",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "line_start": 585,
+      "line_end": 597,
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "range_sha256": "97d68e6c09fdee77e4ee1abfa395436d5385379345b1942d4d9f8157f477ef21",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-SERVER-SG",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "line_start": 16170,
+      "line_end": 16287,
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "range_sha256": "45a125253ee2b9db9e03ea39541a1e8290416c575d8ea68b7382e8c991cd8d05",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CLIENT-SG",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "line_start": 4045,
+      "line_end": 4073,
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "range_sha256": "f0a1c86c7d2d0e936799e5fcfe3a27b42303d278f8ac5797184d49ee4d6dc11e",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-USES",
+      "source_file": "scripts/components/finiteuses.lua",
+      "line_start": 48,
+      "line_end": 87,
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "range_sha256": "bbe7e14b98fdcb35610e599daec370e6d977c2d86474927787cc478df8c86410",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-OWNER-CLEAR",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 285,
+      "line_end": 291,
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "range_sha256": "52e080e70168191a05359fe7c983b70423e9215c9316f900f92dc6ca30313f92",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-OWNER-REMOVED",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 369,
+      "line_end": 376,
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "range_sha256": "daef783c37c1012908310dca7234279fb07a706796f00f0aa55563701b1d76f9",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-OWNER-EXIT",
+      "source_file": "scripts/components/inventoryitem.lua",
+      "line_start": 485,
+      "line_end": 499,
+      "file_sha256": "1f92787f49f4fdeac53f48e5bbba9002d2050d4585025bb8ad8d1638fc79a6a5",
+      "range_sha256": "4184b9b8da2707a7296d900a88734126dd042820658b58d4f1f5b2ed15460507",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-INVENTORY-REMOVE",
+      "source_file": "scripts/components/inventory.lua",
+      "line_start": 1390,
+      "line_end": 1432,
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "range_sha256": "e1c58bc5143aea07db229d97c2ff8007ccb995ee5b03dc286e6ff64a19fa1222",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-STAR-EXIT",
+      "source_file": "scripts/prefabs/stafflight.lua",
+      "line_start": 5,
+      "line_end": 22,
+      "file_sha256": "26ec1752a685904792024a8e4d2734d9d4082e6e1ee6b52ca47beee9e7718f62",
+      "range_sha256": "06626189e586d99c61ce33e12adf3d13ae5919d00115293237cfa78258da3c8f",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-STAR-FORCE",
+      "source_file": "scripts/prefabs/stafflight.lua",
+      "line_start": 54,
+      "line_end": 64,
+      "file_sha256": "26ec1752a685904792024a8e4d2734d9d4082e6e1ee6b52ca47beee9e7718f62",
+      "range_sha256": "f13877292b409680cb587bce16209b66a88812aa35b0343f29dfe7284ecbb9c9",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-STAR",
+      "source_file": "scripts/prefabs/stafflight.lua",
+      "line_start": 79,
+      "line_end": 205,
+      "file_sha256": "26ec1752a685904792024a8e4d2734d9d4082e6e1ee6b52ca47beee9e7718f62",
+      "range_sha256": "32620a80d504a946737723cde7f704149986aa7a82df21f7363620fbf9743044",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-TIMER",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 27,
+      "line_end": 66,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-TIMER-SAVE",
+      "source_file": "scripts/components/timer.lua",
+      "line_start": 122,
+      "line_end": 142,
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "range_sha256": "9e86e55826707b694a9074e7254f0cfc62b6bb7d68dabe18d17b53fb44d41f6d",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CAST-FX",
+      "source_file": "scripts/prefabs/staffcastfx.lua",
+      "line_start": 27,
+      "line_end": 66,
+      "file_sha256": "7bc8a8c8cf410289c346c8c4b7b9d8d90e3c46ab23cf1baf99850e3cb8dbb39a",
+      "range_sha256": "4b3b463f15c4af04a892253b218c5ddfaf6425612ab2f764e90d136dfc4496b5",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "SPELL-CAST-LIGHT",
+      "source_file": "scripts/prefabs/staff_castinglight.lua",
+      "line_start": 1,
+      "line_end": 67,
+      "file_sha256": "5081853068ecf1b661ac6d1d2c36ef027f6de7b80daf92800eb4a120c949833c",
+      "range_sha256": "6981beffce1f226401179b81665dec53f8755e2bab13683d61a24f4ce5e71a42",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    }
+  ],
+  "artifact_reviews": {
+    "guide": {
+      "relative_path": "stage3-chains/active-skill/guide.md",
+      "sha256": "a95074efc63c02e1fa8058f47df06eccc50559b0e55338a4990a974b618f0fe0",
+      "final_destination": "references/chain-active-skill.md"
+    },
+    "example": {
+      "relative_path": "stage3-chains/active-skill/example.lua",
+      "sha256": "22885dafa658ca9dae66b4d6356ee89a05d876b42c61cb24f60d42a7094e2bb3"
+    },
+    "guide_example_exact_bytes": true,
+    "guide_embedded_sha_matches": true,
+    "public_private_path_scan": "PASS",
+    "vanilla_payload_review": "指南只内嵌自写example，candidate与review只保留scripts定位及hash，没有大段原版Lua。",
+    "semantic_basis": "指南沿黄杖右键、预测、服务器53帧、CanCast/CastSpell、末次owner、星体timer恢复分段，Scope与原生、实际输入和磁盘待验一致。示例明确仅同步Action结算模块，collector及两端ActionHandler由项目接入，1次/5理智/12距离属于演示政策。拒绝与生成nil无扣费，成功先sanity后uses处理末次物品移除，没有新增持久状态或异步资源。",
+    "verification": "独立Lua5.1编译通过，重执行作者替身检查通过。重执行时将来源指定为当前安装ZIP，结果仅写verification/chains。",
+    "limits": "替身对象及手动驱动不证明实际游戏调度、输入、复制、动画物理、磁盘保存或跨分片。",
+    "distribution_links": "已核对现有references兄弟链接，内容寻址研究链接指向本次candidate的topic/hash预期登记位置，实际登记由总控执行。"
+  },
+  "freeze_receipt": {
+    "candidate_guide_example_match_final_result": true,
+    "runtime_verified": false,
+    "review_bytes_final": true,
+    "actual_runtime_evidence": "separate_named_evidence_by_parent"
+  }
+}

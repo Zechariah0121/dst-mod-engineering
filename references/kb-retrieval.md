@@ -62,6 +62,27 @@ Core 和机制研究可在明确的 Reviewer 范围内帮助定位待核查的�
 
 先做小范围查询，复杂问题再展开少量关键记录。模式参数使用小写：`architect` 设计，`implement` 已确定方案实现，`review` 审查，`debug` 排错，`research` 案例研究。`kb_curator` 只用于用户明确要求的维护；检索接口不是写入接口。
 
+### 四族完整对象审阅
+
+完整服务提供以下显式入口，沿用九工具。默认 Coding 准入、省略 `view` 的旧响应和原有视图继续使用各自合同。
+
+```json
+{"tool":"get_entry","arguments":{"id":"EXP-FISH-001","projection":"reviewer","purpose":"review","max_bytes":24000}}
+{"tool":"lookup_api","arguments":{"symbol":"Moisture:ForceDry","projection":"reviewer","family":"all","max_bytes":24000}}
+```
+
+`get_entry` 的 `purpose="review"` 按 ID 自动识别基础、Native AI、Core 和机制族。响应的 `objects` 保存原对象及其条目内 `pointer`，同时携带完整适用范围、三轴状态、更正与证据导航。`complete=true` 表示本次所选对象流已读完，`whole_value_delivered=true` 表示所选根对象一次完整交付。两者分别读取。审阅不会授予 Coding 准入，也不代表执行了游戏验证。
+
+所选对象超过预算时，服务按原始对象边界分页。继续原样调用 `continuation.tool` 和 `continuation.arguments`，其中包含 ID、Reviewer、purpose、原始选择、预算和来源环境。轻量无状态 `cursor` 仅记录页位置并绑定记录及上下文哈希，使多页顺序读取免去手工排列 pointer。改动记录、选择或来源环境后旧 cursor 会被拒绝。可以直接用明确的 `pointer` 读取目标对象，无需先取得 cursor。claim/API/step 的子字段会扩回完整 owner，Native AI 的事实及建议字段保持完整类型对象。
+
+每页按整个普通 UTF-8 JSON payload 计入 `max_bytes`，范围为 1000–64000。必需 Scope 或完整 owner 无法交付时返回 `withheld_reason`，有可行的大预算调用时附 continuation。达到 64000 上限仍无法交付的对象明确转为文件阅读，停止生成重复续读。`objects=[]` 的响应没有交付正文。证据清单使用 `evidence_navigation`，再按原有 `resolve_evidence` 展开相关节点；机制对象同时保留所选引用的定位与来源核验状态。
+
+`lookup_api(family="all", projection="reviewer")` 对精确 API 统一导航。响应 `results[].followup` 可直接交给 `get_entry` 完整审阅，基础、Native AI 和 Core 延用既有声明/合同映射，机制族延用 authored API 身份。结果的 `navigation_only=true` 要求继续读取正文。`source_file` 仍用于来源消歧，模块导出可使用 `require("module").field`。`owner` 和 `identity_kind` 限定 authored research 身份，填写时仅查询机制身份路径。任一身份路径要求消歧时，先读取 `declaration_candidates` 并补充选择。文件局部、可见性、来源版本和未知保持原状。
+
+API 导航的 `results_truncated` 和各 `branches` 诊断保留候选与预算缺口。可使用 `navigation_followup` 扩大导航上限，再用精确来源缩小选择。该入口每条既有路径最多返回 `top_k` 个候选，最大 30，全结果受统一字节预算限制；空结果或未穷尽候选继续保留未知。
+
+命令行也可从包根运行 `run_kb.py review ID`，或 `run_kb.py review --api "Moisture:ForceDry"`，并使用 `--pointer`、`--cursor`、`--source-epoch`、`--max-bytes` 复现返回调用。`--source-file` 与 `--limit` 用于 API 导航。统一 `review` 命令要求有效准备的完整服务；来源未准备或包漂移时明确报错，并提示可另行使用公开 `find/read`。完整 owner 和预算合同在同一 `review` 入口保持一致。
+
 ## 完整模式的版本、角色与预算
 
 - 服务证据环境为 `759671`，九工具的可选 `source_epoch` 只接受该值；762172 是本次核验的来源输入，服务不提供环境切换。返回研究原子的 source_epoch 按文档保留，各版本数量见[源码维护](../docs/source-compatibility.md)。条目保留各自证据和适用范围，不能把历史知识改名为当前源码事实；目标游戏仍需单独核对。

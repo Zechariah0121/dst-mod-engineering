@@ -1,0 +1,981 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "stage3_deployable",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-CHAIN-DEPLOY-001",
+      "title": "portabletent部署、收起与耐久跨形态交接的有限完整链",
+      "aliases": [
+        "portabletent",
+        "portabletent_item",
+        "DISMANTLE",
+        "收起帐篷",
+        "可收起建筑状态迁移"
+      ],
+      "engineering_question": "库存帐篷怎样通过普通DEPLOY成为结构，再经收起或锤击转回物品，耐久与中断恢复由谁承担？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "observed_date": "2026-11-12",
+        "evidence": "explicit_archive_direct_static_lua",
+        "runtime_verified": false,
+        "environment": "portabletent_item与portabletent具名普通DEPLOY、DISMANTLE、HAMMER消费者及稳定形态有限存读档。",
+        "exclusions": [
+          "复用DC-C01/02/03、EXP-BUILD-001/002/003及EXP-LIFE-008/EXP-SAVE-001的原治理与来源身份，不重复登记generic kit或施工合同。",
+          "原版收起动画中重载的续行缺口为明确边界。",
+          "全睡眠数值、完整燃烧、皮肤/全部组件迁移、原生RPC/动画/物理内部、跨分片与第三方兼容。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C01",
+          "kind": "NSF",
+          "statement": "portabletent_item公共构造带portableitem并SetPristine，非master返回；master安装finiteuses/inventoryitem/deployable，OnDeploy是自定义file-local消费者，未安装stackable、complexprojectile或keep_in_inventory_on_deploy。restrictedtag赋值处为注释。独立导出portabletent_item_placer。普通DEPLOY依DC-C01/02/03的移交分支将本次对象交给消费者。",
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S08",
+            "DEP-S09",
+            "DEP-S34"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C02",
+          "kind": "NSF",
+          "statement": "portabletent_item默认使用inventoryitem的prefab后缀placer名与DEFAULT地面测试。PlayerController为活动物/手柄光标物创建预览，绑定replica CanDeploy；POINT菜单也调用replica。鼠标提交发送动作/点/旋转，master OnRemoteRightClick重选同code/mod动作；手柄部署重建需GrandOwner为玩家。两端普通DEPLOY映射doshortaction，client执行preview，server在第6帧PerformBufferedAction。取消预览删除placer，服务器短动作提前退出按缓冲身份及lastheldaction条件清理。",
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S10",
+            "DEP-S11",
+            "DEP-S12",
+            "DEP-S13",
+            "DEP-S14",
+            "DEP-S15",
+            "DEP-S17",
+            "DEP-S19",
+            "DEP-S21",
+            "DEP-S28",
+            "DEP-S29",
+            "DEP-S30",
+            "DEP-S31",
+            "DEP-S32",
+            "DEP-S33",
+            "DEP-S35"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C03",
+          "kind": "NSF",
+          "statement": "portabletent的OnDeploy先SpawnPrefab目标，成功后关闭碰撞、Teleport(pt.x,0,pt.z)、重开碰撞，播放摆放表现，将移交物finiteuses当前uses写给目标，Remove移交物，再调用放置碰撞辅助。未读取rot、未发onbuilt。目标生成nil时此消费者不移除物品、无显式返还，外层Deploy仍发deployitem并true，普通动作据此不进入GiveItem返还。CanDeploy前检拒绝保留持有物，Deploy复检false才有普通动作返还尝试。",
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S08",
+            "DEP-S09"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C04",
+          "kind": "NSF",
+          "statement": "已部署portabletent的master构造拥有finiteuses、sleepingbag、portablestructure和HAMMER workable。右键SCENE筛选DISMANTLE，服务器动作拒绝燃烧及sleepingbag InUse，检查candismantle后调用PortableStructure:Dismantle并true。PortableStructure仅转发回调，回调返回值被忽略。普通无builder速度标签角色的DISMANTLE经dolongaction timeout执行，提前退出按缓冲身份/lastheldaction清理，client只preview且onexit杀make_preview声音。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S05",
+            "DEP-S06",
+            "DEP-S07",
+            "DEP-S16",
+            "DEP-S18",
+            "DEP-S20",
+            "DEP-S22",
+            "DEP-S31",
+            "DEP-S32",
+            "DEP-S33"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C05",
+          "kind": "NSF",
+          "statement": "portabletent的OnDismantle与未烧毁OnHammered共用ChangeToItem。它先RemoveComponent sleepingbag/portablestructure/workable，再加NOCLICK、播放disassemble并注册animover。OnAnimOver仅在AnimDone且当前动画为disassemble时读取结构uses，ReplacePrefab为portabletent_item，再写uses及idle_item。ReplacePrefab只Spawn、定位、删除原实体、返回新实体，没有复制旧组件数据，也未对nil产物设guard。回调只显式转移uses，未声明完整状态迁移。",
+          "evidence_refs": [
+            "DEP-S03",
+            "DEP-S05",
+            "DEP-S24",
+            "DEP-S26"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C06",
+          "kind": "NSF",
+          "statement": "HAMMER的OnHit会唤醒当前sleeper；sleepingbag卸载hook也调用DoWakeUp。唤醒清双方关联并调用portabletent OnWake，后者解绑onignite、停止sleep_tasks并Use一次。finiteuses到零OnFinished停声、播destroy、animover删除且persists=false。烧毁OnBurnt调用DefaultBurntStructureFn后移除碰撞和portablestructure，烧毁后的锤击改走掉落/FX/Remove。此处只绑定portabletent消费者及已列hook，完整燃烧助手内部仍须另外核查。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S03",
+            "DEP-S04",
+            "DEP-S23",
+            "DEP-S25",
+            "DEP-S26"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C07",
+          "kind": "NSF",
+          "statement": "两形态构造均初始化finiteuses最大值和当前值。finiteuses OnSave只在非满或doesnotstartfull时返回uses，OnLoad有uses键才SetUses；GetPersistData汇总仍存在的组件payload。portabletent prefab OnSave仅记录燃烧/烧毁布尔，OnLoad仅据burnt调用burnable.onburnt。ChangeToItem未置persists=false，也未安装保存过渡标志的回调。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S02",
+            "DEP-S03",
+            "DEP-S25",
+            "DEP-S27",
+            "DEP-S36",
+            "DEP-S37"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C08",
+          "kind": "EI",
+          "statement": "限定本次Lua路径，普通未烧毁稳定结构与库存形态可按构造默认+finiteuses payload恢复耐久。收起已开始但disassemble animover尚未成功转换时，保存仍以portabletent形态记录剩余组件数据，读取端普通构造会重建可睡/可拆/可锤组件；本prefab没有从保存数据重建收起动画和animover监听的分支。因此不能承诺动画中重载后自动完成收起，实际磁盘快照、原生动画与事件送达待验。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S02",
+            "DEP-S03",
+            "DEP-S25",
+            "DEP-S27",
+            "DEP-S36",
+            "DEP-S37"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-DEPLOY-001-C09",
+          "kind": "REC",
+          "statement": "以本条研究导航核对当前项目真实源码后，可为自己的有限状态交接选择显式复制所需业务字段。示例采用同步收起、生成失败时保留结构、部署生成失败时显式GiveItem尝试返还移交物的演示政策，避开示例自身的动画中保存状态。动作true仍只表示通用动作链完成，业务生成成功需检查最终实体。项目退款、耗尽与燃烧规则须由需求确定。",
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S03",
+            "DEP-S05",
+            "DEP-S08",
+            "DEP-S09",
+            "DEP-S24",
+            "DEP-S25"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "OnDeploy",
+          "source_file": "scripts/prefabs/portabletent.lua",
+          "visibility": "file-local，portabletent_item的deployable.ondeploy回调，只可由自己消费者实现等价项目逻辑。",
+          "parameters": [
+            "inst是普通DEPLOY移交的库存物实体，pt为点，deployer未在函数体使用。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "server master，目标prefab可生成，两实例具备finiteuses，点具备x/z。"
+          ],
+          "side_effects": [
+            "生成成功后定位与表现，复制当前uses，删除移交物，运行放置碰撞辅助。",
+            "生成nil分支没有本地消费或返还。"
+          ],
+          "lifecycle": [
+            "由itemfn安装，通用Deploy忽略其返回，旋转参数未被本回调消费。"
+          ],
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S08",
+            "DEP-S09"
+          ],
+          "unknowns": [
+            "Spawn失败后的回收交付和原生碰撞行为未实测。"
+          ]
+        },
+        {
+          "symbol": "ChangeToItem",
+          "source_file": "scripts/prefabs/portabletent.lua",
+          "visibility": "file-local，结构OnDismantle及未burnt锤击完成调用。",
+          "parameters": [
+            "inst为已部署结构。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "server master，正常结构组件已装配，动画和事件可用。"
+          ],
+          "side_effects": [
+            "顺序卸载sleepingbag、portablestructure、workable。",
+            "加NOCLICK、播放disassemble并监听animover。"
+          ],
+          "lifecycle": [
+            "只启动异步转换，最终移除由OnAnimOver中的ReplacePrefab完成。",
+            "未保存过渡状态，卸载sleepingbag可能同步唤醒并消费一次uses。"
+          ],
+          "evidence_refs": [
+            "DEP-S03",
+            "DEP-S23",
+            "DEP-S26"
+          ],
+          "unknowns": [
+            "动画中移除/燃烧、事件缺失、保存重载续行未保证。"
+          ]
+        },
+        {
+          "symbol": "OnAnimOver",
+          "source_file": "scripts/prefabs/portabletent.lua",
+          "visibility": "file-local，ChangeToItem注册的结构animover消费者。",
+          "parameters": [
+            "inst为原结构。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "AnimDone且IsCurrentAnimation(disassemble)才进入。",
+            "旧实体finiteuses存在，ReplacePrefab成功产生item及其finiteuses。"
+          ],
+          "side_effects": [
+            "读取uses，ReplacePrefab，写入item uses与idle_item。"
+          ],
+          "lifecycle": [
+            "ReplacePrefab正常返回后原结构已Remove。",
+            "只有指定动画满足才转换，没有基于动作true提前生成。"
+          ],
+          "evidence_refs": [
+            "DEP-S03",
+            "DEP-S24"
+          ],
+          "unknowns": [
+            "nil生成或写入回调错误没有全链回滚；未运行动画事件。"
+          ]
+        },
+        {
+          "symbol": "PortableStructure:Dismantle",
+          "source_file": "scripts/components/portablestructure.lua",
+          "visibility": "原版Lua component method，具体权限与动作门禁属于实际调用者。",
+          "parameters": [
+            "doer透传回调。"
+          ],
+          "returns": "无显式返回，回调返回值被忽略。",
+          "preconditions": [
+            "inst有效，ondismantlefn由SetOnDismantleFn绑定；本组件自身不复检燃烧、占用或权限。"
+          ],
+          "side_effects": [
+            "存在回调则调用ondismantlefn(inst,doer)。"
+          ],
+          "lifecycle": [
+            "普通ACTIONS.DISMANTLE先判燃烧/占用/candismantle，再调用此方法并true。",
+            "portabletent回调会移除此组件，正在执行调用栈仍按正常Lua顺序返回。"
+          ],
+          "evidence_refs": [
+            "DEP-S05",
+            "DEP-S06",
+            "DEP-S03"
+          ],
+          "unknowns": [
+            "第三方直接调用与重入时序须另审。"
+          ]
+        },
+        {
+          "symbol": "ReplacePrefab",
+          "source_file": "scripts/mainfunctions.lua",
+          "visibility": "原版Lua global，限定此函数静态实现与portabletent调用者。",
+          "parameters": [
+            "original_inst，name，skin，skin_id，creator；后四参传给SpawnPrefab。"
+          ],
+          "returns": "返回replacement_inst。",
+          "preconditions": [
+            "original_inst Transform可读，新目标SpawnPrefab正常返回带Transform实体。"
+          ],
+          "side_effects": [
+            "读取旧位置，SpawnPrefab目标，设置目标位置，Remove旧实例。"
+          ],
+          "lifecycle": [
+            "仅位置由函数本体转移，uses由portabletent调用者先读后写。",
+            "本体没有nil生成guard、组件保存恢复或GUID迁移协议。"
+          ],
+          "evidence_refs": [
+            "DEP-S24",
+            "DEP-S03"
+          ],
+          "unknowns": [
+            "native Spawn/Remove内部、异常与跨端后果未实测。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "用item公共信息选择本地预览与部署输入，replica给出预检，master重建/提交动作。",
+          "evidence_refs": [
+            "DEP-S02",
+            "DEP-S10",
+            "DEP-S11",
+            "DEP-S14",
+            "DEP-S28",
+            "DEP-S29"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "server SG执行普通DEPLOY，两次CanDeploy门禁及当前单件移交沿已有合同，portabletent消费者复制uses并消费移交物。",
+          "evidence_refs": [
+            "DEP-S08",
+            "DEP-S09",
+            "DEP-S15",
+            "DEP-S17",
+            "DEP-S02"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "部署结构持有睡眠、耐久与可拆状态，DISMANTLE拒绝燃烧和占用，经长动作进入收起回调。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S05",
+            "DEP-S06",
+            "DEP-S07",
+            "DEP-S16",
+            "DEP-S18"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "收起及未烧毁锤击卸载结构交互，动画完成才ReplacePrefab并显式写uses，耗尽/烧毁分别走其退出消费者。",
+          "evidence_refs": [
+            "DEP-S03",
+            "DEP-S04",
+            "DEP-S23",
+            "DEP-S24",
+            "DEP-S25"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "稳定形态由finiteuses数据恢复；动画中存档不带收起续行标记，明确保持恢复边界和实际游戏待验。",
+          "evidence_refs": [
+            "DEP-S01",
+            "DEP-S02",
+            "DEP-S03",
+            "DEP-S25",
+            "DEP-S27"
+          ]
+        }
+      ],
+      "unknowns": [
+        "runtime_verified=false。未运行游戏、真实远端/客户端输入、动画事件、磁盘重启、跨分片或第三方放置Mod组合。",
+        "范围限普通未骑乘、非漂浮、无hungrybuilder/fastbuilder/slowbuilder速度标签角色的可部署tent路径。特殊角色SG、原生路径/网络、所有burnable助手内部未闭合。",
+        "原版生成nil及ReplacePrefab抛错后的整体事务恢复未承诺。收起动画中保存重载未提供续行标记，不能标记该窗口恢复通过。",
+        "仅uses显式跨形态转移。皮肤、wetness、额外Mod组件、旋转及外部GUID引用没有本条迁移保证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "DEP-S01",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S02",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S03",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S04",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S05",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S06",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S07",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S08",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S09",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S10",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S11",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S12",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S13",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S14",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S15",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S16",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S17",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S18",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S19",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S20",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S21",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S22",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S23",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S24",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S25",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S26",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S27",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S28",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S29",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S30",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S31",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S32",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S33",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S34",
+            "role": "本条具名链的声明、消费者、输入或退出依赖，范围见symbols及对应claims。"
+          },
+          {
+            "ref": "DEP-S35",
+            "role": "默认部署mode或存读档调用链补足定位。"
+          },
+          {
+            "ref": "DEP-S36",
+            "role": "默认部署mode或存读档调用链补足定位。"
+          },
+          {
+            "ref": "DEP-S37",
+            "role": "默认部署mode或存读档调用链补足定位。"
+          }
+        ],
+        "unknowns": [
+          "列出的Lua依赖用于这一个具名样本，不声明全原版/Mod兼容或原生实现闭包。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "DEP-S01",
+      "source_file": "scripts/prefabs/portabletent.lua",
+      "file_sha256": "1ca36d5127620e9288dff0ce62cc19463c8f58ecf584260fb5fa00ee26956dea",
+      "line_start": 169,
+      "line_end": 238,
+      "range_sha256": "2ef65b2e53f0b3246220d93b7a44dd99f3fb26c7ac5892bbd84d4d0d8526a6d2",
+      "symbols": [
+        "fn"
+      ]
+    },
+    {
+      "id": "DEP-S02",
+      "source_file": "scripts/prefabs/portabletent.lua",
+      "file_sha256": "1ca36d5127620e9288dff0ce62cc19463c8f58ecf584260fb5fa00ee26956dea",
+      "line_start": 244,
+      "line_end": 312,
+      "range_sha256": "4c2d50f38534fbe474edc0a1708c1b51aa6e5d2079f0d875ddff9089204f8a8e",
+      "symbols": [
+        "OnDeploy",
+        "itemfn"
+      ]
+    },
+    {
+      "id": "DEP-S03",
+      "source_file": "scripts/prefabs/portabletent.lua",
+      "file_sha256": "1ca36d5127620e9288dff0ce62cc19463c8f58ecf584260fb5fa00ee26956dea",
+      "line_start": 19,
+      "line_end": 93,
+      "range_sha256": "b9c32db2af25bc41c1c6deb189db1960eb3202b933e07a51c0d47f4699d7a965",
+      "symbols": [
+        "OnAnimOver",
+        "ChangeToItem",
+        "OnHammered",
+        "OnHit",
+        "OnSave",
+        "OnLoad",
+        "OnDismantle",
+        "OnBurnt"
+      ]
+    },
+    {
+      "id": "DEP-S04",
+      "source_file": "scripts/prefabs/portabletent.lua",
+      "file_sha256": "1ca36d5127620e9288dff0ce62cc19463c8f58ecf584260fb5fa00ee26956dea",
+      "line_start": 98,
+      "line_end": 167,
+      "range_sha256": "60f76fc20a42cf98adc613a36fa7c40b2d5e7f110b28124bba4a17abdd18be0b",
+      "symbols": [
+        "StopSleepSound",
+        "OnWake",
+        "OnFinished"
+      ]
+    },
+    {
+      "id": "DEP-S05",
+      "source_file": "scripts/components/portablestructure.lua",
+      "file_sha256": "71fae6142c65cb1c91a336866c1952b7c4e0b6436b543a935b5bde2f4a30b47f",
+      "line_start": 1,
+      "line_end": 16,
+      "range_sha256": "f49c79cce4e98b227098072fd893733fbd087815b95379b3cf0708cd5b38e40c",
+      "symbols": [
+        "PortableStructure:SetOnDismantleFn",
+        "PortableStructure:Dismantle"
+      ]
+    },
+    {
+      "id": "DEP-S06",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 4569,
+      "line_end": 4593,
+      "range_sha256": "5705653ba620303403a0065f1a839d90c2d6347f097c6e5f0545660862e2c054",
+      "symbols": [
+        "ACTIONS.DISMANTLE.fn"
+      ]
+    },
+    {
+      "id": "DEP-S07",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 668,
+      "line_end": 685,
+      "range_sha256": "ead9f9c69d70e3564a9a88b4d629b7dc226c994df06cac3822e986d6bdbd7d46",
+      "symbols": [
+        "SCENE.portablestructure"
+      ]
+    },
+    {
+      "id": "DEP-S08",
+      "source_file": "scripts/actions.lua",
+      "file_sha256": "7b9b881134d810644e57d295bd3e268c0eb1dcc5ec664fb15fa7a14514e98a40",
+      "line_start": 1607,
+      "line_end": 1641,
+      "range_sha256": "346ec8f7d126c77c211db3385e7f2a70bcb12de9c4f4522b55072e77f200c0d0",
+      "symbols": [
+        "ACTIONS.DEPLOY.fn"
+      ]
+    },
+    {
+      "id": "DEP-S09",
+      "source_file": "scripts/components/deployable.lua",
+      "file_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "line_start": 89,
+      "line_end": 147,
+      "range_sha256": "4e8688134e8e794e8f7f61222f3467c72b9e904cb2b11fe8081da51761c2f238",
+      "symbols": [
+        "Deployable:IsDeployable",
+        "Deployable:CanDeploy",
+        "Deployable:Deploy"
+      ]
+    },
+    {
+      "id": "DEP-S10",
+      "source_file": "scripts/components/inventoryitem_replica.lua",
+      "file_sha256": "ec930cca232eaab16525fc1eb57f1ee597269f89024086766784dbd6f080f22d",
+      "line_start": 285,
+      "line_end": 369,
+      "range_sha256": "73303ca33dce922321971ee9f384d22c72591210abff421411b4827c859964f3",
+      "symbols": [
+        "InventoryItem:IsDeployable",
+        "InventoryItem:CanDeploy",
+        "InventoryItem:GetDeployPlacerName"
+      ]
+    },
+    {
+      "id": "DEP-S11",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 2885,
+      "line_end": 2918,
+      "range_sha256": "5baffc5840a8751a71b6ea850015472988a13219a2fbf202762d09aeadad2f0b",
+      "symbols": [
+        "PlayerController:OnUpdate deployplacer"
+      ]
+    },
+    {
+      "id": "DEP-S12",
+      "source_file": "scripts/components/placer.lua",
+      "file_sha256": "1bc4a3e4529e2d540d6d2497d3bbd49d74993853c2751a058fa602ba963d14f9",
+      "line_start": 215,
+      "line_end": 229,
+      "range_sha256": "82f5402ddb46cfd01ef960ff687dfd71125f531a611da75ec242dfefddd31498",
+      "symbols": [
+        "Placer:GetDeployAction"
+      ]
+    },
+    {
+      "id": "DEP-S13",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 1539,
+      "line_end": 1545,
+      "range_sha256": "9bf43b0b3efd5aabbaaab58ea4d3f576a2a093b32b5fbcb62c1a3134dcc22aa6",
+      "symbols": [
+        "PlayerController:CancelDeployPlacement"
+      ]
+    },
+    {
+      "id": "DEP-S14",
+      "source_file": "scripts/componentactions.lua",
+      "file_sha256": "a0274749b0453927bfb0904d5e7730fc75d32b80aec40ee9fe010e4ffc011f9a",
+      "line_start": 2079,
+      "line_end": 2102,
+      "range_sha256": "5b91f969f24c75f95297904720fbe5f44705b661e30fefd1ef28125be2df417c",
+      "symbols": [
+        "POINT.deployable"
+      ]
+    },
+    {
+      "id": "DEP-S15",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 1053,
+      "line_end": 1062,
+      "range_sha256": "f4fce36c528ba0efe5a7061384d7866197acd941ebd2e7feab49480f51f0dd2b",
+      "symbols": [
+        "ACTIONS.DEPLOY handler"
+      ]
+    },
+    {
+      "id": "DEP-S16",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 1524,
+      "line_end": 1530,
+      "range_sha256": "aebc2c7a2be6ca7a54b9ab89a23c5d2318040e2d2daa39afa8861316d638f4af",
+      "symbols": [
+        "ACTIONS.DISMANTLE handler"
+      ]
+    },
+    {
+      "id": "DEP-S17",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 8027,
+      "line_end": 8072,
+      "range_sha256": "d4708180514f6e95f7980281282a97c751f36b600cdb6261f9c289aee17a81cf",
+      "symbols": [
+        "doshortaction"
+      ]
+    },
+    {
+      "id": "DEP-S18",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 8360,
+      "line_end": 8429,
+      "range_sha256": "24e8177e1b17ee79a37f777d5e6d2fee2f06a8951ad4366630bdbf57c6049dd1",
+      "symbols": [
+        "dolongaction"
+      ]
+    },
+    {
+      "id": "DEP-S19",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 370,
+      "line_end": 380,
+      "range_sha256": "ad83fc8b2484348228314ad038728eb087004006f5036f4fc80e6af07b83cb25",
+      "symbols": [
+        "ACTIONS.DEPLOY client handler"
+      ]
+    },
+    {
+      "id": "DEP-S20",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 782,
+      "line_end": 788,
+      "range_sha256": "aebc2c7a2be6ca7a54b9ab89a23c5d2318040e2d2daa39afa8861316d638f4af",
+      "symbols": [
+        "ACTIONS.DISMANTLE client handler"
+      ]
+    },
+    {
+      "id": "DEP-S21",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 3123,
+      "line_end": 3156,
+      "range_sha256": "bf4f80c51111d4e3e9c26e5e7463be24ade37a84e481ebe803299bad9c0dc057",
+      "symbols": [
+        "doshortaction preview"
+      ]
+    },
+    {
+      "id": "DEP-S22",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 3185,
+      "line_end": 3233,
+      "range_sha256": "07ed718428b9d2ff877c5a95fc0f97831109c361d7ce3795d3f94316bf98c9b5",
+      "symbols": [
+        "dolongaction preview"
+      ]
+    },
+    {
+      "id": "DEP-S23",
+      "source_file": "scripts/components/sleepingbag.lua",
+      "file_sha256": "8b5423cad0d8e31e9e32c1770f83496fb609c22915167d39f8b9864c77ae1e40",
+      "line_start": 74,
+      "line_end": 95,
+      "range_sha256": "52750f7fe1e9cdc664310053298d5a147b2fdd30eb49fc60eacf1dbcf065c6a1",
+      "symbols": [
+        "SleepingBag:DoWakeUp",
+        "SleepingBag.OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "DEP-S24",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 439,
+      "line_end": 448,
+      "range_sha256": "752524eb4e6dd1bd3358840f169610b79e00f53cd9946516331ad28dcf7b7295",
+      "symbols": [
+        "ReplacePrefab"
+      ]
+    },
+    {
+      "id": "DEP-S25",
+      "source_file": "scripts/components/finiteuses.lua",
+      "file_sha256": "db589f3ccc740d002c6106be914a1cde6375056262720359b2becdba25cec4b4",
+      "line_start": 48,
+      "line_end": 87,
+      "range_sha256": "bbe7e14b98fdcb35610e599daec370e6d977c2d86474927787cc478df8c86410",
+      "symbols": [
+        "FiniteUses:OnSave",
+        "FiniteUses:OnLoad",
+        "FiniteUses:SetUses",
+        "FiniteUses:Use"
+      ]
+    },
+    {
+      "id": "DEP-S26",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "DEP-S27",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1962,
+      "range_sha256": "1828b3a6c013d236154df90ad70408c9099d63abc8ffef61875572696865030a",
+      "symbols": [
+        "EntityScript:GetPersistData"
+      ]
+    },
+    {
+      "id": "DEP-S28",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5041,
+      "line_end": 5123,
+      "range_sha256": "89bb9ff2df12537eb0caece066d7fb6f5fe44a965b3b55dfae46bc02ada4502a",
+      "symbols": [
+        "PlayerController:OnRightClick",
+        "PlayerController:OnRemoteRightClick"
+      ]
+    },
+    {
+      "id": "DEP-S29",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 1045,
+      "line_end": 1064,
+      "range_sha256": "725fa3659d557b84a53f7d8defd1aba6af31887cce092badffb507c0e8ef5bfb",
+      "symbols": [
+        "PlayerController:OnRemoteControllerActionButtonDeploy"
+      ]
+    },
+    {
+      "id": "DEP-S30",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 4632,
+      "line_end": 4647,
+      "range_sha256": "26cad9a5496088dafab9d57b47dc5b348cf930254592ddea4a8ce5dd8c58ef1e",
+      "symbols": [
+        "PlayerController:DoAction"
+      ]
+    },
+    {
+      "id": "DEP-S31",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1588,
+      "line_end": 1595,
+      "range_sha256": "212903647ab07cc468a6a8f79ebba8a1e48fd07b7ea7fa3a8f916ac7fd80032f",
+      "symbols": [
+        "EntityScript:ClearBufferedAction"
+      ]
+    },
+    {
+      "id": "DEP-S32",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1625,
+      "line_end": 1632,
+      "range_sha256": "bc077dc3cbee6b70cb11d66e2f00c3b0121e40e68608353fdb3be86d8dd5a744",
+      "symbols": [
+        "EntityScript:PerformPreviewBufferedAction"
+      ]
+    },
+    {
+      "id": "DEP-S33",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1679,
+      "line_end": 1712,
+      "range_sha256": "d8f1895d5a9b9b1b5ce48c2694c6163884aa9bc770ead6f205351066da1135a3",
+      "symbols": [
+        "EntityScript:PerformBufferedAction"
+      ]
+    },
+    {
+      "id": "DEP-S34",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 1390,
+      "line_end": 1454,
+      "range_sha256": "bb0484fc26f6775af0147e3eb1b0cb2ddb8d801189aab319cbb1e3d290872dee",
+      "symbols": [
+        "Inventory:RemoveItem"
+      ]
+    },
+    {
+      "id": "DEP-S35",
+      "source_file": "scripts/components/deployable.lua",
+      "file_sha256": "6ce4dc04f9f69593f165ee3bdde7f36ae7cf7a056d0aacaec34a5f58ef767392",
+      "line_start": 31,
+      "line_end": 53,
+      "range_sha256": "f34e9de2af1ec1e1e08c53b74e8a0f2526c9bd86de21d2c9d786274a2d2a7c80",
+      "symbols": [
+        "Deployable constructor"
+      ]
+    },
+    {
+      "id": "DEP-S36",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 248,
+      "line_end": 316,
+      "range_sha256": "9d481040bf0dbaead41c3af063852d8a1a469462d12207da61de1b5fdeea7715",
+      "symbols": [
+        "EntityScript:GetSaveRecord"
+      ]
+    },
+    {
+      "id": "DEP-S37",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "portabletent 部署 收起 耐久",
+      "expected_entry_ids": [
+        "EXP-CHAIN-DEPLOY-001"
+      ],
+      "purpose": "显式Reviewer研究可收起建筑完整链与恢复边界。"
+    },
+    {
+      "query": "DISMANTLE PortableStructure ChangeToItem",
+      "expected_entry_ids": [
+        "EXP-CHAIN-DEPLOY-001"
+      ],
+      "purpose": "显式Reviewer研究可收起建筑完整链与恢复边界。"
+    },
+    {
+      "query": "ReplacePrefab portabletent animover save",
+      "expected_entry_ids": [
+        "EXP-CHAIN-DEPLOY-001"
+      ],
+      "purpose": "显式Reviewer研究可收起建筑完整链与恢复边界。"
+    }
+  ],
+  "limitations": [
+    "research/restricted/hold，runtime_verified=false，仅静态Lua与独立替身。",
+    "来源为限定762172 ZIP，引用hash不证明当前全部运行行为。",
+    "原版源码不随本产物分发。数值、退款与示例政策属于演示夹具，需项目明确需求。"
+  ]
+}

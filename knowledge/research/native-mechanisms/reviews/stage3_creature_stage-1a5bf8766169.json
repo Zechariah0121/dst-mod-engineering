@@ -1,0 +1,574 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "candidate_sha256": "073e5e364cf91b6edfb946cc5fbb8bf80634800c8493eeaac23b867ec6fa9de4",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "候选静态研究通过",
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "独立直接读取当前安装且与762172冻结身份相同的scripts.zip，逐引用文件/行范围hash和逐claim/API/step语义反查，审阅指南与自写最小示例，独立Lua5.1编译及只读重执行作者替身检查。",
+  "accepted_scope": {
+    "source_epoch": "762172",
+    "runtime_verified": false,
+    "evidence": "frozen_archive_static_lua",
+    "finite_stages": [
+      "normal",
+      "werepig"
+    ],
+    "subject": "普通pigman，shared entity，非节日/寄生/guard/moon分支。",
+    "increment_over_existing": "复用通用Brain/SG/生命周期/保存合同，新增具名werebeast输入至两态消费者及自身恢复字段。",
+    "exclusions": [
+      "全部Boss阶段",
+      "玩家变形",
+      "技能树",
+      "worldgen",
+      "全部特殊猪变体",
+      "真实网络和磁盘验证"
+    ]
+  },
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": true,
+    "candidate_sha256_verified": true,
+    "archive_identity_verified": true,
+    "source_file_and_range_hashes": "all_match",
+    "governance": "research/restricted/hold preserved",
+    "public_distribution": "candidate无私人绝对路径或原版Lua载荷",
+    "guide_and_example": "PASS_STATIC_AND_LUA51_SUBSTITUTES",
+    "runtime": "not_run"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-CHAIN-STAGE-001",
+      "claim_reviews": [
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C01",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "公共common网络/标签/SetPristine与master组件，normal安装SetOnNormalFn并立即SetNormalPig，端别和入口准确。",
+          "evidence_refs": [
+            "STAGE-P5",
+            "STAGE-P6"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C02",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "Eater PrefersToEat→oneat→oneatfn→OnEaten/HandleEatRemove与pig OnEat条件、阈值4及TriggerDelta钳零/SetWere符合。",
+          "evidence_refs": [
+            "STAGE-F1",
+            "STAGE-P1",
+            "STAGE-P5",
+            "STAGE-W2"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C03",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "isfullmoon/limbo监听、待转取消/同态延长/异态延迟与haunt独立输入可查，未将进入limbo当作取消回退。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-P4"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C04",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "SetWere/SetNormal先回调事件后改变_reverttask，重入可见窗口与IsInWereState单字段判据准确，重复请求会重跑。",
+          "evidence_refs": [
+            "STAGE-W2"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C05",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "同实体Brain/SG/build/属性/掉落/health及目标/交易/跟随/talker/树监听在两回调逐项核对，normal无旧leader恢复。",
+          "evidence_refs": [
+            "STAGE-P2",
+            "STAGE-P3"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C06",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "两Brain分支与Combat doattack、SGpig 13帧/SGwerepig 16帧攻击及jumping onexit motor清理一致。",
+          "evidence_refs": [
+            "STAGE-B1",
+            "STAGE-B2",
+            "STAGE-C1",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-S4",
+            "STAGE-D1"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C07",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "阶段回调先SetStateGraph再由WereBeast发事件，transformWere/Normal表现与存活门禁、onexit清理可查，属性无通用回滚。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C08",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "OnRevert transform门禁无else/重排/清句柄；组件卸载清监听和任务，整实体Remove先清全量资源再调OnRemoveEntity，生命周期名称未混同。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-E2"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C09",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "OnSave待转优先/回退正剩余、OnLoad time重跑阶段，pig build preload/load与EntityScript组件pairs顺序准确，未承诺health先后。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P4",
+            "STAGE-E3"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C10",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "SetMaxHealth同时补当前值、Health加载SetVal与正到零death链、SG死亡消费者均已查。WereBeast确无死亡取消监听，待移除阶段资源留为未验。",
+          "evidence_refs": [
+            "STAGE-H1",
+            "STAGE-H2",
+            "STAGE-H3",
+            "STAGE-D1",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-W1",
+            "STAGE-W2"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-STAGE-001-C11",
+          "kind": "REC",
+          "result": "PASS_STATIC",
+          "semantic_basis": "REC示例复用既有WereBeast并明标阈值2/15秒/测试事件演示，死亡保血等政策未代用户确定。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-E3"
+          ]
+        }
+      ],
+      "api_reviews": [
+        {
+          "symbol": "WereBeast:SetWere",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-P3",
+            "STAGE-P5"
+          ]
+        },
+        {
+          "symbol": "WereBeast:SetNormal",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P6"
+          ]
+        },
+        {
+          "symbol": "WereBeast:TriggerDelta",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P1",
+            "STAGE-P5"
+          ]
+        },
+        {
+          "symbol": "WereBeast:IsInWereState",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnSave",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-E3"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnLoad",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-E3",
+            "STAGE-H1",
+            "STAGE-H2",
+            "STAGE-P4"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnRemoveFromEntity",
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐读声明、回调和实际消费者，核对参数/返回/副作用/生命周期及限定，未提升为公共/原生行为保证。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-E2"
+          ]
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "STAGE-P1",
+            "STAGE-P4",
+            "STAGE-P5",
+            "STAGE-P6",
+            "STAGE-W1"
+          ]
+        },
+        {
+          "step": 2,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-B1",
+            "STAGE-B2"
+          ]
+        },
+        {
+          "step": 3,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-S4",
+            "STAGE-C1"
+          ]
+        },
+        {
+          "step": 4,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-E2",
+            "STAGE-H3",
+            "STAGE-D1"
+          ]
+        },
+        {
+          "step": 5,
+          "result": "PASS_STATIC",
+          "semantic_basis": "逐步对照输入、端别、实际消费者、退出及恢复，所列来源支撑声明边界。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P4",
+            "STAGE-E3",
+            "STAGE-H1",
+            "STAGE-H2"
+          ]
+        }
+      ],
+      "classification_review": "NSF限定快照Lua事实，EI明确推导及前提，REC保留项目选择，私有上下文未知，未虚构运行事实。",
+      "unknowns_review": "实际复制/客户端/动画/磁盘重启/跨分片/原生内部/第三方组合保留未验。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "STAGE-W1",
+      "source_file": "scripts/components/werebeast.lua",
+      "line_start": 1,
+      "line_end": 85,
+      "file_sha256": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+      "range_sha256": "5569d70ba6171711069c90074d31e01a07a50c8d903443bd4d0dd295fbe202ba",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-W2",
+      "source_file": "scripts/components/werebeast.lua",
+      "line_start": 87,
+      "line_end": 169,
+      "file_sha256": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+      "range_sha256": "25f6101b3870118ea7157c9f0bf7921dd0e2dd74a6b18609800997820909f92f",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P1",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 136,
+      "line_end": 147,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "57b31dc4a4c9919d15df19db545a8983cac80e132ec633a38ed91ca86f9d9323",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P2",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 338,
+      "line_end": 371,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "40d603250390014670b99b5203107b79628a3f9e60bfe6ad8ac5ff3edbf4d90d",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P3",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 496,
+      "line_end": 588,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "087409471bdc2815bf7777698db15d62036010629824b1d22052c5f576a9d49f",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P4",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 702,
+      "line_end": 743,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "3086ab8ad6c8303f28cbe898f2dde606869ae0ca090d969a32fa161ceae8b16f",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P5",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 748,
+      "line_end": 887,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "536469214cc244ead64b759a01d911f42414201187910e69f1bdc10480d99f24",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-P6",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "line_start": 922,
+      "line_end": 950,
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "range_sha256": "6f2a2e5a68a253aa3bb18d768ae7798f3ddcb14e3e4fdf5bdfcd7657e1229573",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-B1",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "line_start": 382,
+      "line_end": 423,
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "range_sha256": "438fd461ce934e5e08573b87213d527123798211e2af57498bee9133636aa067",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-B2",
+      "source_file": "scripts/brains/werepigbrain.lua",
+      "line_start": 11,
+      "line_end": 59,
+      "file_sha256": "8671304733cdcbfc31ee3d4a7f04e09cea114ce4b686c8d7ce5f02296e05dfd4",
+      "range_sha256": "568c46d4ccff85a8d446160fa197eabc20f59fe0ca1da11abadf98659bad5c9c",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-S1",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "line_start": 17,
+      "line_end": 83,
+      "file_sha256": "48260ec2214d53a2a0fc20cbe57757c76ec64deff39f0199514df6790969f0be",
+      "range_sha256": "0e27f46b1b0425f0064b52097cb863006850e248f78cf55f61095f27db0afeaa",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-S2",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "line_start": 169,
+      "line_end": 274,
+      "file_sha256": "48260ec2214d53a2a0fc20cbe57757c76ec64deff39f0199514df6790969f0be",
+      "range_sha256": "83ae61c036f1d48ed4727f0df261645feddf0672ccee790de4846e10669507dc",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-S3",
+      "source_file": "scripts/stategraphs/SGwerepig.lua",
+      "line_start": 9,
+      "line_end": 124,
+      "file_sha256": "482b5714e0f7acd431bc727ffefec0675a8ec390bf74fd55f628e518cc424b0a",
+      "range_sha256": "eab977224fdef23acb48133dc22adb38277ff253f4e5bf9ea80aa85be7b47249",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-S4",
+      "source_file": "scripts/stategraphs/SGwerepig.lua",
+      "line_start": 143,
+      "line_end": 214,
+      "file_sha256": "482b5714e0f7acd431bc727ffefec0675a8ec390bf74fd55f628e518cc424b0a",
+      "range_sha256": "8a1135d56e4bb648747c498d24d05172d61b5341e1362c10f67ec12fa7c854c0",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-E1",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1129,
+      "line_end": 1189,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "c86bfd5c97ebf5de430659322cb64ee4793860377048031b43591942cbb45896",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-E2",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1730,
+      "line_end": 1797,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-E3",
+      "source_file": "scripts/entityscript.lua",
+      "line_start": 1928,
+      "line_end": 2014,
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "range_sha256": "e8b5d0d5a7e909beece094aa298671ce52af9e2e585979ab749a5fa49557b471",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-H1",
+      "source_file": "scripts/components/health.lua",
+      "line_start": 154,
+      "line_end": 185,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "faf82d94545ab69c9c84f51ca1248cd0635b0ad94d68c082f558ede84c180dd2",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-H2",
+      "source_file": "scripts/components/health.lua",
+      "line_start": 503,
+      "line_end": 507,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "462241237e323ab993d32a43218828057b9edb214ef82ba873d1f5ed7960230f",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-H3",
+      "source_file": "scripts/components/health.lua",
+      "line_start": 565,
+      "line_end": 611,
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "range_sha256": "7ec7cc80f4b636f4d5bdbc8dc8c16568b9f6d37fd010f70f01190d03f8474090",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-D1",
+      "source_file": "scripts/stategraphs/commonstates.lua",
+      "line_start": 351,
+      "line_end": 385,
+      "file_sha256": "a6c501ad56af9585b8c1b50b3d821851b30b31a58839aba020aac4e834e4d49f",
+      "range_sha256": "3721ac71d1f512535492e386c84c0c210dca4c271d5c75f0c295ab1d9ef25252",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-C1",
+      "source_file": "scripts/components/combat.lua",
+      "line_start": 829,
+      "line_end": 843,
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "range_sha256": "6e074abde398e1f1e737076f065c6dbf8bc6cc551e44f2d13cd0724f3afdb662",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "STAGE-F1",
+      "source_file": "scripts/components/eater.lua",
+      "line_start": 198,
+      "line_end": 286,
+      "file_sha256": "d8de9b5c73274deb42198f8cc937915ff6b1bbb42eb908d72a84cc24bde688b4",
+      "range_sha256": "aa865236e57138534827e2c7344ddd14ad6138644d65dc26632620d8b13e17bd",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    }
+  ],
+  "artifact_reviews": {
+    "guide": {
+      "relative_path": "stage3-chains/creature-stage/guide.md",
+      "sha256": "c4890bd4473ab86ddb7c5d4dce2c3d0084b889abea652779d400e81e15426650",
+      "final_destination": "references/chain-creature-stage.md"
+    },
+    "example": {
+      "relative_path": "stage3-chains/creature-stage/example.lua",
+      "sha256": "bd407aed82a5e6bfca3e5e94b73239e71eba747d2e17c7cea2235d9a3edc2108"
+    },
+    "guide_example_exact_bytes": true,
+    "guide_embedded_sha_matches": true,
+    "public_private_path_scan": "PASS",
+    "vanilla_payload_review": "指南只内嵌自写example，candidate与review只保留scripts定位及hash，没有大段原版Lua。",
+    "semantic_basis": "指南限定普通pigman两态，属性与Brain/SG真实消费者、任务字段窗口、transform到期跳过、死亡无自动取消与health加载顺序边界均保留。示例modmain PostInit重用WereBeast，请求拒绝已死亡/跳过同态，阈值2/15秒及原版补血清leader明标演示，没有新增自有持久数据或跨帧任务。",
+    "verification": "独立Lua5.1编译通过，重执行作者替身检查通过。重执行时将来源指定为当前安装ZIP，结果仅写verification/chains。",
+    "limits": "替身对象及手动驱动不证明实际游戏调度、输入、复制、动画物理、磁盘保存或跨分片。",
+    "distribution_links": "已核对现有references兄弟链接，内容寻址研究链接指向本次candidate的topic/hash预期登记位置，实际登记由总控执行。"
+  },
+  "freeze_receipt": {
+    "candidate_guide_example_match_final_result": true,
+    "runtime_verified": false,
+    "review_bytes_final": true,
+    "actual_runtime_evidence": "separate_named_evidence_by_parent"
+  }
+}

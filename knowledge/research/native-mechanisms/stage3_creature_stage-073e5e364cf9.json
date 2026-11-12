@@ -1,0 +1,868 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "stage3_creature_stage",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-CHAIN-STAGE-001",
+      "title": "普通猪人normal与werepig的有限变形、消费者与恢复链",
+      "aliases": [
+        "pigman werepig",
+        "werebeast",
+        "阶段生物",
+        "形态切换",
+        "满月变形",
+        "transformWere",
+        "transformNormal"
+      ],
+      "engineering_question": "两态生物的阶段状态由谁持有，输入如何进入Brain/SG与属性消费者，取消、到期、死亡、移除及读档的真实边界是什么？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "runtime_verified": false,
+        "evidence": "frozen_archive_static_lua",
+        "finite_stages": [
+          "normal",
+          "werepig"
+        ],
+        "subject": "普通pigman，shared entity，非节日/寄生/guard/moon分支。",
+        "increment_over_existing": "复用通用Brain/SG/生命周期/保存合同，新增具名werebeast输入至两态消费者及自身恢复字段。",
+        "exclusions": [
+          "全部Boss阶段",
+          "玩家变形",
+          "技能树",
+          "worldgen",
+          "全部特殊猪变体",
+          "真实网络和磁盘验证"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CHAIN-STAGE-001-C01",
+          "kind": "NSF",
+          "statement": "普通pigman的common先建Network、AnimState和共享标签，SetPristine后客户端早退。werebeast、eater、health、combat、locomotor等以及normal()里的阶段回调安装在master分支。normal()设置SetOnNormalFn(SetNormalPig)并立即初始化normal态。",
+          "evidence_refs": [
+            "STAGE-P5",
+            "STAGE-P6"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C02",
+          "kind": "NSF",
+          "statement": "食物输入经Eater:Eat的PrefersToEat分支，在oneat事件后调用oneatfn，再调用食物OnEaten与HandleEatRemove。pigman的OnEat仅在edible存在、MEAT、werebeast存在、当前非were且GetHealth(inst)<0时TriggerDelta(1)。master配置triggerlimit=4。TriggerDelta把累计值钳到至少0，达到阈值调用SetWere；未达阈值只累积。",
+          "evidence_refs": [
+            "STAGE-F1",
+            "STAGE-P1",
+            "STAGE-P5",
+            "STAGE-W2"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C03",
+          "kind": "NSF",
+          "statement": "werebeast监听isfullmoon与enterlimbo/exitlimbo。满月变更先取消待转任务，同态满月可延长回退时间，异态且非limbo时安排延迟DoTransform。enterlimbo只取消待转任务，exitlimbo延后重新检查世界状态。CustomOnHaunt在非were且非franken并通过随机条件时另调用SetWere(time)。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-P4"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C04",
+          "kind": "NSF",
+          "statement": "SetWere先取消待转任务，再调用onsetwerefn(inst)、发transformwere、重置触发累计，最后取消旧回退任务并安装新任务。SetNormal先取消待转任务，再调用onsetnormalfn(inst)、发transformnormal、重置累计，最后取消并清回退字段。IsInWereState仅检查_reverttask非nil。首次SetWere回调/事件期间此字段尚未建立，SetNormal回调/事件期间旧字段尚未清除。重复SetWere也会重跑回调和事件。",
+          "evidence_refs": [
+            "STAGE-W2"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C05",
+          "kind": "NSF",
+          "statement": "SetWerePig与SetNormalPig在同一实体上切换werepig标签、Brain、SG、build、睡眠测试/抗性、combat伤害/攻击周期/索敌及保持回调、移动速度、掉落和生命上限。两者均清combat.target。were态禁用trader、清follower leader、忽略talker并移除树目标监听；normal态重新启用trader、恢复talker并按同一函数身份重挂树目标监听。normal回调没有恢复旧leader的语句。",
+          "evidence_refs": [
+            "STAGE-P2",
+            "STAGE-P3"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C06",
+          "kind": "NSF",
+          "statement": "真实消费者分别为pigbrain的追击/冷却逃跑等优先分支和werepigbrain的jumping持续门槛、panic、SafeToEat、ChaseAndAttack及Wander。Combat:TryAttack发送doattack，SGpig按存活/忙碌条件进入attack并于13*FRAMES调用DoAttack。SGwerepig接CommonHandlers.OnAttack，同样检查存活及busy/hit/electrocute条件进入attack，其FrameEvent(16)执行DoAttack，退出时在仍有jumping标签时清motor override并Stop。",
+          "evidence_refs": [
+            "STAGE-B1",
+            "STAGE-B2",
+            "STAGE-C1",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-S4",
+            "STAGE-D1"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C07",
+          "kind": "NSF",
+          "statement": "阶段回调先SetStateGraph，再发形态事件。transformWere入态恢复旧pig build播放变形、添加hostile，受击可转hit且返回true；退出设置werepig_build。transformNormal入态使用werepig_build及五个转换符号、移除hostile，animover使sleeper睡眠并转sleeping；退出恢复inst.build并清五个override。事件入口均检查存活。动画中断沿对应onexit处理表现，已运行的阶段回调属性变化没有通用回滚。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C08",
+          "kind": "NSF",
+          "statement": "OnRevert只在IsInWereState且SG无transform标签时调用SetNormal。若transform期间到期，该函数没有else重排或清_reverttask。WereBeast:OnRemoveFromEntity取消并清两类任务、停止世界状态监听、解绑limbo事件。整实体Remove另清worldstate、事件和pendingtasks，然后调用组件OnRemoveEntity，不能把组件卸载钩子名称混同。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-E2"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C09",
+          "kind": "NSF",
+          "statement": "werebeast OnSave在待转任务存在时按当时满月状态选择保存floor(weretime)或nil，否则对非nil回退任务保存floor剩余且仅正值产出time。不保存triggeramount、阶段动画、Brain树或任务句柄。OnLoad只在data.time存在时SetWere(max(0,time))，重跑阶段回调和事件。pigman OnPreLoad先恢复build，prefab OnLoad仅在非franken且非were时恢复该build。EntityScript以组件OnSave后prefab OnSave保存，并以prefab OnPreLoad、pairs组件OnLoad、prefab OnLoad恢复。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P4",
+            "STAGE-E3"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C10",
+          "kind": "NSF",
+          "statement": "Health:SetMaxHealth直接写maxhealth和currenthealth后ForceUpdateHUD。Health:OnLoad会SetVal保存血量。Health:SetVal在从正血到非正时发entity_death与death，再走淡出/尸体分支。两种pig SG注册CommonHandlers.OnDeath并有death态消费者，但werebeast没有死亡时取消阶段任务的代码。死亡不能据Remove的任务清理合同提前视为已取消。",
+          "evidence_refs": [
+            "STAGE-H1",
+            "STAGE-H2",
+            "STAGE-H3",
+            "STAGE-D1",
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-W1",
+            "STAGE-W2"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-STAGE-001-C11",
+          "kind": "REC",
+          "statement": "当前证据支持声明范围内的静态功能链及上述显式缺口。自有形态系统应先定死亡、保血、取消和存档政策，再按实际owner接线和运行验证。示例选择重用普通pigman原有werebeast，示例阈值2、持续15秒及测试事件属于演示夹具。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-E3"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "WereBeast:SetWere",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [
+            "time可nil，nil/false取weretime；由实际调用方提供可调度数值。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "实例、任务接口、onsetwerefn及SG/组件依赖就绪。"
+          ],
+          "side_effects": [
+            "先取消待转任务，回调、事件、重置触发，再替换回退任务。重复调用也重跑回调。"
+          ],
+          "lifecycle": [
+            "无死亡、当前形态或回调重入守卫，无异常回滚。OnRevert受transform标签限制。"
+          ],
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-P3",
+            "STAGE-P5"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:SetNormal",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "onsetnormalfn及其SG/组件依赖就绪。"
+          ],
+          "side_effects": [
+            "先取消待转任务，回调和事件之后重置累计并取消清回退字段。"
+          ],
+          "lifecycle": [
+            "调用中回调/事件可见旧的IsInWereState结果，无自动还原旧leader/血量。"
+          ],
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P6"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:TriggerDelta",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [
+            "amount为可加数值；配置triggerlimit时triggeramount需已初始化。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "SetTriggerLimit(limit)通过ResetTriggers初始化累计；普通pigman配置4。"
+          ],
+          "side_effects": [
+            "limit非nil时累计钳至少0，达到limit调用SetWere。"
+          ],
+          "lifecycle": [
+            "SetWere/SetNormal重置累计；累计未被OnSave保存。"
+          ],
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P1",
+            "STAGE-P5"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:IsInWereState",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [],
+          "returns": "布尔值，精确等于_reverttask ~= nil。",
+          "preconditions": [
+            "werebeast实例存在。"
+          ],
+          "side_effects": [
+            "只读字段，无有效/到期任务判断。"
+          ],
+          "lifecycle": [
+            "SetWere/SetNormal回调前后有字段更新窗口，transform到期分支可保留已执行句柄。"
+          ],
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnSave",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [],
+          "returns": "nil或仅time的table，按待转/回退任务分支。",
+          "preconditions": [
+            "回退分支的GetTaskRemaining可供floor运算。"
+          ],
+          "side_effects": [
+            "采样剩余时间，不保存累计、回调或Brain/SG。"
+          ],
+          "lifecycle": [
+            "组件保存阶段调用。待转分支优先于回退分支。"
+          ],
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-E3"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnLoad",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [
+            "data可nil；非nil且time存在时要求可与0比较的数值。"
+          ],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "阶段回调及prefab默认组件已就绪。"
+          ],
+          "side_effects": [
+            "有time时SetWere(max(0,time))，重跑属性与事件。"
+          ],
+          "lifecycle": [
+            "组件pairs分发，无health顺序保证，缺数据不会自动设置normal。"
+          ],
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-E3",
+            "STAGE-H1",
+            "STAGE-H2",
+            "STAGE-P4"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        },
+        {
+          "symbol": "WereBeast:OnRemoveFromEntity",
+          "source_file": "scripts/components/werebeast.lua",
+          "visibility": "WereBeast Lua组件方法。普通pigman在master分支安装。回调槽为prefab的文件局部函数，本合同不授予其公共API身份。",
+          "parameters": [],
+          "returns": "无显式返回。",
+          "preconditions": [
+            "组件卸载入口，实例、任务和监听接口仍可用。"
+          ],
+          "side_effects": [
+            "取消并清_task/_reverttask，停止isfullmoon监听，解绑两种limbo事件。"
+          ],
+          "lifecycle": [
+            "移除组件的钩子。整实体Remove的全量资源清理由已有EXP-LIFE-008导航。卸载不回调SetNormal。"
+          ],
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-E2"
+          ],
+          "unknowns": [
+            "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+            "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+            "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+            "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+            "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+            "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "master初始化普通pigman并绑定两态回调，输入来自食用、满月、haunt或明确服务端请求。",
+          "evidence_refs": [
+            "STAGE-P1",
+            "STAGE-P4",
+            "STAGE-P5",
+            "STAGE-P6",
+            "STAGE-W1"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "werebeast管理累计和两类任务，阶段回调切换同实体的Brain、SG、属性、交易/跟随及表现消费者。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P2",
+            "STAGE-P3",
+            "STAGE-B1",
+            "STAGE-B2"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "新SG消费形态事件，动画退出清自身表现；攻击通过combat事件至具名SG时间线执行。",
+          "evidence_refs": [
+            "STAGE-S1",
+            "STAGE-S2",
+            "STAGE-S3",
+            "STAGE-S4",
+            "STAGE-C1"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "显式normal请求或非transform到期回退。limbo、卸载与整实体移除沿各自资源owner清理；死亡保留已发现的任务边界。",
+          "evidence_refs": [
+            "STAGE-W1",
+            "STAGE-W2",
+            "STAGE-E2",
+            "STAGE-H3",
+            "STAGE-D1"
+          ]
+        },
+        {
+          "step": 5,
+          "description": "保存time与build，恢复时重新执行阶段回调；health顺序、transform到期及真实重启继续列为待验。",
+          "evidence_refs": [
+            "STAGE-W2",
+            "STAGE-P4",
+            "STAGE-E3",
+            "STAGE-H1",
+            "STAGE-H2"
+          ]
+        }
+      ],
+      "unknowns": [
+        "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+        "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+        "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+        "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+        "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+        "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+      ],
+      "compatibility": {
+        "dependency_coverage": "enumerated_static",
+        "dependency_refs": [
+          {
+            "ref": "STAGE-W1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-W2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P3",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P4",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P5",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-P6",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-B1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-B2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-S1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-S2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-S3",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-S4",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-E1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-E2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-E3",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-H1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-H2",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-H3",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-D1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-C1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          },
+          {
+            "ref": "STAGE-F1",
+            "role": "具名链定义、实际消费者或退出/恢复依赖"
+          }
+        ],
+        "unknowns": [
+          "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+          "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+          "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+          "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+          "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+          "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+        ]
+      }
+    }
+  ],
+  "source_references": [
+    {
+      "id": "STAGE-W1",
+      "source_file": "scripts/components/werebeast.lua",
+      "file_sha256": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+      "line_start": 1,
+      "line_end": 85,
+      "range_sha256": "5569d70ba6171711069c90074d31e01a07a50c8d903443bd4d0dd295fbe202ba",
+      "symbols": [
+        "OnIsFullmoon",
+        "OnRevert",
+        "WereBeast:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "STAGE-W2",
+      "source_file": "scripts/components/werebeast.lua",
+      "file_sha256": "6c40a93553e5d9b5924bcc2c579d030c70a180b5f272e3ded798c01afc012fa9",
+      "line_start": 87,
+      "line_end": 169,
+      "range_sha256": "25f6101b3870118ea7157c9f0bf7921dd0e2dd74a6b18609800997820909f92f",
+      "symbols": [
+        "WereBeast:SetWere",
+        "WereBeast:SetNormal",
+        "WereBeast:TriggerDelta",
+        "WereBeast:IsInWereState",
+        "WereBeast:OnSave",
+        "WereBeast:OnLoad"
+      ]
+    },
+    {
+      "id": "STAGE-P1",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 136,
+      "line_end": 147,
+      "range_sha256": "57b31dc4a4c9919d15df19db545a8983cac80e132ec633a38ed91ca86f9d9323",
+      "symbols": [
+        "OnEat"
+      ]
+    },
+    {
+      "id": "STAGE-P2",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 338,
+      "line_end": 371,
+      "range_sha256": "40d603250390014670b99b5203107b79628a3f9e60bfe6ad8ac5ff3edbf4d90d",
+      "symbols": [
+        "SetNormalPig"
+      ]
+    },
+    {
+      "id": "STAGE-P3",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 496,
+      "line_end": 588,
+      "range_sha256": "087409471bdc2815bf7777698db15d62036010629824b1d22052c5f576a9d49f",
+      "symbols": [
+        "WerepigRetargetFn",
+        "WerepigKeepTargetFn",
+        "SetWerePig"
+      ]
+    },
+    {
+      "id": "STAGE-P4",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 702,
+      "line_end": 743,
+      "range_sha256": "3086ab8ad6c8303f28cbe898f2dde606869ae0ca090d969a32fa161ceae8b16f",
+      "symbols": [
+        "OnSave",
+        "OnPreLoad",
+        "OnLoad",
+        "CustomOnHaunt"
+      ]
+    },
+    {
+      "id": "STAGE-P5",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 748,
+      "line_end": 887,
+      "range_sha256": "536469214cc244ead64b759a01d911f42414201187910e69f1bdc10480d99f24",
+      "symbols": [
+        "common"
+      ]
+    },
+    {
+      "id": "STAGE-P6",
+      "source_file": "scripts/prefabs/pigman.lua",
+      "file_sha256": "c6e94b83b619d2a4e6c3dd4f2d4622efccac4af54b07f84c18f17d65fcefe884",
+      "line_start": 922,
+      "line_end": 950,
+      "range_sha256": "6f2a2e5a68a253aa3bb18d768ae7798f3ddcb14e3e4fdf5bdfcd7657e1229573",
+      "symbols": [
+        "normal"
+      ]
+    },
+    {
+      "id": "STAGE-B1",
+      "source_file": "scripts/brains/pigbrain.lua",
+      "file_sha256": "1971e5c613237c12b733047d7afe40221b733b748b2beac62bf2a87e26825755",
+      "line_start": 382,
+      "line_end": 423,
+      "range_sha256": "438fd461ce934e5e08573b87213d527123798211e2af57498bee9133636aa067",
+      "symbols": [
+        "PigBrain:OnStart"
+      ]
+    },
+    {
+      "id": "STAGE-B2",
+      "source_file": "scripts/brains/werepigbrain.lua",
+      "file_sha256": "8671304733cdcbfc31ee3d4a7f04e09cea114ce4b686c8d7ce5f02296e05dfd4",
+      "line_start": 11,
+      "line_end": 59,
+      "range_sha256": "568c46d4ccff85a8d446160fa197eabc20f59fe0ca1da11abadf98659bad5c9c",
+      "symbols": [
+        "WerePigBrain:OnStart",
+        "WerePigBrain:OnInitializationComplete"
+      ]
+    },
+    {
+      "id": "STAGE-S1",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "file_sha256": "48260ec2214d53a2a0fc20cbe57757c76ec64deff39f0199514df6790969f0be",
+      "line_start": 17,
+      "line_end": 83,
+      "range_sha256": "0e27f46b1b0425f0064b52097cb863006850e248f78cf55f61095f27db0afeaa",
+      "symbols": [
+        "transformnormal",
+        "doattack"
+      ]
+    },
+    {
+      "id": "STAGE-S2",
+      "source_file": "scripts/stategraphs/SGpig.lua",
+      "file_sha256": "48260ec2214d53a2a0fc20cbe57757c76ec64deff39f0199514df6790969f0be",
+      "line_start": 169,
+      "line_end": 274,
+      "range_sha256": "83ae61c036f1d48ed4727f0df261645feddf0672ccee790de4846e10669507dc",
+      "symbols": [
+        "death",
+        "transformNormal",
+        "attack"
+      ]
+    },
+    {
+      "id": "STAGE-S3",
+      "source_file": "scripts/stategraphs/SGwerepig.lua",
+      "file_sha256": "482b5714e0f7acd431bc727ffefec0675a8ec390bf74fd55f628e518cc424b0a",
+      "line_start": 9,
+      "line_end": 124,
+      "range_sha256": "eab977224fdef23acb48133dc22adb38277ff253f4e5bf9ea80aa85be7b47249",
+      "symbols": [
+        "transformwere",
+        "transformWere",
+        "death"
+      ]
+    },
+    {
+      "id": "STAGE-S4",
+      "source_file": "scripts/stategraphs/SGwerepig.lua",
+      "file_sha256": "482b5714e0f7acd431bc727ffefec0675a8ec390bf74fd55f628e518cc424b0a",
+      "line_start": 143,
+      "line_end": 214,
+      "range_sha256": "8a1135d56e4bb648747c498d24d05172d61b5341e1362c10f67ec12fa7c854c0",
+      "symbols": [
+        "attack"
+      ]
+    },
+    {
+      "id": "STAGE-E1",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1129,
+      "line_end": 1189,
+      "range_sha256": "c86bfd5c97ebf5de430659322cb64ee4793860377048031b43591942cbb45896",
+      "symbols": [
+        "EntityScript:SetBrain",
+        "EntityScript:SetStateGraph"
+      ]
+    },
+    {
+      "id": "STAGE-E2",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1797,
+      "range_sha256": "8452a4e6056040487ae779167dcd2ee7f62631189e0017d99d75791c645a1ed6",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "STAGE-E3",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 2014,
+      "range_sha256": "e8b5d0d5a7e909beece094aa298671ce52af9e2e585979ab749a5fa49557b471",
+      "symbols": [
+        "EntityScript:GetPersistData",
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "STAGE-H1",
+      "source_file": "scripts/components/health.lua",
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "line_start": 154,
+      "line_end": 185,
+      "range_sha256": "faf82d94545ab69c9c84f51ca1248cd0635b0ad94d68c082f558ede84c180dd2",
+      "symbols": [
+        "Health:OnSave",
+        "Health:OnLoad"
+      ]
+    },
+    {
+      "id": "STAGE-H2",
+      "source_file": "scripts/components/health.lua",
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "line_start": 503,
+      "line_end": 507,
+      "range_sha256": "462241237e323ab993d32a43218828057b9edb214ef82ba873d1f5ed7960230f",
+      "symbols": [
+        "Health:SetMaxHealth"
+      ]
+    },
+    {
+      "id": "STAGE-H3",
+      "source_file": "scripts/components/health.lua",
+      "file_sha256": "918695e24c82005106428e2b74e853a9b22208b971161fba935f4d9bc50a040d",
+      "line_start": 565,
+      "line_end": 611,
+      "range_sha256": "7ec7cc80f4b636f4d5bdbc8dc8c16568b9f6d37fd010f70f01190d03f8474090",
+      "symbols": [
+        "Health:SetVal"
+      ]
+    },
+    {
+      "id": "STAGE-D1",
+      "source_file": "scripts/stategraphs/commonstates.lua",
+      "file_sha256": "a6c501ad56af9585b8c1b50b3d821851b30b31a58839aba020aac4e834e4d49f",
+      "line_start": 351,
+      "line_end": 385,
+      "range_sha256": "3721ac71d1f512535492e386c84c0c210dca4c271d5c75f0c295ab1d9ef25252",
+      "symbols": [
+        "onattack",
+        "CommonHandlers.OnAttack",
+        "ondeath",
+        "CommonHandlers.OnDeath"
+      ]
+    },
+    {
+      "id": "STAGE-C1",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 829,
+      "line_end": 843,
+      "range_sha256": "6e074abde398e1f1e737076f065c6dbf8bc6cc551e44f2d13cd0724f3afdb662",
+      "symbols": [
+        "Combat:TryAttack"
+      ]
+    },
+    {
+      "id": "STAGE-F1",
+      "source_file": "scripts/components/eater.lua",
+      "file_sha256": "d8de9b5c73274deb42198f8cc937915ff6b1bbb42eb908d72a84cc24bde688b4",
+      "line_start": 198,
+      "line_end": 286,
+      "range_sha256": "aa865236e57138534827e2c7344ddd14ad6138644d65dc26632620d8b13e17bd",
+      "symbols": [
+        "Eater:Eat"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "pigman werepig 阶段生物 变形 owner 保存",
+      "expected_entry_ids": [
+        "EXP-CHAIN-STAGE-001"
+      ],
+      "purpose": "explicit_reviewer_research_only"
+    },
+    {
+      "query": "WereBeast:SetWere",
+      "expected_entry_ids": [
+        "EXP-CHAIN-STAGE-001"
+      ],
+      "purpose": "explicit_reviewer_research_only"
+    },
+    {
+      "query": "WereBeast:OnLoad",
+      "expected_entry_ids": [
+        "EXP-CHAIN-STAGE-001"
+      ],
+      "purpose": "explicit_reviewer_research_only"
+    },
+    {
+      "query": "transformWere transformNormal",
+      "expected_entry_ids": [
+        "EXP-CHAIN-STAGE-001"
+      ],
+      "purpose": "explicit_reviewer_research_only"
+    }
+  ],
+  "limitations": [
+    "研究限定具名冻结归档762172。来源身份由归档SHA定位，版本标签不代表本机游戏可执行程序核验。",
+    "runtime_verified=false，仅静态与另行记录的Lua替身。",
+    "未运行游戏、专服、真实远端客户端、实际磁盘保存重启或跨分片。原生网络复制、动画资产、物理、sleep/wake时机与GetTaskRemaining内部结果保持未知。",
+    "限定普通pigman的normal/werepig两态。pigguard、moonpig、frankenpig、寄生复活、节日活动和其他Mod改写不纳入此链。",
+    "SetStateGraph替换旧实例的入口没有调用旧态onexit。替换发生于攻击跳跃等临时物理状态时，原生motor清理结果需实际验证。",
+    "werebeast与health组件OnLoad经pairs分发，SetWerePig和SetNormalPig会SetMaxHealth并补满当前血量。存档中受伤werepig的最终血量受加载顺序影响，本次未给出保血保证。",
+    "werebeast没有death监听，回调及SetWere/SetNormal没有死亡守卫。死亡到移除之间的阶段任务、血量重设和SG替换交互需要专门运行验证。",
+    "OnRevert在transform标签期间跳过SetNormal且没有重排或清字段语句。任务执行完成后的句柄剩余时间、再保存和后续满月事件结果未运行验证。"
+  ]
+}

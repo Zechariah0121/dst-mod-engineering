@@ -46,10 +46,58 @@ def public_review(argv):
         return 2
 
 
+def unified_review(argv):
+    """Explicit complete-object review through the existing tools."""
+    parser = argparse.ArgumentParser(description='Review a complete registered object by ID, or navigate an exact API across families.')
+    parser.add_argument('id', nargs='?')
+    parser.add_argument('--api')
+    parser.add_argument('--pointer', default='')
+    parser.add_argument('--cursor', default='')
+    parser.add_argument('--max-bytes', type=int, default=24000)
+    parser.add_argument('--source-file')
+    parser.add_argument('--source-epoch')
+    parser.add_argument('--limit', type=int, default=5)
+    args = parser.parse_args(argv)
+    if bool(args.id) == bool(args.api):parser.error('Supply exactly one ID or --api SYMBOL')
+    if args.api and (args.pointer or args.cursor):parser.error('--pointer/--cursor apply to ID review')
+    if args.id and args.source_file:parser.error('--source-file applies to --api')
+    if not 1000 <= args.max_bytes <= 64000:parser.error('--max-bytes must be 1000..64000')
+    if not 1 <= args.limit <= 30:parser.error('--limit must be 1..30')
+    sys.path.insert(0, str(ROOT / 'dst-kb-service'))
+    from dst_kb.config import KBError
+    try:
+        config, _build = prepared_runtime(ROOT)
+    except PreparationError as exc:
+        print(json.dumps({'error': {'code': exc.code, 'message': str(exc)},
+                          'guidance': 'Unified review requires prepared full service. Public find/read remain available for source-free catalog review.'}, ensure_ascii=False), file=sys.stderr)
+        return 2
+    from dst_kb.mcp_server import Server
+    server = Server(config)
+    values = {'projection': 'reviewer', 'max_bytes': args.max_bytes}
+    if args.source_epoch:values['source_epoch'] = args.source_epoch
+    if args.api:
+        tool = 'lookup_api'
+        values.update(symbol=args.api, family='all', top_k=args.limit)
+        if args.source_file:values['source_file'] = args.source_file
+    else:
+        tool = 'get_entry'
+        values.update(id=args.id, purpose='review', pointer=args.pointer, cursor=args.cursor)
+    try:
+        print(json.dumps(server.call(tool, values), ensure_ascii=False))
+        return 0
+    except (KBError, OSError, ValueError, KeyError, TypeError) as exc:
+        print(json.dumps({'error': {'code': getattr(exc, 'code', 'CONFIG_ERROR'), 'message': str(exc)}}, ensure_ascii=False), file=sys.stderr)
+        return 2
+    finally:
+        server.close()
+
+
 def main(argv=None):
     supplied = list(sys.argv[1:] if argv is None else argv)
     if supplied and supplied[0] in ('find', 'read'):
         return public_review(supplied)
+    if supplied and supplied[0] == 'review':
+        return unified_review(supplied[1:])
     if supplied and supplied[0] == 'update-sources':
         from scripts.update_sources import main as update_main
         return update_main(supplied[1:])
@@ -57,8 +105,8 @@ def main(argv=None):
         from scripts.source_compatibility import main as compatibility_main
         return compatibility_main(supplied[1:])
     parser = argparse.ArgumentParser(description=__doc__, epilog='update-sources: check and prepare an explicitly bound local ZIP; run update-sources --help. maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
-    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources', 'find', 'read'],
-                        help='find QUERY / read ID: source-free public review; see each command --help')
+    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources', 'find', 'read', 'review'],
+                        help='find QUERY / read ID: public catalog; review ID / review --api SYMBOL: full-service object review; see each command --help')
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
     parser.add_argument('--source-epoch', choices=['759671'])
