@@ -146,9 +146,18 @@ def read(record, family, context, pointer='', cursor='', maximum=24000):
                 withheld['guidance'] = 'This complete object exceeds the service byte ceiling. Read the registered file with its complete Scope and evidence.'
             if size(withheld) <= maximum:
                 return withheld
-            return {'id': record['id'], 'purpose': 'review', 'objects': [], 'complete': False,
-                    'whole_value_delivered': False, 'withheld_reason': 'REQUIRED_CONTEXT_EXCEEDS_BUDGET',
-                    'coding_admission_granted': False}
+            compact = {
+                'id': record['id'], 'purpose': 'review', 'objects': [], 'complete': False,
+                'whole_value_delivered': False,
+                'withheld_reason': 'REQUIRED_CONTEXT_EXCEEDS_BUDGET',
+                'coding_admission_granted': False, 'continuation': retry,
+                'guidance': 'Use the supplied larger-budget call.' if retry else
+                    'Read the registered file with its complete Scope and evidence.',
+            }
+            if size(compact) > maximum:
+                compact['continuation'] = None
+                compact['guidance'] = 'Retry with a larger byte budget or read the registered file with complete Scope and evidence.'
+            return compact
         result = proposed
         index += 1
     return result

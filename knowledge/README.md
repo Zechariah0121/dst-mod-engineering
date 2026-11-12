@@ -1,6 +1,6 @@
 # DST 工程知识库
 
-`v2026.11.12.4` 包含300条登记知识，分为64条基础、13条 Native AI、110条 Native Core和113条机制研究。完整数量见 [CATALOG.json](CATALOG.json) 的 `counts`，登记文件见 [FAMILY-REGISTRY.json](FAMILY-REGISTRY.json)。机制研究族另有420项 `api_contracts`，全库 API 总数与源码覆盖率尚待独立盘点。
+包含300条登记知识，分为64条基础、13条 Native AI、110条 Native Core和113条机制研究。完整数量见 [CATALOG.json](CATALOG.json) 的 `counts`，登记文件见 [FAMILY-REGISTRY.json](FAMILY-REGISTRY.json)。机制研究族另有420项 `api_contracts`，全库 API 总数与源码覆盖率尚待独立盘点。
 
 按完整功能找路可读[开发任务地图](../references/task-map.md)。完整服务用 `get_entry(purpose="review", projection="reviewer")` 或 `run_kb.py review ID` 按 ID 读对象，按 API 用 `lookup_api(family="all", projection="reviewer")` 或 `run_kb.py review --api "符号"` 导航后补读。pointer/cursor、continuation与环境要求见[接入说明](../docs/knowledge-integration.md)。公开目录仍可无需来源地用 `find/read`，或按目录 `file`/`pointer` 文件读取；`data/index.json` 和 [INDEX.md](INDEX.md) 保留基础64条的既有视图。条目三轴状态、NSF/RV/EI/REC/UNK分类、版本、Scope和Correction分别判断。110条 Core 保留 Coding HOLD，113条机制研究保持 research/restricted/hold，显式 Reviewer 读取；完整规则见[检索策略](../references/kb-retrieval.md)。
 

@@ -131,7 +131,24 @@ class UnifiedReviewTests(unittest.TestCase):
         result = review_reader.read({'id': 'T', key: 'small'}, 'legacy', {}, '/' + key, maximum=1000)
         self.assertEqual(result['objects'], [])
         self.assertIsNone(result['continuation'])
+        self.assertIn('larger byte budget', result['guidance'])
         self.assertLessEqual(review_reader.size(result), 1000)
+
+    def test_narrow_budget_keeps_retry_when_full_withheld_context_does_not_fit(self):
+        record = {'id': 'T', 'title': 'x' * 2000}
+        context = {'scope': 'required ' + 'x' * 4300}
+        result = review_reader.read(record, 'legacy', context, maximum=4800)
+        self.assertEqual(result['objects'], [])
+        self.assertFalse(result['complete'])
+        self.assertLessEqual(review_reader.size(result), 4800)
+        self.assertIsNotNone(result['continuation'])
+        arguments = result['continuation']['arguments']
+        self.assertEqual(arguments['max_bytes'], 64000)
+        resumed = review_reader.read(record, 'legacy', context,
+            arguments['pointer'], arguments['cursor'], arguments['max_bytes'])
+        self.assertTrue(resumed['complete'])
+        self.assertEqual(resumed['scope'], context['scope'])
+        self.assertEqual([obj['value'] for obj in resumed['objects']], list(record.values()))
 
     def test_review_requires_explicit_role_and_does_not_modify_old_shapes(self):
         with self.assertRaises(KBError) as caught:

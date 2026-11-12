@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.12.4`：300 条登记知识（64 基础 + 13 Native AI + 110 Core + 113 机制研究），配套开发脚本、源码更新助手与只读 MCP。本轮统一 ID/API 审阅与完整对象续读，新增主动技能、装备、可收起建筑和两态生物的有限功能链。[安装](docs/install-and-use.md) · [本轮更新](docs/phase15-unified-chains.md) · [English](README.en.md)
+`v2026.11.12.5`：300 条登记知识（64 基础 + 13 Native AI + 110 Core + 113 机制研究），配套开发脚本、源码更新助手与只读 MCP。本轮统一 ID/API 审阅与完整对象续读，新增主动技能、装备、可收起建筑和两态生物的有限功能链。[安装](docs/install-and-use.md) · [本轮更新](docs/phase15-unified-chains.md) · [English](README.en.md)
 
 ## 工作顺序
 

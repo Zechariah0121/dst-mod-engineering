@@ -1,6 +1,6 @@
 # 能力与适用范围
 
-`v2026.11.12.4` 提供 300 条登记知识及开发工具，数量由 [CATALOG](../knowledge/CATALOG.json) 记录，分为 64 基础、13 Native AI、110 Native Core 和 113 机制研究。具体准入集中在[检索策略](../references/kb-retrieval.md)，按功能定位已有资料和缺口见[开发任务地图](../references/task-map.md)。
+`v2026.11.12.5` 提供 300 条登记知识及开发工具，数量由 [CATALOG](../knowledge/CATALOG.json) 记录，分为 64 基础、13 Native AI、110 Native Core 和 113 机制研究。具体准入集中在[检索策略](../references/kb-retrieval.md)，按功能定位已有资料和缺口见[开发任务地图](../references/task-map.md)。
 
 | 项目 | 适用范围 |
 |---|---|
@@ -13,7 +13,7 @@
 | 来源与更新 | 更新助手维护明确绑定和本地缓存；目标身份、逐引用状态、完整性错误与服务环境见[源码维护](source-compatibility.md) |
 | 客户端接入 | 按实际会话检查工具和任务响应；各 Agent/账户/云端环境分别验收 |
 | 自然检索 | 结果受问法、过滤与预算影响，遗漏时按 ID 或完整对象续读；本轮统一入口与有限链见[本轮说明](phase15-unified-chains.md) |
-| 运行证据 | 历史专服与客户端证据分别见[阶段 11](phase11-native-expansion.md)及[阶段 10](phase10-recovery-delivery.md)；四个新示例完成具名专服检查，其中三类完成隔离存档进程重启，实际范围与早期退出异常见[本轮说明](phase15-unified-chains.md)。真实客户端与跨分片仍待验 |
+| 运行证据 | 历史专服与客户端证据分别见[阶段 11](phase11-native-expansion.md)及[阶段 10](phase10-recovery-delivery.md)；四个新示例完成对应专服检查，其中三类完成存档重启。真实客户端与跨分片仍待验，范围见[本轮说明](phase15-unified-chains.md#验证状态) |
 | 开发脚本 | `check_api.py` 检查语法和部分直接方法声明；`dst_modtest.py` 支持 Windows 隔离单分片专服，客户端和跨分片另验 |
 | 游戏与私人材料 | 发行包不含游戏 Lua、私人项目或原始私人研究；恢复源码与本机状态留在本地 cache/ |
 

@@ -1,6 +1,6 @@
 # 维护与构建
 
-当前工作版本 `v2026.11.12.4` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，300 条知识与 MCP 共用 knowledge/，机制族登记420项 API 合同。统一读取与四条有限链见[本轮说明](phase15-unified-chains.md)，用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
+当前工作版本 `v2026.11.12.5` 分发唯一 dst-mod-engineering.zip 与 SHA256SUMS.txt，300 条知识与 MCP 共用 knowledge/，机制族登记420项 API 合同。统一读取与四条有限链见[本轮说明](phase15-unified-chains.md)，用户入口见[README](../README.md)，来源维护见[专页](source-compatibility.md)。
 
 ```text
 python -B -m unittest discover -s tests -v

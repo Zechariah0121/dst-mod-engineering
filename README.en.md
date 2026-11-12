@@ -1,12 +1,12 @@
 # DST Mod Engineering
 
-`v2026.11.12.4` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
+`v2026.11.12.5` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
 
 The knowledge base has **300 registered records: 64 foundation, 13 Native AI, 110 Native Core and 113 mechanism research records**. This update adds unified ID/API review with whole-object continuation and four bounded feature chains linking input, authoritative execution, consumers, cleanup and recovery. See [changes](docs/phase15-unified-chains.md). Detailed technical guides are mainly in Chinese.
 
-The mechanism research family contains 420 API contracts, counted from its records' `api_contracts` arrays. A whole-library API inventory and a source-coverage denominator have yet to be established.
+The mechanism research family contains 420 API contracts.
 
-The chains cover yellowstaff's ordinary ground cast, Molehat night vision, Portabletent deployment/packing and ordinary pigman normal/werepig transitions. Each includes an independent minimal example and explicit limits. The examples passed targeted dedicated-server checks; equipment, structure and creature fixtures also passed process restarts from the same isolated save. Real clients and cross-shard behavior remain untested. See the scoped [validation results](docs/phase15-unified-chains.md#验证状态). The task map and progressive retrieval are documented in [phase 14](docs/phase14-usage-retrieval.md).
+Minimal examples connect active skills, fueled equipment, deployable structures and two-state creatures into concrete features. Start from the [task map](references/task-map.md); each [feature guide](docs/phase15-unified-chains.md#四条功能链) describes its scope.
 
 ## Download and setup
 

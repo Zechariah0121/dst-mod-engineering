@@ -1,12 +1,12 @@
 # DST Mod Engineering
 
-`v2026.11.12.4` 面向《饥荒联机版》Mod 开发，提供按任务检索的知识、原版核查路径、开发辅助脚本与 MCP。[English](README.en.md)
+`v2026.11.12.5` 面向《饥荒联机版》Mod 开发，提供按任务检索的知识、原版核查路径、开发辅助脚本与 MCP。[English](README.en.md)
 
 当前共 **300 条登记知识：64 基础 + 13 Native AI + 110 Native Core + 113 机制研究**。本轮增加按 ID/API 的统一审阅与完整对象续读，并补充主动技能、装备效果、可收起建筑和两态生物四条具名功能链，连接输入、权威执行、消费者、退出与必要恢复。见[本轮内容](docs/phase15-unified-chains.md)。
 
-机制研究族登记了 420 项 API 合同，计数范围为该族记录的 `api_contracts`。全库 API 总数与源码覆盖率尚无统一盘点。
+机制研究族包含 420 项 API 合同。
 
-四条链分别限定黄杖普通地面施法、Molehat 夜视、Portabletent 部署/收起与普通猪人两态转换，附自写最小示例和各自未知范围。示例已完成有限专服验证，其中装备、建筑和生物示例完成同一隔离存档的进程重启检查；真实客户端与跨分片仍待验。实际范围见[本轮验证](docs/phase15-unified-chains.md#验证状态)。已有任务地图和渐进读取见[阶段 14](docs/phase14-usage-retrieval.md)。
+附主动技能、耗能装备、部署收起和两态生物的最小示例，帮助 AI 串起具体功能。任务入口见[任务地图](references/task-map.md)，示例范围见[功能指南](docs/phase15-unified-chains.md#四条功能链)。
 
 ## 下载与开始使用
 

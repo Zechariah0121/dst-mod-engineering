@@ -21,6 +21,13 @@ def simple_label(value):
     return value
 
 
+def positive_integer(value):
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError('Value must be a positive integer')
+    return number
+
+
 def install_stage_timers():
     from dst_kb import service, retrieval_v2, source_epoch_runtime
     targets = [(service.Service, name) for name in
@@ -129,8 +136,8 @@ def main():
     parser.add_argument('--label', required=True, type=simple_label,
                         help='New run subdirectory identifier, such as baseline or candidate')
     parser.add_argument('--no-profile', action='store_true', help='Measure elapsed time without cProfile tracing')
-    parser.add_argument('--repeat', type=int, default=1)
-    parser.add_argument('--max-requests', type=int)
+    parser.add_argument('--repeat', type=positive_integer, default=1)
+    parser.add_argument('--max-requests', type=positive_integer)
     parser.add_argument('--stage-timings', action='store_true', help='Accumulate inexpensive outer-function timings')
     args = parser.parse_args()
     requests = json.loads(args.requests.read_text(encoding='utf-8'))
@@ -138,6 +145,16 @@ def main():
         simple_label(request['label'])
     if args.max_requests is not None:
         requests = requests[:args.max_requests]
+    operations = []
+    used_labels = {'initialize'}
+    for iteration in range(args.repeat):
+        for request in requests:
+            label = request['label'] + ('-' + str(iteration + 1) if args.repeat > 1 else '')
+            # Evidence files must remain distinct on case-insensitive filesystems.
+            if label.casefold() in used_labels:
+                parser.error('Operation labels must be unique, including initialize: ' + label)
+            used_labels.add(label.casefold())
+            operations.append((label, request['params']))
     output = args.output.resolve()
     directory = output / args.label
     directory.mkdir(parents=True, exist_ok=False)
@@ -164,23 +181,20 @@ def main():
     if row.get('error'):
         raise RuntimeError(row['error'])
     try:
-        for iteration in range(args.repeat):
-            for request in requests:
-                label = request['label'] + ('-' + str(iteration + 1) if args.repeat > 1 else '')
-                params = request['params']
-                result, row = measured(label, lambda: getattr(service, params['name'])(**params['arguments']),
-                                       directory, not args.no_profile)
-                if row.get('error'):
-                    manifest['operations'].append(row)
-                    write_json(directory / 'summary.json', manifest)
-                    raise RuntimeError(row['error'])
-                raw = json.dumps(result, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
-                (directory / (label + '-response.json')).write_bytes(raw)
-                row.update({'response_sha256': hashlib.sha256(raw).hexdigest(), 'response_bytes': len(raw),
-                            'entries': [entry.get('id') for entry in result.get('entries', result.get('results', []))]})
+        for label, params in operations:
+            result, row = measured(label, lambda: getattr(service, params['name'])(**params['arguments']),
+                                   directory, not args.no_profile)
+            if row.get('error'):
                 manifest['operations'].append(row)
                 write_json(directory / 'summary.json', manifest)
-                print(json.dumps(row, ensure_ascii=False), flush=True)
+                raise RuntimeError(row['error'])
+            raw = json.dumps(result, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+            (directory / (label + '-response.json')).write_bytes(raw)
+            row.update({'response_sha256': hashlib.sha256(raw).hexdigest(), 'response_bytes': len(raw),
+                        'entries': [entry.get('id') for entry in result.get('entries', result.get('results', []))]})
+            manifest['operations'].append(row)
+            write_json(directory / 'summary.json', manifest)
+            print(json.dumps(row, ensure_ascii=False), flush=True)
     finally:
         service.close()
 
