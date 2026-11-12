@@ -1,6 +1,6 @@
 """Unified, explanation-bearing lexical retrieval over immutable knowledge."""
 import math
-from .request_analysis import analyzed_request
+from .request_analysis import analyzed_request, memoized_analysis
 from . import developer_trace as dt
 import json
 import re
@@ -148,6 +148,7 @@ def extract_symbols(text):
     out.update(re.findall(left+r'[A-Z][A-Z0-9_]{2,}'+right,text))
     # Exact symbols are extracted from statements, never evidence wrappers/locators.
     return {s.lower() for s in out if len(s)>2 and s.lower() not in STOP}
+@memoized_analysis
 def topics(text):return {name for name,aliases in VOCAB.items() if any(contains(text,a) for a in aliases)}
 
 def intent(query):

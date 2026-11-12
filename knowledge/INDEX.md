@@ -1,6 +1,6 @@
 # 基础64条知识视图
 
-完整187条机器入口为 [CATALOG.json](CATALOG.json)。本页与 `data/index.json` 保留基础64条的既有格式，供旧消费者读取。
+完整296条机器入口为 [CATALOG.json](CATALOG.json)，包含64条基础、13条 Native AI、110条 Native Core和109条机制研究。本页与 `data/index.json` 保留基础64条的既有格式，供旧消费者读取。按完整功能找合同与待验项可从[开发任务地图](../references/task-map.md)进入。
 
 - [FACT-DST-001](facts/klei-lua.md#fact-dst-001) — EntityScript 组件持久化遍历
 - [FACT-DST-002](facts/klei-lua.md#fact-dst-002) — Container 的物品存档

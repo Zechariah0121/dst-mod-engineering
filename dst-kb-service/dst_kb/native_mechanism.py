@@ -7,6 +7,7 @@ from .config import KBError
 from . import family_registry as families
 from . import mechanism_contract
 from .nativecore import pointer as at
+from .request_analysis import memoized_analysis
 
 TYPE = 'native_mechanism_research'
 STATES = {'knowledge_status': 'research', 'retrieval_status': 'restricted', 'coding_status': 'hold'}
@@ -269,12 +270,14 @@ def ranked_units(entry, query):
                   int(row['pointer'].rsplit('/', 1)[1])))
 
 
+@memoized_analysis
 def navigation_terms(text):
     """Bounded task vocabulary for navigation, never evidence or API admission."""
     from .retrieval_v2 import words, extract_symbols
     return words(text) | extract_symbols(text) | {'topic:' + topic for topic in navigation_topics(text)}
 
 
+@memoized_analysis
 def navigation_topics(text):
     from .public_catalog import tokens
     from .retrieval_v2 import topics

@@ -15,8 +15,41 @@ sys.path.insert(0, str(ROOT))
 from prepare_sources import PreparationError, prepared_runtime
 
 
+def public_review(argv):
+    """Short, explicit public-review commands; keep the catalog's admission rules."""
+    parser = argparse.ArgumentParser(description='Find or review registered public knowledge without preparing sources. These commands do not deliver Coding context or verify source evidence.')
+    commands = parser.add_subparsers(dest='command', required=True)
+    find = commands.add_parser('find', help='Find candidate IDs across all registered families')
+    find.add_argument('query')
+    find.add_argument('--limit', type=int, default=5)
+    read = commands.add_parser('read', help='Review a record by ID, preserving Scope, HOLD and evidence limits')
+    read.add_argument('id')
+    read.add_argument('--pointer', default='', help='Optional record-relative JSON Pointer from a previous response')
+    read.add_argument('--max-bytes', type=int, default=12000)
+    args = parser.parse_args(argv)
+    if sys.version_info < (3, 10):
+        parser.error('Python 3.10+ is required')
+    sys.path.insert(0, str(ROOT / 'dst-kb-service'))
+    from dst_kb.public_catalog import main as catalog_main
+    from dst_kb.config import KBError
+    if args.command == 'find':
+        tool, values = 'search_catalog', {'query': args.query, 'limit': args.limit}
+    else:
+        tool, values = 'read_public_entry', {'id': args.id, 'purpose': 'review',
+                                           'pointer': args.pointer, 'max_bytes': args.max_bytes}
+    try:
+        return catalog_main(ROOT, 'call', tool, values)
+    except (KBError, OSError, ValueError, KeyError, TypeError) as exc:
+        print(json.dumps({'error': {'code': getattr(exc, 'code', 'CONFIG_ERROR'), 'message': str(exc)},
+                          'service_started': False, 'client_configuration_modified': False},
+                         ensure_ascii=False), file=sys.stderr)
+        return 2
+
+
 def main(argv=None):
     supplied = list(sys.argv[1:] if argv is None else argv)
+    if supplied and supplied[0] in ('find', 'read'):
+        return public_review(supplied)
     if supplied and supplied[0] == 'update-sources':
         from scripts.update_sources import main as update_main
         return update_main(supplied[1:])
@@ -24,7 +57,8 @@ def main(argv=None):
         from scripts.source_compatibility import main as compatibility_main
         return compatibility_main(supplied[1:])
     parser = argparse.ArgumentParser(description=__doc__, epilog='update-sources: check and prepare an explicitly bound local ZIP; run update-sources --help. maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
-    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources'])
+    parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources', 'find', 'read'],
+                        help='find QUERY / read ID: source-free public review; see each command --help')
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
     parser.add_argument('--source-epoch', choices=['759671'])

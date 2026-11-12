@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.12.2`：296 条登记知识（64 基础 + 13 Native AI + 110 Core + 109 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase13-practical-expansion.md) · [English](README.en.md)
+`v2026.11.12.3`：296 条登记知识（64 基础 + 13 Native AI + 110 Core + 109 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase14-usage-retrieval.md) · [English](README.en.md)
 
 ## 工作顺序
 
@@ -16,7 +16,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 查库与来源
 
-实质性开发、审查或研究前，从实际包根运行：
+仅做目录导航或公开材料审阅时，可直接使用下述 `find` / `read`，无需准备来源或索要源码路径。需要当前源码支持的实质性开发、审查或研究前，从实际包根运行：
 
 ```text
 python -B -X utf8 run_kb.py update-sources ensure
@@ -24,7 +24,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 
 首次使用任务已明确的合法源码加 `--source "<scripts.zip绝对路径>"`；路径不明再确认。助手记忆绑定，输入未变会快返；准备和重连处理见[源码更新助手](references/source-update-assist.md)。简单机械编辑无需重复查库。
 
-优先使用已连接 MCP；无服务时，从 `knowledge/CATALOG.json` 按 file/pointer 读取少量相关记录，并说明“文件读取”。读实际正文与证据，保留 Scope、类型、版本、更正和三轴状态。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整准入、预算与证据规则统一见[检索策略](references/kb-retrieval.md)。
+优先使用已连接 MCP；无服务时，可用 `python -B -X utf8 run_kb.py find "任务或符号"` 定位，再用 `run_kb.py read ID` 审阅所选记录，或从 `knowledge/CATALOG.json` 按 file/pointer 文件读取。两条简短命令统一登记族的目录阅读，不恢复源码、不交付 Coding 上下文。读实际正文与证据，保留 Scope、类型、版本、更正和三轴状态。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整准入、预算与证据规则统一见[检索策略](references/kb-retrieval.md)。
 
 ## 按问题读取
 
@@ -34,6 +34,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 
 | 当前任务 | 参考文件 |
 |---|---|
+| 常见开发任务已有依据、局部缺口与项目所需信息 | [task-map.md](references/task-map.md) |
 | 跨组件问题、首读与条件化补读、预算不足后的读取 | [complex-task-reading.md](references/complex-task-reading.md) |
 | 登记知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |
