@@ -1,6 +1,6 @@
 # 独立原版机制研究族
 
-`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充、表现、事件/SG、加载/Replica、生命周期/恢复、动作执行，以及战斗、物品装备、制作采集、移动关系、世界分片，以及 UI 输入、生物 AI、农作和船体机制，独立机制研究族共 92 条；与历史三族合计 279 条，实际登记数量读目录 counts。
+`knowledge/FAMILY-REGISTRY.json` 登记历史三族和 `native_mechanism`；`CATALOG.json` 的 file/pointer、状态和数量从该登记及其 hash 绑定的正文生成。历史 64/13/110 条身份保留，新增研究不靠散落的固定总数验收。当前注册 Brain、世界生成、料理/调味、成长/再生、温度/潮湿、冻结/火热交互、生存补充、表现、事件/SG、加载/Replica、生命周期/恢复、动作执行，以及战斗、物品装备、制作采集、移动关系、世界分片，以及 UI 输入、生物 AI、农作和船体机制，以及装备耗能/维修、投射物、建筑施工、巢穴种群、世界袭击和海钓，独立机制研究族共 109 条；与历史三族合计 296 条，实际登记数量读目录 counts。
 
 机制研究为 `research/restricted/hold`；审阅绑定精确候选 SHA。来源引用提供限定归档的文件/范围定位与 hash，原生与动态依赖按条目 unknowns 保留。通用准入见[检索策略](../references/kb-retrieval.md)。
 
@@ -59,3 +59,5 @@
 事件/Replica、组件任务与存档恢复新增范围见[本阶段说明](phase8-lifecycle-persistence.md)。
 
 实体 Remove 与普通动作执行见[阶段 9](phase9-action-closure.md)；计时器重放、实体引用重接和奖励队列恢复见[阶段 10](phase10-recovery-delivery.md)；五类常用原版机制扩展见[阶段 11](phase11-native-expansion.md)；UI、生物 AI、农作与船体见[本轮更新](phase12-practical-native.md)。
+
+装备、建筑、生态、海钓与复杂开发问题的实用扩展见[阶段 13](phase13-practical-expansion.md)。

@@ -138,3 +138,5 @@ EXP-SAVE-004～006 补充以下三条恢复路径，沿用本篇的静态来源�
 | SAVE-S41～S46 | 房屋最终工厂、孩子监听建立/移除、postpass 更新生命周期、组件移除分发与烧毁包装接线 |
 
 上表 SAVE-S 编号均可在 [登记研究](../knowledge/research/native-mechanisms/persistence_recovery-c9ceaf8c5538.json) 独立定位到精确 ZIP member、符号和范围摘要。
+
+有期限目标效果可参考[Timer、Tracker 与来源 modifier 的完整接线](timed-effect-recovery.md)，按各自状态所有者保存，在本宿主组件 postpass 后重建效果。

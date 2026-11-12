@@ -5,12 +5,12 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.12.1`：279 条登记知识（64 基础 + 13 Native AI + 110 Core + 92 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase12-practical-native.md) · [English](README.en.md)
+`v2026.11.12.2`：296 条登记知识（64 基础 + 13 Native AI + 110 Core + 109 机制研究），配套开发脚本、源码更新助手与只读 MCP。用于 DST Mod 的设计、实现、审查和排错。[安装](docs/install-and-use.md) · [本轮更新](docs/phase13-practical-expansion.md) · [English](README.en.md)
 
 ## 工作顺序
 
 1. 确认任务、实际 Mod 副本、源码版本和触发环境；接手项目先读入口、配置与交接说明。
-2. 按问题查库并核对当前原版的定义、调用方、端别、初始化、退出和保存。源码用于确认实际行为与接入合同；符合需求的机制直接复用，自有实现按当前需求简化，独立判断其结构与写法是否值得沿用。
+2. 按问题查库；多组件任务按状态归属、消费和恢复分开补读完整合同，再核对当前原版的定义、调用方、端别、初始化、退出和保存。源码用于确认实际行为与接入合同；符合需求的机制直接复用，自有实现按当前需求简化，独立判断其结构与写法是否值得沿用。
 3. 先建立“需求 → Mod 实现 → 原版契约 → 验证方法”，优先用现有入口、直接调用和局部函数完成。新增抽象或防护需对应当前依赖、合法缺省或可达时序。玩法数值、效果与补偿取舍按项目约定；已有授权的必要步骤继续执行。
 4. 覆盖本次涉及的取消、移除、死亡、重连和读档路径，保留协作者改动。验证后交付文件、依据、实际结果和待验项。
 
@@ -34,6 +34,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 
 | 当前任务 | 参考文件 |
 |---|---|
+| 跨组件问题、首读与条件化补读、预算不足后的读取 | [complex-task-reading.md](references/complex-task-reading.md) |
 | 登记知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |
 | Claude Code / Cursor / Copilot / Codex 接入、显式读取、能力限制 | [agent-setup.md](references/agent-setup.md) |
@@ -51,6 +52,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 | 巢穴种群、生成补员、回巢与个体身份 | [nests-population.md](references/nests-population.md) |
 | 新增法术、魔力/能量条、睡眠恢复与完整接入流程 | [spells-and-custom-stats.md](references/spells-and-custom-stats.md) |
 | netvar、Replica、RPC、Shard RPC、客户端与服务端 | [networking-rpc.md](references/networking-rpc.md) |
+| 有期限目标效果、Timer/Tracker 与来源 modifier 恢复 | [timed-effect-recovery.md](references/timed-effect-recovery.md) |
 | 定时效果、死亡复活、事件解绑、存档与迁移 | [lifecycle-save.md](references/lifecycle-save.md) |
 | HUD、Widget、输入、Action、施法与预测 | [ui-actions-controls.md](references/ui-actions-controls.md) |
 | 自定义弹窗、焦点、按键消费与本地 HUD 挂载 | [ui-screen-input.md](references/ui-screen-input.md) |
@@ -70,6 +72,7 @@ python -B -X utf8 run_kb.py update-sources ensure
 | GIF/WebP 帧序列、旋转法阵、锚点与动画编译 | [animation-recipes.md](references/animation-recipes.md) |
 | DST Mod Tool 项目/脚本接口/预览 | [dst-mod-tool.md](references/dst-mod-tool.md) |
 | 音效、FMOD 与粒子 | [audio-particles.md](references/audio-particles.md) |
+| 重复查询、轮询任务、组件计数与缓存失效的实际优化 | [practical-optimization.md](references/practical-optimization.md) |
 | 排错、全面审查、性能、自动化测试、同步和交付 | [testing-release.md](references/testing-release.md) |
 | 资料来历、旧规则纠错与可信度 | [sources-and-corrections.md](references/sources-and-corrections.md) |
 

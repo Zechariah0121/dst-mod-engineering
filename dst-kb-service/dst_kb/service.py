@@ -546,7 +546,7 @@ class Service:
             # ownership from a physical/source navigation match.
             owners=(' '.join(re.split(r'[.:][^.:]+$',name)[0] for name in declared_by_id[identifier]
                              if ':' in name or '.' in name) if d['family']=='native_mechanism' else '')
-            subjects_by_id[identifier]=topics_for(entry['title']+' '+owners)
+            subjects_by_id[identifier]=topics_for(owners or entry['title'])
             fields[identifier]=(terms_for(focus),terms_for(body),extract_symbols(focus+' '+body),[terms_for(u) for u in units])
         df=Counter(term for focus,body,_,_ in fields.values() for term in focus|body)
         idf={term:math.log(1+(len(fields)-n+.5)/(n+.5)) for term,n in df.items()}

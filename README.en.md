@@ -1,10 +1,10 @@
 # DST Mod Engineering
 
-`v2026.11.12.1` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
+`v2026.11.12.2` is an engineering Skill and knowledge base for Don't Starve Together mod development. Retrieve relevant knowledge, inspect current source, then design, implement, review and validate. [中文](README.md)
 
-The knowledge base has **279 registered records: 64 foundation, 13 Native AI, 110 Native Core and 92 mechanism research records**. This round adds 12 research records and 34 API contracts for UI and input, creature AI, farming and boats, with practical guides for choosing native mechanisms or simpler custom implementations. See [changes](docs/phase12-practical-native.md). Detailed technical guides are mainly in Chinese.
+The knowledge base has **296 registered records: 64 foundation, 13 Native AI, 110 Native Core and 109 mechanism research records**. This stage adds 17 research records and 50 API contracts for equipment, projectiles, construction, nests, world events and ocean fishing, helping AI connect complete features with simpler implementations. See [changes](docs/phase13-practical-expansion.md). Detailed technical guides are mainly in Chinese.
 
-Revised engineering guidance reduces unnecessary component dependencies, identity checks, persistence and migration logic, helping agents match implementation and verification to the actual feature.
+New guides connect multi-component retrieval, timed-effect recovery and practical optimization, helping AI find the contracts it needs while reducing duplicate queries, extra polling and redundant state.
 
 ## Download and setup
 

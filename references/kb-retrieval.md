@@ -4,6 +4,8 @@
 
 ## 按任务读取文件
 
+复杂问题先按触发、所有者、消费与恢复分解职责，再读决定当前实现的完整合同；首包只是一段读取结果。具体补读路径见[复杂任务读取](complex-task-reading.md)。
+
 1. 从 `knowledge/CATALOG.json` 的统一登记目录找相关记录 ID，按其 `file`（相对 `knowledge/`）和 JSON `pointer` 定向读取。目录覆盖 64 基础、13 Native AI、110 Core 和独立机制研究（数量以 CATALOG.counts 为准）；目录命中只用于导航，仍需读实际正文、状态与证据。
 2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
 3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
