@@ -77,16 +77,23 @@ class PackageDriftCacheIntegrityTests(unittest.TestCase):
         prepare.write(self.config,value)
         self.failure('INVALID_PATH')
 
-    def test_auto_launcher_never_falls_back_for_combined_damage(self):
+    def test_public_status_is_independent_and_full_rejects_combined_damage(self):
         self.drift()
         (self.build/'knowledge/evidence.json').write_bytes(b'{}\n')
         stdout,stderr=io.StringIO(),io.StringIO()
         with patch.object(launcher,'prepared_runtime',side_effect=lambda _root:prepare.prepared_runtime(self.root)), \
                 patch.object(public_catalog,'main') as catalog,contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):
             result=launcher.main(['status','--mode','auto'])
+        self.assertEqual(result,0)
+        self.assertEqual(json.loads(stdout.getvalue())['service_mode'],'public_reader')
+        self.assertFalse(json.loads(stdout.getvalue())['coding_context_delivered'])
+        catalog.assert_not_called()
+        stdout,stderr=io.StringIO(),io.StringIO()
+        with patch.object(launcher,'prepared_runtime',side_effect=lambda _root:prepare.prepared_runtime(self.root)), \
+                contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):
+            result=launcher.main(['status','--mode','full'])
         self.assertEqual(result,2)
         self.assertEqual(json.loads(stderr.getvalue())['error']['code'],'RUNTIME_CHANGED')
-        catalog.assert_not_called()
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

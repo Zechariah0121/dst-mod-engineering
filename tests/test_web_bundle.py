@@ -26,6 +26,8 @@ class CompleteReleaseTests(unittest.TestCase):
             (self.source / directory).mkdir()
         for name in bundle.ROOT_FILES:
             self.put(name, '# fixture\n')
+        for name in bundle.MOD_EXAMPLES:
+            self.put(name, '-- reviewed example fixture\n')
         for name in bundle.SCRIPTS:
             self.put('scripts/' + name, '# fixture\n')
         for name in bundle.SERVICE_FILES:
@@ -71,6 +73,7 @@ class CompleteReleaseTests(unittest.TestCase):
 
     def test_single_archive_has_skill_187_catalog_and_complete_mcp_without_duplicate_knowledge(self):
         for path in ('cache/runtime/private.lua', 'dist/old.zip', '.git/config',
+                     'examples/stage4-timed-effect/scripts/unreviewed.lua',
                      'knowledge-history/old/data/entries.json', 'dst-engineering-kb/data/entries.json',
                      'compatibility/v0.1/data/entries.json', 'epoch-assets/756039/old.json',
                      'references/secret.dat', 'dst-kb-service/config.local.json'):
@@ -88,6 +91,8 @@ class CompleteReleaseTests(unittest.TestCase):
             self.assertIn(bundle.NAME + '/SKILL.md', names)
             self.assertIn(bundle.NAME + '/prepare_sources.py', names)
             self.assertIn(bundle.NAME + '/run_kb.py', names)
+            for name in bundle.MOD_EXAMPLES:
+                self.assertIn(bundle.NAME + '/' + name, names)
             self.assertIn(bundle.NAME + '/scripts/public_rebind.py', names)
             self.assertIn(bundle.NAME + '/dst-kb-service/dst_kb/mcp_server.py', names)
             self.assertIn(bundle.NAME + '/dst-kb-service/dst_kb/projection_profiles.json', names)

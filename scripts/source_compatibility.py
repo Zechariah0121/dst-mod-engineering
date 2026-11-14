@@ -178,7 +178,7 @@ def locate(archive, symbol, source_file=None, limit=100):
             "proof_kind": "lexical_navigation_only", "behavior_verified": False}
 
 
-def compare_reference(ref, old, new, baseline_problem=None):
+def compare_reference(ref, old, new, baseline_problem=None, *, require_baseline_member=False):
     result = {"id": ref.get("id"), "original_locator": {k: ref.get(k) for k in
               ("source_file", "file_sha256", "line_start", "line_end", "range_sha256", "symbols")},
               "status": "unknown", "source_identity_reusable": False,
@@ -205,12 +205,16 @@ def compare_reference(ref, old, new, baseline_problem=None):
             result["reasons"].append(baseline_problem)
             return result
         target = new.raw(name)
-        if target is None:
+        if target is None and not (old and require_baseline_member):
             result.update(status="missing", reasons=["target_member_missing"])
             return result
-        result["target_file_sha256"] = sha(target)
-        current = target.decode("utf-8").splitlines()
+        if target is not None:
+            result["target_file_sha256"] = sha(target)
+            current = target.decode("utf-8").splitlines()
         baseline = old.raw(name) if old else None
+        if old and require_baseline_member and baseline is None:
+            result["reasons"].append("provided_baseline_member_missing")
+            return result
         if baseline is not None:
             if sha(baseline) != ref["file_sha256"]:
                 result["reasons"].append("provided_baseline_file_does_not_match_reference")
@@ -222,7 +226,10 @@ def compare_reference(ref, old, new, baseline_problem=None):
                 return result
         else:
             old_range = None
-        if sha(target) == ref["file_sha256"]:
+        if target is None:
+            result.update(status="missing", reasons=["target_member_missing"])
+            return result
+        if result["target_file_sha256"] == ref["file_sha256"]:
             if sha(range_bytes(current, start, end)) != ref["range_sha256"]:
                 result["reasons"].append("reference_range_hash_inconsistent_with_identical_file")
                 return result
@@ -328,7 +335,16 @@ def validate_compatibility(entry, references):
             raise ValueError("dependency claim_ids must reference actual claims of this entry")
 
 
-def assess(documents, old, new):
+def archive_delta(old, new):
+    old_names, new_names = set(old.files), set(new.files)
+    return {"added": sorted(new_names - old_names), "removed": sorted(old_names - new_names),
+            "modified": sorted(n for n in new_names & old_names if sha(old.raw(n)) != sha(new.raw(n)))}
+
+
+def assess(documents, old, new, *, matching_baselines=()):
+    by_hash = {archive.sha256: archive for archive in matching_baselines}
+    if old and by_hash:
+        raise ValueError("Cannot combine a single baseline with matching baselines")
     results, checklist = [], []
     for path, document in documents:
         if not isinstance(document, dict) or document.get("schema_version") != "dst-mechanism-research/1":
@@ -339,15 +355,17 @@ def assess(documents, old, new):
         ids = [r.get("id") for r in source_refs]
         if any(not isinstance(i, str) or not i for i in ids) or len(ids) != len(set(ids)):
             raise ValueError("Missing or duplicate reference ID")
-        # The supplied baseline must match each document. Multiple baselines are
-        # processed as separate invocations, never relabelled as one source epoch.
         problem = None
+        baseline = old
         expected_archive = document.get("archive_sha256")
         if not isinstance(expected_archive, str) or not HASH.fullmatch(expected_archive):
             problem = "missing_or_invalid_candidate_archive_commitment"
         elif old and old.sha256 != expected_archive:
             problem = "provided_baseline_archive_does_not_match_candidate"
-        refs = {ref["id"]: compare_reference(ref, old, new, problem) for ref in source_refs}
+        elif by_hash:
+            baseline = by_hash.get(expected_archive)
+        refs = {ref["id"]: compare_reference(ref, baseline, new, problem,
+                require_baseline_member=bool(by_hash)) for ref in source_refs}
         entries = []
         entry_ids = set()
         if not isinstance(document.get("entries", []), list):
@@ -388,14 +406,12 @@ def assess(documents, old, new):
                         "evidence_baseline": {"source_epoch": document.get("source_epoch"),
                                               "archive_sha256": expected_archive},
                         "reference_states": list(refs.values()), "entries": entries})
-    changes = None
-    if old:
-        old_names, new_names = set(old.files), set(new.files)
-        changes = {"added": sorted(new_names - old_names), "removed": sorted(old_names - new_names),
-                   "modified": sorted(n for n in new_names & old_names if sha(old.raw(n)) != sha(new.raw(n)))}
+        if by_hash:
+            results[-1]["matched_baseline_sha256"] = baseline.sha256 if baseline else None
     counts = Counter(r["status"] for d in results for r in d["reference_states"])
-    return {"schema": SCHEMA, "baseline": old.identity() if old else None, "target": new.identity(),
-            "archive_delta": changes, "reference_status_counts": dict(sorted(counts.items())),
+    result = {"schema": SCHEMA, "baseline": old.identity() if old else None, "target": new.identity(),
+            "archive_delta": archive_delta(old, new) if old else None,
+            "reference_status_counts": dict(sorted(counts.items())),
             "candidates": results, "local_review_checklist": checklist,
             "knowledge_reading_available": "independent_public_catalog_or_preserved_baseline_runtime",
             "target_navigation_available": True, "target_admitted_as_evidence_epoch": False,
@@ -403,6 +419,10 @@ def assess(documents, old, new):
             "limitations": ["Exact bytes prove source identity only, not complete behavior compatibility.",
                             "No Lua call graph, native engine model or dynamic consumer closure is inferred.",
                             "Relocation is a proposed locator, never an automatic evidence rewrite."]}
+    if by_hash:
+        result["archive_deltas"] = {digest: {"baseline": archive.identity(), "delta": archive_delta(archive, new)}
+                                    for digest, archive in sorted(by_hash.items())}
+    return result
 
 
 def at(value, pointer):
@@ -525,9 +545,9 @@ def registered_documents(root):
         "entry_count": len(seen_ids), "unregistered_candidates_scanned": False}
 
 
-def assess_registered(root, old, new):
+def assess_registered(root, old, new, *, matching_baselines=()):
     documents, registrations, registration = registered_documents(root)
-    result = assess(documents, old, new)
+    result = assess(documents, old, new, matching_baselines=matching_baselines)
     result["schema"] = "dst-registered-source-compatibility/1"
     result["registration"] = registration
     topics = []
@@ -548,7 +568,8 @@ def assess_registered(root, old, new):
         n for status, n in result["reference_status_counts"].items() if status != "byte_identical"),
         "entries_requiring_source_followup": sum(e["source_status"] != "byte_identical"
             for c in result["candidates"] for e in c["entries"]),
-        "dependency_status": "unknown", "archive_delta_available": old is not None}
+        "dependency_status": "unknown",
+        "archive_delta_available": old is not None or bool(result.get("archive_deltas"))}
     return result
 
 
@@ -587,7 +608,10 @@ def main(argv=None):
     registered.add_argument("--knowledge-root", type=Path, required=True)
     registered.add_argument("--target", type=Path, required=True)
     registered.add_argument("--target-label")
-    registered.add_argument("--baseline", type=Path)
+    registered_baselines = registered.add_mutually_exclusive_group()
+    registered_baselines.add_argument("--baseline", type=Path, help="Require this archive to match each candidate")
+    registered_baselines.add_argument("--matching-baseline", type=Path, action="append",
+                                      help="Use only for candidates with this archive SHA-256 (repeatable)")
     registered.add_argument("--output", type=Path, required=True, help="New JSON sidecar outside knowledge root")
     navigation = sub.add_parser("locate", help="Navigate any explicit target ZIP without an epoch allowlist")
     navigation.add_argument("--target", type=Path, required=True)
@@ -601,6 +625,7 @@ def main(argv=None):
         command.add_argument("--output", type=Path, help="New JSON file; refuses existing paths or source input paths")
     args = parser.parse_args(argv)
     old = new = None
+    matching_baselines = []
     try:
         if args.command == "assess-registered":
             if args.output.resolve().is_relative_to(args.knowledge_root.resolve()):
@@ -616,11 +641,14 @@ def main(argv=None):
             if args.command == "locate":
                 result = {"schema": "dst-target-source-navigation/1", "target": new.identity(),
                           **locate(new, args.symbol, args.source_file, args.limit)}
+            elif args.command == "assess-registered":
+                old = Archive(args.baseline) if args.baseline else None
+                for path in args.matching_baseline or ():
+                    matching_baselines.append(Archive(path))
+                result = assess_registered(args.knowledge_root, old, new, matching_baselines=matching_baselines)
             else:
                 old = Archive(args.baseline) if args.baseline else None
-                result = (assess_registered(args.knowledge_root, old, new)
-                          if args.command == "assess-registered" else
-                          assess([(p, read_json(p)) for p in args.candidate], old, new))
+                result = assess([(p, read_json(p)) for p in args.candidate], old, new)
         rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
         if args.output:
             if args.command == "assess-registered":
@@ -637,6 +665,8 @@ def main(argv=None):
                           "canonical_modified": False, "runtime_verified": False}, ensure_ascii=False), file=sys.stderr)
         return 2
     finally:
+        for archive in matching_baselines:
+            archive.close()
         if old:
             old.close()
         if new:

@@ -2,11 +2,11 @@
 
 先选当前要交付的功能，再读对应指南和少量登记记录。跨组件问题继续沿“输入 → 权威状态 → 消费 → 退出与恢复”补齐关键合同，具体读取方法见[复杂任务读取](complex-task-reading.md)。
 
-本地图基于当前 [CATALOG](../knowledge/CATALOG.json) 的300条记录整理，覆盖64条基础、13条 Native AI、110条 Native Core和113条机制研究。机制族420项 API 合同按登记记录的 `api_contracts` 计数；功能完成度与源码覆盖率尚无统一分母。每项列出的ID用于定向补读，可从[文件与命令入口](../docs/knowledge-integration.md)定位正文。未列出的主题可继续查目录，零命中时再核对目标源码。
+本地图基于当前 [CATALOG](../knowledge/CATALOG.json) 的302条记录整理，覆盖64条基础、13条 Native AI、110条 Native Core和115条机制研究。机制族424项 API 合同按登记记录的 `api_contracts` 计数；功能完成度与源码覆盖率尚无统一分母。每项列出的ID用于定向补读，可从[文件与命令入口](../docs/knowledge-integration.md)定位正文。未列出的主题可继续查目录，零命中时再核对目标源码。
 
-完整服务可直接使用 `get_entry(id=..., projection="reviewer", purpose="review")`，或先用 `lookup_api(symbol=..., family="all", projection="reviewer")` 再执行 `results[].followup`。命令行为 `run_kb.py review ID` / `run_kb.py review --api "符号"`，均需已准备完整来源；超预算时原样执行 `continuation`，也可按实际返回的pointer直接选对象。无需来源的公开目录阅读继续使用 `find/read`。完整对象交付、来源核验、Coding准入和游戏验证各按响应状态判断。
+默认 MCP 可直接使用 `get_entry(id=...)`，或先用 `lookup_api(symbol=...)` 再执行 `results[].followup`。命令行为 `run_kb.py review ID` / `run_kb.py review --api "符号"`，默认读取公共知识，无需准备来源。超预算时原样执行 `continuation`，也可按实际返回的 pointer 直接选对象。显式来源环境及证据展开按各自的来源校验要求执行。完整对象交付、来源核验、Coding 准入和游戏验证各按响应状态判断。
 
-Native AI Coding 每任务最多五条并使用十字段投影。下列 Core 记录保留 Coding HOLD，`EXP-*` 机制研究保持 `research/restricted/hold`，需显式 Reviewer 读取。指南中的工程建议和示例按各自前提使用，研究材料的准入、Scope、证据版本及未知依赖继续按[检索策略](kb-retrieval.md)核对。
+Native AI Coding 每任务最多五条并使用十字段投影。下列 Core 记录保留 Coding HOLD，`EXP-*` 机制研究保持 `research/restricted/hold`，默认公共读取使用 Reviewer。指南中的工程建议和示例按各自前提使用，研究材料的准入、Scope、证据版本及未知依赖继续按[检索策略](kb-retrieval.md)核对。
 
 ## 主动技能、法术与自定义资源条
 
@@ -17,9 +17,10 @@ Native AI Coding 每任务最多五条并使用十字段投影。下列 Core 记
 
 ## 有期限效果、存档与生命周期恢复
 
+- `EXP-CHAIN-EFFECT-001` 对照原版具名伤害 Buff 和自有世界装置的不同恢复入口。[有期限效果链](chain-timed-effect.md)包含可运行装置、目标、普通伤害计算、剩余时间恢复和到期清理。
 - 指南从[有期限效果恢复](timed-effect-recovery.md)进入，通用引用接线与资源归属见[保存恢复](save-recovery-architecture.md)、[组件任务归属](component-task-ownership.md)。
 - 已有 `EXP-SAVE-001` 的旧GUID/嵌套postpass、`EXP-SAVE-004` 的Timer加载、`EXP-SAVE-005` 的Tracker监听身份、`EXP-MOVE-001` 的来源修改器，以及 `EXP-LIFE-001` / `EXP-LIFE-005` / `EXP-LIFE-006` / `EXP-LIFE-008` 的监听、组件、任务与实体退出合同。
-- 恢复示例限同分片世界保存路径中的来源装置与目标实体。玩家session、Debuffable嵌套载体和跨分片引用需继续核查，各保存路径的映射能力保留差别；实际磁盘重启和联机结果待验。
+- 来源装置和目标实体示例已通过同分片真实存档重启。玩家 session、嵌套 Buff 的实际重启和跨分片引用各有单独验证范围。
 - 项目需确定刷新/叠加、离线时间、死亡与缺目标政策。下一步核对宿主保存调用方，再验施加、换目标、取消、到期、组件卸载、来源/目标移除与独立进程读档。
 
 ## 装备效果、耐久、耗能与修理
@@ -66,6 +67,7 @@ Native AI Coding 每任务最多五条并使用十字段投影。下列 Core 记
 
 ## 自定义弹窗、HUD与资源表现
 
+- `EXP-CHAIN-SKILL-HUD-001` 定位背包动作、服务器扣费和 owner 定向复制的依据。[资源与 HUD 链](chain-skill-resource-hud.md)包含可运行示例、界面重建与客户端验收步骤。
 - 输入与HUD从[Screen与控件](ui-screen-input.md)进入，资产接线读[动画资源](assets-animation.md)，声音/粒子读[音效与粒子](audio-particles.md)。
 - 已有 `EXP-UI-001` / `EXP-UI-002` / `EXP-UI-003` 的Screen栈、control消费与Controls重建，`AI-N001-10` 的分层视图，以及 `EXP-PRES-001` / `EXP-PRES-002` / `EXP-PRES-003` 的具名动画、声音和FX退出样本。
 - 本地控件静态合同与少量具名FX已有研究。具体SCML/build/symbol、分辨率、焦点、音效与粒子效果需读取项目资产并实际查看；HUD业务数据就绪和服务器权限要另接目标功能。

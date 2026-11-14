@@ -3,7 +3,7 @@
   "tools": [
     {
       "name": "search_kb",
-      "description": "Search ranked DST engineering knowledge across registered families. For code review or native API research use projection=reviewer, view=decision, then expand useful IDs. Results retain whole original atoms, Scope and evidence. scope_logic=and intersects filter dimensions; or unions them.",
+      "description": "Discover current public knowledge across four families and registered task guides. Default reviewer reading returns relevant complete original body objects with Scope, corrections and independent source state. Explicit projection=coding or mode=coding retains legacy admission. scope_logic combines supported explicit filters.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -11,7 +11,8 @@
             "type": "string"
           },
           "top_k": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "mode": {
             "type": "string",
@@ -31,7 +32,7 @@
               "coding",
               "reviewer"
             ],
-            "default": "coding"
+            "default": "reviewer"
           },
           "view": {
             "type": "string",
@@ -143,7 +144,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [],
@@ -158,7 +159,7 @@
     },
     {
       "name": "lookup_api",
-      "description": "Look up an exact API identity. Explicit family=all with projection=reviewer navigates all four families and returns executable complete-object review calls, preserving source ambiguity and evidence limits. Default family=legacy finds preserved physical declarations and mapped claims; contract_delivery reports whether behavior claims were delivered. Explicit family=native_mechanism requires projection=reviewer and returns complete research API atoms under max_bytes. Use source_file to disambiguate sources; owner and identity_kind narrow native_mechanism only. Bare names and qualified identities such as require(\"module\").field are supported; signatures and dynamic expressions are not. File-local functions retain their visibility. A declaration or catalog gap alone does not establish a method contract, public API or absence. Defaults to reviewer projection and compact decision view.",
+      "description": "Navigate authored API identities across all families by default. Qualified identities match their complete owner; bare names group symbol/owner/file/visibility without merging file-local and exported identities. Supports require(\"module\").field. Use each executable followup to read its complete contract; navigation does not establish a public API or current behavior.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -166,7 +167,8 @@
             "type": "string"
           },
           "top_k": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "projection": {
             "type": "string",
@@ -190,9 +192,11 @@
             "enum": [
               "legacy",
               "native_mechanism",
-              "all"
+              "all",
+              "native_ai",
+              "native_core"
             ],
-            "default": "legacy"
+            "default": "all"
           },
           "owner": {
             "type": "string",
@@ -225,7 +229,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [
@@ -242,7 +246,7 @@
     },
     {
       "name": "get_entry",
-      "description": "Read a selected knowledge ID. Explicit purpose=review with projection=reviewer reads complete original objects across all four families under max_bytes. Follow continuation.arguments unchanged for content-bound paging, or select a record-relative pointer. Typed owner atoms and required Scope remain whole. view=decision is compact; reviewer adds detail; evidence adds source navigation. Omitting view preserves the legacy response. projection controls admission independently. For mechanism research, pointer selects a whole typed atom and max_bytes bounds delivery.",
+      "description": "Read a current public knowledge or guide ID without source preparation. Default reviewer preserves complete Scope, corrections and typed owner objects. Follow content-bound continuation unchanged, or select a relative JSON pointer. Explicit coding or source_epoch retains the legacy source-verified contract.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -255,7 +259,7 @@
               "coding",
               "reviewer"
             ],
-            "default": "coding"
+            "default": "reviewer"
           },
           "view": {
             "type": "string",
@@ -287,7 +291,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [
@@ -338,7 +342,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [
@@ -369,7 +373,8 @@
             }
           },
           "depth": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "entry_types": {
             "type": "array",
@@ -386,7 +391,8 @@
             ]
           },
           "limit": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "projection": {
             "type": "string",
@@ -394,12 +400,12 @@
               "coding",
               "reviewer"
             ],
-            "default": "coding"
+            "default": "reviewer"
           },
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [
@@ -424,12 +430,13 @@
             "type": "string"
           },
           "top_k": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [],
@@ -458,12 +465,13 @@
             }
           },
           "top_k": {
-            "type": "integer"
+            "type": "integer",
+            "maximum": 30
           },
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [],
@@ -478,7 +486,7 @@
     },
     {
       "name": "get_context_bundle",
-      "description": "Select knowledge for a substantial DST engineering task. For code review or native API research use projection=reviewer, view=decision and normally budget=normal. Packs whole original atoms with required Scope and evidence within the total budget; inspect gaps and expand selected IDs. metadata_ref and metadata_template resolve in the card shared_metadata table. mode changes task priorities; projection controls admission.",
+      "description": "Select public knowledge and guide body objects for a task, preserving Scope and evidence limits. compact/normal/deep bound the whole response at 16000/32000/64000 bytes. Default reviewer uses current public package; explicit coding uses legacy admission.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -511,7 +519,7 @@
               "coding",
               "reviewer"
             ],
-            "default": "coding"
+            "default": "reviewer"
           },
           "view": {
             "type": "string",
@@ -525,7 +533,7 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [
@@ -549,10 +557,74 @@
           "source_epoch": {
             "type": "string",
             "maxLength": 160,
-            "description": "Configured service environment; omit for default 759671. Reuse when expanding results. Each record retains its own source Scope."
+            "description": "Explicit legacy source-verified environment. Omit to read current public package independently of source preparation."
           }
         },
         "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_catalog",
+      "description": "Navigate current public knowledge and registered companion guides.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "read_public_entry",
+      "description": "Read a public object with complete Scope and content-bound continuation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "review"
+            ]
+          },
+          "pointer": {
+            "type": "string"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "max_bytes": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 64000
+          }
+        },
+        "required": [
+          "id"
+        ],
         "additionalProperties": false
       },
       "annotations": {

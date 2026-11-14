@@ -30,7 +30,7 @@ def public_review(argv):
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required')
     sys.path.insert(0, str(ROOT / 'dst-kb-service'))
-    from dst_kb.public_catalog import main as catalog_main
+    from dst_kb.public_reader import PublicReader
     from dst_kb.config import KBError
     if args.command == 'find':
         tool, values = 'search_catalog', {'query': args.query, 'limit': args.limit}
@@ -38,7 +38,12 @@ def public_review(argv):
         tool, values = 'read_public_entry', {'id': args.id, 'purpose': 'review',
                                            'pointer': args.pointer, 'max_bytes': args.max_bytes}
     try:
-        return catalog_main(ROOT, 'call', tool, values)
+        server = PublicReader(ROOT)
+        try:
+            print(json.dumps(server.call(tool, values), ensure_ascii=False))
+            return 0
+        finally:
+            server.close()
     except (KBError, OSError, ValueError, KeyError, TypeError) as exc:
         print(json.dumps({'error': {'code': getattr(exc, 'code', 'CONFIG_ERROR'), 'message': str(exc)},
                           'service_started': False, 'client_configuration_modified': False},
@@ -65,14 +70,8 @@ def unified_review(argv):
     if not 1 <= args.limit <= 30:parser.error('--limit must be 1..30')
     sys.path.insert(0, str(ROOT / 'dst-kb-service'))
     from dst_kb.config import KBError
-    try:
-        config, _build = prepared_runtime(ROOT)
-    except PreparationError as exc:
-        print(json.dumps({'error': {'code': exc.code, 'message': str(exc)},
-                          'guidance': 'Unified review requires prepared full service. Public find/read remain available for source-free catalog review.'}, ensure_ascii=False), file=sys.stderr)
-        return 2
-    from dst_kb.mcp_server import Server
-    server = Server(config)
+    from dst_kb.public_reader import PublicReader
+    server = PublicReader(ROOT)
     values = {'projection': 'reviewer', 'max_bytes': args.max_bytes}
     if args.source_epoch:values['source_epoch'] = args.source_epoch
     if args.api:
@@ -98,20 +97,20 @@ def main(argv=None):
         return public_review(supplied)
     if supplied and supplied[0] == 'review':
         return unified_review(supplied[1:])
-    if supplied and supplied[0] == 'update-sources':
-        from scripts.update_sources import main as update_main
-        return update_main(supplied[1:])
     if supplied and supplied[0] == 'maintain-sources':
         from scripts.source_compatibility import main as compatibility_main
         return compatibility_main(supplied[1:])
-    parser = argparse.ArgumentParser(description=__doc__, epilog='update-sources: check and prepare an explicitly bound local ZIP; run update-sources --help. maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
+    if supplied and supplied[0] == 'rebuild-knowledge':
+        from scripts.rebuild_knowledge import main as rebuild_main
+        return rebuild_main(supplied[1:])
+    parser = argparse.ArgumentParser(description=__doc__, epilog='maintain-sources assess|assess-registered|locate|legacy-inventory|legacy-assess: read-only maintenance of any explicit target ZIP; run maintain-sources --help for options.')
     parser.add_argument('command', choices=['serve', 'status', 'validate', 'reindex', 'call', 'mcp-config', 'maintain-sources', 'find', 'read', 'review'],
-                        help='find QUERY / read ID: public catalog; review ID / review --api SYMBOL: full-service object review; see each command --help')
+                        help='find QUERY / read ID / review ID / review --api SYMBOL: public knowledge access; see each command --help')
     parser.add_argument('--tool')
     parser.add_argument('--arguments-file', type=Path)
     parser.add_argument('--source-epoch', choices=['759671'])
     parser.add_argument('--mode', choices=['auto', 'full', 'catalog'], default='auto',
-                        help='auto uses verified public review for unprepared sources or package drift with a visible reason; cache damage stays an error; full requires verified sources')
+                        help='auto reads public knowledge without prepared sources; full requires verified sources at startup; catalog uses the legacy two-tool interface')
     args = parser.parse_args(argv)
     if sys.version_info < (3, 10):
         parser.error('Python 3.10+ is required')
@@ -137,6 +136,40 @@ def main(argv=None):
                     parser.error('Conflicting source_epoch values')
                 values['source_epoch'] = args.source_epoch
         config = build = None
+        if args.mode in ('auto', 'full') and args.command in ('serve', 'status', 'call'):
+            if args.mode == 'full':
+                # Full requires complete sources, but does not imply Coding
+                # projection. Always expose the current-package public schema.
+                prepared_runtime(ROOT)
+            sys.path.insert(0, str(ROOT / 'dst-kb-service'))
+            from dst_kb.public_reader import PublicReader
+            from dst_kb.config import KBError
+            server = None
+            try:
+                server = PublicReader(ROOT)
+                if args.command == 'status':
+                    print(json.dumps(server.boundary() | {'records': len(server.rows),
+                        'guides': len(server.guides), 'tools': [t['name'] for t in server.tools]}, ensure_ascii=False))
+                elif args.command == 'call':
+                    print(json.dumps(server.call(args.tool, values), ensure_ascii=False))
+                else:
+                    while True:
+                        line = sys.stdin.buffer.readline(1024 * 1024 + 1)
+                        if not line or len(line) > 1024 * 1024:
+                            break
+                        try:
+                            result = server.handle(json.loads(line))
+                        except (ValueError, UnicodeError):
+                            result = {'jsonrpc': '2.0', 'id': None, 'error': {'code': -32700, 'message': 'Invalid JSON'}}
+                        if result is not None:
+                            sys.stdout.buffer.write((json.dumps(result, ensure_ascii=False) + '\n').encode('utf-8'))
+                            sys.stdout.buffer.flush()
+                return 0
+            except KBError as exc:
+                raise PreparationError(exc.code, str(exc)) from exc
+            finally:
+                if server is not None:
+                    server.close()
         if args.mode != 'catalog':
             try:
                 config, build = prepared_runtime(ROOT)

@@ -82,7 +82,8 @@ def units(record, family, pointer):
     result = []
     for child in selected:
         value = at(record, child)
-        if child in ('/claims', '/api_contracts', '/mechanism_steps', '/details', '/reviewer_expansion') and isinstance(value, (dict, list)):
+        if (child in ('/claims', '/api_contracts', '/mechanism_steps', '/details', '/reviewer_expansion')
+                or family == 'guide' and child == '/sections') and isinstance(value, (dict, list)):
             result.extend(children(record, family, child) or [child])
         else:
             result.append(child)

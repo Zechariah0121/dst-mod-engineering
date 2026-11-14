@@ -1,0 +1,9 @@
+name = "Stage 4 Skill and HUD Example"
+description = "An isolated inventory action, server-owned charge, and local HUD example."
+author = "DST Engineering KB"
+version = "1.0.0"
+api_version = 10
+dst_compatible = true
+all_clients_require_mod = true
+client_only_mod = false
+server_only_mod = false

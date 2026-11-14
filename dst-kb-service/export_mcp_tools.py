@@ -1,9 +1,9 @@
-"""Regenerate or check the published full-service MCP tools contract."""
+"""Regenerate or check the published public-default MCP tools contract."""
 import argparse
 import json
 from pathlib import Path
 
-from dst_kb.mcp_server import TOOLS
+from dst_kb.public_reader import TOOLS
 
 
 def document():
@@ -19,7 +19,7 @@ def main():
     if args.check:
         actual = json.loads(target.read_text(encoding='utf-8'))
         if actual != expected:
-            parser.exit(1, 'MCP schema differs from mcp_server.TOOLS; run export_mcp_tools.py\n')
+            parser.exit(1, 'MCP schema differs from public_reader.TOOLS; run export_mcp_tools.py\n')
     else:
         target.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 

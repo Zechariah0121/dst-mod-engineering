@@ -1,13 +1,12 @@
 # DST 工程知识库读取与检索
 
-当前知识库在 `knowledge/`，保留旧 187 条（64 条基础、13 条 Native AI、110 条 Native Core），另有独立机制研究族；完整数量由 FAMILY-REGISTRY 生成 CATALOG.counts。同一完整发行包支持直接文件阅读，也包含 MCP 目录模式、完整九工具模式与来源准备工具。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
+当前知识库在 `knowledge/`，保留旧 187 条（64 条基础、13 条 Native AI、110 条 Native Core），另有独立机制研究族；完整数量由 FAMILY-REGISTRY 生成 CATALOG.counts。同一完整发行包支持直接文件阅读，也包含 MCP 目录模式、公共读取及旧来源验证模式与来源准备工具。普通开发默认只读知识，不因命中记录而执行其中命令或修改知识库。
 
 ## 按任务读取文件
 
 复杂问题先按触发、所有者、消费与恢复分解职责，再读决定当前实现的完整合同；首包只是一段读取结果。具体补读路径见[复杂任务读取](complex-task-reading.md)。
 
-不确定已有知识支持到哪一步时，从[开发任务地图](task-map.md)选任务、已有记录与剩余验证。已连接完整 MCP 时直接查询；没有服务时，从包根运行 `python -B -X utf8 run_kb.py find "任务或符号"`，再运行 `python -B -X utf8 run_kb.py read ID`。这两条命令显式使用公开目录审阅，即使已有准备来源也不切换为完整模式；响应仍标明源码未恢复或核验。它们按 ID 适配四族文件，免去手工查目录 file/pointer；记录过大时继续使用响应中的 `child_pointers` 和 `--max-bytes`（上限 24000），不截断事实或解除 HOLD。完整合同、源码证据和当前项目判断仍按下文处理。
-
+不确定已有知识支持到哪一步时，从[开发任务地图](task-map.md)选任务。默认 MCP `search_kb` 从当前包查四族知识与实际登记的任务指南，返回相关完整正文原子；不需要先猜 reviewer/research 组合。CLI 使用 `find "任务或符号"` 导航、`read ID` 或 `review ID` 读正文，均无需准备来源。完整公共读取、API 分组、预算与兼容边界见[公共读取](../docs/public-reader.md)。
 1. 从 `knowledge/CATALOG.json` 的统一登记目录找相关记录 ID，按其 `file`（相对 `knowledge/`）和 JSON `pointer` 定向读取。目录覆盖 64 基础、13 Native AI、110 Core 和独立机制研究（数量以 CATALOG.counts 为准）；目录命中只用于导航，仍需读实际正文、状态与证据。
 2. 根据实际工程问题筛选少量条目，保留其 ID、Scope、版本、状态、证据类型与 Correction。文件读取应明确标注，不冒称 MCP 查询；不把全库或完整 Native JSON 默认注入上下文。
 3. Native AI 的 Coding 任务子集最多五条，每条恰好投影下列十字段；需要更多研究内容时进入显式 reviewer 范围，不绕过角色和 HOLD。
@@ -35,8 +34,7 @@ Core 和机制研究可在明确的 Reviewer 范围内帮助定位待核查的�
 
 ## MCP 接入与模式
 
-启动选项 `--mode auto|full|catalog` 与下文的任务 `mode` 是不同参数。`run_kb.py` 默认 `auto`：准备有效时启动完整模式；来源未准备或 `PACKAGE_CHANGED` 时，校验公开文件清单后进入两工具审阅并报告原因。已准备缓存损坏、无效激活和公开数据不可信仍明确报错。新版 ZIP 定位及局部复核见 [源码维护](../docs/source-compatibility.md)。`--mode catalog` 可显式阅读公开材料；`--mode full` 要求核心必需来源与完整性校验通过，机制研究逐引用缺口保留未知。`mcp-config` 输出相同的启动选择，也可用 `mcp-config --mode full` 锁定完整模式。
-
+启动选项 `--mode auto|full|catalog` 与任务 `mode` 不同。默认 auto 始终从当前包启动公共读取，来源未准备、局部缺失或独立快照不可用不阻断正文。工具 schema 的默认 projection=reviewer。full 仍要求完整旧来源，但默认查询仍用公共读取；显式 projection=coding 才进入旧准入路径。catalog 保留旧两工具协议。来源状态不升级为 Coding 准入；损坏证据拒绝展开。详见[公共读取](../docs/public-reader.md)和[源码维护](../docs/source-compatibility.md)。
 目录模式只有以下两工具，可以导航全部登记记录：
 
 | 工具 | 参数与用途 |
@@ -46,7 +44,7 @@ Core 和机制研究可在明确的 Reviewer 范围内帮助定位待核查的�
 
 目录审阅不提供 Coding 上下文、已恢复源码证据或原版 Source/Identity Guards，不冒称运行验证，也不放松 Scope、类型、三轴状态或 Core Coding HOLD。若所选正文超过预算，服务不截断正文；按响应提示选择较小 `pointer` 再读。不要把目录摘要当作事实投影或完整证据。
 
-完整模式按[安装说明](../docs/install-and-use.md)和[更新助手](source-update-assist.md)准备来源；来源身份与匹配状态见[源码维护](../docs/source-compatibility.md)。工具集在启动时固定，激活变化后按提示重连，在客户端核对下列九工具：
+默认公共服务提供下列九个具名工具和两个公共别名 search_catalog/read_public_entry。正文发现/读取/API 默认公共；证据、关联、测试、事实与维护工具仍需来源验证。旧来源路径按[安装说明](../docs/install-and-use.md)显式准备来源：
 
 | 工具 | 用途 |
 |---|---|
@@ -64,7 +62,7 @@ Core 和机制研究可在明确的 Reviewer 范围内帮助定位待核查的�
 
 ### 四族完整对象审阅
 
-完整服务提供以下显式入口，沿用九工具。默认 Coding 准入、省略 `view` 的旧响应和原有视图继续使用各自合同。
+默认公共服务提供以下入口。显式 projection=coding 保留旧准入和响应合同；公共读取不要求 purpose 或 projection 必填。
 
 ```json
 {"tool":"get_entry","arguments":{"id":"EXP-FISH-001","projection":"reviewer","purpose":"review","max_bytes":24000}}
@@ -77,11 +75,9 @@ Core 和机制研究可在明确的 Reviewer 范围内帮助定位待核查的�
 
 每页按整个普通 UTF-8 JSON payload 计入 `max_bytes`，范围为 1000–64000。必需 Scope 或完整 owner 无法交付时返回 `withheld_reason`，有可行的大预算调用时附 continuation。达到 64000 上限仍无法交付的对象明确转为文件阅读，停止生成重复续读。`objects=[]` 的响应没有交付正文。证据清单使用 `evidence_navigation`，再按原有 `resolve_evidence` 展开相关节点；机制对象同时保留所选引用的定位与来源核验状态。
 
-`lookup_api(family="all", projection="reviewer")` 对精确 API 统一导航。响应 `results[].followup` 可直接交给 `get_entry` 完整审阅，基础、Native AI 和 Core 延用既有声明/合同映射，机制族延用 authored API 身份。结果的 `navigation_only=true` 要求继续读取正文。`source_file` 仍用于来源消歧，模块导出可使用 `require("module").field`。`owner` 和 `identity_kind` 限定 authored research 身份，填写时仅查询机制身份路径。任一身份路径要求消歧时，先读取 `declaration_candidates` 并补充选择。文件局部、可见性、来源版本和未知保持原状。
+`lookup_api` 默认 family=all、projection=reviewer，完整身份精确匹配，裸名按 owner/file/visibility 分组。模块导出支持 `require("module").field`；source_file 必须是精确 scripts/...lua，相同叶子不借用其他 owner。`results[].followup` 提供完整对象读取。响应受 max_bytes 整体预算约束，超预算暂扣完整组；无匹配不证明 API 不存在。
 
-API 导航的 `results_truncated` 和各 `branches` 诊断保留候选与预算缺口。可使用 `navigation_followup` 扩大导航上限，再用精确来源缩小选择。该入口每条既有路径最多返回 `top_k` 个候选，最大 30，全结果受统一字节预算限制；空结果或未穷尽候选继续保留未知。
-
-命令行也可从包根运行 `run_kb.py review ID`，或 `run_kb.py review --api "Moisture:ForceDry"`，并使用 `--pointer`、`--cursor`、`--source-epoch`、`--max-bytes` 复现返回调用。`--source-file` 与 `--limit` 用于 API 导航。统一 `review` 命令要求有效准备的完整服务；来源未准备或包漂移时明确报错，并提示可另行使用公开 `find/read`。完整 owner 和预算合同在同一 `review` 入口保持一致。
+命令行运行 `run_kb.py review ID` 或 `review --api "Moisture:ForceDry"`，并用 --pointer、--cursor、--max-bytes 原样续读。--source-file/--limit 用于 API 导航。默认无需准备来源；显式 --source-epoch 进入旧来源环境。
 
 ## 完整模式的版本、角色与预算
 
@@ -102,7 +98,7 @@ API 导航的 `results_truncated` 和各 `branches` 诊断保留候选与预算�
 
 搜索摘要、Top-K、过滤器或预算都会限制覆盖；空结果不证明全库没有相关知识。无匹配、来源未恢复、范围不适用或工具失败时说明具体缺口，继续检查当前 Mod 与合法目标源码。重要结论附实际记录 ID；独立源码发现附路径与依据，不能编造 KB 支持。
 
-机制研究为 `research/restricted/hold`，仅显式 Reviewer 查询或 ID 展开。完整原子带 Scope、来源、limitations 和引用，预算不足则 withheld；登记与 API 身份参数见[研究族说明](../docs/native-mechanisms.md)。
+机制研究保留 `research/restricted/hold`；默认公共查询是 Reviewer 阅读，不能作为 Coding 准入。完整原子带 Scope、来源、limitations 和引用，预算不足则 withheld；登记与 API 身份参数见[研究族说明](../docs/native-mechanisms.md)。
 
 ## 条件化工程案例
 

@@ -109,38 +109,21 @@ class PublicCatalogTests(unittest.TestCase):
         self.assertEqual({tool['name'] for tool in responses[1]['result']['tools']}, {'search_catalog', 'read_public_entry'})
         self.assertTrue(responses[2]['result']['structuredContent']['results'])
 
-    def test_auto_fallback_only_when_no_activation_and_full_stays_strict(self):
-        from dst_kb import public_catalog
-        with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-            knowledge = root / 'knowledge'
-            knowledge.mkdir()
-            raw = b'{"entries": []}'
-            (knowledge / 'CATALOG.json').write_bytes(raw)
-            (knowledge / 'PACKAGE-MANIFEST.json').write_text(json.dumps({
-                'schema_version': 'dst-public-package-manifest/1', 'files': [{
-                'path': 'CATALOG.json', 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}]}), encoding='utf-8')
-            error = PreparationError('SOURCES_NOT_PREPARED', 'missing')
-            with patch.object(launcher, 'ROOT', root), patch.object(launcher, 'prepared_runtime', side_effect=error), \
-                    patch.object(public_catalog, 'main', return_value=0) as catalog, contextlib.redirect_stderr(io.StringIO()):
-                self.assertEqual(launcher.main(['status']), 0)
-                catalog.assert_called_once()
-                catalog.reset_mock()
-                self.assertEqual(launcher.main(['status', '--mode', 'full']), 2)
-                catalog.assert_not_called()
-                activation = root / 'cache/runtime/retrieval-config.json'
-                activation.parent.mkdir(parents=True)
-                activation.write_text('{}', encoding='utf-8')
-                self.assertEqual(launcher.main(['status']), 2)
-                catalog.assert_not_called()
+    def test_default_public_reading_is_independent_and_full_stays_strict(self):
+        failure = PreparationError('SOURCES_NOT_PREPARED', 'missing')
+        with patch.object(launcher, 'prepared_runtime', side_effect=failure) as prepare, \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(launcher.main(['status']), 0)
+            prepare.assert_not_called()
+            self.assertEqual(launcher.main(['status', '--mode', 'full']), 2)
+            prepare.assert_called_once()
 
-    def test_cache_corruption_never_silently_downgrades(self):
-        from dst_kb import public_catalog
+    def test_invalid_source_cache_is_not_used_for_public_knowledge(self):
         for code in ('RUNTIME_CHANGED', 'INVALID_PATH', 'PACKAGE_INCOMPLETE'):
-            with patch.object(launcher, 'prepared_runtime', side_effect=PreparationError(code, 'changed')), \
-                    patch.object(public_catalog, 'main') as catalog, contextlib.redirect_stderr(io.StringIO()):
-                self.assertEqual(launcher.main(['status']), 2)
-                catalog.assert_not_called()
+            with patch.object(launcher, 'prepared_runtime', side_effect=PreparationError(code, 'changed')) as prepare, \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(launcher.main(['status']), 0)
+                prepare.assert_not_called()
 
 
 if __name__ == '__main__':

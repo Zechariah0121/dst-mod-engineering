@@ -1,0 +1,834 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "topic": "stage4_skill_resource_hud",
+  "candidate_sha256": "406bf2154fc0a010f21a878f2ea36f67b2beda635685ea701fe4b6a4bf1f156d",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "候选静态研究通过",
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "独立重算与762172冻结身份匹配的现装scripts.zip、全部引用的成员和行范围SHA。逐项核对声明、API、步骤、指南与自写示例，示例逐文件执行Lua 5.1语法检查。",
+  "accepted_scope": {
+    "source_epoch": "762172",
+    "steam_buildid": "26474873",
+    "runtime_verified": false,
+    "evidence": "installed_archive_static_lua",
+    "bounds": [
+      "普通鼠标右键、无活动物品或强制修饰键，普通 Wilson SG，物品位于自己的主背包格，原版 Lua 未被第三方改写。",
+      "展示服务器可自行绑定的原版 INVENTORY 动作路径。自定义动作、扣费、网络投影与 HUD 是边界明确的工程示例，客户端动作和 native transport 仍需实机验证。",
+      "原版 inventory_classified 与 player_classified 仅按所列定向、父实体与状态桥接合同取证。示例每个分类实体对应一个玩家实体，重建按新实例附着。"
+    ],
+    "reused_entry_ids": [
+      "EXP-CHAIN-SPELL-001",
+      "EXP-ACT-001",
+      "EXP-ACT-002",
+      "EXP-LIFE-001",
+      "EXP-UI-003",
+      "N005-UI-C02",
+      "AI-N001-10",
+      "EXP-WORLD-003"
+    ],
+    "increment": "在地面空点 CASTSPELL、普通左键 PICK 和通用 Controls 重建之外，补普通背包格右键的真实输入、局部 RPC、候选重建、长动作提交及其 owner-only 资源 HUD 接线和保存。"
+  },
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": true,
+    "candidate_sha256_verified": true,
+    "archive_identity_verified": true,
+    "source_file_and_range_hashes": "all_match",
+    "governance": "research/restricted/hold preserved",
+    "public_distribution": "公开研究登记保留原版定位、哈希与摘要。候选与审阅无私人绝对路径，无原版Lua载荷。",
+    "guide_and_example": "PASS_STATIC_AND_LUA51_SYNTAX",
+    "runtime": "not_run_by_this_reviewer"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-CHAIN-SKILL-HUD-001",
+      "claim_reviews": [
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C01",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "InvSlot接CONTROL_SECONDARY按下且已通过只读等入口门禁时，普通无修饰分支交背包Replica。具有实际inventory时直接转给组件，远端所列分支由classified重收首项。地图与本地处理拥有各自早退，当前普通技能走其余候选的远端请求。",
+          "evidence_refs": [
+            "HUD-SLOT-CONTROL",
+            "HUD-SLOT-USE",
+            "HUD-INV-REPLICA",
+            "HUD-INV-CLIENT",
+            "HUD-PICKER",
+            "HUD-SORT",
+            "HUD-MAP-TARGET",
+            "HUD-INV-NONNETWORKED"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C02",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "客户端控制器在无locomotor时可直接发送，存在pre_action_cb时受额外忙态门；有locomotor时过非WALKTO、CanLocomote和不忙门后装preview_cb。客户端dolongaction走预演，RemoteBufferedAction要求classified的控制启用值为真才消费发送闭包。",
+          "evidence_refs": [
+            "HUD-PREVIEW-SEND",
+            "HUD-PREVIEW-CALL",
+            "HUD-DO-PREVIEW",
+            "HUD-SG-CLIENT"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C03",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "RPC验证参数形态，解码修饰状态到控制器，转发item/code/mod_name并正常清修饰。库存入口按SG忙态、可访问性与picker决定收集，地图早退以后才对非nil请求code及mod_name匹配；本机可无code。CanAccessItem涵盖打开且可写容器，示例用主库存槽的独立检查收窄。",
+          "evidence_refs": [
+            "HUD-INV-RPC",
+            "HUD-INV-SERVER",
+            "HUD-GET-SLOT"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C04",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "服务器dolongaction无timeout参数时用一秒，超时走PerformBufferedAction，退出按同一缓冲与lastheldaction条件清槽。BufferedAction:Do先通过IsValid再提交Action.fn，成功与失败的后续处理由实际返回控制。",
+          "evidence_refs": [
+            "HUD-SG-SERVER",
+            "HUD-CLEAR",
+            "HUD-BUFFERED",
+            "HUD-PERFORM"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C05",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "原版inventory Replica主模拟的player分支创建分类实体并设父级，OnOpen与OnClose改定向并写visible。远端一次读取GetParent，尝试接到现有Replica，若未接到则保留pending字段；player_classified的父实体附着及master setowner转发均有独立证据。",
+          "evidence_refs": [
+            "HUD-INV-OPEN",
+            "HUD-INV-SPAWN",
+            "HUD-INV-ATTACH",
+            "HUD-PLAYER-SETOWNER",
+            "HUD-PLAYER-ATTACH"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C06",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "netvars.lua文档支持两端一致声明、正常变化dirty和快照读取。原版初始化及远端ghost dirty调用同一函数，具有父实体和HUD时才走owner及Controls；新PlayerHud构造Controls，子Widget Kill递归移除，EntityScript:Remove释放双向事件索引。",
+          "evidence_refs": [
+            "HUD-NET",
+            "HUD-PLAYER-GHOST",
+            "HUD-PLAYER-INITIAL",
+            "HUD-GHOST-CONTROLS",
+            "HUD-HUD-CTOR",
+            "HUD-WIDGET",
+            "HUD-ENTITY-REMOVE",
+            "HUD-PLAYER-GHOST-LISTEN",
+            "HUD-PLAYER-INIT-CALL",
+            "HUD-CONTROLS-GHOST"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C07",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "SerializeUserSession要求玩家及非空userid，满足本地玩家或服务端门后序列化GetSaveRecord并委托原生。GetPersistData只采纳非空表，所列恢复将数据经SetPersistData分发给已装配的OnLoad。纯标量是示例设计；不推断原生玩家会话、跨分片或落盘内部。",
+          "evidence_refs": [
+            "HUD-SESSION",
+            "HUD-GET-RECORD",
+            "HUD-PERSIST-SAVE",
+            "HUD-PERSIST-LOAD",
+            "HUD-SESSION-LOAD"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-SKILL-HUD-001-C08",
+          "kind": "REC",
+          "result": "PASS_STATIC",
+          "semantic_basis": "示例校验当前缓冲、实体和主包所有权，生成FX后的同步回调也可使其取消并清试建FX，成功时按每个BufferedAction标记扣费。初读及后续附着、dirty和退出共同驱动控件，分类实体退出只移除仍指向自身的引用。监听属于Text实体，HUD重建用独立Controls。",
+          "evidence_refs": [
+            "HUD-PERFORM",
+            "HUD-SPAWN-CALLBACK",
+            "HUD-INV-OPEN",
+            "HUD-NET",
+            "HUD-WIDGET",
+            "HUD-ENTITY-REMOVE",
+            "HUD-SPAWN-PUBLIC"
+          ]
+        }
+      ],
+      "api_reviews": [
+        {
+          "symbol": "InvSlot:UseItem",
+          "result": "PASS_STATIC",
+          "semantic_basis": "owner为widgets/invslot.lua中的InvSlot。无显式返回值，tile/item与owner库存Replica可用时才转发；普通右键输入与Tooltip是独立路径。",
+          "evidence_refs": [
+            "HUD-SLOT-USE",
+            "HUD-SLOT-CONTROL"
+          ]
+        },
+        {
+          "symbol": "PlayerController:RemoteUseItemFromInvTile",
+          "result": "PASS_STATIC",
+          "semantic_basis": "owner为components/playercontroller.lua中的PlayerController。参数为动作和物品，只在非master进入。无locomotor有可选前置回调及忙态门，预测分支另有可移动、非忙和非WALKTO门；返回无结果，设置的preview_cb由控制开启时的RemoteBufferedAction调用。",
+          "evidence_refs": [
+            "HUD-PREVIEW-SEND",
+            "HUD-PREVIEW-CALL"
+          ]
+        },
+        {
+          "symbol": "Inventory:UseItemFromInvTile",
+          "result": "PASS_STATIC",
+          "semantic_basis": "owner为components/inventory.lua中的权威Inventory，区别于inventory_replica.lua的同名转发。当前状态图、库存访问、picker与动作参数决定分支；重收动作在设置请求上下文后，地图入口可先退出，无地图且候选匹配时调用locomotor:PushAction，业务提交由后续动作执行。",
+          "evidence_refs": [
+            "HUD-INV-SERVER",
+            "HUD-INV-REPLICA",
+            "HUD-INV-RPC"
+          ]
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "result": "PASS_STATIC",
+          "semantic_basis": "鼠标按下通过具名库存格进入Replica，主机直接交组件，远端普通网络候选经直发或预演发送。",
+          "evidence_refs": [
+            "HUD-SLOT-CONTROL",
+            "HUD-SLOT-USE",
+            "HUD-INV-REPLICA",
+            "HUD-INV-CLIENT",
+            "HUD-PREVIEW-SEND"
+          ]
+        },
+        {
+          "step": 2,
+          "result": "PASS_STATIC",
+          "semantic_basis": "服务器检查库存访问、重建候选、按动作身份入SG，实际执行于超时并复验缓冲对象；提前退出清理条件已核对。",
+          "evidence_refs": [
+            "HUD-INV-RPC",
+            "HUD-INV-SERVER",
+            "HUD-SG-SERVER",
+            "HUD-BUFFERED"
+          ]
+        },
+        {
+          "step": 3,
+          "result": "PASS_STATIC",
+          "semantic_basis": "示例复用具名分类实体的定向与父实体原则，通过一项有未就绪编码的字段传当前余额，UI主动读快照并订阅更新。",
+          "evidence_refs": [
+            "HUD-INV-OPEN",
+            "HUD-INV-ATTACH",
+            "HUD-PLAYER-SETOWNER",
+            "HUD-NET"
+          ]
+        },
+        {
+          "step": 4,
+          "result": "PASS_STATIC",
+          "semantic_basis": "Controls与Text随HUD销毁再创建；服务器资源由组件的存档值重建，UI与分类实体由运行入口重新挂接。",
+          "evidence_refs": [
+            "HUD-HUD-CTOR",
+            "HUD-WIDGET",
+            "HUD-ENTITY-REMOVE",
+            "HUD-PERSIST-SAVE",
+            "HUD-PERSIST-LOAD"
+          ]
+        }
+      ],
+      "classification_review": "NSF只陈述具名原版Lua路径及netvars.lua文档所见。REC标为示例策略和接线。两端的配置与可调用入口未扩大旧条目的Scope和准入。",
+      "unknowns_review": "原生定向投递、首次父实体到达、真实远端鼠标输入、客户端HUD/幽灵及真人session、跨分片和手柄仍待实际验证。示例按新实例替换，不覆盖同一分类实体换父级及第三方异常事务。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "HUD-SLOT-CONTROL",
+      "source_file": "scripts/widgets/invslot.lua",
+      "file_sha256": "4cbcad1e84c917ac37cc7fc03c73682de5ef860e00f74809a318ccbb0ef17018",
+      "line_start": 10,
+      "line_end": 61,
+      "range_sha256": "1291a0ed46513aacfeec9fb08ba77a72043df660d11a256900128070fbf33c12",
+      "symbols": [
+        "InvSlot:OnControl"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SLOT-USE",
+      "source_file": "scripts/widgets/invslot.lua",
+      "file_sha256": "4cbcad1e84c917ac37cc7fc03c73682de5ef860e00f74809a318ccbb0ef17018",
+      "line_start": 396,
+      "line_end": 403,
+      "range_sha256": "a0562b912d300bc048f9260ef55dd6ad03789cc2e8dbe3554d05c04336089382",
+      "symbols": [
+        "InvSlot:UseItem"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-REPLICA",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "line_start": 482,
+      "line_end": 490,
+      "range_sha256": "5fa5d81f4d5937cd2dd5d7054f35c0103d0e4039d4237d3a6989919a522cebf8",
+      "symbols": [
+        "Inventory:UseItemFromInvTile"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-CLIENT",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 901,
+      "line_end": 922,
+      "range_sha256": "0941e690f67bacef9a07f1826b8c860cd6a1027cae6d87c9ab67c67913f73800",
+      "symbols": [
+        "UseItemFromInvTile"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PICKER",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "line_start": 257,
+      "line_end": 289,
+      "range_sha256": "570e4129d0c57d8f50a6d08f11c7a06b046a49ad801cd10ca4dc7a2b76673eeb",
+      "symbols": [
+        "PlayerActionPicker:GetInventoryActions"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SORT",
+      "source_file": "scripts/components/playeractionpicker.lua",
+      "file_sha256": "f09b45d3b7b249c4608287053f74edee17583d3727dd8cbf08708e3177402e42",
+      "line_start": 84,
+      "line_end": 107,
+      "range_sha256": "b444e1a13bc0a3a4d1609a873234f3a0c60ea8492a4fba3e8b55ad90972d0018",
+      "symbols": [
+        "PlayerActionPicker:SortActionList"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PREVIEW-SEND",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5565,
+      "line_end": 5586,
+      "range_sha256": "058ee54967afd7098f3f44d4286e5f5a9450130447c924fc67b59bef439e7ea3",
+      "symbols": [
+        "PlayerController:RemoteUseItemFromInvTile"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PREVIEW-CALL",
+      "source_file": "scripts/components/playercontroller.lua",
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "line_start": 5753,
+      "line_end": 5766,
+      "range_sha256": "eb3f4c75de966b11be8c84820bfe1f123deeab7577fde1217fb1ef5352190449",
+      "symbols": [
+        "PlayerController:RemoteBufferedAction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-DO-PREVIEW",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1625,
+      "line_end": 1632,
+      "range_sha256": "bc077dc3cbee6b70cb11d66e2f00c3b0121e40e68608353fdb3be86d8dd5a744",
+      "symbols": [
+        "EntityScript:PerformPreviewBufferedAction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-RPC",
+      "source_file": "scripts/networkclientrpc.lua",
+      "file_sha256": "2cd54f3524cad4892232fb4a41c05d34a41314a3a65e606356ba243d770163c0",
+      "line_start": 725,
+      "line_end": 740,
+      "range_sha256": "f6ca2080645801fe2665b9284eaf8dbc28c7f46e690224f9ab239bff22184f0a",
+      "symbols": [
+        "RPC.UseItemFromInvTile"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-SERVER",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 2259,
+      "line_end": 2303,
+      "range_sha256": "a3a63999dbd07a20bf045172d07f601790cd42e7a250fcf64623f73fd790e28a",
+      "symbols": [
+        "Inventory:CanAccessItem",
+        "Inventory:UseItemFromInvTile"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-GET-SLOT",
+      "source_file": "scripts/components/inventory.lua",
+      "file_sha256": "a83c8a7b835d8c1782778954512540d98b0a05a49e7e5fdc29bf9fae7d68b6d8",
+      "line_start": 592,
+      "line_end": 598,
+      "range_sha256": "b91f3be062dbff16f8e298f708b113f39f40e739cbc75af6969ab98dfab7bc66",
+      "symbols": [
+        "Inventory:GetItemSlot"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SG-CLIENT",
+      "source_file": "scripts/stategraphs/SGwilson_client.lua",
+      "file_sha256": "532c42a11bb11e4b09c7afe0958c1fa01b6072800420a1c31f05d6545825a85c",
+      "line_start": 3184,
+      "line_end": 3233,
+      "range_sha256": "f968374c3f42d446b603c4f57adffbf5a710c3dd97b8adb07cb00c8b308db406",
+      "symbols": [
+        "dolongaction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SG-SERVER",
+      "source_file": "scripts/stategraphs/SGwilson.lua",
+      "file_sha256": "c23878143e21a65345d0e4a40549d99a6c0f82c445d4981ef8c3060beeb473ed",
+      "line_start": 8359,
+      "line_end": 8429,
+      "range_sha256": "284a17679c61fec860965523efb8b88c2a835181b0442fe355cc7717485d5346",
+      "symbols": [
+        "dolongaction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-CLEAR",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1588,
+      "line_end": 1593,
+      "range_sha256": "1e1674888e9e7d4c0b1293034c3da45be9be58303cd48a67d56dff885f2a5a43",
+      "symbols": [
+        "EntityScript:ClearBufferedAction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-BUFFERED",
+      "source_file": "scripts/bufferedaction.lua",
+      "file_sha256": "82514b46f1fd771094ca41c17645dc98c871a5de998df6b83251db7be67e9f34",
+      "line_start": 22,
+      "line_end": 50,
+      "range_sha256": "117d4f1acea37ee98c18ac3c6801237bb11106816f54cbef7829ceb2a4901728",
+      "symbols": [
+        "BufferedAction:Do",
+        "BufferedAction:IsValid"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PERFORM",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1679,
+      "line_end": 1712,
+      "range_sha256": "d8f1895d5a9b9b1b5ce48c2694c6163884aa9bc770ead6f205351066da1135a3",
+      "symbols": [
+        "EntityScript:PerformBufferedAction"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-SPAWN",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "line_start": 9,
+      "line_end": 34,
+      "range_sha256": "1da788d6bb51878da9bb87bb564d4b0d173552e3577cfd830450d1709ddb9369",
+      "symbols": [
+        "Inventory"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-OPEN",
+      "source_file": "scripts/components/inventory_replica.lua",
+      "file_sha256": "8ea7bf4b057b24cb1dbeacaf655c389027c2048e4c482ca50c5708b6d1b1fe48",
+      "line_start": 145,
+      "line_end": 161,
+      "range_sha256": "b4c68df08d5dbadfbbdb5ed0727f938b4b2c8f3ee108732b5885fec7fe175864",
+      "symbols": [
+        "Inventory:OnOpen",
+        "Inventory:OnClose"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-ATTACH",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "line_start": 79,
+      "line_end": 87,
+      "range_sha256": "c61f2f7557a5b92e7d62b171796d8662b8cd6efc6c3f634d7b515435881bcd95",
+      "symbols": [
+        "OnEntityReplicated"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-SETOWNER",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 1001,
+      "line_end": 1017,
+      "range_sha256": "dbc23d5cd97e94820ac8ba8ffbbd455d76d0411d6c2bc7576ede7bf34fda3e2e",
+      "symbols": [
+        "OnSetOwner"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-ATTACH",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 247,
+      "line_end": 262,
+      "range_sha256": "b2c796ad9c9149da67ba2fa59c99fc7dd98a0c6a7f0a3784c47c20da9721c3dd",
+      "symbols": [
+        "OnEntityReplicated"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-NET",
+      "source_file": "scripts/netvars.lua",
+      "file_sha256": "c8943567120d420a762e66821288885177a2ce440709f7fdc5a601192724522f",
+      "line_start": 4,
+      "line_end": 69,
+      "range_sha256": "4296f63260b3d57a39917781b4c43d1f3cc93f0d7f8a3e0ae6cfa0bf77674707",
+      "symbols": [
+        "net_smallbyte",
+        "netvar:set",
+        "netvar:value"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-GHOST",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 815,
+      "line_end": 822,
+      "range_sha256": "08f9adb69207817294ccdc850d7e13ff05f9434debb6c873d071105238d53c66",
+      "symbols": [
+        "OnGhostModeDirty"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-INITIAL",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "line_start": 1305,
+      "line_end": 1339,
+      "range_sha256": "228e586f788c2fb3c4f4499f88cdfd00ab837dabb4ed39a4f46cbfc296aa776d",
+      "symbols": [
+        "fns.OnInitialDirtyStates"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-GHOST-CONTROLS",
+      "source_file": "scripts/prefabs/player_common.lua",
+      "file_sha256": "6e84df1d245195fb81c8d0af6ae3167ad4930a00fa5a4198a52083c22fb8a287",
+      "line_start": 955,
+      "line_end": 964,
+      "range_sha256": "b522dd5b5b8412a9bb470904f739f087fdeb89c7525b56e0d3bee97501bf02a6",
+      "symbols": [
+        "SetGhostMode"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-HUD-CTOR",
+      "source_file": "scripts/screens/playerhud.lua",
+      "file_sha256": "89efec8385b91e49f7b86048d3d349a51ceae9044acab3e3995ec7825a2128ff",
+      "line_start": 928,
+      "line_end": 962,
+      "range_sha256": "9217bc026f7546ed49120a6b57f60ba01b6a668bf58958fc5963e740ed1b7e4e",
+      "symbols": [
+        "PlayerHud:SetMainCharacter"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-WIDGET",
+      "source_file": "scripts/widgets/widget.lua",
+      "file_sha256": "6e2206ab42c04a1a1f0978f3347bcd3a02acd1a4306da73210662d9a8444b9f5",
+      "line_start": 291,
+      "line_end": 334,
+      "range_sha256": "74f7dd72783001c730b03b5e51315cd290ebb3555b8479b2b64929d330492287",
+      "symbols": [
+        "Widget:KillAllChildren",
+        "Widget:Kill"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-ENTITY-REMOVE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1747,
+      "range_sha256": "80de3205cab85b6eaef4ab1645244f83e4f387605572999f8ec62170b45615a0",
+      "symbols": [
+        "EntityScript:Remove"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SESSION",
+      "source_file": "scripts/networking.lua",
+      "file_sha256": "ca41f0418bef3866d1f879cd9160c2386e77445e885fc49c5d84e72408b01b84",
+      "line_start": 303,
+      "line_end": 320,
+      "range_sha256": "0a7152e7088c5d3c6d50a2397049ec3c4af96f8821228a8e2c1813ef805601fe",
+      "symbols": [
+        "SerializeUserSession"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-GET-RECORD",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 308,
+      "line_end": 316,
+      "range_sha256": "9728efeac1c5f55602ec973051db737447ec1aa30ee4a5b38a80e94956ba9bda",
+      "symbols": [
+        "EntityScript:GetSaveRecord"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PERSIST-SAVE",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 1947,
+      "range_sha256": "f9c3c95e7354bf4623e18e958479919767034b91cefe4532b8850bf6e0287aca",
+      "symbols": [
+        "EntityScript:GetPersistData"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PERSIST-LOAD",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1979,
+      "line_end": 2014,
+      "range_sha256": "eaab33fbb5aae7ec74a47bfddc0b24863f730b8a317e75e64b4d2cadd26ae021",
+      "symbols": [
+        "EntityScript:SetPersistData"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SESSION-LOAD",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 2101,
+      "line_end": 2107,
+      "range_sha256": "22998960095a5eebb76dbe3eaa20bb38dacfbc4b36ed9d91d8b70ca7f424389a",
+      "symbols": [
+        "ResumeExistingUserSession"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SPAWN-CALLBACK",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 373,
+      "line_end": 423,
+      "range_sha256": "c1421b2760c7f1c1b8c7b28eb4d16d746cb429f705d320560e18421299c30958",
+      "symbols": [
+        "SpawnPrefabFromSim"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-SPAWN-PUBLIC",
+      "source_file": "scripts/mainfunctions.lua",
+      "line_start": 429,
+      "line_end": 437,
+      "symbols": [
+        "SpawnPrefab"
+      ],
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "range_sha256": "68a997623e74ae82c251a5381779153cffea59723bb7f3377ff5d5cddd754e84",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-GHOST-LISTEN",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "line_start": 1217,
+      "line_end": 1234,
+      "symbols": [
+        "RegisterNetListeners_local"
+      ],
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "range_sha256": "f1c0c873ec952b06f8393b30b1b768d63f42a843e416a065eafa4b8efc529309",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-PLAYER-INIT-CALL",
+      "source_file": "scripts/prefabs/player_classified.lua",
+      "line_start": 1277,
+      "line_end": 1303,
+      "symbols": [
+        "RegisterNetListeners"
+      ],
+      "file_sha256": "d03a01967c344767309685e99b2932f0c6138acab2194e7ac57e5710fea58361",
+      "range_sha256": "02910d7f46d77ea8d71bc4cd78666d705f9066844e87980caa9fca7aa6215fd9",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-CONTROLS-GHOST",
+      "source_file": "scripts/widgets/controls.lua",
+      "line_start": 487,
+      "line_end": 491,
+      "symbols": [
+        "Controls:SetGhostMode"
+      ],
+      "file_sha256": "2a0ccc0638315f8766b9f46cc5431c718f307570781cfaee20857eb87930a04d",
+      "range_sha256": "8f36b2d7f1fd048efc8529957f645c68b7afd412640f7ff8ab5fd707141559da",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-MAP-TARGET",
+      "source_file": "scripts/components/playercontroller.lua",
+      "line_start": 423,
+      "line_end": 442,
+      "symbols": [
+        "PlayerController:GetMapTarget"
+      ],
+      "file_sha256": "3906f661082d007bd134f2c172608d75fa4c7e7c4e9aff0a825ff3dc3214a01a",
+      "range_sha256": "72f55653d7880dc9aec9d7c837e173b8a20d8fa6cb369aca7f7388ff1b95d241",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "HUD-INV-NONNETWORKED",
+      "source_file": "scripts/prefabs/inventory_classified.lua",
+      "line_start": 881,
+      "line_end": 899,
+      "symbols": [
+        "TryNonNetworkedAction"
+      ],
+      "file_sha256": "d6a64f8650af0efbee58ba7cd1d2d59b813c1ce2685c0f238e3646e2a7632f6f",
+      "range_sha256": "add177bfcab37e06704a843064aeb0db6d226825733336fa38e308584e53fad4",
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    }
+  ],
+  "artifact_reviews": {
+    "guide": {
+      "relative_path": "hud/guide.md",
+      "sha256": "95a63f7a6d7fb5f47ede5ec4ef55ec9090d56aec9b0bca33bc9d7a9ea2d2edd2",
+      "final_destination": "references/chain-skill-resource-hud.md"
+    },
+    "example_files": [
+      {
+        "relative_path": "hud/example-mod/modinfo.lua",
+        "sha256": "085d9646b5549f32964ecbaeebd8ba70e25e8c7c0c8304dd7cfe688cbdadac03",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/modmain.lua",
+        "sha256": "4ce27f49ba91826c57dc5d0bfd05f32f8ffa0dd872218fac700f21c557e781c0",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/scripts/components/s4hud_charge.lua",
+        "sha256": "6ae7a0dee1c3bdd438fae1c0a85b452d386b1df7ba41971f9b6d7364742f7584",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/scripts/prefabs/s4hud_charge_classified.lua",
+        "sha256": "1528655d95001edc07b5e97be0cbad7c9813ee8a990fd56a1dddbe4a6d58d570",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/scripts/prefabs/s4hud_pulse_stone.lua",
+        "sha256": "7f59f6c3983501c11dee456c6a1dde86c6fa34372ee06ed996eca79e3d2656e0",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/scripts/s4hud_charge_values.lua",
+        "sha256": "8f1dd19551352d90503e2d15e58922a930023d1ae777ff01bd422db116f7eac2",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "hud/example-mod/scripts/s4hud_hud.lua",
+        "sha256": "ee646a0d91ad43d4c839d7f5d560843b0832a27314ecf3404fa7261bee03cd56",
+        "lua_5_1_syntax": "PASS"
+      }
+    ],
+    "semantic_basis": "七个示例Lua构成完整可安装Mod。公开指南链接均解析到该目录或已存在的引用，依次说明本地输入、权威结算、余额与分类实体的独立所有权、HUD重建、组件存档与客户端待验。独立重跑Lua 5.1替身用例通过。",
+    "limits": "独立审阅含静态和替身验证。另有与当前样例字节一致的真实隔离专服：服务器库存动作到SG、结算及退出，和无userid合成Wilson的两进程同分片世界磁盘保存重载。真实客户端、定向送达和真人会话仍待验。"
+  },
+  "freeze_receipt": {
+    "review_bytes_final": true,
+    "runtime_verified": false,
+    "actual_runtime_evidence": "separate_named_server_action_and_synthetic_world_disk_runs_example_only"
+  }
+}

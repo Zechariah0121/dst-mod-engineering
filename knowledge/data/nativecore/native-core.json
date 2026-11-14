@@ -15873,7 +15873,7 @@
         },
         {
           "kind": "NSF",
-          "statement": "StateGraphInstance:PreviewAction 有匹配 handler 时检查 condition/deststate；缺少 handler 且不是 instant 时进入 previewaction 回退，否则可直接 PerformPreviewBufferedAction。StartAction 则没有同样的缺失 handler 回退；匹配后进入状态，或在无 deststate 时 PerformBufferedAction。",
+          "statement": "StateGraphInstance:PreviewAction 仅在 sg.actionhandlers 非 nil、表中无匹配 handler 且动作非 instant 时调用 GoToState(\"previewaction\")。无 actionhandlers 表、无匹配 handler 但动作是 instant，或匹配 handler 无 condition（或 condition 返回真值）且无 deststate 时，直接调用 PerformPreviewBufferedAction。匹配 handler 的 condition 返回假值或 deststate 函数返回 nil 时直接返回；deststate 函数返回非 nil 时将结果交给 GoToState。StartAction 只处理匹配且条件允许的 handler：有 deststate 时仅在结果为真值时调用 GoToState，无 deststate 时调用 PerformBufferedAction。",
           "evidence_refs": [
             {
               "artifact_path": "research/native-core/sources/689635242bbaa6d0-n003-staging.json",
@@ -17741,7 +17741,7 @@
         "runtime_verified": false,
         "new_source_research": false,
         "new_coding_admission": false,
-        "original_fact_statement_preserved": true,
+        "original_fact_statement_preserved": false,
         "static_locator_verification": "PASS_IF_FINAL_DRAFT_AUDIT_HAS_ZERO_ERRORS",
         "source_locator_hashes_verified_this_sprint": true
       }

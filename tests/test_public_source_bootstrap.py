@@ -160,10 +160,10 @@ class BootstrapTests(unittest.TestCase):
         self.build([self.current, self.historical])
         active = self.root / 'cache/runtime/retrieval-config.json'
         original = active.read_bytes()
-        with self.assertRaises(prepare.PreparationError) as caught:
-            self.build([self.current])
-        self.assertEqual(caught.exception.code, 'SOURCE_GAP')
-        self.assertEqual(caught.exception.details['source_gaps'][0]['source_file'], 'scripts/a.lua')
+        result = self.build([self.current])
+        self.assertEqual(result['status'], 'PARTIAL_EVIDENCE_PREPARED')
+        self.assertEqual(result['source_gaps'][0]['source_file'], 'scripts/a.lua')
+        self.assertEqual(result['evidence_status'], 'PARTIAL')
         self.assertEqual(active.read_bytes(), original)
         self.assertTrue((self.root / 'cache/runtime/.prepare.lock').exists())
         with prepare.preparation_lock(self.root / 'cache/runtime/.prepare.lock'):

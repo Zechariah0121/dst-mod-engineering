@@ -78,6 +78,8 @@ Screen 的 control 消费针对本次事件。HUD 的 `HasInputFocus` 还会影�
 
 ## 常驻内容复用现成 HUD 节点
 
+资源数值需要从服务器同步时，参阅[技能资源与 HUD](chain-skill-resource-hud.md)的首次快照、后续变化和 Controls 重建路径。
+
 本地 HUD 的正常创建路径会生成新的 PlayerHud，随后 `SetMainCharacter` 创建新的 Controls。`AddClassPostConstruct("widgets/controls", ...)` 在原构造后取得本次实例及 owner，可把一个小 Widget 挂到 `top_root`、`topright_root` 等适合的节点。对应字段已指向现成 HUD 缩放子节点，原版构造和屏幕尺寸变化会走 `SetHUDSize`。通常只需设置自己的相对位置。来源 `UI-S19`、`UI-S20`、`UI-S21` 至 `UI-S26`、`UI-S28`、`UI-S35`、`UI-S36`。
 
 hook 内直接使用传入的 `controls`。`owner.HUD.controls` 的赋值发生在整个 Controls 构造返回之后，postconstruct 执行时这个字段可能仍为空或仍保留旧对象。这是由当前赋值与包装顺序得到的静态推断。来源 `UI-S20`、`UI-S28`。

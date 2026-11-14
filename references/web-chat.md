@@ -14,6 +14,8 @@
 
 Claude 的技能入口与账户要求见 [使用说明](https://support.claude.com/en/articles/12512180-use-skills-in-claude)，ZIP 顶层应为直接包含 `SKILL.md` 的 `dst-mod-engineering/`，见 [打包说明](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)。ChatGPT 可使用普通附件或 [Projects](https://help.openai.com/en/articles/10169521-projects-in-chatgpt)；原生导入仅在账户提供相应入口时使用，见 [Skills 说明](https://help.openai.com/en/articles/20001066-skills-in-chatgpt)。文件限制以 [上传说明](https://help.openai.com/en/articles/8555545-file-uploads-faq) 和当前界面为准。普通附件不是技能安装包，技能包也不是插件包。
 
+普通知识阅读无需上传游戏源码：具备包内文件访问时可用 `find/read/review`，有 MCP 连接时默认 `auto` 提供 11 工具公共发现和正文读取。当前源码核对另需合法目标片段或明确来源；partial 证据快照、旧缓存与当前游戏验证分别说明，见[知识读取](../docs/knowledge-integration.md)与[证据快照](../docs/evidence-snapshots.md)。
+
 ## 按问题提供最少材料
 
 | 问题 | 相关专题 | 首批项目材料 |

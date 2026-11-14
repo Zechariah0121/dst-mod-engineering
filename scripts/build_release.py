@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 NAME = 'dst-mod-engineering'
-VERSION = 'v2026.11.12.5'
+VERSION = 'v2026.11.13.4'
 ARCHIVE = NAME + '.zip'
 CHECKSUMS = 'SHA256SUMS.txt'
 MANIFEST = 'RELEASE-MANIFEST.json'
@@ -19,7 +19,22 @@ ROOT_FILES = ('SKILL.md', 'README.md', 'README.en.md', 'LICENSE', 'requirements.
               'prepare_sources.py', 'run_kb.py', 'retrieval-config.json',
               'source-epochs.json', 'source-payload-recipe.json', 'PUBLICATION-ORIGIN-MAP.json')
 DIRECTORIES = {'references': '.md', 'docs': '.md', 'templates': '.md', 'examples': '.json'}
-SCRIPTS = ('dst_zip_tool.py', 'check_api.py', 'dst_modtest.py', 'source_payload.py', 'public_rebind.py', 'source_compatibility.py', 'catalog_fallback_policy.py', 'register_mechanisms.py', 'legacy_adapter.py', 'update_sources.py')
+# Self-authored, independently reviewed Lua fixtures. Enumerate source files so
+# extracting vanilla scripts or running an example cannot add release members.
+MOD_EXAMPLES = (
+    'examples/stage4-timed-effect/modinfo.lua',
+    'examples/stage4-timed-effect/modmain.lua',
+    'examples/stage4-timed-effect/scripts/stage4_timed_damage.lua',
+    'examples/stage4-timed-effect/scripts/prefabs/stage4_timed_damage.lua',
+    'examples/stage4-skill-resource-hud/modinfo.lua',
+    'examples/stage4-skill-resource-hud/modmain.lua',
+    'examples/stage4-skill-resource-hud/scripts/components/s4hud_charge.lua',
+    'examples/stage4-skill-resource-hud/scripts/prefabs/s4hud_charge_classified.lua',
+    'examples/stage4-skill-resource-hud/scripts/prefabs/s4hud_pulse_stone.lua',
+    'examples/stage4-skill-resource-hud/scripts/s4hud_charge_values.lua',
+    'examples/stage4-skill-resource-hud/scripts/s4hud_hud.lua',
+)
+SCRIPTS = ('dst_zip_tool.py', 'check_api.py', 'dst_modtest.py', 'source_payload.py', 'public_rebind.py', 'source_compatibility.py', 'catalog_fallback_policy.py', 'register_mechanisms.py', 'legacy_adapter.py', 'rebuild_knowledge.py', 'maintenance_support.py', 'build_release.py')
 SERVICE_FILES = ('LICENSE', 'README.md', 'config.example.json', 'dst_kb_cli.py', 'export_mcp_tools.py')
 SERVICE_DATA = ('dst-kb-service/dst_kb/contract_map.json',
                 'dst-kb-service/dst_kb/source_identity_map.json',
@@ -79,6 +94,8 @@ def source_files(root):
             name = path.relative_to(root).as_posix()
             if name not in MAINTAINER_DOCS:
                 add(name)
+    for name in MOD_EXAMPLES:
+        add(name)
     for name in SCRIPTS:
         add('scripts/' + name)
     for name in SERVICE_FILES:

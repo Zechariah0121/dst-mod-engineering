@@ -69,9 +69,23 @@ def check_arguments(spec,args):
 class Server:
     tools=TOOLS
     instructions=INSTRUCTIONS
-    def __init__(self,config=None):
+    def __init__(self,config=None,public_default=True):
         self.config=config;self.service=None;self.services={};self.initialized=False
+        self.public_reader=None
+        self.public_default=public_default and type(self) is Server
+        if self.public_default:
+            from .public_reader import TOOLS as public_tools, INSTRUCTIONS as public_instructions
+            self.tools=public_tools
+            self.instructions=public_instructions
     def call(self,name,args):
+        legacy_request=(isinstance(args,dict) and (args.get('projection')=='coding' or args.get('mode')=='coding' or 'source_epoch' in args)
+                        or name in ('resolve_evidence','validate_kb','get_klei_facts','get_tests','get_related'))
+        if self.public_default and not legacy_request:
+            if self.public_reader is None:
+                from pathlib import Path
+                from .public_reader import PublicReader
+                self.public_reader=PublicReader(Path(__file__).resolve().parents[2])
+            return self.public_reader.call(name,args)
         spec=next((x for x in self.tools if x['name']==name),None)
         if spec is None:raise KBError('INVALID_TOOL','Unknown tool '+str(name))
         check_arguments(spec,args)
@@ -124,6 +138,9 @@ class Server:
             data={'error':{'code':'SERVICE_ERROR','message':'KB operation failed; inspect local service log.'},'kb_available':False}
         return base|{'result':{'content':[{'type':'text','text':json.dumps(data,ensure_ascii=False)}],'structuredContent':data,'isError':True}}
     def close(self):
+        if self.public_reader is not None:
+            self.public_reader.close()
+            self.public_reader=None
         for service in self.services.values():service.close()
         self.services.clear();self.service=None
 

@@ -31,6 +31,16 @@ class PreparationError(Exception):
         super().__init__(message)
 
 
+def snapshot_call(function, *args, **kwargs):
+    """Keep the preparation CLI's structured error contract for reader guards."""
+    try:
+        return function(*args, **kwargs)
+    except Exception as exc:
+        if str(getattr(exc, 'code', '')).startswith('EVIDENCE_'):
+            raise PreparationError(exc.code, str(exc)) from exc
+        raise
+
+
 def read(path):
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
 
@@ -369,16 +379,20 @@ def install_build(assembled, final, manifest_hash, runtime):
 def prepare(root, values):
     root = Path(root).resolve()
     sources = source_inputs(values)
+    input_hashes = [sha(p.read_bytes()) if p.is_file() else None for p in sources]
     rows = package_inputs(root)
     package_hash = digest(rows)
     runtime = child(root, 'cache/runtime')
     runtime.mkdir(parents=True, exist_ok=True)
     lock = child(root, 'cache/runtime/.prepare.lock')
     with preparation_lock(lock):
+        sys.path.insert(0, str(ROOT / 'dst-kb-service'))
+        from dst_kb import evidence_snapshot
         if child(root, 'cache/runtime/retrieval-config.json').is_file():
             try:
                 _, previous = prepared_runtime(root)
-                if same_source_inputs(previous, sources):
+                assessment = snapshot_call(evidence_snapshot._load, root, verify_package=False)
+                if assessment is not None and assessment['status'] == 'COMPLETE' and same_source_inputs(previous, sources):
                     return {'status': 'LOCAL_RUNTIME_ALREADY_PREPARED',
                         'runtime_build': previous.relative_to(root).as_posix(), 'source_epochs': list(EPOCHS),
                         'client_configuration_modified': False, 'service_started': False,
@@ -405,19 +419,45 @@ def prepare(root, values):
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(child(root, name), destination)
             hydrated, _ = payload.hydrate(templates, recipe, sources, output_root=assembled)
+            supplied = payload.Sources(sources)
+            observed = {}
+            try:
+                hydrated['gap_statuses'] = {}
+                matched = {m['id'] for m in hydrated['matches']}
+                for slot in recipe['slots']:
+                    present = False
+                    for coordinate in slot['coordinates']:
+                        for index, raw in supplied.candidates(coordinate['source_file']):
+                            present = True
+                            observed[(index, coordinate['source_file'])] = sha(raw)
+                    if slot['id'] not in matched:
+                        hydrated['gap_statuses'][slot['id']] = ('CHANGED_UNKNOWN' if present else
+                            'MISSING' if slot['coordinates'] else 'UNKNOWN')
+            finally:
+                supplied.close()
+            mechanism_checks = {'status': 'NO_REGISTERED_MECHANISM_FAMILY'}
+            if (root / 'knowledge/FAMILY-REGISTRY.json').is_file():
+                verifier = load_helper(root / 'dst-kb-service/dst_kb/native_mechanism_source.py', 'prepared_mechanism_source')
+                mechanism_checks = verifier.verify(root, sources)
+            source_identities = []
+            for index, path in enumerate(sources):
+                source_identities.append({'source_input_index': index, 'kind': 'ZIP' if path.is_file() else 'DIRECTORY',
+                    'archive_sha256': sha(path.read_bytes()) if path.is_file() else None,
+                    'observed_files': sorted((name, value) for (i, name), value in observed.items() if i == index)})
+            assessment = snapshot_call(evidence_snapshot.build, root, recipe, hydrated, mechanism_checks, source_identities, package_hash,
+                native_ai=evidence_snapshot.verify_native_ai(root, sources))
+            if input_hashes != [sha(p.read_bytes()) if p.is_file() else None for p in sources]:
+                raise PreparationError('SOURCE_CHANGED_DURING_READ', 'Source ZIP changed during preparation; previous activations preserved.')
             if (hydrated.get('missing_required_count') or hydrated.get('missing_noncache_source_literal_count')):
-                raise PreparationError('SOURCE_GAP',
-                    'Required source ranges do not match the supplied input. Review the reported ranges or supply an authorized matching source; no partial runtime was activated.',
-                    {'hydration_status': hydrated['status'], 'missing_required_count': hydrated['missing_required_count'],
-                     'missing_noncache_source_literal_count': hydrated['missing_noncache_source_literal_count'],
-                     'source_gaps': unique_gaps(hydrated)})
+                snapshot_id = snapshot_call(evidence_snapshot.activate, root, assessment)
+                return {'status': 'PARTIAL_EVIDENCE_PREPARED', 'evidence_snapshot_id': snapshot_id,
+                    'evidence_status': assessment['status'], 'affected_entry_ids': assessment['affected_entry_ids'],
+                    'source_gaps': unique_gaps(hydrated), 'runtime_activated': False,
+                    'previous_runtime_preserved': True, 'client_configuration_modified': False,
+                    'service_started': False, 'local_source_payload_do_not_publish': True}
             remaining = remaining_slots(assembled)
             if remaining:
                 raise PreparationError('SOURCE_GAP', 'Unresolved source slots remain; no runtime activated.', {'files': remaining})
-            mechanism_checks = {'status': 'NO_REGISTERED_MECHANISM_FAMILY'}
-            if (assembled / 'knowledge/FAMILY-REGISTRY.json').is_file():
-                verifier = load_helper(assembled / 'dst-kb-service/dst_kb/native_mechanism_source.py', 'prepared_mechanism_source')
-                mechanism_checks = verifier.verify(assembled, sources)
             rebound, origins = rebind.rebind(assembled, assembled / 'PUBLICATION-ORIGIN-MAP.json')
             if rebound.get('unresolved'):
                 raise PreparationError('REBIND_FAILED', 'Typed source commitments could not be rebound.', {'unresolved': rebound['unresolved']})
@@ -455,8 +495,21 @@ def prepare(root, values):
                     'runtime_manifest_sha256': manifest_hash}}
             pending = temporary / 'activation.json'
             write(pending, activation)
-            os.replace(pending, runtime / 'retrieval-config.json')
+            # The independent evidence activation never claims runtime activation.
+            # If it fails, the previous runtime pointer is still untouched.
+            evidence_pointer = child(root, 'cache/evidence/active.json')
+            previous_evidence = evidence_pointer.read_bytes() if evidence_pointer.exists() else None
+            snapshot_id = snapshot_call(evidence_snapshot.activate, root, assessment)
+            try:
+                os.replace(pending, runtime / 'retrieval-config.json')
+            except BaseException:
+                if previous_evidence is None:
+                    evidence_pointer.unlink(missing_ok=True)
+                else:
+                    evidence_snapshot._atomic(evidence_pointer, previous_evidence)
+                raise
             result = {'status': 'LOCAL_RUNTIME_PREPARED', 'runtime_build': 'cache/runtime/builds/' + build_id,
+                    'evidence_snapshot_id': snapshot_id, 'evidence_status': assessment['status'],
                     'source_epochs': list(EPOCHS), 'client_configuration_modified': False,
                     'service_started': False, 'local_source_payload_do_not_publish': True}
             if quarantined is not None:

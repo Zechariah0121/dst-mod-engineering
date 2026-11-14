@@ -1,6 +1,6 @@
 # 安装与使用 / Installation and use
 
-当前版本 `v2026.11.12.1` 包含 279 条登记记录，版本与数量分别见 RELEASE-MANIFEST、FAMILY-REGISTRY 和 CATALOG。
+当前包的版本与登记数量分别见 RELEASE-MANIFEST、FAMILY-REGISTRY 和 CATALOG。
 
 ## 下载与解压
 
@@ -21,21 +21,15 @@
 
 `~` 属于运行 Agent 的主机。刷新技能列表或重启会话后，确认实际读取的 `SKILL.md`、相关专题和 `knowledge/`。不能自动发现时直接读取其绝对路径。官方来源及云端差异见 [Agent 接入](../references/agent-setup.md)。更新前保存定制版，避免同名副本混淆。
 
-提供任务、Mod 根目录、实际 DST 版本与合法本地 `data/databundles/scripts.zip`。没有 MCP 时按 [知识文件入口](knowledge-integration.md) 选少量相关条目，报告文件读取，不需要安装或启动服务。
+提供任务、Mod 根目录与实际 DST 版本；核对当前源码时再提供合法本地 `data/databundles/scripts.zip`。没有 MCP 时按 [知识文件入口](knowledge-integration.md) 选少量相关条目，报告文件读取，不需要安装或启动服务。
 
-## 首次绑定与自动检查
+## 默认知识读取与显式来源维护
 
-在本包根目录使用 Python 3.10+，绑定任务已明确的合法游戏源码：
+默认 MCP 无需源码准备。在包根运行 `python -B -X utf8 run_kb.py mcp-config`，将配置接入客户端；默认 `auto` 提供 11 个工具。自然问题、按 ID 或 API 读取均走公共知识入口，`review ID` / `review --api` 也无需源码。显式 Coding、来源 epoch 与证据展开仍使用原有来源和准入守卫。
 
-```text
-python -B -X utf8 run_kb.py update-sources ensure --source "<scripts.zip绝对路径>"
-```
+来源证据仅按维护任务显式准备；使用下面的手动命令，核对来源身份和逐引用状态。准备状态、失败处理与重连见[源码维护](source-compatibility.md)。
 
-以后由 Skill 在实质查库前执行 `run_kb.py update-sources ensure`，复用已记忆的路径；输入未变会快返，相同失败输入不反复重建。`update-sources status` 可查看绑定和上次尝试。首次路径不明确时先确认，不扫描磁盘猜测。网页或云端没有本地权限时，报告不能执行，不伪造绑定或检查成功。
-
-准备状态、失败处理与重连统一按[更新助手](../references/source-update-assist.md)执行。准备后在客户端检查实际工具、来源和一次查询。
-
-## 手动来源准备与完整九工具 MCP
+## 手动来源准备与严格完整模式
 
 需要 Python 3.10+ 与 SQLite FTS5，MCP 与来源准备使用标准库。当前核验目标及证据环境见[源码维护](source-compatibility.md)。在包根运行手动准备：
 
@@ -53,9 +47,9 @@ python -B -X utf8 run_kb.py mcp-config --mode full
 python -B -X utf8 run_kb.py serve --mode full
 ```
 
-这是等待 MCP 输入的 stdio 服务，不提供网页或监听端口。在客户端确认实际 `tools/list` 有九工具，再执行一次任务相关查询并检查响应与来源身份；打印配置或 `validate` 成功不能代替实际连接和查询。服务工具集在启动时固定，已经连接目录模式的会话必须在准备成功后重启。
+这是等待 MCP 输入的 stdio 服务，不提供网页或监听端口。在客户端确认实际 `tools/list` 有 11 个工具，再执行一次任务相关查询并检查响应与来源身份；打印配置或 `validate` 成功不能代替实际连接和查询。`full` 同样默认读取公共知识；其启动额外要求完整来源准备。已经连接显式 `catalog` 模式的会话改用 `auto` 后须重启，才能使用 11 个工具。
 
-准备结果位于本地 `cache/runtime/`；恢复 Lua 留在本地。损坏构建会隔离保留，修复后重新准备；进程退出自动释放准备锁。
+完整运行环境位于本地 `cache/runtime/`；独立证据快照位于 `cache/evidence/`。来源局部缺口可激活 partial 证据快照，旧完整环境保留原来源身份；公共发现与正文读取继续可用，详见[证据快照](evidence-snapshots.md)。恢复 Lua 留在本地。损坏构建会隔离保留，修复后重新准备；进程退出自动释放准备锁。
 
 命令行查询使用 `call`；只有它接受 `--tool`、`--arguments-file` 与 `--source-epoch`：
 
@@ -67,13 +61,13 @@ python -B -X utf8 run_kb.py call --mode full --tool get_context_bundle --argumen
 
 ## 启动模式与公开目录审阅
 
-正常完整使用可由更新助手检查并准备，也可按上面的手动流程准备。`--mode` 可用于 `run_kb.py` 各位置子命令，支持：
+普通知识读取无需准备来源；维护来源证据或使用严格完整模式时，按任务显式手动准备。`--mode` 可用于 `run_kb.py` 各位置子命令，支持：
 
 | 启动选项 | 行为 |
 |---|---|
-| `--mode auto`（默认） | 准备有效时进入完整九工具模式；来源未准备或 `PACKAGE_CHANGED` 时，核验公开清单后提供两工具审阅并报告原因；缓存损坏、无效激活及公开文件失配仍报错 |
-| `--mode catalog` | 显式选择目录导航与公开材料审阅，无需游戏来源 |
-| `--mode full` | 要求完整来源准备及 SQLite FTS5；核心必需来源缺失、缓存损坏或完整性校验失败均报错；机制研究逐引用缺口保留未知 |
+| `--mode auto`（默认） | 默认提供 11 工具的公共知识发现和正文读取，无需来源；公开清单与正文身份仍严格核验，显式 Coding、epoch 和证据请求沿用原来源守卫 |
+| `--mode catalog` | 保留旧两工具目录导航与公开材料审阅，无需游戏来源 |
+| `--mode full` | 启动要求完整来源准备及 SQLite FTS5，默认发现和正文仍为 11 工具公共入口；显式 Coding/证据保留原守卫，来源缺口不得伪装已核对 |
 
 目录模式的 `search_catalog` 和 `read_public_entry` 用于导航与显式 `purpose="review"` 审阅。角色、读取预算与完整模式差异统一见[检索策略](../references/kb-retrieval.md)。
 
@@ -104,9 +98,9 @@ python -m venv .venv
 |---|---|
 | 找不到 Skill 或知识文件 | 检查目录层级、完整解压和实际加载路径；不要只复制 `SKILL.md` |
 | 找不到 `prepare_sources.py` / `run_kb.py` | 检查是否完整解压当前 `dst-mod-engineering.zip`，并在含 `SKILL.md` 的包根目录操作 |
-| 单份当前源码准备失败 | 核对输入是否为本版核验的 `762172 / build 26474873`、ZIP 是否完整及输出的必需范围/哈希要求；其他目标先做局部复核，旧版源码不是启动前提 |
-| `auto` 报缓存损坏，或报告包升级降级审阅 | 缓存损坏仍须修复；包升级可先用已校验公开资料审阅，再按 [源码维护](source-compatibility.md) 局部复核新版源码 |
-| 准备成功后仍只有两工具 | 重启 MCP 会话，工具集不会在已连接会话中自动切换 |
+| 来源出现局部缺口 | 核对输入、逐引用状态及 affected_entry_ids；partial 快照不替换旧完整环境，公共正文仍可读；来源身份匹配不等于游戏行为验证 |
+| 来源缓存损坏或包已升级 | 默认公共正文仍按当前公开清单核验；显式来源操作须先修复或重建相应缓存，不把旧缓存作为新来源证据 |
+| 仍只有两工具 | 检查是否显式使用 `--mode catalog`；改为默认 `auto` 并重启 MCP 会话 |
 | MCP 已配置但无工具或查询失败 | 核对当前 Python、包路径、启动模式、准备状态、stderr 与客户端会话 |
 | 网页 AI 无本地权限 | 提供必要材料；云端不能直接读取用户电脑的游戏和缓存 |
 

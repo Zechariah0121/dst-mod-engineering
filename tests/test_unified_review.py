@@ -208,19 +208,19 @@ class UnifiedReviewTests(unittest.TestCase):
 
 
 class UnifiedReviewCommandTests(unittest.TestCase):
-    def test_unprepared_review_reports_error_and_keeps_the_review_contract(self):
+    def test_unprepared_review_reads_public_material(self):
         failure = run_kb.PreparationError('SOURCES_NOT_PREPARED', 'fixture missing sources')
         for arguments in (['review', 'AI-N001-01'], ['review', '--api', 'Demo:Run']):
             error = io.StringIO()
             with patch.object(run_kb, 'prepared_runtime', side_effect=failure), \
                     patch.object(run_kb, 'public_review', side_effect=AssertionError('no mode downgrade')), \
-                    contextlib.redirect_stderr(error):
-                self.assertEqual(run_kb.main(arguments), 2)
-            self.assertEqual(json.loads(error.getvalue())['error']['code'], 'SOURCES_NOT_PREPARED')
+                    contextlib.redirect_stdout(error):
+                self.assertEqual(run_kb.main(arguments), 0)
+            self.assertIn('objects' if arguments[1] != '--api' else 'results', json.loads(error.getvalue()))
 
     def test_id_review_passes_bound_continuation_parameters(self):
         with patch.object(run_kb, 'prepared_runtime', return_value=('fixture-config', ROOT)), \
-                patch('dst_kb.mcp_server.Server') as factory, contextlib.redirect_stdout(io.StringIO()):
+                patch('dst_kb.public_reader.PublicReader') as factory, contextlib.redirect_stdout(io.StringIO()):
             factory.return_value.call.return_value = {'objects': []}
             code = run_kb.main(['review', 'AI-N001-01', '--pointer', '/native_fact', '--cursor', 'fixture',
                                '--source-epoch', '759671', '--max-bytes', '64000'])
@@ -232,7 +232,7 @@ class UnifiedReviewCommandTests(unittest.TestCase):
 
     def test_api_review_selects_all_families_without_manual_routing(self):
         with patch.object(run_kb, 'prepared_runtime', return_value=('fixture-config', ROOT)), \
-                patch('dst_kb.mcp_server.Server') as factory, contextlib.redirect_stdout(io.StringIO()):
+                patch('dst_kb.public_reader.PublicReader') as factory, contextlib.redirect_stdout(io.StringIO()):
             factory.return_value.call.return_value = {'results': []}
             code = run_kb.main(['review', '--api', 'Demo:Run', '--source-file', 'scripts/demo.lua', '--limit', '10'])
         self.assertEqual(code, 0)

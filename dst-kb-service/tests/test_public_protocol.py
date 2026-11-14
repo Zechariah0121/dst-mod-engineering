@@ -23,7 +23,7 @@ from dst_kb.mcp_server import Server
 from dst_kb.delivery_wire import expand_l1_metadata
 
 TOOLS = {'search_kb', 'get_entry', 'get_related', 'get_klei_facts', 'get_tests',
-         'get_context_bundle', 'lookup_api', 'resolve_evidence', 'validate_kb'}
+         'get_context_bundle', 'lookup_api', 'resolve_evidence', 'validate_kb', 'search_catalog', 'read_public_entry'}
 EPOCH = 'public64-protocol-fixture'
 FACT = 'FACT-DST-001'
 TASK = '核对 EntityScript 的 GetPersistData / SetPersistData 如何遍历 components 并调用 OnSave / OnLoad。'
@@ -148,7 +148,7 @@ class PublicProtocolTests(unittest.TestCase):
         self.assertEqual(json.loads(response['result']['content'][0]['text']), value)
         return value
 
-    def test_stdio_initialize_and_nine_tool_inventory(self):
+    def test_stdio_initialize_and_public_tool_inventory(self):
         messages = [
             {'jsonrpc': '2.0', 'id': 1, 'method': 'tools/list', 'params': {}},
             {'jsonrpc': '2.0', 'id': 2, 'method': 'initialize', 'params': {
@@ -175,11 +175,12 @@ class PublicProtocolTests(unittest.TestCase):
         self.assertEqual(set(specs), TOOLS)
         for name, spec in specs.items():
             with self.subTest(tool=name):
-                self.assertIn('source_epoch', spec['inputSchema']['properties'])
+                if name not in ('search_catalog', 'read_public_entry'):
+                    self.assertIn('source_epoch', spec['inputSchema']['properties'])
                 self.assertFalse(spec['inputSchema']['additionalProperties'])
                 self.assertTrue(spec['annotations']['readOnlyHint'])
                 self.assertFalse(spec['annotations']['destructiveHint'])
-        self.assertEqual(specs['get_entry']['inputSchema']['properties']['projection']['default'], 'coding')
+        self.assertEqual(specs['get_entry']['inputSchema']['properties']['projection']['default'], 'reviewer')
         self.assertEqual(specs['lookup_api']['inputSchema']['properties']['projection']['default'], 'reviewer')
         self.assertEqual(replies[3]['result'], {})
 

@@ -49,12 +49,12 @@ class PatchIntegrationTests(unittest.TestCase):
                 code = self.launcher.main(arguments)
         return code, out.getvalue(), err.getvalue()
 
-    def test_auto_package_upgrade_serves_verified_public_catalog(self):
+    def test_default_public_reader_is_independent_of_runtime_package_upgrade(self):
         code, out, err = self.run_launcher(["status"], prepare_sources.PreparationError("PACKAGE_CHANGED", "synthetic package upgrade"))
         self.assertEqual(code, 0, err)
         value = json.loads(out)
         self.assertEqual(value["records"], json.loads((REPO / "knowledge/CATALOG.json").read_bytes())["counts"]["total"])
-        self.assertEqual(value["availability_fallback"]["reason_code"], "PACKAGE_CHANGED")
+        self.assertEqual(value["service_mode"], "public_reader")
         self.assertFalse(value["coding_context_delivered"])
 
     def test_full_package_upgrade_stays_error(self):
@@ -62,8 +62,12 @@ class PatchIntegrationTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertEqual(json.loads(err)["error"]["code"], "PACKAGE_CHANGED")
 
-    def test_corrupt_runtime_stays_error(self):
-        code, _, err = self.run_launcher(["status"], prepare_sources.PreparationError("RUNTIME_CHANGED", "fixture"))
+    def test_corrupt_runtime_is_rejected_by_full_mode(self):
+        failure = prepare_sources.PreparationError("RUNTIME_CHANGED", "fixture")
+        code, out, err = self.run_launcher(["status"], failure)
+        self.assertEqual(code, 0, err)
+        self.assertFalse(json.loads(out)["coding_context_delivered"])
+        code, _, err = self.run_launcher(["status", "--mode", "full"], failure)
         self.assertEqual(code, 2)
         self.assertEqual(json.loads(err)["error"]["code"], "RUNTIME_CHANGED")
 

@@ -47,9 +47,8 @@ class ResearchReadTests(unittest.TestCase):
         for name,digest in expected.items():self.assertEqual(sha((ROOT/'knowledge'/name).read_bytes()),digest,name)
         registry=families.load(ROOT/'knowledge')
         core=json.loads((ROOT/'knowledge/data/nativecore/native-core.json').read_bytes())
-        # Reverse only the four reviewed recommendation edits before comparing
-        # the historical semantic baseline. Source facts and original Scope
-        # remain covered by the original digest.
+        # Reverse the explicitly reviewed edits before comparing the original
+        # semantic baseline. Keep the original digest for all other content.
         revision_path='research/native-core/recommendation-revisions-20261112.json'
         revision_raw=(ROOT/'knowledge'/revision_path).read_bytes()
         self.assertEqual(sha(revision_raw),'d50ff62d19154f19bf53119b29b71afa72d6ff2905776d550b5ecb26e2d680f3')
@@ -69,6 +68,17 @@ class ResearchReadTests(unittest.TestCase):
                 self.assertEqual(entry['scope'].pop('recommendation_correction_note'),
                     'original_projection 保留修订前研究原值；当前工程建议以 claims 和本更正为准。')
                 self.assertTrue(entry['scope']['projection_preserved_exact_as_json_value'])
+        corrected = next(e for e in core['entries'] if e['id'] == 'NC-N003-INT-03')
+        claim = corrected['claims'][1]
+        self.assertEqual(claim['kind'], 'NSF')
+        self.assertEqual(families.digest(claim['statement']),
+                         'a7d6991470862827c92cee1de96af0facc09f717aab14a856af4a34bf62eae13')
+        self.assertIs(corrected['gate_a']['original_fact_statement_preserved'], False)
+        claim['statement'] = ('StateGraphInstance:PreviewAction 有匹配 handler 时检查 condition/deststate；'
+                              '缺少 handler 且不是 instant 时进入 previewaction 回退，否则可直接 '
+                              'PerformPreviewBufferedAction。StartAction 则没有同样的缺失 handler 回退；'
+                              '匹配后进入状态，或在无 deststate 时 PerformBufferedAction。')
+        corrected['gate_a']['original_fact_statement_preserved'] = True
         def semantic(value):
             if isinstance(value,dict):
                 return {k:semantic(v) for k,v in value.items() if k not in {'evidence_refs','sha256','bytes','source_artifacts'}}

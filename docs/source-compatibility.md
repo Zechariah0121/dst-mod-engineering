@@ -1,14 +1,10 @@
 # 源码更新与局部复核
 
-证据基线、目标游戏源码和派生缓存分别管理。`v2026.11.12.5` 的服务环境参数仍仅接受 `source_epoch=759671`，本次核验的来源输入为 762172。研究原子保留自身证据身份：23 条为 759671、14 条为 760944、7 条为 761239、69 条为 762172。新增四条有限功能链均绑定 762172 冻结来源，历史版本分布保留。目标输入标签不构成整包版本白名单，不切换服务环境或改写历史 Scope。官方更新后，旧知识仍可按原 Scope 审阅，新 ZIP 可独立定位和比较。
+证据基线、目标游戏源码和派生缓存分别管理。`v2026.11.13.4` 的服务环境参数仍仅接受 `source_epoch=759671`，本次核验的来源输入为 762172。研究原子保留自身证据身份：23 条为 759671、14 条为 760944、7 条为 761239、71 条为 762172。两条新增研究均使用 762172 冻结来源。目标输入标签不构成整包版本白名单，不切换服务环境或改写历史 Scope。官方更新后，旧知识仍可按原 Scope 审阅，新 ZIP 可独立定位和比较。
 
-## Skill 自动检查入口
+## 本机手动来源维护
 
-需要当前源码证据的工作前由 Skill 执行 `run_kb.py update-sources ensure`。仅做公开目录导航或公开材料审阅可直接使用 `find/read`。首次用 `ensure --source "<明确的scripts.zip绝对路径>"` 绑定；以后检查记忆路径，不扫描其他安装，也不在 `serve` 中隐式运行。相同成功输入快返，相同失败输入抑制自动重试；只有处理原因后确需重试时显式 `--retry`。
-
-助手尝试适配可恢复来源，不改知识正文或历史证据身份。准备改变激活时按 reconnect_required 重连，再核对工具、任务响应和来源；失败后以明确目标 ZIP 与哈希继续核对本次任务的定义、消费者、端别和生命周期，不关闭整库或把新结论写成 canonical。遇文件缺失或限定符号零命中时，去掉原文件限定寻找搬迁。完整命令与状态处理集中在 [源码更新助手](../references/source-update-assist.md)。
-
-下面的手动准备、`maintain-sources`、逐引用状态和缓存完整性契约继续适用。
+普通查库和公共阅读无需准备来源。维护来源证据时，显式执行 `python -B -X utf8 prepare_sources.py --source "<scripts.zip绝对路径>"`。输入路径必须明确；准备后核对逐引用状态及实际来源，配置切换后重连。局部缺口不改写知识正文、历史Scope或准入。
 
 ## 本次目标与来源准备边界
 
@@ -17,20 +13,22 @@
 | 目标游戏版本 / Steam build | `762172 / 26474873` |
 | 目标 `scripts.zip` SHA-256 | `733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980` |
 | Lua 文件盘点 | 见 [762172 适配记录](version-762172.md) 的逐文件差异 |
-| 知识目录与准入 | 300 条，保留旧 187 条身份；113 条机制研究仍为 `research/restricted/hold` |
+| 知识目录与准入 | 302 条，保留旧 187 条身份；115 条机制研究仍为 `research/restricted/hold` |
 
 上述为来源字节盘点。使用者按[安装说明](install-and-use.md)准备合法来源；其他 ZIP 可独立导航和评估，完整模式仍检查必需范围。
 
-统一审阅响应继续并列历史来源身份、当前输入核验状态与未知。`get_entry(purpose="review", projection="reviewer")` 的 pointer/cursor 续读与 `lookup_api(family="all")` 的跨族导航沿用各来源规则，入口参数见[知识读取](knowledge-integration.md)。四条功能链的定义、消费者和退出/恢复范围见[本轮说明](phase15-unified-chains.md)，逐引用匹配和完整对象交付各自保留其验证含义。
+统一审阅响应继续并列历史来源身份、当前输入核验状态与未知。`get_entry(purpose="review", projection="reviewer")` 的 pointer/cursor 续读与 `lookup_api(family="all")` 的跨族导航沿用各来源规则，入口参数见[知识读取](knowledge-integration.md)。功能链的定义、消费者和退出/恢复范围见[既有四条功能链](phase15-unified-chains.md)及[效果恢复与资源 HUD](phase16-effect-and-resource.md)，逐引用匹配和完整对象交付各自保留其验证含义。
 
 前版 760178 适配已将 4 个重复的必需传送来源槽从 `scripts/componentutil.lua:1320–1408` 收窄到 `1325–1408`。范围来自可信 759671 完整旧源码，移除不属于该传送契约、在目标中已变化的注册函数；保留的 84 行在旧、新输入中逐字一致。必要范围及派生哈希重新绑定，原始历史证据仍按原身份和 `metadata_only` 保留；760944 的 componentutil.lua 与 760178 整文件一致，本轮沿用该范围，不改变证据和校验器。具体对照见 [760944 适配记录](version-760944.md)。这不是将旧文件整体哈希改写为新版，也不表示其他消费者未变。
 
-核心必需载荷槽仍严格校验，无法恢复时 `SOURCE_GAP` 不激活部分运行环境。独立机制研究的来源核验则按每条引用区分：
+核心必需载荷槽仍严格校验，无法恢复时不建立含未恢复 slots 的完整运行环境；可独立激活 `PARTIAL_EVIDENCE_PREPARED` 证据快照，保留旧完整缓存。默认发现和正文不受局部缺口阻断。快照按引用列状态及 affected_entry_ids，未实际检查覆盖的条目明确标 UNKNOWN；详情见[独立证据快照](evidence-snapshots.md)。逐引用状态包括：
 
 | 逐引用状态 | 可以据此确认与保留的边界 |
 |---|---|
 | `EXACT_FILE_RANGE` | 被引用文件及范围哈希匹配；不要求无关文件或整个 ZIP 相同，不等于游戏行为验证 |
 | `RANGE_ONLY` | 文件整体已变，但找到唯一相同范围，可包含行号迁移；原文件身份未验证，文件其他部分及依赖影响仍需复核 |
+| `EXACT_FILE` | N001 仅文件哈希匹配，`range_verified=false`，不能当作范围或运行验证 |
+| `UNKNOWN` | 缺少可执行检查、历史依赖 pointer 不可用或条目尚未核对；不得视为已验证 |
 | `CHANGED_UNKNOWN` | 找不到唯一相同范围、输入限制或信息不足；原 Scope 保留，目标证据未知 |
 | `MISSING` | 目标中没有该引用文件；保留来源缺口，可用独立导航继续定位 |
 
@@ -45,6 +43,7 @@ python -B -X utf8 run_kb.py maintain-sources --help
 python -B -X utf8 run_kb.py maintain-sources locate --target "<new scripts.zip>" --symbol "Brain:OnStart"
 python -B -X utf8 run_kb.py maintain-sources assess --baseline "<evidence baseline scripts.zip>" --target "<new scripts.zip>" --candidate "<reviewed candidate.json>" --output "<new report.json>"
 python -B -X utf8 run_kb.py maintain-sources assess-registered --knowledge-root knowledge --target "<new scripts.zip>" --baseline "<optional evidence baseline scripts.zip>" --output "<new report outside knowledge root.json>"
+python -B -X utf8 run_kb.py maintain-sources assess-registered --knowledge-root knowledge --target "<new scripts.zip>" --matching-baseline "<evidence archive A.zip>" --matching-baseline "<evidence archive B.zip>" --output "<new report outside knowledge root.json>"
 python -B -X utf8 run_kb.py maintain-sources legacy-inventory --knowledge-root knowledge --output "<new inventory.json>"
 ```
 
@@ -66,15 +65,24 @@ record hash，并要求 CATALOG 的机制研究条目与登记闭合。路径必
 输出是 `dst-registered-source-compatibility/1` JSON sidecar，包含逐候选、逐引用、
 claim / API contract / mechanism step 结果、`topic_summary` 与 `difference_summary`；
 保留原 Scope、unknowns、limitations、review 身份与三轴状态。登记 topic 短名与候选的
-`authored_topic` 描述分别保留。`archive_delta` 在提供旧 ZIP 时列出新增、删除、变化文件，
-不含 Lua 文本；缺旧 ZIP 时为 null，不据此宣称没有变化。
+`authored_topic` 描述分别保留。
+
+- `--baseline` 使用单份 ZIP，候选归档 SHA-256 不匹配时，其引用为
+  `unknown/provided_baseline_archive_does_not_match_candidate`。归档差异写入 `archive_delta`。
+- `--matching-baseline` 可重复，与 `--baseline` 互斥。工具按候选已登记的 `archive_sha256`
+  选择 ZIP，再核验其中的文件和范围承诺。`matched_baseline_sha256` 记录每个候选匹配的归档，
+  未匹配时为 null，此时按省略基线的规则核对目标文件和范围。
+  `archive_deltas` 以每份输入 ZIP 的 SHA-256 为键，记录各自相对同一目标的 `baseline` 和 `delta`。
+  此模式下原单份 ZIP 字段 `baseline` 和 `archive_delta` 为 null。
+
+归档差异列出 `scripts/` 下所有新增、删除和变化文件，包含 `.pot` 等非 Lua 成员。
+`lua_count` 只统计 Lua 文件。差异报告仅含定位与哈希，不含源码正文。
 
 `--output` 必填且必须在 knowledge 根目录外；完整评估及序列化成功后，工具在输出目录
 暂存并以不覆盖的原子硬链接发布新文件。文件系统不支持硬链接、发布失败或目标已存在时
 报错并清理暂存文件，不回退为部分写入。此命令不准备或安装来源、不改旧知识及 Scope，
-也不限制目标 ZIP 的版本。`--baseline` 可省略；单次只接受一份旧 ZIP，多归档候选中与其
-不匹配的引用保留 unknown，不猜测来源身份。匹配字节不消除动态/native/未枚举依赖的
-unknown，也不解除 Coding HOLD 或代表游戏行为验证。
+也不限制目标 ZIP 的版本。匹配字节不消除动态/native/未枚举依赖的 unknown，
+也不解除 Coding HOLD 或代表游戏行为验证。
 
 ## 报告的含义
 
@@ -104,9 +112,9 @@ unknown，也不解除 Coding HOLD 或代表游戏行为验证。
 
 ## 读取旧知识与准备完整模式
 
-`--mode full` 仍严格要求核心必需载荷、公开数据与身份 guards 全部通过；机制研究的逐引用缺口按上表保留，不等同整个完整服务无法启动。`--mode auto` 在未准备来源，或包升级造成 `PACKAGE_CHANGED` 时，先核验当前公开知识清单，再提供两工具审阅；状态及 MCP initialize 指令中报告 `availability_fallback.reason_code`。损坏缓存、无效激活、非法路径或不可信公开知识仍报错。
+`--mode full` 启动仍严格要求核心必需载荷、公开数据与身份 guards 全部通过；其默认自然发现和正文与 `auto` 一样走 11 工具公共入口。`--mode auto` 无需来源准备；`--mode catalog` 保留旧两工具。公共知识清单、文件身份与 cursor 仍严格核验；显式 Coding、epoch 和证据展开继续检查各自来源缓存，损坏或失配不能作为已验证证据交付。
 
-已有完整缓存不会因为游戏目录 ZIP 被官方更新就自动失效；启动校验的是缓存及包内承诺文件。本版核验的 762172 输入按当前适配记录准备；其他新 ZIP 仍可先使用公开审阅与独立源码导航。某一核心必需范围不能恢复时，`prepare_sources.py` 仍可能报 `SOURCE_GAP`，此时不激活部分来源，不篡改旧范围或旧版本。
+已有完整缓存不会因为游戏目录 ZIP 被官方更新就自动失效；启动校验的是缓存及包内承诺文件。本版核验的 762172 输入按当前适配记录准备；其他新 ZIP 仍可先使用公开审阅与独立源码导航。某一核心必需范围不能恢复时，`prepare_sources.py` 可激活 partial 证据快照；不切换旧完整 runtime，不篡改旧范围或旧版本。快照的全局状态不能替代逐条核对状态。
 
 维护命令退出 0 表示评估完成。旧 187 条记录的 legacy-inventory 只盘点来源：Legacy locator、Native AI research refs 和 Core typed artifact refs 分别绑定原 Scope，不统一改标。
 

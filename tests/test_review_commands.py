@@ -32,22 +32,30 @@ class ReviewCommandTests(unittest.TestCase):
                 self.assertEqual(found['results'][0]['id'], identifier)
                 code, read = self.invoke(['read', identifier, '--pointer', '/title', '--max-bytes', '24000'])
                 self.assertEqual(code, 0)
-                self.assertEqual(read['entry']['id'], identifier)
-                self.assertTrue(read['whole_value_delivered'])
-                self.assertFalse(read['coding_context_delivered'])
+                if not read['objects']:
+                    self.assertEqual(read['withheld_reason'], 'REQUIRED_CONTEXT_EXCEEDS_BUDGET')
+                    followup = read['continuation']['arguments']
+                    code, read = self.invoke(['review', followup['id'], '--pointer', followup['pointer'],
+                                              '--cursor', followup['cursor'],
+                                              '--max-bytes', str(followup['max_bytes'])])
+                    self.assertEqual(code, 0)
+                self.assertEqual(read['entry_registration']['id'], identifier)
+                self.assertTrue(read['complete'])
+                self.assertEqual(read['objects'], [{'pointer': '/title', 'value': found['results'][0]['title']}])
+                self.assertFalse(read['coding_admission_granted'])
                 self.assertFalse(read['runtime_validation_performed'])
-                self.assertEqual(read['source_evidence_status'], 'NOT_RESTORED_OR_VERIFIED')
+                self.assertIn('source_input_assessment', read)
 
     def test_mechanism_owner_is_whole_and_hold_is_preserved(self):
         code, read = self.invoke(['read', 'EXP-FISH-001', '--pointer', '/api_contracts/2', '--max-bytes', '24000'])
         self.assertEqual(code, 0)
         self.assertTrue(read['whole_value_delivered'])
-        self.assertEqual(read['entry']['coding_status'], 'hold')
-        self.assertIn('research_context', read)
+        self.assertEqual(read['entry_registration']['coding_status'], 'hold')
+        self.assertIn('source_references', read)
 
     def test_unknown_id_and_bad_pointer_fail(self):
         for arguments in (['read', 'NOT-A-RECORD'], ['read', 'EXP-FISH-001', '--pointer', '/../bad'],
-                          ['read', 'EXP-FISH-001', '--max-bytes', '999999'], ['find', 'fish', '--limit', '21']):
+                          ['read', 'EXP-FISH-001', '--max-bytes', '999999'], ['find', 'fish', '--limit', '31']):
             with self.subTest(arguments=arguments):
                 code, result = self.invoke(arguments)
                 self.assertEqual(code, 2)
@@ -58,7 +66,7 @@ class ReviewCommandTests(unittest.TestCase):
                                  'read', 'EXP-FISH-001', '--pointer', '/title'],
                                 cwd=ROOT.parent, capture_output=True, text=True, encoding='utf-8', timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(json.loads(result.stdout)['entry']['id'], 'EXP-FISH-001')
+        self.assertEqual(json.loads(result.stdout)['entry_registration']['id'], 'EXP-FISH-001')
 
 
 if __name__ == '__main__':

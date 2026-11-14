@@ -90,11 +90,23 @@ class RegisteredAssessmentTests(unittest.TestCase):
             {"path": name, "sha256": digest} for name, digest in self.commitments.items()
             if name != "PACKAGE-MANIFEST.json"]})
 
-    def run_assessment(self, baseline=True, output=None):
+    def set_candidate_baseline(self, topic_index, archive):
+        row = self.registry["families"][-1]["documents"][topic_index]
+        doc = compat.read_json(self.knowledge / row["file"])
+        doc["archive_sha256"] = compat.file_sha(archive)
+        row["sha256"] = self.write(row["file"], doc)
+        review = row["review"]
+        review["sha256"] = self.write(review["file"], {"candidate_sha256": row["sha256"],
+                                                      "runtime_verified": False})
+        self.refresh()
+
+    def run_assessment(self, baseline=True, output=None, matching_baselines=()):
         args = ["assess-registered", "--knowledge-root", str(self.knowledge), "--target", str(self.target),
                 "--target-label", "future-unregistered-version", "--output", str(output or self.output)]
         if baseline:
             args.extend(["--baseline", str(self.baseline)])
+        for archive in matching_baselines:
+            args.extend(["--matching-baseline", str(archive)])
         with contextlib.redirect_stderr(io.StringIO()) as errors:
             code = compat.main(args)
         return code, errors.getvalue()
@@ -158,6 +170,61 @@ class RegisteredAssessmentTests(unittest.TestCase):
         self.assertEqual(report["reference_status_counts"], {"unknown": 2})
         self.assertIn("provided_baseline_archive_does_not_match_candidate",
                       report["candidates"][0]["reference_states"][0]["reasons"])
+
+    def test_matching_baselines_select_by_hash_and_report_separate_deltas(self):
+        beta_baseline = self.archive("old-beta.zip", {"scripts/beta.lua": self.files["scripts/beta.lua"]})
+        self.set_candidate_baseline(1, beta_baseline)
+        self.target = self.archive("changed.zip", {**self.files, "scripts/alpha.lua": b"return 99\n"})
+        old_report = self.root / "single.json"
+        self.assertEqual(self.run_assessment(output=old_report), (0, ""))
+        old_result = compat.read_json(old_report)
+        self.assertEqual(old_result["reference_status_counts"], {"review_required": 1, "unknown": 1})
+        self.assertNotIn("archive_deltas", old_result)
+        self.assertEqual(self.run_assessment(baseline=False,
+            matching_baselines=(beta_baseline, self.baseline, beta_baseline)), (0, ""))
+        report = compat.read_json(self.output)
+        self.assertEqual(report["schema"], "dst-registered-source-compatibility/1")
+        self.assertEqual(report["reference_status_counts"], {"byte_identical": 1, "review_required": 1})
+        self.assertTrue(report["difference_summary"]["archive_delta_available"])
+        self.assertIsNone(report["baseline"])
+        self.assertIsNone(report["archive_delta"])
+        hashes = [compat.file_sha(archive) for archive in (self.baseline, beta_baseline)]
+        self.assertEqual([c["matched_baseline_sha256"] for c in report["candidates"]], hashes)
+        self.assertEqual(set(report["archive_deltas"]), set(hashes))
+        self.assertEqual(report["archive_deltas"][hashes[0]]["delta"]["modified"], ["scripts/alpha.lua"])
+        self.assertEqual(report["archive_deltas"][hashes[1]]["delta"]["added"], ["scripts/alpha.lua"])
+        for candidate in report["candidates"]:
+            self.assertEqual(candidate["entries"][0]["original_statuses"]["coding_status"], "hold")
+        self.assertFalse(report["coding_hold_changed"])
+        self.assertFalse(report["runtime_verified"])
+
+    def test_unmatched_candidates_use_no_baseline_behavior(self):
+        self.target = self.archive("changed.zip", {**self.files, "scripts/beta.lua": b"return 99\n"})
+        unrelated = self.archive("same_members_other_identity.zip", {
+            **self.files, "scripts/unrelated.lua": b"return 0\n"})
+        no_baseline = self.root / "no-baseline.json"
+        self.assertEqual(self.run_assessment(baseline=False, output=no_baseline), (0, ""))
+        self.assertEqual(self.run_assessment(baseline=False, matching_baselines=(unrelated,)), (0, ""))
+        report = compat.read_json(self.output)
+        self.assertEqual(report["reference_status_counts"], {"byte_identical": 1, "unknown": 1})
+        for actual, expected in zip(report["candidates"], compat.read_json(no_baseline)["candidates"]):
+            self.assertIsNone(actual["matched_baseline_sha256"])
+            self.assertEqual(actual["reference_states"], expected["reference_states"])
+
+    def test_matching_archive_must_contain_committed_member_bytes(self):
+        for name, files, reason in (
+                ("missing.zip", {}, "provided_baseline_member_missing"),
+                ("different.zip", {"scripts/alpha.lua": b"return 0\n"},
+                 "provided_baseline_file_does_not_match_reference")):
+            with self.subTest(name=name):
+                archive = self.archive(name, files)
+                self.set_candidate_baseline(0, archive)
+                output = self.root / (name + ".json")
+                self.assertEqual(self.run_assessment(baseline=False, output=output,
+                    matching_baselines=(archive,)), (0, ""))
+                ref = compat.read_json(output)["candidates"][0]["reference_states"][0]
+                self.assertEqual(ref["status"], "unknown")
+                self.assertEqual(ref["reasons"], [reason])
 
     def test_catalog_omission_and_duplicate_registration(self):
         self.catalog["entries"].pop()

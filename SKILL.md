@@ -5,7 +5,7 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 # DST 模组工程
 
-`v2026.11.12.5`：300 条登记知识（64 基础 + 13 Native AI + 110 Core + 113 机制研究），配套开发脚本、源码更新助手与只读 MCP。本轮统一 ID/API 审阅与完整对象续读，新增主动技能、装备、可收起建筑和两态生物的有限功能链。[安装](docs/install-and-use.md) · [本轮更新](docs/phase15-unified-chains.md) · [English](README.en.md)
+`v2026.11.13.4`：302 条登记知识（64 基础 + 13 Native AI + 110 Core + 115 机制研究），配套开发脚本、来源准备工具与只读 MCP。默认发现并读取公共知识；当前来源按相关证据独立核对，维护更正由统一入口生成候选。[安装](docs/install-and-use.md) · [公共读取](docs/public-reader.md) · [English](README.en.md)
 
 ## 工作顺序
 
@@ -16,17 +16,19 @@ description: 开发、设计、审查与验证《饥荒联机版》DST Mod；按
 
 ## 查库与来源
 
-仅做目录导航或公开材料审阅时，可直接使用下述 `find` / `read`，无需准备来源或索要源码路径。需要当前源码支持的实质性开发、审查或研究前，从实际包根运行：
+默认 MCP 检索和公共材料阅读无需准备来源或索要源码路径。需要当前源码支持的实质性开发、审查或研究前，从实际包根运行：
 
 ```text
-python -B -X utf8 run_kb.py update-sources ensure
+python -B -X utf8 prepare_sources.py --source "<scripts.zip绝对路径>"
 ```
 
-首次使用任务已明确的合法源码加 `--source "<scripts.zip绝对路径>"`；路径不明再确认。助手记忆绑定，输入未变会快返；准备和重连处理见[源码更新助手](references/source-update-assist.md)。简单机械编辑无需重复查库。
+来源准备仅由维护任务显式触发；源码路径必须明确，准备和重连见[源码维护](docs/source-compatibility.md)。简单机械编辑无需重复查库。
 
-优先使用已连接 MCP；无服务时，可用 `python -B -X utf8 run_kb.py find "任务或符号"` 定位，再用 `run_kb.py read ID` 审阅所选记录，或从 `knowledge/CATALOG.json` 按 file/pointer 文件读取。两条简短命令统一登记族的目录阅读，不恢复源码、不交付 Coding 上下文。读实际正文与证据，保留 Scope、类型、版本、更正和三轴状态。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整准入、预算与证据规则统一见[检索策略](references/kb-retrieval.md)。
+优先使用已连接 MCP 的 `search_kb(query=...)` 或 `get_context_bundle(task_description=...)`，默认 Reviewer 可发现四族知识与任务指南，并返回相关完整正文对象；没有 `objects` 的命中仍只是导航。无服务时，用 `python -B -X utf8 run_kb.py find "任务或符号"` 定位，再用 `run_kb.py read ID` 审阅，或从 `knowledge/CATALOG.json` 按 file/pointer 读取。保留 Scope、类型、版本、更正和三轴状态；公共可读不授予 Coding 准入。Native AI Coding 使用十字段、每任务最多五条；Core 保持 Coding HOLD，机制研究保持 research/restricted/hold。完整规则见[检索策略](references/kb-retrieval.md)。
 
-完整服务的统一审阅使用 `get_entry(id=..., projection="reviewer", purpose="review")`，按符号定位用 `lookup_api(symbol=..., projection="reviewer", family="all")` 并执行返回的 `results[].followup`。命令行可用 `run_kb.py review ID` / `run_kb.py review --api "符号"`，两种形式均要求已准备完整来源；对象超预算时原样执行 `continuation`。pointer/cursor和预算见[知识读取](docs/knowledge-integration.md)。四条具名链各自保留 Scope、演示政策及待验项，研究状态继续按上段处理。
+公共审阅使用 `get_entry(id=...)`，按符号定位用 `lookup_api(symbol=...)` 并执行返回的 `results[].followup`；默认分别为 Reviewer 和全部登记族。命令行可用 `run_kb.py review ID` / `run_kb.py review --api "符号"`，均无需完整来源；对象超预算时原样执行 `continuation`。pointer/cursor、完整 owner 与预算见[公共读取](docs/public-reader.md)。显式 Coding、历史来源环境和证据展开仍走原有来源与准入校验。
+
+局部来源变化不阻断历史公共正文；按[独立证据快照](docs/evidence-snapshots.md)区分精确匹配、变化、缺失和未评估，不以旧缓存冒充新来源核验。维护知识库时使用[作者维护入口](docs/author-maintenance.md)生成更正候选，文本重建不代表语义审批或游戏验证。
 
 ## 按问题读取
 
@@ -41,6 +43,8 @@ python -B -X utf8 run_kb.py update-sources ensure
 | Molehat 装备标签、夜视消费者、耗能与正燃料恢复 | [chain-equipment.md](references/chain-equipment.md) |
 | Portabletent 部署/收起、耐久交接与稳定形态保存 | [chain-deployable.md](references/chain-deployable.md) |
 | 普通猪人两态、Brain/SG消费者、回退与恢复边界 | [chain-creature-stage.md](references/chain-creature-stage.md) |
+| 有期限伤害倍率、同分片目标重连与剩余时间恢复 | [chain-timed-effect.md](references/chain-timed-effect.md) |
+| 背包动作、服务器扣费、资源同步和 HUD 重建 | [chain-skill-resource-hud.md](references/chain-skill-resource-hud.md) |
 | 跨组件问题、首读与条件化补读、预算不足后的读取 | [complex-task-reading.md](references/complex-task-reading.md) |
 | 登记知识文件读取、MCP 检索、准入与证据 | [kb-retrieval.md](references/kb-retrieval.md) |
 | 网页 AI、技能 ZIP、普通附件、云端检查与本机交接 | [web-chat.md](references/web-chat.md) |

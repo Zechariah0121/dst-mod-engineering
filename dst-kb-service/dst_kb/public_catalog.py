@@ -3,6 +3,7 @@ import hashlib
 import json
 import math
 from collections import Counter
+from functools import cached_property
 from pathlib import Path, PurePosixPath
 import re
 import sys
@@ -202,12 +203,18 @@ class PublicCatalog(Server):
                     raise KBError('PUBLIC_PACKAGE_CHANGED', 'Catalog pointer identity mismatch')
                 self.records[row['id']] = record
                 self.search_text[row['id']] = json.dumps(record, ensure_ascii=False).lower()
-            self.ranker = CatalogRanker(self.rows, self.records)
+            self._ranking_rows = self.rows
             self.corrections = [{key: claim.get(key) for key in ('id', 'status', 'superseded_by')}
                                 for claim in self.read_file('data/claims.json')['claims']
                                 if claim.get('status') == 'superseded']
         except (OSError, ValueError, TypeError, KeyError) as exc:
             raise KBError('PUBLIC_PACKAGE_CHANGED', 'Public package is missing or invalid: ' + str(exc)) from exc
+
+    @cached_property
+    def ranker(self):
+        # Direct ID and API requests never use the search index. PublicReader
+        # adds its guides to the ranking rows before the first search.
+        return CatalogRanker(self._ranking_rows, self.records)
 
     def read_file(self, name):
         if name in self.documents:

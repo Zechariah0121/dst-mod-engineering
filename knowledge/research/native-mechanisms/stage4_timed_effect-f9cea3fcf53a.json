@@ -1,0 +1,613 @@
+{
+  "schema_version": "dst-mechanism-research/1",
+  "topic": "stage4_timed_effect",
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "entries": [
+    {
+      "id": "EXP-CHAIN-EFFECT-001",
+      "title": "有期限普通伤害倍率的原版具名消费者与同分片来源恢复",
+      "aliases": [
+        "有期限效果",
+        "buff_attack",
+        "辣味食物攻击倍率",
+        "来源装置存档恢复",
+        "Timer EntityTracker Combat"
+      ],
+      "engineering_question": "谁持有普通攻击倍率、剩余时间及目标引用，在哪个恢复阶段接回消费，如何独立清理缺目标或失效应用？",
+      "knowledge_status": "research",
+      "retrieval_status": "restricted",
+      "coding_status": "hold",
+      "scope": {
+        "source_epoch": "762172",
+        "game_version": "762172",
+        "steam_buildid": "26474873",
+        "observed_date": "2026-11-13",
+        "evidence": "current_local_archive_static_lua",
+        "runtime_verified": false,
+        "environment": "原版辣味食品具名buff_attack、普通未骑乘无武器伤害倍率消费者、同分片SaveGame/PopulateWorld顶层来源装置的自写组合。",
+        "historical_dependencies": [
+          "EXP-SAVE-001、EXP-SAVE-004、EXP-SAVE-005的世界恢复、Timer与Tracker合同",
+          "EXP-LIFE-001、EXP-LIFE-005、EXP-LIFE-006、EXP-LIFE-008的事件、组件、任务和Remove合同",
+          "EXP-MOVE-001的来源列表API",
+          "NC-N004-FINAL-03、NC-N004-FINAL-06、NC-N004-FINAL-07的历史Core事实，各依原Scope及Coding HOLD",
+          "EXP-COOK-006覆盖的调味入口用于定位，具名效果与恢复分支在本条当前源码重查"
+        ],
+        "exclusions": [
+          "原生写盘原子性、故障回滚、停服现实时间、玩家session、第三方及跨分片交接。",
+          "食品Buff的其他入口、其他伤害通道、客户端表现与真实交战结果。"
+        ]
+      },
+      "claims": [
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C01",
+          "kind": "NSF",
+          "statement": "辣味食品的oneaten_chili对食用者请求具名buff_attack。EntityScript:AddDebuff先保证debuffable组件，再经资格门进入组件。组件启用时，缺名字会尝试SpawnPrefab，非nil才进入RegisterDebuff。新实体有debuff组件才登记具名记录并调用AttachTo，缺组件则移除该实体。已有同名实体时对现有实例调用Extend。",
+          "evidence_refs": [
+            "TDE-S01",
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C02",
+          "kind": "NSF",
+          "statement": "buff_attack的master构造启动buffover Timer并标记自身persists=false。Attach将buff设为食用者的子实体，监听其death，并在食用者有combat时，以buff实体为来源向其externaldamagemultipliers写入倍率。重复施加重开buffover完整时长并发附着事件，attack实例没有额外extended函数。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S14",
+            "TDE-S15"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C03",
+          "kind": "NSF",
+          "statement": "buffover到期先删除Timer名字再发timerdone。OnTimerDone调用Debuff:Stop；具名记录仍在且事件处理正常返回时，目标移除该记录并触发OnDetach。attack_detach在食用者仍有combat时移除倍率来源，通用OnDetached发送退出事件并删除buff。食用者death监听进入相同的Stop。",
+          "evidence_refs": [
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S15"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C04",
+          "kind": "NSF",
+          "statement": "Debuffable:OnSave按具名记录收集buff的GetSaveRecord首个返回，保存在宿主。OnLoad对缺名字调用不传newents的SpawnSaveRecord，成功返回实体才进入RegisterDebuff。buff构造先装Timer，保存payload若含buffover则Timer:OnLoad替换同名构造计时。随后Attach直接使用当前持有者，持有者有combat时重建攻击倍率。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S04",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S16",
+            "TDE-S18",
+            "TDE-S21"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C05",
+          "kind": "NSF",
+          "statement": "Combat构造的externaldamagemultipliers为默认基值1的乘法列表。CalcDamage将选中列表的聚合值乘进普通伤害主体，再加bonus；特殊伤害另算。普通未骑乘、无武器攻击使用攻击者的列表。无武器骑乘分支可改读坐骑列表，alwaysblock先返回0。DoAttack所列普通交战分支调用CalcDamage后再交GetAttacked_Internal。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S12",
+            "TDE-S13",
+            "TDE-S28"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C06",
+          "kind": "EI",
+          "statement": "同分片顶层持久来源可通过Timer、EntityTracker与自有标量分别恢复剩余时间、身份和倍率；本宿主组件LoadPostPass之后才由prefab回调恢复自身source/key。refs只给已经符合SaveGame条件的目标记录标旧ID；运行中存在但未保存的目标可在标准重启时缺映射。该选择与具名buff_attack的宿主内嵌恢复各依自己的调用路径。",
+          "evidence_refs": [
+            "TDE-S04",
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S19",
+            "TDE-S20",
+            "TDE-S21",
+            "TDE-S22"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C07",
+          "kind": "REC",
+          "statement": "自有装置施加前验证参数和目标，合格时清理旧槽、计时与旧列表键。记录实际写入的列表、目标和回调身份，退出时解除自身的source/key；按声明支持的目标移除、主动结束、换目标和到期共用该出口。原版事件先复制回调再派发，清理可承受当前快照内的Tracker回调仍执行。",
+          "evidence_refs": [
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S17",
+            "TDE-S23",
+            "TDE-S24",
+            "TDE-S25",
+            "TDE-S26",
+            "TDE-S27"
+          ]
+        },
+        {
+          "id": "EXP-CHAIN-EFFECT-001-C08",
+          "kind": "REC",
+          "statement": "若自有装置明确支持整次SetPersistData与LoadPostPass配对重放，用OnPreLoad清空本功能旧应用，后续由Timer加载和组件postpass重建；仅重复调用postpass仍可能触发Tracker同名覆盖及旧监听。Combat运行中卸载时，已写列表仍由本功能持有到声明的退出，装置可按项目资格政策另接组件卸载事件。",
+          "evidence_refs": [
+            "TDE-S14",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S23",
+            "TDE-S26",
+            "TDE-S27"
+          ]
+        }
+      ],
+      "api_contracts": [
+        {
+          "symbol": "Combat:CalcDamage",
+          "source_file": "scripts/components/combat.lua",
+          "visibility": "component_method",
+          "parameters": [
+            "target为本次攻击受击实体",
+            "weapon可省略",
+            "multiplier可省略"
+          ],
+          "returns": "普通伤害值和可选特殊伤害表。alwaysblock分支返回普通值0。",
+          "preconditions": [
+            "target支持HasTag及相关分支读取。weapon非nil时须提供weapon.components.weapon。普通无武器、未骑乘分支使用本实例攻击列表。"
+          ],
+          "side_effects": "按当前分支读取攻击状态、装备和来源倍率，可调用自定义伤害倍率回调。交战调用方另行处理实际受击。",
+          "lifecycle": "攻击者combat构造提供列表。使用者按对应source/key接入和清理；重建后由各来源恢复其项。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S28"
+          ],
+          "unknowns": [
+            "本条限定普通伤害选中列表的消费，不涵盖全部伤害分支、最终生命差额或客户端。"
+          ]
+        }
+      ],
+      "mechanism_steps": [
+        {
+          "step": 1,
+          "description": "辣味食物提交具名buff_attack，首次构造并Attach，同名则刷新。",
+          "evidence_refs": [
+            "TDE-S01",
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "description": "普通未骑乘无武器CalcDamage读取攻击者外发倍率，普通伤害和特殊伤害分别产出。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S12",
+            "TDE-S13",
+            "TDE-S28"
+          ]
+        },
+        {
+          "step": 3,
+          "description": "按载体恢复。原版buff由食用者组件嵌套生成再Attach；自有顶层装置按旧ID映射和本宿主postpass恢复关系，保留剩余时间。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S04",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S19",
+            "TDE-S20",
+            "TDE-S21",
+            "TDE-S22"
+          ]
+        },
+        {
+          "step": 4,
+          "description": "原版buff通过Stop和Detach退场。自有装置释放所持列表键、Timer名字、Tracker槽与监听。",
+          "evidence_refs": [
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S17",
+            "TDE-S23",
+            "TDE-S24",
+            "TDE-S25"
+          ]
+        }
+      ],
+      "unknowns": [
+        "本条正文仅具名静态Lua核查。隔离示例的运行证据独立交付。",
+        "未测原版食品Buff在真实玩家退出重连或迁移时的完整调用链。",
+        "异常中断和损坏Timer payload的修复策略取决于项目。"
+      ]
+    }
+  ],
+  "source_references": [
+    {
+      "id": "TDE-S01",
+      "source_file": "scripts/spicedfoods.lua",
+      "file_sha256": "6ccaac6a0b37ca2aca5f93f999b04ddec4e9481f14d59eb7541dec0e1d4ee97d",
+      "line_start": 13,
+      "line_end": 22,
+      "range_sha256": "cd41ed97d37da60a0fa6f4f82108a543eddd5f056ae7f26d99c966a0bcaa88e6",
+      "symbols": [
+        "oneaten_chili",
+        "SPICES"
+      ]
+    },
+    {
+      "id": "TDE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 2140,
+      "line_end": 2160,
+      "range_sha256": "4a50229773f17d4926157b62196f02452b3118905aa8428578bf7a018f1d8a20",
+      "symbols": [
+        "EntityScript:AddDebuff",
+        "EntityScript:RemoveDebuff"
+      ]
+    },
+    {
+      "id": "TDE-S03",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 72,
+      "line_end": 124,
+      "range_sha256": "71382367f1c4ed21c1253f8e0f0e3fc492ceac738f445225de9d16d5153085d5",
+      "symbols": [
+        "RegisterDebuff",
+        "Debuffable:AddDebuff",
+        "Debuffable:RemoveDebuff"
+      ]
+    },
+    {
+      "id": "TDE-S04",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 126,
+      "line_end": 150,
+      "range_sha256": "07ae368e7f852d18f79369b8abf12061f640bdbc34e8bbb5f9ee696cb697568c",
+      "symbols": [
+        "Debuffable:OnSave",
+        "Debuffable:OnLoad"
+      ]
+    },
+    {
+      "id": "TDE-S05",
+      "source_file": "scripts/components/debuff.lua",
+      "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+      "line_start": 28,
+      "line_end": 57,
+      "range_sha256": "9b696034b19002eca76e219dfe9b28fb131fbd26806f6ccb0f17f2666afc1e68",
+      "symbols": [
+        "Debuff:Stop",
+        "Debuff:AttachTo",
+        "Debuff:OnDetach",
+        "Debuff:Extend"
+      ]
+    },
+    {
+      "id": "TDE-S06",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 17,
+      "line_end": 27,
+      "range_sha256": "b22edeb027a20bf5777204137570c8cbe025edd4ed392b195934cbecdf83126d",
+      "symbols": [
+        "attack_attach",
+        "attack_detach"
+      ]
+    },
+    {
+      "id": "TDE-S07",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 134,
+      "line_end": 180,
+      "range_sha256": "3eab45006d38939e27367122a6cf1f576dcc13733f2e86e032b804db8f2e5b86",
+      "symbols": [
+        "OnTimerDone",
+        "MakeBuff",
+        "OnAttached",
+        "OnExtended",
+        "OnDetached"
+      ]
+    },
+    {
+      "id": "TDE-S08",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 182,
+      "line_end": 219,
+      "range_sha256": "05e1578f5e6f2b84d467f586ca4c85ab64114208be2347450c150ef7868bbc77",
+      "symbols": [
+        "MakeBuff",
+        "buff_attack"
+      ]
+    },
+    {
+      "id": "TDE-S09",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 64,
+      "line_end": 66,
+      "range_sha256": "4dbda3618eb29f892edf90984a0fe3440a8e4a0137872cdb31a64f08f5cea6bb",
+      "symbols": [
+        "Combat"
+      ]
+    },
+    {
+      "id": "TDE-S10",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 871,
+      "line_end": 964,
+      "range_sha256": "e534fad7d76dcc872c6ec2711b802ae119a024495c78c1f16dbd19808e636023",
+      "symbols": [
+        "Combat:CalcDamage"
+      ]
+    },
+    {
+      "id": "TDE-S11",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1195,
+      "line_end": 1221,
+      "range_sha256": "7a4d947c8f49fc062df836ae116f7b81a3aebafe7cfaa84b50f64d71ca582636",
+      "symbols": [
+        "Combat:DoAttack"
+      ]
+    },
+    {
+      "id": "TDE-S12",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 8,
+      "line_end": 27,
+      "range_sha256": "073fe91ef88bb26b894e35e3d3346b368372a1284dad0a69e8abaa9a2e118250",
+      "symbols": [
+        "SourceModifierList",
+        "SourceModifierList.multiply"
+      ]
+    },
+    {
+      "id": "TDE-S13",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 38,
+      "line_end": 58,
+      "range_sha256": "4c8c90a29a7b63b215d75c420045aa5e6688c82b3795029aad936c698c707f78",
+      "symbols": [
+        "SourceModifierList:Get",
+        "SourceModifierList:RecalculateModifier"
+      ]
+    },
+    {
+      "id": "TDE-S14",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 64,
+      "line_end": 122,
+      "range_sha256": "a111be18db46133c6dc2b56b5e6d632d40168391bdc13fe80ac75b700504059d",
+      "symbols": [
+        "SourceModifierList:SetModifier",
+        "SourceModifierList:RemoveModifier"
+      ]
+    },
+    {
+      "id": "TDE-S15",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 66,
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "symbols": [
+        "Timer:TimerExists",
+        "OnTimerDone",
+        "Timer:StartTimer",
+        "Timer:StopTimer"
+      ]
+    },
+    {
+      "id": "TDE-S16",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 68,
+      "line_end": 142,
+      "range_sha256": "2f4194e6337e4f5dd2221e9dd9318594392a413ceb65867659e76e721442bddf",
+      "symbols": [
+        "Timer:IsPaused",
+        "Timer:GetTimeLeft",
+        "Timer:OnSave",
+        "Timer:OnLoad"
+      ]
+    },
+    {
+      "id": "TDE-S17",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 20,
+      "line_end": 64,
+      "range_sha256": "fbe0447d9fba7263f4fd79c8f0646959407807a20a46f42babf0dc7c0decda02",
+      "symbols": [
+        "EntityTracker:TrackEntity",
+        "EntityTracker:ForgetEntity",
+        "EntityTracker:GetEntity",
+        "EntityTracker:OnSave",
+        "EntityTracker:LoadPostPass"
+      ]
+    },
+    {
+      "id": "TDE-S18",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 2014,
+      "range_sha256": "e8b5d0d5a7e909beece094aa298671ce52af9e2e585979ab749a5fa49557b471",
+      "symbols": [
+        "EntityScript:GetPersistData",
+        "EntityScript:LoadPostPass",
+        "EntityScript:SetPersistData"
+      ]
+    },
+    {
+      "id": "TDE-S19",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1103,
+      "line_end": 1133,
+      "range_sha256": "a830968b1dc5b2f26389f65b8eeef5250890907b36ef7c3f86198d00820b2261",
+      "symbols": [
+        "SaveGame"
+      ]
+    },
+    {
+      "id": "TDE-S20",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1207,
+      "line_end": 1213,
+      "range_sha256": "bdb187765e803d19582bc69d8f30f6ee8392c7149b14737785980dccda1f24b8",
+      "symbols": [
+        "SaveGame"
+      ]
+    },
+    {
+      "id": "TDE-S21",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "symbols": [
+        "SpawnSaveRecord"
+      ]
+    },
+    {
+      "id": "TDE-S22",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 629,
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "symbols": [
+        "PopulateWorld"
+      ]
+    },
+    {
+      "id": "TDE-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1256,
+      "range_sha256": "af29a12426ef44bb903ac81d7729ac714c8b2370e847a361f8a3a030239b5748",
+      "symbols": [
+        "EntityScript:ListenForEvent",
+        "EntityScript:RemoveEventCallback"
+      ]
+    },
+    {
+      "id": "TDE-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ]
+    },
+    {
+      "id": "TDE-S25",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1753,
+      "range_sha256": "98a04ae9f32bd309403fd88e245a04264cfc9b56f414c196e53895b63ef0fb6e",
+      "symbols": [
+        "EntityScript:Remove"
+      ]
+    },
+    {
+      "id": "TDE-S26",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ]
+    },
+    {
+      "id": "TDE-S27",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1359,
+      "line_end": 1374,
+      "range_sha256": "d9e4e8e478acb22a19f3a028038db7200eda1ba5f1d0de8d20a414b5311c9a5f",
+      "symbols": [
+        "Combat:OnRemoveFromEntity"
+      ]
+    },
+    {
+      "id": "TDE-S28",
+      "source_file": "scripts/componentutil.lua",
+      "file_sha256": "c16f7ab5be64e5eb606a00cbf2a44ce440cd1f343dddc02b05a65cab81a84a90",
+      "line_start": 1607,
+      "line_end": 1614,
+      "range_sha256": "089880aa798e47640210e5c92cf9cc489e27e29078d9d032a15ff292059361c4",
+      "symbols": [
+        "CanApplyPlayerDamageMod",
+        "PlayerDamageMod"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "有期限目标效果 普通攻击倍率 Timer Tracker 读档恢复 source key",
+      "expected_entry_ids": [
+        "EXP-CHAIN-EFFECT-001"
+      ],
+      "purpose": "定位顶层来源装置的恢复与普通伤害消费者"
+    },
+    {
+      "query": "buff_attack 辣味食物 Debuffable 保存 Attach Combat CalcDamage",
+      "expected_entry_ids": [
+        "EXP-CHAIN-EFFECT-001"
+      ],
+      "purpose": "定位具名原版buff及其嵌套恢复边界"
+    }
+  ],
+  "limitations": [
+    "用本机version.txt、Steam应用322330清单及源码归档确认762172 / build26474873。归档、成员和引用范围均计算SHA256。",
+    "文件SHA为ZIP成员原字节，范围SHA为UTF-8 splitlines后按LF连接且无末尾换行。",
+    "本条保持research/restricted/hold、runtime_verified=false。历史依赖维持各自原Scope。自写夹具和任何专服结果均独立于此研究登记。"
+  ]
+}

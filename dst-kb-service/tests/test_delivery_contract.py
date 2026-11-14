@@ -12,7 +12,8 @@ SERVICE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVICE))
 
 from dst_kb.config import KBError
-from dst_kb.mcp_server import Server, TOOLS, tool
+from dst_kb.mcp_server import Server, tool
+from dst_kb.public_reader import TOOLS
 from dst_kb.service import Service
 
 
@@ -99,7 +100,7 @@ class PublishedSchemaTests(unittest.TestCase):
         server.handle({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize'})
         reply = server.handle({'jsonrpc': '2.0', 'id': 2, 'method': 'tools/list'})
         self.assertEqual(reply['result']['tools'], published['tools'])
-        self.assertEqual(len(published['tools']), 9)
+        self.assertEqual(len(published['tools']), 11)
 
     def test_transport_reads_subclass_contract_without_opening_full_service(self):
         class NavigationServer(Server):

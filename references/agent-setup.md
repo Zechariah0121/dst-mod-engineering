@@ -13,6 +13,8 @@
 
 让 Agent 确认实际读到的 `SKILL.md` 和当前任务相关参考。没有 Skills 自动发现能力时，提供其绝对路径并显式读取即可。只有对话文本、没有文件访问时，使用 [网页附件方式](web-chat.md)。本 Skill 未逐一完成所有产品的端到端安装与执行测试。
 
+默认 MCP 使用 `auto` 提供 11 工具，普通发现、ID/API 审阅与 `run_kb.py review` 无需本地游戏源码。显式 `catalog` 保留旧两工具；`full` 启动要求完整准备，但默认读取公共知识。Coding、epoch 和源码证据请求仍保留原守卫；partial 来源快照不阻断知识正文，见[知识读取](../docs/knowledge-integration.md)与[证据快照](../docs/evidence-snapshots.md)。
+
 ## 本地与云端
 
 安装路径属于运行 Agent 的主机。云端工作区不能直接读取用户电脑上的 DST、Mod 或工具：

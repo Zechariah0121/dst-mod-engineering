@@ -1,0 +1,684 @@
+{
+  "schema_version": "dst-practical-native-review/1",
+  "topic": "stage4_timed_effect",
+  "candidate_sha256": "f9cea3fcf53a2266f39fb8cb8702c0819d7b76ff2cb57f7e1802fb6525f2244c",
+  "verdict": "PASS_STATIC_RESEARCH",
+  "verdict_label": "候选静态研究通过",
+  "runtime_verified": false,
+  "source_epoch": "762172",
+  "archive_sha256": "733a0f7f97ace5a76aa5acee95405a6ec01697d93d844eeb4ecce7c001306980",
+  "review_scope": "独立重算与762172冻结身份匹配的现装scripts.zip、全部引用的成员和行范围SHA。逐项核对声明、API、步骤、指南与自写示例，示例逐文件执行Lua 5.1语法检查。",
+  "accepted_scope": {
+    "source_epoch": "762172",
+    "game_version": "762172",
+    "steam_buildid": "26474873",
+    "observed_date": "2026-11-13",
+    "evidence": "current_local_archive_static_lua",
+    "runtime_verified": false,
+    "environment": "原版辣味食品具名buff_attack、普通未骑乘无武器伤害倍率消费者、同分片SaveGame/PopulateWorld顶层来源装置的自写组合。",
+    "historical_dependencies": [
+      "EXP-SAVE-001、EXP-SAVE-004、EXP-SAVE-005的世界恢复、Timer与Tracker合同",
+      "EXP-LIFE-001、EXP-LIFE-005、EXP-LIFE-006、EXP-LIFE-008的事件、组件、任务和Remove合同",
+      "EXP-MOVE-001的来源列表API",
+      "NC-N004-FINAL-03、NC-N004-FINAL-06、NC-N004-FINAL-07的历史Core事实，各依原Scope及Coding HOLD",
+      "EXP-COOK-006覆盖的调味入口用于定位，具名效果与恢复分支在本条当前源码重查"
+    ],
+    "exclusions": [
+      "原生写盘原子性、故障回滚、停服现实时间、玩家session、第三方及跨分片交接。",
+      "食品Buff的其他入口、其他伤害通道、客户端表现与真实交战结果。"
+    ]
+  },
+  "blockers": [],
+  "minimal_revisions": [],
+  "validation": {
+    "shared_mechanism_contract": true,
+    "candidate_sha256_verified": true,
+    "archive_identity_verified": true,
+    "source_file_and_range_hashes": "all_match",
+    "governance": "research/restricted/hold preserved",
+    "public_distribution": "公开研究登记保留原版定位、哈希与摘要。候选与审阅无私人绝对路径，无原版Lua载荷。",
+    "guide_and_example": "PASS_STATIC_AND_LUA51_SYNTAX",
+    "runtime": "not_run_by_this_reviewer"
+  },
+  "entry_reviews": [
+    {
+      "entry_id": "EXP-CHAIN-EFFECT-001",
+      "claim_reviews": [
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C01",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "oneaten_chili向eater请求同名与同prefab。AddDebuff先装组件，再过启用与死/鬼门。组件只有生成非nil才进入RegisterDebuff，具有debuff组件才登记并Attach，已有名字则Extend。",
+          "evidence_refs": [
+            "TDE-S01",
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C02",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "MakeBuff的非master分支早退并安排Remove。master将persists设false、启动buffover。OnAttached先设父级、位置、death监听与附着事件，再调用带combat守门的attack_attach。Extend重开计时并发事件，attack的自有extended参数为nil。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S14",
+            "TDE-S15"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C03",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "计时完成先StopTimer后发timerdone。具名消费者由Debuff:Stop转到当前记录清除与解绑，正常OnDetach时attack_detach有combat守门，通用退出随后发布事件并Remove。目标death亦调用Stop。",
+          "evidence_refs": [
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S15"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C04",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "Debuffable收集GetSaveRecord的首个返回。只对当前缺失名字调用不带newents的SpawnSaveRecord。构造计时存在时由Timer:OnLoad逐名替换，成功返回后RegisterDebuff直接将当前持有者交Attach。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S04",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S16",
+            "TDE-S18",
+            "TDE-S21"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C05",
+          "kind": "NSF",
+          "result": "PASS_STATIC",
+          "semantic_basis": "Combat列表为默认基值1的乘法列表。普通无武器未骑乘读取攻击者的列表，受阻早退，骑乘有可用坐骑combat时改读其列表。聚合倍率只乘普通伤害主体，bonus随后加入，特殊伤害另算。DoAttack在目标有combat时将计算结果交GetAttacked_Internal，仍有交战处理。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S12",
+            "TDE-S13",
+            "TDE-S28"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C06",
+          "kind": "EI",
+          "result": "PASS_STATIC",
+          "semantic_basis": "SaveGame只为已纳入顶层保存表的引用补旧ID，SpawnSaveRecord先接入newents再SetPersistData，PopulateWorld在实体重建遍历后分发各自postpass，本宿主组件先于prefab回调。应用该顺序恢复自写source/key是工程组合，具名buff的嵌套恢复从当前宿主直接Attach。",
+          "evidence_refs": [
+            "TDE-S04",
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S19",
+            "TDE-S20",
+            "TDE-S21",
+            "TDE-S22"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C07",
+          "kind": "REC",
+          "result": "PASS_STATIC",
+          "semantic_basis": "示例拒绝无效参数时不清旧应用。有效施加先释放原列表及原监听，再开启所选计时并接入新目标。退出直接用缓存对象并只移除本功能键；快照内续行的Tracker回调仅清本例已结束的槽。",
+          "evidence_refs": [
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S17",
+            "TDE-S23",
+            "TDE-S24",
+            "TDE-S25",
+            "TDE-S26",
+            "TDE-S27"
+          ]
+        },
+        {
+          "claim_id": "EXP-CHAIN-EFFECT-001-C08",
+          "kind": "REC",
+          "result": "PASS_STATIC",
+          "semantic_basis": "OnPreLoad处于原版补建之后、组件OnLoad之前，示例清私有命名资源可避免正常的完整配对重放留下旧引用。单独postpass没有经过此清理。Combat:OnRemoveFromEntity不负责清该倍率列表，示例退出用实际保存的列表对象。",
+          "evidence_refs": [
+            "TDE-S14",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S23",
+            "TDE-S26",
+            "TDE-S27"
+          ]
+        }
+      ],
+      "api_reviews": [
+        {
+          "symbol": "Combat:CalcDamage",
+          "result": "PASS_STATIC",
+          "semantic_basis": "owner为Combat，实际定义在scripts/components/combat.lua。target必需，非nil weapon须有weapon组件，multiplier可省略。alwaysblock返回0，其余所审分支返回普通伤害与可选特殊伤害并可能调用自定义计算函数；受击由外层Combat路径处理。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S28"
+          ]
+        }
+      ],
+      "step_reviews": [
+        {
+          "step": 1,
+          "result": "PASS_STATIC",
+          "semantic_basis": "具名触发通过AddDebuff与Debuffable的有条件Attach或同名Extend。",
+          "evidence_refs": [
+            "TDE-S01",
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08"
+          ]
+        },
+        {
+          "step": 2,
+          "result": "PASS_STATIC",
+          "semantic_basis": "普通无武器未骑乘读取当前攻击者Combat列表，普通、特殊伤害和最终受击有独立计算。",
+          "evidence_refs": [
+            "TDE-S09",
+            "TDE-S10",
+            "TDE-S11",
+            "TDE-S12",
+            "TDE-S13",
+            "TDE-S28"
+          ]
+        },
+        {
+          "step": 3,
+          "result": "PASS_STATIC",
+          "semantic_basis": "嵌套buff由持有者加载；标准同分片世界装置经旧ID映射与本宿主postpass接回原生计时和自有列表项。",
+          "evidence_refs": [
+            "TDE-S03",
+            "TDE-S04",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S08",
+            "TDE-S16",
+            "TDE-S17",
+            "TDE-S18",
+            "TDE-S19",
+            "TDE-S20",
+            "TDE-S21",
+            "TDE-S22"
+          ]
+        },
+        {
+          "step": 4,
+          "result": "PASS_STATIC",
+          "semantic_basis": "原版Stop/Detach及自写装置的名单、列表、追踪槽、监听清理分别对应实际代码。",
+          "evidence_refs": [
+            "TDE-S02",
+            "TDE-S03",
+            "TDE-S05",
+            "TDE-S06",
+            "TDE-S07",
+            "TDE-S14",
+            "TDE-S15",
+            "TDE-S17",
+            "TDE-S23",
+            "TDE-S24",
+            "TDE-S25"
+          ]
+        }
+      ],
+      "classification_review": "NSF限具名原版Lua可见分支，EI说明标准世界路径可支持该工程组合，REC明确示例的替换、移除和恢复政策。",
+      "unknowns_review": "跨分片、客户端、原版食品真实重启、玩家session、损坏计时数据及原生落盘保证保留原边界。"
+    }
+  ],
+  "source_reference_reviews": [
+    {
+      "id": "TDE-S01",
+      "source_file": "scripts/spicedfoods.lua",
+      "file_sha256": "6ccaac6a0b37ca2aca5f93f999b04ddec4e9481f14d59eb7541dec0e1d4ee97d",
+      "line_start": 13,
+      "line_end": 22,
+      "range_sha256": "cd41ed97d37da60a0fa6f4f82108a543eddd5f056ae7f26d99c966a0bcaa88e6",
+      "symbols": [
+        "oneaten_chili",
+        "SPICES"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S02",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 2140,
+      "line_end": 2160,
+      "range_sha256": "4a50229773f17d4926157b62196f02452b3118905aa8428578bf7a018f1d8a20",
+      "symbols": [
+        "EntityScript:AddDebuff",
+        "EntityScript:RemoveDebuff"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S03",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 72,
+      "line_end": 124,
+      "range_sha256": "71382367f1c4ed21c1253f8e0f0e3fc492ceac738f445225de9d16d5153085d5",
+      "symbols": [
+        "RegisterDebuff",
+        "Debuffable:AddDebuff",
+        "Debuffable:RemoveDebuff"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S04",
+      "source_file": "scripts/components/debuffable.lua",
+      "file_sha256": "6b54db69ec5398b611201714c67eeb72f429a28e8f54b2b795c24b748446c96a",
+      "line_start": 126,
+      "line_end": 150,
+      "range_sha256": "07ae368e7f852d18f79369b8abf12061f640bdbc34e8bbb5f9ee696cb697568c",
+      "symbols": [
+        "Debuffable:OnSave",
+        "Debuffable:OnLoad"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S05",
+      "source_file": "scripts/components/debuff.lua",
+      "file_sha256": "264ddb551ad9e767ef938e967c22114001d5cdbb5b9943f10b0fa64798fb2ba1",
+      "line_start": 28,
+      "line_end": 57,
+      "range_sha256": "9b696034b19002eca76e219dfe9b28fb131fbd26806f6ccb0f17f2666afc1e68",
+      "symbols": [
+        "Debuff:Stop",
+        "Debuff:AttachTo",
+        "Debuff:OnDetach",
+        "Debuff:Extend"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S06",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 17,
+      "line_end": 27,
+      "range_sha256": "b22edeb027a20bf5777204137570c8cbe025edd4ed392b195934cbecdf83126d",
+      "symbols": [
+        "attack_attach",
+        "attack_detach"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S07",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 134,
+      "line_end": 180,
+      "range_sha256": "3eab45006d38939e27367122a6cf1f576dcc13733f2e86e032b804db8f2e5b86",
+      "symbols": [
+        "OnTimerDone",
+        "MakeBuff",
+        "OnAttached",
+        "OnExtended",
+        "OnDetached"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S08",
+      "source_file": "scripts/prefabs/foodbuffs.lua",
+      "file_sha256": "d079610b0aa9be2a1b6f9d767893842584417e2f9214bc50de33d94ed91df8eb",
+      "line_start": 182,
+      "line_end": 219,
+      "range_sha256": "05e1578f5e6f2b84d467f586ca4c85ab64114208be2347450c150ef7868bbc77",
+      "symbols": [
+        "MakeBuff",
+        "buff_attack"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S09",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 64,
+      "line_end": 66,
+      "range_sha256": "4dbda3618eb29f892edf90984a0fe3440a8e4a0137872cdb31a64f08f5cea6bb",
+      "symbols": [
+        "Combat"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S10",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 871,
+      "line_end": 964,
+      "range_sha256": "e534fad7d76dcc872c6ec2711b802ae119a024495c78c1f16dbd19808e636023",
+      "symbols": [
+        "Combat:CalcDamage"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S11",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1195,
+      "line_end": 1221,
+      "range_sha256": "7a4d947c8f49fc062df836ae116f7b81a3aebafe7cfaa84b50f64d71ca582636",
+      "symbols": [
+        "Combat:DoAttack"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S12",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 8,
+      "line_end": 27,
+      "range_sha256": "073fe91ef88bb26b894e35e3d3346b368372a1284dad0a69e8abaa9a2e118250",
+      "symbols": [
+        "SourceModifierList",
+        "SourceModifierList.multiply"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S13",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 38,
+      "line_end": 58,
+      "range_sha256": "4c8c90a29a7b63b215d75c420045aa5e6688c82b3795029aad936c698c707f78",
+      "symbols": [
+        "SourceModifierList:Get",
+        "SourceModifierList:RecalculateModifier"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S14",
+      "source_file": "scripts/util/sourcemodifierlist.lua",
+      "file_sha256": "91563297510373cb38443786c0f5846b2a6d091715282cd4458563d433c88227",
+      "line_start": 64,
+      "line_end": 122,
+      "range_sha256": "a111be18db46133c6dc2b56b5e6d632d40168391bdc13fe80ac75b700504059d",
+      "symbols": [
+        "SourceModifierList:SetModifier",
+        "SourceModifierList:RemoveModifier"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S15",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 27,
+      "line_end": 66,
+      "range_sha256": "9f85accc236e332d2a0aa6db36a1aa188fb8d02c50f0600fd9c09d656dcb9652",
+      "symbols": [
+        "Timer:TimerExists",
+        "OnTimerDone",
+        "Timer:StartTimer",
+        "Timer:StopTimer"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S16",
+      "source_file": "scripts/components/timer.lua",
+      "file_sha256": "ecd8efa36015ea6282534ab31880e2fbb6d0ab7aab8e0b09e2e23ef15def125b",
+      "line_start": 68,
+      "line_end": 142,
+      "range_sha256": "2f4194e6337e4f5dd2221e9dd9318594392a413ceb65867659e76e721442bddf",
+      "symbols": [
+        "Timer:IsPaused",
+        "Timer:GetTimeLeft",
+        "Timer:OnSave",
+        "Timer:OnLoad"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S17",
+      "source_file": "scripts/components/entitytracker.lua",
+      "file_sha256": "89b28b7e40e618f7c23351b1e090cbbdac3b3fafb1ceb41321e50e712e254b74",
+      "line_start": 20,
+      "line_end": 64,
+      "range_sha256": "fbe0447d9fba7263f4fd79c8f0646959407807a20a46f42babf0dc7c0decda02",
+      "symbols": [
+        "EntityTracker:TrackEntity",
+        "EntityTracker:ForgetEntity",
+        "EntityTracker:GetEntity",
+        "EntityTracker:OnSave",
+        "EntityTracker:LoadPostPass"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S18",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1928,
+      "line_end": 2014,
+      "range_sha256": "e8b5d0d5a7e909beece094aa298671ce52af9e2e585979ab749a5fa49557b471",
+      "symbols": [
+        "EntityScript:GetPersistData",
+        "EntityScript:LoadPostPass",
+        "EntityScript:SetPersistData"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S19",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1103,
+      "line_end": 1133,
+      "range_sha256": "a830968b1dc5b2f26389f65b8eeef5250890907b36ef7c3f86198d00820b2261",
+      "symbols": [
+        "SaveGame"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S20",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 1207,
+      "line_end": 1213,
+      "range_sha256": "bdb187765e803d19582bc69d8f30f6ee8392c7149b14737785980dccda1f24b8",
+      "symbols": [
+        "SaveGame"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S21",
+      "source_file": "scripts/mainfunctions.lua",
+      "file_sha256": "53831dfadc029a24a36e0e703c9b3f404ee1a733e1b2e0e22b99abd450642a51",
+      "line_start": 464,
+      "line_end": 510,
+      "range_sha256": "a2f72f25e6342a8a618d1edcdbca2ed9811fd16eb9befe8b80ef5b2eafd50774",
+      "symbols": [
+        "SpawnSaveRecord"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S22",
+      "source_file": "scripts/gamelogic.lua",
+      "file_sha256": "6e1416f28ee01a395c4920f528840af40ff6a3533373b515c39a1c6ed233a16e",
+      "line_start": 613,
+      "line_end": 629,
+      "range_sha256": "772cb4355a75a3f4f49ba6afd7218c7a26e224fe23b5f1511d035657d4116a35",
+      "symbols": [
+        "PopulateWorld"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S23",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1198,
+      "line_end": 1256,
+      "range_sha256": "af29a12426ef44bb903ac81d7729ac714c8b2370e847a361f8a3a030239b5748",
+      "symbols": [
+        "EntityScript:ListenForEvent",
+        "EntityScript:RemoveEventCallback"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S24",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1312,
+      "line_end": 1345,
+      "range_sha256": "eb9e4f30ce6186e69dda5c30009aa5bd424345eb0d8ab515ebf25f75e29d7c15",
+      "symbols": [
+        "EntityScript:PushEvent_Internal",
+        "EntityScript:PushEvent"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S25",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 1730,
+      "line_end": 1753,
+      "range_sha256": "98a04ae9f32bd309403fd88e245a04264cfc9b56f414c196e53895b63ef0fb6e",
+      "symbols": [
+        "EntityScript:Remove"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S26",
+      "source_file": "scripts/entityscript.lua",
+      "file_sha256": "9dce0787ffeacefc3c7017ae041ba8408b25ca9344aea25d979945feef6b4cac",
+      "line_start": 670,
+      "line_end": 685,
+      "range_sha256": "5687150000d6eb07acd300590c506393bd8357b0d4138bab8b1eba2daff1346f",
+      "symbols": [
+        "EntityScript:RemoveComponent"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S27",
+      "source_file": "scripts/components/combat.lua",
+      "file_sha256": "731e27d0ba8e92730ebcad985a6d6ad0476ad43c0a29421ddd66c76e39e71891",
+      "line_start": 1359,
+      "line_end": 1374,
+      "range_sha256": "d9e4e8e478acb22a19f3a028038db7200eda1ba5f1d0de8d20a414b5311c9a5f",
+      "symbols": [
+        "Combat:OnRemoveFromEntity"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    },
+    {
+      "id": "TDE-S28",
+      "source_file": "scripts/componentutil.lua",
+      "file_sha256": "c16f7ab5be64e5eb606a00cbf2a44ce440cd1f343dddc02b05a65cab81a84a90",
+      "line_start": 1607,
+      "line_end": 1614,
+      "range_sha256": "089880aa798e47640210e5c92cf9cc489e27e29078d9d032a15ff292059361c4",
+      "symbols": [
+        "CanApplyPlayerDamageMod",
+        "PlayerDamageMod"
+      ],
+      "identity_result": "EXACT_FILE_RANGE",
+      "semantic_result": "reviewed_in_claim_API_step_context"
+    }
+  ],
+  "artifact_reviews": {
+    "guide": {
+      "relative_path": "effect/guide.md",
+      "sha256": "912a79227a968ca2e9f51d4aff2930684fee5ef009a695ff084723fdb557441b",
+      "final_destination": "references/chain-timed-effect.md"
+    },
+    "example_files": [
+      {
+        "relative_path": "effect/example-mod/modinfo.lua",
+        "sha256": "cdccb07ab1d5218c35a5da00cad2e71a254107b998a00bcae872e60e345dc5e1",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "effect/example-mod/modmain.lua",
+        "sha256": "cb56802786b966bf0d1778e8e8cece83a37fd13ec0912e10a6a80b3d40b82754",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "effect/example-mod/scripts/prefabs/stage4_timed_damage.lua",
+        "sha256": "17a8cf7be1bec1b610d24108bba5d197b0fcfe16b03647fa1ddf402856146f31",
+        "lua_5_1_syntax": "PASS"
+      },
+      {
+        "relative_path": "effect/example-mod/scripts/stage4_timed_damage.lua",
+        "sha256": "3d390655dad905500d4fa5bc486cd055048d8ee60e487a9b2ad7624cba3bc863",
+        "lua_5_1_syntax": "PASS"
+      }
+    ],
+    "semantic_basis": "四个示例Lua构成可安装Mod，主分支装配Timer、Tracker及Combat，示例指南链接同一完整实现。范围与哈希、退出及读档顺序和实测边界一致。",
+    "limits": "独立审阅仅静态核对与Lua 5.1编译。另有自写示例的具名单分片专服保存与另进程重载证据。该证据限示例，不覆盖原版食品、实际客户端、跨分片或任意异常恢复。"
+  },
+  "freeze_receipt": {
+    "review_bytes_final": true,
+    "runtime_verified": false,
+    "actual_runtime_evidence": "separate_named_server_run_example_only"
+  }
+}

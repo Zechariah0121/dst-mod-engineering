@@ -1,0 +1,9 @@
+name = "Timed Damage Recovery Example"
+description = "Two inert prefabs for a same-shard timed combat modifier example."
+author = "DST Engineering KB"
+version = "1.0"
+api_version = 10
+dst_compatible = true
+all_clients_require_mod = true
+client_only_mod = false
+server_only_mod = false
